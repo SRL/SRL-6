@@ -1,0 +1,106 @@
+{$DEFINE SRL_SMART}
+{$DEFINE SMART}
+
+{$loadlib libsmart}
+
+function IsKeyDown(C:Byte): Boolean;
+begin
+  Result := SmartIsKeyDown(C);
+end;
+
+procedure MoveMouse(x, y: Integer);
+begin
+  SmartMoveMouse(x, y);
+end;
+
+procedure HoldMouse(x, y: Integer; button : integer);
+begin
+  if button = mouse_left then
+    SmartHoldMouse(x, y, true)
+  else if button = mouse_right then
+    SmartHoldMouse(x,y,false)
+  else
+    raiseexception(ercustomerror,'Unknown mouse button in SmartHoldMouse');
+end;
+
+procedure ReleaseMouse(x, y: Integer; button : integer);
+begin
+  if button = mouse_left then
+    SmartReleaseMouse(x, y, true)
+  else if button = mouse_right then
+    SmartReleaseMouse(x,y,false)
+  else
+    raiseexception(ercustomerror,'Unknown mouse button in SmartReleaseMouse');
+end;
+
+procedure KeyUp(key: Byte);
+begin
+  If Key = 13 Then
+    Key := 10;
+  SmartReleaseKey(key);
+end;
+
+procedure KeyDown(key: Byte);
+begin
+  If Key = 13 Then
+    Key := 10;
+  SmartHoldKey(key);
+end;
+
+procedure SendKeys(S: String);
+begin
+  SmartSendKeys(S);
+end;
+
+procedure GetMousePos(var x, y: Integer);
+begin
+  SmartGetMousePos(x, y);
+end;
+
+function GetColor(x, y: Integer): Integer;
+begin
+  result:= SmartGetColor(x, y);
+end;
+
+procedure SmartSetTarget;
+begin
+  SetTargetArray(SmartImageArray, 765,503);
+end;
+
+function FindWindow(Title: String): Boolean;
+begin
+  result:= true;
+end;
+
+procedure ActivateClient;
+begin
+end;
+
+function FindWindowBySize(Width, Height: Integer): Boolean;
+begin
+  result:= true;
+end;
+
+{procedure SmartSaveSettings(v: TVariantArray);
+var
+  i: Integer;
+  ts: TStringArray;
+begin
+  ts := ['server', 'members', 'signed', 'sd', 'DC', IncludePath + 'SRL/SRL/misc/smartINI.ini'];
+  for i := 0 to 4 do
+    WriteINI('SMART', ts[i], v[i], ts[5]);
+end;   }
+
+procedure SmartSetupEx(Server: integer; members, signed, superdetail: boolean);
+var
+  prefix: string;
+begin
+  prefix := ReadINI('World' + IntToStr(Server), 'Prefix', IncludePath + 'SRL/SRL/misc/worlds.ini');
+  if(prefix = '')then
+  begin
+    writeln('Invalid world number or corrupted world list. Please review your settings');
+    TerminateScript;
+  end;
+  SmartSetup('http://'+prefix+'.runescape.com/', 'plugin.js?param=o0,a' + IntToStr((Integer(not(Signed)) + 1) * Integer(not((SuperDetail and Signed)))) + ',m' + IntToStr(Integer(Members)), 765, 503, 's');
+  //SmartSaveSettings([Server, Members, Signed, SuperDetail, SmartGetDC]);
+end;

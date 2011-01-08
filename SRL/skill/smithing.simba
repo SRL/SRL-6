@@ -1,0 +1,291 @@
+(*
+Smithing
+
+======
+The Smithing include contains all kinds of functions & features to use with the
+Smithing skill.
+
+*)
+
+{*******************************************************************************
+ function FindFurnace(var X, Y: Integer): Boolean;
+ By: n3ss3s
+ Description: Finds a furnace and stores the coordinates into X and Y.
+*******************************************************************************}
+function FindFurnace(var X, Y: Integer): Boolean;
+var
+   TPAA: T2DPointarray;
+   TPA: TPointarray;
+   CTS, I: Integer;
+begin
+  CTS := GetToleranceSpeed;
+  ColorToleranceSpeed(2);
+  FindColorsSpiralTolerance(MSCX, MSCY, TPA, 3815998, MSX1, MSY1, MSX2, MSY2, 10);
+  ColorToleranceSpeed(CTS);
+  TPAA := TPAToATPAEx(TPA, 50, 50);
+  SortATPASize(TPAA, True);
+  for I := 0 To High(TPAA) Do
+    if Getarraylength(TPAA[i]) > 150 then
+    begin
+      MiddleTPAEx(TPAA[i], X, Y);
+      MMouse(X, Y, 3, 3);
+      if WaitUpText('urnac', 300) then
+      begin
+        Result := True;
+        GetMousePos(X, Y);
+        Break;
+      end;
+    end;
+end;
+
+{*******************************************************************************
+ function SmeltingScreen: Boolean;
+ By: n3ss3s
+ Description: Returns true if the bar selection in chatbox is open.
+*******************************************************************************}
+function SmeltingScreen: Boolean;
+begin
+  Result := GetTextAtEx(158, 367, 0, NPCChars, False, False, 0, 0, 128, 4, True, tr_Letters) = 'What';
+end;
+
+{*******************************************************************************
+ function OpenFurnace: Boolean;
+ By: n3ss3s
+ Description: Returns true if managed to open the bar selection in chatbox.
+*******************************************************************************}
+function OpenFurnace: Boolean;
+var
+   X, Y, Z: Integer;
+begin
+  if SmeltingScreen then
+  begin
+    Result := True;
+    Exit;
+  end;
+  if FindFurnace(X, Y) then
+  begin
+    Mouse(X, Y, 5, 5, False);
+    if not ChooseOption('melt') then Exit;
+    Z := GetSystemTime;
+    repeat
+      if Random(80) = 0 then MMouse(MSX1, MSY1, MIX2, MIY2);
+      if GetSystemTime - Z >= 20000 then Break;
+      if FindNormalRandoms then Break;
+      Wait(500);
+      if SmeltingScreen then
+      begin
+        Result := True;
+        Break;
+      end;
+    until(not(LoggedIn));
+  end;
+end;
+
+{*******************************************************************************
+ function BarToPoint(Bar: String): TPoint;
+ By: n3ss3s, edit by NaumanAkhlaQ
+ Description: Returns the coordinates of the bar.
+*******************************************************************************}
+function BarToPoint(Bar: string): TPoint;
+var
+  TSA: TStringarray;
+  I: Integer;
+begin
+  Result.Y := 410;
+  TSA := ['bronze', 'blurite', 'iron', 'silver', 'steel', 'gold', 'mithril', 'adamant', 'runite'];
+  if InStrArrEx(LowerCase(Bar), TSA, I) then
+  begin
+    Result.x := I * 50 + 53;
+    Exit;
+  end;
+  srl_Warn('BarToPoint', 'Invalid bar name', warn_Warning);
+  Result := Point(0, 0);
+end;
+
+{*******************************************************************************
+ procedure Smelt(Bar, Amount: String);
+ By: n3ss3s, edit by Rasta Magician
+ Description: Smelts the Bar bar for the amount Amount -
+
+ '1', '5' and '10' will choose the corresponding option, but any other,
+ except for 0 ofcourse uses the Smelt X.
+*******************************************************************************}
+function Smelt(Bar, Amount: string): Boolean;
+var
+   P: TPoint;
+   t: integer;
+begin
+  if StrToIntDef(Amount, 0) < 1 then
+    srl_Warn('Smelt', 'Bar amount is less than 1', warn_Warning)
+  else
+    if SmeltingScreen then
+    begin
+      P := BarToPoint(Bar);
+      if (P.x = 0) or (P.y = 0) then Exit;
+      Mouse(P.x, P.y, 8, 8, False);
+      if InStrArr(Amount, ['1', '5', '10'], True) then
+        Result := ChooseOption('melt '+Amount)
+      else
+        if ChooseOption('melt X') then
+        begin
+          t:= GetSystemTime;
+          while ((GetSystemTime - t) < 3000) do
+          begin
+            wait(100)
+            if GetColor(258, 428) = 8388608 then break;
+          end;
+          wait(Random(500));
+          Result := True;
+          TypeSend(Amount);
+        end;
+    end;
+end;
+
+{*******************************************************************************
+ function SmithingScreen: Boolean;
+ By: n3ss3s
+ Description: Returns true if the smithing interface is open.
+*******************************************************************************}
+function SmithingScreen: Boolean;
+begin
+  Result := FindTextTPA(2071039, 0, 161, 30, 356, 53, 'mithing', UpChars, nothing);
+end;
+
+{*******************************************************************************
+ procedure FixSmith(Down: Boolean);
+ By: n3ss3s
+ Description: Scrolls the smithing screen.
+*******************************************************************************}
+procedure FixSmith(Down: Boolean);
+var
+   TPA: TPointarray;
+   X, Y, S: Integer;
+begin
+  if not SmithingScreen then Exit;
+  if Down then
+    TPA := [Point(499, 306), Point(499, 315)]
+  else
+    TPA := [Point(497, 75), Point(499, 66)];
+  if GetColor(TPA[0].x, TPA[0].y) <> srl_outline_black then
+  begin
+    X := TPA[1].x - 4 + Random(8);
+    Y := TPA[1].y - 4 + Random(8);
+    HoldMouse(X, Y, mouseaction(True));
+    S := GetSystemTime;
+    while GetColor(TPA[0].x, TPA[0].y) <> srl_outline_black do
+      if GetSystemTime - S > 3500 then
+        Break
+      else
+        Wait(10);
+    ReleaseMouse(X, Y, MouseAction(True));
+  end;
+end;
+
+{*******************************************************************************
+ function SmithItem(Item: String; Amount: string): Boolean;
+ By: n3ss3s
+ Description: Returns true if could smith the item Item.
+ Use when the smithing interface is open, if you enter to the amount:
+ 1: It will right click and click 1.
+ 5: It will right click and click 5.
+ All: It will right click and click All.
+ Other: It will right click and click X and type the amount.
+*******************************************************************************}
+function SmithItem(Item, Amount: string): Boolean;
+var
+   Items: array [0..1] of TStringarray;
+   Scroll: Boolean;
+   W, X, Y, Z: Integer;
+begin
+  Items[0] := ['Dagger', 'Axe', 'Mace', 'Med', 'bolts', 'Sword', 'Nails',
+               'Studs', 'Arrow tips', 'Scimitar', 'limbs', 'Longsword',
+               'knife', 'Full helm', 'Square', 'Lantern', 'Warhammer',
+               'Battleaxe'];
+
+  Items[1] := ['Chain', 'Kite', '2-h', 'skirt', 'legs', 'Platebody'];
+
+  if InStrArrEx(Item, Items[0], W) then
+    Z := 0
+  else
+    if InStrArrEx(Item, Items[1], W) then
+    begin
+      Scroll := True
+      Z := 1;
+    end else
+    begin
+      srl_Warn('SmithItem', 'Invalid smithable item', warn_Warning);
+      Exit;
+    end;
+
+  if Scroll then
+    FixSmith(True);
+
+  if FindText(X, Y, Items[z][w], StatChars, MSX1, MSY1, MSX2, MSY2) then
+  begin
+    if CountColor(65280, X - 2, Y + 2, X + 10, Y + 10) < 1 then
+    begin
+      srl_Warn('SmithItem', 'not enough bars to smith', warn_Warning);
+      Exit;
+    end;
+    Mouse(X + 3, Y + 3, 4, 4, False);
+    if InStrArr(Amount, ['1', '5', 'All'], True) then
+      Result := ChooseOption('ake '+Capitalize(Amount))
+    else
+      if ChooseOption('ake X') then
+      begin
+        Wait(2000 + Random(2000));
+        TypeSend(Amount);
+        Result := True;
+      end;
+  end;
+end;
+
+{*******************************************************************************
+function GetSmeltingXP(bar: string): extended;
+By: ???
+Description: Result the xp gained from Smelting bar
+*******************************************************************************}
+function GetSmeltingXP(bar: string): extended;
+begin
+  case bar of
+    'bronze': Result := 6.2;
+    'blurite': Result := 8.0;
+    'iron': Result := 12.5;
+    'elemental': Result := 7.5;
+    'silver': Result := 13.7;
+    'steel': Result := 17.5;
+    'gold': Result := 22.5;
+    'mithril': Result := 30.0;
+    'adamant': Result := 37.5;
+    'rune': Result := 50.0;
+  end;
+end;
+
+{*******************************************************************************
+function GetSmithingXP(bar: string): extended;
+By: ???
+Description: Result the xp gained from Smithing bar
+*******************************************************************************}
+function GetSmithingXP(bar: string): extended;
+begin
+  case bar of
+    'bronze': Result := 12.5;
+    'blurite': Result := 17.0;
+    'iron': Result := 25.0;
+    'elemental': Result := 20.0;
+    'steel': Result := 37.5;
+    'mithril': Result := 50.0;
+    'adamant': Result := 62.5;
+    'rune': Result := 75.0;
+  end;
+end;
+
+{*******************************************************************************
+procedure SetupSmithing;
+By: SRL
+Description: Declares Global Bitmaps.
+*******************************************************************************}
+{procedure SetupSmithing;
+begin
+  srl_LoadBitmapRange(1, 17);
+end;     }

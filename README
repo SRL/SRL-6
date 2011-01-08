@@ -1,0 +1,7 @@
+This is the SRL Resource Library 5. (for Simba[1])
+
+Include SRL.simba in your script to use it.
+You may need to copy the plugins from the plugins folder to your Simba/Plugins
+folder.
+
+[1] http://wizzup.org/simba/

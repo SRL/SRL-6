@@ -1,0 +1,133 @@
+(*
+Fighting
+
+======
+The Fighting include contains all kinds of functions & features to use with the
+Fighting skill.
+
+*)
+
+{*******************************************************************************
+function Damage: Integer;
+By: WT-Fakawi
+Description: Returns the amount of damage.
+*******************************************************************************}
+function Damage:Integer;
+begin
+  Result := (GetSkillInfo('hitpoints', False) - GetSkillInfo('hitpoints', True));
+end;
+
+{*****************************************************************************
+function InFight: Boolean;
+By: Frement
+Description: Returns as True if player is in a fight.
+See "srl_FindFight;" in /core/Globals.scar for more info.
+*****************************************************************************}
+function InFight: Boolean;
+begin
+  Result := srl_InFight;
+end;
+
+{*****************************************************************************
+function IsFightAt(x, y: Integer): Boolean;
+By: realrune and N1ke!
+Description: results true if it finds a fight near x,y.
+*****************************************************************************}
+function IsFightAt(x, y: Integer): Boolean;
+var
+  xx, yy: Integer;
+begin
+  Result := FindColor(xx, yy, 10496, x - 20, y - 20, x + 20, y + 20);
+end;
+
+{*******************************************************************************
+function FightNPC(Colors: TIntegerArray; Tol, TimeOut: Integer): Boolean;
+By: WT-Fakawi & Cazax
+Description: Fights NPC. Input an array of colors. (May be the same colors),
+tol = tolerance, TimeOut = amount of time before clicking on next NPC
+*******************************************************************************}
+function FightNPC(Colors: TIntegerArray; Tol, TimeOut: Integer): Boolean;
+var
+  X, Y, Mark: Integer;
+begin
+  Result := False;
+  if (not LoggedIn) or (FindDead) then exit;
+  if FindObjCustom(X, Y, ['ttack'], Colors, Tol) then
+  begin
+    Result := True;
+    GetMousePos(X, Y);
+    Mouse(X, Y, 0, 0, True);
+    Wait(1000 + Random(500));
+    FFlag(10);
+    Mark := GetSystemTime;
+    while (InFight) and (TimeFromMark(Mark) < TimeOut) and (not FindNormalRandoms) do
+    begin
+      Wait(1000 + Random(500));
+      if (srl_Procs[srl_AntiBan] <> nil) then
+        srl_Procs[srl_AntiBan]();
+    end;
+  end;
+end;
+
+{*******************************************************************************
+function FindAllHPBars(Sx, Sy, x1, y1, x2, y2: Integer): TBoxArray;
+By: Cazax
+Description: Finds all the HP bars (the TPAs of them) in the box formed by
+ x1, y1, x2, y2. Recommended to set Sx and Sy to MSCX and MSCY, so Result[0]
+ is your own Bar or the closest one to you.
+*******************************************************************************}
+function FindAllHPBars(Sx, Sy, x1, y1, x2, y2: Integer): TBoxArray;
+var
+  a, b : TPointArray;
+  ATPA : T2DPointArray;
+  H, I : Integer;
+begin
+  FindColorsSpiralTolerance(Sx, Sy, a, 10496, x1, y1, x2, y2, 0);
+  FindColorsSpiralTolerance(Sx, Sy, b, 198716, x1, y1, x2, y2, 0);
+  ATPA := TPAToATPAEx(CombineTPA(a, b), 55, 7);
+  H := High(ATPA);
+  SetLength(Result, Length(ATPA));
+  for I := 0 to H do
+    Result[i] := GetTPABounds(ATPA[i]);
+end;
+
+{*******************************************************************************
+function GetHits(Sx, Sy, x1, y1, x2, y2: Integer): TIntegerArray;
+By: n3ss3s & Cazax
+Description: Finds all HP percents of the HP bars in x1, y1, x2, y2.
+ READ THE DESCRIPTION OF FindAllHPBars!
+*******************************************************************************}
+function GetHitsIn(Sx, Sy, x1, y1, x2, y2: Integer): TIntegerArray;
+var
+   E: Extended;
+   I, H: Integer;
+   TBA : TBoxArray;
+begin
+  TBA := FindAllHPBars(Sx, Sy, x1, y1, x2, y2);
+  SetArrayLength(Result, GetArrayLength(TBA));
+  H := High(TBA);
+  for I := 0 To H Do
+  begin
+    E := CountColorTolerance(56488, TBA[i].x1, TBA[i].y1, TBA[i].x2, TBA[i].y2, 43) / 60;
+    Result[i] := Round(100 * E);
+  end;
+end;
+
+{*******************************************************************************
+function FindMainScreenHits(Bar: Integer): Integer;
+By: n3ss3s
+Description: Returns the rounded HP percent of the hp bar Bar counting out from
+ main screen centre, if Bar is 0, it's your own bar or the closest one to you.
+ If could not find the bar Bar, returns -1 so you can't confuse it to 0 HP%.
+*******************************************************************************}
+function FindMainScreenHits(Bar: Integer): Integer;
+var
+   TIA: TIntegerArray;
+begin
+  TIA := GetHitsIn(MSCX, MSCY, MSX1, MSY1, MSX2, MSY2);
+  try
+    Result := TIA[bar];
+  except
+    Result := -1;
+  end;
+end;

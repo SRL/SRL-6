@@ -1,0 +1,426 @@
+//-----------------------------------------------------------------//
+//--               Scar Standard Resource Library                --//
+//--               » Prison Pete Solver Routines                 --//
+//-----------------------------------------------------------------//
+// * function InPrisonPete: Boolean;                                          // * by ZephyrsFury, modded by TRiLeZ
+// * function Pete_WalkTo: Boolean;                                           // * by IceFire908
+// * function Pete_TalkTo: Boolean;                                           // * by IceFire908
+// * function Pete_PullLever: Boolean;                                        // * by IceFire908
+// * function Pete_AnalyzeAnimal(var Animal: string): Boolean;                // * TRiLeZ
+// * function Pete_CloseAnimalScreen: Boolean;                                // * by IceFire908
+// * function Pete_FindAnimal(var X, Y: LongInt; AnimalName: string; ClientHDC: LongWord): Boolean; // * by Iroki & Naum
+// * function Pete_OpenGate: Boolean;                                         // * by IceFire908
+// * function SolvePrisonPete: Boolean;                                       // * by IceFire908, Iroki, & Naum + TRiLeZ
+
+{*******************************************************************************
+function InPrisonPete: Boolean;
+by: ZephyrsFury, modded by TRiLeZ
+Description: Checks if we're in the Prison Pete Random.
+*******************************************************************************}
+function InPrisonPete: Boolean; //Remove 'a' if you put this in your SRL folder.
+var
+  Pts: TPointArray;
+  ATPA: T2DPointArray;
+  X, Y, CTS: Integer;
+begin
+  CTS := GetColorToleranceSpeed();
+  ColorToleranceSpeed(1);
+  if (FindColor(X, Y, 60909, MMX1, MMY1, MMX2, MMY2)) then
+    if (CountColor(60909, MMX1, MMY1, MMX2, MMY2) = 1) then
+      if (CountColorTolerance(1322555, MMX1, MMY1, MMX2, MMY2, 16) > 80) then
+        if (CountColorTolerance(13884127, MMX1, MMY1, MMX2, MMY2, 18) > 1000) then
+        begin
+          FindColorsTolerance(Pts, 237, MMX1, MMY1, MMX2, MMY2, 22);
+          ATPA := SplitTPAEx(Pts, 8, 2);
+          if (InRange(Length(ATPA), 1, 4)) then
+            Result := (CountColorTolerance(clWhite, MMX1, MMY1, MMX2, MMY2, 50) > 500);
+        end;
+  ColorToleranceSpeed(CTS);
+end;
+
+{*******************************************************************************
+function Pete_WalkTo: Boolean;
+by: IceFire908
+Description: Finds Pete's NPC yellow dot on the MM and walks to it.
+*******************************************************************************}
+
+function Pete_WalkTo: Boolean;
+var
+  TPA: TPointArray;
+  WTP: TPoint;
+begin
+  Result := FindColors(TPA, 195836, MMX1, MMY1, MMX2, MMY2);
+  if (not (Result)) then
+    Exit;
+
+  // XXX: Wizzup, Why not pie???
+  FilterPointsDist(TPA,0,75,MMCX,MMCY);
+  //FilterPointsPie(TPA, 0, 360, 0, 75, MMCX, MMCY);
+  WTP := MiddleTPA(TPA);
+  if (Distance(MMCX, MMCY, WTP.X, WTP.Y) < 4) then
+    Exit;
+  Mouse(WTP.X, WTP.Y, 2, 2, True);
+  Wait(RandomRange(300, 500));
+  FFlag(0);
+  Wait(RandomRange(750, 1000));
+end;
+
+{*******************************************************************************
+function Pete_TalkTo: Boolean;
+by: IceFire908
+Description: If pete is on the main screen, this will start a convo with him.
+*******************************************************************************}
+
+function Pete_TalkTo: Boolean;
+var
+  TPAA: T2DPointArray;
+  TPA: TPointArray;
+  C, I: LongInt;
+  PTT: TPoint;
+begin
+  ColorToleranceSpeed(2);
+  SetColorSpeed2Modifiers(0.02, 0.66);
+  FindColorsSpiralTolerance(MSCX, MSCY, TPA, 5339562, MSX1, MSY1, MSX2, MSY2, 11);
+  ColorToleranceSpeed(1);
+  SetColorSpeed2Modifiers(0.2, 0.2);
+  TPAA := TPAToATPAEx(TPA, 10, 10);
+  SortATPAFromFirstPoint(TPAA, Point(MSCX, MSCY));
+  for I := 0 to High(TPAA) do
+  begin
+    if (Length(TPAA[I]) < 5) then
+      Continue;
+    PTT := MiddleTPA(TPAA[I]);
+    MMouse(PTT.X, PTT.Y, 0, 0);
+    Wait(RandomRange(250, 350));
+    C := CountColorTolerance(648165, 7, 7, 100, 25, 50);
+    if ((C > 50) and (C < 150)) then
+    begin
+      Result := True;
+      GetMousePos(PTT.X, PTT.Y);
+      Mouse(PTT.X, PTT.Y, 0, 0, True);
+      Wait(RandomRange(300, 500));
+      FFlag(0);
+      Wait(RandomRange(300, 500));
+      Exit;
+    end;
+  end;
+end;
+
+{*******************************************************************************
+function Pete_PullLever: Boolean;
+by: IceFire908
+Description: Pulls the lever.
+*******************************************************************************}
+
+function Pete_PullLever: Boolean;
+var
+  TPAA: T2DPointArray;
+  TPA: TPointArray;
+  C, I: LongInt;
+  PPL: TPoint;
+begin
+  ColorToleranceSpeed(2);
+  SetColorSpeed2Modifiers(0.06, 0.46);
+  FindColorsSpiralTolerance(MSCX, MSCY, TPA, 3954019, MSX1, MSY1, MSX2, MSY2, 11);
+  ColorToleranceSpeed(1);
+  SetColorSpeed2Modifiers(0.2, 0.2);
+  TPAA := TPAToATPAEx(TPA, 10, 10);
+  SortATPAFromFirstPoint(TPAA, Point(MSCX, MSCY));
+  for I := 0 to High(TPAA) do
+  begin
+    if (Length(TPAA[I]) < 5) then
+      Continue;
+    PPL := MiddleTPA(TPAA[I]);
+    MMouse(PPL.X, PPL.Y, 0, 0);
+    Wait(RandomRange(250, 350));
+    C := CountColorTolerance(14342657, 7, 7, 100, 25, 70);
+    if ((C > 50) and (C < 140)) then
+    begin
+      Result := True;
+      GetMousePos(PPL.X, PPL.Y);
+      Mouse(PPL.X, PPL.Y, 0, 0, True);
+      Wait(RandomRange(300, 500));
+      FFlag(0);
+      Wait(RandomRange(2000, 4000));
+      Exit;
+    end;
+  end;
+end;
+
+const
+  Pete_Unknown = -1;
+  Pete_empty = 0;
+  Pete_goat = 1;
+  pete_cat = 2;
+  pete_sheep = 3;
+  pete_dog = 4;
+
+{*******************************************************************************
+function Pete_AnalyzeAnimal1(var AnimalName: string) : Boolean;
+by: TRiLeZ
+Description: Returns animal name from animal screen window;
+*******************************************************************************}
+
+function Pete_AnalyzeAnimal1(var AnimalName: Integer) : boolean;
+var
+  T, P, mP, o: Integer;
+begin
+  ColorToleranceSpeed(2);
+  SetColorspeed2Modifiers(0.19, 1.5);
+  MarkTime(o);
+  repeat
+    MarkTime(t);
+    while (TimeFromMark(t) < 10000) do
+    begin
+      P := CountColorTolerance(9053853, MSX1, MSY1, MSX2, MSY2, 22);
+      if (P > mP) then mP := P;
+    end;
+
+    case mP of
+      9100..10100: AnimalName := pete_dog;
+      10200..10600: AnimalName := pete_cat;
+      10800..11500: AnimalName := pete_sheep;
+      14000..18000: AnimalName := pete_goat;
+    end;
+    if (AnimalName <> pete_empty) then
+    Begin
+      Writeln('analyzed animal: ' + ToStr(AnimalName));
+      Result := True;
+    End;
+  until (AnimalName <> pete_empty) or (TimeFromMark(o) >= 60000);
+  if (AnimalName = pete_empty) then
+  begin
+    case mP of
+      0..10149:
+        case Random(2) of
+          0: AnimalName := pete_dog;
+          1: AnimalName := pete_cat;
+        end;
+      10150..20000:
+        case Random(2) of
+          0: AnimalName := pete_sheep;
+          1: AnimalName := pete_goat;
+        end;
+      else
+        case Random(4) of
+          0: AnimalName := pete_dog;
+          1: AnimalName := pete_cat;
+          2: AnimalName := pete_sheep;
+          3: AnimalName := pete_goat;
+        end;
+    end;
+    Writeln('Could not analyze animal, randomly choosing: ' + ToStr(AnimalName));
+  end;
+end;
+
+{*******************************************************************************
+function Pete_CloseAnimalScreen: Boolean;
+by: IceFire908
+Description: Closes the animal screen.
+*******************************************************************************}
+
+function Pete_CloseAnimalScreen: Boolean;
+var
+  TPAA: T2DPointArray;
+  TPA: TPointArray;
+  P: TPoint;
+begin
+  SaveScreenShot(TheDate(1) + ' ' + Replace(TheTime, ':', '_') + '.bmp');
+  Result := FindColorsTolerance(TPA, 159998, MSX1, MSY1, MSX2, MSY2, 50);
+  if (Length(TPA) < 1) then
+    Exit;
+  TPAA := TPAToATPAEx(TPA, 25, 25);
+  if (Length(TPAA) < 1) then
+    Exit;
+  SortATPASize(TPAA, True);
+  P := MiddleTPA(TPAA[0]);
+  Mouse(P.X, P.Y, 0, 0, True);
+  Wait(RandomRange(3000, 4000));
+end;
+
+{*******************************************************************************
+function Pete_FindAnimal(var X, Y: LongInt; AnimalName: string; ClientHDC: LongWord): Boolean;
+by: Iroki & Naum
+Description: Finds animal on MS.
+*******************************************************************************}
+
+{*******************************************************************************
+function Pete_OpenGate: Boolean;
+by: IceFire908
+Description: Opens the exit gate.
+*******************************************************************************}
+
+function Pete_OpenGate: Boolean;
+var
+  TPAA: T2DPointArray;
+  TPA: TPointArray;
+  POG: TPoint;
+  I: LongInt;
+begin
+  ColorToleranceSpeed(2);
+  SetColorSpeed2Modifiers(0.38, 0.07);
+  FindColorsSpiralTolerance(MSCX, MSCY, TPA, 8027265, MSX1, MSY1, MSX2, MSY2, 14);
+  ColorToleranceSpeed(1);
+  SetColorSpeed2Modifiers(0.2, 0.2);
+  TPAA := TPAToATPAEx(TPA, 15, 40);
+  SortATPAFromFirstPoint(TPAA, Point(MSCX, MSCY));
+  for I := 0 to High(TPAA) do
+  begin
+    if (Length(TPAA[I]) < 50) then
+      Continue;
+    POG := MiddleTPA(TPAA[I]);
+    MMouse(POG.X, POG.Y, 0, 0);
+    Wait(RandomRange(250, 350));
+    if (CountColorTolerance(14342657, 7, 7, 100, 25, 70) > 140) then
+    begin
+      Result := True;
+      GetMousePos(POG.X, POG.Y);
+      Mouse(POG.X, POG.Y, 0, 0, True);
+      Exit;
+    end;
+  end;
+end;
+
+{*******************************************************************************
+function SolvePrisonPete: Boolean;
+by: IceFire908, Iroki, & Naum.
+Description: Solves the prison pete random!
+*******************************************************************************}
+
+function SolvePrisonPete: Boolean;
+var
+  Guessed, ToLate: Boolean;
+  Animals: TIntegerArray;
+  Animal: Integer;
+  I, Keys: Byte;
+  MS: LongInt;
+  P: TPoint;
+begin
+  if (not (InPrisonPete)) then
+    Exit;
+  Animals := [pete_goat, pete_dog, pete_sheep, pete_cat];
+  MakeCompass('S');
+  SetAngle(True);
+  if (Pete_WalkTo) then
+    if (Pete_TalkTo) then
+      Wait(100)
+    else
+    begin
+      WriteLn('Unable to talk to pete!');
+      LogOut;
+      Exit;
+    end;
+  if (FindNPCChatText('ucky', Nothing)) then
+  begin
+    WriteLn('Unable to solve random, it''s been too long.');
+    LogOut;
+    Exit;
+  end;
+  for I := 0 to 9 do
+    ClickContinue(True, True);
+  for Keys := 1 to 12 do
+  begin
+    if (not (Pete_PullLever)) then
+    begin
+      WriteLn('Unable to find lever!');
+      LogOut;
+      Exit;
+    end;
+    Animal := pete_empty;
+    SaveScreenShot(TheDate(1) + ' ' + Replace(TheTime, ':', '_') + '.bmp');
+    Pete_AnalyzeAnimal1(Animal);
+    if (not (Pete_CloseAnimalScreen)) then
+    begin
+      WriteLn('Unable to close animal screen!');
+      LogOut;
+      Exit;
+    end;
+    Mouse(620, 104, 5, 5, True);
+    Wait(RandomRange(300, 500));
+    FFlag(0);
+    Wait(RandomRange(300, 500));
+    for I := 0 to 20 do
+    begin
+      if (not (LoggedIn)) then
+        Break;
+      if (not (InIntArray(Animals,animal))) then
+      begin
+        if (I = 0) then
+          WriteLn('Unable to identify animal! Going to pick a random one...');
+        Animal := Animals[Random(4)];
+        Guessed := True;
+      end;
+      if ((not (Guessed)) and (I = 0)) then
+        WriteLn('Identified ' + ToStr(Animal) + '! Searching...');
+      if ((LoggedIn) and (InPrisonPete)) then
+      begin
+        MS := MouseSpeed;
+        MouseSpeed := 35;
+        Pete_FindAnimal(P.X, P.Y, Animal, ExportImageTarget);
+        if (PointInBox(P, IntToBox(MSX1, MSY1, MSX2, MSY2))) then
+          Mouse(P.X, P.Y, 0, 0, False);
+        MouseSpeed := MS;
+        Wait(RandomRange(500, 1000));
+        if (ChooseOption('op')) then
+        begin
+          Wait(RandomRange(500, 1000));
+          if (FindNPCChatText('ucky', Nothing)) then
+          begin
+            ToLate := True;
+            Break;
+          end;
+          WriteLn('Found ' + ToStr(Animal) + '!');
+          FFlag(0);
+          Break;
+        end
+        else
+          WriteLn('Unable to find ' + ToStr(Animal) + ' try ' + IntToStr(I + 1) + '.');
+      end;
+    end;
+    if ((I > 20) or (not (LoggedIn)) or (ToLate)) then
+    begin
+      SaveScreenShot(TheDate(1) + ' ' + Replace(TheTime, ':', '_') + '.bmp');
+      if (ToLate) then
+        WriteLn('Unable to solve random, it''s been too long.')
+      else
+        WriteLn('Could not find any animals!');
+      LogOut;
+      Exit;
+    end;
+    Wait(RandomRange(4000, 5000));
+    ClickContinue(True, False);
+    Wait(RandomRange(7000, 8000));
+    ClickContinue(True, False);
+    Wait(RandomRange(4000, 5000));
+    if ((FindNPCChatText('ooray', Nothing) or (FindNPCChatText('iend', Nothing)))) then
+    begin
+      WriteLn('Found the right key!');
+      if (FindNPCChatText('iend', Nothing)) then
+      begin
+        WriteLn('Found all keys! Ready to leave! took ' + IntToStr(Keys) + ' trys.');
+        WriteLn('Opening gate...');
+        if (Pete_OpenGate) then
+        begin
+          Result := True;
+          WriteLn('Opened Gate! Exiting random...');
+          Sleep(RandomRange(10000, 12000));
+          MakeCompass('N');
+          Exit;
+        end
+        else
+        begin
+          SaveScreenShot(TheDate(1) + ' ' + Replace(TheTime, ':', '_') + '.bmp');
+          WriteLn('Failed to open gate!');
+          LogOut;
+          Exit;
+        end;
+      end;
+    end
+    else
+      WriteLn('Wrong key!');
+    ClickContinue(True, False);
+  end;
+  SaveScreenShot(TheDate(1) + ' ' + Replace(TheTime, ':', '_') + '.bmp');
+  WriteLn('Took too many trys!');
+  LogOut;
+end;

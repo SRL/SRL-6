@@ -1,0 +1,43 @@
+(*
+Compile SRL
+======
+
+The script contains the entire usable SRL include. Its purpose is to let anyone
+make changes and test to see if SRL compiles successfully.
+
+*)
+
+{$DEFINE SMART}
+
+{$I SRL/SRL.simba}
+
+{$I SRL/skill/agility.simba}
+{$I SRL/skill/construction.simba}
+{$I SRL/skill/cooking.simba}
+{$I SRL/skill/crafting.simba}
+{$I SRL/skill/farming.simba}
+{$I SRL/skill/fighting.simba}
+{$I SRL/skill/firemaking.simba}
+{$I SRL/skill/fishing.simba}
+{$I SRL/skill/fletching.simba}
+{$I SRL/skill/herblore.simba}
+{$I SRL/skill/hunting.simba}
+{$I SRL/skill/magic.simba}
+{$I SRL/skill/mining.simba}
+{$I SRL/skill/prayer.simba}
+{$I SRL/skill/ranging.simba}
+{$I SRL/skill/runecrafting.simba}
+{$I SRL/skill/slayer.simba}
+{$I SRL/skill/smithing.simba}
+{$I SRL/skill/thieving.simba}
+{$I SRL/skill/woodcutting.simba}
+
+{$I SRL/misc/debug.simba}
+{$I SRL/misc/paintsmart.simba}
+{$I SRL/misc/smartcolors.simba}
+{$I SRL/misc/stats.simba}
+{$I SRL/misc/reports.simba}
+
+begin
+  SetUpSRL;
+end.

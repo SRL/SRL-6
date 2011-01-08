@@ -1,0 +1,322 @@
+//-----------------------------------------------------------------//
+//--               Scar Standard Resource Library                --//
+//--               » Cap'n Arnav Solver Routines                 --//
+//-----------------------------------------------------------------//
+// * function arnav_InRandom: Boolean;                             // * by Nielsie95
+// * function arnav_LockScreen: Boolean;                           // * by Nielsie95
+// * procedure arnav_ClickArrow(Col, Count: Integer);              // * by Nielsie95
+// * function arnav_FixLock: Boolean;                              // * by Nielsie95
+// * function SolveArnav: Boolean;                                 // * by Nielsie95
+//-----------------------------------------------------------------//
+
+
+{*******************************************************************************
+function arnav_InRandom: Boolean;
+by: TRiLeZ
+Description: Returns true if in the Cap'n Arnav random.
+*******************************************************************************}
+function arnav_InRandom: Boolean;
+var
+  Pts: TPointArray;
+begin
+  if (InRange(CountDots('npc'), 3, 5)) then // Sometimes a shark goes off the screen
+  begin
+    FindColorsPie(Pts, 10010053, 30, 0, 360, 0, 45, MMX1, MMY1, MMX2, MMY2, MMCX, MMCY);
+    Result := (InRange(Length(Pts), 300, 600)) and
+      (Length(GetColorsBox(MMX1 + 10, MMCY - 5, MMX1 + 20, MMCY + 5, True)) < 10);
+  end;
+end;
+
+{*******************************************************************************
+function arnav_LockScreen: Boolean;
+by: Nielsie95
+Description: Checks if the lock screen is visible.
+*******************************************************************************}
+
+function arnav_LockScreen: Boolean;
+begin
+  Result := SimilarColors(GetColor(497, 19), 6788266, 3);
+end;
+
+{*******************************************************************************
+procedure arnav_ClickArrow(Col, Count: Integer);
+by: Nielsie95
+Description: Clicks the arrow at Col, Count number of times.
+*******************************************************************************}
+
+procedure arnav_ClickArrow(Col, Count: Integer);
+var
+  i: Integer;
+  t: TPoint;
+  Up: Boolean;
+begin
+  Up := (Count < 0);
+  for i := 1 to iAbs(Count) do
+  begin
+    t.x := 123 + (Col * 90);
+    if Up then
+      t.y := 20
+    else
+      t.y := 305;
+    Mouse(t.x, t.y, 8, 8, True);
+    Wait(500 + Random(500));
+  end;
+end;
+
+{*******************************************************************************
+function arnav_FixLock: Boolean;
+by: Nielsie95
+Description: Moves the required items into line.
+*******************************************************************************}
+
+function arnav_FixLock: Boolean;
+var
+  t, Target, r, c: Integer;
+  tpa: TPointArray;
+  b: TBox;
+  Col: array[0..2] of Boolean;
+begin
+  ColorToleranceSpeed(2);
+  Result := False;
+  if (not arnav_LockScreen) then
+    Exit;
+  t := GetSystemTime;
+
+  FindColorsTolerance(tpa, 0, 7, 150, 80, 185, 1);
+  WriteLn('Arnav Target Text Color Count: ' + inttostr(Length(tpa)));
+
+  case Length(tpa) of
+    116: Target := 0;//'ring';
+    84: Target := 1;//'bar';
+    108: Target := 2;//'bowl';
+    102: Target := 3;//'coins'; 4.
+    else
+    begin
+      WriteLn('Could not get Arnav target!');
+      Exit;
+    end;
+  end;
+
+  while (not Result) and ((GetSystemTime - t) < 30000) and arnav_LockScreen do
+  begin
+    for c := 0 to 2 do
+    begin
+      if Col[c] then
+        Continue;
+      for r := 0 to 2 do
+      begin
+        b := IntToBox(91 + (88 * c), 45 + (88 * r), 166 + (88 * c), 112 + (88 * r));
+        SetColorSpeed2Modifiers(0.02, 0.22);
+        FindColorsTolerance(tpa, 803162, b.x1, b.y1, b.x2, b.y2, 20);
+        if (Length(tpa) > 400) then
+        begin
+          arnav_ClickArrow(c, Target - r);
+          Col[c] := True;
+          Break;
+        end;
+        SetColorSpeed2Modifiers(0.02, 0.05);
+        FindColorsTolerance(tpa, 2281971, b.x1, b.y1, b.x2, b.y2, 20);
+        if (Length(tpa) > 400) then
+        begin
+          arnav_ClickArrow(c, Target - r - 1);
+
+          Col[c] := True;
+          Break;
+        end;
+      end;
+    end;
+    Result := Col[0] and Col[1] and Col[2];
+    Wait(60);
+  end;
+end;
+
+{*******************************************************************************
+function arnav_TalkToCapnArnav: Boolean;
+by: IceFire908
+Description: Talks to the Cap'n
+*******************************************************************************}
+
+function arnav_TalkToCapnArnav: Boolean;
+var
+  TempHue, TempSat: Extended;
+  TPAA: T2DPointArray;
+  I, CTS, T: LongInt;
+  TPA: TPointArray;
+  CA: TPoint;
+begin
+  CTS := GetColorToleranceSpeed;
+  GetColorspeed2Modifiers(TempHue, TempSat);
+  ColorToleranceSpeed(2);
+  SetColorSpeed2Modifiers(0.31, 0.13);
+  FindColorsTolerance(TPA, 3752258, MSX1, MSY1, MSX2, MSY2, 6);
+  SetColorSpeed2Modifiers(TempHue, TempSat);
+  ColorToleranceSpeed(CTS);
+  repeat
+    if (Length(TPA) < 1) then
+      Break;
+    TPAA := TPAToATPAEx(TPA, 15, 15);
+    if (Length(TPAA) < 1) then
+      Break;
+    SortATPASize(TPAA, True);
+    for I := 0 to High(TPAA) do
+    begin
+      CA := MiddleTPA(TPAA[I]);
+      MMouse(CA.X, CA.Y, 0, 0);
+      Wait(200 + Random(50));
+      if (CountColorTolerance(648165, 7, 7, 100, 25, 50) > 50) then
+      begin
+        Mouse(CA.X, CA.Y, 0, 0, False);
+        Wait(100 + Random(200));
+        if (ChooseOptionMulti(['alk-to', 'o C', 'k-t', 'Talk'])) then
+        begin
+          Wait(500);
+          FFlag(0);
+          T := GetSystemTime;
+          while ((not (AreTalking)) and ((GetSystemTime - T) < 5000)) do
+            Wait(100);
+          Result := True;
+          Exit;
+        end;
+      end;
+    end;
+  until (True);
+  WriteLn('Did not find Capn''n Arnav!');
+end;
+
+{*******************************************************************************
+function arnav_ExitPortal: Boolean;
+by: IceFire908
+Description: Walks through the exit portal
+*******************************************************************************}
+
+function arnav_ExitPortal: Boolean;
+var
+  TempHue, TempSat: Extended;
+  TPAA: T2DPointArray;
+  TPA: TPointArray;
+  I, CTS: LongInt;
+  EP: TPoint;
+begin
+  CTS := GetColorToleranceSpeed;
+  {$IFNDEF Simba}
+  GetColorspeed2Modifiers(TempHue, TempSat);
+  {$ELSE}
+  GetToleranceSpeed2Modifiers(TempHue, TempSat);
+  {$ENDIF}
+  ColorToleranceSpeed(2);
+  SetColorSpeed2Modifiers(0.20, 2.14);
+  FindColorsTolerance(TPA, 9430204, MSX1, MSY1, MSX2, MSY2, 2);
+  SetColorSpeed2Modifiers(TempHue, TempSat);
+  ColorToleranceSpeed(CTS);
+  repeat
+    if (Length(TPA) < 1) then
+      Break;
+    TPAA := TPAToATPAEx(TPA, 20, 20);
+    if (Length(TPAA) < 1) then
+      Break;
+    SortATPASize(TPAA, True);
+    for I := 0 to High(TPAA) do
+    begin
+      EP := MiddleTPA(TPAA[I]);
+      MMouse(EP.X, EP.Y, 0, 0);
+      Wait(200 + Random(50));
+      if (IsUpTextMultiCustom(['portal', 'Exit', 'nter'])) then
+      begin
+        Mouse(EP.X, EP.Y, 0, 0, False);
+        Wait(100 + Random(200));
+        if (ChooseOptionMulti(['nter', 'er E', 'r Ex'])) then
+        begin
+          Wait(500);
+          FFlag(0);
+          Wait(4000);
+          Result := True;
+          Exit;
+        end;
+      end;
+    end;
+  until (True);
+  WriteLn('Did not find Capn''n Arnav exit portal!');
+end;
+
+{*******************************************************************************
+function SolveArnav: Boolean;
+by: Nielsie95
+Description: Solves the Cap'n Arnav random.
+*******************************************************************************}
+
+function SolveArnav: Boolean;
+var
+  deg, cts, x, t: Integer;
+begin
+  Result := False;
+  if (not arnav_InRandom) then
+  begin
+    WriteLn('Not in Arnav!');
+    Exit;
+  end;
+
+  cts := GetColorToleranceSpeed;
+  deg := Round(rs_GetCompassAngleDegrees);
+  MakeCompass('n');
+  t := GetSystemTime;
+
+  SetAngle(True);
+  while ((GetSystemTime - t) < 40000) and (not arnav_LockScreen) do
+  begin
+    Wait(1500);
+    if AreTalking then
+    begin
+      if FindNPCChatText('hop through', ClickLeft) then
+      begin
+        arnav_ExitPortal;
+        SetColorSpeed2Modifiers(0.2, 0.2);
+        ColorToleranceSpeed(cts);
+        Exit;
+      end;
+      if (not ClickContinue(True,True)) then
+        FindNPCChatText('ready to try', ClickLeft);
+    end
+    else
+      arnav_TalkToCapnArnav;
+  end;
+
+  if (not arnav_FixLock) then
+  begin
+    WriteLn('Could not identify arnav objects!');
+    SetColorSpeed2Modifiers(0.2, 0.2);
+    ColorToleranceSpeed(cts);
+    Exit;
+  end;
+
+  Mouse(405, 245, 70, 20, True);
+  x := GetSystemTime;
+  while arnav_LockScreen and ((GetSystemTime - x) < 5000) do Wait(100);
+
+  if arnav_LockScreen then
+  begin
+    MouseFlag(MMCX, MMCY - 10, 5, 5, 0);
+    Wait(1000 + Random(1000));
+  end;
+
+  t := GetSystemTime;
+  while arnav_InRandom and ((GetSystemTime - t) < 30000) do
+  begin
+    Wait(100);
+    if InConvo then
+      ClickContinue(True,True)
+    else
+      arnav_ExitPortal;
+  end;
+
+  Result := (not arnav_InRandom);
+  if (not Result) then
+  begin
+    arnav_ExitPortal;
+    Result := (not arnav_InRandom);
+  end;
+
+  arnav_ExitPortal;
+  MakeCompass(Deg);
+  SetColorSpeed2Modifiers(0.2, 0.2);
+  ColorToleranceSpeed(cts);
+end;

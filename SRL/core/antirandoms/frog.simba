@@ -1,0 +1,256 @@
+//-----------------------------------------------------------------//
+//--               Scar Standard Resource Library                --//
+//--               » Frog Random Solver Routines                 --//
+//-----------------------------------------------------------------//
+// * function InSecondCave: Boolean;                               // * by marpis
+// * function Frog_InRandom: Boolean;                              // * by marpis
+// * function Frog_ClickFrog: Boolean;                             // * by marpis
+// * ffunction SolveFrogCave: Boolean;                             // * by marpis
+// * ffunction SolveFrog: Boolean;                                 // * by Nielsie95 & ZephyrsFury & marpis
+//-----------------------------------------------------------------//
+
+{*******************************************************************************
+function InSecondCave: Boolean;
+by: marpis
+Description: Returns true if the second, larger frog cave is found.
+*******************************************************************************}
+function InSecondCave: Boolean;
+var
+  X, Y, DTM: Integer;
+  A: Extended;
+begin
+  DTM := DTMFromString('78DA632C666260706200036608C51038A9824' +
+       '112483342F98C0D4035AEA86A9C2A9250D57403D5041250D30654' +
+       '9384AAC6AB3517554D33504D16AA1A473D115435A940355EA86AF' +
+       'CFB4A51D5C400D544A0AAF16ECF47559306549382DBAEFF400000' +
+       '8FEF13BD');
+  Result := FindDTMRotated(DTM, X, Y, MMX1, MMY1, MMX2, MMY2, -Pi, Pi, Pi/50, A);
+end;
+
+{*******************************************************************************
+function Frog_InRandom: Boolean;
+by: marpis
+Description: Checks if we're in the frog random.
+*******************************************************************************}
+function Frog_InRandom: Boolean;
+var
+  X, Y: Integer;
+begin
+  If Length(GetMinimapDots('npc')) >= 4 Then
+    If PercentBlackMM >= 35 Then
+      If FindColorTolerance(X, Y, 1141775, MSX1, MSY1, MSX2, MSY2, 30) Then // Green
+        If FindColorTolerance(X, Y, 2109415, MSX1, MSY1, MSX2, MSY2, 30) Then // Red
+          Result := FindColorTolerance(X, Y, 1742268, MSX1, MSY1, MSX2, MSY2, 30); // Yellow
+end;
+
+{*******************************************************************************
+function Frog_ClickFrog: Boolean;
+by: marpis
+Description: Clicks the Frog Prince/Princess.
+*******************************************************************************}
+function Frog_ClickFrog: Boolean;
+Var
+  Yellow, TPAGasHole: TPointArray;
+  GasHole, Middle: TPoint;
+  ATPA: T2DPointArray;
+  I, RedCount: Integer;
+Begin
+  {WriteLn('Entering function: Frog_ClickFrog');}
+  FindColorsTolerance(TPAGasHole, 8557924, MSX1, MSY1, MSX2, MSY2, 10);
+  GasHole := MiddleTPA(TPAGasHole);
+  
+  FindColorsTolerance(Yellow, 2075092, MSX1, MSY1, MSX2, MSY2, 30);
+  ATPA := SplitTPA(Yellow, 10);
+  SortATPAFrom(ATPA, GasHole);
+  InvertATPA(ATPA);
+  
+  For I := 0 To High(ATPA) Do
+  Begin
+    Middle := MiddleTPA(ATPA[I]);
+    RedCount := CountColorTolerance(2241261, Middle.X - 20, Middle.Y - 20, Middle.X + 20, Middle.Y + 20, 30);
+    { Length(ATPA[I]) = Yellow count! }
+    If Trunc(RedCount*1.2) < Length(ATPA[I]) Then
+      If InRange(RedCount, 1, 30) Then
+      Begin
+        WriteLn('Trying to click a frog...');
+        Mouse(Middle.X, Middle.Y, 0, 0, True);
+        Wait(2000 + Random(500));
+        While IsMoving Do
+          Wait(50 + Random(20));
+        Wait(1000 + Random(500));
+
+        While FindNPCChatText('ontinue', ClickLeft) Do
+          Wait(3000 + Random(500));
+
+        If FindNPCChatText('please', ClickLeft) Then
+        Begin
+          Wait(3000 + Random(500));
+          While FindNPCChatText('ontinue', ClickLeft) Do
+            Wait(3000 + Random(500));
+        End;
+
+        Result := Not Frog_InRandom;
+        Exit;
+      End;
+  End;
+  
+  WriteLn('Princess not found!');
+  If Not InSecondCave Then
+    If (Distance(GasHole.X, GasHole.Y, MSCX, MSCY) > 150) Then
+    Begin
+      WriteLn('Walking to Gas Hole...');
+      Mouse(GasHole.X - 50, GasHole.Y + 30, 10, 10, False);
+      WaitOption('alk here', 500);
+    End;
+End;
+
+
+
+
+{function Frog_ClickFrog: Boolean;
+var
+  i, cts, x, y: Integer;
+  tpa: TPointArray;
+  atpa: T2DPointArray;
+  b: TBox;
+begin
+  WriteLn('Entering function: Frog_ClickFrog');
+  Result := False;
+  if (FindTextTpa(128, 0, MCX1, MCY1, MCX2, MCY2, 'Princ', NPCChars, Nothing)) then
+  begin
+    Result := True;
+    Exit;
+  end;
+  cts := GetColorToleranceSpeed;
+  ColorToleranceSpeed(2);
+
+  SetColorSpeed2Modifiers(0.05, 1.1);
+  FindColorsTolerance(tpa, 2476797, MSX1, MSY1, MSX2, MSY2, 10);
+  atpa := SplitTPAEx(tpa, 5, 5);
+  SortATPAFromFirstPoint(atpa, Point(MSCX, MSCY));
+
+  SetColorSpeed2Modifiers(0.05, 0.15);
+  for i := 0 to High(atpa) do
+  begin
+    //WriteLn('Len: '+IntToStr(Length(atpa[i])));
+    if (Length(atpa[i]) < 20) then
+      Continue;
+    b := GetTPABounds(atpa[i]);
+    FindColorsTolerance(tpa, 1319846, b.x1 - 20, b.y1 - 20, b.x2 + 20, b.y2 + 20, 11);
+    //WriteLn('Red: '+IntToStr(Length(tpa)));
+    //WriteLn( IntToStr((b.x1 + b.x2) shr 1) +', '+ IntToStr((b.y1 + b.y2) shr 1) );
+    if (Length(tpa) > 10) then
+      Continue;
+    MMouse((b.x1 + b.x2) shr 1, (b.y1 + b.y2) shr 1, 3, 3);
+    if (not IsUpText('Frog')) then
+      Continue;
+    GetMousePos(x, y);
+    Mouse(x, y, 0, 0, True);
+    Wait(500);
+    FFlag(0);
+    x := GetSystemTime;
+    while (not AreTalking) and ((GetSystemTime - x) < 4000) do
+      Wait(100);
+    Break;
+  end;
+
+  SetColorSpeed2Modifiers(0.2, 0.2);
+  ColorToleranceSpeed(cts);
+  Result := (FindTextTpa(128, 0, MCX1, MCY1, MCX2, MCY2, 'Princ', NPCChars, Nothing));
+  if (Result) then WriteLn('Talking to Frog Prince(ss).');
+end;}
+
+
+{*******************************************************************************
+function SolveFrogCave: Boolean;
+by: marpis
+Description: Solves the larger frog cave.
+*******************************************************************************}
+function SolveFrogCave: Boolean;
+Var
+  TPA: TPointArray;
+  Tries, T, CenterX, CenterY, SwampColor: Integer;
+begin
+  WriteLn('In Main Cave...');
+  SwampColor := 7901777;
+  T := GetSystemTime + 5*60000;
+  
+  Repeat
+    If Frog_ClickFrog Then
+      Break;
+      
+    FindColorsTolerance(TPA, SwampColor, MMX1, MMY1, MMX2, MMY2, 30);
+    MiddleTPAEx(TPA, CenterX, CenterY);
+    WriteLn('Moving in cave to point: '+IntToStr(Tries));
+    
+    Case Tries Of
+      0, 2, 4: Mouse(CenterX, CenterY + 50, 2, 2, True);
+      1:       Mouse(CenterX + 40, CenterY, 2, 2, True);
+      3:       Mouse(CenterX - 40, CenterY, 2, 2, True);
+      5:       Mouse(CenterX, CenterY, 2, 2, True);
+    End;
+    Wait(1900 + Random(200));
+    
+    While IsMoving Do
+      Wait(100 + Random(50));
+      
+    Inc(Tries);
+    If Tries > 5 Then
+      Tries := 0;
+  Until(GetSystemTime > T);
+  
+  Result := Not Frog_InRandom;
+end;
+
+{*******************************************************************************
+function SolveFrog: Boolean;
+by: Nielsie95 & ZephyrsFury & marpis
+Description: Solves the Frog Random, also solves the larger frog cave.
+*******************************************************************************}
+function SolveFrog: Boolean;
+var
+  t: Integer;
+begin
+  Result := False;
+
+  if (not Frog_InRandom) then
+  begin
+    WriteLn('Not in FrogCave!');
+    Exit;
+  end;
+
+  Wait(1000);
+  while FindNPCChatText('ontinue', ClickLeft) do
+    Wait(2000 + Random(500));
+
+  SetAngle(True);
+  t := GetSystemTime;
+  while (GetSystemTime - T < 180000) do
+  begin
+
+    if (InSecondCave) then
+    begin
+      if (SolveFrogCave) then
+        WriteLn('Solved Frog Cave... but we are now in the middle of nowhere...');
+      Break;
+    end;
+    
+    Wait(1000 + Random(500));
+    if (Frog_ClickFrog) then
+      Break
+    Else
+      MakeCompass(rs_GetCompassAngleDegrees + 90);
+  end;
+
+  T := GetSystemTime;
+  while (Frog_InRandom) and (GetSystemTime - T < 30000) do
+  begin
+    while (ClickContinue(True, True)) do
+      Wait(500 + Random(500));
+    Wait(1500 + Random(500));
+  end;
+  
+  Wait(5000);
+
+  Result := (not Frog_InRandom);
+end;

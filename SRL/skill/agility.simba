@@ -1,0 +1,34 @@
+(*
+Agility
+
+======
+The Agility include contains all kinds of functions & features to use with the
+Agility skill.
+
+*)
+
+{*******************************************************************************
+function GetCourseXP(Course: String): Extended;
+By: Mad Cow, Hobbit & Simtoon
+Description: Returns the experience for a certain agility course.
+*******************************************************************************}
+function GetCourseXP(Course: string): Extended;
+begin
+  case LowerCase(Course) of
+    'agility dungeon ledge': Result := 22.5;
+    'gnome course': Result := 86.5;
+    'gnome course extra': Result := 725;
+    'barbarian course': Result := 153.2;
+    'barbarian course extra': Result := 740.67;
+    'werewolves course': Result := 540;
+    'penguin course': Result := 540;
+    'wilderness course': Result := 571.4;
+    'ape atoll course': Result := 580;
+    'agility pyramid': Result := 1014;
+    'dorgesh-kaan long(2)': Result := 2750;
+    'dorgesh-kaan long+grapple': Result := 1429;
+    'dorgesh-kaan grapple(2)': Result := 108;
+    else
+      Result := 0;
+  end;
+end;

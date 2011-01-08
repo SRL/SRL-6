@@ -1,0 +1,178 @@
+commit ca85febf21c627917dce86a80af21599e0b3545b
+Author: Raymond <Raymond@6aa993dd-eb45-4ab4-881a-589510b4aab8>
+Date:   Fri Sep 10 22:47:53 2010 +0000
+
+    Fixed DebugATPABounds bug in Simba
+    
+    git-svn-id: http://villavu.com/repositories/srl-opendev@605 6aa993dd-eb45-4ab4-881a-589510b4aab8
+
+commit 332d020d768b7e02e565ce1c76395f3b947b1168
+Author: Coh3n <Coh3n@6aa993dd-eb45-4ab4-881a-589510b4aab8>
+Date:   Mon Jun 21 01:25:40 2010 +0000
+
+    - Fixed compiling issues in Debug.scar (2 forgotten semicolons)
+    
+    
+    git-svn-id: http://villavu.com/repositories/srl-opendev@540 6aa993dd-eb45-4ab4-881a-589510b4aab8
+
+commit 1bf4059a57cca75485d1ec0298ebea20490fb523
+Author: IceFire908 <IceFire908@6aa993dd-eb45-4ab4-881a-589510b4aab8>
+Date:   Sun Jun 20 18:33:43 2010 +0000
+
+    DebugATPABounds fix simba portion by Nava2
+    
+    git-svn-id: http://villavu.com/repositories/srl-opendev@538 6aa993dd-eb45-4ab4-881a-589510b4aab8
+
+commit 559f1150146b84398e1fd311badcc06cdd1be36b
+Author: Raymond <Raymond@6aa993dd-eb45-4ab4-881a-589510b4aab8>
+Date:   Wed May 12 13:23:18 2010 +0000
+
+    Lamp solves perfectly, just needs to slow down a bit :). + Unused variable.
+    
+    git-svn-id: http://villavu.com/repositories/srl-opendev@489 6aa993dd-eb45-4ab4-881a-589510b4aab8
+
+commit 2371149674e597d845abbe006c0c30aeca563999
+Author: Raymond <Raymond@6aa993dd-eb45-4ab4-881a-589510b4aab8>
+Date:   Sat May 8 22:57:08 2010 +0000
+
+    Added ReadLn and edited the debugging methods a bit..
+    
+    git-svn-id: http://villavu.com/repositories/srl-opendev@470 6aa993dd-eb45-4ab4-881a-589510b4aab8
+
+commit 63ab06c9d8748e7041bb1e0e7dc8181b616c65c7
+Author: Raymond <Raymond@6aa993dd-eb45-4ab4-881a-589510b4aab8>
+Date:   Sun Apr 11 19:20:20 2010 +0000
+
+    Added some simba stuff :).
+    
+    git-svn-id: http://villavu.com/repositories/srl-opendev@433 6aa993dd-eb45-4ab4-881a-589510b4aab8
+
+commit 7f0c4ca3cd09b7fd8e8beb817c0622a856e48240
+Author: Raymond <Raymond@6aa993dd-eb45-4ab4-881a-589510b4aab8>
+Date:   Sat Mar 27 23:01:39 2010 +0000
+
+    Added other standard fixes, by Dgby714
+    
+    git-svn-id: http://villavu.com/repositories/srl-opendev@423 6aa993dd-eb45-4ab4-881a-589510b4aab8
+
+commit 9fe4a1668a709be4ed6a11b3709187aed60c9b42
+Author: IceFire908 <IceFire908@6aa993dd-eb45-4ab4-881a-589510b4aab8>
+Date:   Mon Mar 22 02:25:14 2010 +0000
+
+    Made RandomID multi possible now, Fixed Forester, fixed Drag Item, cleaned up some DebugATPABounds mess lol. Rev 420.. epic pwnage
+    
+    git-svn-id: http://villavu.com/repositories/srl-opendev@420 6aa993dd-eb45-4ab4-881a-589510b4aab8
+
+commit cbe44f5e395a4d133fd76c8695203f43da050e58
+Author: IceFire908 <IceFire908@6aa993dd-eb45-4ab4-881a-589510b4aab8>
+Date:   Sun Mar 21 19:31:11 2010 +0000
+
+    LevelUp fix, Hopefully Arnav fix. Inventory standards fix, DeBugATPABounds fix
+    
+    git-svn-id: http://villavu.com/repositories/srl-opendev@419 6aa993dd-eb45-4ab4-881a-589510b4aab8
+
+commit f0246e846800770dd49e5a3fa783cef1b13c9253
+Author: Raymond <Raymond@6aa993dd-eb45-4ab4-881a-589510b4aab8>
+Date:   Wed Mar 3 15:55:13 2010 +0000
+
+    Fixed issues where it would search outside the client.
+    
+    git-svn-id: http://villavu.com/repositories/srl-opendev@403 6aa993dd-eb45-4ab4-881a-589510b4aab8
+
+commit 8e6e2b24ad9b5683a220db84cbd2afd01d9de181
+Author: Raymond <Raymond@6aa993dd-eb45-4ab4-881a-589510b4aab8>
+Date:   Sat Feb 6 18:22:39 2010 +0000
+
+    More Simba changes.
+    
+    git-svn-id: http://villavu.com/repositories/srl-opendev@371 6aa993dd-eb45-4ab4-881a-589510b4aab8
+
+commit e0adaf68711dd9d27b499b90bff018c43433d822
+Author: Nava2 <Nava2@6aa993dd-eb45-4ab4-881a-589510b4aab8>
+Date:   Wed Dec 30 22:13:41 2009 +0000
+
+    Loads of shit fixed and updated.
+    
+    Worked with some small things, making the Color functions work in Color.scar.
+    
+    Removed some compiling errors in SmartColors.scar.
+    
+    Changed something in Debug.scar, to be honest I have no idea what it was.
+    
+    
+    git-svn-id: http://villavu.com/repositories/srl-opendev@329 6aa993dd-eb45-4ab4-881a-589510b4aab8
+
+commit d066656c926eb4d18aecca7ae91e32dc1447eb91
+Author: Nava2 <Nava2@6aa993dd-eb45-4ab4-881a-589510b4aab8>
+Date:   Sun Nov 29 01:01:02 2009 +0000
+
+    Fixed small things that really made no sense..
+    
+    
+    git-svn-id: http://villavu.com/repositories/srl-opendev@291 6aa993dd-eb45-4ab4-881a-589510b4aab8
+
+commit 74c05a059dd96e5fd21f37d865f85b4cf360fef2
+Author: EvilChicken! <EvilChicken!@6aa993dd-eb45-4ab4-881a-589510b4aab8>
+Date:   Sat Oct 17 00:55:15 2009 +0000
+
+    Fixed.
+    
+    God, I can't do a single commit correctly these days.
+    
+    Sorry, guys.
+    
+    git-svn-id: http://villavu.com/repositories/srl-opendev@271 6aa993dd-eb45-4ab4-881a-589510b4aab8
+
+commit 0345fa816109ed3e0608d1fc0f53e9740c7c0cd2
+Author: EvilChicken! <EvilChicken!@6aa993dd-eb45-4ab4-881a-589510b4aab8>
+Date:   Fri Oct 16 09:34:16 2009 +0000
+
+    Small changes, mostly TakeScreenShotEx.
+    
+    git-svn-id: http://villavu.com/repositories/srl-opendev@269 6aa993dd-eb45-4ab4-881a-589510b4aab8
+
+commit 232bf1ddc4d263e6f1e18911a98c2106e351b196
+Author: ZephyrsFury <ZephyrsFury@6aa993dd-eb45-4ab4-881a-589510b4aab8>
+Date:   Thu Sep 10 18:46:55 2009 +0000
+
+    Stuff.
+    
+    git-svn-id: http://villavu.com/repositories/srl-opendev@235 6aa993dd-eb45-4ab4-881a-589510b4aab8
+
+commit b6fbf521502ebf7b444d8563e3dd957d57aedc30
+Author: ZephyrsFury <ZephyrsFury@6aa993dd-eb45-4ab4-881a-589510b4aab8>
+Date:   Sat Jun 20 20:47:34 2009 +0000
+
+    Minor edits. Added DebugBitmap to Debug.scar.
+    
+    git-svn-id: http://villavu.com/repositories/srl-opendev@88 6aa993dd-eb45-4ab4-881a-589510b4aab8
+
+commit 8519792392734a00c08d417b0832a4fca8ab5e70
+Author: Nava2 <Nava2@6aa993dd-eb45-4ab4-881a-589510b4aab8>
+Date:   Sun May 31 02:20:52 2009 +0000
+
+    Added Fighting fixes.
+    Changed TakeScreenshot
+    
+    git-svn-id: http://villavu.com/repositories/srl-opendev@34 6aa993dd-eb45-4ab4-881a-589510b4aab8
+
+commit 947febf8aecb1f9a1b0ef87d286ffc5cc4214c5f
+Author: Nava2 <Nava2@6aa993dd-eb45-4ab4-881a-589510b4aab8>
+Date:   Sat May 23 14:23:17 2009 +0000
+
+    Exiting Mordaut should be fixed.. Not sure.
+    
+    Close Window, needs some testing..
+    
+    I broked DebugATPABounds, its in the text writing, someone look at it please.
+    
+    git-svn-id: http://villavu.com/repositories/srl-opendev@11 6aa993dd-eb45-4ab4-881a-589510b4aab8
+
+commit b286550bc6df862a3c76f00992c1b3aa86f8625f
+Author: Wizzup? <Wizzup?@6aa993dd-eb45-4ab4-881a-589510b4aab8>
+Date:   Mon May 18 20:19:48 2009 +0000
+
+    Recommit.
+    
+    
+    git-svn-id: http://villavu.com/repositories/srl-opendev@1 6aa993dd-eb45-4ab4-881a-589510b4aab8

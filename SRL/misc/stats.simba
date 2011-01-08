@@ -1,0 +1,223 @@
+(*
+
+Stats
+=====
+
+The Stats include contains wrapper functions provided by the SRL Stats API.
+The functions contained are meant for ease of use for implementation into
+scripts.
+
+*)
+
+// behaves as entries in a dict.
+type
+  TStats_Vars = record
+    Name: string;
+    Value: integer;
+  end;
+
+
+var
+  stats_Vars: Array of TStats_Vars;
+  stats_UserName, stats_UserPass, stats_ScriptID: String;
+  stats_Timer: integer;
+  stats_RandNames: Array of String;
+  stats_RandSolved: Array of Integer;
+
+
+(*
+SetupSRLStats
+~~~~~~~~~~~~~
+
+.. code-block:: pascal
+    procedure SetupSRLStats(ScriptID: integer; UserName, UserPass: string);
+
+Initializes all variables necessary for SRL stats to function. Username and
+password are *not* case sensitive.
+
+Example:
+.. code-block:: pascal
+    SetupSRLStats(64, 'SRL-Developers', 'SRLSRLSRL');
+*)
+procedure SetupSRLStats(ScriptID: integer; UserName, UserPass: string);
+begin
+  stats_Timer := GetSystemTime;
+  stats_ScriptID := IntToStr(ScriptID);
+  stats_Username := LowerCase(UserName);
+  stats_UserPass := LowerCase(UserPass);
+  stats_RandNames := ['leo the gravedigger', 'freaky forester', 'maze',
+                      'prison pete', 'evil bob''s island', 'drill demon',
+                      'quiz', 'surprise exam', 'mollys evil twin', 'pinball',
+                      'sandwich lady', 'bee keeper', 'pillory', 'capn arnav',
+                      'abyssal teleport', 'certer', 'mime', 'frog', 'trade',
+                      'mod', 'fight', 'lamp', 'bird nest', 'death'];
+  SetArrayLength(stats_RandSolved, Length(stats_RandNames));
+end;
+
+(*
+stats_InitVariable
+~~~~~~~~~~~~~~~~~~
+
+.. code-block:: pascal
+    stats_InitVariable(VarName: String; InitValue: Integer);
+
+Helper method to clean up code in the include. Removes some repeating code
+internally.
+
+.. WARNING::
+    Use of this method outside of this include *may* lead to multiple variables
+    of the same name. It does **not** check to see if the variable is already
+    present.
+
+.. code-block:: pascal
+    stats_InitVariable('coal', 0);
+
+*)
+procedure stats_InitVariable(VarName: String; InitValue: Integer);
+var
+  len: Integer;
+begin
+  len := Length(stats_Vars);
+  SetArrayLength(stats_Vars, len + 1);
+  stats_Vars[len].Name := LowerCase(VarName);
+  stats_Vars[len].Value := InitValue;
+end;
+
+
+(*
+stats_SetVariable
+~~~~~~~~~~~~~~~~~
+
+.. code-block:: pascal
+    stats_SetVariable(VarName: string; NewValue: Integer);
+
+Sets the passed variable to the new value regardless of old value. This method
+behaves much like stats_InitVariable but checks for the variable present first.
+
+Example:
+.. code-block:: pascal
+    stats_SetVariable('runite', 10)
+*)
+procedure stats_SetVariable(VarName: string; NewValue: Integer);
+var
+  i, h: Integer;
+begin
+  h := High(stats_Vars);
+  VarName := LowerCase(VarName); // set it to lowercase since not case sensitive
+
+  if (h >= 0) then
+    for i := h downto 0 do
+      if (VarName = stats_Vars[i].Name) then
+      begin
+        stats_Vars[i].Value := NewValue;
+        Exit;
+      end;
+
+  // the variable is not present already, thus make a new entry into the dict.
+  stats_InitVariable(VarName, NewValue);
+end;
+
+(*
+stats_IncVariable
+~~~~~~~~~~~~~~~~~
+
+.. code-block:: pascal
+    procedure stats_IncVariable(VarName: string; Value: integer);
+
+Increments a variable by the value passed.
+
+Example:
+.. code-block:: pascal
+    stats_IncVariable('cod', 69);
+
+*)
+procedure stats_IncVariable(VarName: string; Value: integer);
+var
+  i, h: Integer;
+begin
+  h := High(stats_Vars);
+  VarName := LowerCase(VarName); // set it to lowercase since not case sensitive
+
+  if (h >= 0) then
+    for i := h downto 0 do
+      if (VarName = stats_Vars[i].Name) then
+      begin
+        stats_Vars[i].Value := stats_Vars[i].Value + Value;
+        Exit;
+      end;
+
+  // the variable is not present already, thus make a new entry into the dict.
+  stats_InitVariable(VarName, Value);
+end;
+
+
+(*
+stats_Commit
+~~~~~~~~~~~~
+
+.. code-block:: pascal
+    function stats_Commit: Boolean;
+
+Sends all the information currently stored in the system to the server. Returns
+true if commit was successful, displays error messages. One should note that the
+stats variables are set to 0 on commit.
+
+Example:
+.. code-block:: pascal
+    if (stats_Commit) then
+      WriteLn('We are success.');
+
+*)
+function stats_Commit: Boolean;
+var
+  SRLClient, Worked, i, ExtraTime: integer;
+  S: String;
+begin
+  ExtraTime := GetSystemTime - stats_Timer;
+  Worked :=  ExtraTime / 60000;
+  ExtraTime := ExtraTime - (Worked*60000);
+  if Worked < 1 then
+    Exit;
+  stats_Timer := GetSystemTime - ExtraTime;
+  SRLClient := InitializeHTTPClientWrap(False);
+  ClearPostData(SRLClient);
+
+  AddPostVariable(SRLClient, 'user', stats_UserName);
+  AddPostVariable(SRLClient, 'password', stats_UserPass);
+  AddPostVariable(SRLClient, 'script', stats_ScriptID);
+  AddPostVariable(SRLClient, 'time', IntToStr(Worked));
+
+  for i := 0 to 23 do
+    if (RandSolved[i] > stats_RandSolved[i]) then
+    begin
+      AddPostVariable(
+          SRLClient,
+          stats_RandNames[i],
+          IntToStr(RandSolved[i]-stats_RandSolved[i])
+      );
+      stats_RandSolved[i]:= RandSolved[i];
+    end;
+
+  if (Length(stats_Vars) > 0) then
+   for i := 0 to High(stats_Vars) do
+    with stats_Vars[i] do
+    begin
+      AddPostVariable(SRLClient, Name, IntToStr(Value));
+      Value := 0;//Clear for next commit
+    end;
+
+  S := PostHTTPPageEx(SRLClient, 'http://old.villavu.com/stats/api/commit');
+  FreeHTTPClient(SRLClient);
+  Result := False;
+  case StrToIntDef(ExtractFromStr(S, Numbers), -1) of
+    100: Result := True; // successful commit.
+    110: Writeln('SRL_Stats: Incorrect user and/or password');
+    120: Writeln('SRL_Stats: Incorrect script ID');
+    130: Writeln('SRL_Stats: Invalid time');
+    140: Writeln('SRL_Stats: Variable does not exist');
+    150: Writeln('SRL_Stats: Wrong info for variable');
+    160: Writeln('SRL_Stats: Internal server error');
+    else
+      Writeln('SRL_Stats: No POST return');
+  end;
+end;

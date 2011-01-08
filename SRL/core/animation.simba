@@ -1,0 +1,170 @@
+(*
+Animation
+=========
+
+The Amount include contains all kinds of color related functions to get the animation of NPC's.
+
+*)
+
+(*
+PixelShiftMulti
+~~~~~~~~~~~~~~~
+
+.. code-block:: pascal
+
+    function PixelShiftMulti(B: TBoxArray; T: Integer): TIntegerArray;
+
+Calculates how many pixels change in boxes B during time T.
+
+.. note::
+
+  by marpis
+
+Example:
+
+.. code-block:: pascal
+
+*)
+
+function PixelShiftMulti(B: TBoxArray; T: Integer): TIntegerArray;
+Var
+  L, I: Integer;
+  BMP, BMP2: TIntegerArray;
+begin
+  L := Length(B);
+  SetLength(BMP, L);
+  SetLength(BMP2, L);
+  SetLength(Result, L);
+  for I := 0 to (L - 1) do
+    BMP[I] := BitmapFromClient(B[i].x1,B[i].y1,B[i].x2,B[i].y2);
+  Wait(T);
+  for I := 0 to (L - 1) do
+    BMP2[I] := BitmapFromClient(B[i].x1,B[i].y1,B[i].x2,B[i].y2);
+  for i := 0 to (L - 1) do
+    result[i] := CalculatePixelShift(BMP[i],BMP2[i],IntToBox(0,0,(b[i].x2 - b[i].x1),(b[i].y2-b[i].y1)));
+  for I := 0 to (L - 1) do
+  begin
+    FreeBitmap(BMP[I]);
+    FreeBitmap(BMP2[I]);
+  end;
+end;
+
+(*
+PixelShiftMulti
+~~~~~~~~~~~~~~~
+
+.. code-block:: pascal
+
+    function PixelShiftMulti(B: TBoxArray; T: Integer): TIntegerArray;
+
+Calculates how many pixels change in boxes B during time T.
+
+.. note::
+
+  by marpis
+
+Example:
+
+.. code-block:: pascal
+
+*)
+
+function PixelShift(B: TBox; Time: Integer): Integer;
+var
+  TIA: TIntegerArray;
+begin
+  TIA := PixelShiftMulti([B], Time);
+  Result := TIA[0];
+end;
+
+(*
+AnimatingMulti
+~~~~~~~~~~~~~~
+
+.. code-block:: pascal
+
+    function AnimatingMulti(B: TBoxArray; Time, MinCount: Integer): TBooleanArray;
+
+Finds constant animation in boxes B during time T. If PixelShift in box is smaller than MinCount, it's considered not animating.
+.. note::
+
+  by marpis
+
+Example:
+
+.. code-block:: pascal
+
+*)
+
+function AnimatingMulti(B: TBoxArray; Time, MinCount: Integer): TBooleanArray;
+var
+  Shifts: TIntegerArray;
+  TT, I, H: Integer;
+begin
+  TT := GetSystemTime + Time;
+  H := High(B);
+  SetLength(Result, H + 1);
+  for I := 0 to H do
+    Result[I] := True;
+  while (GetSystemTime < TT) do
+  begin
+   Shifts := PixelShiftMulti(B, 50);
+   for I := 0 to H do
+     if (Shifts[I] <= MinCount) then
+       Result[I] := False;
+  end;
+end;
+
+(*
+Animating
+~~~~~~~~~
+
+.. code-block:: pascal
+
+    function Animating(B: TBox; Time, MinCount: Integer): Boolean;
+
+Finds constant animation in box B during time T. If PixelShift in box B is smaller than MinCount, it's considered not animating.
+
+.. note::
+
+  by marpis
+
+Example:
+
+.. code-block:: pascal
+
+*)
+
+function Animating(B: TBox; Time, MinCount: Integer): Boolean;
+var
+  TBA: TBooleanArray;
+begin
+  TBA := AnimatingMulti([B], Time, MinCount);
+  Result := TBA[0];
+end;
+
+(*
+IsMoving
+~~~~~~~~
+
+.. code-block:: pascal
+
+    function IsMoving: Boolean;
+
+Results true if character is moving.
+
+.. note::
+
+  by marpis
+
+Example:
+
+.. code-block:: pascal
+
+*)
+
+
+function IsMoving: Boolean;
+begin
+  Result := PixelShift(IntToBox(MMCX-30, MMCY-30, MMCX+30, MMCY+30), 500) > 200;
+end;

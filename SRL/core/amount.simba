@@ -1,0 +1,605 @@
+(*
+Amount
+======
+
+The Amount include contains all kinds of functions to get the amount of items.
+Items can be in your bank or in your inventory.
+
+*)
+
+
+function BankScreen: Boolean; forward;
+function DepositScreen: Boolean; forward;
+
+(*
+TradeScreen
+~~~~~~~~~~~
+
+.. code-block:: pascal
+
+    function TradeScreen: Integer;
+
+Returns 1 or 2 for the respective tradescreens, 0 if neither is open.
+
+.. note::
+
+  by Zephyrsfury
+
+Example:
+
+.. code-block:: pascal
+
+*)
+
+function TradeScreen: Integer;
+begin
+  for Result := 2 downto 1 do
+    case Result of
+      2: if (CountColor(16776960, 127, 32, 373, 51) > 20) then Break;
+      1: if (GetColor(93, 69) = 0) then Break;
+    end;
+end;
+
+(*
+ShopScreen
+~~~~~~~~~~
+
+.. code-block:: pascal
+
+    Function ShopScreen : Boolean;
+
+Returns true if a shop interface is opened.
+
+.. note::
+
+  by ZephyrsFury fixed by NCDS
+
+Example:
+
+.. code-block:: pascal
+
+*)
+
+Function ShopScreen : Boolean;
+Begin
+  Result := FindTextTPA(2070783, 10, 58, 303, 85, 317, 'Right', StatChars, Nothing);
+End;
+
+(*
+FindItemEx
+~~~~~~~~~~
+
+.. code-block:: pascal
+
+    function FindItemEx(var x, y: Integer; IdentType: string; Ident: Integer; Area: TBox; Tol: TIntegerArray): Boolean;
+
+Finds an item in Area specified by TBox in Area. Valid IdentTypes are:
+             bmp, mask, color, dtm. The Tol variable is:
+             Tol[0] : Color Tolerance;
+             Tol[1] : Contour Tolerance or minimum Colors to Find to be True.
+
+.. note::
+
+  by Nava2
+
+Example:
+
+.. code-block:: pascal
+
+*)
+
+function FindItemEx(var x, y: Integer; IdentType: string; Ident: Integer; Area: TBox; Tol: TIntegerArray): Boolean;
+var
+  Pts: TPointArray;
+begin
+  Result := False;
+  SetLength(Tol, 2);
+  case Lowercase(IdentType) of
+    'bitmap mask', 'bmpmask', 'bmp mask', 'mask': Result := FindBitmapMaskTolerance(Ident, x, y, Area.x1, Area.y1, Area.x2, Area.y2, Tol[0], Tol[1]);
+    'bitmap', 'bmp': Result := FindTransparentBitmapTolerance(Ident, x, y, 0, Area.x1, Area.y1, Area.x2, Area.y2, Tol[0]);
+    'dtm': Result := FindDTM(Ident, x, y, Area.x1, Area.y1, Area.x2, Area.y2);
+    'colour', 'color':
+      begin
+        FindColorsTolerance(Pts, Ident, Area.x1, Area.y1, Area.x2, Area.y2, Tol[0]);
+        if Tol[1] < 1 then Tol[1] := 1;
+        Result := Length(Pts) >= Tol[1];
+        if Result then
+          MiddleTPAEx(Pts, x, y);
+      end;
+    else
+      SRL_Warn('FindItem', 'Invalid identifier input as IdentType.', -1);
+  end;
+end;
+
+(*
+FindItem
+~~~~~~~~
+
+.. code-block:: pascal
+
+    function FindItem(var x, y: Integer; IdentType: string; Ident, x1, y1, x2, y2: Integer; Tol: TIntegerArray): Boolean;
+
+
+Finds an item in Area specified by x1, y1, x2, y2 in the Area.
+    -   Valid IdentTypes are any of the SRL_Item types. The Tol variable is:
+    -   Tol[0] : Color Tolerance;
+    -   Tol[1] : Contour Tolerance or minimum Colors to Find to be True.   True.
+
+.. note::
+
+  by Nava2
+
+Example:
+
+.. code-block:: pascal
+
+*)
+
+function FindItem(var x, y: Integer; IdentType: string; Ident: Integer; x1, y1, x2, y2: Integer; Tol: TIntegerArray): Boolean;
+begin
+  Result := FindItemEx(x, y, IdentType, Ident, IntToBox(x1, y1, x2, y2), Tol);
+end;
+
+(*
+GetAmount
+~~~~~~~~~
+
+.. code-block:: pascal
+
+  function GetAmount(ItemX, ItemY: Integer): Integer;
+
+
+Returns the amount of an item at coordinates (ItemX, ItemY).
+Returns approximate values for 'K' and 'M'.
+
+.. note::
+
+  by Zeph, N1ke & Narcle
+
+Example:
+
+.. code-block:: pascal
+
+*)
+
+function GetAmount(ItemX, ItemY: Integer): Integer;
+var
+  Col: TIntegerArray;
+  X, Y, I: Integer;
+  B: TBox;
+  TPA: TPointArray;
+  S: String;
+begin
+  Result := 0;
+  If Not FindColor(X, Y, srl_outline_black, ItemX-30, ItemY-30, ItemX+30, ItemY+30)then
+    Exit;
+  Inc(Result);
+  Col := [65535, 65278, 16777215, 8453888];
+  For I := 0 to High(Col) do
+   If FindColor(X, Y, Col[I], ItemX-22, ItemY-22, ItemX+22, ItemY+22)then
+   begin
+     FindColors(TPA, Col[i], ItemX-22, ItemY-22, ItemX+22, ItemY+22);
+     B := GetTPABounds(TPA);
+     S := Trim(GetTextAtEx(B.X1-1, B.Y1-1, 0, StatChars, False, False, 0, 1, Col[I], 5, True, tr_AllChars));
+     Result := StrToIntDef(GetNumbers(S), 1);
+     Case I of
+       2: Result := Result * 1000;
+       3: Result := Result * 1000000;
+     end;
+     Exit;
+   end;
+end;
+
+(*
+AreaInfo
+~~~~~~~~
+
+.. code-block:: pascal
+
+  procedure AreaInfo(area: String; var startx, starty, rowsize, colsize, colnumber, rownumber: Integer);
+
+
+Returns info on certain interfaces.
+Row and col amounts, startcoords, sizes for inventory, bans, shop, ...
+
+.. note::
+
+  by masquerader fixed by Mr. Freeweed
+
+Example:
+
+.. code-block:: pascal
+
+*)
+
+procedure AreaInfo(area: string; var startx, starty, rowsize, colsize, colnumber, rownumber: Integer);
+begin
+  case LowerCase(area) of
+    'inv', 'inventory': begin
+                          startx := 560;
+                          starty := 212;
+
+                          rowsize := 36;
+                          colsize := 42;
+
+                          colnumber := 4;
+                          rownumber := 7;
+                        end;
+    'shop':             begin
+                          startx := 63;
+                          starty := 97;
+
+                          rowsize := 55;
+                          colsize := 39;
+
+                          colnumber := 10;
+                          rownumber := 4; //?
+                        end;
+    'bank':             begin
+                          startx := 35;
+                          starty := 91;
+
+                          rowsize := 44;
+                          colsize := 44;
+
+                          colnumber := 10;
+                          rownumber := 5;
+                        end;
+    'deposit box':      begin
+                          startx := 97;
+                          starty := 60;
+
+                          rowsize := 48;
+                          colsize := 50;
+
+                          colnumber := 7;
+                          rownumber := 4;
+                        end;
+    'trade':            begin
+                          startx := 310;
+                          starty := 75;
+
+                          rowsize := 32;
+                          colsize := 49;
+
+                          colnumber := 4;
+                          rownumber := 7;
+                        end;
+    'your trade':       begin
+                          startx := 24;
+                          starty := 75;
+
+                          rowsize := 32;
+                          colsize := 49;
+
+                          colnumber := 4;
+                          rownumber := 7;
+                        end;
+  else srl_Warn('AreaInfo', Area + ' is an invalid option', warn_AllVersions);
+  end;
+end;
+
+(*
+CheckArea
+~~~~~~~~~
+
+.. code-block:: pascal
+
+  function CheckArea(area: String): Boolean;
+
+
+Checks if the given interface is opened.
+
+.. note::
+
+  by masquerader streamlined by EvilChicken!
+
+Example:
+
+.. code-block:: pascal
+
+*)
+
+function CheckArea(area: string): Boolean;
+begin
+  Result := false;
+  case LowerCase(area) of
+    'inv', 'inventory': begin
+                          Result := (BankScreen) or (ShopScreen) or (TradeScreen > 0);
+                          if (not(Result)) then Result := GameTab(tab_Inv);
+                        end;
+    'shop': Result := ShopScreen;
+    'bank': Result := BankScreen;
+    'deposit box': Result := DepositScreen;
+    'trade', 'your trade': Result := (TradeScreen > 0);
+  else
+    srl_Warn('CheckArea', Area + ' is an invalid option.', warn_AllVersions);
+  end;
+  if (Result = False) then
+    WriteLn('PROBLEM: ' + area + ' interface not open');
+end;
+
+(*
+CheckArea
+~~~~~~~~~
+
+.. code-block:: pascal
+
+  function ItemCoordinates(Area, ItemType: string; Item, Tol: TIntegerArray): TPointArray;
+
+Returns a TPA with the positions of all occurances of Item.
+Parameters:
+
+    -   Area:   'inv', 'shop', 'bank', 'trade', 'your trade'.
+    -   ItemType:  DTM, Color, BitmapMask, Bitmap
+    -   Item:   name/value of your dtm/bmp/color/bmpmask.
+    -   Tol:    'dtm' - [] (dtm's can't have tolerance).
+                'bmp' - [BMPTol].
+                'color' - [COLOUR Tol, Minimum Colour Count].
+                'bmpmask' - [BMPTol, ContourTol].
+
+
+.. note::
+
+  by masquerader modified by ZephyrsFury
+
+Example:
+
+.. code-block:: pascal
+
+*)
+
+function ItemCoordinates(Area, ItemType: string; Item: Integer; Tol: TIntegerArray): TPointArray;
+var
+  startx, starty, rowsize, colsize, colnumber, rownumber, col, row: Integer;
+  x1, y1, x2, y2: Integer;
+  itemx, itemy, L: Integer;
+begin
+  if (CheckArea(area)) then
+  begin
+    AreaInfo(area, startx, starty, rowsize, colsize, colnumber, rownumber);
+    SetLength(Result, RowNumber * ColNumber);
+    for row := 0 to rownumber - 1 do
+      for col := 0 to colnumber - 1 do
+      begin
+        x1 := startx + col * colsize;
+        y1 := starty + row * rowsize;
+        x2 := x1 + colsize;
+        y2 := y1 + rowsize;
+        if FindItem(Itemx, Itemy, ItemType, Item, x1, y1, x2, y2, Tol) then
+        begin
+          Result[L].x := ItemX;
+          Result[L].y := ItemY;
+          Inc(L);
+        end;
+      end;
+  end;
+  SetLength(Result, L);
+end;
+
+(*
+CountItemsIn
+~~~~~~~~~~~~
+
+.. code-block:: pascal
+
+  function CountItemsIn(Area, ItemType: string; Item: Integer; Tol: TIntegerArray): Integer;
+
+Counts the number of items found within the Area. (Does not count stacks)
+Parameters:
+
+    -   Area:   'inv', 'shop', 'bank', 'trade', 'your trade'.
+    -   ItemType:   SRL_DTM, SRL_Bitmap, SRL_BitmapMask, SRL_Color
+    -   Item:   name/value of your dtm/bmp/color/bmpmask.
+    -   Tol:    'dtm' - [] (dtm's can't have tolerance).
+                'bmp' - [BMPTol].
+                'color' - [COLOUR Tol, Min Colour Count].
+                'bmpmask' - [BMPTol, ContourTol].
+
+.. note::
+
+  by masquerader modified by ZephyrsFury
+
+Example:
+
+.. code-block:: pascal
+
+*)
+
+function CountItemsIn(area, ItemType: string; Item: Integer; Tol: TIntegerArray): Integer;
+begin
+  Result := Length(ItemCoordinates(Area, ItemType, Item, Tol));
+end;
+
+(*
+CountItemsArea
+~~~~~~~~~~~~~~
+
+.. code-block:: pascal
+
+  function CountItemsArea(area: String): Integer;
+
+Counts items in a specified area. (Doesn't count stacks)
+
+.. note::
+
+  by masquerader
+
+Example:
+
+.. code-block:: pascal
+
+*)
+
+
+function CountItemsArea(area: string): Integer;
+begin
+  Result := CountItemsIn(area, 'colour', srl_outline_black,  [0, 1]);
+end;
+
+(*
+ItemAmount
+~~~~~~~~~~
+
+.. code-block:: pascal
+
+  function ItemAmount(Area, ItemType: string; Item: Integer; Tol: TIntegerArray): Integer;
+
+Counts the number of items found with a color in a certain area. (Counts stacks)
+Parameters:
+
+    -   Area - 'inv', 'shop', 'bank', 'trade', 'your trade'.
+    -   ItemType - 'dtm', 'bmp', 'color', 'bmpmask'.
+    -   Item - name/value of your dtm/bmp/color/bmpmask.
+    -   Tol - 'dtm' - [] (dtm's can't have tolerance).
+          'bmp' - [BMPTol].
+          'color' - [COLOUR Tol, Min Colour Count].
+          'bmpmask' - [BMPTol, ContourTol].
+
+.. note::
+
+  by masquerader modified by ZephyrsFury.
+
+Example:
+
+.. code-block:: pascal
+
+*)
+
+function ItemAmount(area, ItemType: string; Item: Integer; Tol: TIntegerArray): Integer;
+var
+  Coords: TPointArray;
+  i, h: Integer;
+begin
+  Result := 0;
+  Coords := ItemCoordinates(Area, ItemType, Item, Tol);
+  h := High(Coords);
+  for i := 0 to h do
+    Result := Result + GetAmount(Coords[i].x, Coords[i].y);
+end;
+
+(*
+FindCoins
+~~~~~~~~~
+
+.. code-block:: pascal
+
+  function FindCoins(var X, Y: Integer; Area: string): Boolean;
+
+Finds coins in Area and stores the coords in x and y.
+
+.. note::
+
+  by ZephyrsFury.
+
+Example:
+
+.. code-block:: pascal
+
+*)
+
+function FindCoins(var X, Y: Integer; Area: string): Boolean;
+var
+  B: TBox;
+  CTS, I, J, H, L: Integer;
+  Pts, tPts: TPointArray;
+  ATPA: T2DPointArray;
+  V: array [0..1] of TVariantArray;
+begin
+  case Lowercase(Area) of
+    'inv', 'inventory': B := IntToBox(MIX1, MIY1, MIX2, MIY2);
+    'bank': B := IntToBox(MBx1, MBy1, MBx2, MBy2);
+    'trade': B := IntToBox(323, 73, 509, 302);
+    'your trade': B := IntToBox(9, 73, 196, 302);
+  end;
+  V[0] := [1606307, 4, 0.09, 1.32]; //Darker colour (top of coins)
+  V[1] := [2209251, 8, 0.04, 1.08]; //Lighter colour (rest of the coins)
+  CTS := GetColorToleranceSpeed;
+  ColorToleranceSpeed(2);
+  SetLength(tPts, 0);
+  try
+    for I := 0 to 1 do
+    begin
+      SetColorSpeed2Modifiers(V[I][2], V[I][3]);
+      FindColorsTolerance(Pts, V[I][0], B.X1, B.Y1, B.X2, B.Y2, V[I][1]);
+      if (Length(Pts) < 10) then Exit;
+      ATPA := SplitTPAEx(Pts, 10, 10);
+      h := High(ATPA);
+      L := High(tPts) + 1;
+      SetLength(tPts, L + h + 1);
+      for J := 0 to H do
+        tPts[L + j] := MiddleTPA(ATPA[J]);
+    end;
+    ATPA := SplitTPAEx(tPts, 20, 20);
+    H := High(ATPA);
+    for I := 0 to H do
+      if (High(ATPA[I]) = 1) then
+        Break;
+    if (I > H) then Exit;
+    Result := True;
+    MiddleTPAEx(ATPA[I], X, Y);
+  finally
+    ColorToleranceSpeed(CTS);
+    SetColorSpeed2Modifiers(0.2, 0.2);
+  end;
+end;
+
+(*
+CoinAmount
+~~~~~~~~~~
+
+.. code-block:: pascal
+
+  function CoinAmount(Area: String): Integer;
+
+Returns the amount of coins in a specified interface.
+
+.. note::
+
+  by ZephyrsFury.
+
+Example:
+
+.. code-block:: pascal
+
+*)
+
+function CoinAmount(Area: string): Integer;
+var
+  X, Y: Integer;
+begin
+  if (FindCoins(X, Y, Area)) then
+    Result := GetAmount(X, Y);
+end;
+
+(*
+ShopSwitchTab
+~~~~~~~~~~~~~
+
+.. code-block:: pascal
+
+  procedure ShopSwitchTab(name:string);
+
+Switches the shop tab to the one you want, only moves mouse if
+  neccessary ShopSwitchTab('main') or ShopSwitchTab('player').
+
+.. note::
+
+  by Rasta Magician & ZephyrsFury
+
+Example:
+
+.. code-block:: pascal
+
+*)
+
+procedure ShopSwitchTab(Name: string);
+begin
+  if (not(InStrArr(Name, ['main', 'player'], False))) then
+  begin
+    srl_Warn('ShopSwitchTab', 'Name: ' + Name + ' is not a valid tab.', warn_AllVersions);
+    Exit;
+  end;
+  if (ShopScreen) then
+    FindTextTpa(1930687, 0, 50, 65, 225, 83, Capitalize(Name), SmallChars, ClickLeft);
+end;

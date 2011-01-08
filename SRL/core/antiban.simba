@@ -1,0 +1,395 @@
+(*
+Antiban
+=======
+
+The Atiban include contains functions how not to get banned.
+
+*)
+
+(*
+RandomRClick
+~~~~~~~~~~~~
+
+.. code-block:: pascal
+
+    procedure RandomRClick;
+
+Performs random right click to stay active.
+
+.. note::
+
+    by phantombmx/EvilChicken!, idea by NaumanAkhlaQ
+
+Example:
+
+.. code-block:: pascal
+
+*)
+
+procedure RandomRClick;
+var
+  I: TBooleanArray;
+  II, M, R: Byte;
+  Inv: Boolean;
+begin
+  if (not LoggedIn) then exit;
+  M := MouseSpeed;
+  MouseSpeed := 7 + Random(25);
+  Inv := (GetCurrentTab = tab_Inv);
+  if (Inv) then Inv := ((not InvEmpty) and (Random(3) > 0));
+  if (not Inv) then
+    MouseBox(MSX1, MSY1, MIX2, MIY2, 2)
+  else
+  begin
+    SetLength(I, 28);
+    for II := 0 to 27 do
+      I[II] := ExistsItem(II + 1);
+
+    R := RandomRange(1, 28);
+    while (not I[R - 1]) do
+      R := RandomRange(1, 28);
+    InvMouse(R, 2);
+  end;
+  Inv := False;
+  if (Random(3) > 0) then
+    Inv := ChooseOption('xamine');
+  if (not Inv) then ChooseOption('ancel');
+  MouseSpeed := M;
+end;
+
+(*
+HoverSkill
+~~~~~~~~~~
+
+.. code-block:: pascal
+
+    procedure HoverSkill(Skill: variant; Click: Boolean);
+
+Hovers mouse over selected skill to "check exp"
+Click = True will Click Skill and Click = False will 'Hover'.
+Won't "check" skills where your level is 1.
+
+.. note::
+
+    by Dankness/Cheesehunk/Ron/Raymond/ZephyrsFury
+
+Example:
+
+.. code-block:: pascal
+
+*)
+
+procedure HoverSkill(Skill: variant; Click: Boolean);
+var
+  TP: TPoint;
+  Skills: TStringArray;
+  TheSkill: string;
+begin
+  if(not(GameTab(tab_Stats))) then exit;
+  
+  if ((VarType(Skill) = varInteger) or (VarType(Skill) = varByte)) then
+  begin
+
+    if Skill > 0 then
+      TP := SkillToCoords(Skill)
+    else
+      repeat
+        Skill := RandomRange(skill_Attack, skill_Summoning);
+        TP := SkillToCoords(Skill);
+      until(GetSkillLevel(TheSkill) > 1)
+
+  end else begin
+  
+    if(Lowercase(Skill) <> 'random')then
+      TP := SkillToCoords(Skill)
+    else
+    repeat
+      Skills := ['attack','defence','strength','hitpoints','mining','smithing','woodcutting','firemaking','magic',
+                 'fletching','hunter', 'summoning','fishing','construction','herblore','agility','thieving','crafting',
+                 'ranged','slayer','farming', 'prayer', 'runecrafting', 'cooking'];
+      TheSkill := Skills[Random(Length(Skills))];
+      TP := SkillToCoords(TheSkill);
+    until (TP.x > 0) and (GetSkillLevel(TheSkill) > 1);
+
+  end;
+  
+  if(Click)then
+  begin
+    Mouse(Tp.X, TP.Y, 10, 10, True);
+    Wait(5000 + Random(9000));
+    CloseWindow;
+  end else
+  begin
+     MMouse(TP.x, TP.y, 10, 10);
+     Wait(1000 + Random(3000));
+  end;
+end;
+
+(*
+PickUpMouse
+~~~~~~~~~~~
+
+.. code-block:: pascal
+
+    procedure PickUpMouse;
+
+Acts just like you picked your mouse off the pad...
+then sets it back down.
+
+.. note::
+
+    by dark_sniper
+
+Example:
+
+.. code-block:: pascal
+
+*)
+
+procedure PickUpMouse;
+var
+  cx, cy, XX, YY: Integer;
+begin
+  if(not(LoggedIn))then
+    exit;
+  GetMousePos(cx, cy);
+  XX := cx;
+  YY := cy;
+  if(Random(2) = 0)then
+    MMouse(cx - 3 - Random(5), cy - 8 - Random(17), 0, 0)
+  else
+    MMouse(cx + 3, cy - 8 - Random(17), 5, 0);
+  Wait(1131 + Random(358));
+  if(Random(2) = 0)then
+    MMouse(XX + 3, YY + 8, 5, 9)
+  else
+    MMouse(XX - 3 - Random(5), YY + 8, 0, 9);
+end;
+
+(*
+RandomMovement
+~~~~~~~~~~~~~~
+
+.. code-block:: pascal
+
+    procedure PickUpMouse;
+
+Presses random arrow keys and moves the mouse. Able to press 2 keys simultaneously.
+
+.. note::
+
+    by Krazy_Meerkat
+
+Example:
+
+.. code-block:: pascal
+
+*)
+
+procedure RandomMovement;
+var
+  Keys: TIntegerArray;
+  I: Integer;
+  Deg: Extended;
+begin
+ if(not(LoggedIn))then exit;
+  Keys := [VK_RIGHT, VK_LEFT];
+  I := Random(2);
+ if (Random(2) = I) then
+  begin
+   ActivateClient;
+   Deg := RS_GetCompassAngleDegrees;
+   Wait(100 + random(50));
+   KeyDown(Keys[I]);
+   Wait(500 + random(1000));
+   KeyUp(Keys[I]);
+   Wait(500 + random(1000));
+   MakeCompass(Deg);
+  end else
+   if (Random(3) = 0) then
+    SleepAndMoveMouse(1000 + random(200));
+end;
+
+(*
+BoredHuman
+~~~~~~~~~~
+
+.. code-block:: pascal
+
+    procedure BoredHuman;
+
+Performs 5-15 times:
+    - Rotates the cam,
+    - Moves the mouse around MainScreen,
+    - If it finds IsUpText('option'), it will Chooseoption('Examine');
+
+.. note::
+
+    by WT-Fakawi, small edit by Hy71194
+
+Example:
+
+.. code-block:: pascal
+
+*)
+
+procedure BoredHuman;
+var
+  i, x, y: Integer;
+  Deg: Variant;
+begin
+  if not LoggedIn then exit;
+  Deg := rs_GetCompassAngleDegrees;
+  for i := 1 to (3 + Random(11)) do
+  begin
+    MMouse(Random(MSX2), Random(MSY2), 0, 0);
+    if IsUpText('opti') then
+    begin
+      GetMousePos(x, y);
+      Mouse(x, y, 0, 0, False);
+      ChooseOption('Examine');
+    end;
+    case Random(6) of
+      0: SendArrowWait(((Random(2) * 2) + 1), 1000 + Random(200));
+      1: SendArrowWait(((Random(2) * 2)), 1000 + Random(200));
+      2: SendArrowWait(((Random(2) * 2) + 1), 200 + Random(200));
+      3: SendArrowWait(((Random(2) * 2)), 200 + Random(200));
+      4: SendArrowWait(((Random(2) * 2) + 1), 20 + Random(20));
+      5: SendArrowWait(((Random(2) * 2)), 20 + Random(20));
+    end;
+  end;
+  if (Deg <> 0) then
+    MakeCompass(Round(Deg))
+  else
+    MakeCompass('N');
+  SendArrowWait(0, 750 + Random(500));
+end;
+
+(*
+ExamineInv
+~~~~~~~~~~
+
+.. code-block:: pascal
+
+    procedure ExamineInv;
+
+Chooses a random item in the inventory to examine.
+
+.. note::
+
+    by R1ch
+
+Example:
+
+.. code-block:: pascal
+
+*)
+
+procedure ExamineInv;
+var
+  InvSpots: array of Byte;
+  I, L: Byte;
+begin
+  if (InvEmpty) then exit;
+  for I := 1 to 28 do
+    if ExistsItem(I) then
+    begin
+      SetLength(InvSpots, Length(InvSpots) + 1);
+      InvSpots[L] := I;
+      Inc(L);
+    end;
+  MouseItem(InvSpots[Random(Length(InvSpots))], False);
+  if (not WaitOption('xamine', 375)) then
+    if (Random(2) = 0) then
+      WaitOption('ancel', 375);
+end;
+
+{*******************************************************************************
+procedure RandomAngle(HowToEnd : Variant);
+By: R1ch
+Description: Randomly changes the angle of the compass. Finishes depending on
+             HowToEnd:
+                      1, 'up', True = Highest angle
+                      2, 'down', False = Lowest angle
+             Put '' to leave it as it is.
+*******************************************************************************}
+
+(*
+RandomAngle
+~~~~~~~~~~~
+
+.. code-block:: pascal
+
+    procedure ExamineInv;
+
+Randomly changes the angle of the compass. Finishes depending on HowToEnd:
+    - 1, 'up', True = Highest angle
+    - 2, 'down', False = Lowest angle
+    - Put '' to leave it as it is.
+
+.. note::
+
+    by R1ch
+
+Example:
+
+.. code-block:: pascal
+
+*)
+
+
+
+procedure RandomAngle(HowToEnd : Variant);
+var
+  Key : Byte;
+  B : Boolean;
+begin
+  B:= RBoolEx(2);
+  if B then
+    Key:= 38
+  else
+    Key:= 40;
+  SetAngle(B);
+  Wait(RandomRange(500, 1000));
+  KeyDown(Key);
+  Wait(RandomRange(500, 1100));
+  KeyUp(Key);
+  Wait(RandomRange(500, 1000));
+  case (HowToEnd) of
+    1, 'up', True : SetAngle(True);
+    2, 'down', False : SetAngle(False);
+  end;
+end;
+
+(*
+LevelUp
+~~~~~~~~~~~
+
+.. code-block:: pascal
+
+    function LevelUp : Boolean;
+
+Checks if you've leveled up - click Continue and returns True.
+
+.. note::
+
+    by R1ch
+
+Example:
+
+.. code-block:: pascal
+
+*)
+
+function LevelUp : Boolean;
+var
+  X, Y : Integer;
+begin
+  if (not(FindColor(X, Y, 0, 7, 460, 69, 474))) then
+    Result:= FindNPCChatText('gratu', Nothing);
+  if Result then
+  begin
+    ClickContinue(True, True);
+    WriteLn(Players[CurrentPlayer].Name + ' leveled up');
+  end;
+end;

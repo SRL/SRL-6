@@ -1,0 +1,356 @@
+//-----------------------------------------------------------------//
+//--               Scar Standard Resource Library                --//
+//--               » Mordaut Routines                            --//
+//-----------------------------------------------------------------//
+// * function InMordaut: Boolean;                                  // * by Nava2
+// * function ExitMordaut: Boolean;                                // * by Nava2
+// * function M_Explode(var a: TIntegerArray; Border, S: string): Integer; // * by Iroki and Nava2
+// * function M_QuestionType: string;                              // * by Iroki and Nava2
+// * procedure M_SmallPuzzle;                                      // * by Iroki
+// * procedure M_BigPuzzle;                                        // * by Iroki
+// * Procedure SolveMordaut;                                       // * by Nava2 and Iroki
+{--------------------------Plugin Routines-----------------------------}
+// * function Mordaut_GetSlotNr(ScanningTime: Extended; ClientHDC: HDC): integer;                         // * by Iroki
+// * function Mordaut_GetBigSlotNr(ScanningTime: Extended; QuestionType: string; ClientHDC: HDC): string; // * by Iroki
+
+
+(* Special Thanks to NaumanAkhlaQ the original work on this Solver.
+                                                        ~ Nava2 and Iroki     *)
+                                                        
+                                                        
+const
+  M_ScanningTime = 3.5;  // Time in seconds to scan.
+
+{*******************************************************************************
+function InMordaut: Boolean;
+by: Nava2 fixed by NCDS
+Description: Finds if your in Mr.Mordaut random
+*******************************************************************************}
+function InMordaut: Boolean;
+Begin
+  Result := (CountColor(128, 258, 358, 352, 372) = 191);
+end;
+
+{*******************************************************************************
+function ExitMordaut: Boolean;
+by: Nava2
+Description: Exits the classroom!
+*******************************************************************************}
+function ExitMordaut: Boolean;
+var
+  Str, tS, sR: String;
+  T, i, h, cts, fCount, mx, my, A, C: Integer;
+  Pts: TPointArray;
+  aPts: T2DPointArray;
+  P: TPoint;
+begin
+  Result := False;
+  if FindTextTpa(clBlack, 0, MCX1, MCY1, MCX2, MCY2, 'ext question', NPCChars, Nothing) then Exit;
+  if (not FindTextTpa(clBlack, 0, MCX1, MCY1, MCX2, MCY2, 'exit', NPCChars, Nothing)) then
+    while ClickContinue(True, True) do
+    begin
+      if FindTextTpa(clBlack, 0, MCX1, MCY1, MCX2, MCY2, 'exit', NPCChars, Nothing) then Break;
+      Wait(50);
+    end;
+
+  repeat
+    if fCount = 5 then Break;
+    Inc(fCount);
+    if FindTextTpa(clBlack, 0, MCX1, MCY1, MCX2, MCY2, 'exit', NPCChars, Nothing) then
+      Str := GetTextAtEx(125, 388, 0, NPCChars, False, False, 0, 1, 0, 80, False, tr_NormalChars)
+    else
+    begin
+      Wait(3000);
+      Continue;
+    end;
+
+    //Writeln(Str);
+    SetAngle(True);
+    tS := Lowercase(Trim(Between('in the ', ' of', Str)));
+    sR := '[Mordaut] Finding the ' + tS + ' door with ';
+    case tS of
+      'south-west' : begin P := Point(MMX1, MMY2); A := 270; end;
+      'north'      : begin P := Point(MMX2, MMY1); A := 0; end;
+      'north-west' : begin P := Point(MMX1, MMY1); A := 270; end;
+      'south-east' : begin P := Point(MMX2, MMY2); A := 90; end;
+      else
+      begin
+        Writeln('[Mordaut] Could not get Direction of door - ''' + tS + '''');
+        Continue;
+      end;
+    end;
+
+    tS := Trim(Between(' the ', ' door', Str));
+    case tS of
+      'purple circle' : C := 14370509;
+      'red cross'     : C := 923262;
+      'green square'  : C := 3658833;
+      'blue star'     : C := 6904632;
+      else
+      begin
+        Writeln('[Mordaut] Could not get the type of door - ''' + tS + '');
+        Continue;
+      end;
+    end;
+    sR := sR + tS + ' on the glass.';
+    Writeln(sR);
+
+    cts := GetColorToleranceSpeed;
+    ColorToleranceSpeed(1);
+
+    //FindColorsPie(Pts, 237, 17, A - 6, A + 6, 10, 60, MMX1, MMY1, MMX2, MMY2, MMCX, MMCY);
+    FindColorsTolerance(Pts, 237, MMX1, MMY1, MMX2, MMY2, 17);
+    aPts := SplitTPAEx(Pts, 1, 1);
+    WriteLn('Found ' + IntToStr(Length(aPts)) + ' doors.');
+    if (High(aPts) = -1) then Break;
+    SortATPAFromFirstPoint(aPts, P);
+    MiddleTPAEx(aPts[0], mx, my);
+    Mouse(mx, my, 0, 2, True);
+    Flag;
+
+    MakeCompass(RandomRange(A - 6, A + 6));
+
+    //ClickToContinue;
+
+    FindColorsTolerance(Pts, C, MSX1, MSY1, MSX2, MSY2, 10);
+    //DebugTPA(Pts, '');
+    ColorToleranceSpeed(cts);
+    aPts := SplitTPA(Pts, 3);
+    SortATPASize(aPts, True);
+    h := High(aPts);
+    for i := 0 to h do
+    begin
+      if high(aPts[i]) < 5 then Continue;
+      MiddleTPAEx(aPts[i], mx, my);
+      MMouse(mx, my, 5, 5);
+      Wait(RandomRange(100, 150));
+      if IsUpText('oor') then
+      begin
+        GetMousePos(mx, my);
+        Mouse(mx, my, 0, 0, True);
+        Flag;
+        T := GetSystemTime;
+        while (InMordaut) and (GetSystemTime - T < 15000) do
+        begin
+          ClickContinue(True, True);
+          Wait(100 + RandomRange(50, 100));
+        end;
+        Break;
+      end;
+    end;
+
+    Wait(4000 + Random(1000));
+    Result := TabExists(tab_Inv);
+  until Result or (fCount = 5);
+  if not Result then
+    SRL_Warn('ExitMordaut', 'Could not exit', Warn_AllVersions);
+End;
+
+{*******************************************************************************
+function M_Explode(var a: TIntegerArray; Border, S: string): Integer;
+by: Iroki and Nava2
+Description: Explodes string
+*******************************************************************************}
+function M_Explode(var a: TIntegerArray; Border, S: string): Integer;
+var
+  S2: string;
+  b: TStringArray;
+  i, h: Integer;
+begin
+  Result := 0;
+  S2 := S + Border;
+  repeat
+    SetLength(b, Length(b) + 1);
+    b[Result] := Copy(S2, 0, Pos(Border, S2) - 1);
+    Delete(S2, 1, Length(b[Result] + Border));
+    Inc(Result);
+  until S2 = '';
+  h := High(b);
+  SetLength(a, h + 1);
+  for i := 0 to h do
+  try a[i] := StrToInt(GetNumbers(Trim(b[i]))); except Writeln('[Mordaut - Explode] String ' + IntToStr(i) + ' ''' + b[i] + ''''); end;
+end;
+
+{*******************************************************************************
+function M_QuestionType: string;
+by: Iroki and Nava2
+Description: Gets the large puzzle combination.
+*******************************************************************************}
+function M_QuestionType: integer;
+
+var
+  X, Y, ii, i, h : integer;
+  QO : array [1..10] of TStringArray;
+begin
+  Result := 0;
+  QO[1] := ['thirst', 'dehydrated'];
+  QO[2] := ['landlubbers', 'pirate', 'hearties'];
+  QO[3] := ['shiny', 'jewellery', 'bangles'];
+  QO[4] := ['arrow', 'archer', 'ranged'];
+  QO[5] := ['fire', 'igniting'];
+  QO[6] := ['-to-', 'melee'];
+  QO[7] := ['wizard', 'pocus', 'mystical'];
+  QO[8] := ['unmask', 'disguise', 'hidden'];
+  QO[9] := ['headgear', 'hat', 'cap'];
+  QO[10]:= ['fish'];
+
+  for ii := 1 to 10 do
+  begin
+    h := High(QO[ii]);
+    For i := 0 to h Do
+      If FindText(x, y, QO[ii][i], SmallChars, 373, 60, 473, 160) then
+      begin
+        result := ii;
+        WriteLn('[Mordaut - Big] Question combination is ' + Tostr(Result));
+        Exit;
+      end;
+  end;
+  Writeln('Unknown Combination');
+  TakeScreen('[Mordaut - Big] Unknown combination');
+end;
+
+{*******************************************************************************
+function M_SmallPuzzle: integer;
+by: Iroki
+Description: Solves the small puzzle, choose the next in the sequence.
+*******************************************************************************}
+function M_SmallPuzzle: integer;
+var
+  i: integer;
+begin
+  for i := 0 to 4 do
+  begin
+    Result := Mordaut_GetSlotNr(M_ScanningTime, ExportImageTarget);
+    Wait(RandomRange(1000, 2000));
+    if (Result <> 0) then Exit;
+  end;
+  Writeln('[Mordaut - Small] Could not figure out answer, guessing.');
+  TakeScreen('[Mordaut - Small] Unknown Answer');
+  Result := RandomRange(3, 6);
+end;
+
+{*******************************************************************************
+function m_GetSlots(const slots : integer) : TIntegerArray;
+by: Raymond
+Description: Returns which slots are stored in the integer.. (Simba)
+*******************************************************************************}
+function m_GetSlots(const slots : integer) : TIntegerArray;
+var
+  i : integer;
+begin
+  for i := 0 to 31 do
+    if (slots and (1 shl i)) <> 0 then
+    begin
+      setlength(result, length(result) + 1);
+      result[high(result)] := i;
+    end;
+end;
+{*******************************************************************************
+procedure M_BigPuzzle;
+by: Iroki
+Description: Solves the large puzzle, choose three common themed.
+*******************************************************************************}
+procedure M_BigPuzzle;
+var
+  ThaSlots : integer;
+  s : string;
+  Slots: TIntegerArray;
+  i, Sx1, Sy1, Sx2, Sy2: integer;
+begin
+  Mordaut_GetBigSlotNr(M_ScanningTime, M_QuestionType, ExportImageTarget, ThaSlots);
+  Slots := m_GetSlots(ThaSlots);
+  S := '[Mordaut - Big] Answers: ';
+  for i := 0 to 2 do
+  begin
+    case Slots[i] of
+      0..4:
+        begin
+          Sx1 := 40 + Slots[i] * 67;
+          Sy1 := 35;
+          Sx2 := Sx1 + 63;
+          Sy2 := 114;
+        end;
+      5..9:
+        begin
+          Sx1 := -295 + Slots[i] * 67;
+          Sy1 := 126;
+          Sx2 := Sx1 + 63;
+          Sy2 := 205;
+        end;
+      10..14:
+        begin
+          Sx1 := -630 + Slots[i] * 67;
+          Sy1 := 217;
+          Sx2 := Sx1 + 63;
+          Sy2 := 296;
+        end;
+    end;
+    Wait(RandomRange(1500, 2000));
+    Mouse(Sx1 + Random(Sx2 - Sx1), Sy1 + Random(Sy2 - Sy1), 0, 0, true);
+    S := S + IntToStr(Slots[i]) + ' ';
+  end;
+  Writeln(Copy(S, 1, Length(S) - 1)  + '.');
+end;
+
+{*******************************************************************************
+Procedure SolveMordaut;
+by: Nava2 and Iroki
+Description: Solves the Mordaut random.
+*******************************************************************************}
+function SolveMordaut: Boolean;
+var
+  x, y, cts, T, M: integer;
+  HandDTM: Integer;
+begin
+  if not InMordaut then Exit;
+
+  while ClickContinue(True, True) do
+    Wait(100 + Random(50));
+
+  HandDTM := DTMFromString('78DA63E4646060E063400187BBD3184480342' +
+             '310FF0702466E208309558D083333030B540D08300A619A83A146' +
+             '002488AA86879911550D1B901025A006E4161E5435E2DC2C286A0' +
+             '0ACBB06F0');
+
+  cts := GetColorToleranceSpeed;
+
+  T := GetSystemTime;
+  repeat
+    if not LoggedIn then Break;
+    
+    if (FindDTM(HandDTM, X, Y, MSX1, MSY1, MSX2, MSY2)) then
+    begin
+      WriteLn('[Mordaut] Found Large Puzzle');
+      M_BigPuzzle;
+      Wait(RandomRange(1000, 2000));
+      if FindDTM(HandDTM, x, y, MSX1, MSY1, MSX2, MSY2) then
+        Mouse(x - 3, y - 3, 7, 7, True);
+    end else
+      if (CountColor(0, 165, 142, 357, 183) = 322) then
+      begin
+        Writeln('[Mordaut] Found Small Puzzle');
+        case M_SmallPuzzle of
+          3: Mouse(RandomRange(91, 131), RandomRange(220, 252), 0, 0, True);
+          4: Mouse(RandomRange(187, 227), RandomRange(220, 252), 0, 0, True);
+          5: Mouse(RandomRange(290, 315), RandomRange(220, 252), 0, 0, True);
+          6: Mouse(RandomRange(379, 419), RandomRange(220, 252), 0, 0, True);
+        end;
+      end;
+    
+    M := GetSystemTime;
+    while (not(InConvo)) and (GetSystemTime - M < 20000) do
+      Wait(3000 + Random(2000));
+    if FindTextTpa(clBlack, 0, MCX1, MCY1, MCX2, MCY2, 'ext question', NPCChars, Nothing) then
+    begin
+      while (ClickContinue(True, True)) do
+        Wait(100);
+      Continue;
+    end else
+    
+    
+    Result := ExitMordaut;
+  until (Result) or (GetSystemTime - T > 300000);
+
+  FreeDTM(HandDTM);
+  ColorToleranceSpeed(cts);
+end;

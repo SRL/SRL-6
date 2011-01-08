@@ -1,0 +1,637 @@
+//----------------------------------------------------------------------------//
+//--               Scar Standard Resource Library                           --//
+//--               » SmartColor Routines                                    --//
+//----------------------------------------------------------------------------//
+// * procedure SC_Debug(s: string);                                           // by Rasta Magician
+// * procedure MakeObjEx(Index, MyColor, MyTol: integer; MyHue,               // by Rasta Magician
+// *                 MySat: extended; MyUpTexts, MyOptions: TStringArray);    //
+// * procedure MakeObj(MyName: variant; MyColor, MyTol: integer; MyHue,       // by Rasta Magician
+//                   MySat: extended; MyUpTexts, MyOptions: TStringArray);    //
+// * function GetObject(Which: string; var ObjID: integer): TMSObj;           // by Rasta Magician
+// * procedure SetupSmartColorsDetailsEx(Index, ColorMin, ColorMax,           // by Rasta Magician
+// *        MaxColors, BoxSize, Tol, Dist, ClickStyle, R_RL_Chance: integer); //
+// * procedure SetupSmartColorsDetails(Name: string; ColorMin, ColorMax,      // by Rasta Magician
+//          MaxColors, BoxSize, Tol, Dist, ClickStyle, R_RL_Chance: integer); //
+// * function CheckNewColor(Color: integer; Rock: TMSObj): boolean;           // by Rasta Magician
+// * function AnalyseColor(Color: integer): integer;                          // by Rasta Magician
+// * function OrganizeColors(Colors, Lengths: TIntegerArray): TIntegerArray;  // by Rasta Magician
+// * function GatherColors(var Rock: TMSObj): boolean;                        // by Rasta Magician
+// * function CheckAndClick(Pos: TPoint, Rock: TMSObj): boolean;              // by Rasta Magician
+// * function FirstFinder(var Rock: TMSObj): boolean;                         // by Rasta Magician
+// * function SmartColorsEx(Index: integer): boolean;                         // by Rasta Magician
+// * function SmartColors(FindWhat: variant): boolean;                        // by Rasta Magician
+
+const
+{ SC_ constants are the suggested values, however, you can use different values
+  by calling SetupSmartColorsDetails; }
+  
+  //SmartColors Specifics
+    DEBUG_SMART_COLORS    = true;
+    SC_UNIQUE_COLOR_MIN      =  5;
+    SC_UNIQUE_COLOR_MAX      = 20;
+    SC_MAX_COLORS_IN_ARRAY   =  7;
+    SC_HALF_BOX_SIZE         = 25;
+    SC_USE_TOL               =  5;
+    SC_TPA_DIST              =  5;
+    
+    //Clicking Style
+      SC_CLICK_STYLE = 3;
+      LEFT_CLICK      = 1;
+      RIGHT_CLICK     = 2;
+      RANDOM_RL_CLICK = 3;
+        SC_RANDOM_RL_CHANCE = 20; // x / 100 for R click
+
+    //Timing
+      UPTEXT_TIME = 300; // ms
+      RANDOM_WAIT = 50;  // ms
+
+type
+{Type TSCDetails
+   Description: Extra Object details; Can set them up or leave it to default values }
+  TSCDetails = record
+    IsSCSetup           : boolean; //do not touch, let SC know if you are using custom or default values
+    UNIQUE_COLOR_MIN    : integer; //the mininum amount of color for it to join the SC array
+    UNIQUE_COLOR_MAX    : integer; //same as above for maximum
+    MAX_COLORS_IN_ARRAY : integer; //max length of SC Array
+    HALF_BOX_SIZE       : integer; //half box size of object you are searching
+    USE_TOL             : integer; //tolerance for your object
+    TPA_DIST            : integer; //max distanc between points
+    CLICK_STYLE         : integer; //how to click your object. Check consts
+    RANDOM_RL_CHANCE    : integer; // x/100 to do R Click instead of L click
+  end;
+
+{ Type TMSObj
+    Description: To be used for finding on the MS. Stores all necessary
+    information. }
+  TMSObj = record
+    Name      : variant;
+    UpTexts   : TStringArray;
+    Options   : TStringArray;
+    Color     : integer;
+    Tol       : integer;
+    Hue       : extended;
+    Sat       : extended;
+    SCArray   : TIntegerArray;
+    Details   : TSCDetails;
+  end;
+
+
+var
+  SCObjectsArray: Array of TMSObj;
+
+{*******************************************************************************
+procedure SC_Debug(s: string);
+By: Rasta Magician
+Description: Will Debug SmartColors if DEBUG_SMART_COLORS = True
+*******************************************************************************}
+procedure SC_Debug(s: string);
+begin
+  if not DEBUG_SMART_COLORS then
+    exit;
+  debugln(s);
+end;
+
+{*******************************************************************************
+procedure MakeObjEx(Index, MyColor, MyTol: integer; MyHue, MySat: extended; MyUpTexts, MyOptions: TStringArray);
+By: Rasta Magician
+Description: Will save the information about an object to a global array.
+             Uses CTS 2
+*******************************************************************************}
+procedure MakeObjEx(Index, MyColor, MyTol: integer; MyHue, MySat: extended; MyUpTexts, MyOptions: TStringArray);
+var
+  L: integer;
+begin
+  L := Length(SCObjectsArray);
+  
+  //avoiding conflicting records
+  if (Index < L) then
+    if  (SCObjectsArray[Index].Color <> 0) then
+    begin
+      srl_Warn('MakeObjEx', 'Index ' + IntToStr(Index) + ' is already in use and can not be overwritten; Use a different Index',
+              warn_AllVersions);
+      exit;
+    end;
+
+  if (Index >= L) then
+    SetLength(SCObjectsArray, Index + 1);
+
+  with SCObjectsArray[Index] do
+  begin
+    Name := Index;
+    UpTexts := MyUpTexts;
+    Options := MyOptions;
+    Color := MyColor;
+    Tol := MyTol;
+    Hue := MyHue;
+    Sat := MySat;
+  end;
+end;
+
+{*******************************************************************************
+procedure MakeObj(MyName: variant; MyColor, MyTol: integer; MyHue, MySat: extended; MyUpTexts, MyOptions: TStringArray);
+By: Rasta Magician
+Description: Will save the information about an object to a global array.
+             Uses CTS 2
+*******************************************************************************}
+procedure MakeObj(MyName: variant; MyColor, MyTol: integer; MyHue, MySat: extended; MyUpTexts, MyOptions: TStringArray);
+var
+  L: integer;
+begin
+  L := Length(SCObjectsArray);
+  SetLength(SCObjectsArray, L + 1);
+
+  with SCObjectsArray[L] do
+  begin
+    Name := MyName;
+    UpTexts := MyUpTexts;
+    Options := MyOptions;
+    Color := MyColor;
+    Tol := MyTol;
+    Hue := MyHue;
+    Sat := MySat;
+  end;
+end;
+
+{*******************************************************************************
+function GetObject(Which: string; var ObjID: integer): TMSObj;
+By: Rasta Magician
+Description: Retrieves object 'Which' from the global array
+*******************************************************************************}
+function GetObject(Which: variant; var ObjID: integer): TMSObj;
+var
+  i, L : integer;
+  MyName : string;
+begin
+  ObjID := -1;
+  try
+    L := High(SCObjectsArray);
+  except
+    writeln('Object never initialized: ' + string(which));
+    exit;
+  end;
+  
+  MyName := lowercase(Which);
+
+  for i:= 0 to L do
+    if MyName = lowercase(SCObjectsArray[i].Name) then
+    begin
+      Result := SCObjectsArray[i];
+      ObjID := i;
+      break;
+    end;
+
+end;
+
+{*******************************************************************************
+procedure SetupSmartColorsDetailsEx(Index, ColorMin, ColorMax, MaxColors, BoxSize, Tol, Dist, ClickStyle, R_RL_Chance: integer);
+By: Rasta Magician
+Description: Sets up several variables used in SmartColors.
+*******************************************************************************}
+procedure SetupSmartColorsDetailsEx(Index, ColorMin, ColorMax, MaxColors, BoxSize, Tol, Dist, ClickStyle, R_RL_Chance: integer);
+begin
+
+  with SCObjectsArray[Index].Details do
+  begin
+    IsSCSetup               := true;
+    UNIQUE_COLOR_MIN        := ColorMin;
+    UNIQUE_COLOR_MAX        := ColorMax;
+    MAX_COLORS_IN_ARRAY     := MaxColors;
+    HALF_BOX_SIZE           := (BoxSize/2);
+    USE_TOL                 := Tol;
+    TPA_DIST                := Dist;
+    CLICK_STYLE             := ClickStyle;
+    RANDOM_RL_CHANCE        := R_RL_Chance;
+  end;
+end;
+
+{*******************************************************************************
+procedure SetupSmartColorsDetails(Name: string; ColorMin, ColorMax, MaxColors, BoxSize, Tol, Dist, ClickStyle, R_RL_Chance: integer);
+By: Rasta Magician
+Description: Sets up several variables used in SmartColors.
+*******************************************************************************}
+procedure SetupSmartColorsDetails(Name: variant; ColorMin, ColorMax, MaxColors, BoxSize, Tol, Dist, ClickStyle, R_RL_Chance: integer);
+var ID: integer;
+begin
+  GetObject(Name, ID);
+  
+  SetupSmartColorsDetailsEx(ID, ColorMin, ColorMax, MaxColors, BoxSize, Tol, Dist, ClickStyle, R_RL_Chance);
+end;
+
+{*******************************************************************************
+function CheckNewColor(Color: integer; Rock: TMSObj): boolean;
+By: Rasta Magician
+Description: Returns true if Color is in tolerance range of the color
+             provided for the Object
+*******************************************************************************}
+function CheckNewColor(Color: integer; Rock: TMSObj): boolean;
+var
+  CTS: integer;
+  //H, S: extended;
+begin
+  CTS := GetColorToleranceSpeed;
+  //GetColorspeed2Modifiers(H, S);
+
+  ColorToleranceSpeed(2);
+  SetColorspeed2Modifiers(Rock.Hue, Rock.Sat);
+
+  Result := SimilarColors(Color, Rock.Color, Rock.Tol);
+
+  ColorToleranceSpeed(CTS);
+  //SetColorspeed2Modifiers(H, S);
+end;
+
+{*******************************************************************************
+function AnalyseColor(Color: integer; Rock: TMSObj): integer;
+By: Rasta Magician
+Description: Scans MS for Color, returning the number of times it was found
+*******************************************************************************}
+function AnalyseColor(Color: integer; Rock: TMSObj): integer;
+var
+  CTS, L : integer;
+  TPA : TPointArray;
+begin
+  CTS := GetColorToleranceSpeed;
+  ColorToleranceSpeed(1);
+
+  FindColors(TPA, Color, MSX1, MSY1, MSX2, MSY2)
+
+  L := Length(TPA);
+
+  //this will avoid a useless color returning a false positive
+    if L < Rock.Details.UNIQUE_COLOR_MIN then L := Rock.Details.UNIQUE_COLOR_MAX + 10;
+
+  SC_Debug('Analyse '+IntToStr(Color)+': '+IntToStr(L));
+  Result := L;
+  ColorToleranceSpeed(CTS);
+end;
+
+{*******************************************************************************
+function OrganizeColors(Colors, Lengths: TIntegerArray): TIntegerArray;
+By: Rasta Magician
+Description: Organizes Colors, rarest first, returns organized TIntegerArray
+*******************************************************************************}
+function OrganizeColors(Colors, Lengths: TIntegerArray): TIntegerArray;
+var
+  Ic, HighColors: integer;
+  Swapped: boolean;
+begin
+  SC_Debug('Organizing colors');
+  HighColors := High(Colors);
+  
+  //BubbleSort algorithm
+  Swapped := True;
+  while (Swapped) do
+  begin
+    Swapped := false;
+
+    for Ic := 0 to HighColors - 2 do
+      if (Lengths[Ic + 1] < Lengths[Ic]) then
+      begin
+        swap(Lengths[Ic + 1], Lengths[Ic]);
+        swap(Colors[Ic + 1], Colors[Ic]);
+        Swapped := true;
+      end;
+
+  end;
+
+  Result := Colors;
+  SC_Debug('Done organizing');
+end;
+
+{*******************************************************************************
+function GatherColors(var Rock: TMSObj): boolean;
+By: Rasta Magician
+Description: Gathers Colors from a box with double side length of
+             HALF_BOX_SIZE which match the Color and Tol from TMSObj
+             with the Hue and Sat modifiers and CTS 2
+             Sets TMSObj.SCArray to the gathered colors
+*******************************************************************************}
+function GatherColors(var Rock: TMSObj): boolean;
+var
+  x, y, i, CTS, RockColorIndex, L: integer;
+  //H, S: extended;
+  TPA: TPointArray;
+  ColorArray, LengthArray: TIntegerArray;
+begin
+  SC_Debug('gathering colors');
+  if not LoggedIn then exit;
+  if not IsUpTextMultiCustom(Rock.UpTexts) then exit;
+
+  SC_Debug('in color gatherer');
+  GetMousePos(x, y);
+  CTS := GetColorToleranceSpeed;
+  //GetColorspeed2Modifiers(H, S);
+  
+  //scanning colors around in a HALF_BOX_SIZE*2 box
+    ColorToleranceSpeed(2);
+    SetColorSpeed2Modifiers(Rock.Hue, Rock.Sat);
+    if not FindColorsTolerance(
+                                TPA, Rock.Color,
+                                x - Rock.Details.HALF_BOX_SIZE, y - Rock.Details.HALF_BOX_SIZE,
+                                x + Rock.Details.HALF_BOX_SIZE, y + Rock.Details.HALF_BOX_SIZE,
+                                Rock.Tol
+                              ) then
+    begin
+      ColorToleranceSpeed(CTS);
+      //SetColorspeed2Modifiers(H, S);
+      exit;
+    end;
+
+    ColorArray := GetColors(TPA);
+    ClearSameIntegers(ColorArray);
+
+  //analysing colors for uniqueness
+    L := Length(ColorArray);
+
+    SetLength(Rock.SCArray, L);
+    SetLength(LengthArray, L);
+
+    for i:= 0 to High(ColorArray) do
+    begin
+      L := AnalyseColor(ColorArray[i], Rock);
+
+      if L <= Rock.Details.UNIQUE_COLOR_MAX then
+      begin
+        Rock.SCArray[RockColorIndex] := ColorArray[i];
+        LengthArray[i] := L;
+        Inc(RockColorIndex);
+      end;
+    end;
+
+    SetLength(Rock.SCArray, RockColorIndex + 1);
+    Rock.SCArray := OrganizeColors(Rock.SCArray, LengthArray);
+    Result := (RockColorIndex > 2);
+
+    ColorToleranceSpeed(CTS);
+    //SetColorspeed2Modifiers(H, S);
+end;
+
+{*******************************************************************************
+function CheckAndClick(Pos: TPoint, Rock: TMSObj): boolean;
+By: Rasta Magician
+Description: Checks Pos for matches with Rock.UpTexts. Return true if
+             found and click according to CLICK_STYLE
+*******************************************************************************}
+function CheckAndClick(Pos: TPoint; Rock: TMSObj): boolean;
+var
+  x, y, ClickType: integer;
+begin
+  //checking Uptext
+  MMouse(Pos.x, Pos.y, 2, 2);
+  if WaitUpTextMulti(Rock.UpTexts, UPTEXT_TIME) then
+  begin
+    wait(Random(RANDOM_WAIT));
+    GetMousePos(x, y);
+
+    //Clicking
+    if Rock.Details.CLICK_STYLE = RANDOM_RL_CLICK then
+      if random(100) <= Rock.Details.RANDOM_RL_CHANCE then
+        ClickType := RIGHT_CLICK
+      else
+        ClickType := LEFT_CLICK;
+
+    if ClickType = LEFT_CLICK then
+    begin
+      Mouse(x, y, 0, 0, True);
+      Result := DidRedClick;
+    end else begin
+      Mouse(x, y, 0, 0, false);
+      Result := ChooseOptionMulti(Rock.Options);
+    end;
+
+  end;
+end;
+
+{*******************************************************************************
+function FirstFinder(var Rock: TMSObj): boolean;
+By: Rasta Magician
+Description: Finds object through Object record, and sets up the SCArray
+*******************************************************************************}
+function FirstFinder(var Rock: TMSObj): boolean;
+var
+  CTS, i, L : integer;
+  //H, S      : extended;
+  TPA       : TPointArray;
+  ATPA      : T2DPointArray;
+  TP        : TPoint;
+begin
+  Result := false;
+  
+  SC_Debug('first finder');
+  CTS := GetColorToleranceSpeed;
+  //GetColorspeed2Modifiers(H, S);
+
+  ColorToleranceSpeed(2);
+  SetColorspeed2Modifiers(Rock.Hue, Rock.Sat);
+
+  FindColorsSpiralTolerance(MSCX, MSCY, TPA, Rock.Color, MSX1, MSY1, MSX2, MSY2, Rock.Tol);
+
+  if length(TPA) <= 0 then
+  begin
+    ColorToleranceSpeed(CTS);
+    //SetColorspeed2Modifiers(H, S);
+    exit;
+  end;
+
+  ATPA := TPAtoATPAEx(TPA, Rock.Details.HALF_BOX_SIZE*2, Rock.Details.HALF_BOX_SIZE*2);
+  L := High(ATPA);
+
+  for i := 0 to L do
+  begin
+    wait(100+Random(RANDOM_WAIT));
+    TP := MiddleTPA(ATPA[i]);
+    MMouse(TP.x, TP.y, 2, 2);
+    if WaitUpTextMulti(Rock.UpTexts, UPTEXT_TIME) then
+    begin
+      SC_Debug('found text');
+      wait(Random(RANDOM_WAIT));
+      Result := GatherColors(Rock);
+
+      if Result then
+        SC_Debug('Gathered Colors')
+      else begin
+        SC_Debug('unable to gather colors');
+        ColorToleranceSpeed(CTS);
+        Result := CheckAndClick(TP, Rock);
+        exit;
+      end;
+
+      if Length(Rock.SCArray) > Rock.Details.MAX_COLORS_IN_ARRAY then
+        SetLength(Rock.SCArray, Rock.Details.MAX_COLORS_IN_ARRAY);
+
+      CheckAndClick(TP, Rock);
+      break;
+    end else SC_Debug('Uptext: ' + GetUpText);
+  end;
+
+  ColorToleranceSpeed(CTS);
+  //SetColorspeed2Modifiers(H, S);
+end;
+
+{*******************************************************************************
+function SmartColorsEx(Index: integer): boolean;
+By: Rasta Magician
+Description: Finds object by index. Need to call MakeObj first.
+*******************************************************************************}
+function SmartColorsEx(Index: integer): boolean;
+var
+  ATPA : T2DPointArray;
+  TPA: TPointArray;
+  TP: TPoint;
+  i, h, L, ArrayLength, UseTol,
+  NewColor, CTS: integer;
+  Hue, Sat: extended;
+  Rock: TMSObj;
+begin
+
+  Rock := SCObjectsArray[Index];
+
+  if Rock.Color = 0 then
+  begin
+    srl_Warn('SmartColors', 'You did not create the object index: '+IntToStr(Index)+'. Please call MakeObj BEFORE SmartColors',
+              warn_AllVersions);
+    exit;
+  end;
+
+  //Setting up default details if not custom
+  if not Rock.Details.IsSCSetup then
+    SetupSmartColorsDetailsEx(
+                      Index,
+                      SC_UNIQUE_COLOR_MIN,
+                      SC_UNIQUE_COLOR_MAX,
+                      SC_MAX_COLORS_IN_ARRAY,
+                      SC_HALF_BOX_SIZE*2,
+                      SC_USE_TOL,
+                      SC_TPA_DIST,
+                      SC_CLICK_STYLE,
+                      SC_RANDOM_RL_CHANCE
+                    );
+
+  //Setting up SmartColors, if it is the firsttime it is called
+    SC_Debug('SC Array: ' + IntToStr(Length(Rock.SCArray)));
+    if Length(Rock.SCArray) <= 0 then
+    begin
+      Result := FirstFinder(Rock);
+
+      if Result then
+        SCObjectsArray[Index] := Rock;
+        
+      exit;
+    end;
+
+  CTS := GetColorToleranceSpeed;
+  //GetColorspeed2Modifiers(Hue, Sat);
+
+  ColorToleranceSpeed(2);
+  SetColorspeed2Modifiers(Rock.Hue, Rock.Sat);
+
+  UseTol := 0;
+
+  //Searching for Objectwith SmartColors algorithm
+    repeat
+      L := High(Rock.SCArray);
+
+      //if running for loop for the first time, 0 tol, else, USE_TOL
+      if i >= L then
+        UseTol := Rock.Details.USE_TOL;
+
+      SC_Debug('Using Tol: '+IntToStr(UseTol));
+
+      for i:= 0 to L do
+      begin
+        if Result then break;
+
+        //Making sure we are using an empty TPA
+          SetLength(TPA, 0);
+        SC_Debug('Search for: '+ IntToStr(Rock.SCArray[i]));
+        FindColorsTolerance(TPA, Rock.SCArray[i], MSX1, MSY1, MSX2, MSY2, UseTol);
+
+        SC_Debug('Found total: '+IntToStr(Length(TPA)));
+        
+        h := Length(TPA);
+        if (h < Rock.details.UNIQUE_COLOR_MIN) then
+          continue;
+          
+        if (h > Rock.details.UNIQUE_COLOR_MAX * 50) then
+          continue;
+
+        ATPA := SplitTPA(TPA, Rock.Details.TPA_DIST);
+        SortATPAFrom(ATPA, Point(MSCX, MSCY));
+        SortATPAFromFirstPoint(ATPA, Point(MSCX, MSCY));
+        
+        for h := 0 to High(ATPA) do
+        begin
+
+          if not InRange(Length(ATPA[h]), 0, Rock.Details.UNIQUE_COLOR_MAX) then
+            Continue;
+
+          TP := MiddleTPA(ATPA[h]);
+
+          //if using tolerance, it might have found a new pure color
+          if UseTol = Rock.Details.USE_TOL then
+            Newcolor := GetColor(TP.x, TP.y);
+
+          Result := CheckAndClick(TP, Rock);
+
+          if Result then
+          begin
+            SC_Debug('Found with color number: '+IntToStr(i));
+
+            //moving the color up in the array
+            if i > 0 then
+            begin
+              swap(Rock.SCArray[i], Rock.SCArray[i - 1]);
+              SC_Debug('Moving '+IntToStr(Rock.SCArray[i])+' up to spot '+IntToStr(i-1));
+            end;
+
+            //if using tolerance
+            if UseTol = Rock.Details.USE_TOL then                                     //if using tolerance
+              if AnalyseColor(NewColor, Rock) <= Rock.Details.UNIQUE_COLOR_MAX then   //if the color is rare
+                if CheckNewColor(NewColor, Rock) then                                 //if in tolerance range
+                begin
+                  ArrayLength := High(Rock.SCArray) + 1;
+
+                  if  ArrayLength >= Rock.Details.MAX_COLORS_IN_ARRAY then //swapping it with last color in array
+                    Rock.SCArray[ArrayLength - 1] := NewColor
+                  else begin                                              //adding color at end of array
+                    SetLength(Rock.SCArray, ArrayLength + 1);
+                    Rock.SCArray[ArrayLength] := NewColor;
+                  end;
+
+                  SC_Debug('Added Color '+IntToStr(NewColor)+' to array');
+                end;
+
+            break;
+          end;
+        end;
+      end;
+    until((Result)or(UseTol = Rock.Details.USE_TOL))
+
+  SCObjectsArray[Index] := Rock;   //updating global record
+
+  ColorToleranceSpeed(CTS);
+  SetColorspeed2Modifiers(Hue, Sat);
+end;
+
+{*******************************************************************************
+function SmartColors(FindWhat: string): boolean;
+By: Rasta Magician
+Description: Finds object 'FindWhat'. Need to call MakeObj first.
+*******************************************************************************}
+function SmartColors(FindWhat: variant): boolean;
+var
+  //NewColor, CTS: integer;
+  ObjID: Integer;
+begin
+                    
+  GetObject(FindWhat, ObjID);
+
+  if ObjID < 0 then
+  begin
+    srl_Warn('SmartColors', 'You did not create the object '+string(FindWhat)+'. Please call MakeObj BEFORE SmartColors',
+              warn_AllVersions);
+    exit;
+  end;
+
+  Result := SmartColorsEx(ObjID);
+end;

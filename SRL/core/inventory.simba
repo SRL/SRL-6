@@ -1,0 +1,1109 @@
+(*
+Inventory
+=========
+
+The Inventory include contains all inventory-related functions
+
+*)
+
+{ type TInvenItem;
+  Description: Holds data regarding an inventory item }
+type
+  TInvenItem  = record
+    Width, Height : Integer; // the width and height of the item
+    Count : Integer;         // the count of the item
+    ItemBox : TBox;          // the exact box around the item
+    CenterPoint: TPoint;     // the center point inside the item
+    ExistsItem : Boolean;    // to define the item Exists
+  end;
+  TInvenItemArr = array of TInvenItem;
+
+(*
+GetInven
+~~~~~~~~
+
+.. code-block:: pascal
+
+    function GetInven(Inven: Integer): TInvenItem;
+
+Returns The Width, Height, Count, ItemBox and CenterPoint of the
+Given Item Slot.
+
+.. note::
+
+    by SKy Scripter
+
+Example:
+
+.. code-block:: pascal
+
+
+*)
+
+function GetInven(Inven: Integer): TInvenItem;
+var
+  Slot, Row, Ix, Iy, I, Cx, Cy: Integer;
+  P: TPointArray;
+  MinP, MaxP: TPoint;
+begin
+  GameTab(tab_Inv);
+  Inven := Inven - 1;
+  Slot := Inven mod 4;
+  Row := Inven div 4;
+  IX := 560 + (Slot * 42);
+  IY := 210 + (Row * 36);
+  FindColorsTolerance(P, srl_outline_black, IX, IY, IX + 41, IY + 35, 0);
+  Result.Count := Length(P);
+  if (Result.Count = 0) then Exit;
+  Result.ExistsItem := True;
+  MinP := P[0];
+  MaxP := P[Result.Count-1];
+  Cx := P[0].x + P[Result.Count-1].x;
+  Cy := P[0].y + P[Result.Count-1].y;
+  for I := 1 to Result.Count - 2 do
+  begin
+    if (P[i].x < MinP.x) then MinP.x := P[i].x;
+    if (P[i].y < MinP.y) then MinP.y := P[i].y;
+    if (P[i].x > MaxP.x) then MaxP.x := P[i].x;
+    if (P[i].y > MaxP.y) then MaxP.y := P[i].y;
+    Cx := Cx + P[i].x;
+    Cy := Cy + P[i].y;
+  end;
+  Cx := Cx div Result.Count;
+  Cy := Cy div Result.Count;
+  Result.CenterPoint := Point(Cx, Cy);
+  Result.Width  := MaxP.x - MinP.x;
+  Result.Height := MaxP.y - MinP.y;
+  Result.ItemBox  := PointToBox(MinP, MaxP);
+end;
+
+(*
+GetInventoryArray
+~~~~~~~~~~~~~~~~~
+
+.. code-block:: pascal
+
+    function GetInventoryArray : array of TInvenItem;
+
+Returns The Width, Height, Count, ItemBox and CenterPoint
+in array [0..27] of  all Items in the inventory.
+
+.. note::
+
+    by SKy Scripter
+
+Example:
+
+.. code-block:: pascal
+
+
+*)
+
+function GetInventoryArray : TInvenItemArr;
+var
+  I: Byte;
+begin
+  SetArrayLength(Result, 28);
+  for I := 0 to 27 do
+   Result[I] := GetInven(i + 1);
+end;
+
+(*
+InvBox
+~~~~~~
+
+.. code-block:: pascal
+
+    Function InvBox(i :Integer): TBox;
+
+Returns TBox of surrounding Inventory SlotBox
+1-2-3-4
+5-6-7-8
+etc.
+
+.. note::
+
+    by Boreas, created by WT-Fakawi. Coords by Ogre July 15th 2009.
+
+Example:
+
+.. code-block:: pascal
+
+
+*)
+
+function InvBox(I :Integer): TBox;
+var
+  Slot1, Slot6: TBox;
+begin
+  if not InRange(I, 1, 28) then
+  begin
+    Result := IntToBox(-1,-1,-1,-1);
+    srl_Warn('InvBox', 'Incorrect index: ' + IntToStr(i), warn_AllVersions);
+    Exit;
+  end;
+  Slot1 := IntToBox(563, 213, 594, 244);
+  Slot6 := IntToBox(605, 249, 31415, 92653);
+  Result.x1 := Slot1.X1 + ((((i + 3) mod 4)) * (Slot6.X1 - Slot1.X1));
+  Result.y1 := Slot1.Y1 + ((((i - 1) div 4)) * (Slot6.Y1 - Slot1.Y1));
+  Result.x2 := Result.x1 + (Slot1.X2 - Slot1.X1);
+  Result.y2 := Result.y1 + (Slot1.Y2 - Slot1.Y1);
+end;
+
+(*
+ItemCoords
+~~~~~~~~~~
+
+.. code-block:: pascal
+
+    function ItemCoords(i: Integer): TPoint;
+
+Returns X and Y of Specified Inventory Spot
+
+.. note::
+
+    by RsN
+
+Example:
+
+.. code-block:: pascal
+
+
+*)
+
+function ItemCoords(i: Integer): TPoint;
+var
+  Box: TBox;
+begin
+  Box := InvBox(i);
+  Result.X := (Box.X1 + Box.X2) Shr 1;
+  Result.Y := (Box.Y1 + Box.Y2) Shr 1;
+end;
+
+(*
+CoordsToItem
+~~~~~~~~~~~~
+
+.. code-block:: pascal
+
+    function CoordsToItem(X, Y: Integer): Integer;
+
+Returns which Inventory slot the X and Y coords are in. If the
+coords are between slots (or not in the inventory area at all) it will return 0.
+
+
+.. note::
+
+    by Boreas
+
+Example:
+
+.. code-block:: pascal
+
+
+*)
+function CoordsToItem(X, Y: Integer): Integer;
+var
+  tmpBox: TBox;
+begin
+  if not PointInBox(Point(X, Y), IntToBox(MIX1, MIY1, MIX2, MIY2)) then exit;
+  for Result := 1 to 4 do
+  begin
+    tmpBox := InvBox(result);
+    if InRange(X, tmpBox.x1, tmpBox.x2) then break;
+  end;
+  while (not InRange(Y, tmpBox.y1, tmpBox.y2)) do
+  begin
+    IncEx(Result, 4);
+    if (Result > 28) then
+      Break;
+    tmpBox := InvBox(Result);
+  end;
+  if (not PointInBox(Point(X, Y), tmpBox)) then
+    Result := 0;
+end;
+
+(*
+GetInvItemBounds
+~~~~~~~~~~~~~~~~
+
+.. code-block:: pascal
+
+    function GetInvItemBounds(InvSpot: Integer; T: TBox): Boolean;
+
+If item exists, returns TBox of the item, else returns the normal InvBox.
+
+.. note::
+
+    by Wizzup?
+
+Example:
+
+.. code-block:: pascal
+
+
+*)
+
+function GetInvItemBounds(InvSpot: Integer; var T: TBox): Boolean;
+var
+  TPA: TPointArray;
+begin
+  GameTab(tab_inv);
+  if (not FindColors(TPA, srl_outline_black, T.x1, T.y1, T.x2, T.y2)) then //No shortcut elevation
+  begin
+    Result := False;
+    T := InvBox(InvSpot);
+    Exit;
+  end;
+  Result := True;
+  T := GetTPABounds(TPA);
+end;
+
+(*
+ExistsItem
+~~~~~~~~~~
+
+.. code-block:: pascal
+
+    function ExistsItem(i: Integer): Boolean;
+
+Checks if item in inventory at specified position exists
+
+.. note::
+
+    by WT-Fakawi
+
+Example:
+
+.. code-block:: pascal
+
+
+*)
+
+function ExistsItem(I: Integer): Boolean;
+var
+  X, Y: Integer;
+  TB: TBox;
+begin
+  GameTab(tab_Inv);
+  TB := InvBox(I);
+  Result := FindColor(x, y, srl_outline_black, TB.x1, TB.y1, TB.x2, TB.y2);
+end;
+
+(*
+ExistsItemDTM
+~~~~~~~~~~~~~
+
+.. code-block:: pascal
+
+    function ExistsItemDTM(dtm: Integer; var x, y: Integer): Boolean;
+
+Checks if the item with dtm is in the inventory. Returns the item's coordinates.
+
+
+.. note::
+
+    by NCDS
+
+Example:
+
+.. code-block:: pascal
+
+
+*)
+function ExistsItemDTM(dtm: Integer; var x, y: Integer): Boolean;
+begin
+  Gametab(tab_Inv);
+  Wait(300 + Random(300));
+  Result := FindDTM(dtm, x, y, MIx1, MIy1, MIx2, MIy2);
+end;
+
+(*
+InvMouse
+~~~~~~~~
+
+.. code-block:: pascal
+
+    function InvMouse(InvSlot, Action: Byte) : boolean;
+
+A combined MouseItem & MMouseItem, will hopefully replace both one day.
+Usage is like SRL's MouseBox, Action determines what to do:
+
+    - 1. Leftclick
+    - 2. Rightclick
+    - 3. Move mouse to item
+
+.. note::
+
+    by EvilChicken!
+
+Example:
+
+.. code-block:: pascal
+
+
+*)
+function InvMouse(InvSlot, Action: Byte) : boolean;
+var
+  TB: TBox;
+  CurrPT : TPoint;
+begin
+  result := false;
+  if (not InRange(Action, 1, 3)) then
+  begin
+    srl_Warn('InvMouse', 'Action #' + IntToStr(Action) + ' is not a valid action', warn_AllVersions);
+    Exit;
+  end;
+  if (not InRange(InvSlot, 1, 28)) then
+  begin
+    srl_Warn('InvMouse', 'Inventory slot #' + IntToStr(InvSlot) + ' is not a valid slot', warn_AllVersions);
+    Exit;
+  end;
+  GameTab(tab_inv);
+  Result := true;
+  TB := InvBox(InvSlot);
+  GetMousePos(CurrPT.x,CurrPT.y);
+  if PointInBox(CurrPT,TB) then
+    MouseBox(Max(CurrPT.x-random(2),TB.x1),Max(CurrPT.y-random(2),TB.y1),
+             Min(CurrPT.x+random(2),TB.x2),Min(CurrPT.y+random(2),TB.y2),Action) //LOL Pro-human much!
+  else
+    MouseBoxEx(TB.X1, TB.Y1, TB.X2, TB.Y2,14, Action);
+end;
+
+(*
+MMouseItem
+~~~~~~~~~~
+
+.. code-block:: pascal
+
+    procedure MMouseItem(i: Integer);
+
+Moves mouse to specified inventory spot.
+
+
+.. note::
+
+    by WT-Fakawi/EvilChicken!
+
+Example:
+
+.. code-block:: pascal
+
+
+*)
+
+procedure MMouseItem(I: Byte);
+begin
+  InvMouse(I, 3);
+end;
+
+(*
+MouseItem
+~~~~~~~~~
+
+.. code-block:: pascal
+
+    procedure MouseItem(i: Byte; Left: Boolean);
+
+Moves Mouse to inv spot then clicks left or right.
+
+.. note::
+
+    by WT-Fakawi/EvilChicken!, edit by NaumanAkhlaQ
+
+Example:
+
+.. code-block:: pascal
+
+*)
+
+procedure MouseItem(I: Byte; Left: Boolean);
+begin
+  case left of
+    true : InvMouse(I,1);
+    false: InvMouse(I,2);
+  end;
+end;
+
+(*
+DragItem
+~~~~~~~~
+
+.. code-block:: pascal
+
+    procedure DragItem(Inv1, Inv2: Integer);
+
+Drags Item from first position Inv1 to Inv2 (Inventory Slots)
+
+.. note::
+
+    by NaumanAkhlaQ
+
+Example:
+
+.. code-block:: pascal
+
+
+*)
+
+procedure DragItem(Inv1, Inv2: Integer);
+var
+  InvAr: array [0..1] of TBox;
+begin
+  InvAr[0] := InvBox(Inv1);
+  InvAr[1] := InvBox(Inv2);
+  DragMouse(InvAr[0].x1, InvAr[0].y1, InvAr[0].x2 - InvAr[0].x1, InvAr[0].y2 - InvAr[0].y1,
+            InvAr[1].x1, InvAr[1].y1, InvAr[1].x2 - InvAr[1].x1, InvAr[1].y2 - InvAr[1].y1);
+end;
+
+(*
+InvCount
+~~~~~~~~
+
+.. code-block:: pascal
+
+    function InvCount: Integer;
+
+Returns amount of items in your inventory
+
+.. note::
+
+    by RsN
+
+Example:
+
+.. code-block:: pascal
+
+
+*)
+function InvCount: Integer;
+var
+  I: Integer;
+begin
+  Result := 0;
+  GameTab(tab_inv);
+  for I := 1 to 28 do
+    if (ExistsItem(I)) then
+     Inc(Result);
+end;
+
+
+(*
+InvEmpty
+~~~~~~~~
+
+.. code-block:: pascal
+
+    function InvEmpty: Boolean;
+
+Returns True if inventory is empty
+
+.. note::
+
+    by WT-Fakawi
+
+Example:
+
+.. code-block:: pascal
+
+
+*)
+
+function InvEmpty: Boolean;
+var
+  X, Y: Integer;
+begin
+  GameTab(tab_Inv);
+  Result := (not FindColor(X, Y, srl_outline_black, MIX1, MIY1, MIX2, MIY2));
+end;
+
+(*
+InvFull
+~~~~~~~
+
+.. code-block:: pascal
+
+    function InvFull: Boolean;
+
+Returns True if inventory is full
+
+.. note::
+
+    by RsN
+
+Example:
+
+.. code-block:: pascal
+
+
+*)
+
+function InvFull: Boolean;
+begin
+  Result := (InvCount = 28);
+end;
+
+(*
+CountItems
+~~~~~~~~~~
+
+.. code-block:: pascal
+
+      function CountItems(ItemType: string; Identifier: Integer; tol: TIntegerArray): Integer;
+
+Counts Items in the inventory.
+    - ItemType
+        - 'dtm', 'bitmap', 'bitmap mask', 'color'
+    - Item
+        - name/value of your dtm/bmp/color/bmpmask.
+    - Tol
+        - 'dtm' - [] (dtm's can't have tolerance).
+        - 'bmp' - [BMPTol].
+        - 'color' - [COLOUR Tol, Colour Count].
+        - 'bmpmask' - [BMPTol, ContourTol].
+
+.. note::
+
+    by WT-Fakawi / Sumilion
+
+Example:
+
+.. code-block:: pascal
+
+
+*)
+function CountItems(ItemType: string; Identifier: Integer; tol: TIntegerArray): Integer;
+begin
+  GameTab(tab_Inv);
+  Result := CountItemsIn('inv', ItemType, Identifier, Tol)
+end;
+
+(*
+ClickAllItemsExcept
+~~~~~~~~~~~~~~~~~~~
+
+.. code-block:: pascal
+
+    function ClickAllItemsExcept(ItemType: String; Identifier: Integer; option: string; SlotIgnores: TIntegerArray; waitnum: Integer; tol: TIntegerArray):Integer;
+
+Performs "option" popup menu action on all items with
+    - ItemType - 'dtm', 'bitmap', 'bitmap mask', 'color'
+    - Identifier - name/value of your dtm/bmp/color/bmpmask.
+    - Tol
+        - 'dtm' - [] (dtm's can't have tolerance).
+        - 'bmp' - [BMPTol].
+        - 'color' - [COLOUR Tol, Colour Count].
+        - 'bmpmask' - [BMPTol, ContourTol].
+
+Will not click items in slots SlotIgnores
+
+.. note::
+
+    by WT-Fakawi, Sumilion & Nava2
+
+Example:
+
+.. code-block:: pascal
+
+
+*)
+
+function ClickAllItemsExcept(ItemType: String; Identifier: Integer; option: string; SlotIgnores: TIntegerArray; waitnum: Integer; tol: TIntegerArray):Integer;
+var
+  arr: TIntegerArray;
+  I, X, Y: Integer;
+  TB: Tbox;
+begin
+  GameTab(tab_Inv);
+  Result := 0;
+  arr :=[1,2,3,4,5,6,7,8,9,10,11,12,13,14,15,16,17,
+      18,19,20,21,22,23,24,25,26,27,28];
+  for i := 1 to 28 - 4 do
+    Swap(arr[RandomRange(i - 1, i + 4)], arr[RandomRange(i - 1, i + 4)] );
+  SetLength(Tol, 2);
+  for i := 0 to 27 do
+  begin
+    if InIntArray(SlotIgnores, arr[i] + 1) then Continue;
+    TB := InvBox(arr[i]);
+    if ExistsItem(arr[i]) then
+    try
+      if not FindItemEx(x, y, ItemType, Identifier, TB, Tol) then Continue;
+      if (Option <> '') then
+      begin
+        MouseItem(arr[i], False);
+        WaitOption(Option, waitnum);
+        Inc(Result);
+      end
+      else
+        MouseItem(arr[i], True);
+      Wait(waitnum);
+    except end;
+  end;
+end;
+
+(*
+ClickAllItems
+~~~~~~~~~~~~~
+
+.. code-block:: pascal
+
+    function ClickAllItems(ItemType: String; Identifier: Integer; option: string; waitnum: Integer; tol: TIntegerArray):Integer;
+
+See ClickAllItemsExcept, this doesn't ignore any slots.
+
+.. note::
+
+    by Nava2
+
+Example:
+
+.. code-block:: pascal
+
+
+*)
+
+function ClickAllItems(ItemType: String; Identifier: Integer; option: string; waitnum: Integer; tol: TIntegerArray):Integer;
+begin
+  Result := ClickAllItemsExcept(ItemType, Identifier, option, [], waitnum, tol);
+end;
+
+(*
+DropItem
+~~~~~~~~
+
+.. code-block:: pascal
+
+    procedure DropItem(i: Integer);
+
+Drops item at given position (1-28)
+
+.. note::
+
+    by Lorax
+
+Example:
+
+.. code-block:: pascal
+
+
+*)
+
+function DropItem(i: Integer): Boolean;
+begin
+  Result := False;
+  if ExistsItem(i) then
+  begin
+    MouseItem(i, False);
+    if (WaitOptionEx('rop', 'action', ClickLeft, 250)) then
+    begin
+      Result := True;
+      Wait(RandomRange(50, 200));
+    end;
+  end;
+end;
+
+(*
+DropArray
+~~~~~~~~~
+
+.. code-block:: pascal
+
+    procedure DropArray(InvSlots: TIntegerArray);
+
+Drops item positioned equivalent to numbers in "InvSlots" array.
+Example: "DropArray([2, 4, 9, 12]);" would drop items in InvSlot 2, 4, 9 and 12.
+
+.. note::
+
+    by Lorax/EvilChicken!, Tickyy for idea.
+
+Example:
+
+.. code-block:: pascal
+
+
+*)
+procedure DropArray(InvSlots: TIntegerArray);
+var
+  I, Len: Integer;
+begin
+  Len := Length(InvSlots);
+  for I := 1 to Len - 4 do
+    Swap(InvSlots[RandomRange(I - 1, I + 4)], InvSlots[RandomRange(I - 1, I + 4)]);
+  for I := 0 to Len - 1 do
+    DropItem(InvSlots[I]);
+end;
+
+const
+  dp_UpToDown = 1;
+  dp_Snake = 2;
+  dp_Random = 3;
+
+(*
+DropPattern
+~~~~~~~~~~~
+
+.. code-block:: pascal
+
+    procedure DropPattern(Which: Integer);
+
+Drops all items in inventory according to pattern which.
+
+.. note::
+
+    by Rasta Magician
+
+Example:
+
+.. code-block:: pascal
+
+
+*)
+procedure DropPattern(Which: Integer);
+var
+  Col, A, I: Integer;
+  Arr: TIntegerArray;
+  Turn: Boolean;
+begin
+  SetLength(Arr, 28);
+  A := 0;
+  if (Which = 0) then
+    Which := Random(2) + 1; //ignores complete randomness, unless scripter chooses to use it
+  srl_warn('DropPattern','Dropping by pattern: ' + IntToStr(Which),warn_Debug);
+  case which of
+    dp_UpToDown:
+      for Col := 1 to 4 do
+        if InIntArray([2, 4], Col) then
+        begin
+          for i := 6 Downto 0 do
+          begin
+            Arr[a] := Col + i*4;
+            Inc(a);
+          end;
+        end else
+          for i := 0 to 6 do
+          begin
+            Arr[a] := Col + i*4;
+            Inc(a);
+          end;
+    dp_Snake:
+      repeat
+        if (not Turn) then
+        begin
+          for i:= 1 to 4 do
+            Arr[a + I - 1] := A + I;
+          IncEx(a, 4);
+          Turn := True;
+        end else begin
+          for I := 4 Downto 1 do
+            Arr[a-i+4] := a + i;
+          IncEx(a, 4);
+          Turn := false;
+        end;
+      until (a >= 28);
+    dp_Random:
+      begin
+         DropArray([1, 2, 3, 4, 5, 6, 7, 8, 9, 10, 11, 12, 13, 14, 15, 16, 17,
+           18, 19, 20, 21, 22, 23, 24, 25, 26, 27, 28]);
+         Exit;
+      end;
+  end;
+  if Random(2) = 1 then
+    InvertTIA(Arr);
+  Gametab(tab_inv);
+  for i:= 0 to 27 do
+    DropItem(Arr[i]);
+end;
+
+(*
+DropAll
+~~~~~~~
+
+.. code-block:: pascal
+
+    procedure DropAll;
+
+Drops all items in inventory.
+
+.. note::
+
+    by Rasta Magician
+
+Example:
+
+.. code-block:: pascal
+
+
+*)
+procedure DropAll;
+var i: integer;
+begin
+  for i:= 0 to 2 do
+  begin
+    DropPattern(Random(2) + 1);
+    if InvCount = 0 then
+      break;
+  end;
+end;
+
+(*
+DropAllExcept
+~~~~~~~~~~~~~
+
+.. code-block:: pascal
+
+    procedure DropAllExcept(IgnoreInvSlots: TIntegerArray);
+
+Drops everything in inventory.
+Ignores slots specified by DontDrop array.
+
+.. note::
+
+    by Nava2
+
+Example:
+
+.. code-block:: pascal
+
+
+*)
+procedure DropAllExcept(DontDrop: TIntegerArray);
+var
+  inv, i, h: Integer;
+begin
+  h := high(DontDrop);
+  for i := 0 to h do
+    { Set the bit associated with the DontDrop Array }
+    inv := inv or (1 shl DontDrop[i]);
+  for i := 1 to 28 do
+    { Check the bit at i, and if its high, then we dont drop. }
+    if (((inv shr i) and 1) = 0) then
+      DropItem(i);
+end;
+
+
+(*
+DropItemsByIdentifier
+~~~~~~~~~~~~~~~~~~~~~
+
+.. code-block:: pascal
+
+    procedure DropItemsByIdentifier;
+
+See description of ClickAllItemsExcept.
+
+.. note::
+
+    by EvilChicken! Fixed by Coh3n
+
+Example:
+
+.. code-block:: pascal
+
+
+*)
+procedure DropItemsByIdentifier(ItemType: string; Identifier: Integer; Tol: TIntegerArray);
+begin
+  ClickAllItems(ItemType, Identifier, 'rop', 250, Tol);
+end;
+
+
+(*
+ArrangeInv
+~~~~~~~~~~
+
+.. code-block:: pascal
+
+    procedure ArrangeInv;
+
+Arrange's inventory in an orderly fashion.
+
+.. note::
+
+    by Cheesehunk
+
+Example:
+
+.. code-block:: pascal
+
+
+*)
+procedure ArrangeInv;
+var
+  InvSpace, i, c, OpenSpace: Integer;
+  InvSpotFull: array[1..28] of Boolean;
+begin
+  InvSpace := InvCount;
+  if (InvSpace <= 0) or (InvSpace >= 28) then
+    Exit;
+  for i := 1 to 28 do
+    InvSpotFull[i] := ExistsItem(i);
+  for i := 1 to 28 do
+    if InvSpotFull[i] then
+      for c := 1 to 28 do
+        if not ExistsItem(c) then
+        begin
+          OpenSpace := c;
+          if (i > 1) and (c < i) then
+          begin
+            DragItem(i, c);
+            Break;
+          end;
+        end;
+end;
+
+(*
+CountItemsBlackLine
+~~~~~~~~~~~~~~~~~~~
+
+.. code-block:: pascal
+
+    function CountItemsBlackLine(Count, Tol: Integer): Integer;
+
+Returns the number of items in inventory with Count amount of
+blackline points and Tol tolerance in the amount of points.
+
+.. note::
+
+    by n3ss3s
+
+Example:
+
+.. code-block:: pascal
+
+
+*)
+function CountItemsBlackLine(Count, Tol: Integer): Integer;
+var
+  TPA: TPointArray;
+  I, H: Integer;
+  TPAA: T2DPointArray;
+begin
+  GameTab(tab_Inv);
+  result := 0;
+  FindColors(TPA, srl_outline_black, MIX1, MIY1, MIX2, MIY2);
+  TPAA := TPAToATPAEx(TPA, 42, 36);
+  H := High(TPAA);
+  for I := 0 to H do
+    if InRange(GetArrayLength(TPAA[i]), Count - Tol, Count + Tol) then
+      Inc(Result);
+end;
+
+
+(*
+ClickAllItemsBlackLine
+~~~~~~~~~~~~~~~~~~~~~~
+
+.. code-block:: pascal
+
+    function ClickAllItemsBlackLine(Count, Tol: Integer; Option: String): Integer;
+
+Finds all items in inventory with blackline points amount of Count
+with Tol tolerance, and returns the amount of items could choose the
+option Option to. Waits the WaitT amount of millisecs between items, with
+WaitR randomness of milliseconds.
+
+.. note::
+
+    by n3ss3s
+
+Example:
+
+.. code-block:: pascal
+
+
+*)
+
+function ClickAllItemsBlackLine(Count, Tol, WaitT, WaitR: Integer; Option: String): Integer;
+var
+  TPA: TPointArray;
+  X, Y, Z, H: Integer;
+  TPAA: T2DPointArray;
+begin
+  GameTab(tab_Inv);
+  result := 0;
+  FindColorsTolerance(TPA, srl_outline_black, MIX1, MIY1, MIX2, MIY2, 0);
+  TPAA := TPAToATPAEx(TPA, 42, 36);
+  H := High(TPAA);
+  for z := 0 to H do
+    if InRange(GetArrayLength(TPAA[z]), Count - Tol, Count + Tol) then
+    begin
+      MiddleTPAEx(TPAA[z], X, Y);
+      Mouse(X, Y, 2, 2, False);
+      if WaitOption(Option, 300) then
+      begin
+        Inc(Result);
+        Wait(WaitT + Random(WaitR));
+      end;
+    end;
+end;
+
+
+(*
+ItemActivated
+~~~~~~~~~~~~~
+
+.. code-block:: pascal
+
+    function ItemActivated(Slot: Integer): Boolean;
+
+Checks if item in specified inventory slot has a white outline.
+Returns True if the item has a white outline, otherwise returns false.
+
+.. note::
+
+    by marpis
+
+Example:
+
+.. code-block:: pascal
+
+
+*)
+
+function ItemActivated(Slot: Integer): Boolean;
+var
+  X, Y: Integer;
+  TB: TBox;
+begin
+  result := false;
+  if not GameTab(tab_Inv) then
+    exit;
+  TB := InvBox(Slot);
+  Result := FindColor(x, y, srl_outline_white, TB.x1, TB.y1, TB.x2, TB.y2) and InRange(
+                    CountColor(srl_outline_white, TB.x1, TB.y1, TB.x2, TB.y2) -
+                    CountColor(srl_outline_black, TB.x1, TB.y1, TB.x2, TB.y2),-40,40);
+end;
+
+(*
+SelectedItem
+~~~~~~~~~~~~
+
+.. code-block:: pascal
+
+    function SelectedItem : integer;
+
+Returns the selected item in invetory (if any), else returns -1.
+
+.. note::
+
+    by MaaaassturrRrrraymond
+
+Example:
+
+.. code-block:: pascal
+
+
+*)
+function ActivatedItem : integer;
+var
+  i : integer;
+begin;
+  result := -1;
+  for i := 1 to 28 do
+    if ItemActivated(i) then
+    begin
+      result := i;
+      exit;
+    end;
+end;

@@ -1,0 +1,357 @@
+(*
+
+AutoColor
+=========
+
+Auto color finding routines.
+*)
+
+
+{ const AutoColor Constants;
+  Description: Constants representing the different types of AutoColors }
+const
+    srl_AutoColorCount   = 13;
+    srl_VarrockRoadColor   = 0;
+    srl_LumbridgeRoadColor = 1;
+    srl_FaladorRoadColor   = 2;
+    srl_AlKharidRoadColor  = 3;
+    srl_DarkDirtRoadColor  = 4;
+    srl_LightDirtRoadColor = 5;
+    srl_SandColor          = 6;
+    srl_WaterColor         = 7;
+    srl_SwampWaterColor    = 8;
+    srl_LadderColor        = 9;
+    srl_RockColor          = 10;
+    srl_MineRockColor      = 11;
+    srl_TreeColor          = 12;
+
+(*
+
+.. code-block:: pascal
+
+    { Description: Constants representing the different types of AutoColors }
+    const
+        srl_AutoColorCount   = 13;
+        srl_VarrockRoadColor   = 0;
+        srl_LumbridgeRoadColor = 1;
+        srl_FaladorRoadColor   = 2;
+        srl_AlKharidRoadColor  = 3;
+        srl_DarkDirtRoadColor  = 4;
+        srl_LightDirtRoadColor = 5;
+        srl_SandColor          = 6;
+        srl_WaterColor         = 7;
+        srl_SwampWaterColor    = 8;
+        srl_LadderColor        = 9;
+        srl_RockColor          = 10;
+        srl_MineRockColor      = 11;
+        srl_TreeColor          = 12;
+
+*)
+
+(*
+SetupAutoColors
+~~~~~~~~~~~~~~~
+
+.. code-block:: pascal
+
+    procedure SetupAutoColors;
+
+Need to initialize the global vars Which store information
+
+.. note::
+
+  by Nava2
+
+Example:
+
+.. code-block:: pascal
+
+*)
+
+procedure SetupAutoColors;
+begin
+  setLength(acArr, srl_AutoColorCount);
+  setLength(isACLoaded, srl_AutoColorCount);
+end;
+
+(*
+LoadColorArray
+~~~~~~~~~~~~~~
+
+.. code-block:: pascal
+
+    function LoadColorArray(Which: Integer): TIntegerArray;
+
+Returns a color array depending on the parameter Which.
+
+.. note::
+
+  by Coh3n
+
+Example:
+
+.. code-block:: pascal
+
+*)
+function LoadColorArray(Which: Integer): TIntegerArray;
+begin
+  case Which of
+    srl_VarrockRoadColor:
+      Result := [ 8620683, 8752269, 8489097, 8291717, 8160131, 8357511, 8818318,
+                  8949648, 8816777, 8422019, 8947853, 8555145, 8094342, 8686479,
+                  9013897, 8947848, 8487296, 9145489, 8947337, 9013386, 9013388,
+                  8355458, 8487043, 7960700 ];
+
+    srl_LumbridgeRoadColor:
+      Result := [ 7963536, 7568520, 6318195, 7832206, 8161171, 7634570, 8095122,
+                  7305605, 7766156, 7107969, 8095891, 7964305, 6977152, 7569290,
+                  7437960, 7832975, 8357520, 8226190, 8160140, 7106937, 8489106,
+                  7435903, 7702922, 7373956, 6847355, 6252912, 6186862, 7701377,
+                  8161929, 7964549, 7832963, 8359564, 7306361, 7503741 ];
+
+    srl_FaladorRoadColor:
+      Result := [ 7569029, 7306114, 7437443, 6976892, 6647670, 6450290, 6318704,
+                  6121068, 6581876, 7635079, 6910842, 7108478, 7240064, 5726310,
+                  5265501, 7831939, 7305081, 7173751, 8029318, 6844529, 7504518,
+                  7043967, 6583669, 7569021, 7700351, 8095623, 8226953, 6975865,
+                  6778229 ];
+
+    srl_AlKharidRoadColor:
+      Result := [ 6195595, 6327438, 6063495, 6525074, 6590868, 6656917, 6459024,
+                  6261644, 6327187, 6261137, 6129293, 6458773, 5931658, 6656666,
+                  6853530, 6852759, 6457486, 6789533 ];
+
+    srl_DarkDirtRoadColor:
+      Result := [ 1853017, 1786966, 1786452, 1918811, 1654093, 2049630, 2049116,
+                  2114904, 2115418 ];
+
+    srl_LightDirtRoadColor:
+      Result := [ 6784402, 7047575, 6652302, 6586508, 6520459, 6455952, 6390158,
+                  6653845, 6192778, 6060678, 6456974, 6720403, 6589073, 6127750,
+                  6586772, 6652566, 6784666, 6257293, 6326163, 6589592, 6655386,
+                  6261136, 5799813, 6063501, 6260882, 5865353, 6458011 ];
+
+    srl_SandColor:
+      Result := [ 8367041, 8103355, 8368321, 8566214, 6859196, 6133416, 6727353,
+                  7188934, 8829900, 8696521, 8630728, 6395825, 6857148, 6659512,
+                  6263724, 6988992, 5737886, 5605787, 4814213, 5409429, 5541273,
+                  5607323, 8435903, 8501953, 7124673, 5937826, 6927036, 8633796,
+                  8304060, 9224908, 7314081, 5869721 ];
+
+    srl_WaterColor:
+      Result := [ 10524303, 9603459, 10064009, 9142909, 8748408, 8617079,
+                  10655889, 10721682, 11180175, 10851211, 10127746, 10655624,
+                  10261123, 10063744, 10719630, 10588045, 9338236, 10327945,
+                  10262151, 10130566, 9670272, 8682096, 10917513, 11114892 ];
+
+    srl_SwampWaterColor:
+      Result := [ 6121029, 6515785, 6647370, 6384199, 6187848, 5858628, 5793600,
+                  6122820, 6252619, 5923399, 6121034, 6123596, 5728584, 5597509,
+                  5463361, 5331776, 5595720, 6450502, 6055490, 6122571, 5793351,
+                  6123082, 5728070, 6189387, 5794631, 6383946, 6054726 ];
+
+    srl_LadderColor:
+      Result := [ 405597, 207703, 405078, 470616, 601431, 404825, 339287, 338262,
+                  404569, 470108, 208989, 274010, 338780, 601175, 272982, 208733,
+                  536151, 272730, 208215, 339037, 405596, 601944, 207958, 601949,
+                  405852, 340822, 798806, 143195, 403800, 404566 ];
+
+    { The color of the rocks found on the Minimap.  This also works with the
+      GRAY mine rocks. }
+    srl_RockColor:
+      Result := [ 5725020, 4474183, 3685438, 2829872, 5987671, 4736834, 3948089,
+                  4539973, 5855580, 3815998, 4604743 ];
+
+    { The REDish color of the rocks in a mine on the minimap.  Use srl_RockColor
+      for the GRAY mine rocks. }
+    srl_MineRockColor:
+      Result := [ 3100807, 2573687, 2573941, 3101061, 2177633, 2706292, 3233412,
+                  2309984, 2770298, 3297418, 2373990, 2509689, 3036809, 2971525,
+                  2444405, 2048097, 2971271, 2444151, 2047843 ];
+
+    srl_TreeColor:
+      Result := [ 2121284, 1463332, 1527603, 1333281, 1267488, 1202468, 999966 ];
+
+    else
+      srl_Warn('AutoColor',
+               'Index ''' + IntToStr(Which) + ''' is not a valid SRL AutoColor.',
+               warn_AllVersions);
+  end;
+end;
+
+(*
+LoadAutoColor
+~~~~~~~~~~~~~
+
+.. code-block:: pascal
+
+    function LoadAutoColor(which: Integer; var theAC: TAutoColorInfo): Boolean;
+
+Finds the color on the minimap depending on the parameter *which*.
+
+.. note::
+
+  by Nava2 & Coh3n
+
+Example:
+
+.. code-block:: pascal
+
+*)
+function LoadAutoColor(which: Integer; var theAC: TAutoColorInfo): Boolean;
+var
+  X, Y, Z: Extended;
+  R, G, B: Integer;
+  foundCols, newCols: TIntegerArray;
+  functTime, curCTS, h, i, c: Integer;
+  validPts, t: TPointArray;
+begin
+  functTime := GetTimeRunning;
+
+  if (not LoggedIn) then
+    Exit;
+
+  if (not InRange(which, 0, (srl_AutoColorCount - 1))) then
+  begin;
+    srl_Warn('LoadAutoColor', 'Index ''' + IntToStr(which) + ''' is not a valid AutoColor. ', warn_AllVersions);
+    Exit;
+  end;
+
+  acArr[which] := CreateAutoColorInfo(LoadColorArray(which));
+  //srl_warn('LoadAutoColor', 'Rough AutoColor = ' + IntToStr(acArr[which].Color) + ' ', warn_AllVersions);
+  with acArr[which] do
+  begin
+    curCTS := GetColorToleranceSpeed;
+    ColorToleranceSpeed(2);
+  {
+    Find the colours which match the TAutoColorInfo and filter out points that
+    are not part of the minimap using RemoveDistTPointArray
+  }
+    SetColorSpeed2Modifiers(hueMod, satMod);
+    FindColorsTolerance(t, color, MMX1, MMY1, MMX2, MMY2, lumTol);
+    validPts := RemoveDistTPointArray(MMCX, MMCY, (MMX2 - MMCX), t, True);
+    //debugTPA(validPts, '');
+
+    SetColorSpeed2Modifiers(0.2, 0.2);
+    ColorToleranceSpeed(curCTS);
+
+  {
+    This is because the ladder color is much more specific and all that is
+    required is to check if it's on the minimap
+  }
+    if (which = srl_LadderColor) and (Length(validPts) > 0) then
+    begin
+      Result := true;
+      theAC := acArr[which];
+      srl_Warn('LoadAutoColor', 'Function Successful: Found Color = ' + IntToStr(theAC.Color) + ' ', warn_AllVersions);
+      Exit;
+    end;
+
+    if (Length(validPts) = 0) then
+    begin
+      srl_Warn('LoadAutoColor', 'Length(t) = 0 ', warn_AllVersions);
+      Exit;
+    end;
+
+    foundCols := GetColors(validPts);
+    ClearSameIntegers(foundCols);
+  {
+    Cycle through the colors found on the minimap, creating a new array based
+    on their RGB/XYZ ranges
+  }
+    h := High(foundCols);
+    SetLength(newCols, h + 1);
+    for i := 0 to h do
+    begin
+      ColorToRGB(foundCols[i], R, G, B);
+
+      if (R >= MinR) and (R <= MaxR) and (G >= MinG) and (G <= MaxG) and
+         (B >= MinB) and (B <= MaxB) then
+      begin
+        ColorToXYZ(foundCols[i], X, Y, Z);
+
+        if (X >= MinX) and (X <= MaxX) and (Y >= MinY) and (Y <= MaxY) and
+           (Z >= MinZ) and (Z <= MaxZ) then
+        begin
+          newCols[c] := foundCols[i];
+          Inc(c);
+        end;
+      end;
+    end;
+
+    Dec(c);
+    SetLength(newCols, c);
+
+    if (Length(newCols) > 0) then
+    begin
+      acArr[which] := CreateAutoColorInfo(newCols);
+      theAC := acArr[which];
+      result := True;
+      srl_Warn('LoadAutoColor', 'Function Successful: Found Color = ' + IntToStr(theAC.Color) + ' ', warn_AllVersions);
+    end else
+      srl_Warn('LoadAutoColor', 'Couldn''t Find Color Index ' + IntToStr(which) + ', using rough color ', warn_AllVersions);
+  end;
+
+  //srl_Warn('LoadAutoColor', 'Took: ' + IntToStr(GetTimeRunning - functTime) + 'ms ', warn_AllVersions);
+end;
+
+(*
+AutoColorEx
+~~~~~~~~~~~
+
+.. code-block:: pascal
+
+    function AutoColorEx(i: Integer): TAutoColorInfo;
+
+Check the isACLoaded boolean for the asked AC, if true, we know the
+AutoColorInfo has been loaded, and we will not do it again.
+Otherwise, load the initial TAutoColorInfo from the stored array of
+colours.
+
+.. note::
+
+  by Nava2 & Coh3n
+
+Example:
+
+.. code-block:: pascal
+
+*)
+function AutoColorEx(which: Integer): TAutoColorInfo;
+begin
+  if isACLoaded[which] then
+    result := acArr[which]
+  else
+  begin
+    if (LoadAutoColor(which, result)) then
+    begin
+      acArr[which] := result;
+      isACLoaded[which] := True;
+    end else
+      result := acArr[which];
+  end;
+end;
+
+(*
+AutoColor
+~~~~~~~~~
+
+.. code-block:: pascal
+
+    function AutoColor(which: Integer): Integer;
+
+Returns the correct color based on the autocolor constant
+
+.. note::
+
+  by Coh3n
+
+Example:
+
+.. code-block:: pascal
+
+*)
+function AutoColor(which: Integer): Integer;
+begin
+  Result := AutoColorEx(which).Color;
+end;

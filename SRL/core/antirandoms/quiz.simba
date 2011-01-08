@@ -1,0 +1,635 @@
+//-----------------------------------------------------------------//
+//--               Scar Standard Resource Library                --//
+//--               »» Quiz Routines                              --//
+//-----------------------------------------------------------------//
+// * function InQuizRandom : Boolean;                              // * by ZephyrsFury
+// * Function QuizItemBox(Index: Integer): TBox;                   // * by Wizzup?
+// * Procedure LoadQuizArray;                                      // * by Wizzup?
+// * Function GetQuizObjectInfo(Index: Integer): QuizObj;          // * by Wizzup?
+// * Function GetQuizObjectInfoAverage(Index, Times: Integer): QuizObj; // * by Wizzup?
+// * Function GetQuizItem(Index: Integer): QuizObj;                // * by Wizzup?
+// * Procedure SolveQuizQuestion;                                  // * by Wizzup?
+// * function Quiz_Leave: Boolean;                                 // * by IceFire908
+// * Function SolveQuiz: Boolean;                                  // * by Wizzup? and ZephyrsFury
+// * Function FindQuiz: Boolean;                                   // * by Wizzup?
+
+Type
+   QuizObj = Record
+     Count, Width, Height, TotalCount: Integer;
+     CoverPercentage: Extended;
+     Name, Use: String;
+   End;
+
+Var
+   QuizItems: Array Of QuizObj;
+   QuizAccuracy: Integer;
+
+
+{*******************************************************************************
+function InQuizRandom : Boolean;
+by: ZephyrsFury
+Description: Returns true if the quiz random is found.
+*******************************************************************************}
+
+function InQuizRandom : Boolean;
+begin
+  if (InBlack) then
+    Result := (PercentBlackMM > 95);
+end;
+
+{*******************************************************************************
+Function QuizItemBox(Index: Integer): TBox;
+by: Wizzup?
+Description: Returns a TBox of the Quiz Item Slow defined by Index.
+*******************************************************************************}
+
+Function QuizItemBox(Index: Integer): TBox;
+
+Begin
+  Result.X1 := 46 + 174 * (Index-1);
+  Result.Y1 := 417;
+  Result.X2 := 46 + 174 * (Index-1) + 80;
+  Result.Y2 := 417 + 33;
+End;
+
+{*******************************************************************************
+Procedure LoadQuizArray;
+by: Wizzup?
+Description: Loads all the data.
+*******************************************************************************}
+
+Procedure LoadQuizArray;
+
+Begin
+  If Length(QuizItems) <> 0 Then
+    Exit;
+  QuizAccuracy := 100;
+  SetLength(QuizItems, 20);
+
+  With QuizItems[0] Do
+  Begin
+    Name := 'Trout Fish Big';
+    Use := 'Edible';
+    Count := 165;
+    Width := 23;
+    Height := 15;
+    TotalCount := 330;
+    CoverPercentage := 50.0;
+  End;
+
+  With QuizItems[1] Do
+  Begin
+    Name := 'Trout Fish Small';
+    Use := 'Edible';
+    Count := 105;
+    Width := 18;
+    Height := 11;
+    TotalCount := 205;
+    CoverPercentage := 52.0;
+  End;
+
+  With QuizItems[2] Do
+  Begin
+    Name := 'Tuna Fish Big';
+    Use := 'Edible';
+    Count := 225;
+    Width := 23;
+    Height := 15;
+    TotalCount := 365;
+    CoverPercentage := 61.0;
+  End;
+
+  With QuizItems[3] Do
+  Begin
+    Name := 'Tuna Fish Small';
+    Use := 'Edible';
+    Count := 140;
+    Width := 18;
+    Height := 12;
+    TotalCount := 220;
+    CoverPercentage := 63.0;
+  End;
+
+  With QuizItems[4] Do
+  Begin
+    Name := 'Necklace Small';
+    Use := 'Jewelry';
+    Count := 80;
+    Width := 17;
+    Height := 10;
+    TotalCount := 170;
+    CoverPercentage := 47.0;
+  End;
+
+  With QuizItems[5] Do
+  Begin
+    Name := 'Necklace Big';
+    Use := 'Jewelry';
+    Count := 128;
+    Width := 21;
+    Height := 13;
+    TotalCount := 275;
+    CoverPercentage := 46.0;
+  End;
+
+  With QuizItems[6] Do
+  Begin
+    Name := 'Ring Small';
+    Use := 'Jewelry';
+    Count := 90;
+    Width := 13;
+    Height := 9;
+    TotalCount := 125;
+    CoverPercentage := 72.0;
+  End;
+
+  With QuizItems[7] Do
+  Begin
+    Name := 'Ring Big';
+    Use := 'Jewelry';
+    Count := 148;
+    Width := 17;
+    Height := 12;
+    TotalCount := 213;
+    CoverPercentage := 70;
+  End;
+
+  With QuizItems[8] Do
+  Begin
+    Name := 'Shield Small';
+    Use := 'Armour';
+    Count := 78;
+    Width := 13;
+    Height := 8;
+    TotalCount := 104;
+    CoverPercentage := 76.0;
+  End;
+
+  With QuizItems[9] Do
+  Begin
+    Name := 'Shield Big';
+    Use := 'Armour';
+    Count := 123;
+    Width := 16;
+    Height := 10;
+    TotalCount := 172;
+    CoverPercentage := 71.0;
+  End;
+
+  With QuizItems[10] Do
+  Begin
+    Name := 'Spade';
+    Use := 'Tool';
+    Count := 95;
+    Width := 23;
+    Height := 14;
+    TotalCount := 304;
+    CoverPercentage := 31.5;
+  End;
+
+  With QuizItems[11] Do
+  Begin
+    Name := 'Sword Small';
+    Use := 'Weapon';
+    Count := 36;
+    Width := 15;
+    Height := 10;
+    TotalCount := 142;
+    CoverPercentage := 25.0;
+  End;
+
+  With QuizItems[12] Do
+  Begin
+    Name := 'Sword Big';
+    Use := 'Weapon';
+    Count := 55;
+    Width := 21;
+    Height := 13;
+    TotalCount := 239;
+    CoverPercentage := 23.0;
+  End;
+
+  With QuizItems[13] Do
+  Begin
+    Name := 'Shears Small';
+    Use := 'Tool';
+    Count := 122;
+    Width := 20;
+    Height := 12;
+    TotalCount := 243;
+    CoverPercentage := 50.0;
+  End;
+
+  With QuizItems[14] Do
+  Begin
+    Name := 'Shears Big';
+    Use := 'Tool';
+    Count := 195;
+    Width := 25;
+    Height := 16;
+    TotalCount := 395;
+    CoverPercentage := 49.0;
+  End;
+
+  With QuizItems[15] Do
+  Begin
+    Name := 'BattleAxe Big';
+    Use := 'Weapon';
+    Count := 108;
+    Width := 21;
+    Height := 13;
+    TotalCount := 275;
+    CoverPercentage := 38.0;
+  End;
+
+  With QuizItems[16] Do
+  Begin
+    Name := 'BattleAxe Big';
+    Use := 'Weapon';
+    Count := 108;
+    Width := 21;
+    Height := 13;
+    TotalCount := 275;
+    CoverPercentage := 38.0;
+  End;
+
+  With QuizItems[17] Do
+  Begin
+    Name := 'BattleAxe Small';
+    Use := 'Weapon';
+    Count := 68;
+    Width := 16;
+    Height := 10;
+    TotalCount := 171;
+    CoverPercentage := 40.0;
+  End;
+
+  With QuizItems[18] Do
+  Begin
+    Name := 'Helmet Small';
+    Use := 'Weapon';
+    Count := 246;
+    Width := 16;
+    Height := 17;
+    TotalCount := 285;
+    CoverPercentage := 85.5;
+  End;
+
+  With QuizItems[19] Do
+  Begin
+    Name := 'Helmet Big';
+    Use := 'Weapon';
+    Count := 388;
+    Width := 21;
+    Height := 22;
+    TotalCount := 465;
+    CoverPercentage := 83.5;
+  End;
+End;
+
+{*******************************************************************************
+Function GetQuizObjectInfo(Index: Integer): QuizObj;
+by: Wizzup?
+Description: Get's the data of a QuizObj, once.
+*******************************************************************************}
+
+Function GetQuizObjectInfo(Index: Integer): QuizObj;
+
+Var
+   TPA, TPA2, ObjectTPA: TPointArray;
+   aTPA: T2DPointArray;
+   SearchB, ObjB: TBox;
+   cts: Integer;
+
+Begin
+  Cts := GetColorToleranceSpeed;
+  ColorToleranceSpeed(1);
+  SearchB := QuizItemBox(Index);
+  FindColorsTolerance(TPA, 7807248 , SearchB.X1, SearchB.Y1, SearchB.X2, SearchB.Y2, 35);
+  FindColorsTolerance(TPA2, 11040367 , SearchB.X1, SearchB.Y1, SearchB.X2, SearchB.Y2, 35);
+  TPA := CombineTPA(TPA, TPA2);
+  ObjectTPA := ReturnPointsNotInTPA(TPA, SearchB);
+  ObjB := GetTPABounds(ObjectTPA);
+  aTPA := SplitTPA(ObjectTPA, 5);
+  SortATPASize(aTPA, True);
+  If Length(aTPA) <> 0 Then
+    ObjectTPA := aTPA[0]
+  Else
+    SetLength(ObjectTPA, 0);
+
+  Result.Count := Length(ObjectTPA);
+  Result.Width := ObjB.X2 - ObjB.X1;
+  Result.Height := ObjB.Y2 - ObjB.Y1;
+  Result.TotalCount := (ObjB.X2 - ObjB.X1) * (ObjB.Y2 - ObjB.Y1);
+  ColorToleranceSpeed(cts);
+End;
+
+{*******************************************************************************
+Function GetQuizObjectInfoAverage(Index, Times: Integer): QuizObj;
+by: Wizzup?
+Description: Get's the average data of a QuizObj
+*******************************************************************************}
+
+Function GetQuizObjectInfoAverage(Index, Times: Integer): QuizObj;
+
+Var
+   I: Integer;
+   TempObjs: Array Of quizObj;
+Begin
+  SetLength(TempObjs, Times);
+  For I := 0 To Times - 1 Do
+  Begin
+    tempObjs[I] := GetQuizObjectInfo(Index);
+    Wait(50);
+  End;
+  For I := 0 To Times - 1 Do
+  Begin
+    Result.Count := Result.Count + tempObjs[I].Count;
+    Result.Width := Result.Width + tempObjs[I].Width;
+    Result.Height := Result.Height + tempObjs[I].Height;
+    Result.TotalCount := Result.TotalCount + tempObjs[I].TotalCount;
+  End;
+  Result.Count := Result.Count div Times;
+  Result.Width := Result.Width div Times;
+  Result.Height := Result.Height div Times;
+  Result.TotalCount := Result.TotalCount div Times;
+  Result.CoverPercentage := Result.Count div Result.TotalCount * 100.0;
+End;
+
+{$IFDEF DebugQuiz}
+{*******************************************************************************
+Procedure QuizObjStats(Obj: QuizObj);
+by: Wizzup?
+Description: WriteLn's a QuizObj's data.
+*******************************************************************************}
+
+Procedure QuizObjStats(Obj: QuizObj);
+
+Begin
+  WriteLn('Count: ' + IntToStr(Obj.Count));
+  WriteLn('Width: ' + IntToStr(Obj.Width));
+  WriteLn('Height: ' + IntToStr(Obj.Height));
+  WriteLn('TotalCount: ' + IntToStr(Obj.TotalCount));
+  WriteLn('Cover Percent: ' + FloatToStr(Obj.Count / Obj.TotalCount * 100.0));
+End;
+{$ENDIF}
+
+{*******************************************************************************
+Function GetQuizItem(Index: Integer): QuizObj;
+by: Wizzup?
+Description: Identifies a Quiz Item.
+*******************************************************************************}
+
+Function GetQuizItem(Index: Integer): QuizObj;
+
+Var
+   I, maxScore, maxIndex: Integer;
+   theObj: QuizObj;
+   Scores: TIntegerArray;
+
+Begin
+  theObj := GetQuizObjectInfoAverage(Index, QuizAccuracy);
+  {$IFDEF DebugQuiz} QuizObjStats(theObj); {$ENDIF}
+  SetLength(Scores, Length(QuizItems));
+
+  For I := 0 To High(QuizItems) Do
+  Begin
+    If (QuizItems[I].Width = theObj.Width) And (QuizItems[I].Height = theObj.Height) Then
+    Begin
+      Scores[I] := Scores[I] + 5;
+      {$IFDEF DebugQuiz} WriteLn(QuizItems[I].Name + ' are of the same width and height'); {$ENDIF}
+    End Else
+    If InRange(theObj.Width, QuizItems[I].Width - 2, QuizItems[I].Width + 2) And InRange(theObj.Height, QuizItems[I].Height - 2, QuizItems[I].Height + 2) Then
+    Begin
+      Scores[I] := Scores[I] + 3;
+      {$IFDEF DebugQuiz} WriteLn(QuizItems[I].Name + ' are nearly of the same width and height'); {$ENDIF}
+    End;
+
+    If InRange(theObj.Count, QuizItems[I].Count - 8, QuizItems[I].Count + 8) Then
+    Begin
+      Scores[I] := Scores[I] + 2;
+      {$IFDEF DebugQuiz} WriteLn(QuizItems[I].Name + '''s object Count is in range.'); {$ENDIF}
+    End;
+
+    If InRange(theObj.TotalCount, QuizItems[I].TotalCount - 8, QuizItems[I].TotalCount + 8) Then
+    Begin
+      Scores[I] := Scores[I] + 2;
+      {$IFDEF DebugQuiz} WriteLn(QuizItems[I].Name + '''s object TotalCount is in range.'); {$ENDIF}
+    End;
+
+    If (theObj.CoverPercentage > QuizItems[I].CoverPercentage - 3) And (theObj.CoverPercentage < QuizItems[I].CoverPercentage + 3) Then
+    Begin
+      Scores[I] := Scores[I] + 2;
+      {$IFDEF DebugQuiz} WriteLn(QuizItems[I].Name + '''s object TotalCount is in range.'); {$ENDIF}
+    End;
+    {$IFDEF DebugQuiz}
+    if Scores[I] > 0 Then
+      WriteLn(QuizItems[I].Name + ' has a final score of ' + IntToStr(Scores[I]));
+    {$ENDIF}
+  End;
+
+  maxScore := -1;
+  maxIndex := -1;
+  For I := 0 To High(Scores) Do
+  Begin
+    If Scores[I] > maxScore Then
+    Begin
+      maxScore := Scores[I];
+      maxIndex := I;
+    End;
+  End;
+
+  //WriteLn('The winner: ' + QuizItems[maxIndex].Name + ', with a score of ' + IntToStr(Scores[maxIndex]));
+  WriteLn(QuizItems[maxIndex].Name + ', with a score of ' + IntToStr(Scores[maxIndex]));
+  Result.Name := QuizItems[maxIndex].Name;
+  Result.Use := QuizItems[maxIndex].Use;
+End;
+
+{*******************************************************************************
+Procedure SolveQuizQuestion;
+by: Wizzup?
+Description: Solves one question of the quiz.
+*******************************************************************************}
+
+Procedure SolveQuizQuestion;
+
+Var
+   I, II, Count: Integer;
+   Found: Boolean;
+   ObjInfo: Array [0..2] Of QuizObj;
+   theUsesNames: TStringArray;
+   theUsesCount: TIntegerArray;
+   itemBox: TBox;
+
+Begin
+  Try
+    Found := False;
+    For I := 0 To 2 Do
+      ObjInfo[I] := GetQuizItem(I + 1);
+
+    For I := 0 To 2 Do
+    Begin
+      For II := 0 To High(theUsesNames) Do
+        If ObjInfo[I].Use = theUsesNames[II] Then
+        Begin
+          Found := True;
+          Break;
+        End;
+
+      If Found Then
+        theUsesCount[II] := theUsesCount[II] + 1
+      Else
+      Begin
+        SetLength(theUsesNames, Length(theUsesNames) + 1);
+        SetLength(theUsesCount, Length(theUsesCount) + 1);
+        theUsesNames[High(theUsesNames)] := ObjInfo[I].Use;
+        theUsesCount[High(theUsesCount)] := 1;
+      End;
+      Found := False;
+    End;
+    II := -1;
+    Count := -1;
+    For I := 0 To High(theUsesNames) Do
+    Begin
+      WriteLn('Use: ' + theUsesNames[I] + ', Count: ' + IntToStr(theUsesCount[I]));
+      If theUsesCount[I] > Count Then
+      Begin
+        Count := theUsesCount[I];
+        II := I;
+      End;
+    End;
+
+    For I := 0 To 2 Do
+      If ObjInfo[I].Use <> theUsesNames[II] Then
+        Break;
+    WriteLn('We need to pick ' + ObjInfo[I].Name + ', and it''s use is ' + ObjInfo[I].Use + ' and located at slot ' + IntToStr(I + 1));
+    itemBox := QuizItemBox(I + 1);
+
+    Mouse(itemBox.X1 + 5, ItemBox.Y1 + 5, itemBox.X2 - itemBox.X1 - 5, itemBox.Y2- itemBox.Y1 - 5, True);
+  Except
+  End;
+End;
+
+{*******************************************************************************
+function Quiz_Leave: Boolean;
+by: IceFire908
+Description: Leaves the quiz random, true if portal found.
+*******************************************************************************}
+
+function Quiz_Leave: Boolean;
+var
+  TPAA: T2DPointArray;
+  TPA: TPointArray;
+  QL, QP: TPoint;
+  I: LongInt;
+begin
+  MakeCompass('N');
+  SetAngle(True);
+  FindColorsTolerance(TPA, clWhite, MMX1, MMY1, MMX2, MMY2, 421);
+
+  // XXX, Wizzup: Why not pie???
+  FilterPointsDist(TPA,0,75,MMCX,MMCY);
+  //FilterPointsPie(TPA, 0, 360, 0, 75, MMCX, MMCY);
+  QL := MiddleTPA(TPA);
+  if (Distance(MMCX, MMCY, QL.X + 15, QL.Y) > 7) then
+  begin
+    Mouse(QL.X + 15, QL.Y, 0, 0, True);
+    Flag;
+  end;
+  Wait(1000 + Random(500));
+  ColorToleranceSpeed(2);
+  SetColorSpeed2Modifiers(0.16, 1.80);
+  FindColorsSpiralTolerance(MSCX, MSCY, TPA, 6670489, MSX1, MSY1, MSX2, MSY2, 11);
+  ColorToleranceSpeed(1);
+  SetColorSpeed2Modifiers(0.2, 0.2);
+  TPAA := TPAToATPAEx(TPA, 30, 30);
+  SortATPAFromFirstPoint(TPAA, Point(MSCX, MSCY));
+  for I := 0 to High(TPAA) do
+  begin
+    if (Length(TPAA[I]) < 50) then
+      Continue;
+    QP := MiddleTPA(TPAA[I]);
+    MMouse(QP.X, QP.Y, 0, 0);
+    Wait(RandomRange(250, 350));
+    if (CountColorTolerance(14342657, 7, 7, 100, 25, 70) > 100) then
+    begin
+      Result := True;
+      GetMousePos(QP.X, QP.Y);
+      Mouse(QP.X, QP.Y, 0, 0, True);
+      Wait(RandomRange(5000, 7000));
+      Exit;
+    end;
+  end;
+end;
+
+{*******************************************************************************
+Function SolveQuiz: Boolean;
+by: Wizzup? and ZephyrsFury
+Description: Solves the quiz random and returns true if solved.
+*******************************************************************************}
+
+Function SolveQuiz: Boolean;
+
+Var
+   NonBlackC: TPointArray;
+   TimeMarker: LongInt;
+   X, Y: Integer;
+Begin
+  Result := False;
+  LoadQuizArray;
+  FindColorsTolerance(NonBlackC, clWhite, MMX1, MMY1, MMX2, MMY2, 421);
+
+  // XXX: Wizzup, why not pie??
+  FilterPointsDist(NonBlackC,0,70,MMCX,MMCY);
+  //FilterPointsPie(NonBlackC, 0, 360, 0, 70, MMCX, MMCY);
+
+  TimeMarker := GetSystemTime;
+  while ((GetSystemTime - TimeMarker) < 15000) and FindNPCChatText('Talk to',nothing) do
+    wait(500 + random(1000));
+  While GetSystemTime - TimeMarker < 300000 Do
+  Begin
+    while (ClickContinue(True, True)) do
+      Wait(500 + Random(1000));
+    if (FindColor(X, Y, 65535, MCX1, MCY1, MCX2, MCY2)) then
+    begin
+      SolveQuizQuestion;
+      Wait(2000 + Random (1000));
+    end;
+    if (Length(NonBlackC) > 50) then
+      if (FindNPCChatText('hank y', Nothing)) then
+        begin
+          Result := Quiz_Leave;
+          Exit;
+        end;
+    if (Length(NonBlackC) < 50) then
+      if (PercentBlackMM < 95) then
+      begin
+        Result := True;
+        Exit;
+      end;
+  End;
+End;
+
+{*******************************************************************************
+Function FindQuiz: Boolean;
+by: Wizzup?
+Description: Solves the quiz random and returns true if solved.
+*******************************************************************************}
+
+Function FindQuiz: Boolean;
+Begin
+  LoadQuizArray;
+  Players[CurrentPlayer].Rand := 'Quiz';
+  Wait(10000);
+  If SolveQuiz Then
+    Result := True
+  Else
+  Begin
+    Result := False;
+    Players[CurrentPlayer].Active := False;
+    Players[CurrentPlayer].Rand := 'NoQuiz';
+    Repeat
+      Wait(1000);
+    Until Not LoggedIn;
+  End;
+End;

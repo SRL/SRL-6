@@ -1,0 +1,644 @@
+//-----------------------------------------------------------------//
+//--               Scar Standard Resource Library                --//
+//--               » Leo The Grave Digger Routines               --//
+//-----------------------------------------------------------------//
+// * procedure Leo_LoadDTMs;                                     // * by ZephyrsFury
+// * function InLeoGraveyard: Boolean;                           // * by ZephyrsFury
+// * procedure Leo_WaitForScreen(What: string);                  // * by Iroki
+// * procedure Leo_ToCenter;                                     // * by IceFire908
+// * function Leo_WalkTo: Boolean;                               // * by IceFire908
+// * function Leo_DepositMausoleum: Boolean;                     // * by IceFire908
+// * function Leo_TalkTo: Boolean;                               // * by IceFire908
+// * function Leo_ClickNearestGrave(cx, cy: Integer): Boolean;   // * by Nielsie95 and SKy Scripter
+// * function Leo_AnalyzeCoffin2(h: GetClientCanvas.Handle): string;// * by Iroki
+// * function Leo_AnalyzeGraveStone2(h: GetClientCanvas.Handle): string; // * by Iroki
+// * function Leo_BuryCoffins: Boolean;                          // * by IceFire908 & Iroki
+// * function SolveLeo: Boolean;                                 // * by IceFire908, Iroki, Nielsie95, & SKy Scripter
+
+var
+  LeoDTM_Coffin: Integer;
+
+const
+  Leo_CoffinColour = 3105664;
+  Leo_CoffinTol = 8;
+  Leo_CoffinHue = 0.06;
+  Leo_CoffinSat = 1.30;
+
+{*******************************************************************************
+procedure Leo_LoadDTMs;
+By: ZephyrsFury
+Description: Loads Leo Solver DTMs and Bitmaps, etc.
+*******************************************************************************}
+
+procedure Leo_LoadDTMs;
+begin
+  LeoDTM_Coffin :=  DTMFromString('78DA633CC1C4C0C0CAC8800A98C0244C94F11' +
+       '090FF8301BF9AAB40FE5F026A6E02F99C04EC3A07E47F2360CE79' +
+       '20FF1F038A5894873A830D121F00118609F7');
+end;
+
+{*******************************************************************************
+function InLeoGraveyard: Boolean;
+By: ZephyrsFury
+Description: Checks if we're in the Leo random.
+*******************************************************************************}
+
+function InLeoGraveyard: Boolean;
+var
+  Pts: TPointArray;
+  ATPA: T2DPointArray;
+  X, Y, II, GraveCount, cts: Integer;
+  B: TBox;
+begin
+  if (InBlack) then
+    if (FindColor(X, Y, 60909, MMX1, MMY1, MMX2, MMY2)) then
+      if (CountColor(60909, MMX1, MMY1, MMX2, MMY2) = 1) then
+        if (InRange(PercentBlackMM, 75, 80)) then
+        begin
+          FindColorsPie(Pts, clWhite, 50, 0.0, 360.0, 0.0, 76.0, MMX1, MMY1, MMX2, MMY2, MMCX, MMCY);
+          B := GetTPABounds(Pts);
+          cts := GetColorToleranceSpeed;
+          ColorToleranceSpeed(2);
+          SetColorSpeed2Modifiers(100.0, 100.0);
+          FindColorsTolerance(Pts, 0, B.X1, B.Y1, B.X2, B.Y2, 3);
+          SetColorSpeed2Modifiers(0.2, 0.2);
+          ColorToleranceSpeed(cts);
+          ATPA := SplitTPAEx(Pts, 1, 1);
+          for II := 0 to High(ATPA) do
+            if (Length(ATPA[II]) < 50) then
+              Inc(GraveCount);
+          Result := (GraveCount > 5);
+        end;
+end;
+
+{*******************************************************************************
+procedure Leo_WaitForScreen(What: string);
+By: Iroki
+Description: Waits for a gravestone/coffin screen.
+*******************************************************************************}
+
+procedure Leo_WaitForScreen(What: string);
+var
+  t, C: Integer;
+begin
+  if (What = 'coffin') then
+    C := 0
+  else
+    C := 465160;
+  t := GetSystemTime;
+  while (GetColor(20, 20) <> C) and ((GetSystemTime - t) <= (5 * 1000)) do WaitNone;
+end;
+
+
+{*******************************************************************************
+procedure Leo_ToCenter;
+By: IceFire908
+Description: Walks to the center of the graveyard
+*******************************************************************************}
+
+procedure Leo_ToCenter;
+var
+  TPA: TPointArray;
+  LTC: TPoint;
+begin
+  FindColorsTolerance(TPA, clWhite, MMX1, MMY1, MMX2, MMY2, 421);
+
+  // XXX, Wizzup: Why not Pie???
+  FilterPointsDist(TPA,0,75,MMCX,MMCY);
+  //FilterPointsPie(TPA, 0, 360, 0, 75, MMCX, MMCY);
+
+  LTC := MiddleTPA(TPA);
+  if (Distance(MMCX, MMCY, LTC.X + 3, LTC.Y + 6) > 4) then
+  begin
+    Mouse(LTC.X + 3, LTC.Y + 6, 0, 0, True);
+    Wait(RandomRange(700, 1400));
+    Flag;
+  end;
+  Wait(2500 + Random(500));
+end;
+
+{*******************************************************************************
+function Leo_WalkTo: Boolean;
+by: IceFire908
+Description: Finds Leo's NPC yellow dot on the MM and walks to it.
+*******************************************************************************}
+
+function Leo_WalkTo: Boolean;
+var
+  TPA: TPointArray;
+  LWT: TPoint;
+begin
+  Result := FindColors(TPA, 195836, MMX1, MMY1, MMX2, MMY2);
+  if (not (Result)) then
+    Exit;
+  // XXX, Wizzup: Why not Pie???
+  FilterPointsDist(TPA,0,75,MMCX,MMCY);
+  // FilterPointsPie(TPA, 0, 360, 0, 75, MMCX, MMCY);
+
+  LWT := MiddleTPA(TPA);
+  if (Distance(MMCX, MMCY, LWT.X, LWT.Y) < 5) then
+    Exit;
+  Mouse(LWT.X, LWT.Y, 2, 2, True);
+  Wait(RandomRange(300, 500));
+  FFlag(0);
+  Wait(RandomRange(1500, 2000));
+end;
+
+{*******************************************************************************
+function Leo_DepositMausoleum: Boolean;
+by: IceFire908
+Description: Deposits your last 5 items if needed into your bank.
+*******************************************************************************}
+
+function Leo_DepositMausoleum: Boolean;
+var
+  TPAA: T2DPointArray;
+  TPA: TPointArray;
+  DM, P: TPoint;
+  I: LongInt;
+  II: Byte;
+  B: TBox;
+begin
+  ColorToleranceSpeed(2);
+  SetColorSpeed2Modifiers(0.42, 0.08);
+  FindColorsSpiralTolerance(MSCX, MSCY, TPA, 5066321, MSX1, MSY1, MSX2, MSCY, 10);
+  SetColorSpeed2Modifiers(0.2, 0.2);
+  ColorToleranceSpeed(1);
+  TPAA := TPAToATPAEx(TPA, 50, 50);
+  SortATPASize(TPAA, True);
+  for I := 0 to High(TPAA) do
+  begin
+    DM := MiddleTPA(TPAA[I]);
+    MMouse(DM.X, DM.Y, 3, 3);
+    Wait(200 + Random(50));
+    if (CountColorTolerance(14342657, 7, 7, 100, 25, 70) > 100) then
+    begin
+      Result := True;
+      GetMousePos(DM.X, DM.Y);
+      Mouse(DM.X, DM.Y, 0, 0, True);
+      Wait(RandomRange(2000, 3000));
+      ClickContinue(True, True);
+      Wait(RandomRange(2000, 3000));
+      for II := 0 to 4 do
+      begin
+        B := IntToBox(383 - (II * 48), 218, 431 - (II * 48), 256);
+        if (FindColor(P.X, P.Y, srl_OutLine_Black, B.X1, B.Y1, B.X2, B.Y2)) then
+        begin
+          Mouse((B.X1 + B.X2) div 2, (B.Y1 + B.Y2) div 2, 2, 2, False);
+          Wait(RandomRange(400, 600));
+          ChooseOption('Deposit-All');
+          Wait(RandomRange(600, 800));
+        end;
+      end;
+      Mouse(434, 40, 0, 0, True);
+      Wait(RandomRange(1200, 1400));
+      Exit;
+    end;
+  end;
+end;
+
+{*******************************************************************************
+function Leo_TalkTo: Boolean;
+By: IceFire908
+Description: Finds Leo and talks to him.
+*******************************************************************************}
+
+function Leo_TalkTo: Boolean;
+var
+  TPAA: T2DPointArray;
+  TPA: TPointArray;
+  LTT: TPoint;
+  I: LongInt;
+begin
+  MMouse(MSCX, MSCY, 0, 0);
+  Wait(200 + Random(50));
+  if (CountColorTolerance(648165, 7, 7, 100, 25, 50) > 40) then
+  begin
+    Result := True;
+    GetMousePos(LTT.X, LTT.Y);
+    Mouse(LTT.X, LTT.Y, 0, 0, True);
+    Wait(RandomRange(1000, 2000));
+    Exit;
+  end;
+  ColorToleranceSpeed(2);
+  SetColorSpeed2Modifiers(0.15, 0.21);
+  FindColorsSpiralTolerance(MSCX, MSCY, TPA, 3624531, MSX1, MSY1, MSX2, MSY2, 4);
+  SetColorSpeed2Modifiers(0.2, 0.2);
+  ColorToleranceSpeed(1);
+  TPAA := TPAToATPAEx(TPA, 15, 15);
+  SortATPASize(TPAA, True);
+  for I := 0 to High(TPAA) do
+  begin
+    LTT := MiddleTPA(TPAA[I]);
+    MMouse(LTT.X, LTT.Y, 3, 3);
+    Wait(200 + Random(50));
+    if (CountColorTolerance(648165, 7, 7, 100, 25, 50) > 40) then
+    begin
+      Result := True;
+      GetMousePos(LTT.X, LTT.Y);
+      Mouse(LTT.X, LTT.Y, 0, 0, True);
+      Wait(RandomRange(1000, 2000));
+      Exit;
+    end;
+  end;
+end;
+
+{*******************************************************************************
+procedure Leo_GrabCoffins;
+By: Nielsie95 and SKy Scripter
+Description: Grabs all coffins from the screen.
+*******************************************************************************}
+
+procedure Leo_GrabCoffins;
+var
+  i, x, y, c, Time, f: Integer;
+  p: TPointArray;
+  t: T2DPointArray;
+  First : boolean;
+begin
+  Time := GetSystemTime;
+  First := false;
+  if CountItems('dtm',LeoDTM_Coffin,[]) = 0 then
+    First := True;
+  while (CountItems('dtm', LeoDTM_Coffin, []) < 5) and ((GetSystemTime - Time) <= (60 * 1000)) and (f < 5) do
+  begin
+    ColorToleranceSpeed(2);
+    SetColorSpeed2Modifiers(Leo_CoffinHue, Leo_CoffinSat);
+    FindColorsTolerance(p, leo_CoffinColour, MSX1, MSY1, MSX2, MSY2, Leo_CoffinTol);
+    if (Length(p) < 30) then Continue;
+    t := SplitTPAEx(p, 7, 7);
+    SortATPAFromFirstPoint(t, Point(MSCX, MSCY));
+    for i := 0 to High(t) do
+    begin
+      MiddleTPAEx(t[i], x, y);
+      MMouse(x, y, 5, 15);
+      Wait(200 + Random(50));
+      if (InRange(CountColorTolerance(14342657, 7, 7, 100, 25, 70), 10, 70)) then
+      begin
+        GetMousePos(x, y);
+        c := InvCount;
+        Mouse(x, y, 0, 0, True);
+        Wait(500);
+        FFlag(0);
+        Wait(1500);
+        if first and InConvo then
+        begin
+          ClickContinue(True, True);
+          Wait(1000);
+          if (FindColor(X, Y, clBlack, 128, 429, 380, 448)) then
+            Mouse(178, 433, 50, 5, True);
+          Wait(RandomRange(1000, 1500));
+          while clickContinue(true,True) do
+            Wait(500 + random(250));
+          if (InvCount > 23) then
+            Leo_DepositMausoleum;
+        end;
+        y := 0;
+        while (c = InvCount) and (y < 20) do
+        begin
+          Inc(y);
+          Wait(500);
+        end;
+        if (c < InvCount) then
+          Break;
+      end;
+    end;
+    if (i > High(t)) then
+    begin
+      Inc(f);
+      Leo_ToCenter;
+    end;
+    ColorToleranceSpeed(1);
+  end;
+end;
+
+{*******************************************************************************
+function Leo_ClickNearestGrave(cx, cy: Integer): Boolean;
+By: Nielsie95 and SKy Scripter
+Description: Puts the coffin inside the grave.
+*******************************************************************************}
+
+function Leo_ClickNearestGrave(cx, cy: Integer): Boolean;
+var
+  i, c, x, y: Integer;
+  p: TPointArray;
+  t: T2DPointArray;
+  b: TBox;
+begin
+  Result := False;
+  ColorToleranceSpeed(2);
+  SetColorSpeed2Modifiers(0.03, 0.33);
+  FindColorsTolerance(p, 4609120, MSX1, MSY1, MSX2, MSY2, 13);
+  SetColorSpeed2Modifiers(0.1, 0.2);
+  t := SplitTPAEx(p, 3, 3);
+  SortATPAFrom(t, Point(cx, cy));
+  SortATPAFromFirstPoint(t, Point(cx, cy));
+
+  for i := 0 to High(t) do
+    if (Length(t[i]) > 150) then
+    begin
+      b := GetTPABounds(t[i]);
+      if (CountColorTolerance(3563122, b.x1 + 10, b.y1 + 10, b.x2 -10, b.y2 -10, 13) > 5) then Continue;
+      MiddleTPAEx(t[i], x, y);
+      MMouse(x -4, y -4, 10, 10);
+      Wait(200 + Random(150));
+      if (not (InRange(CountColorTolerance(14342657, 7, 7, 100, 25, 70), 10, 70))) then Continue;
+      GetMousePos(x, y);
+      c := InvCount;
+      Mouse(x, y, 0, 0, True);
+      Result := True;
+      Wait(500);
+      FFLag(0);
+      y := 0;
+      while (c = InvCount) and (y < 20) do
+      begin
+        Inc(y);
+        Wait(500);
+      end;
+      if (c > InvCount) then
+        Break
+      else
+        Leo_ClickNearestGrave(cx, cy);
+    end;
+end;
+
+{*******************************************************************************
+function Leo_AnalyzeCoffin2(h: GetClientCanvas.Handle): string;
+By: Iroki
+Description: Indentifys the coffin, should work first try, if not fail safe :-)
+*******************************************************************************}
+
+{*******************************************************************************
+function Leo_AnalyzeGraveStone2(h: GetClientCanvas.Handle): string;
+By: Iroki
+Description: Indentifys the grave stone, 3 trys and you're good.
+*******************************************************************************}
+
+{*******************************************************************************
+function Leo_BurryCoffins: Boolean;
+By: IceFire908 & Iroki
+Description: Finds and identifies coffins and graves.
+*******************************************************************************}
+const
+  Coffin_error = -1;
+  Coffin_empty = 0;
+  Coffin_woodcutting = 1;
+  coffin_cooking = 2;
+  coffin_crafting = 3;
+  coffin_farming = 4;
+  coffin_mining = 5;
+
+function Leo_BuryCoffins: Boolean;
+var
+  GraveTypeCount: array [0..4] of array [0..4] of Integer;
+  GraveNames: array [0..4] of array [0..2] of integer;
+  CofNames, GraveName: array [0..4] of integer;
+  InvLoc: array [0..4] of Integer;
+  I, Coffin, II, III, T: Integer;
+  C, Center, RGS, UWG: TPoint;
+  GraveSkills: TIntegerArray;
+  StoneLoc: array of TBox;
+  TPAA: T2DPointArray;
+  TPA: TPointArray;
+  BadName: Boolean;
+  B: TBox;
+begin
+  Leo_GrabCoffins;
+  if (CountItems('dtm', LeoDTM_Coffin, []) < 5) then
+  begin
+    WriteLn('Could not find all coffins!');
+    LogOut;
+    Exit;
+  end;
+  for I := 1 to 28 do
+  begin
+    if (not (ExistsItem(I))) then
+      Continue;
+    B := InvBox(I);
+    if (FindDTM(LeoDTM_Coffin, C.X, C.Y, B.X1, B.Y1, B.X2, B.Y2)) then
+    begin
+      InvLoc[Coffin] := I;
+      for II := 0 to 4 do
+      begin
+        BadName := False;
+        Mouse(C.X, C.Y, 2, 2, True);
+        Leo_WaitForScreen('coffin');
+        CofNames[Coffin] := Leo_AnalyzeCoffin2(ExportImageTarget);
+        Wait(RandomRange(1000, 2000));
+        Mouse(490, 26, 2, 2, True);
+        for III := 0 to 4 do
+          if ((CofNames[III] = CofNames[Coffin]) and (III <> Coffin)) then
+            BadName := True;
+        if ((CofNames[Coffin] <> Coffin_error) and (CofNames[Coffin] <> Coffin_empty) and (not (BadName))) then
+        begin
+          WriteLn('Coffin ' + IntToStr(Coffin + 1) + ' ' + ToStr(CofNames[Coffin]) + ' identified!');
+          Inc(Coffin);
+          Break;
+        end;
+        if (II = 4) then
+        begin
+          WriteLn('Unable to identify coffin!');
+          LogOut;
+          Exit;
+        end;
+      end;
+    end;
+  end;            //NW[0], NE[1], SW[2], SM[3], SE[4] for the loc indexes
+  GraveSkills := [coffin_cooking, coffin_crafting, coffin_farming, coffin_mining, coffin_woodcutting];
+  StoneLoc := [IntToBox(123, 45, 264, 161), IntToBox(274, 48, 402, 169), IntToBox(14, 162, 178, 317),
+               IntToBox(232, 149, 333, 331), IntToBox(367, 158, 509, 331)];
+  for I := 0 to 4 do
+  begin
+    Center := Point((StoneLoc[I].X1 + StoneLoc[I].X2) div 2, (StoneLoc[I].Y1 + StoneLoc[I].Y2) div 2);
+    Leo_ToCenter;
+    for II := 0 to 2 do
+    begin
+      ColorToleranceSpeed(2);
+      SetColorSpeed2Modifiers(0.42, 0.08);
+      if (II = 0) then
+        FindColorsSpiralTolerance(Center.X, Center.Y, TPA, 6908269, StoneLoc[I].X1, StoneLoc[I].Y1, StoneLoc[I].X2, StoneLoc[I].Y2, 17)
+      else
+        FindColorsSpiralTolerance(MSCX, MSCY, TPA, 6908269, MSCX - 50, MSCY - 50, MSCX + 50, MSCY + 50, 14);
+      SetColorSpeed2Modifiers(0.2, 0.2);
+      ColorToleranceSpeed(1);
+      TPAA := TPAToATPAEx(TPA, 10, 10);
+      if (II = 0) then
+        SortATPAFromFirstPoint(TPAA, Center)
+      else
+        SortATPAFromFirstPoint(TPAA, Point(MSCX, MSCY));
+      for III := 0 to High(TPAA) do
+      begin
+        RGS := MiddleTPA(TPAA[III]);
+        MMouse(RGS.X, RGS.Y, 2, 2);
+        Wait(250 + Random(50));
+        if (CountColorTolerance(14342657, 7, 7, 100, 25, 70) > 100) then
+        begin
+          GetMousePos(RGS.X, RGS.Y);
+          Mouse(RGS.X, RGS.Y, 0, 0, True);
+          Leo_WaitForScreen('');
+          GraveNames[I][II] := Leo_AnalyzeGraveStone2(ExportImageTarget);
+          if (GraveNames[I][II] = Coffin_empty) then
+            GraveNames[I][II] := coffin_error;
+          WriteLn('Grave ' + IntToStr(I + 1) + ' ' + IntToStr(II + 1) + ' ' + ToStr(GraveNames[I][II]) + ' identified!');
+          Wait(RandomRange(2000, 3000));
+          Mouse(490, 26, 2, 2, True);
+          Break;
+        end;
+        if (III = High(TPAA)) then
+        begin
+          WriteLn('Could not find grave stone!');
+          LogOut;
+          Exit;
+        end;
+      end;
+    end;
+  end;
+
+  for I := 0 to 4 do     //Count em up
+    for II := 0 to 2 do
+      if InIntArrayEx(GraveSkills,III, GraveNames[I][II]) then
+        Inc(GraveTypeCount[I][III]);
+  for I := 0 to 4 do    //Found a 3 of one
+    for II := 0 to 4 do
+      if (GraveTypeCount[I][II] > 2) then
+        if (not (InIntArray(GraveName,GraveSkills[ii]))) then
+          GraveName[I] := GraveSkills[II];
+  for I := 0 to 4 do    //Found a 2 of one
+    for II := 0 to 4 do
+      if (GraveTypeCount[I][II] > 1) then
+        if (not (InIntArray(GraveName,GraveSkills[ii]))) then
+          GraveName[I] := GraveSkills[II];
+  for I := 0 to 4 do     //Maybe one of them
+  begin
+    if (GraveName[I] <> Coffin_empty) then
+      Continue;
+    for II := 0 to 2 do
+      if (not (InIntArray(GraveName,GraveNames[I][II]))) then
+        if InIntArray(GraveSkills,GraveNames[I][II]) then
+          GraveName[I] := GraveNames[I][II];
+  end;
+  for I := 0 to 4 do    //randomize the rest and pray
+  begin
+    if (GraveName[I] <> Coffin_empty) then
+      Continue;
+    for II := 0 to 4 do
+    if (not (InIntArray(GraveName,GraveSkills[ii]))) then
+      begin
+        GraveName[I] := GraveSkills[II];
+        Break;
+      end;
+  end;
+  for I := 0 to 4 do
+    WriteLn(IntToStr(I + 1) + ' = ' + ToStr(GraveName[I]));
+  for I := 0 to 4 do //bury coffins
+  begin
+    Leo_ToCenter;
+
+    InIntArrayEx(CofNames,II, GraveName[I]);
+
+    MouseItem(InvLoc[II], False);
+    Wait(250 + Random(50));
+    ChooseOption('se');
+    Wait(RandomRange(500, 800));
+    Center := Point((StoneLoc[I].X1 + StoneLoc[I].X2) div 2, (StoneLoc[I].Y1 + StoneLoc[I].Y2) div 2);
+    ColorToleranceSpeed(2);
+    SetColorSpeed2Modifiers(0.11, 0.19);
+    FindColorsSpiralTolerance(Center.X, Center.Y, TPA, 3490382, StoneLoc[I].X1, StoneLoc[I].Y1, StoneLoc[I].X2, StoneLoc[I].Y2, 7);
+    SetColorSpeed2Modifiers(0.2, 0.2);
+    ColorToleranceSpeed(1);
+    TPAA := TPAToATPAEx(TPA, 30, 30);
+    SortATPAFromFirstPoint(TPAA, Center);
+    for II := 0 to High(TPAA) do
+    begin
+      UWG := MiddleTPA(TPAA[II]);
+      MMouse(UWG.X, UWG.Y, 2, 2);
+      Wait(250 + Random(50));
+      if (InRange(CountColorTolerance(14342657, 7, 7, 250, 25, 70), 100, 200)) then
+      begin
+        III := InvCount;
+        GetMousePos(UWG.X, UWG.Y);
+        Mouse(UWG.X, UWG.Y, 0, 0, True);
+        T := GetSystemTime;
+        while (((GetSystemTime - T) <  15000) and (InvCount = III)) do
+          Wait(RandomRange(500, 1500));
+        Wait(RandomRange(2000, 3000));
+        Break;
+      end;
+      if (II = High(TPAA)) then
+      begin
+        WriteLn('Could not find grave!');
+        LogOut; //Deselect coffin
+        Wait(RandomRange(500, 1000));
+        LogOut;
+        Exit;
+      end;
+    end;
+  end;
+  Result := True;
+end;
+
+{*******************************************************************************
+function SolveLeo: Boolean;
+By: IceFire908, Iroki, Nielsie95, & SKy Scripter
+Description: Solves the Leo random.
+*******************************************************************************}
+
+function SolveLeo: Boolean;
+var
+  X, Y, Leo_Trys: Integer;
+  KeepGoin: Boolean;
+begin
+  Leo_LoadDTMs;
+  for Leo_Trys := 1 to 10 do
+  begin
+    WriteLn('Leo try # ' + IntToStr(Leo_Trys));
+    SetAngle(True);
+    MakeCompass('N');
+    GameTab(tab_Inv);
+    Wait(2000);
+    if (Leo_Trys = 1) then
+    begin
+      while (InConvo) do
+        ClickContinue(True, True);
+      Wait(1000);
+      if (FindColor(X, Y, 65535, MSX1, MSY1, MSX2, MSY2)) then
+        Mouse(455, 45, 5, 5, True);
+      Wait(RandomRange(1000, 1500));
+      if (InvCount > 23) then
+        Leo_DepositMausoleum;
+    end;
+    if Leo_BuryCoffins then
+      if Leo_WalkTo then
+        if Leo_TalkTo then
+        begin
+          while (InConvo) do
+          begin
+            ClickContinue(True, True);
+            if (FindNPCChatText('want', ClickLeft)) then
+              KeepGoin := True;
+            Wait(RandomRange(1500, 2500));
+          end;
+        end;
+    if (not (KeepGoin)) then
+      Break;
+    KeepGoin := False;
+    if (Leo_Trys = 10) then
+    begin
+      WriteLn('Failed to solve Leo!');
+      LogOut;
+    end;
+  end;
+  FreeDTM(LeoDTM_Coffin);
+
+  Result := (LoggedIn);
+  if (Result) then
+  begin
+    WriteLn('Solved Leo!')
+    while (ClickContinue(True, True)) do
+      Wait(500 + Random(500));
+  end else
+  begin
+    WriteLn('Failed to solve Leo!');
+    LogOut;
+  end;
+end;

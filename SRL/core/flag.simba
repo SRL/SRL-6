@@ -1,0 +1,372 @@
+(*
+Flag
+====
+
+The Flag include contains all Flag related functions
+
+*)
+
+function rs_OnMinimap(x, y: Integer): Boolean; forward;
+
+(*
+FlagColor
+~~~~~~~~~
+
+.. code-block:: pascal
+
+    const FlagColor: Integer;
+
+Stores minimap flag color.
+
+
+.. note::
+
+    by The SRL Devs.
+
+Example:
+
+.. code-block:: pascal
+
+*)
+
+const
+  FlagColor = 3026478;
+
+(*
+FlagPresent
+~~~~~~~~~~~
+
+.. code-block:: pascal
+
+    function FlagPresent: Boolean;
+
+T/F depending on flag exist.
+
+
+.. note::
+
+    by Mutant Squirrle
+
+Example:
+
+.. code-block:: pascal
+
+
+*)
+
+function FlagPresent: Boolean;
+var
+  x, y: integer;
+begin
+  Result := FindColor(x, y, FlagColor, MMX1, MMY1, MMX2, MMY2);
+end;
+
+(*
+FlagDistance
+~~~~~~~~~~~~
+
+.. code-block:: pascal
+
+    function FlagDistance: Integer;
+
+Returns distance in pixels your char dot is from flag on mini-map
+
+
+.. note::
+
+    by PPLSUQBAWLZ/Odie533
+
+Example:
+
+.. code-block:: pascal
+
+
+*)
+
+function FlagDistance: Integer;
+var
+  X, Y: Integer;
+begin
+  Result := -1;
+  if (FindColor(X, Y, FlagColor, MMX1, MMY1, MMX2, MMY2)) then
+    Result := Distance(MMCX, MMCY, X + 1, Y + 14);
+end;
+
+(*
+WalkingToFlag
+~~~~~~~~~~~~~
+
+.. code-block:: pascal
+
+    function WalkingToFlag(WaitTime: Integer): Boolean;
+
+Checks if your charachter is moving; stores current FlagDistance to a variable,
+waits "WaitTime" ms and then checks the FlagDistance again.
+If it differs from the Distance stored in the variable, function returns true.
+
+.. note::
+
+    by EvilChicken!
+
+Example:
+
+.. code-block:: pascal
+
+
+*)
+
+function WalkingToFlag(WaitTime: Integer): Boolean;
+var
+  FirstDistance: Integer;
+begin
+  Result := False;
+  if (not FlagPresent) then exit;
+  FirstDistance := FlagDistance;
+  Wait(WaitTime);
+  Result := (FirstDistance <> FlagDistance);
+end;
+
+function RoadColorChecker: Boolean; Forward;
+
+(*
+FlagEx
+~~~~~~
+
+.. code-block:: pascal
+
+    function FlagEx(Dist: Integer; RoadColorCheck: Boolean): Boolean;
+
+Waits until Flag is within "Distance" distance.
+
+.. note::
+
+    by Wizzup? / WT-Fakawi / ZephyrsFury modified by N1ke!
+
+Example:
+
+.. code-block:: pascal
+
+
+*)
+
+function FlagEx(Dist: Integer; RoadColorCheck: Boolean): Boolean;
+var
+  Tx, Ty, M, D1, D2: Integer;
+begin
+  Result := False;
+  M := GetSystemTime;
+  while (FindColor(Tx, Ty, FlagColor, MMX1, MMY1, MMX2, MMY2)) do
+  begin
+    wait(50);
+    D1 := Distance(Tx, Ty + 14, MMCX, MMCY);
+    if (D1 <= Dist) then
+    begin
+      Result := True;
+      Exit;
+    end;
+    if (RoadColorCheck) then
+      RoadColorChecker;
+    Wait(100);
+    if (GetColor(6, 6) <> clWhite) then
+      if (GetSystemTime - M > 5000) then
+      begin
+        if (D1 = D2) then Exit;
+        D2 := D1;
+        M := GetSystemTime;
+      end;
+    if (Random(20) = 0) then IdleTime(500, 1000, 0.01);
+    if SRL_Procs[SRL_AntiBan] <> nil then
+      SRL_Procs[SRL_AntiBan]();
+  end;
+  Wait(RandomRange(200, 400));
+end;
+
+(*
+MouseFlagEx
+~~~~~~~~~~~
+
+.. code-block:: pascal
+
+    function MouseFlagEx(X, Y, rX, rY, Xmod, Ymod, FlagDist: Integer; CheckForFlag, CheckForRoadColor: Boolean): Boolean;
+
+MouseFlag, MFF & MFNF combined into one procedure.
+X, Y is the point you want to click, rX, rY are randomness modifiers.
+Xmod and Ymod is the adjustment for each click without finding a flag.
+FlagDist is how close you want to be (in pixels) to the flag before exiting.
+CheckForFlag = True if you want to exit the function if a flag is present. (MFF)
+CheckForRoadColor = True if you want to call RoadColorChecked while FlagPresent.
+
+.. note::
+
+    by EvilChicken!
+
+Example:
+
+.. code-block:: pascal
+
+
+*)
+
+function MouseFlagEx(X, Y, rX, rY, Xmod, Ymod, FlagDist: Integer;
+  CheckForFlag, CheckForRoadColor: Boolean): Boolean;
+var
+  I: Integer;
+  P: TPoint;
+begin
+  Result := False;
+  if (FlagPresent) then
+    if (CheckForFlag) or (FlagDistance <= FlagDist) then exit;
+
+  P := Point(X - Xmod, Y - Ymod);
+  Xmod := Max(Xmod, 3);
+  Ymod := Max(Ymod, 3);
+
+  for I := 0 to 4 do
+  begin
+    IncEx(P.X, Xmod + Random(rX));
+    IncEx(P.Y, Ymod + Random(rY));
+    if not rs_OnMiniMap(P.X, P.Y) then Continue;
+    Mouse(P.X, P.Y, 0, 0, True);
+    Result := WaitFunc(@FlagPresent, 50, 3000);
+    if (Result) then break;
+  end;
+  if (FlagDist > -1) then
+    FlagEx(FlagDist, CheckForRoadColor);
+end;
+
+(*
+MFF
+~~~
+
+.. code-block:: pascal
+
+    function MFF(X, Y, Xmod, Ymod: Integer): Boolean;
+
+
+If the flag is not present it will click at (ax, ay) increasing by
+(xmod, ymod) 5 times or until the flag appears.
+
+
+.. note::
+
+    by EvilChicken! from an original idea by WT-Fakawi
+
+Example:
+
+.. code-block:: pascal
+
+
+*)
+
+function MFF(X, Y, Xmod, Ymod: Integer): Boolean;
+begin
+  Result := MouseFlagEx(X, Y, 3, 3, Xmod, Ymod, -1, True, False);
+end;
+
+(*
+MFNF
+~~~~
+
+.. code-block:: pascal
+
+    Function MFNF(ax, ay, xmod, ymod: Integer):Boolean;
+
+Like MFF except it will click even if the flag is present when the
+
+.. note::
+
+    by EvilChicken! from an original idea by WT-Fakawi
+
+Example:
+
+.. code-block:: pascal
+
+
+*)
+
+function MFNF(X, Y, Xmod, Ymod: Integer): Boolean;
+begin
+  Result := MouseFlagEx(X, Y, 3, 3, Xmod, Ymod, -1, False, False);
+end;
+
+(*
+FFlag
+~~~~~
+
+.. code-block:: pascal
+
+    function FFlag(Dist: Integer): Boolean;
+
+Waits until Flag is within "Distance" distance.
+
+
+.. note::
+
+    by Wizzup? / WT-Fakawi / ZephyrsFury
+
+Example:
+
+.. code-block:: pascal
+
+
+*)
+
+function FFlag(Dist: Integer): Boolean;
+begin
+  Result := FlagEx(Dist, False);
+end;
+
+(*
+Flag
+~~~~
+
+.. code-block:: pascal
+
+    function Flag: Boolean;
+
+Waits while flag exists.
+
+
+.. note::
+
+    by Nava2
+
+Example:
+
+.. code-block:: pascal
+
+
+*)
+
+function Flag: Boolean;
+begin
+  Result := FlagEx(0, False);
+end;
+
+(*
+MouseFlag
+~~~~~~~~~
+
+.. code-block:: pascal
+
+    procedure MouseFlag(X, Y, rX, rY, FlagDist: Integer);
+
+Mouse and Flag combined into one easy procedure.
+
+
+.. note::
+
+    by EvilChicken!
+
+Example:
+
+.. code-block:: pascal
+
+
+*)
+
+
+function MouseFlag(X, Y, rX, rY, FlagDist: Integer): Boolean;
+begin
+  Result := MouseFlagEx(X, Y, rX, rY, 0, 0, FlagDist, False, False);
+end;

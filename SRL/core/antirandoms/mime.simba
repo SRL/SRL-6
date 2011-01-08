@@ -1,0 +1,131 @@
+//-----------------------------------------------------------------//
+//--               Scar Standard Resource Library                --//
+//--               » Mime Routines                               --//
+//-----------------------------------------------------------------//
+// * function Mime_InSlot: Boolean;                                // * by Nava2
+// * procedure Mime_ClickOption(Action: String);                   // * by Nava2
+// * function SolveMime;                                           // * by Nava2
+{--------------------------Plugin Routines-----------------------------}
+// * function Mime_AnalyzeAnimation(ClientHDC: HDC): String;       // * by Iroki
+
+const
+  Mime_Unknown =  -1;
+  Mime_Empty =  0;
+  Mime_Think = 1;
+  Mime_Dance = 2;
+  Mime_Glass_Wall = 3;
+  Mime_Lean_on_air = 4;
+  Mime_Glass_box = 5;
+  Mime_Laugh = 6;
+  Mime_Climb_rope = 7;
+  Mime_Cry = 8;
+
+{*******************************************************************************
+function Mime_InSlot: Boolean;
+by: Nava2
+Description: Checks if the player is in the Slot to watch the Mime.
+*******************************************************************************}
+function Mime_InSlot: Boolean;
+var
+  TPA: TPointArray;
+begin
+  FindColorsTolerance(TPA, 15657968, MMX1, MMY1, MMX2, MMY2 - 20, 20);
+  SortTPAFrom(TPA, Point(MMCX, MMCY));
+  //Writeln(IntToStr(Distance(MMCX, MMCY, TPA[0].x, TPA[0].y)));
+  //DebugTPA(TPA, '');
+  Result := (Distance(MMCX, MMCY, TPA[0].x, TPA[0].y) <= 7);
+end;
+
+{*******************************************************************************
+procedure Mime_ClickOption(Action: String);
+by: Nava2
+Description: Uses the Action to and clicks on it.
+*******************************************************************************}
+procedure Mime_ClickOption(Action: integer);
+var
+  t: TPointArray;
+  a: T2DPointArray;
+  b: TBox;
+  i, c: Integer;
+  iis: TIntegerArray;
+  ss: TIntegerArray;
+begin
+  if (Action = Mime_Empty) or (Action = mime_unknown) or (not LoggedIn) then Exit;
+  FindColorsTolerance(t, 11503238, MCX1, MCY1, MCX2, MCY2, 3);
+  a := SplitTPAEx(t, 15, 2);
+  iis := [104, 59, 96, 140, 164, 141, 181, 103];
+  ss := [mime_laugh, mime_cry, mime_dance, mime_lean_on_air, mime_glass_wall, mime_glass_box,
+         mime_climb_rope, mime_think];
+  c := 0;
+  for i := 0 to 7 do
+    if Action = ss[i] then
+      c := iis[i];
+
+  for i := 0 to 7 do
+    if High(a[i]) = c then
+    begin
+      b := GetTPABounds(a[i]);
+      MouseBox(b.x1, b.y1, b.x2, b.y2, 1);
+      Break;
+    end;
+end;
+
+{*******************************************************************************
+function SolveMime: Boolean;
+by: Nava2
+Description: Solves the Mime Random.
+*******************************************************************************}
+function SolveMime: Boolean;
+var
+  TheAction: Integer;
+  t, x, y, cts, fT: Integer;
+begin
+  Result := False;
+  if not LoggedIn then Exit;
+  
+  fT := GetTimeRunning + 300000;
+  
+  cts := GetColorToleranceSpeed;
+  ColorToleranceSpeed(1);
+  while ClickContinue(True, True) do
+    Wait(50 + Random(25));
+
+  while not Mime_InSlot do
+    Wait(300 + Random(200));
+  SetAngle(True);
+  MakeCompass(0);
+
+  MMouse(RandomRange(MSX1, MSX2), RandomRange(MSCY, MSY2), 0, 0);
+  while (CountColor(0, MCX1, MCY1, MCX2, MCY2) <> 625) and LoggedIn do
+    wait(100);
+      
+  repeat
+    if not LoggedIn then Break;
+    
+    TheAction := Mime_Empty;
+    t := GetSystemTime + 60000;
+    while (TheAction = Mime_Empty) and LoggedIn and (t > GetSystemTime) do
+      TheAction := Mime_AnalyzeAnimation(ExportImageTarget);
+
+    if TheAction = Mime_Unknown then Continue;
+    //Writeln('[Mime] - Found Action: '#39 + TheAction + #39);
+
+    t := GetSystemTime + 25000;
+    while (not FindColorTolerance(x, y, 11503238, MCX1, MCY1, MCX2, MCY2, 3)) and (LoggedIn) and (t > GetSystemTime) do
+      Wait(100 + Random(50));
+
+    Wait(RandomRange(200, 600));
+    Mime_ClickOption(TheAction);
+    while (FindColorTolerance(x, y, 11503238, MCX1, MCY1, MCX2, MCY2, 3)) and (LoggedIn) and (t > GetSystemTime) do
+      Wait(100 + Random(50));
+    MMouse(RandomRange(MSX1, MSX2), RandomRange(MSCY, MSY2), 0, 0);
+    while (CountColor(0, MCX1, MCY1, MCX2, MCY2) <> 625) and LoggedIn do
+      wait(100);
+
+    while (ClickContinue(True, True)) do
+      Wait(500 + Random(1000));
+  until TabExists(tab_Stats) or (GetTimeRunning > fT);
+  
+  Result := TabExists(tab_Stats);
+  ColorToleranceSpeed(cts);
+end;

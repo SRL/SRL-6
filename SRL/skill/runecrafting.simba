@@ -1,0 +1,181 @@
+(*
+Runecrafting
+
+======
+The Runecrafting include contains all kinds of functions & features to use with the
+Runecrafting skill.
+
+*)
+
+(*
+Rune constants
+~~~~~~~~~~~
+
+.. note::
+
+For use with EXPPerEssence's & RunesPerEssence's Rune input.
+
+*)
+
+const
+  Runes_Air = 0;
+  Runes_Mind = 1;
+  Runes_Water = 2;
+  Runes_Earth = 3;
+  Runes_Fire = 4;
+  Runes_Body = 5;
+  Runes_Cosmic = 6;
+  Runes_Chaos = 7;
+  Runes_Nature = 8;
+  Runes_Law = 9;
+  Runes_Death = 10;
+  Runes_Blood = 11;
+  Runes_Soul = 12;
+  Runes_Astral = 13;
+
+(*
+EXPPerEssence
+~~~~~~~~~~~
+
+.. code-block:: pascal
+
+    function EXPPerEssence(Rune: Integer): Extended;
+
+Returns the amount of EXP you will recieve per essence based on a rune.
+
+.. note::
+
+  by IceFire908
+
+Example:
+
+.. code-block:: pascal
+
+    EXPPerEssence(Runes_Air);
+
+*)
+
+function EXPPerEssence(Rune: Integer): Extended;
+begin
+  Result := ((0.5 * Rune) + 5.0);
+  if (Rune = Runes_Astral) then
+    Result := 8.75;
+end;
+
+(*
+RunesPerEssence
+~~~~~~~~~~~
+
+.. code-block:: pascal
+
+    function RunesPerEssence(Level, Rune: Integer): Integer;
+
+Returns the number of runes you will recieve per essence based on a level.
+
+.. note::
+
+  by IceFire908
+
+Example:
+
+.. code-block:: pascal
+
+    RunesPerEssence(90, Runes_Nature);
+
+*)
+
+function RunesPerEssence(Level, Rune: Integer): Integer;
+var
+  X2Runes: TIntegerArray;
+begin
+  X2Runes := [11, 14, 19, 26, 35, 46, 59, 82, 91, 200, 200, 200, 200, 74];
+  Result := ((Level div X2Runes[Rune]) + 1);
+end;
+
+(*
+ClickPouch
+~~~~~~~~~~~
+
+.. code-block:: pascal
+
+    function ClickPouch(Pouch, Option: string): Boolean;
+
+Returns true if the pouch exists. Can be used for small, medium, large, gaint. With
+options built in options check, empty, fill - other options put well be put into ChoooseOption.
+
+.. note::
+
+  by IceFire908 & Wizzup?
+
+Example:
+
+.. code-block:: pascal
+
+    ClickPouch('small', 'fill');
+
+*)
+
+function ClickPouch(Pouch, Option: string): Boolean;
+var
+ dtmPouch, T, C, I: LongInt;
+ B, L: Boolean;
+ P: TPoint;
+begin
+  case (LowerCase(Pouch)) of
+    'small': dtmPouch := DTMFromString('78DA633CC0C4C0F08C0105E4B5C631FC07D28' +
+                       'C40FC1F08187700D5DC6340034C609211CA63DC07E4DF24A0E604' +
+                       '90FF80809ADD40FE3B22CC794B40CD4120FF3D7E3500D82D11FE');
+    'medium': dtmPouch := DTMFromString('78DA639CC6C4C0F0940105E4B5C631FC07D28' +
+                        'C40FC1F0818FB816AEE30A0012630C908E5314E01F26F1050339F' +
+                        '0873406A5E1150D307E4BF26A006E4AF8FF8D500002F4410CB');
+    'large': dtmPouch := DTMFromString('78DA63CC61626078C18002F25AE318FE03694' +
+                       '620FE0F048CA940357718D00013986484F218B381FC5B04D41403' +
+                       'F97709A82907F25F11509308E4BF26C23D9FF0AB01008F5B0FA9');
+    'giant': dtmPouch := DTMFromString('78DA637466626078C18002F25AE318FE03694' +
+                       '620FE0F048C5640353719D00013986484F21841E6DC20A0C61BC8' +
+                       'BF45404D2090FF9208BBBE10506302E4BFC2AF0600EC770E82');
+
+    else
+      Exit;
+  end;
+  if (not (FindDTM(dtmPouch, P.X, P.Y, MIX1, MIY1, MIX2, MIY2))) then
+    Exit;
+  Result := True;
+  I := CoordsToItem(P.X, P.Y);
+  if (InStrArr(Option, ['fill', 'leftclick'], False)) then
+  begin
+    L := True;
+    C := InvCount;
+    T := GetSystemTime;
+  end;
+  case (LowerCase(Option)) of
+    'fill': begin
+              B := BankScreen;
+              MouseItem(I, (not (B)));
+              if (B) then
+                WaitOptionMulti(['Fil', 'ill', 'll ' + UpperCase(Copy(Pouch, 0, 1))], RandomRange(350, 450));
+            end;
+    'empty': begin
+               MouseItem(I, False);
+               WaitOptionMulti(['mpt', 'Emp', 'mpty'], RandomRange(350, 450));
+             end;
+    'check': begin
+               MouseItem(i, False);
+               WaitOptionMulti(['hec', 'Che', 'heck'], RandomRange(350, 450));
+             end;
+
+  else
+    begin
+      MouseItem(I, (LowerCase(Option) = 'leftclick'));
+      WaitOption(Option, RandomRange(350, 450));
+    end;
+  end;
+  FreeDTM(dtmPouch);
+  if (L) then
+    while (C = InvCount) do
+    begin
+      Wait(100 + Random(50));
+      if ((GetSystemTime - T) > 2500) then
+        Exit;
+    end;
+end;

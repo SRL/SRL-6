@@ -1,0 +1,770 @@
+(*
+Timing
+======
+
+The Timing include contains a lot of timing related functions.
+
+*)
+
+const
+  Time_Formal = 0;
+  Time_Short  = 1;
+  Time_Abbrev = 2;
+  Time_Bare   = 3;
+  Time_FStop  = 4;
+
+  Date_Formal = 1;
+  Date_Month  = 2;
+  Date_Day    = 3;
+
+{ const srl_MaxWaitTime;
+  Description: Used when ever WaitFunc is used in SRL. Increase for slow computers. }
+  srl_MaxWaitTime = 400;
+
+function InvCount: Integer; forward;
+function GetCurrentTab: Integer; forward;
+function TabExists(Tab: Integer): Boolean; forward;
+function GameTab(Tab: Integer): Boolean; forward;
+
+(*
+MsToTime
+~~~~~~~~
+
+.. code-block:: pascal
+
+    function MsToTime(MS, StrType: Integer): string;
+
+Takes MS in milliseconds and outputs a string with hours, mins and
+seconds. Different styles can be created with different StrType values:
+Str Type:
+
+    -  Time_Formal: 2 Hours, 47 Minutes and 28 Seconds
+    -  Time_Short: 02h, 47m, 28s
+    -  Time_Abbrev: 2 hr, 47 min, 28 sec
+    -  Time_Bare: 02:47:28
+    -  Time_FStop: 12.04.40
+
+.. note::
+
+  by Zephyrsfury, Nava2 and Rasta Magician.
+
+Example:
+
+.. code-block:: pascal
+
+*)
+function MsToTime(MS, TheType: Integer): string;
+var
+  STA: array [0..4] of TVariantArray;
+  Time: array [0..2] of Integer;
+  i: Integer;
+begin
+  Result := '';
+  if (not(InRange(TheType, 0, High(STA)))) then
+  begin
+    srl_Warn('MsToTime', 'TheType: ''' + IntToStr(TheType) + ''' is not a valid value. Using Time_Bare.', warn_AllVersions);
+    TheType := Time_Bare;
+  end;
+  STA[Time_Formal] := [' Hours, ', ' Minutes and ', ' Seconds', False, 0];
+  STA[Time_Short] := ['h ', 'm ', 's', False, 2];
+  STA[Time_Abbrev] := [' hr ', ' min ', ' sec', False, 0];
+  STA[Time_Bare] := [':', ':', '', True, 2];
+  STA[Time_FStop] := ['.', '.', '', True, 2];
+  ConvertTime(MS, Time[0], Time[1], Time[2]);
+  for i := 0 to 2 do
+    if (Time[i] > 0) or (STA[TheType][3]) or (i = 2) then
+      Result := Result + PadZ(IntToStr(Time[i]), STA[TheType][4]) + STA[TheType][i];
+end;
+
+(*
+TimeRunning
+~~~~~~~~~~~
+
+.. code-block:: pascal
+
+    function TimeRunning: String;
+
+Returns Time since the script was started (GetTimeRunning).
+
+.. note::
+
+  by Rasta Magician.
+
+Example:
+
+.. code-block:: pascal
+
+*)
+function TimeRunning: string;
+begin
+  Result := MsToTime(GetTimeRunning, Time_Formal);
+end;
+
+(*
+MarkTime
+~~~~~~~~~~~
+
+.. code-block:: pascal
+
+    procedure MarkTime(var TimeMarker: Integer);
+
+Sets TimeMarker to current system time
+
+.. note::
+
+  by Stupid3ooo
+
+Example:
+
+.. code-block:: pascal
+
+*)
+procedure MarkTime(var TimeMarker: Integer);
+begin
+  TimeMarker := GetSystemTime;
+end;
+
+(*
+TimeFromMark
+~~~~~~~~~~~~
+
+.. code-block:: pascal
+
+    function TimeFromMark(TimeMarker: Integer): Integer;
+
+Returns Milliseconds since MarkTime was set
+
+.. note::
+
+  by Stupid3ooo
+
+Example:
+
+.. code-block:: pascal
+
+*)
+function TimeFromMark(TimeMarker: Integer): Integer;
+begin
+  Result := GetSystemTime - TimeMarker;
+end;
+
+
+(*
+TheTime 
+~~~~~~~~
+
+.. code-block:: pascal
+
+    function TheTime(FullTime : boolean) : string;
+
+Returns current time as a string
+FullTime = True will return in 24 hours rather than 12 hours
+
+.. note::
+
+  by RsN (fixed by Ron, fixed by Markus)
+
+Example:
+
+.. code-block:: pascal
+
+*)
+function TheTime: string;
+var
+  Hour, Mins, Sec, MSec: Word;
+  PAM: string;
+begin
+  DecodeTime(Now, Hour, Mins, Sec, MSec);
+  PAM := 'AM';
+  if (Hour > 12) then
+  begin
+    Hour := Hour - 12;
+    PAM := 'PM';
+  end else if (Hour = 12) then
+    PAM := 'PM'
+  else if (Hour = 0) then
+    Hour := 12;
+  Result := (Padz(IntToStr(Hour), 2) + ':' + Padz(IntToStr(Mins), 2) + ':' + Padz(IntToStr(Sec), 2) + ' ' + PAM);
+end;
+
+(*
+TheDate
+~~~~~~~
+
+.. code-block:: pascal
+
+    function TheDate(DateFormat : Integer) : String;
+
+TheDate will return the current date. DateFormats can be:
+
+    -   Date_Formal = April 2nd, 2007  Month Day, Year
+    -   Date_Month  = 04/02/07         Month/Day/Year
+    -   Date_Day    = 02-04-07         Day-Month-Year
+
+.. note::
+
+  by Ron, Nava2 & Narcle
+
+Example:
+
+.. code-block:: pascal
+
+*)
+function TheDate(DateFormat: Integer): string;
+var
+  Year, Month, Day: Word;
+  D: string;
+  Mnths, sfx: TStringArray;
+begin
+  DecodeDate(Date, Year, Month, Day);
+  Mnths := ['January', 'February', 'March', 'April', 'May', 'June', 'July',
+            'August', 'September', 'October', 'November', 'December'];
+  sfx := ['st', 'nd', 'rd'];
+  case DateFormat of
+    1:
+      begin
+        if InRange(Day mod 10, 1, 3) and not InRange(Day, 11, 13) then
+          D := sfx[(Day mod 10)-1]
+        else
+          D := 'th';
+        Result := Mnths[Month - 1] + ' ' + IntToStr(Day) + D +', ' + IntToStr(Year);
+      end;
+    2: Result := Padz(IntToStr(Month), 2) + '/' + Padz(IntToStr(Day), 2) + '/' + Copy(IntToStr(Year), 3, 4);
+    3: Result := Padz(IntToStr(Day), 2) + '-' + Padz(IntToStr(Month), 2) + '-' + Copy(IntToStr(Year), 3, 4);
+  else
+    srl_Warn('TheDate', 'DateFormat can only be 1, 2, or 3!', warn_AllVersions);
+  end;
+end;
+
+(*
+WaitOptionMultiEx
+~~~~~~~~~~~~~~~~~
+
+.. code-block:: pascal
+
+    function WaitOptionMultiEx(S: TStringArray; TextType: string;
+        Action: fnct_ActionOptions; Time: Integer): Boolean;
+
+Waits for a TStringArray of options and selects one of them.
+Searches for TextType you input.
+'action', 'player': The white text
+'item': The orange text
+'npc': The yellow text
+'object': The cyan text
+'all': Searches for all colors of text.
+Will default to 'all'.
+
+.. note::
+
+  by Infantry001
+
+Example:
+
+.. code-block:: pascal
+
+*)
+function WaitOptionMultiEx(S: TStringArray; TextType: string; Action: fnct_ActionOptions; Time: Integer): Boolean;
+var
+  T: Integer;
+begin
+  Result := False;
+  T := GetSystemTime + Time;
+  while (GetSystemTime < T) do
+  begin
+    if (ChooseOptionMultiEx(S, TextType, Action)) then
+    begin
+      Result := True;
+      Exit;
+    end;
+    Wait(20 + Random(10));
+  end;
+end;
+
+(*
+WaitOptionMulti
+~~~~~~~~~~~~~~~
+
+.. code-block:: pascal
+
+    function WaitOptionMulti(S: TStringArray; Time: Integer): Boolean;
+
+Waits for a TStringArray of options and selects one of them
+
+.. note::
+
+  by Marpis, N1ke! & Rasta Magician
+
+Example:
+
+.. code-block:: pascal
+
+*)
+function WaitOptionMulti(S: TStringArray; Time: Integer): Boolean;
+begin
+  Result := WaitOptionMultiEx(S, 'all', ClickLeft, Time);
+end;
+
+(*
+WaitOptionEx
+~~~~~~~~~~~~
+
+.. code-block:: pascal
+
+    function WaitOptionEx(S, TextType: String; Time: Integer): Boolean;
+
+Waits for an Option and selects it. Searches for TextType.
+
+.. note::
+
+  by Infantry001
+
+Example:
+
+.. code-block:: pascal
+
+*)
+function WaitOptionEx(S, TextType: string; Action: fnct_ActionOptions; Time: Integer): Boolean;
+begin
+  Result := WaitOptionMultiEx([S], TextType, Action, Time);
+end;
+
+(*
+WaitOption
+~~~~~~~~~~
+
+.. code-block:: pascal
+
+    function WaitOption(S: String; Time: Integer): Boolean;
+
+Waits for an Option and selects it
+
+.. note::
+
+  by N1ke!
+
+Example:
+
+.. code-block:: pascal
+
+*)
+function WaitOption(S: string; Time: Integer): Boolean;
+begin
+  Result := WaitOptionMultiEx([S], 'all', ClickLeft, Time);
+end;
+
+(*
+WaitUpTextMulti
+~~~~~~~~~~~~~~~
+
+.. code-block:: pascal
+
+    function WaitUpTextMulti(S: TStringArray; Time: integer): Boolean;
+
+Waits for a TStringArray of UpText, returns true if found
+
+.. note::
+
+  by Marpis & N1ke!
+
+Example:
+
+.. code-block:: pascal
+
+*)
+function WaitUpTextMulti(S: TStringArray; Time: Integer): Boolean;
+var
+  T: Integer;
+begin
+  Result := false;
+  T := GetSystemTime + Time;
+  while (GetSystemTime < T) do
+  begin
+    if (IsUpTextMultiCustom(S)) then
+    begin
+      Result := True;
+      Exit;
+    end;
+    Wait(20 + Random(20));
+  end;
+end;
+
+(*
+WaitUptext
+~~~~~~~~~~
+
+.. code-block:: pascal
+
+    function WaitUptext(S: String; Time: Integer): Boolean;
+
+Waits for an UpText, returns true if found
+
+.. note::
+
+  by Marpis edited by N1ke!
+
+Example:
+
+.. code-block:: pascal
+
+*)
+function WaitUptext(S: string; Time: Integer): Boolean;
+begin
+  Result := WaitUptextMulti([S], Time);
+end;
+
+(*
+WaitInvCount
+~~~~~~~~~~~~
+
+.. code-block:: pascal
+
+    function WaitInvCount(Count, MaxTime: Integer; CountType: (MaxCT, MinCT, ExactCT)): boolean;
+
+Waits for a maximum inv count. Returns true if InvCount <= Count
+
+.. note::
+
+  by Rasta Magician
+
+Example:
+
+.. code-block:: pascal
+
+*)
+function WaitInvCount(Count, MaxTime: Integer; CountType: (MaxCT, MinCT, ExactCT)): boolean;
+var
+  T: integer;
+begin
+  if not GameTab(tab_Inv) then exit;
+
+  Result := false;
+  T := GetSystemTime + MaxTime;
+
+  while GetSystemTime < T do
+  begin
+    wait(10);
+    case CountType of
+      MaxCT   : if InvCount <= Count then  Result := true;
+      MinCT   : if InvCount >=  Count then  Result := true;
+      ExactCT : if InvCount =  Count then  Result := true;
+    end;
+
+    if Result then break;
+
+  end;
+end;
+
+(*
+WaitInvMaxCount
+~~~~~~~~~~~~~~~
+
+.. code-block:: pascal
+
+    function WaitInvMaxCount(Count, MaxTime: integer): boolean;
+
+Waits for a maximum inv count. Returns true if InvCount <= Count
+
+.. note::
+
+  by Rasta Magician.
+
+Example:
+
+.. code-block:: pascal
+
+*)
+function WaitInvMaxCount(Count, MaxTime: integer): boolean;
+begin
+  Result := WaitInvCount(Count, MaxTime, MaxCT);
+end;
+
+(*
+WaitInvMinCount
+~~~~~~~~~~~~~~~
+
+.. code-block:: pascal
+
+    function WaitInvMinCount(Count, MaxTime: integer): boolean;
+
+Waits for a minimum inv count. Returns true if InvCount >= Count
+
+.. note::
+
+  by Rasta Magician
+
+Example:
+
+.. code-block:: pascal
+
+*)
+function WaitInvMinCount(Count, MaxTime: integer): boolean;
+begin
+  Result := WaitInvCount(Count, MaxTime, MinCT);
+end;
+
+(*
+WaitColor
+~~~~~~~~~
+
+.. code-block:: pascal
+
+    function WaitColor(x, y, Color, Tol, MaxTime: integer): Boolean;
+
+Waits for a color at (x, y) with tolerance Tol, returns true if found
+
+.. note::
+
+  by Rasta Magician, fixed by TRiLeZ
+
+Example:
+
+.. code-block:: pascal
+
+*)
+function WaitColor(X, Y, Color, Tol, MaxTime: Integer): Boolean;
+var
+  Time: Integer;
+begin
+  Result := False;
+  if tol = 0 then tol := 1; //due to scar bug
+  Time := GetSystemTime + MaxTime;
+  while (Time > GetSystemTime) do
+  begin
+    if SimilarColors(GetColor(X, Y), Color, Tol) then
+    begin
+      Result := True;
+      Exit;
+    end;
+    Wait(5 + Random(6));
+  end;
+end;
+
+(*
+WaitFindColor
+~~~~~~~~~~~~~
+
+.. code-block:: pascal
+
+    function WaitFindColor(var x, y: integer; Color, Tol, x1, y1, x2, y2, MaxTime: integer): Boolean;
+
+Waits for a color at (x, y) with tolerance Tol, returns true if found
+
+.. note::
+
+  by Rasta Magician, fixed by TRiLeZ
+
+Example:
+
+.. code-block:: pascal
+
+*)
+function WaitFindColor(var X, Y: Integer; Color, x1, y1, x2, y2, Tol, MaxTime: Integer): Boolean;
+var
+  Time: Integer;
+begin
+  Result := False;
+  Time := GetSystemTime + MaxTime;
+  while (GetSystemTime < Time) do
+  begin
+    if FindColorTolerance(X, Y, Color, x1, y1, x2, y2, Tol) then
+    begin
+      Result := True;
+      Exit;
+    end;
+    Wait(10 + Random(6));
+  end;
+end;
+
+(*
+WaitFindColors
+~~~~~~~~~~~~~~
+
+.. code-block:: pascal
+
+    function WaitFindColors(var x, y: integer; Color, Tol, x1, y1, x2, y2, MaxTime: integer): Boolean;
+
+Waits for a color at (x, y) with tolerance Tol, returns true if found
+
+.. note::
+
+  by IceFire908 based completely off WaitFindColor
+
+Example:
+
+.. code-block:: pascal
+
+*)
+function WaitFindColors(var TPA: TPointArray; Color, x1, y1, x2, y2, Tol, MaxTime: Integer): Boolean;
+var
+  Time: Integer;
+begin
+  Result := False;
+  Time := GetSystemTime + MaxTime;
+  while (GetSystemTime < Time) do
+  begin
+    FindColorsTolerance(TPA, Color, x1, y1, x2, y2, Tol);
+    if (Length(TPA) > 0) then
+    begin
+      Result := True;
+      Exit;
+    end;
+    Wait(10 + Random(6));
+  end;
+end;
+
+(*
+WaitColorCount
+~~~~~~~~~~~~~~
+
+.. code-block:: pascal
+
+    function WaitColorCount(Color, x1, y1, x2, y2, Tol, MinCount, MaxCount, MaxTime: integer):boolean;
+
+Waits Color count in box (x1, y1, x2, y2) with Tol
+
+.. note::
+
+  by Rasta Magician
+
+Example:
+
+.. code-block:: pascal
+
+*)
+function WaitColorCount(Color, x1, y1, x2, y2, Tol, MinCount, MaxCount, MaxTime: integer):boolean;
+var
+  Time: integer;
+  TPA: TPointArray;
+begin
+  Result := False;
+  Time := GetSystemTime + MaxTime;
+  while (GetSystemTime < Time) do
+  begin
+    if FindColorsTolerance(TPA, Color, x1, y1, x2, y2, Tol) then
+      if InRange(Length(TPA), MinCount, MaxCount) then
+      begin
+        Result := True;
+        Exit;
+      end;
+    Wait(15 + Random(10));
+  end;
+end;
+
+(*
+WaitColorGone
+~~~~~~~~~~~~~
+
+.. code-block:: pascal
+
+    function WaitColorGone(Color, x, y, Tol, MaxTime: integer): Boolean;
+
+Waits until a colour is gone at (x, y) with tolerance and a timeout.
+Results true if the colour disappeared at (x, y) within the time cap.
+
+.. note::
+
+  by TRiLeZ
+
+Example:
+
+.. code-block:: pascal
+
+*)
+function WaitColorGone(Color, x, y, Tol, MaxTime: integer): Boolean;
+var
+  Time: Integer;
+begin
+  Result := False;
+  if Tol = 0 then Tol := 1;
+  Time := GetSystemTime + MaxTime;
+  while (Time > GetSystemTime) do
+  begin
+    if (not SimilarColors(GetColor(X, Y), Color, Tol)) then
+    begin
+      Result := True;
+      Exit;
+    end;
+    Wait(10);
+  end;
+end;
+
+(*
+WaitColorGoneIn
+~~~~~~~~~~~~~~~
+
+.. code-block:: pascal
+
+    function WaitColorGoneIn(Colour, x1, y1, x2, y2, Tol, MaxTime: integer): Boolean;
+
+Waits until a colour is gone in an area with tolerance and a timeout.
+Results true if the colour disappeared in the area within the time cap.
+
+.. note::
+
+  by TRiLeZ
+
+Example:
+
+.. code-block:: pascal
+
+*)
+function WaitColorGoneIn(Colour, x1, y1, x2, y2, Tol, MaxTime: integer): Boolean;
+var
+  Time, CX, CY: Integer;
+begin
+  Result := False;
+  if Tol = 0 then Tol := 1;
+  Time := GetSystemTime + MaxTime;
+  while (Time > GetSystemTime) do
+  begin
+    if (not FindColorTolerance(cx, cy, Colour, x1, y1, x2, y2, Tol)) then
+    begin
+      Result := True;
+      Exit;
+    end;
+    Wait(10);
+  end;
+end;
+
+(*
+WaitFunc
+~~~~~~~~
+
+.. code-block:: pascal
+
+    function WaitFunc(Func: Function: Boolean; WaitPerLoop, MaxTime: Integer): Boolean;
+
+Waits for function Func to be true. WaitPerLoop is how often you
+want to call "Func" function.
+Example: "WaitFunc(@BankScreen, 10 + Random(15), 750);" will check if BankScreen
+is open every 10-25th millisecond, for a maximum of 750 milliseconds.
+Notice the '@'.
+
+.. note::
+
+  by Rasta Magician, small edit by EvilChicken!
+
+Example:
+
+.. code-block:: pascal
+
+*)
+function WaitFunc(Func: function: Boolean; WaitPerLoop, MaxTime: Integer): Boolean;
+var
+  T: Integer;
+begin
+  T := GetSystemTime + MaxTime;
+  while (GetSystemTime < T) do
+  begin
+    if (Func()) then
+    begin
+      Result := True;
+      Exit;
+    end;
+    Wait(WaitPerLoop);
+  end;
+end;
+
+procedure WaitNone;
+begin
+end;

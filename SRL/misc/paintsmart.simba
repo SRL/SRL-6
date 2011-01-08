@@ -1,0 +1,197 @@
+//-----------------------------------------------------------------//
+//--               Scar Standard Resource Library                --//
+//--               � Smart Painting routines                     --//
+//-----------------------------------------------------------------//
+// Procedure ClearCanvas(canvas: TCanvas; w, h: integer);          //
+// Procedure ClearRSCanvas(canvas: TCanvas);                       //
+// Procedure SMART_DrawDotsEx(Clear: boolean; pixels: TPointArray; color: TColor);
+// Procedure SMART_DrawDots(Dots: TPointArray);                    //
+// Procedure SMART_DrawBoxEx(Clear: boolean; Box: TBox; color: TColor);
+// procedure SMART_DrawBox(Box: TBox);                             //
+// procedure SMART_DrawText(x, y: Integer; font, Text: string; Color:TColor);
+//-----------------------------------------------------------------//
+
+
+
+{*******************************************************************************
+Procedure ClearCanvas(canvas: TCanvas; w, h: integer);
+Contributors: Sir R. Magician, mastaraymond
+Description: Clears a canvas of dimensions (w, h)
+*******************************************************************************}
+Procedure ClearCanvas(canvas: TCanvas; w, h: integer);
+var
+  CleanBMP: integer;
+begin
+
+  CleanBMP := BitmapFromString(w, h, '');
+
+  DrawBitmap(CleanBMP,Canvas,0,0);
+
+  try
+    FreeBitmap(CleanBMP);
+  except end;
+
+end;
+
+{*******************************************************************************
+Procedure ClearRSCanvas(canvas: TCanvas);
+Contributors: Sir R. Magician
+Description: Clears a canvas of RS dimensions
+*******************************************************************************}
+Procedure ClearRSCanvas(canvas: TCanvas);
+begin
+  ClearCanvas(canvas, MIX2, MIY2);
+end;
+
+{*******************************************************************************
+Procedure SMART_DrawDotsEx(Clear: boolean; pixels: TPointArray; color: TColor);
+Contributors: Sir R. Magician
+Description: Draws an ATPA onto the SMART Debug canvas
+*******************************************************************************}
+procedure DrawDotsMulti(Clear: boolean; pixels : T2DPointArray);
+{$IFDEF SMART}
+var
+  i, h, color : integer;
+  drawing : TBitmap;
+begin
+  drawing := TBitmap.Create;
+  drawing.canvas.handle := SmartGetDebugDC;
+
+
+  if Clear then ClearRSCanvas(drawing.canvas);
+
+  for h := 0 to High(pixels) do
+  begin
+  
+    color := h div 5 + h mod 5;
+    case color of
+      0 : drawing.canvas.Pen.Color := clWhite;
+      1 : drawing.canvas.Pen.Color := clYellow;
+      2 : drawing.canvas.Pen.Color := clBlue;
+      3 : drawing.canvas.Pen.Color := clLime;
+      4 : drawing.canvas.Pen.Color := clGreen;
+    end;
+    
+    for i:= 0 to High(pixels[h]) do
+    begin
+      drawing.canvas.moveto(pixels[h][i].x-1, pixels[h][i].y);
+      drawing.canvas.LineTo(pixels[h][i].x, pixels[h][i].y);
+    end;
+  end;
+
+  try
+    FreeBitmap(drawing);
+  except end;
+
+{$ELSE}
+begin
+{$ENDIF}
+end;
+
+{*******************************************************************************
+Procedure SMART_DrawDotsEx(Clear: boolean; pixels: TPointArray; color: TColor);
+Contributors: Sir R. Magician, caused, mastaraymond
+Description: Draws a TPA onto the SMART Debug canvas
+*******************************************************************************}
+procedure SMART_DrawDotsEx(Clear: boolean; pixels: TPointArray; color: TColor);
+{$IFDEF SMART}
+var
+  i : integer;
+  drawing : TBitmap;
+begin
+
+  drawing := TBitmap.Create;
+  drawing.canvas.handle := SmartGetDebugDC;
+  drawing.canvas.Pen.Color := color;
+
+  if Clear then ClearRSCanvas(drawing.canvas);
+
+  for i:= 0 to high(pixels) do
+  begin
+    drawing.canvas.moveto(pixels[i].x-1,pixels[i].y);
+    drawing.canvas.LineTo(pixels[i].x,pixels[i].y);
+  end;
+
+  try
+    FreeBitmap(drawing);
+  except end;
+
+{$ELSE}
+begin
+{$ENDIF}
+
+end;
+
+{*******************************************************************************
+Procedure SMART_DrawDots(Dots: TPointArray);
+Contributors: Sir R. Magician
+Description: Draws a TPA onto the SMART Debug canvas
+*******************************************************************************}
+procedure SMART_DrawDots(Dots: TPointArray);
+begin
+  SMART_DrawDotsEx(True, Dots, clRed);
+end;
+
+
+{*******************************************************************************
+procedure SMART_DrawBoxEx(Clear: boolean; Box: TBox; color: TColor);
+Contributors: Sir R. Magician, caused, mastaraymond
+Description: Draws a TBox onto the SMART Debug canvas
+*******************************************************************************}
+procedure SMART_DrawBoxEx(Clear: boolean; Box: TBox; color: TColor);
+{$IFDEF SMART}
+var
+  drawing : TBitmap;
+begin
+
+  drawing := TBitmap.Create;
+  drawing.canvas.handle := SmartGetDebugDC;
+  drawing.canvas.Pen.Color := color;
+
+  if Clear then ClearRSCanvas(drawing.canvas);
+
+  drawing.canvas.moveto(Box.x1,Box.y1);
+  drawing.canvas.LineTo(Box.x2,Box.y1);
+  drawing.canvas.LineTo(Box.x2,Box.y2);
+  drawing.canvas.LineTo(Box.x1,Box.y2);
+  drawing.canvas.LineTo(Box.x1,Box.y1);
+
+
+  try
+    FreeBitmap(drawing);
+  except end;
+
+{$ELSE}
+begin
+{$ENDIF}
+
+end;
+
+{*******************************************************************************
+Procedure SMART_DrawBox(Box: TBox);
+Contributors: Sir R. Magician
+Description: Draws a TBox onto the SMART Debug canvas
+*******************************************************************************}
+procedure SMART_DrawBox(Box: TBox);
+begin
+  SMART_DrawBoxEx(True, Box, clRed);
+end;
+
+{*******************************************************************************
+procedure SMART_DrawText(x, y: Integer; font, Text: string; Color: TColor);
+Contributors: Jukka
+Description: Draws a TBox onto the SMART Debug canvas
+*******************************************************************************}
+procedure SMART_DrawText(x, y: Integer; font, Text: string; Color:TColor);
+var
+  i, height: integer;
+  tpa: tpointarray;
+begin
+  tpa := LoadTextTPA(text,font,height);
+  for i:= 0 to high(tpa) do
+  begin
+    tpa[i].x := tpa[i].x + x;
+    tpa[i].y := tpa[i].y + y;
+  end;
+  SMART_DrawDotsEx(false, tpa, Color);
+end;

@@ -1,0 +1,485 @@
+//-----------------------------------------------------------------//
+//--               Scar Standard Resource Library                --//
+//--               » Reports Routines                            --//
+//-----------------------------------------------------------------//
+// * function SRLProgressReport(                                   // * by Rasta Magician
+//                           ResultType:integer;                   //
+//                           ScriptName, ScriptAuthor, ScriptVersion: String;
+//                           VarNames: TStringArray;               //
+//                           VarValues: TVariantArray              //
+//                          ): Variant;                            //
+// * function SRLPlayerReport(                                     // * by Rasta Magician
+//                          ResultType, SkillLevel: Integer;       //
+//                          LongReport:boolean;                    //
+//                          DefaultSettings:TBooleanArray;         //
+//                          VarNames: TStringArray;                //
+//                          PlayerBooleans, PlayerIntegers, PlayerStrings, PlayerExtendeds: TIntegerArray
+//                         ): Variant;                             //
+//-----------------------------------------------------------------//
+
+const
+  ResultDebugBox  = 0;
+  ResultReportBox = 1;
+  ResultString    = 2;
+  
+{ SRLProgressReport example
+[================================]
+[ RM Proggie 1.00                ]
+[       by Rasta Magician        ]
+[================================]
+[ TimeRunning    : 67h, 58m, 34s ]
+[ Total Fish     : 56788         ]
+[ Active Players : 7             ]
+[================================]
+[         RM Proggie 1.00        ]
+[================================]
+}
+
+{ SRLPlayerReport - short example
+[=======================================================================================]
+[ Nick           | Active | Worked   | Banked | Loc     | fishes | Responses | FishType ]
+[=======================================================================================]
+[ Rasta Magician | True   | 20:10:56 | 43     | lumby   | 26     | 162       | trout    ]
+[ Wizzup?        | False  | 25:25:53 | 83     | draynor | 99     | 190       | shrimps  ]
+[ WT-Fakawi      | True   | 11:37:37 | 55     | draynor | 68     | 122       | shrimps  ]
+[ Hobbit         | False  | 24:17:35 | 31     | lumby   | 14     | 198       | trout    ]
+[ Nielsie95      | True   | 21:04:37 | 24     | draynor | 2      | 192       | shrimps  ]
+[ ------------------------------------------------------------------------------------- ]
+[ ZephyrsFury    | False  | 06:12:55 | 0      | draynor | 48     | 168       | shrimps  ]
+[ Boreas         | True   | 18:52:54 | 77     | lumby   | 94     | 144       | trout    ]
+[ Sumilion       | False  | 15:39:55 | 70     | draynor | 82     | 137       | shrimps  ]
+[ The Claw       | False  | 17:44:36 | 24     | lumby   | 9      | 153       | trout    ]
+[ Tarajunky      | False  | 14:31:38 | 18     | draynor | 97     | 146       | shrimps  ]
+[ ------------------------------------------------------------------------------------- ]
+[ Ray            | False  | 27:11:36 | 94     | lumby   | 43     | 122       | trout    ]
+[ Nava2          | False  | 99:59:59 | 86145  | guild   | 167854 | 9999785   | SHARK    ]
+[=======================================================================================]
+}
+
+{ SRLPlayerReport - long example
+[=========================]
+[     Rasta Magician      ]
+[ Active    : True        ]
+[ Worked    : 20h 10m 56s ]
+[ Banked    : 43          ]
+[ Location  : lumby       ]
+[ fishes    : 26          ]
+[ Responses : 162         ]
+[ FishType  : trout       ]
+[=========================]
+[         Wizzup?         ]
+[ Active    : False       ]
+[ Worked    : 25h 25m 53s ]
+[ Banked    : 83          ]
+[ Location  : draynor     ]
+[ fishes    : 99          ]
+[ Responses : 190         ]
+[ FishType  : shrimps     ]
+[=========================]
+}
+
+{*******************************************************************************
+function SRLProgressReport(
+                           ResultType:integer; ScriptName, ScriptAuthor, ScriptVersion: String;
+                           VarNames: TStringArray;
+                           VarValues: TVariantArray
+                          ): Variant;
+By: Rasta Magician
+Description: Prints a Standardized Progress Report, with the variables of your choice
+
+Instructions:
+  ResultType => ResultDebugBox, ResultReportBox, ResultString
+  VarNames is a TStringArray, and the order has to be the one you'll use in the VarValues Array
+    e.g.  ['bool1', 'bool2', 'int1', 'string1', 'string2', 'extended1']
+  VarValues the variable with the values corresponding to VarNames
+    e.g.  [bool1, bool2, int1, string1, string2, extended1]
+
+  SRLProgressReport(ResultDebugBox, 'ScriptName', 'ScriptAuthor', '1.00',
+                    ['TimeRunning', 'Total Fish', 'Active Players'],
+                    [GetTimeRunning, TotalFish, PlayersActive ]);
+*******************************************************************************}
+function SRLProgressReport(
+                           ResultType:integer; ScriptName, ScriptAuthor, ScriptVersion: String;
+                           VarNames: TStringArray;
+                           VarValues: TVariantArray
+                          ): Variant;
+var
+  TSA        : TStringArray;
+  s          : string;
+  i, i2, L   : integer;
+begin
+  if (ResultType = ResultString) then
+    Result := '';
+
+  if length(VarNames) <> Length(VarValues) then
+  begin
+    SRL_Warn('SRLProgressReport', 'VarNames and VarValues must be the same length', warn_AllVersions);
+    exit;
+  end;
+  SetLength(TSA, 3 + Length(VarNames) + 4);
+
+  TSA[0] := '=';
+  TSA[1] := Capitalize(ScriptName)+' '+ScriptVersion;
+  TSA[2] := 'by '+ScriptAuthor;
+  TSA[3] := '=';
+
+  i2 := 3 + Length(VarNames);
+
+  for i:= 4 to i2 do
+    L := Max(L, Length(VarNames[i-4]));
+
+  for i:= 4 to i2 do
+  begin
+    s := VarValues[i-4];
+    TSA[i] := Padr(Capitalize(VarNames[i-4]), L)+' : '+ Capitalize(s);
+  end;
+
+  TSA[i2+1]   := '=';
+  TSA[i2+2] := Capitalize(ScriptName)+' '+ScriptVersion;
+  TSA[i2+3] := '=';
+
+  i2 := 0;
+  for i:= 0 to High(TSA) do
+    i2 := Max(i2, Length(TSA[i]));
+
+  TSA[0] := Replicate('=', i2);
+  TSA[3] := Replicate('=', i2);
+  TSA[High(TSA)-2] := Replicate('=', i2);
+  TSA[High(TSA)]   := Replicate('=', i2);
+
+  TSA[2] := Replicate(' ', round((i2 - Length(TSA[2]))/2) ) + TSA[2]; //centering by ScriptAuthor
+  TSA[High(TSA)-1] := Replicate(' ', round((i2 - Length(TSA[High(TSA)-1]))/2) ) + TSA[High(TSA)-1];
+
+  for i:= 0 to High(TSA) do
+    if (TSA[i][1] = '=') then
+      case ResultType of
+        ResultDebugBox  : writeln     ('[='+Padr(TSA[i], i2)+'=]');
+        ResultReportBox : AddToReport ('[='+Padr(TSA[i], i2)+'=]');
+        ResultString    : Result := Result + '[='+Padr(TSA[i], i2)+'=]' + chr(13);
+        else begin SRL_Warn('SRLProgressReport', 'Invalid Result Type', warn_AllVersions); exit; end;
+      end
+    else
+      case ResultType of
+        ResultDebugBox  : writeln     ('[ '+Padr(TSA[i], i2)+' ]');
+        ResultReportBox : AddToReport ('[ '+Padr(TSA[i], i2)+' ]');
+        ResultString    : Result := Result + '[ '+Padr(TSA[i], i2)+' ]' + chr(13);
+        else begin SRL_Warn('SRLProgressReport', 'Invalid Result Type', warn_AllVersions); exit; end;
+      end;
+
+  if not ResultType = ResultString then Result := true;
+
+end;
+
+
+{*******************************************************************************
+function SRLPlayerReport(
+                          ResultType, SkillLevel: Integer; LongReport:boolean;
+                          DefaultSettings:TBooleanArray;
+                          VarNames: TStringArray;
+                          PlayerBooleans, PlayerIntegers, PlayerStrings, PlayerExtendeds: TIntegerArray
+                         ): Variant;
+By: Rasta Magician
+Description: Prints a Standardized MultiPlayer Report, with the variables of your choice
+
+Instructions:
+  ResultType => ResultDebugBox, ResultReportBox, ResultString
+  SkillLevel => check Players.scar for the index of each level
+    e.g. for fishing = 17  ; 0 for none
+  Default settings: [Players.Worked, Players.Banked, Players.Level, Players.location, Players.Skill, Players.Random]
+    e.g.  [True, True, false, true, false, false]
+  VarNames is a TStringArray, and the order has to be the one you'll use in the TIntegerArrays
+    e.g.  ['bool1', 'bool2', 'int1',   'string1',   'string2',  'extended1'        ]
+    e.g.  ['safe',  'ready', 'fishes', 'EquipName', 'FishType', 'AverageTime/Fish' ]
+  PlayerBooleans: the index of the booleans you wish to show
+    e.g. show Players.Boolean[0] and Players.Booleans[3]
+      ==> [0, 3]
+  Same applies for similarly name TIntegerArrays
+  SRLPlayerReport(
+                  ResultDebugBox, 0, False,
+                  [True, True, False, True, False, False],
+                  ['fishes', 'Responses', 'FishType'],
+                  [], [0, 1], [0], []
+                 );
+*******************************************************************************}
+function SRLPlayerReport(
+                          ResultType, SkillLevel: Integer; LongReport:boolean;
+                          DefaultSettings:TBooleanArray;
+                          VarNames: TStringArray;
+                          PlayerBooleans, PlayerIntegers, PlayerStrings, PlayerExtendeds: TIntegerArray
+                         ): Variant;
+var
+  TSA                    : TStringArray;
+  i, i2, i3, L, PN, c, d : integer;
+  T2DVA                  : Array of TVariantArray;
+begin
+  if (ResultType = ResultString) then
+    Result := '';
+
+  if Length(DefaultSettings) <> 6 then
+  begin
+    SRL_Warn('SRLPlayerReport', 'DefaultSettings must be exactly 6 settings!', warn_AllVersions);
+    SetLength(DefaultSettings, 6);
+  end;
+
+  L := Length(PlayerBooleans) + Length(PlayerIntegers) + Length(PlayerStrings) + Length(PlayerExtendeds);
+  if length(VarNames) <> L then
+  begin
+    SRL_Warn('SRLPlayerReport', 'VarNames and VarValues must be the same length', warn_AllVersions);
+    exit;
+  end;
+
+  if LongReport then
+  begin
+    L := 3;
+    for i:= 0 to high(DefaultSettings) do
+      if DefaultSettings[i] then inc(L);
+
+    L := L + Length(VarNames);
+    SetLength(TSA, L*HowManyPlayers+1);
+    d := 8;
+    for i:= 0 to High(VarNames) do
+      d := Max(d, Length(VarNames[i]));
+
+    i := 0;
+    for PN := 0 to (HowManyPlayers - 1) do
+    begin
+
+      TSA[i]   := replicate('=', 16);
+      with Players[PN] do
+      begin
+        TSA[i+1] := Nick;
+        TSA[i+2] := padr('Active', d)+' : ' + BoolToStr(Active);
+      end;
+
+      i := i + 3;
+      if DefaultSettings[0] then
+      begin
+        TSA[i] := padr('Worked', d)+' : '+MSToTime(playerWorked(PN), Time_Short);
+        inc(i);
+      end;
+
+      for i2 := 1 to High(DefaultSettings) do
+        if DefaultSettings[i2] then
+        begin
+          case i2 of
+            1: TSA[i] := padr('Banked', d)+' : '+ IntToStr(Players[PN].Banked);
+            2: TSA[i] := padr('Level', d)+' : '+ IntToStr(Players[PN].Level[SkillLevel]);
+            3: TSA[i] := padr('Location', d)+' : ' + Players[PN].Loc;
+            4: TSA[i] := padr('Skill', d)+' : ' + Players[PN].Skill;
+            5: TSA[i] := padr('Random', d)+' : '+ Players[PN].Rand;
+          end;
+          inc(i);
+        end;
+
+      i2 := 0;
+      for i3 := 0 to High(PlayerBooleans) do
+      begin
+        c := PlayerBooleans[i3];
+        TSA[i] := padr(VarNames[i2], d)+' : '+BoolToStr(Players[PN].Booleans[c]);
+        inc(i); inc(i2);
+      end;
+
+      for i3 := 0 to High(PlayerIntegers) do
+      begin
+        c := PlayerIntegers[i3];
+        TSA[i] := padr(VarNames[i2], d)+' : '+IntToStr(Players[PN].Integers[c]);
+        inc(i); inc(i2);
+      end;
+
+      for i3 := 0 to High(PlayerStrings) do
+      begin
+        c := PlayerStrings[i3];
+        TSA[i] := padr(VarNames[i2], d)+' : '+Players[PN].Strings[c];
+        inc(i); inc(i2);
+      end;
+
+      for i3 := 0 to High(PlayerExtendeds) do
+      begin
+        c := PlayerExtendeds[i3];
+        TSA[i] := padr(VarNames[i2], d)+' : '+FloatToStr(Players[PN].Extendeds[c]);
+        inc(i); inc(i2);
+      end;
+
+    end;
+
+    i2 := 0;
+    for i:= 0 to High(TSA) do
+      i2 := Max(i2, Length(TSA[i]));
+
+    if i2 > 16 then
+      for PN := 0 to (HowManyPlayers - 1) do
+        TSA[PN*L] := Replicate('=', i2);
+
+    TSA[High(TSA)] := Replicate('=', i2);
+
+    //centering the nick
+    for PN := 0 to (HowManyPlayers - 1) do
+      TSA[PN*L+1] := Replicate(' ', round((i2 - Length(Players[PN].Nick))/2)) + Players[PN].Nick;
+
+
+
+
+    for i:= 0 to High(TSA) do
+    begin
+      if i mod L = 0 then
+        case ResultType of
+          ResultDebugBox  : writeln     ('[='+Padr(TSA[i], i2)+'=]');
+          ResultReportBox : AddToReport ('[='+Padr(TSA[i], i2)+'=]');
+          ResultString    : Result := Result + '[='+Padr(TSA[i], i2)+'=]' + chr(13);
+          else begin SRL_Warn('SRLPlayerReport', 'Invalid Result Type!', Warn_AllVersions); exit end;
+        end
+      else
+        case ResultType of
+          ResultDebugBox  : writeln     ('[ '+Padr(TSA[i], i2)+' ]');
+          ResultReportBox : AddToReport ('[ '+Padr(TSA[i], i2)+' ]');
+          ResultString    : Result := Result + '[ '+Padr(TSA[i], i2)+' ]' + chr(13);
+          else begin SRL_Warn('SRLPlayerReport', 'Invalid Result Type!', Warn_AllVersions); exit end;
+        end;
+    end;
+    if not ResultType = ResultString then Result := true;
+  end else begin
+    SetLength(T2DVA, HowManyPlayers + 2)
+    // T2DVA[0] will be used to store string lengths
+    // T2DVA[1] will be used to store variable names
+    // The others will be used to store Player Info as strings
+    SetLength(TSA, HowManyPlayers + 3);
+    L := 2;
+
+    for i:= 0 to high(DefaultSettings) do
+      if DefaultSettings[i] then inc(L);
+
+    L := L + Length(VarNames);
+    SetLength(T2DVA[0], L);
+    SetLength(T2DVA[1], L);
+
+    T2DVA[1][0] := 'Nick';
+    T2DVA[1][1] := 'Active';
+    i := 2;
+
+    for i2:= 0 to high(DefaultSettings) do
+      if DefaultSettings[i2] then
+      begin
+        case i2 of
+          0: T2DVA[1][i] := 'Worked';
+          1: T2DVA[1][i] := 'Banked';
+          2: T2DVA[1][i] := 'Level';
+          3: T2DVA[1][i] := 'Loc';
+          4: T2DVA[1][i] := 'Skill';
+          5: T2DVA[1][i] := 'Rand';
+        end;
+        inc(i);
+      end;
+
+    for i2 := 0 to High(VarNames) do
+    begin
+      T2DVA[1][i] := VarNames[i2];
+      inc(i);
+    end;
+
+    i := 0;
+    for PN := 0 to HowManyPlayers - 1 do
+    begin
+      SetLength(T2DVA[PN+2], L);
+      T2DVA[PN+2][0] := Players[PN].Nick;
+      T2DVA[PN+2][1] := BoolToStr(Players[PN].Active);
+
+      i := 2;
+      for i2 := 0 to high(DefaultSettings) do
+        if DefaultSettings[i2] then
+        begin
+          case i2 of
+            0: T2DVA[PN+2][i] := MsToTime(PlayerWorked(PN), Time_Bare);
+            1: T2DVA[PN+2][i] := IntToStr(Players[PN].Banked);
+            2: T2DVA[PN+2][i] := IntToStr(Players[PN].Level[SkillLevel]);
+            3: T2DVA[PN+2][i] := Players[PN].Loc;
+            4: T2DVA[PN+2][i] := Players[PN].Skill;
+            5: T2DVA[PN+2][i] := Players[PN].Rand;
+          end;
+          inc(i);
+        end;
+
+      for i2 := 0 to High(PlayerBooleans) do
+      begin
+        c := PlayerBooleans[i2];
+        T2DVA[PN+2][i] := BoolToStr(Players[PN].Booleans[c]);
+        inc(i);
+      end;
+
+      for i2 := 0 to High(PlayerIntegers) do
+      begin
+        c := PlayerIntegers[i2];
+        T2DVA[PN+2][i] := IntToStr(Players[PN].Integers[c]);
+        inc(i);
+      end;
+
+      for i2 := 0 to High(PlayerStrings) do
+      begin
+        c := PlayerStrings[i2];
+        T2DVA[PN+2][i] := Players[PN].Strings[c];
+        inc(i);
+      end;
+
+      for i2 := 0 to High(PlayerExtendeds) do
+      begin
+        c := PlayerExtendeds[i2];
+        T2DVA[PN+2][i] := FloatToStr(Players[PN].Extendeds[c]);
+        inc(i);
+      end;
+    end;
+
+    L := High(T2DVA[0]);
+
+    for i:= 1 to High(T2DVA) do
+      for i2 := 0 to L do
+        T2DVA[0][i2] := Max(T2DVA[0][i2], Length(T2DVA[i][i2]));
+
+    for i:= 1 to High(T2DVA) do
+      for i2 := 0 to L do
+      begin
+        TSA[i] := TSA[i] + Padr(T2DVA[i][i2], T2DVA[0][i2]);
+        if i2 <> L then
+          TSA[i] := TSA[i] + ' | ';
+      end;
+
+    i2 := Length(TSA[1]);
+
+    TSA[0] := Replicate('=', i2);
+    TSA[High(TSA)] := Replicate('=', i2);
+
+    for i:= 0 to High(TSA) do
+    begin
+      if (i = 0)or(i=High(TSA)) then
+      begin
+        case ResultType of
+          ResultDebugBox  : writeln('[=' + Replicate('=', i2)+ '=]');
+          ResultReportBox : AddToReport('[=' + Replicate('=', i2)+ '=]');
+          ResultString    : Result := Result + '[=' + Replicate('=', i2)+ '=]' + chr(13);
+        end;
+        continue;
+      end;
+
+      case ResultType of
+        ResultDebugBox  : writeln('[ '+ TSA[i] +' ]');
+        ResultReportBox : AddToReport('[ '+ TSA[i] +' ]');
+        ResultString    : Result := Result + '[ '+ TSA[i] +' ]' + chr(13);
+        else begin SRL_Warn('SRLPlayerReport', 'Invalid Result Type!', Warn_AllVersions); exit; end;
+      end;
+
+      if i = 1 then
+        case ResultType of
+          ResultDebugBox  : writeln('[=' + Replicate('=', i2)+ '=]');
+          ResultReportBox : AddToReport('[=' + Replicate('=', i2)+ '=]');
+          ResultString    : Result := Result + '[=' + Replicate('=', i2)+ '=]' + chr(13);
+        end;
+
+      if i > 5 then
+        if ((i-1) mod 5) = 0 then
+          if i <> (High(TSA)-1) then
+            case ResultType of
+              ResultDebugBox  : writeln('[ ' + Replicate('-', i2)+ ' ]');
+              ResultReportBox : AddToReport('[ ' + Replicate('-', i2)+ ' ]');
+              ResultString    : Result := Result + '[ ' + Replicate('-', i2)+ ' ]' + chr(13);
+            end;
+    end;
+  end;
+end;

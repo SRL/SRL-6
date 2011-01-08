@@ -1,0 +1,484 @@
+(*
+Color
+=====
+
+The Color include contains all Colorfinding routines.
+
+.. note::
+
+    Remove?:
+    
+        -   FindDeformed
+        -   DTMRotated
+        -   GetColorsBox?
+
+*)
+
+(*
+FindDeformed
+~~~~~~~~~~~~
+
+.. code-block:: pascal
+
+    function FindDeformed(var Xoff, Yoff: Integer; BMP, a, b, c, d: Integer): Boolean;
+
+Finds Bitmap in Box a,b,c,d. Returns coords in ObjX and ObjY.
+Uses Deformed Bitmap. FindDeformed will gradually lower Tol and reduce Accuracy.
+Functon can cause severe Lag when using bitmaps bigger then 16 pixels. Works but Lags.
+Useful for MM-clicking. For ObjectFinding use FindObjectDeformed.
+
+
+.. note::
+
+    by WT-Fakawi
+
+Example:
+
+.. code-block:: pascal
+
+
+*)
+
+
+function FindDeformed(var Xoff, Yoff: Integer; BMP, a, b, c, d: Integer):
+  Boolean;
+var
+  acc, ref: Extended;
+  XT, YT, times, tol: Integer;
+begin
+  result := false;
+  ref := 0.9;
+  tol := 0;
+  for times := 1 to 50 do
+  begin
+    FindDeformedBitmapToleranceIn(BMP, XT, YT, a, b, c, d, tol, 2, True, acc);
+    if (acc >= ref) then
+    begin
+      Xoff := XT;
+      YOff := YT;
+      Result := True;
+      Exit;
+    end;
+    if (Times mod 5 = 0) then
+    begin
+      ref := ref - 0.1;
+      tol := tol + 10;
+    end;
+    Wait(1);
+  end;
+end;
+(*
+FindColorsPie
+~~~~~~~~~~~~~
+
+.. code-block:: pascal
+
+
+    function FindColorsPie(var Points: TPointArray; Color, Tol: Integer; StartD,
+    EndD, MinR, MaxR: Extended; x1, y1, x2, y2, Mx, My: Integer): Boolean;
+
+Finds all Colors with tolerance in the Pie, defined by x1, y1, x2, y2, Mx, My,
+StartDegree, EndDegree, MinRadius and MaxRadius.
+
+.. note::
+
+    by Wizzup?, edit by EvilChicken!
+
+Example:
+
+.. code-block:: pascal
+
+
+*)
+
+function FindColorsPie(var Points: TPointArray; Color, Tol: Integer; StartD,
+  EndD, MinR, MaxR: Extended; x1, y1, x2, y2, Mx, My: Integer): Boolean;
+begin
+  Result := FindColorsTolerance(Points, Color, x1, y1, x2, y2, Tol);
+  if (Result) then
+    FilterPointsPie(Points, StartD, EndD, MinR, MaxR, Mx, My);
+end;
+
+(*
+DTMRotated
+~~~~~~~~~~
+
+.. code-block:: pascal
+
+    function DTMRotated(DTM: Integer; var x, y: Integer; x1, y1, x2, y2: Integer): Boolean;
+
+First looks for a DTM without rotation, then increases the amount
+of rotation around 0 gradually until it finds the DTM. A bit like the
+ProgressiveTol Bitmap Engines.
+
+.. note::
+
+    by Yakman
+
+Example:
+
+.. code-block:: pascal
+
+
+*)
+
+function DTMRotated(DTM: Integer; var x, y: Integer; x1, y1, x2, y2: Integer): Boolean;
+var
+  t, s, AngleFound: Extended;
+begin
+  result := false;
+  if (FindDTM(DTM, x, y, x1, y1, x2, y2)) then
+  begin
+    Result := True;
+    Exit;
+  end;
+  repeat
+    s := 0.3;
+    repeat
+      if (FindDTMRotated(DTM, x, y, x1, y1, x2, y2, 0 - t, 0 + t, s, AngleFound)) then
+      begin
+        Result := True;
+        Exit;
+      end;
+      s := s - 0.1;
+    until (s <= 0.1);
+    t := t + (Pi / 20);
+  until (t >= Pi / 3);
+end;
+
+(*
+GetColorsBox
+~~~~~~~~~~~~~
+
+.. code-block:: pascal
+
+    function GetColorsBox(x1, y1, x2, y2: Integer; ClearSameColors: Boolean): TIntegerArray;
+
+Returns an array of all colors within box ((x1, y1), (x2, y2)).
+If ClearSameColors is set to True, all duplicate colors will be deleted.
+
+.. note::
+
+    by Rasta Magician
+
+Example:
+
+.. code-block:: pascal
+
+
+*)
+
+function GetColorsBox(x1, y1, x2, y2: Integer; ClearSameColors: Boolean): TIntegerArray;
+begin
+  Result := GetColors(TPAFromBox(IntToBox(x1, y1, x2, y2)));
+  if (ClearSameColors) then
+    ClearSameIntegers(Result);
+end;
+
+(*
+PercentColorMMEx
+~~~~~~~~~~~~~~~~
+
+.. code-block:: pascal
+
+    function PercentColorMMEx(Color, Tol, StartRadial, EndRadial, StartRadius, EndRadius: Integer): integer;
+
+Returns the percentage of colour on the minimap section defined by
+StartRadial, EndRadial, StartRadius, and EndRadius.
+
+
+.. note::
+
+    by Richard, and Nava2
+
+Example:
+
+.. code-block:: pascal
+
+
+*)
+
+function PercentColorMMEx(Color, Tol, StartRadial, EndRadial, StartRadius, EndRadius: Integer): integer;
+var
+  TPA: TPointArray;
+begin
+  FindColorsTolerance(TPA, Color, MMX1, MMY1, MMX2, MMY2, Tol);
+  FilterPointsPie(TPA, StartRadial, EndRadial, StartRadius, EndRadius, MMCX, MMCY);
+  Result := ceil((Length(TPA) * 100) / ((Pi * (EndRadius * EndRadius)) * ((EndRadial - StartRadial) / 360.0)-((Pi * (StartRadius * StartRadius)) * ((EndRadial - StartRadial) / 360.0))));
+end;
+
+(*
+PercentColorMM
+~~~~~~~~~~~~~~
+
+.. code-block:: pascal
+
+    function PercentColorMM(Color, Tol: Integer): Integer;
+
+Returns the percent of a colour on the whole minimap.
+
+
+.. note::
+
+    by Richard
+
+Example:
+
+.. code-block:: pascal
+
+
+*)
+
+function PercentColorMM(Color, Tol: Integer): Integer;
+begin
+  Result := PercentColorMMEx(Color, Tol, 0, 360, 0, 76);
+end;
+
+function LoggedIn: Boolean; forward;
+
+(*
+FindMMColorsTolerance
+~~~~~~~~~~~~~~~~~~~~~
+
+.. code-block:: pascal
+
+    function FindMMColorsTolerance(var Points: TPointArray; Color, Tol: Integer): Boolean;
+
+
+Finds all colors within "Tol" tolerance in the minimap circle and if
+successful, returns a TPointArray containing them, sorted from MMCX, MMCY.
+
+.. note::
+
+    by EvilChicken!
+
+Example:
+
+.. code-block:: pascal
+
+
+*)
+
+function FindMMColorsSpiralTolerance(var Points: TPointArray; Color, Tol: Integer): Boolean;
+begin
+  FindColorsSpiralTolerance(MMCX, MMCY, Points, Color, MMX1, MMY1, MMX2, MMY2, Tol);
+
+  // XXX, Wizzup: Why dist and not pie ?? 
+  FilterPointsDist(Points,0,76,MMCX,MMCY);
+  //FilterPointsPie(Points, 0.0, 360.0, 0.0, 76.0, MMCX, MMCY);
+  Result := (Length(Points) > 0);
+end;
+
+(*
+GetColorArrayInfo
+~~~~~~~~~~~~~~~~~
+
+.. code-block:: pascal
+
+    function GetColorArrayInfo(C: TIntegerArray; var BestColors, Tolerances: TIntegerArray; Speed2Mods: TExtendedArray; var RGB: array of TIntegerArray; var HSL, XYZ: array of TExtendedArray): array of array of TExtendedArray;
+
+Takes an array of colours and outputs a multitude of information
+     - BestColors
+        - An array of the best color to find per CTS Speed, the
+          array index is relative to the CTS - 1. AKA BestColors[2]
+          returns the best color for ColorToleranceSpeed 3.
+
+     - Tolerances
+        - An array of the necessary tolerance to find all of the
+          colours with array index is the CTS. Tolerances[1] = CTS 1.
+     - Speed2Mods
+        - [0]is Hue modifier, [1] is Saturation.
+          RGB, HSL, XYZ: Arrays which hold the RGB, HSL, and XYZ values respectively.
+     - The Result
+        - The result array is divided like so
+            - Result[CTS][Div][MMA]
+            - CTS
+                - The colour tolerance speed - 1. 0 and 1 are combined since they both use RGB.
+            - Div
+                - The division, for exampe HSL, H is index 0, S is index 1, and L is index 2.
+            - MMA
+                - The last values are the Minimum, Maximum, and average of the colors.
+
+.. note::
+
+    by Nava2
+
+Example:
+
+.. code-block:: pascal
+
+
+*)
+
+function GetColorArrayInfo(C: array of Integer; var BestColors, Tolerances: TIntegerArray; var Speed2Mods: TExtendedArray; var rRGB: T2DIntegerArray; var rHSL, rXYZ: T2DExtendedArray): T3DExtendedArray;
+var
+  i, ii, h: Integer;
+  tE: array of TExtendedArray;
+begin
+  h := Length(c);
+
+  SetLength(rRGB, h);
+  SetLength(rHSL, h);
+  SetLength(rXYZ, h);
+  SetLength(Tolerances, 3);
+  SetLength(Speed2Mods, 2);
+  SetLength(BestColors, 3);
+  SetLength(Result, 3);
+  Dec(h);
+  for i := 0 to h do
+  begin
+    SetLength(rRGB[i], 3);
+    SetLength(rHSL[i], 3);
+    SetLength(rXYZ[i], 3);
+  end;
+  SetLength(tE, 3);
+  for i := 0 to 2 do
+  begin
+    SetLength(Result[i], 3);
+    SetLength(tE[i], 3);
+    for ii := 0 to 2 do
+      SetLength(Result[i][ii], 3);
+  end;
+
+  for i := 0 to 2 do
+    for ii := 0 to 2 do
+    begin
+      Result[i][ii][0] := 300;
+      Result[i][ii][1] := 0;
+    end;
+
+  Dec(h);
+  for i := 0 to h do
+  begin
+    ColorToRGB(C[i], rRGB[i][0], rRGB[i][1], rRGB[i][2]);
+    ColorToHSL(C[i], rHSL[i][0], rHSL[i][1], rHSL[i][2]);
+    ColorToXYZ(C[i], rXYZ[i][0], rXYZ[i][1], rXYZ[i][2]);
+    for ii := 0 to 2 do
+    begin
+      // Calculates the Min and Max of the RGB, HSL, and XYZ
+      Result[0][ii][0] := Min(rRGB[i][ii], Round(Result[0][ii][0]));
+      Result[0][ii][1] := Max(rRGB[i][ii], Round(Result[0][ii][1]));
+      Result[1][ii][0] := MinE(rHSL[i][ii], Result[1][ii][0]);
+      Result[1][ii][1] := MaxE(rHSL[i][ii], Result[1][ii][1]);
+      Result[2][ii][0] := MinE(rXYZ[i][ii], Result[2][ii][0]);
+      Result[2][ii][1] := MaxE(rXYZ[i][ii], Result[2][ii][1]);
+
+      // Totals the Values of color values for later avg.
+      Result[0][ii][2] := (Result[0][ii][2]) + (rRGB[i][ii]);
+      Result[1][ii][2] := (Result[1][ii][2]) + (rHSL[i][ii]);
+      Result[2][ii][2] := (Result[2][ii][2]) + (rXYZ[i][ii]);
+    end;
+  end;
+
+  // Calculate the Geometric Average of the Ranges to create best colour.
+  Inc(h);
+  for i := 0 to 2 do
+    for ii := 0 to 2 do
+      Result[i][ii][2] := Result[i][ii][2] / h;
+
+  for i := 0 to 2 do
+    Result[0][i][2] := Round(Result[0][i][2]);
+
+  // Get Tolerances for each ColorSpeedTolerance, 3 is unknown so is skipped.
+  for i := 0 to 2 do
+    Tolerances[0] := Max(Tolerances[0], iAbs(Round(Result[0][i][1] - Result[0][i][0])));
+
+  Tolerances[1] := Ceil(sqrt(sqr(Result[0][0][0] - Result[0][0][1]) + sqr(Result[0][1][0] - Result[0][1][1])
+                    + sqr(Result[0][2][0] - Result[0][2][1])));
+
+  Tolerances[2] := Ceil(abs(Result[1][2][0] - Result[1][2][1]));
+  for i := 0 to 1 do
+  try
+    Speed2Mods[i] := (abs(Result[1][i][0] - Result[0][i][1]) / Tolerances[2]);
+  except Speed2Mods[i] := 0.0; end;
+
+
+  // Create best colour based on ranges.
+  BestColors[0] := RGBToColor(Round(Result[0][0][2]), Round(Result[0][1][2]), Round(Result[0][2][2]));
+  BestColors[1] := HSLToColor(Result[1][0][2], Result[1][1][2], Result[1][2][2]);
+  BestColors[2] := XYZToColor(Result[2][0][2], Result[2][1][2], Result[2][2][2]);
+end;
+
+(*
+GetBestColor
+~~~~~~~~~~~~
+
+.. code-block:: pascal
+
+    function GetBestColor(Colors: TIntegerArray; CTS: Integer; var Tol: Integer; var Speed2Modifiers: TExtendedArray): Integer;
+
+Gets the best colour to find as well as the tolerance and modifiers
+based on which CTS you input.
+
+
+.. note::
+
+    by Nava2
+
+Example:
+
+.. code-block:: pascal
+
+
+*)
+
+function GetBestColor(Colors: TIntegerArray; CTS: Integer; var Tol: Integer; var Speed2Modifiers: TExtendedArray): Integer;
+var
+  RGB: T2DIntegerArray;
+  HSL, XYZ: T2DExtendedArray;
+  BestColours, Tols: TIntegerArray;
+begin
+  ClearSameIntegers(Colors);
+  GetColorArrayInfo(Colors, BestColours, Tols, Speed2Modifiers, RGB, HSL, XYZ);
+  if CTS <> 3 then Tol := Tols[CTS] else Writeln('ColorSpeed3Tolerance not supported.');
+  if CTS <> 2 then Speed2Modifiers := [];
+  if CTS = 0 then CTS := 1;
+  Result := BestColours[CTS - 1];
+end;
+
+(*
+CreateAutoColorInfo
+~~~~~~~~~~~~~~~~~~~
+
+.. code-block:: pascal
+
+    function CreateAutoColorInfo(Colors: TIntegerArray): TAutoColorInfo;
+
+Creates a TAutoColorInfo from the inputted array of colors.
+
+.. note::
+
+    by Nava2
+
+Example:
+
+.. code-block:: pascal
+
+
+*)
+
+function CreateAutoColorInfo(Colors: TIntegerArray): TAutoColorInfo;
+var
+  RGB: T2DIntegerArray;
+  HSL, XYZ: T2DExtendedArray;
+  Mods: TExtendedArray;
+  BestColours, Tols: TIntegerArray;
+  EInfo: T3DExtendedArray;
+begin
+  EInfo := GetColorArrayInfo(Colors, BestColours, Tols, Mods, RGB, HSL, XYZ);
+
+  with Result do
+  begin
+    Color := BestColours[1];
+    HueMod := Mods[0];
+    SatMod := Mods[1];
+    LumTol := Tols[2];
+    MinR := Round(EInfo[0][0][0]);  MaxR := Round(EInfo[0][0][1]);
+    MinG := Round(EInfo[0][1][0]);  MaxG := Round(EInfo[0][1][1]);
+    MinB := Round(EInfo[0][2][0]);  MaxB := Round(EInfo[0][2][1]);
+
+    MinX := EInfo[2][0][0];  MaxX := EInfo[2][0][1];
+    MinY := EInfo[2][1][0];  MaxY := EInfo[2][1][1];
+    MinZ := EInfo[2][2][0];  MaxZ := EInfo[2][2][1];
+  end;
+end;

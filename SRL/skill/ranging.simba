@@ -1,0 +1,103 @@
+(*
+Ranging
+
+======
+The Ranging include contains all kinds of functions & features to use with the
+Ranging skill.
+
+*)
+
+var
+  headcolorar, tailcolor: Integer;
+
+{*******************************************************************************
+function ArrowAmount: Integer;
+By: masquerader
+Description: Returns the number of equiped arrows.
+*******************************************************************************}
+function ArrowAmount: Integer;
+begin
+  GameTab(tab_Equip);
+  Result := GetAmount(673, 249);
+end;
+
+{*******************************************************************************
+function GetArrowColor: Boolean;
+By: masquerader | Fixed by Freddy1990
+Description: Returns the number of equiped arrows.
+*******************************************************************************}
+function GetArrowColor: Boolean;
+begin
+  if (ArrowAmount > 0) then
+  begin
+    Result := True;
+    headcolorar := GetColor(700, 257);
+    tailcolor := GetColor(688, 271);
+    WriteLn('arrow head color: ' + IntToStr(headcolorar));
+    WriteLn('tail color: ' + IntToStr(tailcolor));
+  end;
+end;
+
+{*******************************************************************************
+function FindInvArrows(var arrowx, arrowy: Integer): Boolean;
+By: masquerader
+Description: Returns true if arrows are found in the inventory and the coordinates.
+*******************************************************************************}
+function FindInvArrows(var arrowx, arrowy: Integer): Boolean;
+var
+  tailcoords: TPointArray;
+  i, headx, heady: Integer;
+begin
+  GameTab(tab_Inv);
+  tailcoords := ItemCoordinates('inv', 'color', tailcolor, [0]); //finds all arrow stacks
+  if (GetArrayLength(tailcoords) > 0) then
+  begin
+    for i := 0 to GetArrayLength(tailcoords) - 1 do
+    begin
+      if (FindColor(headx, heady, headcolorar, tailcoords[i].x, tailcoords[i].y,
+        tailcoords[i].x + 36, tailcoords[i].y + 42)) then
+      begin //only one stack of headcolorar :)
+        Result := True;
+        arrowx := tailcoords[i].x;
+        arrowy := tailcoords[i].y;
+        Exit;
+      end;
+    end;
+  end;
+end;
+
+{*******************************************************************************
+function InvArrows: Integer;
+By: masquerader
+Description: Returns the number of arrows in the inventory.
+*******************************************************************************}
+function InvArrows: Integer;
+var
+  arrowx, arrowy: Integer;
+begin
+  if (FindInvArrows(arrowx, arrowy)) then
+    Result := GetAmount(arrowx, arrowy);
+end;
+
+{*******************************************************************************
+function EquipArrows: Boolean;
+By: Freddy1990
+Description: Equips arrows if they are found in the inventory.
+*******************************************************************************}
+function EquipArrows: Boolean;
+var
+  xx, yy: Integer;
+begin
+  Result := FindInvArrows(xx, yy);
+  Wait(100 + Random(250));
+  Mouse(xx, yy, 0, 0, True);
+end;
+
+{*******************************************************************************
+procedure SetupRanging;
+By: SRL
+Description: Declares Global Bitmaps.
+*******************************************************************************}
+procedure SetupRanging;
+begin
+end;

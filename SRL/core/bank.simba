@@ -1,0 +1,1685 @@
+(*
+Bank
+====
+
+The Bank include contains Bank finders, and all banking routines.
+
+*)
+
+{ const Bnk Constants;
+  Description: Constants representing the different types of Banks }
+
+const
+  Bank_FE = 'feb'; // (Falador East Bank)
+  Bank_FW = 'fwb'; // (Falador West Bank)
+  Bank_VE = 'veb'; // (Varrock East Bank)
+  Bank_VW = 'vwb'; // (Varrock West Bank)
+  Bank_GE = 'geb'; // (Varrock GE Bank)
+  Bank_DR = 'db' ; // (Draynor Bank)
+  Bank_AK = 'akb'; // (Al-Kharid Bank)
+  Bank_EV = 'eb' ; // (Edgeville Bank)
+  Bank_CT = 'ctb'; // (Catherby bank)
+  Bank_CM = 'clt'; // (Camelot bank)
+  Bank_NA = 'nab'; // (North Ardougne bank)
+  Bank_SA = 'sab'; // (South Ardougne bank)
+  Bank_YN = 'ynb'; // (Yanille bank)
+  Bank_NG = 'ngb'; // (North gnome bank)
+  Bank_SG = 'sgb'; // (South gnome bank)
+  Bank_WG = 'wgb'; // (Warrior guild bank)
+  Bank_FG = 'fgb'; // (Fishing guild bank)
+
+(*
+BankScreen
+~~~~~~~~~~
+
+.. code-block:: pascal
+
+    function BankScreen: Boolean;
+
+Finds Bankscreen. Returns true if Found.
+
+.. note::
+
+    by The SRL Dev Team
+
+Example:
+
+.. code-block:: pascal
+
+*)
+
+function BankScreen: Boolean;
+var
+  c: Integer;
+begin
+  if (CountColor(0, MSX1, MSY1, MSX2, MSY2) > 113000) then
+  begin
+    MouseBox(26, 138, 489, 157, 1);
+    c := GetTimeRunning + 45000;
+    while (not BankScreen) and (GetTimeRunning < c) do
+      Wait(50);
+    Wait(RandomRange(100, 150));
+  end;
+  Result := FindTextTPA(4106994, 20, 20, 22, 400, 45, 'Bank', upchars, Nothing);
+end;
+
+(*
+DepositScreen
+~~~~~~~~~~~~~
+
+.. code-block:: pascal
+
+    function DepositScreen: Boolean;
+
+Returns true if deposit screen is Found.
+
+.. note::
+
+    by Shuttleu
+
+Example:
+
+.. code-block:: pascal
+
+*)
+
+function DepositScreen: Boolean;
+var
+  X, Y: Integer;
+begin
+  Result := FindText(x, y, 'Deposit Box', upchars, 92, 29, 396, 54);
+end;
+
+(*
+PinScreen
+~~~~~~~~~
+
+.. code-block:: pascal
+
+    function PinScreen: Boolean;
+
+Finds Pin Screen. Returns true if Found.
+
+.. note::
+
+    by NaumanAkhlaq
+
+Example:
+
+.. code-block:: pascal
+
+*)
+
+
+function PinScreen : Boolean;
+begin
+  Result := FindTextTPA(2070783, 0, 90, 50, 160, 85, 'Please', UpChars, Nothing);
+end;
+
+(*
+InPin
+~~~~~
+
+.. code-block:: pascal
+
+    function InPin(Pin: String): Boolean;
+
+Enters bank pin. Will try 3 times, returns true if bank is opened.
+
+.. note::
+
+    by ZephyrsFury and Nava2
+
+Example:
+
+.. code-block:: pascal
+
+*)
+
+
+function InPin(Pin: string): Boolean;
+var
+  TMouseSpeed, iNumber, Tx, Ty, Counter, i: Integer;
+  Boxes: array of TBox;
+  OnBox: Boolean;
+begin
+  Result := False;
+  if (not(PinScreen)) then Exit;
+  if (GetNumbers(Pin) <> Pin) then
+  begin
+    srl_Warn('InPin', '''' + Pin + ''' is not a valid Pin', warn_AllVersions);
+    Exit;
+  end;
+  if (Length(Pin) <> 4) then
+  begin
+    srl_Warn('InPin', 'Pin must be 4 digits long', warn_AllVersions);
+    Exit;
+  end;
+  Boxes := [IntToBox(37, 107, 100, 170), IntToBox(131, 107, 194, 170), IntToBox(225, 107, 288, 170), IntToBox(309, 107, 372, 170),
+            IntToBox(37, 179, 100, 242), IntToBox(131, 179, 194, 242), IntToBox(225, 179, 288, 242), IntToBox(37, 251, 100, 314),
+            IntToBox(131, 251, 194, 314), IntToBox(225, 251, 288, 314)];
+  TMouseSpeed := MouseSpeed;
+  MouseSpeed := 25;
+  Counter := 0;
+  repeat
+    if (PinScreen) then
+    begin
+      for iNumber := 1 to Length(Pin) do
+      begin
+        if OnBox then
+        begin
+          repeat
+            Tx := RandomRange(MBX1, MBX2);
+            Ty := RandomRange(MBY1, MBY2);
+            for i := 0 to 9 do
+            begin
+              if IntInBox(Tx, ty, Boxes[i]) then
+              begin
+                OnBox := True;
+                Break;
+              end;
+              OnBox := False;
+            end;
+          until (not(OnBox));
+          MMouse(Tx, Ty, 0, 0);
+          Wait(500 + Random(500));
+        end;
+
+        if (FindText(Tx, Ty, Pin[iNumber], UpChars, 30, 100, 383, 319)) then
+        Begin
+          for i := 0 to 9 do
+          begin
+            OnBox := False;
+            if IntInBox(Tx, Ty, Boxes[i]) then
+            with Boxes[i] do
+            begin
+              OnBox := True;
+              MouseBox(x1, y1, x2, y2, 1);
+              Break;
+            end;
+          end;
+          Wait(1000 + Random(500));
+        End;
+      end;
+    end;
+    Wait(1000 + Random(500));
+    if (BankScreen) then
+    begin
+      Result := True;
+      MouseSpeed := TMouseSpeed;
+      Exit;
+    end;
+    ClickContinue(True, True);
+    while (not(FindColor(Tx, Ty, 0, 7, 460, 69, 474))) do
+    begin
+      if (not(LoggedIn)) then
+      begin
+        MouseSpeed := TMouseSpeed;
+        Exit;
+      end;
+      Wait(1000 + Random(500));
+    end;
+    Inc(Counter);
+  until(Counter > 2);
+end;
+
+(*
+MSTPointToBankPoint
+~~~~~~~~~~~~~~~~~~~
+
+.. code-block:: pascal
+
+    function MSTPointToBankPoint(P: TPoint): TPoint;
+
+Converts a point on the Mainscreen to the point in the Bank.
+
+First Row and Col are (0,0).
+.. note::
+
+    by Wizzup?
+
+Example:
+
+.. code-block:: pascal
+
+*)
+
+function MSTPointToBankPoint(MSP: TPoint): TPoint;
+begin
+  Result.X := (MSP.X - 38) div 44;
+  Result.Y := (MSP.Y - 90) div 45;
+end;
+
+ (*
+BankPointToBankIndex
+~~~~~~~~~~~~~~~~~~~~
+
+.. code-block:: pascal
+
+    function BankPointToBankIndex(P: TPoint): Integer;
+
+Description: Converts a Bank Point (Row,Col) to Bank Index (spot in bank).
+(0, 0) = 1
+
+.. note::
+
+    by Wizzup?
+
+Example:
+
+.. code-block:: pascal
+
+*)
+
+
+function BankPointToBankIndex(P: TPoint): Integer;
+begin
+  Result := P.Y * 10 + P.X + 1;
+end;
+
+(*
+BankIndexToBankPoint
+~~~~~~~~~~~~~~~~~~~~
+
+.. code-block:: pascal
+
+    function BankIndexToBankPoint(ind: Integer): TPoint;
+
+Converts the Bank Index (spot in bank) to a Bank Point (Row,Col).
+1 = (0, 0)
+
+.. note::
+
+    by Wizzup?
+
+Example:
+
+.. code-block:: pascal
+
+*)
+
+function BankIndexToBankPoint(Index: Integer): TPoint;
+begin
+  Index := Index - 1;
+  Result := Point((Index mod 10), Floor(Index div 10));
+end;
+
+(*
+BankIndexToMSPoint
+~~~~~~~~~~~~~~~~~~
+
+.. code-block:: pascal
+
+    function BankIndexToMSPoint(Index: Integer): TPoint;
+
+Converts the Bank Index (spot in bank) to a Mainscreen TPoint of
+the Index. (Top Left)
+
+.. note::
+
+    by Wizzup?
+
+Example:
+
+.. code-block:: pascal
+
+*)
+
+function BankIndexToMSPoint(Index: Integer): TPoint;
+begin
+  Index := Index - 1;
+  Result := Point(38 + (Index mod 10) * 44, 90 + Floor(Index div 10) * 45);
+end;
+
+(*
+BankIndexToMSBox
+~~~~~~~~~~~~~~~~
+
+.. code-block:: pascal
+
+    function BankIndexToMSBox(ind:Integer): TBox;
+
+Converts the Bank Index (spot in bank) to a Mainscreen TBox of
+the Index.
+.. note::
+
+    by Wizzup?
+
+Example:
+
+.. code-block:: pascal
+
+*)
+
+function BankIndexToMSBox(Index: Integer): TBox;
+var
+   P: TPoint;
+begin
+  P := BankIndexToMSPoint(Index);
+  Result.X1 := P.X;
+  Result.Y1 := P.Y;
+  Result.X2 := Result.X1 + 31;
+  Result.Y2 := Result.Y1 + 32;
+end;
+
+(*
+DepositItemBox
+~~~~~~~~~~~~~~
+
+.. code-block:: pascal
+
+    function DepositItemBox(Item: Integer): TBox;
+
+Returns a TBox surround Item (1 to 28) in the Deposit Box screen.
+
+.. note::
+
+    by ZephyrsFury
+
+Example:
+
+.. code-block:: pascal
+
+*)
+
+
+function DepositItemBox(Item: Integer): TBox;
+begin
+  Result.X1 := 97 + (Item - 1) mod 7 * 48;
+  Result.Y1 := 60 + (Item - 1) div 7 * 50;
+  Result.X2 := Result.X1 + 48;
+  Result.Y2 := Result.Y1 + 50;
+end;
+
+(*
+FixBank
+~~~~~~~
+
+.. code-block:: pascal
+
+    procedure FixBank;
+
+Scrolls the bank screen up.
+
+.. note::
+
+    by lordsaturn, Nava2, IceFire908 & Bixby Sayz
+
+Example:
+
+.. code-block:: pascal
+
+*)
+
+procedure FixBank;
+var
+  Timer   : Integer;
+begin
+  if (SimilarColors(GetColor(481, 110), 723981, 20)) then
+    if (BankScreen) then
+      if (not (SimilarColors(GetColor(489, 101), 1316634, 5))) then
+      begin
+        Timer := GetTimeRunning + 5000;
+        MouseBox(482, 101, 488, 111, 1);
+        while ((not (SimilarColors(GetColor(489, 101), 1316634, 5))) and (GetTimeRunning < Timer)) do
+          Wait(50 + Random(50));
+        Wait(RandomRange(100, 200));
+      end;
+end;
+
+(*
+FixBankTab
+~~~~~~~~~~
+
+.. code-block:: pascal
+
+    function FixBankTab: Boolean;
+
+Fixes the BankTab to 'View All'
+
+.. note::
+
+    by Wizzup?
+
+Example:
+
+.. code-block:: pascal
+
+*)
+
+function FixBankTab: Boolean;
+var
+   activeTPA, notactiveTPA: TPointArray;
+   T: Integer;
+begin
+  Result := False;
+  FindColorsTolerance(activeTPA, 2896954, 25, 45, 70, 80, 5);
+  FindColorsTolerance(notactiveTPA, 2437688, 25, 45, 70, 80, 5);
+
+  if Length(activeTPA) > Length(notactiveTPA) then
+  begin
+    Result := True;
+    Exit;
+  end;
+
+  Mouse(40, 60, 10, 10, True);
+  T := GetSystemTime;
+  while Length(activeTPA) <= Length(notactiveTPA) do
+  begin
+    FindColorsTolerance(activeTPA, 2896954, 25, 45, 70, 80, 5);
+    FindColorsTolerance(notactiveTPA, 2437688, 25, 45, 70, 80, 5);
+    Wait(500);
+    if ((GetSystemTime - T) div 1500) mod 2 = 0 then
+      Mouse(40, 60, 10, 10, True);
+    if GetSystemTime - T > 10000 then
+      Exit;
+  end;
+end;
+
+(*
+CurrentBankTab
+~~~~~~~~~~~~~~
+
+.. code-block:: pascal
+
+    function CurrentBankTab: Integer;
+
+Returns Current Bank Tab selected
+
+.. note::
+
+    by Narcle
+
+Example:
+
+.. code-block:: pascal
+
+*)
+
+function CurrentBankTab: Integer;
+begin
+  Result := -1;
+  if not BankScreen then
+    Exit;
+  for Result := 1 to 9 do
+    if GetColor(40 + 48 * (Result - 1), 83) = 2896954 then
+      Exit;
+  Result := 0;
+end;
+
+(*
+ExistsBankTab
+~~~~~~~~~~~~~
+
+.. code-block:: pascal
+
+    function ExistsBankTab(T: Integer): Boolean;
+
+Returns true if Bank Tab Exists
+
+.. note::
+
+    by Narcle
+
+Example:
+
+.. code-block:: pascal
+
+*)
+
+function ExistsBankTab(T: Integer): Boolean;
+var
+  x, y: integer;
+begin
+  Result := False;
+  if not BankScreen then
+  begin
+    srl_Warn('ExistsBankTab', 'Bank not open.', warn_AllVersions);
+    Exit;
+  end;
+  if (not(InRange(T, 1, 9))) then
+  begin
+    srl_Warn('ExistsBankTab', 'Bank Tab: ' + IntToStr(T) + ' is not possible (1..9) only.', warn_AllVersions);
+    Exit;
+  end;
+  if T = 1 then
+    Result := true;
+
+  if FindColor(x, y, srl_outline_black, 27+(T-1)*48, 51, 70+(T-1)*48, 81) then
+    Result := true;
+end;
+
+(*
+BankTab
+~~~~~~~
+
+.. code-block:: pascal
+
+    function BankTab(T: Integer): Boolean;
+
+If Bank Tab is there will switch to it.
+
+.. note::
+
+    by Narcle
+
+Example:
+
+.. code-block:: pascal
+
+*)
+
+function BankTab(T: Integer): Boolean;
+begin
+  result := false;
+  if not BankScreen then
+    Exit;
+
+  if T = CurrentBankTab then
+  Begin
+    Result := true;
+    Exit;
+  end;
+
+  if not ExistsBankTab(T) then
+    srl_Warn('BankTab', 'Bank Tab '+inttostr(T) +' does not Exist.', warn_AllVersions)
+  else
+    Mouse(48 * T, 57, 10, 10, true);
+
+  Result := T = CurrentBankTab;
+end;
+
+(*
+SearchBank
+~~~~~~~~~~
+
+.. code-block:: pascal
+
+    procedure SearchBank(Item: string);
+
+Searches for Item in your bank.
+
+.. note::
+
+    by ZephyrsFury
+
+Example:
+
+.. code-block:: pascal
+
+*)
+
+procedure SearchBank(Item: string);
+var
+  T, II: Integer;
+begin
+  if (not(BankScreen)) then Exit;
+  for II := 0 to 2 do
+  begin
+    FixBankTab;
+    Mouse(75, 300, 20, 10, True);
+    T := GetSystemTime;
+    while (BankScreen) and (GetSystemTime - T < 5000) do
+    begin
+      Wait(500 + Random(500));
+      if (FindTextTpa(0, 0, 350, 392, 399, 410, 'search', UpChars, Nothing)) then
+      begin
+        TypeSend(Item);
+        Exit;
+      end;
+    end;
+    Wait(500 + Random(500));
+  end;
+end;
+
+(*
+DepositAll
+~~~~~~~~~~
+
+.. code-block:: pascal
+
+    function DepositAll: Boolean;
+
+Deposits all items in your inventory
+
+.. note::
+
+    by ZephyrsFury & Quickmarch
+
+Example:
+
+.. code-block:: pascal
+
+*)
+
+function DepositAll: Boolean;
+var
+  T, X, Y: Integer;
+  BScreen, DScreen: Boolean;
+begin
+  Result := false;
+  BScreen := BankScreen;
+  if (not(BScreen)) then
+    DScreen := DepositScreen;
+  if (BScreen) or (DScreen) then
+    if (InvCount > 0) or (FindColor(X, Y, srl_outline_black, 98, 68, 436, 257) and (DSCreen)) then
+    begin
+      Mouse(390 - 50 * Integer(DScreen), 305 - 30 * Integer(DScreen), 15, 10, True);
+      Wait(200 + Random(300));
+      T := GetSystemTime;
+      while (InvCount > 0) or (FindColor(X, Y, srl_outline_black, 98, 68, 436, 257) and (DSCreen)) and (GetSystemTime - T < 2000) do
+        Wait(100);
+      Result := (InvEmpty) or (not(FindColor(X, Y, srl_outline_black, 98, 68, 436, 257)) and (DScreen));
+    end;
+end;
+
+(*
+Deposit
+~~~~~~~
+
+.. code-block:: pascal
+
+    Procedure Deposit(SlotFrom, SlotTo: Integer; vType: Variant);
+
+    - Deposits from Slot to ToSlot.
+    - vType True = Deposit All.
+    - vType False = Deposit one by one.
+    - Any integer is deposit with Deposit X. (except for 5 and 10)
+
+.. note::
+
+    by WT-Fakawi/PPLSUQBAWLZ/Stupid3ooo/Town
+
+Example:
+
+.. code-block:: pascal
+
+*)
+
+
+procedure Deposit(SlotFrom, SlotTo: Integer; vType: Variant);
+var
+   DepositX, BScreen, DScreen: Boolean;
+   All: Variant;
+   I, T, x, y: Integer;
+   B: TBox;
+begin
+  BScreen := BankScreen;
+  if (not(BScreen)) then
+    DScreen := DepositScreen;
+  if not (BScreen or DScreen) then
+    Exit;
+  if vType = 2 then
+    srl_Warn('Deposit', '2 now means store per 2, not ''All''', 15);
+  DepositX := False;
+  case VarType(vType) of
+    varInteger: begin
+         DepositX := not InIntArray([1, 5, 10], vType);
+         if vType = 1 then
+           All := False
+         else
+           All := True;
+       end;
+    varBoolean: All := vType;
+  end;
+  if (SlotFrom = 1) and (SlotTo = 28) and (All = true) then
+    if DepositAll then
+      exit;  
+  for I := SlotFrom to SlotTo do
+  begin
+    if (BScreen) then
+    begin
+      If Not ExistsItem(I) Then
+        Continue;
+      MouseItem(I, not All);
+    end else
+    begin
+      B := DepositItemBox(I);
+      if (not(FindColor(X, Y, srl_outline_black, B.X1, B.Y1, B.X2, B.Y2))) then
+        Continue;
+      Mouse((B.X1 + B.X2) shr 1, (B.Y1 + B.Y2) shr 1, 0, 0, not All);
+    end;
+    if DepositX then
+    begin
+      WaitOptionMulti(['Deposit-X', 'Deposit'], 200);
+      T := GetSystemTime;
+      while (not FindColor(x, y, 8388608, MCX1, MCY1, MCX2, MCY2)) and (GetSystemTime - T < 3000) do
+        Wait(100);
+      TypeSend(vType);
+    end else if VarType(vType) = varInteger then
+      WaitOptionMulti(['Deposit-' + inttostr(vType), 'Deposit'], 200)
+    else
+      WaitOptionMulti(['Deposit-All', 'Deposit'], 200);
+    T := GetSystemTime;
+    Wait(RandomRange(200, 300));
+    repeat
+      if (BScreen) then
+        if (not(ExistsItem(I))) then Break;
+      if (DScreen) then
+        if (not(FindColor(X, Y, srl_outline_black, B.X1, B.Y1, B.X2, B.Y2))) then Break;
+      Wait(50);
+    until(GetSystemTime - T > 2000);
+  end;
+end;
+
+(*
+WithdrawEx
+~~~~~~~~~~
+
+.. code-block:: pascal
+
+    function WithdrawEx(Col, Row, Amount: Integer; Uptexts: TStringArray): Boolean;
+
+Withdraws Amount at Column/Row.
+
+.. note::
+
+    by Starblaster100, Town, Wizzup? and Narcle, small fixes by r!ch!e & EvilChicken!
+
+Example:
+
+.. code-block:: pascal
+
+*)
+
+function WithdrawEx(Col, Row, Amount: Integer; Uptexts: TStringArray): Boolean;
+var
+  BBox: TBox;
+  X, Y: Integer;
+begin
+  Result := False;
+  FixBank;
+  FixBankTab;
+
+  BBox := BankIndexToMSBox(BankPointToBankIndex(Point(Col, Row)));
+  GetMousePos(X, Y);
+  if (not PointInBox(Point(X, Y), BBox)) then
+    MouseBox(BBox.X1 + 5, BBox.Y1 + 5, BBox.X2 - 5, BBox.Y2 - 5, 3);
+
+  if (Length(Uptexts) > 0) then
+    if (not WaitUptextMulti(Uptexts, 500)) then
+      Exit;
+
+  ClickMouse2(Amount = 1);
+  if (Amount = 1) then
+  begin
+    Result := True;
+    Wait(RandomRange(250, 550));
+    Exit;
+  end;
+
+  if (Amount = 0) then
+    Result := WaitOptionMulti(['Withdraw-All', 'w-A'], 300)
+  else
+    Result := WaitOptionMulti(['Withdraw-' + IntToStr(Amount), 'w-' + IntToStr(Amount)] , 300);
+
+  if (not (Result)) and (Amount > 0) then
+  begin
+    MouseBox(BBox.X1 + 5, BBox.Y1 + 5, BBox.X2 - 5, BBox.Y2 - 5, 2);
+    if WaitOptionMulti(['Withdraw-X', 'w-X'], 500) then
+    begin
+       X := GetSystemTime + 10000;
+       while (X >= GetSystemTime) and (not (InRange(CountColor(0, 250, 396, 307, 410), 155, 165))) do
+         Wait(50);
+       Wait(RandomRange(75, 400));
+       TypeSend(IntToStr(Amount));
+       Result := True;
+    end;
+  end;
+end;
+
+(*
+Withdraw
+~~~~~~~~
+
+.. code-block:: pascal
+
+    function Withdraw(Col, Row, Amount: Integer): Boolean;
+
+Withdraws Amount at Column/Row.
+
+.. note::
+
+    by Starblaster100, Town, Wizzup? and Narcle
+
+Example:
+
+.. code-block:: pascal
+
+*)
+
+function Withdraw(col, row, Amount: Integer): Boolean;
+begin
+  Result := WithdrawEx(Col, Row, Amount,[]);
+end;
+(*
+WithdrawItemEx
+~~~~~~~~~~~~~~
+
+.. code-block:: pascal
+
+    function WithdrawItemEx(Ident: integer; IdentType: string; var Index: integer; Amount: integer; UpText: String; Tol: TIntegerArray): boolean;
+
+Withdraws an item from the bank by using "Ident" with
+    - tol[0] as color tolerance,
+    - tol[1] as contour tolerance in case of bmp masks,  or the count of colors for TPA item finding.
+    - Valid IdentTypes are all in FindItem.
+        - Index: The Bank Index where the item is found, must be a variable.
+        - Speeds up future withdraws.
+        - Amount: Amount to withdraw from bank.
+        - UpText: The UpText which the function checks for.
+
+.. note::
+
+    by Nava2
+
+Example:
+
+.. code-block:: pascal
+
+*)
+
+
+function WithdrawItemEx(Ident: integer; IdentType: string; var Index: integer; Amount: integer; UpText: string; Tol: TIntegerArray): Boolean;
+var
+  x, y: integer;
+  BPoint: TPoint;
+  BankBox: TBox;
+  Found: Boolean;
+  t: TPointArray;
+label
+  Start;
+begin
+  Result := False;
+  if not BankScreen then Exit;
+  FixBank;
+
+  if (Index = 0) then
+  begin
+    Start:
+    for Index := 1 to 50 do
+    begin
+      if FindItemEx(x, y, IdentType, Ident, BankIndexToMSBox(Index), Tol) then
+      begin
+        MMouse(x, y, 4, 4);
+        if WaitUpText(UpText, 300) then
+        begin
+          Writeln('Found Item at Bank Slot ' + IntToStr(Index) + '.');
+          Found := True;
+          Break;
+        end else
+          Writeln('Found Incorrect Item, Moving to new Bank Spot.');
+      end;
+    end;
+  end else
+  begin
+    BankBox := BankIndexToMSBox(Index);
+    FindColors(t, srl_outline_black, BankBox.x1, BankBox.y1, BankBox.x2, BankBox.y2);
+    BankBox := GetTPABounds(t);
+    MouseBox(BankBox.x1, BankBox.y1, BankBox.x2, BankBox.y2, 3);
+    if WaitUpText(UpText, 300) then
+      Found := true
+    else
+    begin
+      Writeln('Item Moved from Bank Slot ' + IntToStr(Index) + ', checking bank again.');
+      GoTo Start;
+    end;
+  end;
+  Wait(RandomRange(200, 350));
+  if Found then
+  begin
+    BPoint := BankIndexToBankPoint(Index);
+    //Writeln(IntToStr(BPoint.x) + ', ' + IntToStr(BPoint.y));
+    Withdraw(BPoint.x, BPoint.y, Amount);
+    Result := True;
+  end else
+  begin
+    Index := 0;
+    SRL_Warn('WithdrawItem', 'Could not Find ' + IdentType + ' in Bank. [Uptext: ' + UpText + ']', Warn_AllVersions);
+  end;
+end;
+
+(*
+WithdrawItem
+~~~~~~~~~~~~
+
+.. code-block:: pascal
+
+    function WithdrawItem(Ident: integer; IdentType: string; Amount: integer; UpText: TStringArray; Tol: TIntegerArray): boolean;
+
+Withdraws an item using WithdrawItemEx, but removes the Index check.
+
+.. note::
+
+    by Nava2
+
+Example:
+
+.. code-block:: pascal
+
+*)
+
+function WithdrawItem(Ident: integer; IdentType: string; Amount: integer; UpText: String; Tol: TIntegerArray): boolean;
+var
+  I : Integer;
+begin
+  Result := WithdrawItemEx(Ident, IdentType, I, Amount, UpText, Tol);
+end;
+
+(*
+Notes
+~~~~~
+
+.. code-block:: pascal
+
+    procedure Notes(SwitchOn: Boolean);
+
+Toggles note withdrawal on or off.
+
+.. note::
+
+    by lordsaturn, idea by R1ch
+
+Example:
+
+.. code-block:: pascal
+
+*)
+
+procedure Notes(SwitchOn: Boolean);
+begin
+  if BankScreen then
+    if (GetColor(254, 306) = 5863290) xor SwitchOn then
+      Mouse(250, 300, 10, 10, True);
+end;
+
+(*
+CloseBank
+~~~~~~~~~
+
+.. code-block:: pascal
+
+    function CloseBank: Boolean;
+
+Closes the bank window - Tries twice before exiting
+
+.. note::
+
+    by Starblaster100
+
+Example:
+
+.. code-block:: pascal
+
+*)
+
+function CloseBank: Boolean;
+var
+  i, Timer: Integer;
+begin
+  Result := False;
+  if BankScreen then
+  begin
+    Timer := GetTimeRunning + 8000;
+    repeat
+      Mouse(483, 28, 10, 12, True);
+      for i := 0 to 30 do
+      begin
+        if not BankScreen then
+        begin
+          Result:= True;
+          Break;
+        end;
+        Wait(100);
+      end;
+      Wait(Random(100));
+    until (GetTimeRunning > Timer) or Result;
+  end;
+end;
+
+(*
+OpenBankQuiet
+~~~~~~~~~~~~~
+
+.. code-block:: pascal
+
+    function OpenBankQuiet(WhichBank: string): Boolean;
+
+Opens any given bank in the free world using FindDeformedBitmapToleranceIn.
+Avoids strange mouse movements.
+Will causesignificant lag (approx. 1 second), but finds the bank with one click.
+
+Valid arguments are:
+
+    - 'feb' (Falador East Bank)
+    - 'fwb' (Falador West Bank)
+    - 'veb' (Varrock East Bank)
+    - 'vwb' (Varrock West Bank)
+    - 'db'  (Draynor Bank)
+    - 'eb'  (Edgeville Bank)
+    - 'akb' (Al-Kharid Bank)
+
+.. note::
+
+    by WT-Fakawi
+
+Example:
+
+.. code-block:: pascal
+
+*)
+
+function OpenBankQuiet(WhichBank: string): Boolean;
+var
+  TheCounter, dx, dy, tol, Mark2, Mark3: Integer;
+  acc, accthres: Extended;
+begin
+  result := false;
+  case WhichBank of
+    'feb', 'fwb': TheCounter := BitmapFromString(1, 10, '6C583296897A948779948779736' +
+        'C63A59E968C7F6F9686749B8A7685663E');
+    // varrock west
+    'vwb': TheCounter:= BitmapFromString(10, 1, 'A0997F504A49504A49504A495E4' +
+       'F215E4F215E4F215E4F212C250EA0997F');
+    // varrock east
+    'veb': TheCounter := BitmapFromString(1, 10, '5E4D1589826D88806D88806D867' +
+       'F6C9996907C7664847D648C836891876B');
+    // draynor and this works too for alkharid
+    'akb', 'db', 'eb': TheCounter:= BitmapFromString(12, 1, '584209735C29735C29735C29605' +
+       '85558504D60504D58504D58504D58504D58504D605855');
+  else
+    begin
+      srl_Warn('OpenBankQuiet', 'Unknown bank: ' + WhichBank, warn_AllVersions);
+      Exit;
+    end;
+  end;
+
+  MarkTime(Mark3);
+  tol := 1;
+  accthres := 0.6;
+  repeat
+    if (Length(Players) > 0) then
+      if (Players[CurrentPlayer].Pin <> '') then
+        InPin(Players[CurrentPlayer].Pin);
+    if BankScreen or PinScreen then
+    begin
+      Result := True;
+      FreeBitmap(TheCounter);
+      Exit;
+    end;
+    if WaitUpTextMulti(['ank', 'Bo', 'ot'], 300) then
+    begin
+      GetMousePos(dx, dy);
+      Mouse(dx, dy, 0, 0, False);
+      if WaitOption('uickly', 300) then
+      begin
+        MarkTime(Mark2);
+        repeat
+          Wait(10);
+          if TimeFromMark(Mark2) > 20000 then
+          begin
+            WriteLn('Couldn''t find the bank. Exiting');
+            FreeBitmap(TheCounter);
+            Exit;
+          end;
+        until BankScreen or PinScreen;
+        if (Length(Players) > 0) then
+          if (Players[CurrentPlayer].Pin <> '') then
+            InPin(Players[CurrentPlayer].Pin);
+        Result := True;
+        FreeBitmap(TheCounter);
+        Exit;
+      end;
+    end;
+
+    FindDeformedBitmapToleranceIn(TheCounter, dx, dy, MSX1 + 50, MSY1 + 50, MSX2
+      - 50, MSY2 - 50, tol, 4, True, acc);
+    if (acc >= accthres) then
+    begin
+      if (Length(Players) > 0) then
+        if (Players[CurrentPlayer].Pin <> '') then
+          InPin(Players[CurrentPlayer].Pin);
+      if BankScreen or PinScreen then
+      begin
+        Result := True;
+        FreeBitmap(TheCounter);
+        Exit;
+      end;
+      MMouse(dx, dy, 0, 0);
+      if WaitUptextMulti(['ank', 'Bo', 'ot'], 300) then
+      begin
+        GetMousePos(dx, dy);
+        Mouse(dx, dy, 0, 0, False);
+        if WaitOption('uickly', 200) then
+        begin
+          MarkTime(Mark2);
+          repeat
+            Wait(10);
+            if TimeFromMark(Mark2) > 20000 then
+            begin
+              WriteLn('Couldn''t find the bank. Exiting');
+              FreeBitmap(TheCounter);
+              Exit;
+            end;
+          until BankScreen or PinScreen;
+        end;
+        if (Length(Players) > 0) then
+          if (Players[CurrentPlayer].Pin <> '') then
+            InPin(Players[CurrentPlayer].Pin);
+        Result := True;
+        FreeBitmap(TheCounter);
+        Exit;
+      end;
+    end;
+    Wait(100);
+    tol := tol + 4;
+    if tol >= 20 then
+    begin
+      tol := 1;
+      accthres := accthres - 0.1;
+      if accthres < 0.2 then
+      begin
+        WriteLn('Couldn''t find the bank. Exiting');
+        FreeBitmap(TheCounter);
+        Exit;
+      end;
+    end;
+  until TimeFromMark(Mark3) > 60000;
+  FreeBitmap(TheCounter);
+end;
+
+(*
+OpenBankGlass
+~~~~~~~~~~~~~
+
+.. code-block:: pascal
+
+    function OpenBankGlass(WhichBank: String; ChangeCompass, ChangeAngle: Boolean): Boolean;
+
+
+Opens the bank.
+Valid arguments are:
+
+    - 'feb' (Falador East Bank)
+    - 'fwb' (Falador West Bank)
+    - 'veb' (Varrock East Bank)
+    - 'vwb' (Varrock West Bank)
+    - 'db'  (Draynor Bank)
+    - 'akb' (Al-Kharid Bank)
+    - 'eb'  (Edgeville Bank)
+    - 'ctb' (Catherby bank)
+    - 'clt' (Camelot bank)
+    - 'nab' (North Ardougne bank)
+    - 'sab' (South Ardougne bank)
+    - 'ynb' (Yanille bank)
+    - 'ngb' (North gnome bank)
+    - 'sgb' (South gnome bank)
+    - 'wgb' (Warrior guild bank)
+    - 'fgb' (Fishing guild bank)
+
+.. note::
+
+    by Wizzup? and modified by Ron updated to P2p banks by N1ke!
+
+Example:
+
+.. code-block:: pascal
+
+*)
+
+
+function OpenBankGlass(WhichBank: string; ChangeCompass, ChangeAngle: Boolean): Boolean;
+var
+  OBC: TPoint;
+  c, Speed, Col: Integer;
+begin
+  result := false;
+  Speed := GetColorToleranceSpeed;
+  ColorToleranceSpeed(2);
+  if ChangeAngle then SetAngle(True);
+  if ChangeCompass then
+  begin
+    c := Random(2);
+    case WhichBank of
+      'feb', 'fwb', 'veb', 'ctb', 'clt', 'nab': if c = 0 then MakeCompass('N') else MakeCompass('S');
+      'akb', 'db', 'eb', 'vwb', 'sab', 'ynb', 'sgb', 'wgb', 'fgb': if c = 0 then MakeCompass('E') else MakeCompass('W');
+      'ngb': if c = 0 then MakeCompass(45) else MakeCompass(225);
+    end;
+  end;
+  Col := 10070458;
+  If (WhichBank = 'nab') or (WhichBank = 'sab')then
+    Col := 8095371;
+  if FindColorSpiralTolerance(OBC.x, OBC.y, Col, MSX1, MSY1, MSX2, MSY2, 10) then
+  begin
+    MMouse(OBC.x, OBC.y, 4, 4);
+    if WaitUpTextMulti(['nk', 'bo', 'ot'], 300) then
+    begin
+      Mouse(OBC.x, OBC.y, 0, 0, False);
+      WaitOption('uickly', 300);
+      FFlag(0);
+      Wait(2000 + Random(500));
+      if (Length(Players) > 0) then
+        if (Players[CurrentPlayer].Pin <> '') then
+          InPin(Players[CurrentPlayer].Pin);
+      Result := (BankScreen) or (PinScreen);
+    end;
+  end else
+    if FindObj(OBC.x, OBC.y, 'ank', 10070458, 20) then
+    begin
+      Mouse(OBC.x, OBC.y, 0, 0, False);
+      WaitOption('uickly', 300);
+      FFlag(0);
+      Wait(2000 + Random(500));
+      if (Length(Players) > 0) then
+        if (Players[CurrentPlayer].Pin <> '') then
+          InPin(Players[CurrentPlayer].Pin);
+      Result := (BankScreen) or (PinScreen);
+    end;
+  ColorToleranceSpeed(Speed);
+end;
+
+(*
+OpenBankFast
+~~~~~~~~~~~~
+
+.. code-block:: pascal
+
+    function OpenBankFast(Location: String): Boolean;
+
+Description: Opens the bank.
+Valid arguments are:
+
+    - 'feb', 'falador east bank'
+    - 'fwb', 'falador west bank'
+    - 'veb', 'varrock east bank'
+    - 'vwb', 'varrock west bank'
+    - 'db' , 'draynor bank'
+    - 'akb', 'al-kharid bank'
+    - 'eb'  (Edgeville Bank)
+    - 'ctb', 'catherby bank'
+    - 'clt', 'camelot bank'
+    - 'nab', 'north ardougne bank'
+    - 'sab', 'south ardougne bank'
+    - 'ynb', 'yanille bank'
+    - 'ngb', 'north gnome bank'
+    - 'sgb', 'south gnome bank'
+    - 'wgb', 'warrior guild bank'
+    - 'fgb', 'fishing guild bank'
+
+.. note::
+
+    by Wizzup? and Nielsie95 updated by N1ke! updated again by marpis
+
+Example:
+
+.. code-block:: pascal
+
+*)
+
+function OpenBankFast(Location: String): Boolean;
+var
+  bo, i, l, c, z: Integer;
+  Info: TVariantArray;
+  Booths: TPointArray;
+  ABooths: T2DPointArray;
+  B: TBox;
+begin
+  result := false;
+  if (not LoggedIn) then
+    Exit;
+  if BankScreen or PinScreen then
+  begin
+    Result := True;
+    Exit;
+  end;
+
+  case LowerCase(Location) of {            Sort X     Sort Y     Color    Tol   Hue   Sat   Count  SplitTPA?  W   H }
+    'akb', 'al kharid':           Info := [MSCX - 50, MSCY,      11196157, 20,   0.20, 1.15, 100,   False,   10, 10]; // Fixed 12/7, #40
+    'lb', 'lumbridge':            Info := [MSCX,      MSCY - 50, 6780805,  10,   0.19, 0.27, 100,   False,   10, 10]; // Fixed 12/7, #40
+    'veb', 'varrock east':        Info := [MSCX,      MSCY + 50, 3037545,  5,    0.41, 1.32, 100,   False,   10, 10]; // Fixed 12/7, #40
+    'vwb', 'varrock west':        Info := [MSCX,      MSCY,      3037545,  5,    0.41, 1.32, 100,   False,   10, 10]; // Fixed 12/7, #40
+    'feb', 'falador east':        Info := [MSCX,      MSCY + 50, 5008519,  10,   0.22, 0.67, 100,   False,   10, 10]; // Fixed 12/7, #40
+    'fwb', 'falador west':        Info := [MSCX,      MSCY + 50, 5074569,  15,   0.22, 0.67, 50,    False,   10, 10]; // Fixed 12/7, #40
+    'db', 'draynor':              Info := [MSCX - 50, MSCY,      5527389,  7,    0.20, 0.20, 10,    False,   5,  10]; // Fixed 12/7, #40
+    'eb', 'edgeville bank':       Info := [MSCX + 20, MSCY,      3561835,  20,   0.32, 0.61, 50,    False,   10, 10]; // Fixed 12/7, #40
+    'ctb', 'catherby bank':       Info := [MSCX,      MSCY,      3239049,  8,    0.20, 0.20, 100,   False,   10, 10];
+    'clt', 'camelot bank':        Info := [MSCX,      MSCY,      7636882,  5,    0.20, 0.20, 100,   False,   10, 10];
+    'nab', 'north ardougne bank': Info := [MSCX,      MSCY,      4084572,  5,    0.20, 0.20, 100,   False,   10, 10];
+    'sab', 'south ardougne bank': Info := [MSCX,      MSCY,      4084572,  5,    0.20, 0.20, 100,   False,   10, 10];
+    'ynb', 'yanille bank':        Info := [MSCX,      MSCY,      3239049,  7,    0.20, 0.20, 100,   False,   10, 10];
+    'ngb', 'north gnome bank':    Info := [MSCX,      MSCY,      3239049,  7,    0.20, 0.20, 100,   False,   10, 10];
+    'sgb', 'south gnome bank':    Info := [MSCX,      MSCY,      3239049,  7,    0.20, 0.20, 100,   False,   10, 10];
+    'wgb', 'warrior guild bank':  Info := [MSCX,      MSCY,      2578286,  7,    0.20, 0.20, 100,   False,   10, 10];
+    'fgb', 'fishing guild bank':  Info := [MSCX,      MSCY,      2908796,  10,   0.20, 0.20, 100,   False,   10, 10];
+    else
+    begin
+      srl_Warn('OpenBankFast', 'Unknown bank: '+Location, warn_AllVersions);
+      Exit;
+    end;
+  end;
+
+  MakeCompass('n');
+  z := GetColorToleranceSpeed;
+  ColorToleranceSpeed(2);
+  SetColorSpeed2Modifiers(Info[4], Info[5]);
+
+  FindColorsSpiralTolerance(Info[0], Info[1], Booths, Info[2], MSX1, MSY1, MSX2, MSY2, Info[3]);
+  ColorToleranceSpeed(z);
+  SetColorSpeed2Modifiers(0.2, 0.2);
+
+  { Split to ATPA. }
+  if Info[7] then
+    ABooths := SplitTPA(Booths, 1)
+  else
+    ABooths := TPAtoATPA(Booths, 10);
+
+  Booths := [];
+
+  { Go through ATPA. }
+  l := GetArrayLength(ABooths) -1;
+  for i := 0 to l do
+  begin
+    { Too few pixels. }
+    if (Length(ABooths[i]) < Info[6]) then
+      Continue;
+
+    { Too small TPA bounds. }
+    B := GetTPABounds(ABooths[i]);
+    If ((B.X2 - B.X1) < Info[8]) Or ((B.Y2 - B.Y1) < Info[9]) Then
+      Continue;
+      
+    Inc(bo);
+    SetArrayLength(Booths, bo);
+    Booths[bo-1] := MiddleTPA(ABooths[i]);
+    
+  end;
+  
+  SortTPAFrom(Booths, Point(Info[0], Info[1]));
+  
+  l := GetArrayLength(Booths) -1;
+  for i := 0 to l do
+  begin
+  
+    MMouse(Booths[i].X, Booths[i].Y, 3, 3);
+    if WaitUpText('ooth', 1200) Then
+    begin
+      GetMousePos(Booths[i].X, Booths[i].Y);
+      Mouse(Booths[i].X, Booths[i].Y, 0, 0, False);
+      if WaitOption('uickl', 2200) then
+      begin
+        FFLag(0);
+        MarkTime(c);
+        repeat
+          Wait(100);
+        until (BankScreen) or (PinScreen) or (TimeFromMark(c) > 10000);
+        Wait(Random(300));
+        if (HowManyPlayers > 0) then
+          if (Players[CurrentPlayer].Pin <> '') then
+            InPin(Players[CurrentPlayer].Pin);
+        Result := (BankScreen) or (PinScreen);
+        if (Result) then Exit;
+      end;
+    end;
+  end;
+end;
+
+(*
+Home
+~~~~
+
+.. code-block:: pascal
+
+    function OpenBankNPC: Boolean;
+
+Opens the bank by using Banker.
+
+.. note::
+
+    by Home
+
+Example:
+
+.. code-block:: pascal
+
+*)
+
+function OpenBankNPC: Boolean;
+var
+  bx, by, Speed, ColFace, ColGrey, ColBlue: Integer;
+begin
+  Result := (LoggedIn) and (BankScreen or PinScreen);
+  if (Result) then exit;
+
+  Speed := GetColorToleranceSpeed;
+  ColorToleranceSpeed(2);
+  ColFace := 7774419; // Face Color
+  ColGrey := 6381925; // Grey Color [ Clothes ]
+  ColBlue := 2429979; // Blue Color [ Clothes ]
+  if (FindObjThroughMM(bx, by, 'npc', [ColFace, ColBlue, ColGrey], [5, 5, 5],
+    ['anke', 'to B', 'Banker', 'nker'], 2, 2)) then
+  begin
+    Mouse(bx, by, 0, 0, False);
+    WaitOption('ank B', 500);
+    FFlag(0);
+    Wait(2000 + Random(500));
+    if (Length(Players) > 0) then
+      if ((PinScreen) and (Players[CurrentPlayer].Pin <> '')) then
+        InPin(Players[CurrentPlayer].Pin);
+    Result := (BankScreen) or (PinScreen);
+  end;
+  ColorToleranceSpeed(Speed);
+end;
+
+(*
+OpenBank
+~~~~~~~~~~~~
+
+.. code-block:: pascal
+
+    function OpenBank(WhichBank: String, ChangeCompass, ChangeAngle: Boolean): Boolean;
+
+Opens the bank if possible.
+Valid arguments are:
+
+    - 'feb' (Falador East Bank)
+    - 'fwb' (Falador West Bank)
+    - 'veb' (Varrock East Bank)
+    - 'vwb' (Varrock West Bank)
+    - 'db'  (Draynor Bank)
+    - 'akb' (Al-Kharid Bank)
+    - 'eb'  (Edgeville Bank)
+    - 'lb'  (Lumbridge Bank)
+    - 'ctb' (Catherby bank)
+    - 'clt' (Camelot bank)
+    - 'nab' (North Ardougne bank)
+    - 'sab' (South Ardougne bank)
+    - 'ynb' (Yanille bank)
+    - 'ngb' (North gnome bank)
+    - 'sgb' (South gnome bank)
+    - 'wgb' (Warrior guild bank)
+    - 'fgb' (Fishing guild bank)
+
+.. note::
+
+    by phantombmx/EvilChicken!, idea by NaumanAkhlaQ
+
+Example:
+
+.. code-block:: pascal
+
+*)
+
+function OpenBank(WhichBank: string; ChangeCompass, ChangeAngle: Boolean): Boolean;
+var
+  I: Integer;
+begin
+  result := false;
+  if BankScreen then
+  begin
+    Result := True;
+    Exit;
+  end;
+  
+  for I := 0 to 3 do
+  begin
+    case I of
+      0: Result := OpenBankFast(WhichBank);
+      1: Result := OpenBankGlass(WhichBank, ChangeCompass, ChangeAngle);
+      2: Result := OpenBankQuiet(WhichBank);
+      3: Result := OpenBankNPC;
+    end;
+    
+    if Result then
+      Exit;
+  end;
+end;
+
+(*
+FindBank
+~~~~~~~~
+
+.. code-block:: pascal
+
+    function FindBank(TheBank: String): Boolean;
+
+Finds and opens any given bank in the free world.
+If the MM DTM is found it will find and open the bank.
+Valid arguments are:
+
+    - 'feb' (Falador East Bank)
+    - 'fwb' (Falador West Bank)
+    - 'veb' (Varrock East Bank)
+    - 'vwb' (Varrock West Bank)
+    - 'db'  (Draynor Bank)
+    - 'akb' (Al-Kharid Bank)
+    - 'ctb' (Catherby bank)
+    - 'clt' (Camelot bank)
+    - 'nab' (North Ardougne bank)
+    - 'sab' (South Ardougne bank)
+    - 'ynb' (Yanille bank)
+    - 'ngb' (North gnome bank)
+    - 'sgb' (South gnome bank)
+    - 'fgb' (Fishing guild bank)
+
+.. note::
+
+    by WT-Fakawi and modified by Ron Updated to P2p by N1ke! Eb added by R1ch
+
+Example:
+
+.. code-block:: pascal
+
+*)
+
+function FindBank(TheBank: string): Boolean;
+var
+  bx, by, TheDTM: Integer;
+  WhichAngle: Extended;
+begin
+  result := false;
+  TheBank := LowerCase(TheBank);
+  case TheBank of
+    'feb': TheDTM := DTMFromString('78DA63AC67626088634001FFFFFD63F80FA41' +
+        '9416C2060AC01AA4987C83141D5FCF9C3C4C0055503028CAD44A8' +
+        'E924AC0600131E11B5');
+    'fwb': TheDTM := DTMFromString('78DA636C676260086540038C0CFFC12403C37' +
+        'F206004A98986C8304155FCF9C3C4C0055503D6D14C849A6EC26A' +
+        '009F5A0EA1');
+    'db': TheDTM := DTMFromString('78DA632C6162608866400181DEDE0CFF81342' +
+       '310FF0702C62CA09A4454357FFE30313043D58000584D1C116AC2' +
+       'F0AB0100EC370F0C');
+    'veb': TheDTM := DTMFromString('78DA63EC61626008624001FFFFFD63F80FA41' +
+        '9416C2060EC00AA8982C83141D5FCF9C3C4C0055503028C138850' +
+        'D343580D00122211A9');
+    'vwb': TheDTM := DTMFromString('78DA63EC606260B066C000FF819811440301E' +
+        '354A01A3B88381354FECF1F260611A81A1000AB3125428D2E7E35' +
+        '0087F80E5E');
+    'akb': TheDTM := DTMFromString('78DA636C606260F06140019D9D710CFF81342' +
+        '310FF0702C652A01A37881C1354CD9F3F4C0C5C5035200056E345' +
+        '841A3FFC6A002A3B0F97');
+
+    'ctb': TheDTM := DTMFromString('78DA63CC63626008624001478F1E65F80FA41' +
+       '981F83F1030A602D578A0AAF9F387898119AA060418F388505344' +
+       '849A32C26A00FE5D12EE');
+    'clt': TheDTM := DTMFromString('78DA63CC67626008604001E78E1F67F80FA41' +
+       '981F83F10306601D5B8A2AAF9F387898119AA060418CB88505345' +
+       '849A3AC26A000B52130B');
+    'nab': TheDTM := DTMFromString('78DA63AC61626008654001135A8B19FE03694' +
+       '620FE0F048C454035B1A86AFEFC61626086AA0101C66A22D47400' +
+       'D5C4E057030045F20FE7');
+    'sab': TheDTM := DTMFromString('78DA632C656260086040017DCD850CFF81342' +
+       '310FF0702C63AA09A6454357FFE30313043D58000584D180135F5' +
+       '40359EF8D500003F560FC7');
+    'ynb': TheDTM := DTMFromString('78DA632C60626008654001E78E1F67F80FA41' +
+       '981F83F10305601D5F8A2AAF9F387898119AA0604182B31CDC1AA' +
+       '260ABF1A009CFB108C');
+    'ngb': TheDTM := DTMFromString('78DA632C66626008654001FFFFFF67F80FA41' +
+       '921ECFF8CB94035B1A86AFEFC61626086AA0101C632C26A00AD6D' +
+       '0E64');
+    'sgb': TheDTM := DTMFromString('78DA632C606260086640038C0CFFC12403C37' +
+       'F20604C05AA894255F1E70F130333540D5807484D18116AFCF0AB' +
+       '01006D100DF4');
+
+    'fgb': TheDTM := DTMFromString('78DA632C626260F0654001F5311E0CFF81342' +
+       '310FF0702C64CA01A1754357FFE30313043D58000588D27116A02' +
+       '8950138A5F0D0041A911BD');
+    'eb' : TheDTM := DTMFromString('78DA63E4666060E0614001EF2F2832FC07D28' +
+       'C40FC1F0818E5800C7154355FBF426846289F51124848A3AAF9F3' +
+       '8709558D0490504255F3EF9F20A6395AF8D500008FCC0FE1');
+    else
+    begin
+      srl_Warn('FindBank', 'Invalid bank name', warn_Warning);
+      Exit;
+    end;
+  end;
+  if FindDtmRotated(TheDTM, bx, by, MMX1, MMY1, MMX2, MMY2, Radians(-30), Radians(30), 0.05, WhichAngle) then
+  begin
+    Mouse(bx, by, 0, 0, True);
+    FFlag(0);
+    Wait(300+Random(400));
+    Result := OpenBank(TheBank, False, False);
+  end;
+  FreeDTM(TheDTM);
+end;
+
+(*
+OpenDepositBox
+~~~~~~~~~~~~~~
+
+.. code-block:: pascal
+
+    function OpenDepositBox : Boolean;
+
+Opens the deposit box.
+
+.. note::
+
+    by Shuttleu
+
+Example:
+
+.. code-block:: pascal
+
+*)
+
+function OpenDepositBox : Boolean;
+var
+  X, Y, T:integer;
+begin
+  result := false;
+  If(not(LoggedIn)) then exit;
+  begin
+    if FindObjTPA(x, y, 739167, 10, -1, 30, 30, 200, ['deposit']) then
+    begin
+      GetMousePos(X, Y);
+      Mouse(x, y, 0, 0, True);
+      Result := True;
+      T :=0;
+      repeat
+        Inc(T);
+        Wait(500+random(500));
+      until (DepositScreen) or (T>=30);
+    end else
+    Writeln('Could not find the deposit box');
+  end;
+end;

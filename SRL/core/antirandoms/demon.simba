@@ -1,0 +1,555 @@
+//-----------------------------------------------------------------//
+//--               Scar Standard Resource Library                --//
+//--               » Drill Demon Solver Routines                 --//
+//-----------------------------------------------------------------//
+// * function Demon_InRandom: Boolean;                          // * by TRiLeZ
+// * function NoSignObstruction: Boolean;                          // * by Sumilion, ZephyrsFury & TRiLeZ
+// * function DemonCenter: Boolean;                                // * by TRiLeZ
+// * procedure IdentifySigns(var JogIndex, StarIndex, SitIndex, PushIndex: Integer);     // * by Sumilion & TRiLeZ
+// * function demon_GetTask: string;                               // * by TRiLeZ & Nielsie95
+// * function PerformTask(TaskIndex: Integer): Boolean;            // * by Sumilion
+// * function GetSigns(var JogIndex, StarIndex, SitIndex, PushIndex: Integer): Boolean;  // * by Sumilion , ZephyrsFury & TRiLez
+// * function SolveDemon: Boolean;                                 // * by Sumilion
+//-----------------------------------------------------------------//
+
+{*******************************************************************************
+function Demon_InRandom: Boolean;
+by: TRiLeZ
+Description: Checks if you're in the demon random.
+Date: December 15, 2009
+*******************************************************************************}
+function Demon_InRandom: Boolean;
+var
+  TempCTS: Integer;
+begin
+  TempCTS := GetColorToleranceSpeed;
+  ColorToleranceSpeed(1);
+  if (CountDots('npc') = 1) then
+    if (not (TabExists(tab_Magic))) then
+      if (CountColorTolerance(15986930, MMX1, MMY1, MMX2, MMY2, 18) >= 750) then //white fences
+        if (not (GetColor(504, 348) = 657930)) then //Arrow in chat box
+        Result := True;
+  ColorToleranceSpeed(TempCTS);
+end;
+
+{*******************************************************************************
+function NoSignObstruction: Boolean;
+by: Sumilion & ZephyrsFury, little modifiction by TRiLeZ
+Description: Checks if the signs are fully visible.
+*******************************************************************************}
+function NoSignObstruction: Boolean;
+var
+  arP: TPointArray;
+  ararP: T2DPointArray;
+  arC: TIntegerArray;
+  b: TBox;
+  i, j, x, y: Integer;
+begin
+  ColorToleranceSpeed(2);
+  SetColorspeed2Modifiers(0.12, 0.16);
+  try
+    FindColorsSpiralTolerance(MSX1, MSCY, arP, 6257516, MSX1, MSY1, MSX2, MSY2, 10);
+    if (Length(arP) = 0) then Exit;
+
+    ararP := SplitTPA(arP, 10);
+
+    if (Length(ararP) <> 4) then Exit;
+
+    for i := 0 to High(ararP) do
+    begin
+      SetLength(arP, 0);
+
+      b := GetTPABounds(ararP[i]);
+      for x := b.x1 - 1 to b.x2 + 1 do
+      begin
+        SetLength(arP, Length(arP) + 2);
+        arP[High(arP) - 1] := Point(x, b.y1 - 1);
+        arP[High(arP)] := Point(x, b.y2 + 1);
+      end;
+      for y := b.y1 - 1 to b.y2 + 1 do
+      begin
+        SetLength(arP, Length(arP) + 2);
+        arP[High(arP) - 1] := Point(b.x1 - 1, y);
+        arP[High(arP)] := Point(b.x2 + 1, y);
+      end;
+
+      arC := GetColors(arP);
+
+      for j := 0 to High(arC) do
+      begin
+        SetColorspeed2Modifiers(0.1, 0.58);  // filling
+        Result := SimilarColors(3695936, arC[j], 4);
+        if not Result then
+        begin
+          SetColorSpeed2Modifiers(0.06, 0.15); // rims
+          Result := SimilarColors(2971495, arC[j], 11);
+          if (not(Result)) then Exit;
+        end;
+      end;
+
+    end;
+
+  finally
+    ColorToleranceSpeed(1);
+    SetColorspeed2Modifiers(0.2, 0.2);
+  end;
+end;
+
+{*******************************************************************************
+function DemonCenter: Boolean;
+by: TRiLeZ
+Description: Walks to the center of the random.
+*******************************************************************************}
+
+function DemonCenter: Boolean;
+var
+  cts, H, F: Integer;
+  arP: TPointarray;
+  P: TPoint;
+  SarP: T2DPointArray;
+begin
+  cts := GetColorToleranceSpeed;
+  Mouse(543, 24, 12, 12, true);
+  Wait(150 + Random(200));
+  SetAngle(True);
+  ColorToleranceSpeed(2);
+  SetColorspeed2Modifiers(0.77, 2.5);
+  if not FindColorsTolerance(arP, 3433847, MSX1, MSY1, MSX2, MSY2, 4) then
+  begin
+    Writeln('DemonCenter - Could not find the board colors.');
+    Exit;
+  end;
+
+  H := High(arP);
+  SarP := TPAtoATPA(arP, 50);
+  F := High(SarP);
+
+  if ((arP[0].x < MSCX) and (arP[H].x < MSCX)) or ((arP[0].x > MSCX) and
+  (arP[H].x > MSCX)) then
+  begin
+    if (arP[0].x < MSCX) and (arP[H].x < MSCX) then
+    begin
+      Writeln('DemonCenter - We are at the edge of the random area, fixing position.');
+      Mouse(MiddleTPA(SarP[Round(F/2)]).x, MiddleTPA(SarP[Round(F/2)]).y + 60, 10, 10, False);
+      WaitOption('Walk', 400);
+      Wait(2000);
+      FFlag(0);
+      Wait(2000 + Random(250));
+    end else
+    if (arP[0].x > MSCX) and (arP[H].x > MSCX) then
+    begin
+      Writeln('DemonCenter - We are at the edge of the random area, fixing position.');
+      Mouse(MiddleTPA(SarP[F]).x, MiddleTPA(SarP[F]).y + 60, 10, 10, False);
+      WaitOption('Walk', 400);
+      Wait(2000);
+      FFlag(0);
+      Wait(2000 + Random(250));
+    end;
+    if not FindColorsTolerance(arP, 3433847, MSX1, MSY1, MSX2, MSY2, 4) then
+    begin
+      Writeln('DemonCenter - Could not find the board colors.');
+      Exit;
+    end;
+  end;
+
+  Result := Length(arP) > 0;
+  P := MiddleTPA(arP);
+  if (IsUpText('Walk')) then
+    Mouse(P.X, P.Y + 50, 0, 0, True)
+  else
+  begin
+    Mouse(P.X, P.Y + 50, 0, 0, False);
+    ChooseOption('Walk');
+  end;
+  Wait(2000);
+  FFlag(0);
+  Wait(2000 + Random(250));
+  ColorToleranceSpeed(cts);
+end;
+
+{*******************************************************************************
+procedure IdentifySigns(var JogIndex, StarIndex, SitIndex, PushIndex: Integer);
+by: Sumilion, little modification by TRiLeZ
+Description: Gets the actions on the signs.
+*******************************************************************************}
+
+procedure IdentifySigns(var JogIndex, StarIndex, SitIndex, PushIndex: Integer);
+var
+  i, MinLength, MaxWidth: Integer;
+  arP: TPointArray;
+  ararP: T2DPointArray;
+  arColors: TIntegerArray;
+  b: TBox;
+begin
+  ColorToleranceSpeed(2);
+  SetColorspeed2Modifiers(0.12, 0.16);
+  FindColorsSpiralTolerance(MSX1, MSCY, arP, 6257516, MSX1, MSY1, MSX2, MSY2, 10);
+
+  ararP := TPAtoATPA(arP, 45);
+  if (Length(ararP) <> 4) then
+    Exit;
+
+  MinLength := 999;
+  for i := 0 to High(ararP) do
+  begin
+    if (Length(ararP[i]) < Minlength) then
+    begin
+      MinLength := Length(ararP[i]);
+      JogIndex := i + 1;
+    end;
+  end;
+
+  for i := 0 to High(ararP) do
+  begin
+    if (i = JogIndex - 1) then Continue;
+
+    b := GetTPABounds(ararP[i]);
+
+    if ((b.x2 - b.x1) > MaxWidth) then
+    begin
+      MaxWidth := b.x2 - b.x1;
+      PushIndex := i + 1;
+    end;
+  end;
+
+  for i := 0 to High(ararP) do
+  begin
+    if (i = JogIndex - 1) then Continue;
+    if (i = PushIndex - 1) then Continue;
+
+    arColors := GetColors(ararP[i]);
+    ClearSameIntegers(arColors);
+
+    if (Length(arColors) = 2) then
+      StarIndex := i + 1;
+    if (Length(arColors) = 1) then
+      SitIndex := i + 1;
+  end;
+end;
+
+{*******************************************************************************
+function demon_GetTask: string;
+by: TRiLeZ & Nielsie95
+Description: Reads from Damien what we should do.
+*******************************************************************************}
+
+function demon_GetTask: string;
+var
+  dx, dy, t, cts, q: Integer;
+  Tasks: TStringArray;
+  DRed, DBlack, TPA: TPointArray;
+  Demon: T2DPointArray;
+begin
+  if FindNPCChatText('orders', Nothing) then
+  begin
+    Writeln('We should talk to Damien.');
+    MarkTime(t);
+    cts := GetColorToleranceSpeed;
+    ColorToleranceSpeed(2);
+    repeat
+      SetColorspeed2Modifiers(0.1, 1.35);
+      FindColorsTolerance(DRed, 988783, MSX1, MSY1, MSX2, MSY2, 4);
+      SetColorspeed2Modifiers(0, 3.71);
+      FindColorsTolerance(DBlack, 855309, MSX1, MSY1, MSX2, MSY2, 3);
+      if (Length(DRed) > 0) and (Length(DBlack) > 0) then
+      begin
+        TPA := CombineTPA(DRed, DBlack);
+        Demon := SplitTPAEx(TPA, 20, 20);
+        SortATPAFrom(Demon, Point(MSCX, MSCY));
+        for q := 0 to High(Demon) do
+        begin
+          MiddleTPAEx(Demon[q], dx, dy);
+          MMouse(dx, dy, 2, 2);
+          if WaitUpText('Talk', 150) then
+          begin
+            GetMousePos(dx, dy);
+            Mouse(dx, dy, 0, 0, false);
+            Break;
+          end;
+        end;
+      end;
+      Wait(150 + Random(50));
+    until ChooseOption('to Se') or (TimeFromMark(t) > 30000);
+    ColorToleranceSpeed(cts);
+
+    if (TimeFromMark(t) > 30000) then
+    begin
+      Writeln('Can''t find Damien.');
+      LogOut;
+      Exit;
+    end;
+
+    MarkTime(t);
+    while FindNPCChatText('orders', Nothing) and
+    (TimeFromMark(t) < 30000) do
+      Wait(500 + Random(100));
+
+    if (TimeFromMark(t) > 30000) then
+    begin
+      Writeln('Failed to talk to Damien.');
+      LogOut;
+      Exit;
+    end;
+  end;
+
+  T := GetSystemTime;
+  while (not(FindNPCChatText('this mat', Nothing))) and
+  (ClickContinue(True, True)) and (GetSystemTime - T < 30000) do
+    Wait(100);
+
+  Tasks := ['jog', 'star', 'sit', 'push'];
+  for t := 0 to 3 do
+    if FindNPCChatText(Tasks[t], Nothing) then
+    begin
+      Result := Capitalize(Tasks[t]);
+      Break;
+    end;
+
+  if (Result = '') then
+  begin
+    Writeln('Can''t find what Damien wants us to do.');
+    LogOut;
+    Exit;
+  end;
+
+  ClickContinue(True, True);
+  ClickContinue(True, False);
+end;
+
+{*******************************************************************************
+function PerformTask(TaskIndex: Integer): Boolean;
+by: Sumilion
+Description: Performs the correct workout.
+*******************************************************************************}
+
+function PerformTask(TaskIndex: Integer): Boolean;
+var
+  arP, arAP: TPointArray;
+  arC, arUC: TIntegerArray;
+  ararP: T2DPointArray;
+  tmpCTS, i, j, arL, arL2, t: Integer;
+  X, Y, Z: Extended;
+begin
+  tmpCTS := GetColorToleranceSpeed;
+  ColorToleranceSpeed(2);
+  SetColorSpeed2Modifiers(0.06, 0.15);
+
+  if not(FindColorsTolerance(arP, 2971495, MSX1, MSY1, MSX2, MSY2, 11)) then
+  begin
+    Writeln('Failed to find the signs, no object found.');
+    ColorToleranceSpeed(tmpCTS);
+    SetColorSpeed2Modifiers(0.2, 0.2);
+    Exit;
+  end;
+
+  arC := GetColors(arP);
+  arUC := arC;
+  ClearSameIntegers(arUC);
+  arL := High(arUC);
+  arL2 := High(arC);
+
+  for i := 0 to arL do
+  begin
+    ColorToXYZ(arC[i], X, Y, Z);
+
+    if (X >= 6.61) and (X <= 19.45) and (Y >= 7.00) and (Y <= 20.47) and (Z >= 2.28) and (Z <= 6.43) then
+    begin
+      for j := 0 to arL2 do
+      begin
+        if (arUC[i] = arC[j]) then
+        begin
+          SetLength(arAP, Length(arAP) + 1);
+          arAP[High(arAP)] := arP[j];
+        end;
+      end;
+    end;
+  end;
+
+  ararP := SplitTPAEx(arAP, 10, 10);
+  arL := High(ararP);
+  SetLength(arP, 0);
+
+  for i := 0 to arL do
+  begin
+    if (Length(ararP[i]) < 100) then Continue;
+    if (Length(ararP[i]) > 250) then Continue;
+    SetLength(arP, Length(arP) + 1);
+    arP[High(arP)] := MiddleTPA(ararP[i]);
+  end;
+
+  SortTPAFrom(arP, Point(MSX1, MSCY));
+
+  if (not (InRange(Length(arP), 3, 5))) then
+  begin
+    Writeln('Wrong Array Length, failed to find the mat.');
+    ColorToleranceSpeed(tmpCTS);
+    SetColorSpeed2Modifiers(0.2, 0.2);
+    LogOut;
+    Exit;
+  end;
+
+  MMouse(arP[TaskIndex - 1].x, arP[TaskIndex - 1].y + 65, 5, 5);
+  Wait(100 + Random(100));
+  if (IsUpText('Exercise')) then
+  begin;
+    Result := True;
+    GetMousePos(arP[TaskIndex - 1].x, arP[TaskIndex - 1].y);
+    Mouse(arP[TaskIndex - 1].x, arP[TaskIndex - 1].y, 0, 0, True);
+    Flag;
+    MarkTime(t);
+    while not FindNPCChatText('Sergeant Damien', Nothing) and
+         (TimeFromMark(t) < 20000) do
+      Wait(100 + Random(100));
+
+    if (TimeFromMark(t) > 20000) then
+    begin
+      Writeln('Task Timeout');
+      ColorToleranceSpeed(tmpCTS);
+      SetColorSpeed2Modifiers(0.2, 0.2);
+      LogOut;
+      Exit;
+    end;
+  end;
+
+  ColorToleranceSpeed(tmpCTS);
+  SetColorSpeed2Modifiers(0.2, 0.2);
+end;
+
+{*******************************************************************************
+function GetSigns(var JogIndex, StarIndex, SitIndex, PushIndex: Integer): Boolean;
+by: Sumilion & ZephyrsFury, little modification by TRiLeZ
+Description: Handles the getting of the signs.
+*******************************************************************************}
+
+function GetSigns(var JogIndex, StarIndex, SitIndex, PushIndex: Integer): Boolean;
+var
+  C, I, T: Integer;
+begin
+  c := 0;
+  if not DemonCenter then
+  begin
+    Writeln('Failed to find the demon center.');
+    LogOut;
+    Exit;
+  end;
+  Mouse(543, 24, 12, 12, true);
+  Wait(150 + Random(200));
+  SetAngle(False);
+  JogIndex := 0;
+  StarIndex :=0;
+  SitIndex := 0;
+  PushIndex := 0;
+
+  while ((JogIndex = 0) or (StarIndex = 0) or (SitIndex = 0) or (PushIndex = 0)) and (c < 250) and Demon_InRandom do
+  begin
+    JogIndex := 0; StarIndex := 0; SitIndex := 0; PushIndex := 0;
+    try
+      while (not NoSignObstruction) do
+      begin
+        Wait(20 + Random(10));
+        if (TimeFromMark(t) >= 120000) then Break;
+      end;
+      IdentifySigns(JogIndex, StarIndex, SitIndex, PushIndex);
+    except end;
+    if ((JogIndex = 0) or (StarIndex = 0) or (SitIndex = 0) or (PushIndex = 0)) then
+    begin
+      Inc(c);
+      if (c = 20) then
+        MakeCompass('N');
+      if (c >= 40) then Break;
+      if (c mod 3 = 0) then
+        if (c < 20) then
+        begin
+          KeyDown(vk_Right);
+          Wait(60 + Random(25));
+          KeyUp(vk_Right);
+        end else
+        begin
+          KeyDown(vk_Left);
+          Wait(60 + Random(25));
+          KeyUp(vk_Left);
+        end;
+      Wait(150 + Random(150));
+    end;
+  end;
+  Mouse(543, 24, 12, 12, true);
+  Wait(150 + Random(200));
+  SetAngle(True);
+  Result := (JogIndex > 0) and (StarIndex > 0) and (SitIndex > 0) and (PushIndex > 0);
+
+  for i := 0 to 3 do
+  begin
+    if (JogIndex - 1 = i) then
+      Writeln(IntToStr(JogIndex) + ': Jog mat');
+    if (StarIndex - 1 = i) then
+      Writeln(IntToStr(StarIndex) + ': Star Jump mat');
+    if (PushIndex - 1 = i) then
+      Writeln(IntToStr(PushIndex) + ': Push-up mat');
+    if (SitIndex - 1 = i) then
+      Writeln(IntToStr(SitIndex) + ': Sit-up mat');
+  end;
+end;
+
+{*******************************************************************************
+function SolveDemon: Boolean;
+by: Sumilion
+Description: Main solving procedure.
+*******************************************************************************}
+
+function SolveDemon: Boolean;
+var
+  Task: string;
+  JogIndex, StarIndex, SitIndex, PushIndex, t: Integer;
+begin
+  Result := false;
+  TakeScreen('Found Demon');
+  ClickContinue(True, True);
+  SetAngle(true);
+  MarkTime(t);
+  MakeCompass('N');
+  repeat;
+    Task := demon_GetTask;
+    Writeln(Task);
+
+    if (not(GetSigns(JogIndex, StarIndex, SitIndex, PushIndex))) then
+    begin
+      WriteLn('Could not identify demon signs.');
+      LogOut;
+      Exit;
+    end;
+
+    case Task of
+      'Jog': Result := PerformTask(JogIndex);
+      'Star': Result := PerformTask(StarIndex);
+      'Sit': Result := PerformTask(SitIndex);
+      'Push': Result := PerformTask(PushIndex);
+    end;
+
+    if (not (Result)) then
+      Exit;
+
+    Wait(100 + Random(200));
+
+    if FindNPCChatText('Wrong exercise', Nothing) then
+      Writeln('Wrong exercise.');
+
+  until FindNPCChatText('actually', Nothing) or (TimeFromMark(t) > 10 * 60 * 1000);
+
+  if (TimeFromMark(t) > 10 * 60 * 1000) then
+  begin
+    Writeln('We''ve been in the demon random for 10 minutes. It failed.');
+    LogOut;
+    Exit;
+  end;
+
+  Wait(10000);
+  while (ClickContinue(True, True)) do
+    Wait(500 + Random(500));
+  t := GetSystemTime + 15000;
+  while (GetSystemTime < t) and Demon_InRandom do
+    wait(100+random(200));
+  Result := (not(Demon_InRandom));
+  if (Result) then
+    Writeln('Demon random solved!');
+
+end;

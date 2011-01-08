@@ -1,0 +1,1119 @@
+(*
+Login
+=====
+
+The Login include contains all Login related functions
+
+*)
+const
+  SM_Color = 8115338;
+
+{ var SRL_Logs: Integer;
+  var RandomPlayer, GraphicsSet: Boolean;
+  Description: Variables needed for some login functions. }
+var
+  SRL_Logs: Integer;
+  RandomPlayer, GraphicsSet, AllowPVP: Boolean;
+
+procedure NextPlayer(Active: Boolean); forward;
+procedure RandomNextPlayer(Active: Boolean); forward;
+
+const
+  UBx1 = 279; // Username tBox - in use now
+  UBy1 = 192;
+  UBx2 = 486;
+  UBy2 = 218;
+
+  PBx1 = 279; // Password tBox - in use now
+  PBy1 = 238;
+  PBx2 = 486;
+  PBy2 = 264;
+
+  GBx1 = 230; // greeting box in final screen
+  GBy1 = 330;
+  GBx2 = 660;
+  GBy2 = 400;
+
+  WDx1 = 88;  // window box (to enter game) "click here to play"
+  WDy1 = 450;
+  WDx2 = 545;
+  WDy2 = 473;
+
+  WHITE_TEXT    = 16777215; // white text color
+  MESSAGE_BOX   = 11452366; // The "helpful message" box color
+  INFO_BOX      = 7428416; // Blue information box color
+  LOGIN_COLOR   = 6865381; // Login button color
+  ERROR_BOX     = 2044518; // Error box (comes up on incorrect pw/un or banned acc
+  SWORD_COLOR   = 11848397; // used for RSReady (the sword between "Runescape" title
+
+const                       //GetScreen
+  LOGIN_TA_X1 = 210;        //Text check area
+  LOGIN_TA_Y1 = 54;
+  LOGIN_TA_X2 = 556;
+  LOGIN_TA_Y2 = 228;
+
+  LOGIN_TEXTCOLOUR = 12378347; //Colour of text
+
+(*
+LobbyScreen
+~~~~~~~~~~~
+
+.. code-block:: pascal
+
+    function LobbyScreen: Boolean;
+
+Returns true if we are at the Lobby Screen
+
+.. note::
+
+    by IceFire908 & Bionicle1800
+
+Example:
+
+.. code-block:: pascal
+
+
+*)
+
+function LobbyScreen: Boolean;
+begin
+  Result := InRange(GetLobbyTab, L_PlayerInfo, L_Options);
+end;
+
+
+(*
+RSReady
+~~~~~~~
+
+.. code-block:: pascal
+
+    function RSReady: Boolean;
+
+Returns true if we are ready to auto (on loginscreen or logged in).
+Useful for waiting until RS has fully loaded.
+
+.. note::
+
+    by ZephyrsFury
+
+Example:
+
+.. code-block:: pascal
+
+
+*)
+
+function RSReady: Boolean;
+begin
+  Result := (LoggedIn)or (LobbyScreen) or (GetColor(745, 17) = 12312554); //X button in top right
+end;
+
+(*
+Login_SetAudio
+~~~~~~~~~~~~~~
+
+.. code-block:: pascal
+
+    procedure Login_SetAudio(Volume, SFX, Area: Integer; SMSetting: (Stereo, Mono, NoChange) );
+
+Sets audio options through the login screen.
+Use: Enter the desired Setting for the desired Option. Make option 0 for no change.
+EG. Login_SetAudio(1, 5, 2, NoChange);
+
+1   2   3   4   5
+<-o---o---o---o---o->
+Volume, SFX, Area:
+
+.. note::
+
+    by ZephyrsFury, fixed by Markus
+
+Example:
+
+.. code-block:: pascal
+
+
+*)
+
+procedure Login_SetAudio(Volume, SFX, Area: Integer; SMSetting: TSMSetting);
+var
+  II, Tx, Ty, T, AudioMask,x,y: Integer;
+  Pts: TIntegerArray;
+begin
+  if (LoggedIn) then Exit;
+  AudioMask := BitmapFromString(28, 3, 'beNrLyMAKGBgYJ85Y' +       //gfx slice but too lazy
+       'dOfmw4VrdgPZaFJAdOniSSDacug8miwuAFSWWVAJVL9kzWqgsUA2X' +   // to fuck this entire function around
+       'CPENKBUZXs3BBFjJsRAoPPguoAOhhsLJCEGerjZQRxsbaaFbgQAUH' +
+       'JlGA==');
+  TypeByte(vk_Escape);
+  T := GetSystemTime;
+  while (not(FindBitmapToleranceIn(AudioMask, X, Y, 717, 458, 760, 498, 10))) and (GetSystemTime - T < 5000) do
+    Wait(100);
+  if (FindBitmapToleranceIn(AudioMask, X, Y, 717, 458, 760, 498, 10)) then
+    Mouse(X, Y, 20, 20, True)
+  else
+  begin
+    FreeBitmap(AudioMask);
+    Exit;
+  end;
+  Wait(100);
+  Pts := [Volume, SFX, Area];
+  for II := 0 to 2 do
+  begin
+    if (Pts[II] = 0) then Continue;
+    if (not(InRange(Pts[II], 0, 5))) then
+    begin
+      srl_Warn('Login_SetAudio', 'Points must be between 0 and 5', warn_AllVersions);
+      Continue;
+    end;
+    if Pts[II] = 1 then Tx:=32 else
+    //Tx := 337 + Round((425 - 337) * (Pts[II] - 1) / 4);
+    Tx := 319 * (PTS[II] - 1) * 32; //why do hard if we can do easy -.-
+    Ty := round(II * 22.5) + 397; //I THINK this is the formula, but I don't care.
+    //Ty := //Round(3.5 * II * II + 46.5 * II + 245);
+    if (GetColor(Tx, Ty) = 1315860) then
+      Mouse(Tx - 10, Ty - 0, 10, 5, True);   //bit of randomness never hurts
+    Wait(50);
+  end;
+  if (GetColor(527, 433) = 4473924) and (SMSetting = Mono) then   //if set at stereomode
+    Mouse(527, 433, 10, 10, True)
+  else
+  if (GetColor(527, 411) = 499676) and (SMSetting = Stereo) then
+    Mouse(527, 411, 10, 10, True);
+  Wait(100);
+  TypeByte(vk_Escape);
+  FreeBitmap(AudioMask);
+end;
+
+
+(*
+Login_SetGraphics
+~~~~~~~~~~~~~~~~~
+
+.. code-block:: pascal
+
+    procedure Login_SetGraphics(Brightness: Integer);
+
+Sets graphic options in the login screen.
+
+.. note::
+
+    by ZephyrsFury Fixed by TRiLeZ, Markus
+
+Example:
+
+.. code-block:: pascal
+
+
+*)
+
+procedure Login_SetGraphics(Brightness: Integer);
+var
+  T, x, y, tx, ty, graphicsslice, i: Integer;
+  P: TPoint;
+begin
+  if (LoggedIn) then Exit;
+  graphicsslice := BitmapFromString(28, 3, 'beNrLyMAKGBgYJ85Y' +
+       'dOfmw4VrdgPZaFJAdOniSSDacug8miwuAFSWWVAJVL9kzWqgsUA2X' +
+       'CPENKBUZXs3BBFjJsRAoPPguoAOhhsLJCEGerjZQRxsbaaFbgQAUH' +
+       'JlGA==');
+  TypeByte(vk_Escape);
+  T := GetSystemTime;
+  while (not(FindBitmapToleranceIn(graphicsslice, X, Y, 717, 458, 760, 498,10))) and (GetSystemTime - T < 5000) do
+    Wait(100);
+  if (FindBitmapToleranceIn(graphicsslice, X, Y, 717, 458, 760, 498, 10)) then
+    Mouse(X, Y, 20, 20, True)
+  else
+  begin
+    FreeBitmap(graphicsslice);
+    Exit;
+  end;
+  Wait(100);
+  if not (GetColor(340, 115) = SM_Color) then
+  for i := 0 to 2 do
+  begin
+    //Checks for the green arrow, clicks middle of box
+    Mouse(260, 162, 5, 5, True);
+    if WaitColor(340, 115, SM_Color, 0, 2000) then
+      Break;
+    if i = 2 then
+    begin
+      srl_Warn('SetGraphics', 'Failed to select Safe Mode', warn_Warning);
+      Exit;
+    end;
+  end;
+  if (Brightness > 4) then
+    srl_Warn('Login_SetGraphics', 'Brightness must be between 0 and 4', warn_AllVersions)
+  else
+  if (Brightness <> 0) then
+  begin
+    x := 0;
+    repeat
+      P := Point(328 + (Brightness-1) * 32, 222);//coords of some thing
+      if (GetColor(P.x, P.y) = 1315860) then
+      begin
+        Mouse(P.x, P.y, 3, 3, True);
+        if WaitColor(P.x, P.Y, 3976149, 1, 1000) then
+          break;
+        Inc(x);
+      end else
+        break;
+    until(x >= 5)
+  end;
+  repeat
+    if FindColor(x, y, 14790912, 361,234, 673,373) then  //wtf is this
+    begin
+      Mouse(x + 10, y + 3, 10, 7, True);
+      getmousepos(tx, ty);
+      mouse(tx, ty + 10, 4, 4, true);
+      wait(300);
+    end;
+  until(not(FindColor(x, y, 14790912, 361,234, 673,373)));
+  Wait(100);
+  TypeByte(vk_Escape);
+  FreeBitmap(graphicsslice);
+end;
+
+(*
+SetAudioOff
+~~~~~~~~~~~
+
+.. code-block:: pascal
+
+    procedure SetAudioOff;
+
+Sets the Audio to off (1 for each bar). Works logged in and out.
+
+.. note::
+
+    by ZephyrsFury
+
+Example:
+
+.. code-block:: pascal
+
+
+*)
+
+procedure SetAudioOff;
+begin
+  if (LoggedIn) then
+    SetAudio(1, 1, 1, NoChange)
+  else
+    Login_SetAudio(1, 1, 1, NoChange);
+end;
+
+(*
+SetAutoingDefaults
+~~~~~~~~~~~~~~~~~~
+
+.. code-block:: pascal
+
+    procedure SetAutoingDefaults;
+
+ Sets the graphic options for best SRL compatibility. Works both logged in and out.
+
+.. note::
+
+    by ZephyrsFury
+
+Example:
+
+.. code-block:: pascal
+
+
+*)
+
+procedure SetAutoingDefaults;
+begin
+  if (LoggedIn) then
+    FixGraphics
+  else
+    Login_SetGraphics(4);
+end;
+
+(*
+ExitToLobby
+~~~~~~~~~~~
+
+.. code-block:: pascal
+
+    function ExitToLobby: Boolean;
+
+Exits to the Lobby (for breaks?)
+
+.. note::
+
+    by Starblaster100, Raymond, IceFire908, & Tarajunky
+
+Example:
+
+.. code-block:: pascal
+
+
+*)
+
+function ExitToLobby: Boolean;
+var
+  x, y, c, i: Integer;
+begin
+  Result := LobbyScreen;
+  if Result = True then
+    Exit;
+  if (SRL_Procs[srl_OnExitToLobby] <> nil) then
+    SRL_Procs[srl_OnExitToLobby]();
+  if (not (GameTab(tab_LogOut))) then
+    Exit;
+  Wait(200 + Random(100));
+  while (LoggedIn) and (c < 10) do
+  begin
+    Inc(c);
+    if(FindText(x, y, 'obb', UpChars, MIX1, MIY1, MIX2, MIY2))then
+    begin
+      MouseBox(574, 362, 705, 388, 1);
+      for i := 0 to 10 do
+      begin
+        Wait(1000);
+        if (LobbyScreen) then
+        begin
+          Result := True;
+          Exit;
+        end;
+      end;
+    end else
+    if(FindText(x, y, 'lick', UpChars, MIX1, MIY1, MIX2, MIY2))then
+    begin
+      MouseBox(579, 367, 699, 386, 1);
+      for i := 0 to 10 do
+      begin
+        Wait(1000);
+        if not(LoggedIn) then
+        begin
+          Result := True;
+          Exit;
+        end;
+      end;
+    end
+  end;
+end;
+
+(*
+LeaveLobby
+~~~~~~~~~~
+
+.. code-block:: pascal
+
+    function LeaveLobby: Boolean;
+
+Logs you out from lobby screen.
+
+.. note::
+
+    by IceFire908
+
+Example:
+
+.. code-block:: pascal
+
+
+*)
+
+function LeaveLobby: Boolean;
+var
+  T: LongInt;
+begin
+  T := GetSystemTime;
+  while ((not (Result)) and ((GetSystemTime - T) < 30000)) do
+  begin
+    MouseBox(678, 24, 699, 43, 1);
+    Wait(RandomRange(1000, 2000));
+    Result := (not (LobbyScreen));
+  end;
+end;
+
+(*
+Logout
+~~~~~~
+
+.. code-block:: pascal
+
+    function Logout: Boolean;
+
+Logs you all the way out from ingame.
+
+.. note::
+
+    by Starblaster100, Raymond, IceFire908, & Tarajunky
+
+Example:
+
+.. code-block:: pascal
+
+
+*)
+
+function Logout: Boolean;
+var
+  x, y, c, i: Integer;
+begin
+  Result := (not (LoggedIn));
+  if (Result) then
+    Exit;
+  if (SRL_Procs[srl_OnLogOut] <> nil) then
+    SRL_Procs[srl_OnLogOut]();
+  if (not (GameTab(tab_LogOut))) then
+    Exit;
+  Wait(200 + Random(100));
+  while (LoggedIn) and (c < 10) do
+  begin
+    Inc(c);
+    if(FindText(x, y, 'ogin', UpChars, MIX1, MIY1, MIX2, MIY2))then
+    begin
+      MouseBox(573, 403, 702, 429, 1);
+      for i := 0 to 10 do
+      begin
+        Wait(1000);
+        if (not (LoggedIn)) then
+        begin
+          Result := True;
+          Exit;
+        end;
+      end;
+    end else
+    if(FindText(x, y, 'lick', UpChars, MIX1, MIY1, MIX2, MIY2))then
+    begin
+      MouseBox(579, 367, 699, 386, 1);
+      for i := 0 to 10 do
+      begin
+        Wait(1000);
+        if not(LoggedIn) then
+        begin
+          Result := True;
+          Exit;
+        end;
+      end;
+    end
+  end;
+end;
+
+(*
+LoginPlayerToLob
+~~~~~~~~~~~~~~~~
+
+.. code-block:: pascal
+
+    function LoginPlayerToLob: Boolean;
+
+Like LoginPlayer but only to the lobbyscreen.
+
+.. note::
+
+    by The SRL Team
+
+Example:
+
+.. code-block:: pascal
+
+
+*)
+
+function LoginPlayerToLob: Boolean;
+var
+  Members, RetryLogin: Boolean;
+  Actions: TVariantArray;
+  T, Attempts{, I}: LongInt;
+  //ATPA: T2dPointArray;
+  TPA: TPointArray;
+  //B: TBox;
+label
+  ProcStart;
+begin
+  ActivateClient;
+  Wait(100);
+  TypeByte(vk_Escape);
+  Wait(500);
+
+         {Check for lobby screen already open/ already logged in}
+
+  Result := ((LobbyScreen) or (LoggedIn));
+  if (Result) then
+    Exit;
+
+                       {Check for active player.}
+
+  if (not (Players[CurrentPlayer].Active)) then
+  begin
+    WriteLn('Player is not Active...');
+    if (AllPlayersInActive) then
+    begin
+      WriteLn('All players not active!');
+      Exit;
+    end;
+    NextPlayer(False);
+    Exit;
+  end;
+
+               {Wait for the client to finish loading.}
+
+  T := GetSystemTime;
+  repeat
+    if (RSReady) then
+      Break;
+    if ((GetSystemTime - T) > 180000) then
+    begin
+      WriteLn('It has been 3 minutes and Runescape is not yet ready... Terminating.');
+      TerminateScript;
+    end;
+    Wait(RandomRange(1000, 2000));
+  until (False);
+  WriteLn('Welcome to Runescape.');
+
+                   {Click less info if needed.}
+
+  if (not (SimilarColors(GetColor(382, 11), 14285562, 20))) then //Runescae sword green bead
+  begin
+    MouseBox(212, 479, 550, 495, 1); //Less info button
+    Wait(RandomRange(1000, 2000));
+  end;
+
+                      {Click Members/free.}
+
+  Members := Players[CurrentPlayer].Member;
+  if (Length(Players[CurrentPlayer].WorldInfo) > 0) then
+    Members := Players[CurrentPlayer].WorldInfo[0];
+
+  ProcStart:
+  
+  {if (Members) then
+    I := 1;
+
+  if (GetColor(248, 359) <> 1381653) then //Black outline on forgotten pwd button.
+  begin
+    FindColors(TPA, 9291999, 10, 370, 675, 475);
+    ATPA := SplitTPA(TPA, 4);
+    if (Length(ATPA) > 2) then
+    begin
+      if (I = 1) then
+        I := 0
+      else
+        I := 1;
+      B := GetTPABounds(ATPA[1 + I]); //If demo mode is still up
+    end
+    else
+      if (Length(ATPA) = 2) then
+        B := GetTPABounds(ATPA[0 + I]) //When there's no demo mode
+      else
+        B := IntToBox(210, 424, 367, 446);
+
+    with B do
+      MouseBox(X1 + 20, Y1 + 10, X2 - 20, Y2 + 8, 1);
+
+    T := GetSystemTime;                  //Black outline on forgotten pwd button.
+    while ((GetSystemTime - T < 3000) and (GetColor(248, 359) <> 1381653)) do
+      Wait(RandomRange(100, 200));
+
+  end;    }
+
+                       {Type in username}
+
+  FindColors(TPA, LOGIN_TEXTCOLOUR, UBx1, UBy1, UBx2, UBy2);
+  if (Length(TPA) > 0) then
+  begin
+    SortTPAFrom(TPA, Point(UBx2, UBy1+(UBy2-UBy1) div 2));
+    Mouse(TPA[0].X + 20, TPA[0].Y, 5, 5, True);
+  end
+  else
+    MouseBox(UBx1, UBy1, UBx2, UBy2, 1); //Username box
+  while (CountColor(LOGIN_TEXTCOLOUR, UBx1, UBy1, UBx2, UBy2) > 0) do
+  begin
+    TypeByte(VK_BACK);
+    Wait(50+Random(50));
+  end;
+  Wait(100 + Random(200));
+  WriteLn(Capitalize(Players[CurrentPlayer].Name));
+  TypeSend(Players[CurrentPlayer].Name);
+  Wait(100 + Random(50));
+
+                       {Type in password}
+
+  while (CountColor(LOGIN_TEXTCOLOUR, PBx1, PBy1, PBx2, PBy2) > 0) do
+  begin
+    TypeByte(VK_BACK);
+    Wait(50 + Random(50));
+  end;
+  Wait(100 + Random(200));
+  TypeSend(Players[CurrentPlayer].Pass);
+  Wait(500 + Random(300));
+
+                        {Check responses}
+
+  T := GetSystemTime;
+  repeat
+
+    SetLength(Actions, 0);
+
+    if ((GetSystemTime - T) > 60000) then
+      Actions :=       ['One minute has passed...',              0,    0,    'PlayerFalse',   'Login Failed']
+    else
+    case (CountColor(LOGIN_TEXTCOLOUR, 260, 140, 510, 400)) of //text colour points
+                        // WriteLn Error                  Wait for   Retrys     Action      Player[CurrentPlayer].Loc
+      763, 2348: Actions :=  ['Invalid Username / Password',           0,    2,    'PlayerFalse',   'Wrong User/Pass'];
+      1088: Actions := ['Your account has been disabled',        0,    0,    'PlayerFalse',   'Acc Disabled'];
+       951: Actions := ['Your account is already logged in',  5000,    0,    'PlayerTrue',    'Already logged in'];
+      1239: Actions := ['Not a Members Account',                 0,    1,    'PlayerTrue',   ''];
+       364: Actions := ['Error Connecting.',                 20000,    9,    'Terminate',     'Error Connecting'];
+      1057: Actions := ['Too many incorrect logins.',    5 * 60000,    2,    'PlayerFalse',    'Too many logins'];
+        -1: Actions := ['Runescape has been updated.',           0,    0,    'Terminate',     'RS updated'];
+    end;
+                             {Respond}
+
+    if (Length(Actions) > 0) then
+    begin
+      WriteLn(Actions[0]);
+      if (Actions[0] <> 'Not a Members Account') then
+      begin
+        Wait(1000 + Random(500));
+        TypeByte(vk_Escape);
+      end;
+      Wait(Actions[1] + Random(100));
+      if (Actions[2] <> 0) then
+        if (Attempts < Actions[2]) or (Actions[2] = -1) then
+        begin
+          if (Actions[0] = 'Not a Members Account') then
+          begin
+            Players[CurrentPlayer].Member := False;
+            if (Length(Players[CurrentPlayer].WorldInfo) > 0) then
+              Players[CurrentPlayer].WorldInfo[0] := False;
+            MouseBox(267, 321, 496, 350, 1); //Play free game instead button
+            Wait(3000 + Random(2000));
+            Result := True;
+            Exit;
+          end;
+          RetryLogin := True;
+          Wait(2000 + Random(1000));
+          Break;
+        end;
+      if (Actions[4] <> '') then
+        Players[CurrentPlayer].Loc := Actions[4];
+      case Actions[3] of
+        'PlayerFalse': NextPlayer(False);
+        'PlayerTrue': NextPlayer(True);
+        'Terminate': TerminateScript;
+      end;
+      Exit;
+    end;
+    Wait(100);
+    Result := (LobbyScreen) or (LoggedIn);
+  until (Result);
+
+                     {Back to main screen if needed}
+
+  if (RetryLogin) then
+  begin
+    RetryLogin := False;
+    Inc(Attempts);
+    goto ProcStart;
+  end;
+
+end;
+
+(*
+LoginPlayer
+~~~~~~~~~~~
+
+.. code-block:: pascal
+
+    procedure LoginPlayer;
+
+Logs in the Player[CurrentPlayer]. Detects most Client Login Errors
+
+.. note::
+
+    by The SRL Team
+
+Example:
+
+.. code-block:: pascal
+
+
+*)
+
+function LoginPlayer: Boolean;
+var
+  RetryLogin, B, BB: Boolean;
+  Actions: TVariantArray;
+  T, Attempts: LongInt;
+label
+  ProcStart;
+begin
+  ProcStart:
+  Writeln('1');
+  if (not (Result)) then    {Check if Logged in}
+    Result := LoggedIn;
+  Writeln('2');
+  if (Result) then
+  begin
+    Result := True;
+    //AddToSRLLog('Current player: ' + Capitalize(Players[CurrentPlayer].Name));
+    PlayerStartTime := GetSystemTime; // PlayerStartTime
+    if (SRL_Procs[srl_OnLogIn] <> nil) then
+      SRL_Procs[srl_OnLogIn]();
+
+    Exit;
+  end;
+  Writeln('4');
+  if (not (LoginPlayerToLob)) then    {Get to lobby screen}
+    Exit;
+    Writeln('5');
+  Wait(500 + Random(500));
+                           {World switching}
+  if (Length(Players[CurrentPlayer].WorldInfo) > 0) then
+    if (Players[CurrentPlayer].WorldInfo[0]) then
+      Players[CurrentPlayer].Member := True
+    else
+      Players[CurrentPlayer].Member := False;
+
+  case Length(Players[CurrentPlayer].WorldInfo) of
+    2: SelectWorld(Players[CurrentPlayer].WorldInfo[1]);
+    3: begin
+         if (Players[CurrentPlayer].WorldInfo[0]) then
+           B := True
+         else
+           B := False;
+         if (Players[CurrentPlayer].WorldInfo[2]) then
+           BB := True
+         else
+           BB := False;
+         SelectWorld(RandomWorld(B, BB));
+       end;
+  end;
+                          {Click Here to Play}
+
+  if (LobbyScreen) then
+    MouseBox(72, 445, 570, 477, 1); //Button
+
+                            {Check responses}
+
+  T := GetSystemTime;
+  repeat
+
+    SetLength(Actions, 0);
+    if ((GetSystemTime - T) > 60000) then
+      Actions :=       ['One minute has passed...',                    0,     0,  'NextPlayer',   'Login Failed']
+    else
+    case (CountColor(LOGIN_TEXTCOLOUR, 260, 140, 510, 400)) of //text colour points
+                        // WriteLn Error                          Wait for   Retrys  Action     Player[CurrentPlayer].Loc
+       364: Actions := ['Error Connecting.',                       20000,     9,  'Terminate',    'Error Connecting'];
+       850: Actions := ['You need skill total of 1000.',               0,     9,  'PlayerTrue',   '1000 skill club'];
+      1028: Actions := ['You are standing in a members-only area.',    0,     1,  'PlayerFalse',  'In Mems-Only Area'];
+      1239: Actions := ['Not a Members Account',                       0,     1,  'PlayerFalse',  'Non-member'];
+        -1: Actions := ['You need skill total of 1500.',               0,     9,  'PlayerTrue',   '1500 skill club'];
+        -1: Actions := ['You need 20 combat for PvP',                  0,     1,  'PlayerFalse',  'PvP warning'];
+    end;
+
+    if (CountColor(clWhite, 415, 336, 476, 356)= 210) then //PVP login button white colour points
+    begin
+      if (Length(Players[CurrentPlayer].WorldInfo) > 2) then
+      begin
+        if (Players[CurrentPlayer].WorldInfo[2]) then
+          MouseBox(389, 332, 502, 354, 1) //PvP login button
+        else
+          MouseBox(263, 335, 372, 354, 1); //Go back
+      end
+      else
+        if (AllowPVP) then
+          MouseBox(389, 332, 502, 354, 1)
+        else
+          MouseBox(263, 335, 372, 354, 1);
+      Wait(3000 + Random(2000));
+    end;
+
+                             {Respond}
+
+    if (Length(Actions) > 0) then
+    begin
+      WriteLn(Actions[0]);
+      Wait(Actions[1] + Random(100));
+      if (Actions[2] <> 0) then
+        if (Attempts < Actions[2]) or (Actions[2] = -1) then
+        begin
+          case Actions[0] of
+            'You are standing in a members-only area.': begin
+                                                          Players[CurrentPlayer].Member := True;
+                                                          Players[CurrentPlayer].WorldInfo := [True, 0, AllowPVP];
+                                                        end;
+            'You need 20 combat for PvP': Players[CurrentPlayer].WorldInfo := [Players[CurrentPlayer].Member, 0, False];
+            'Not a Members Account': begin
+                                       Players[CurrentPlayer].Member := False;
+                                       Players[CurrentPlayer].WorldInfo := [False, 0, AllowPVP];
+                                     end;
+          end;
+          RetryLogin := True;
+          Wait(2000 + Random(1000));
+          Break;
+        end;
+      if (Actions[4] <> '') then
+        Players[CurrentPlayer].Loc := Actions[4];
+      case Actions[3] of
+        'PlayerFalse': NextPlayer(False);
+        'PlayerTrue': NextPlayer(True);
+        'Terminate': TerminateScript;
+      end;
+      Exit;
+    end;
+    Wait(100);
+    Result := (LoggedIn);
+  until (Result);
+
+                     {Back to lobby screen if needed}
+
+  if (RetryLogin) then
+  begin
+    RetryLogin := False;
+    Inc(Attempts);
+    goto ProcStart;
+  end;
+
+                      {Set player start time ect...}
+
+  if (Result) then
+    goto ProcStart;
+
+end;
+
+(*
+NextPlayerIndex
+~~~~~~~~~~~~~~~
+
+.. code-block:: pascal
+
+    function NextPlayerIndex: Integer;
+
+Returns the player number of the next active player.
+
+.. note::
+
+    by Dankness, Ron, Raymond & ZephyrsFury
+
+Example:
+
+.. code-block:: pascal
+
+
+*)
+
+function NextPlayerIndex: Integer;
+begin
+  if (AllPlayersInactive) then
+  begin
+    Result := -1;
+    Exit;
+  end;
+  Result := (CurrentPlayer + 1) mod Length(Players);
+  while (Players[Result].Active = False) do
+    Result := (Result + 1) mod Length(Players);
+end;
+
+(*
+RandomPlayerIndex
+~~~~~~~~~~~~~~~~~
+
+.. code-block:: pascal
+
+    function RandomPlayerIndex: Integer;
+
+Returns the Player number of a random active player.
+
+.. note::
+
+    by Dankness, Ron, Raymond & ZephyrsFury
+
+Example:
+
+.. code-block:: pascal
+
+
+*)
+
+function RandomPlayerIndex: Integer;
+var
+  N: Integer;
+begin
+  if (AllPlayersInactive) then
+  begin
+    Result := -1;
+    Exit;
+  end;
+  N := Random(Length(Players));
+  while (Players[N].Active = False) or (N = CurrentPlayer) do
+  begin
+    if (PlayersActive = 1) and (N = CurrentPlayer) then Break;
+    N := Random(Length(Players));
+  end;
+  Result := N;
+end;
+
+
+(*
+SwitchToPlayer
+~~~~~~~~~~~~~~
+
+.. code-block:: pascal
+
+    function SwitchToPlayer(PlayerNo: Integer; Active: Boolean): Boolean;
+
+Switches to a specific player, setting the current player's
+  activity to True or False.
+
+.. note::
+
+    by Dankness, Ron, Raymond & ZephyrsFury
+
+Example:
+
+.. code-block:: pascal
+
+
+*)
+
+function SwitchToPlayer(PlayerNo: Integer; Active: Boolean): Boolean;
+begin
+  WriteLn('SwitchToPlayer(PlayerNo: ' + IntToStr(PlayerNo) + ', Active: ' + BoolToStr(Active)+ ');');
+  Players[CurrentPlayer].Active := Active;
+  Logout;
+  if (SRL_Procs[srl_OnNextPlayer] <> nil) then
+    SRL_Procs[srl_OnNextPlayer]();
+  PlayerCurTime := GetSystemTime;
+  Players[CurrentPlayer].Worked := Players[CurrentPlayer].Worked + (PlayerCurTime - PlayerStartTime);
+  CurrentPlayer := PlayerNo;
+  SRL_Logs := SRL_Logs + 1;
+  LoginPlayer;
+  Result := LoggedIn;
+end;
+
+(*
+NextPlayer
+~~~~~~~~~~
+
+.. code-block:: pascal
+
+    procedure NextPlayer(Active: Boolean);
+
+Logs in the next player that isn't inactive.
+Boolean: True - Current player is ok. False - Current player is false.
+
+.. note::
+
+    by ZephyrsFury
+
+Example:
+
+.. code-block:: pascal
+
+
+*)
+
+procedure NextPlayer(Active: Boolean);
+var
+  srl_PlayerIndexFunc: function: Integer;
+  cP: Integer;
+begin
+  if (RandomPlayer) then
+    srl_PlayerIndexFunc := @RandomPlayerIndex
+  else
+    srl_PlayerIndexFunc := @NextPlayerIndex;
+
+  WriteLn('NextPlayer');
+  LogOut;
+  cP := srl_PlayerIndexFunc();
+  while (cP = -1) do
+  begin
+    cP := srl_PlayerIndexFunc();
+    if (SRL_Procs[srl_InNextPlayerLoop] <> nil) then
+      SRL_Procs[srl_InNextPlayerLoop]();
+    Wait(5000); //Endless loop
+  end;
+
+  SwitchToPlayer(cP, Active);
+end;
+
+(*
+RandomNextPlayer
+~~~~~~~~~~~~~~~~
+
+.. code-block:: pascal
+
+    procedure RandomNextPlayer(Active: Boolean);
+
+Logs in a random player that isn't inactive.
+Boolean: True - Current player is ok. False - Current player is false.
+
+.. note::
+
+    by ZephyrsFury
+
+Example:
+
+.. code-block:: pascal
+
+
+*)
+
+procedure RandomNextPlayer(Active: Boolean);
+var
+  tmpBool: Boolean;
+begin
+  tmpBool := RandomPlayer;
+  RandomPlayer := True;
+  NextPlayer(Active);
+  RandomPlayer := tmpBool;
+end;
+
+(*
+CheckUserNicks
+~~~~~~~~~~~~~~
+
+.. code-block:: pascal
+
+    procedure CheckUserNicks;
+
+Checks if all nicks are set correct.
+
+.. note::
+
+    by Sumilion, Raymond, and Nava2
+
+Example:
+
+.. code-block:: pascal
+
+
+*)
+
+procedure CheckUserNicks;
+var
+  I, II: Integer;
+  Wrong, FWrong: Boolean;
+  WarnStrings: TStringArray;
+begin
+  WarnStrings := ['Please fill in your nickname.', 'Your nickname isn'' found in the players name'];
+  for i := 0 to HowManyPlayers - 1 do
+    for II := 0 to 1 do
+    begin
+      case II of
+        0: Wrong := (Players[i].Nick = '');
+		1: Wrong := (Pos(Players[i].nick, Capitalize(Players[i].name))<1);
+      end;
+      if Wrong then
+      begin;
+        Writeln('--');
+        Writeln('WARNING: ' + WarnStrings[II] + ' with player: ' + Players[i].Name);
+        FWrong := True;
+      end;
+    end;
+  if FWrong then
+  begin
+    Writeln('');
+    Writeln('For more information, visit http://www.villavu.com/forum/showthread.php?t=5410');
+  end;
+end;
