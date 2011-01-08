@@ -17,10 +17,7 @@ Contents:
     autocolor.rst
     bank.rst
     bitmaps.rst
-    cautorespond.rst
-    chat.rst
     color.rst
-    defines.rst
     flag.rst
     gametab.rst
     inventory.rst
@@ -29,9 +26,7 @@ Contents:
     math.rst
     mouse.rst
     object.rst
-    overwrite.rst
     players.rst
-    rc.rst
     symbol.rst
     timing.rst
     text.rst
