@@ -6,11 +6,6 @@ The Globals include contains all... Globals!
 
 *)
 
-{ const SRLVersionNumber;
-  Description: Repository Version Number. }
-const
-  SRLVersionNumber = 38;
-
 { var TalkAfterRandoms: Boolean;
   Description: Talk random phrases after randoms are detected/solved. }
 var
@@ -38,11 +33,23 @@ var
 var
   LampSkill: string;
 
-{ const srl_outline_black
-  Description: Black Color outline}
+(*
+
+srl_OUTLINE
+~~~~~~~~~~~
+
+Outline colour constants for selected Items.
+Contains:
+- srl_OUTLINE_BLACK
+- srl_OUTLINE_WHITE
+
+.. note::
+  Modified: unknown
+
+*)
 const
-  srl_outline_black = 131072;
-  srl_outline_white = clWhite;
+  srl_OUTLINE_BLACK = 131072;
+  srl_OUTLINE_WHITE = clWhite;
 
 type
   TBooleanArray = array of Boolean;
@@ -433,7 +440,7 @@ begin
 
   Colors := [HP_BAR_GREEN, HP_BAR_RED, HP_BAR_HITS];
   for I := 0 to 1 do
-    for C := 0 to High(Colors[I]) do
+    for C := High(Colors[i]) downto 0 do
     begin
       FindColorsTolerance(TPA1, Colors[I][C],
         MSCX - 25, MSCY - 40, MSCX + 25, MSCY - 15, 30);

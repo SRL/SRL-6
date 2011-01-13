@@ -7,9 +7,71 @@ Items can be in your bank or in your inventory.
 
 *)
 
+{.include_once bank.simba}
 
-function BankScreen: Boolean; forward;
-function DepositScreen: Boolean; forward;
+
+//function BankScreen: Boolean; forward;
+//function DepositScreen: Boolean; forward;
+
+(*
+
+ITEM_IDENT Constants
+~~~~~~~~~~~~~~
+
+Constants associated with the different finding methods.
+These consist of:
+
+- *BITMAP*
+- *DTM*
+- *COLOUR*, *COLOR*
+- *MASK*[*]_
+
+.. [*] Refers to bitmap masks.
+
+*)
+
+const
+  srl_ITEM_IDENT_BITMAP = 0;
+  srl_ITEM_IDENT_DTM    = 1;
+  srl_ITEM_IDENT_COLOUR = 2;  srl_ITEM_IDENT_COLOR = srl_ITEM_IDENT_COLOUR;
+  srl_ITEM_IDENT_MASK   = 3;
+
+(*
+srl_TItemInterface Record
+~~~~~~~~~~~~~~~~
+
+Record holding information of an interface of items. The record is structured as
+follows:
+
+start: **TPoint**
+  The coordinates associated with the Item Interface. Typically, this denotes
+  the origin of the colums and rows.
+
+rowsize,colsize: **Integer**
+  The dimensions of the rows or columns respectively. This is a measurement in
+  pixels.
+
+rownumber,colnumber: **Integer**
+  The number of rows or colums respectively present in the ItemInterface
+  which creates the grid.
+
+*)
+
+type
+  srl_TItemInterface = record
+    start: TPoint;      // area coords
+    rowsize,colsize: Integer;  //w,h of cols,rows
+    colnumber,rownumber: Integer;  //num of cols,rows
+    check: function: Boolean;
+  end;
+
+const
+  srl_ITEMINT_INVENTORY  = 0;
+  srl_ITEMINT_SHOP       = 1;
+  srl_ITEMINT_BANK       = 2;
+  srl_ITEMINT_DEPOSITBOX = 3;
+  srl_ITEMINT_TRADE      = 4;
+  srl_ITEMINT_TRADE_YOUR = 5; // rename?
 
 (*
 TradeScreen
@@ -19,11 +81,15 @@ TradeScreen
 
     function TradeScreen: Integer;
 
-Returns 1 or 2 for the respective tradescreens, 0 if neither is open.
+Returns srl_ITEMINT_TRADE or srl_ITEMINT_TRADE_YOUR for the respective
+tradescreens, -1 if neither is open.
 
 .. note::
 
   by Zephyrsfury
+
+.. note::
+  Modified: 13 Jan 2011 - Nava2
 
 Example:
 
@@ -33,11 +99,12 @@ Example:
 
 function TradeScreen: Integer;
 begin
-  for Result := 2 downto 1 do
-    case Result of
-      2: if (CountColor(16776960, 127, 32, 373, 51) > 20) then Break;
-      1: if (GetColor(93, 69) = 0) then Break;
-    end;
+  if (CountColor(16776960, 127, 32, 373, 51) > 20) then
+    Result := srl_ITEMINT_TRADE
+  else if (GetColor(93, 69) = 0) then
+    Result := srl_ITEMINT_TRADE_YOUR
+  else
+    Result := -1;
 end;
 
 (*
@@ -71,16 +138,26 @@ FindItemEx
 
 .. code-block:: pascal
 
-    function FindItemEx(var x, y: Integer; IdentType: string; Ident: Integer; Area: TBox; Tol: TIntegerArray): Boolean;
+  function FindItemEx(
+      var x, y: Integer;
+      IdentType, Ident: Integer;
+      Area: TBox;
+      Tol: TIntegerArray
+  ): Boolean;
 
-Finds an item in Area specified by TBox in Area. Valid IdentTypes are:
-             bmp, mask, color, dtm. The Tol variable is:
-             Tol[0] : Color Tolerance;
-             Tol[1] : Contour Tolerance or minimum Colors to Find to be True.
+Finds an item_IDENT in Area specified by TBox in Area.
+Valid IdentTypes are the `ITEM_IDENT Constants`_.
+
+The tolerance parameter works as follows:
+  - *Tol[0]*: Color Tolerance;
+  - *Tol[1]*: Contour Tolerance or minimum Colors to Find to be True.
 
 .. note::
 
   by Nava2
+
+.. note::
+  Modified: 13 Jan 2011 - Nava2
 
 Example:
 
@@ -88,27 +165,45 @@ Example:
 
 *)
 
-function FindItemEx(var x, y: Integer; IdentType: string; Ident: Integer; Area: TBox; Tol: TIntegerArray): Boolean;
+function FindItemEx(
+    var x, y: Integer;
+    IdentType, Ident: Integer;
+    Area: TBox;
+    Tol: TIntegerArray
+  ): Boolean;
 var
   Pts: TPointArray;
 begin
   Result := False;
   SetLength(Tol, 2);
-  case Lowercase(IdentType) of
-    'bitmap mask', 'bmpmask', 'bmp mask', 'mask': Result := FindBitmapMaskTolerance(Ident, x, y, Area.x1, Area.y1, Area.x2, Area.y2, Tol[0], Tol[1]);
-    //'bitmap', 'bmp': Result := FindTransparentBitmapTolerance(Ident, x, y, 0, Area.x1, Area.y1, Area.x2, Area.y2, Tol[0]);
-    'bitmap', 'bmp': Result := FindBitmapToleranceIn(Ident, x, y, Area.x1, Area.y1, Area.x2, Area.y2, Tol[0]);
-    'dtm': Result := FindDTM(Ident, x, y, Area.x1, Area.y1, Area.x2, Area.y2);
-    'colour', 'color':
+  case IdentType of
+    srl_ITEM_IDENT_MASK:
+      Result := FindBitmapMaskTolerance(
+          Ident, x, y, Area.x1, Area.y1, Area.x2, Area.y2, Tol[0], Tol[1]
+      );
+
+    srl_ITEM_IDENT_BITMAP:
+      Result := FindBitmapToleranceIn(
+          Ident, x, y, Area.x1, Area.y1, Area.x2, Area.y2, Tol[0]
+      );
+
+    srl_ITEM_IDENT_DTM:
+      Result := FindDTM(Ident, x, y, Area.x1, Area.y1, Area.x2, Area.y2);
+
+    srl_ITEM_IDENT_COLOUR:
       begin
-        FindColorsTolerance(Pts, Ident, Area.x1, Area.y1, Area.x2, Area.y2, Tol[0]);
+        FindColorsTolerance(
+            Pts, Ident, Area.x1, Area.y1, Area.x2, Area.y2, Tol[0]
+        );
         if Tol[1] < 1 then Tol[1] := 1;
         Result := Length(Pts) >= Tol[1];
         if Result then
           MiddleTPAEx(Pts, x, y);
       end;
     else
-      SRL_Warn('FindItem', 'Invalid identifier input as IdentType.', -1);
+      SRL_Warn(
+          'FindItem', 'Invalid identifier input as IdentType.', warn_ALLVERSIONS
+      );
   end;
 end;
 
@@ -118,17 +213,23 @@ FindItem
 
 .. code-block:: pascal
 
-    function FindItem(var x, y: Integer; IdentType: string; Ident, x1, y1, x2, y2: Integer; Tol: TIntegerArray): Boolean;
+  function FindItem(
+      var x, y: Integer;
+      IdentType, Ident: Integer;
+      x1, y1, x2, y2: Integer;
+      Tol: TIntegerArray
+    ): Boolean;
 
 
-Finds an item in Area specified by x1, y1, x2, y2 in the Area.
-    -   Valid IdentTypes are any of the SRL_Item types. The Tol variable is:
-    -   Tol[0] : Color Tolerance;
-    -   Tol[1] : Contour Tolerance or minimum Colors to Find to be True.   True.
+Finds an item_IDENT in Area specified by x1, y1, x2, y2 in the Area.
+Please see `FindItemEx`_ for more information.
 
 .. note::
 
   by Nava2
+
+.. note::
+  Modified: 13 Jan 2011
 
 Example:
 
@@ -136,7 +237,12 @@ Example:
 
 *)
 
-function FindItem(var x, y: Integer; IdentType: string; Ident: Integer; x1, y1, x2, y2: Integer; Tol: TIntegerArray): Boolean;
+function FindItem(
+    var x, y: Integer;
+    IdentType, Ident: Integer;
+    x1, y1, x2, y2: Integer;
+    Tol: TIntegerArray
+  ): Boolean;
 begin
   Result := FindItemEx(x, y, IdentType, Ident, IntToBox(x1, y1, x2, y2), Tol);
 end;
@@ -150,7 +256,7 @@ GetAmount
   function GetAmount(ItemX, ItemY: Integer): Integer;
 
 
-Returns the amount of an item at coordinates (ItemX, ItemY).
+Returns the amount of an item_IDENT at coordinates (ItemX, ItemY).
 Returns approximate values for 'K' and 'M'.
 
 .. note::
@@ -181,7 +287,13 @@ begin
    begin
      FindColors(TPA, Col[i], ItemX-22, ItemY-22, ItemX+22, ItemY+22);
      B := GetTPABounds(TPA);
-     S := Trim(GetTextAtEx(B.X1-1, B.Y1-1, 0, StatChars, False, False, 0, 1, Col[I], 5, True, tr_AllChars));
+     S := Trim(
+        GetTextAtEx(
+            B.X1-1, B.Y1-1, 0, StatChars,
+            False, False, 0, 1,
+            Col[I], 5, True, tr_AllChars
+          )
+      );
      Result := StrToIntDef(GetNumbers(S), 1);
      Case I of
        2: Result := Result * 1000;
@@ -197,15 +309,18 @@ AreaInfo
 
 .. code-block:: pascal
 
-  procedure AreaInfo(area: String; var startx, starty, rowsize, colsize, colnumber, rownumber: Integer);
+  function AreaInfo(area: Integer): srl_TItemInterface;
 
 
-Returns info on certain interfaces.
-Row and col amounts, startcoords, sizes for inventory, bans, shop, ...
+Returns info on certain interfaces as an srl_TItemInterface.
+Row and col amounts, startcoords, sizes for inventory, banks, shop, ...
 
 .. note::
 
-  by masquerader fixed by Mr. Freeweed
+  by masquerader, and Nava2
+
+.. note::
+  Modified: 13 Jan 2011 - Nava2
 
 Example:
 
@@ -213,70 +328,84 @@ Example:
 
 *)
 
-procedure AreaInfo(area: string; var startx, starty, rowsize, colsize, colnumber, rownumber: Integer);
+function AreaInfo(area: Integer): srl_TItemInterface;
 begin
-  case LowerCase(area) of
-    'inv', 'inventory': begin
-                          startx := 560;
-                          starty := 212;
+  case area of
+    srl_AREA_INVENTORY:
+      with Result do
+      begin
+        start := Point(560, 212);
 
-                          rowsize := 36;
-                          colsize := 42;
+        rowsize := 36;
+        colsize := 42;
 
-                          colnumber := 4;
-                          rownumber := 7;
-                        end;
-    'shop':             begin
-                          startx := 63;
-                          starty := 97;
+        colnumber := 4;
+        rownumber := 7;
+      end;
 
-                          rowsize := 55;
-                          colsize := 39;
+    srl_AREA_SHOP:
+      with Result do
+      begin
+        start := Point(63, 97);
 
-                          colnumber := 10;
-                          rownumber := 4; //?
-                        end;
-    'bank':             begin
-                          startx := 35;
-                          starty := 91;
+        rowsize := 55;
+        colsize := 39;
 
-                          rowsize := 44;
-                          colsize := 44;
+        colnumber := 10;
+        rownumber := 4; //?
+      end;
 
-                          colnumber := 10;
-                          rownumber := 5;
-                        end;
-    'deposit box':      begin
-                          startx := 97;
-                          starty := 60;
+    srl_AREA_BANK:
+      with Result do
+      begin
+        start := Point(35, 91);
 
-                          rowsize := 48;
-                          colsize := 50;
+        rowsize := 44;
+        colsize := 44;
 
-                          colnumber := 7;
-                          rownumber := 4;
-                        end;
-    'trade':            begin
-                          startx := 310;
-                          starty := 75;
+        colnumber := 10;
+        rownumber := 5;
+      end;
 
-                          rowsize := 32;
-                          colsize := 49;
+    srl_AREA_DEPOSITBOX:
+      with Result do
+      begin
+        start := Point(97,60);
 
-                          colnumber := 4;
-                          rownumber := 7;
-                        end;
-    'your trade':       begin
-                          startx := 24;
-                          starty := 75;
+        rowsize := 48;
+        colsize := 50;
 
-                          rowsize := 32;
-                          colsize := 49;
+        colnumber := 7;
+        rownumber := 4;
+      end;
 
-                          colnumber := 4;
-                          rownumber := 7;
-                        end;
-  else srl_Warn('AreaInfo', Area + ' is an invalid option', warn_AllVersions);
+    srl_AREA_TRADE:
+      with Result do
+      begin
+        start := Point(310, 75);
+
+        rowsize := 32;
+        colsize := 49;
+
+        colnumber := 4;
+        rownumber := 7;
+      end;
+
+    srl_AREA_TRADE_YOUR:
+      with Result do
+      begin
+        start := Point(24, 75);
+
+        rowsize := 32;
+        colsize := 49;
+
+        colnumber := 4;
+        rownumber := 7;
+      end;
+    else
+      srl_Warn(
+        'AreaInfo', toStr(Area)+' is an invalid option', warn_AllVersions
+      );
   end;
 end;
 
@@ -286,14 +415,17 @@ CheckArea
 
 .. code-block:: pascal
 
-  function CheckArea(area: String): Boolean;
+  function CheckArea(area: Integer): Boolean;
 
 
 Checks if the given interface is opened.
 
 .. note::
 
-  by masquerader streamlined by EvilChicken!
+  by masquerader, and EvilChicken!
+
+.. note::
+  Modified: 13 Jan 2011 - Nava2
 
 Example:
 
@@ -301,39 +433,46 @@ Example:
 
 *)
 
-function CheckArea(area: string): Boolean;
+function CheckArea(area: Integer): Boolean;
 begin
   Result := false;
-  case LowerCase(area) of
-    'inv', 'inventory': begin
-                          Result := (BankScreen) or (ShopScreen) or (TradeScreen > 0);
-                          if (not(Result)) then Result := GameTab(tab_Inv);
-                        end;
-    'shop': Result := ShopScreen;
-    'bank': Result := BankScreen;
-    'deposit box': Result := DepositScreen;
-    'trade', 'your trade': Result := (TradeScreen > 0);
-  else
-    srl_Warn('CheckArea', Area + ' is an invalid option.', warn_AllVersions);
+  case area of
+    srl_AREA_INVENTORY:
+      begin
+        Result := (BankScreen) or (ShopScreen) or (TradeScreen > 0);
+        if (not(Result)) then Result := GameTab(tab_Inv);
+      end;
+    srl_AREA_SHOP:
+      Result := ShopScreen;
+    srl_AREA_BANK:
+      Result := BankScreen;
+    srl_AREA_DEPOSITBOX:
+      Result := DepositScreen;
+    srl_AREA_TRADE, srl_AREA_TRADE_YOUR:
+      Result := (TradeScreen > 0);
+    else
+      srl_Warn(
+        'CheckArea', toStr(Area) + ' is an invalid option.', warn_AllVersions
+      );
   end;
   if (Result = False) then
-    WriteLn('PROBLEM: ' + area + ' interface not open');
+    WriteLn('PROBLEM: ' + toStr(Area) + ' interface not open');
 end;
 
 (*
-CheckArea
-~~~~~~~~~
+ItemCoordinates
+~~~~~~~~~~~~~~~
 
 .. code-block:: pascal
 
-  function ItemCoordinates(Area, ItemType: string; Item, Tol: TIntegerArray): TPointArray;
+  function ItemCoordinates(Area, ItemType, Item_IDENT, Tol: TIntegerArray): TPointArray;
 
-Returns a TPA with the positions of all occurances of Item.
+Returns a TPA with the positions of all occurances of Item_IDENT.
 Parameters:
 
     -   Area:   'inv', 'shop', 'bank', 'trade', 'your trade'.
     -   ItemType:  DTM, Color, BitmapMask, Bitmap
-    -   Item:   name/value of your dtm/bmp/color/bmpmask.
+    -   Item_IDENT:   name/value of your dtm/bmp/color/bmpmask.
     -   Tol:    'dtm' - [] (dtm's can't have tolerance).
                 'bmp' - [BMPTol].
                 'color' - [COLOUR Tol, Minimum Colour Count].
@@ -344,30 +483,33 @@ Parameters:
 
   by masquerader modified by ZephyrsFury
 
+.. note::
+  Modified: 13 Jan 2011 - Nava2
+
 Example:
 
 .. code-block:: pascal
 
 *)
 
-function ItemCoordinates(Area, ItemType: string; Item: Integer; Tol: TIntegerArray): TPointArray;
+function ItemCoordinates(Area, ItemType, Item_IDENT: Integer; Tol: TIntegerArray): TPointArray;
 var
-  startx, starty, rowsize, colsize, colnumber, rownumber, col, row: Integer;
+  info: srl_TItemInterface;
   x1, y1, x2, y2: Integer;
   itemx, itemy, L: Integer;
 begin
   if (CheckArea(area)) then
   begin
-    AreaInfo(area, startx, starty, rowsize, colsize, colnumber, rownumber);
-    SetLength(Result, RowNumber * ColNumber);
-    for row := 0 to rownumber - 1 do
-      for col := 0 to colnumber - 1 do
+    info := AreaInfo(area);
+    SetLength(Result, info.rownumber * info.colnumber);
+    for row := 0 to info.rownumber-1 do
+      for col := 0 to info.colnumber-1 do
       begin
-        x1 := startx + col * colsize;
-        y1 := starty + row * rowsize;
-        x2 := x1 + colsize;
-        y2 := y1 + rowsize;
-        if FindItem(Itemx, Itemy, ItemType, Item, x1, y1, x2, y2, Tol) then
+        x1 := info.start.x + col * info.colsize;
+        y1 := info.start.y + row * info.rowsize;
+        x2 := x1 + info.colsize;
+        y2 := y1 + info.rowsize;
+        if FindItem(Itemx, Itemy, ItemType, Item_IDENT, x1, y1, x2, y2, Tol) then
         begin
           Result[L].x := ItemX;
           Result[L].y := ItemY;
@@ -384,14 +526,14 @@ CountItemsIn
 
 .. code-block:: pascal
 
-  function CountItemsIn(Area, ItemType: string; Item: Integer; Tol: TIntegerArray): Integer;
+  function CountItemsIn(Area, ItemType: string; Item_IDENT: Integer; Tol: TIntegerArray): Integer;
 
 Counts the number of items found within the Area. (Does not count stacks)
 Parameters:
 
     -   Area:   'inv', 'shop', 'bank', 'trade', 'your trade'.
     -   ItemType:   SRL_DTM, SRL_Bitmap, SRL_BitmapMask, SRL_Color
-    -   Item:   name/value of your dtm/bmp/color/bmpmask.
+    -   Item_IDENT:   name/value of your dtm/bmp/color/bmpmask.
     -   Tol:    'dtm' - [] (dtm's can't have tolerance).
                 'bmp' - [BMPTol].
                 'color' - [COLOUR Tol, Min Colour Count].
@@ -407,14 +549,16 @@ Example:
 
 *)
 
-function CountItemsIn(area, ItemType: string; Item: Integer; Tol: TIntegerArray): Integer;
+function CountItemsIn(area, ItemType, Item_IDENT: Integer; Tol: TIntegerArray): Integer;
 begin
-  Result := Length(ItemCoordinates(Area, ItemType, Item, Tol));
+  Result := Length(ItemCoordinates(Area, ItemType, Item_IDENT, Tol));
 end;
 
 (*
 CountItemsArea
 ~~~~~~~~~~~~~~
+
+
 
 .. code-block:: pascal
 
@@ -444,14 +588,14 @@ ItemAmount
 
 .. code-block:: pascal
 
-  function ItemAmount(Area, ItemType: string; Item: Integer; Tol: TIntegerArray): Integer;
+  function ItemAmount(Area, ItemType: string; Item_IDENT: Integer; Tol: TIntegerArray): Integer;
 
 Counts the number of items found with a color in a certain area. (Counts stacks)
 Parameters:
 
     -   Area - 'inv', 'shop', 'bank', 'trade', 'your trade'.
     -   ItemType - 'dtm', 'bmp', 'color', 'bmpmask'.
-    -   Item - name/value of your dtm/bmp/color/bmpmask.
+    -   Item_IDENT - name/value of your dtm/bmp/color/bmpmask.
     -   Tol - 'dtm' - [] (dtm's can't have tolerance).
           'bmp' - [BMPTol].
           'color' - [COLOUR Tol, Min Colour Count].
@@ -467,13 +611,13 @@ Example:
 
 *)
 
-function ItemAmount(area, ItemType: string; Item: Integer; Tol: TIntegerArray): Integer;
+function ItemAmount(area, ItemType: string; Item_IDENT: Integer; Tol: TIntegerArray): Integer;
 var
   Coords: TPointArray;
   i, h: Integer;
 begin
   Result := 0;
-  Coords := ItemCoordinates(Area, ItemType, Item, Tol);
+  Coords := ItemCoordinates(Area, ItemType, Item_IDENT, Tol);
   h := High(Coords);
   for i := 0 to h do
     Result := Result + GetAmount(Coords[i].x, Coords[i].y);
@@ -604,3 +748,6 @@ begin
   if (ShopScreen) then
     FindTextTpa(1930687, 0, 50, 65, 225, 83, Capitalize(Name), SmallChars, ClickLeft);
 end;
+
+begin
+end.

@@ -6,6 +6,8 @@ The Inventory include contains all inventory-related functions
 
 *)
 
+{.include_once amount.simba}
+
 { type TInvenItem;
   Description: Holds data regarding an inventory item }
 type

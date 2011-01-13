@@ -6,6 +6,8 @@ The Bank include contains Bank finders, and all banking routines.
 
 *)
 
+{.include_once inventory.simba}
+
 { const Bnk Constants;
   Description: Constants representing the different types of Banks }
 
