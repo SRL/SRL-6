@@ -221,19 +221,19 @@ begin
   //srl_warn('LoadAutoColor', 'Rough AutoColor = ' + IntToStr(acArr[which].Color) + ' ', warn_AllVersions);
   with acArr[which] do
   begin
-    curCTS := GetColorToleranceSpeed;
-    ColorToleranceSpeed(2);
+    curCTS := GetToleranceSpeed;
+    SetColorToleranceSpeed(2);
   {
     Find the colours which match the TAutoColorInfo and filter out points that
     are not part of the minimap using RemoveDistTPointArray
   }
-    SetColorSpeed2Modifiers(hueMod, satMod);
+    SetToleranceSpeed2Modifiers(hueMod, satMod);
     FindColorsTolerance(t, color, MMX1, MMY1, MMX2, MMY2, lumTol);
     validPts := RemoveDistTPointArray(MMCX, MMCY, (MMX2 - MMCX), t, True);
     //debugTPA(validPts, '');
 
-    SetColorSpeed2Modifiers(0.2, 0.2);
-    ColorToleranceSpeed(curCTS);
+    SetToleranceSpeed2Modifiers(0.2, 0.2);
+    SetColorToleranceSpeed(curCTS);
 
   {
     This is because the ladder color is much more specific and all that is

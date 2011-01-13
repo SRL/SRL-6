@@ -62,13 +62,13 @@ var
 begin
   Result := -1;
   if (not(LoggedIn)) then Exit;
-  CTS := GetColorToleranceSpeed;
+  CTS := GetToleranceSpeed;
 
-  ColorToleranceSpeed(2);
-  SetColorSpeed2Modifiers(100, 100);
+  SetColorToleranceSpeed(2);
+  SetToleranceSpeed2Modifiers(100, 100);
   FindColorsTolerance(TPA, clBlack, MMX1, MMY1, MMX2, MMY2, 3);
-  SetColorSpeed2Modifiers(0.2, 0.2);
-  ColorToleranceSpeed(CTS);
+  SetToleranceSpeed2Modifiers(0.2, 0.2);
+  SetColorToleranceSpeed(CTS);
   if (Length(TPA) < 1) then Exit;
 
   Cols := GetColors(TPA);

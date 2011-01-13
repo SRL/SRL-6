@@ -239,6 +239,19 @@ var
 var
   Smart_Members, Smart_Signed, Smart_SuperDetail: Boolean;
 
+const
+  tr_AllChars = 0;
+  tr_BigLetters = 1;
+  tr_SmallLetters = 2;
+  tr_Digits = 3;
+  tr_BigSymbols = 4;
+  tr_SmallSymbols = 5;
+  tr_SecondTableChars = 6;
+  tr_Letters = 7;
+  tr_AlphaNumericChars = 8;
+  tr_Symbols = 9;
+  tr_NormalChars = 10;
+
 { var WarnSensitivity: Integer
   Description: var for srl_Warn. }
 var

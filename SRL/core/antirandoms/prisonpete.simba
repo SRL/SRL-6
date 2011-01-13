@@ -23,8 +23,8 @@ var
   ATPA: T2DPointArray;
   X, Y, CTS: Integer;
 begin
-  CTS := GetColorToleranceSpeed();
-  ColorToleranceSpeed(1);
+  CTS := GetToleranceSpeed();
+  SetColorToleranceSpeed(1);
   if (FindColor(X, Y, 60909, MMX1, MMY1, MMX2, MMY2)) then
     if (CountColor(60909, MMX1, MMY1, MMX2, MMY2) = 1) then
       if (CountColorTolerance(1322555, MMX1, MMY1, MMX2, MMY2, 16) > 80) then
@@ -35,7 +35,7 @@ begin
           if (InRange(Length(ATPA), 1, 4)) then
             Result := (CountColorTolerance(clWhite, MMX1, MMY1, MMX2, MMY2, 50) > 500);
         end;
-  ColorToleranceSpeed(CTS);
+  SetColorToleranceSpeed(CTS);
 end;
 
 {*******************************************************************************
@@ -78,11 +78,11 @@ var
   C, I: LongInt;
   PTT: TPoint;
 begin
-  ColorToleranceSpeed(2);
-  SetColorSpeed2Modifiers(0.02, 0.66);
+  SetColorToleranceSpeed(2);
+  SetToleranceSpeed2Modifiers(0.02, 0.66);
   FindColorsSpiralTolerance(MSCX, MSCY, TPA, 5339562, MSX1, MSY1, MSX2, MSY2, 11);
-  ColorToleranceSpeed(1);
-  SetColorSpeed2Modifiers(0.2, 0.2);
+  SetColorToleranceSpeed(1);
+  SetToleranceSpeed2Modifiers(0.2, 0.2);
   TPAA := TPAToATPAEx(TPA, 10, 10);
   SortATPAFromFirstPoint(TPAA, Point(MSCX, MSCY));
   for I := 0 to High(TPAA) do
@@ -119,11 +119,11 @@ var
   C, I: LongInt;
   PPL: TPoint;
 begin
-  ColorToleranceSpeed(2);
-  SetColorSpeed2Modifiers(0.06, 0.46);
+  SetColorToleranceSpeed(2);
+  SetToleranceSpeed2Modifiers(0.06, 0.46);
   FindColorsSpiralTolerance(MSCX, MSCY, TPA, 3954019, MSX1, MSY1, MSX2, MSY2, 11);
-  ColorToleranceSpeed(1);
-  SetColorSpeed2Modifiers(0.2, 0.2);
+  SetColorToleranceSpeed(1);
+  SetToleranceSpeed2Modifiers(0.2, 0.2);
   TPAA := TPAToATPAEx(TPA, 10, 10);
   SortATPAFromFirstPoint(TPAA, Point(MSCX, MSCY));
   for I := 0 to High(TPAA) do
@@ -165,8 +165,8 @@ function Pete_AnalyzeAnimal1(var AnimalName: Integer) : boolean;
 var
   T, P, mP, o: Integer;
 begin
-  ColorToleranceSpeed(2);
-  SetColorspeed2Modifiers(0.19, 1.5);
+  SetColorToleranceSpeed(2);
+  SetToleranceSpeed2Modifiers(0.19, 1.5);
   MarkTime(o);
   repeat
     MarkTime(t);
@@ -257,11 +257,11 @@ var
   POG: TPoint;
   I: LongInt;
 begin
-  ColorToleranceSpeed(2);
-  SetColorSpeed2Modifiers(0.38, 0.07);
+  SetColorToleranceSpeed(2);
+  SetToleranceSpeed2Modifiers(0.38, 0.07);
   FindColorsSpiralTolerance(MSCX, MSCY, TPA, 8027265, MSX1, MSY1, MSX2, MSY2, 14);
-  ColorToleranceSpeed(1);
-  SetColorSpeed2Modifiers(0.2, 0.2);
+  SetColorToleranceSpeed(1);
+  SetToleranceSpeed2Modifiers(0.2, 0.2);
   TPAA := TPAToATPAEx(TPA, 15, 40);
   SortATPAFromFirstPoint(TPAA, Point(MSCX, MSCY));
   for I := 0 to High(TPAA) do

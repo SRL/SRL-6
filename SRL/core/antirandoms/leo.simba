@@ -15,6 +15,8 @@
 // * function Leo_BuryCoffins: Boolean;                          // * by IceFire908 & Iroki
 // * function SolveLeo: Boolean;                                 // * by IceFire908, Iroki, Nielsie95, & SKy Scripter
 
+{$loadlib irokiplugin}
+
 var
   LeoDTM_Coffin: Integer;
 
@@ -57,12 +59,12 @@ begin
         begin
           FindColorsPie(Pts, clWhite, 50, 0.0, 360.0, 0.0, 76.0, MMX1, MMY1, MMX2, MMY2, MMCX, MMCY);
           B := GetTPABounds(Pts);
-          cts := GetColorToleranceSpeed;
-          ColorToleranceSpeed(2);
-          SetColorSpeed2Modifiers(100.0, 100.0);
+          cts := GetToleranceSpeed;
+          SetColorToleranceSpeed(2);
+          SetToleranceSpeed2Modifiers(100.0, 100.0);
           FindColorsTolerance(Pts, 0, B.X1, B.Y1, B.X2, B.Y2, 3);
-          SetColorSpeed2Modifiers(0.2, 0.2);
-          ColorToleranceSpeed(cts);
+          SetToleranceSpeed2Modifiers(0.2, 0.2);
+          SetColorToleranceSpeed(CTS);
           ATPA := SplitTPAEx(Pts, 1, 1);
           for II := 0 to High(ATPA) do
             if (Length(ATPA[II]) < 50) then
@@ -159,11 +161,11 @@ var
   II: Byte;
   B: TBox;
 begin
-  ColorToleranceSpeed(2);
-  SetColorSpeed2Modifiers(0.42, 0.08);
+  SetColorToleranceSpeed(2);
+  SetToleranceSpeed2Modifiers(0.42, 0.08);
   FindColorsSpiralTolerance(MSCX, MSCY, TPA, 5066321, MSX1, MSY1, MSX2, MSCY, 10);
-  SetColorSpeed2Modifiers(0.2, 0.2);
-  ColorToleranceSpeed(1);
+  SetToleranceSpeed2Modifiers(0.2, 0.2);
+  SetColorToleranceSpeed(1);
   TPAA := TPAToATPAEx(TPA, 50, 50);
   SortATPASize(TPAA, True);
   for I := 0 to High(TPAA) do
@@ -220,11 +222,11 @@ begin
     Wait(RandomRange(1000, 2000));
     Exit;
   end;
-  ColorToleranceSpeed(2);
-  SetColorSpeed2Modifiers(0.15, 0.21);
+  SetColorToleranceSpeed(2);
+  SetToleranceSpeed2Modifiers(0.15, 0.21);
   FindColorsSpiralTolerance(MSCX, MSCY, TPA, 3624531, MSX1, MSY1, MSX2, MSY2, 4);
-  SetColorSpeed2Modifiers(0.2, 0.2);
-  ColorToleranceSpeed(1);
+  SetToleranceSpeed2Modifiers(0.2, 0.2);
+  SetColorToleranceSpeed(1);
   TPAA := TPAToATPAEx(TPA, 15, 15);
   SortATPASize(TPAA, True);
   for I := 0 to High(TPAA) do
@@ -262,8 +264,8 @@ begin
     First := True;
   while (CountItems('dtm', LeoDTM_Coffin, []) < 5) and ((GetSystemTime - Time) <= (60 * 1000)) and (f < 5) do
   begin
-    ColorToleranceSpeed(2);
-    SetColorSpeed2Modifiers(Leo_CoffinHue, Leo_CoffinSat);
+    SetColorToleranceSpeed(2);
+    SetToleranceSpeed2Modifiers(Leo_CoffinHue, Leo_CoffinSat);
     FindColorsTolerance(p, leo_CoffinColour, MSX1, MSY1, MSX2, MSY2, Leo_CoffinTol);
     if (Length(p) < 30) then Continue;
     t := SplitTPAEx(p, 7, 7);
@@ -308,7 +310,7 @@ begin
       Inc(f);
       Leo_ToCenter;
     end;
-    ColorToleranceSpeed(1);
+    SetColorToleranceSpeed(1);
   end;
 end;
 
@@ -326,10 +328,10 @@ var
   b: TBox;
 begin
   Result := False;
-  ColorToleranceSpeed(2);
-  SetColorSpeed2Modifiers(0.03, 0.33);
+  SetColorToleranceSpeed(2);
+  SetToleranceSpeed2Modifiers(0.03, 0.33);
   FindColorsTolerance(p, 4609120, MSX1, MSY1, MSX2, MSY2, 13);
-  SetColorSpeed2Modifiers(0.1, 0.2);
+  SetToleranceSpeed2Modifiers(0.1, 0.2);
   t := SplitTPAEx(p, 3, 3);
   SortATPAFrom(t, Point(cx, cy));
   SortATPAFromFirstPoint(t, Point(cx, cy));
@@ -453,14 +455,14 @@ begin
     Leo_ToCenter;
     for II := 0 to 2 do
     begin
-      ColorToleranceSpeed(2);
-      SetColorSpeed2Modifiers(0.42, 0.08);
+      SetColorToleranceSpeed(2);
+      SetToleranceSpeed2Modifiers(0.42, 0.08);
       if (II = 0) then
         FindColorsSpiralTolerance(Center.X, Center.Y, TPA, 6908269, StoneLoc[I].X1, StoneLoc[I].Y1, StoneLoc[I].X2, StoneLoc[I].Y2, 17)
       else
         FindColorsSpiralTolerance(MSCX, MSCY, TPA, 6908269, MSCX - 50, MSCY - 50, MSCX + 50, MSCY + 50, 14);
-      SetColorSpeed2Modifiers(0.2, 0.2);
-      ColorToleranceSpeed(1);
+      SetToleranceSpeed2Modifiers(0.2, 0.2);
+      SetColorToleranceSpeed(1);
       TPAA := TPAToATPAEx(TPA, 10, 10);
       if (II = 0) then
         SortATPAFromFirstPoint(TPAA, Center)
@@ -541,11 +543,11 @@ begin
     ChooseOption('se');
     Wait(RandomRange(500, 800));
     Center := Point((StoneLoc[I].X1 + StoneLoc[I].X2) div 2, (StoneLoc[I].Y1 + StoneLoc[I].Y2) div 2);
-    ColorToleranceSpeed(2);
-    SetColorSpeed2Modifiers(0.11, 0.19);
+    SetColorToleranceSpeed(2);
+    SetToleranceSpeed2Modifiers(0.11, 0.19);
     FindColorsSpiralTolerance(Center.X, Center.Y, TPA, 3490382, StoneLoc[I].X1, StoneLoc[I].Y1, StoneLoc[I].X2, StoneLoc[I].Y2, 7);
-    SetColorSpeed2Modifiers(0.2, 0.2);
-    ColorToleranceSpeed(1);
+    SetToleranceSpeed2Modifiers(0.2, 0.2);
+    SetColorToleranceSpeed(1);
     TPAA := TPAToATPAEx(TPA, 30, 30);
     SortATPAFromFirstPoint(TPAA, Center);
     for II := 0 to High(TPAA) do

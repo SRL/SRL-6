@@ -42,15 +42,15 @@ var
 begin
   with AutoInfo do
   begin
-    tmpCTS := GetColorToleranceSpeed;
-    ColorToleranceSpeed(2);
-    SetColorSpeed2Modifiers(HueMod, SatMod);
+    tmpCTS := GetToleranceSpeed;
+    SetColorToleranceSpeed(2);
+    SetToleranceSpeed2Modifiers(HueMod, SatMod);
 
     if not(FindColorsTolerance(arP, Color, x1, y1, x2 - 3, y2 - 3, LumTol)) then
     begin
       //Writeln('Failed to find the object.');
-      ColorToleranceSpeed(tmpCTS);
-      SetColorSpeed2Modifiers(0.2, 0.2);
+      SetColorToleranceSpeed(tmpCTS);
+      SetToleranceSpeed2Modifiers(0.2, 0.2);
       Exit;
     end;
 
@@ -106,8 +106,8 @@ begin
     end;
     SetLength(Objects, arLC);
 
-    ColorToleranceSpeed(tmpCTS);
-    SetColorSpeed2Modifiers(0.2, 0.2);
+    SetColorToleranceSpeed(tmpCTS);
+    SetToleranceSpeed2Modifiers(0.2, 0.2);
   end;
 end;
 
@@ -432,16 +432,16 @@ var
 begin
   Result := False;
   if not LoggedIn then exit;
-  tCTS := GetColorToleranceSpeed;
+  tCTS := GetToleranceSpeed;
   CTS := Integer(CTS * 9 mod 3 <> 0);
-  ColorToleranceSpeed(CTS);
+  SetColorToleranceSpeed(CTS);
   FindColorsSpiralTolerance(X, Y, Points, Color, MSX1, MSY1, MSX2, MSY2, Tol);
   if Length(Points) = 0 then
   begin
-    ColorToleranceSpeed(tCTS);
+    SetColorToleranceSpeed(tCTS);
     Exit;
   end;
-  ColorToleranceSpeed(1);
+  SetColorToleranceSpeed(1);
   aPoints := TPAtoATPAEx(Points, ObjWidth, ObjHeight);
   SetLength(Points, 0);
   for I := 0 to High(aPoints) do
@@ -454,11 +454,11 @@ begin
     begin
       GetMousePos(X, Y);
       Result := True;
-      ColorToleranceSpeed(tCTS);
+      SetColorToleranceSpeed(tCTS);
       Exit;
     end;
   end;
-  ColorToleranceSpeed(tCTS);
+  SetColorToleranceSpeed(tCTS);
 end;
 
 (*
@@ -490,9 +490,9 @@ var
 begin
   Result := False;
   if not LoggedIn then exit;
-  tCTS := GetColorToleranceSpeed;
+  tCTS := GetToleranceSpeed;
   CTS := Integer(CTS * 9 mod 3 <> 0);
-  ColorToleranceSpeed(CTS);
+  SetColorToleranceSpeed(CTS);
   SetLength(ATPA, Length(Colour));
   for i := 0 to High(Colour) do
   begin
@@ -501,10 +501,10 @@ begin
   TPA := MergeATPA(ATPA);
   if Length(TPA) = 0 then
   begin
-    ColorToleranceSpeed(tCTS);
+    SetColorToleranceSpeed(tCTS);
     Exit;
   end;
-  ColorToleranceSpeed(1);
+  SetColorToleranceSpeed(1);
   aPoints := TPAtoATPAEx(TPA, ObjWidth, ObjHeight);
   for I := 0 to High(aPoints) do
   begin
@@ -516,12 +516,12 @@ begin
     begin
       GetMousePos(X, Y);
       Result := True;
-      ColorToleranceSpeed(tCTS);
+      SetColorToleranceSpeed(tCTS);
       Exit;
     end;
   end;
 
-  ColorToleranceSpeed(tCTS);
+  SetColorToleranceSpeed(tCTS);
 end;
 
 (*

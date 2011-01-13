@@ -965,20 +965,20 @@ var
   curCTS: Integer;
   hMod, sMod: Extended;
 begin
-  curCTS := GetColorToleranceSpeed;
-  GetColorSpeed2Modifiers(hMod, sMod);
+  curCTS := GetToleranceSpeed;
+  GetToleranceSpeed2Modifiers(hMod, sMod);
 
   acInfo := AutoColorEx(autoColorConst);
   with acInfo do
   begin
-    ColorToleranceSpeed(2);
-    SetColorSpeed2Modifiers(hueMod, satMod);
+    SetColorToleranceSpeed(2);
+    SetToleranceSpeed2Modifiers(hueMod, satMod);
 
     result := RadialWalkTolerance(color, sRad, eRad, r, modX, modY, lumTol);
   end;
 
-  SetColorSpeed2Modifiers(hMod, sMod);
-  ColorToleranceSpeed(curCTS);
+  SetToleranceSpeed2Modifiers(hMod, sMod);
+  SetColorToleranceSpeed(curCTS);
 end;
 
 (*

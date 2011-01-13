@@ -22,14 +22,14 @@ function Demon_InRandom: Boolean;
 var
   TempCTS: Integer;
 begin
-  TempCTS := GetColorToleranceSpeed;
-  ColorToleranceSpeed(1);
+  TempCTS := GetToleranceSpeed;
+  SetColorToleranceSpeed(1);
   if (CountDots('npc') = 1) then
     if (not (TabExists(tab_Magic))) then
       if (CountColorTolerance(15986930, MMX1, MMY1, MMX2, MMY2, 18) >= 750) then //white fences
         if (not (GetColor(504, 348) = 657930)) then //Arrow in chat box
         Result := True;
-  ColorToleranceSpeed(TempCTS);
+  SetColorToleranceSpeed(TempCTS);
 end;
 
 {*******************************************************************************
@@ -45,8 +45,8 @@ var
   b: TBox;
   i, j, x, y: Integer;
 begin
-  ColorToleranceSpeed(2);
-  SetColorspeed2Modifiers(0.12, 0.16);
+  SetColorToleranceSpeed(2);
+  SetToleranceSpeed2Modifiers(0.12, 0.16);
   try
     FindColorsSpiralTolerance(MSX1, MSCY, arP, 6257516, MSX1, MSY1, MSX2, MSY2, 10);
     if (Length(arP) = 0) then Exit;
@@ -77,11 +77,11 @@ begin
 
       for j := 0 to High(arC) do
       begin
-        SetColorspeed2Modifiers(0.1, 0.58);  // filling
+        SetToleranceSpeed2Modifiers(0.1, 0.58);  // filling
         Result := SimilarColors(3695936, arC[j], 4);
         if not Result then
         begin
-          SetColorSpeed2Modifiers(0.06, 0.15); // rims
+          SetToleranceSpeed2Modifiers(0.06, 0.15); // rims
           Result := SimilarColors(2971495, arC[j], 11);
           if (not(Result)) then Exit;
         end;
@@ -90,8 +90,8 @@ begin
     end;
 
   finally
-    ColorToleranceSpeed(1);
-    SetColorspeed2Modifiers(0.2, 0.2);
+    SetColorToleranceSpeed(1);
+    SetToleranceSpeed2Modifiers(0.2, 0.2);
   end;
 end;
 
@@ -108,12 +108,12 @@ var
   P: TPoint;
   SarP: T2DPointArray;
 begin
-  cts := GetColorToleranceSpeed;
+  cts := GetToleranceSpeed;
   Mouse(543, 24, 12, 12, true);
   Wait(150 + Random(200));
   SetAngle(True);
-  ColorToleranceSpeed(2);
-  SetColorspeed2Modifiers(0.77, 2.5);
+  SetColorToleranceSpeed(2);
+  SetToleranceSpeed2Modifiers(0.77, 2.5);
   if not FindColorsTolerance(arP, 3433847, MSX1, MSY1, MSX2, MSY2, 4) then
   begin
     Writeln('DemonCenter - Could not find the board colors.');
@@ -164,7 +164,7 @@ begin
   Wait(2000);
   FFlag(0);
   Wait(2000 + Random(250));
-  ColorToleranceSpeed(cts);
+  SetColorToleranceSpeed(CTS);
 end;
 
 {*******************************************************************************
@@ -181,8 +181,8 @@ var
   arColors: TIntegerArray;
   b: TBox;
 begin
-  ColorToleranceSpeed(2);
-  SetColorspeed2Modifiers(0.12, 0.16);
+  SetColorToleranceSpeed(2);
+  SetToleranceSpeed2Modifiers(0.12, 0.16);
   FindColorsSpiralTolerance(MSX1, MSCY, arP, 6257516, MSX1, MSY1, MSX2, MSY2, 10);
 
   ararP := TPAtoATPA(arP, 45);
@@ -244,12 +244,12 @@ begin
   begin
     Writeln('We should talk to Damien.');
     MarkTime(t);
-    cts := GetColorToleranceSpeed;
-    ColorToleranceSpeed(2);
+    cts := GetToleranceSpeed;
+    SetColorToleranceSpeed(2);
     repeat
-      SetColorspeed2Modifiers(0.1, 1.35);
+      SetToleranceSpeed2Modifiers(0.1, 1.35);
       FindColorsTolerance(DRed, 988783, MSX1, MSY1, MSX2, MSY2, 4);
-      SetColorspeed2Modifiers(0, 3.71);
+      SetToleranceSpeed2Modifiers(0, 3.71);
       FindColorsTolerance(DBlack, 855309, MSX1, MSY1, MSX2, MSY2, 3);
       if (Length(DRed) > 0) and (Length(DBlack) > 0) then
       begin
@@ -270,7 +270,7 @@ begin
       end;
       Wait(150 + Random(50));
     until ChooseOption('to Se') or (TimeFromMark(t) > 30000);
-    ColorToleranceSpeed(cts);
+    SetColorToleranceSpeed(CTS);
 
     if (TimeFromMark(t) > 30000) then
     begin
@@ -330,15 +330,15 @@ var
   tmpCTS, i, j, arL, arL2, t: Integer;
   X, Y, Z: Extended;
 begin
-  tmpCTS := GetColorToleranceSpeed;
-  ColorToleranceSpeed(2);
-  SetColorSpeed2Modifiers(0.06, 0.15);
+  tmpCTS := GetToleranceSpeed;
+  SetColorToleranceSpeed(2);
+  SetToleranceSpeed2Modifiers(0.06, 0.15);
 
   if not(FindColorsTolerance(arP, 2971495, MSX1, MSY1, MSX2, MSY2, 11)) then
   begin
     Writeln('Failed to find the signs, no object found.');
-    ColorToleranceSpeed(tmpCTS);
-    SetColorSpeed2Modifiers(0.2, 0.2);
+    SetColorToleranceSpeed(tmpCTS);
+    SetToleranceSpeed2Modifiers(0.2, 0.2);
     Exit;
   end;
 
@@ -382,8 +382,8 @@ begin
   if (not (InRange(Length(arP), 3, 5))) then
   begin
     Writeln('Wrong Array Length, failed to find the mat.');
-    ColorToleranceSpeed(tmpCTS);
-    SetColorSpeed2Modifiers(0.2, 0.2);
+    SetColorToleranceSpeed(tmpCTS);
+    SetToleranceSpeed2Modifiers(0.2, 0.2);
     LogOut;
     Exit;
   end;
@@ -404,15 +404,15 @@ begin
     if (TimeFromMark(t) > 20000) then
     begin
       Writeln('Task Timeout');
-      ColorToleranceSpeed(tmpCTS);
-      SetColorSpeed2Modifiers(0.2, 0.2);
+      SetColorToleranceSpeed(tmpCTS);
+      SetToleranceSpeed2Modifiers(0.2, 0.2);
       LogOut;
       Exit;
     end;
   end;
 
-  ColorToleranceSpeed(tmpCTS);
-  SetColorSpeed2Modifiers(0.2, 0.2);
+  SetColorToleranceSpeed(tmpCTS);
+  SetToleranceSpeed2Modifiers(0.2, 0.2);
 end;
 
 {*******************************************************************************

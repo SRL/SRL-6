@@ -154,14 +154,14 @@ begin
     if (TSA[i][1] = '=') then
       case ResultType of
         ResultDebugBox  : writeln     ('[='+Padr(TSA[i], i2)+'=]');
-        ResultReportBox : AddToReport ('[='+Padr(TSA[i], i2)+'=]');
+        //ResultReportBox : AddToReport ('[='+Padr(TSA[i], i2)+'=]');
         ResultString    : Result := Result + '[='+Padr(TSA[i], i2)+'=]' + chr(13);
         else begin SRL_Warn('SRLProgressReport', 'Invalid Result Type', warn_AllVersions); exit; end;
       end
     else
       case ResultType of
         ResultDebugBox  : writeln     ('[ '+Padr(TSA[i], i2)+' ]');
-        ResultReportBox : AddToReport ('[ '+Padr(TSA[i], i2)+' ]');
+        //ResultReportBox : AddToReport ('[ '+Padr(TSA[i], i2)+' ]');
         ResultString    : Result := Result + '[ '+Padr(TSA[i], i2)+' ]' + chr(13);
         else begin SRL_Warn('SRLProgressReport', 'Invalid Result Type', warn_AllVersions); exit; end;
       end;
@@ -324,14 +324,14 @@ begin
       if i mod L = 0 then
         case ResultType of
           ResultDebugBox  : writeln     ('[='+Padr(TSA[i], i2)+'=]');
-          ResultReportBox : AddToReport ('[='+Padr(TSA[i], i2)+'=]');
+          //ResultReportBox : AddToReport ('[='+Padr(TSA[i], i2)+'=]');
           ResultString    : Result := Result + '[='+Padr(TSA[i], i2)+'=]' + chr(13);
           else begin SRL_Warn('SRLPlayerReport', 'Invalid Result Type!', Warn_AllVersions); exit end;
         end
       else
         case ResultType of
           ResultDebugBox  : writeln     ('[ '+Padr(TSA[i], i2)+' ]');
-          ResultReportBox : AddToReport ('[ '+Padr(TSA[i], i2)+' ]');
+          //ResultReportBox : AddToReport ('[ '+Padr(TSA[i], i2)+' ]');
           ResultString    : Result := Result + '[ '+Padr(TSA[i], i2)+' ]' + chr(13);
           else begin SRL_Warn('SRLPlayerReport', 'Invalid Result Type!', Warn_AllVersions); exit end;
         end;
@@ -452,7 +452,7 @@ begin
       begin
         case ResultType of
           ResultDebugBox  : writeln('[=' + Replicate('=', i2)+ '=]');
-          ResultReportBox : AddToReport('[=' + Replicate('=', i2)+ '=]');
+          //ResultReportBox : AddToReport('[=' + Replicate('=', i2)+ '=]');
           ResultString    : Result := Result + '[=' + Replicate('=', i2)+ '=]' + chr(13);
         end;
         continue;
@@ -460,7 +460,7 @@ begin
 
       case ResultType of
         ResultDebugBox  : writeln('[ '+ TSA[i] +' ]');
-        ResultReportBox : AddToReport('[ '+ TSA[i] +' ]');
+        //ResultReportBox : AddToReport('[ '+ TSA[i] +' ]');
         ResultString    : Result := Result + '[ '+ TSA[i] +' ]' + chr(13);
         else begin SRL_Warn('SRLPlayerReport', 'Invalid Result Type!', Warn_AllVersions); exit; end;
       end;
@@ -468,7 +468,7 @@ begin
       if i = 1 then
         case ResultType of
           ResultDebugBox  : writeln('[=' + Replicate('=', i2)+ '=]');
-          ResultReportBox : AddToReport('[=' + Replicate('=', i2)+ '=]');
+          //ResultReportBox : AddToReport('[=' + Replicate('=', i2)+ '=]');
           ResultString    : Result := Result + '[=' + Replicate('=', i2)+ '=]' + chr(13);
         end;
 
@@ -477,7 +477,7 @@ begin
           if i <> (High(TSA)-1) then
             case ResultType of
               ResultDebugBox  : writeln('[ ' + Replicate('-', i2)+ ' ]');
-              ResultReportBox : AddToReport('[ ' + Replicate('-', i2)+ ' ]');
+              //ResultReportBox : AddToReport('[ ' + Replicate('-', i2)+ ' ]');
               ResultString    : Result := Result + '[ ' + Replicate('-', i2)+ ' ]' + chr(13);
             end;
     end;

@@ -106,11 +106,11 @@ begin
   while (((GetSystemTime - T) < 8000) and (Pillory_LockScreen)) do
   begin
     Wait(RandomRange(50, 75));
-    ColorToleranceSpeed(2);
-    SetColorSpeed2Modifiers(0.26, 0.55);
+    SetColorToleranceSpeed(2);
+    SetToleranceSpeed2Modifiers(0.26, 0.55);
     FindColorsTolerance(TPA, 1121831, 40, 40, 180, 180, 4);
-    ColorToleranceSpeed(1);
-    SetColorSpeed2Modifiers(0.2, 0.2);
+    SetColorToleranceSpeed(1);
+    SetToleranceSpeed2Modifiers(0.2, 0.2);
     LC := Length(TPA);
     if (LC < 300) then
       Continue;
@@ -143,11 +143,11 @@ begin
              B.Y2 := Bounds.Y2;
            end;
       end;
-      ColorToleranceSpeed(2);
-      SetColorSpeed2Modifiers(0.26, 0.55);
+      SetColorToleranceSpeed(2);
+      SetToleranceSpeed2Modifiers(0.26, 0.55);
       FindColorsTolerance(TPA, 1121831, B.X1, B.Y1, B.X2, B.Y2, 4);
-      ColorToleranceSpeed(1);
-      SetColorSpeed2Modifiers(0.2, 0.2);
+      SetColorToleranceSpeed(1);
+      SetToleranceSpeed2Modifiers(0.2, 0.2);
       Dens[I] := Length(TPA);
     end;
 
@@ -191,11 +191,11 @@ begin
   while ((GetSystemTime - t) < 8000) and Pillory_LockScreen do
   begin
     Wait(60);
-    ColorToleranceSpeed(2);
-    SetColorSpeed2Modifiers(0.26, 0.55);
+    SetColorToleranceSpeed(2);
+    SetToleranceSpeed2Modifiers(0.26, 0.55);
     FindColorsTolerance(tpa, 1121831, 190 + (col * 95), 180, 235 + (col * 95), 260, 4);
-    ColorToleranceSpeed(1);
-    SetColorSpeed2Modifiers(0.2, 0.2);
+    SetColorToleranceSpeed(1);
+    SetToleranceSpeed2Modifiers(0.2, 0.2);
     if (Length(tpa) < l) or (Length(tpa) < 230) then
       Continue;
     l := Length(tpa);
@@ -232,11 +232,11 @@ begin
         2: begin b.y1 := b.y2; b.y2 := bounds.y2; end;
         3: begin b.x1 := b.x2; b.x2 := bounds.x2; b.y1 := b.y2; b.y2 := bounds.y2; end;
       end;
-      ColorToleranceSpeed(2);
-      SetColorSpeed2Modifiers(0.26, 0.55);
+      SetColorToleranceSpeed(2);
+      SetToleranceSpeed2Modifiers(0.26, 0.55);
       FindColorsTolerance(tpa, 1121831, b.x1, b.y1, b.x2, b.y2, 4);
-      ColorToleranceSpeed(1);
-      SetColorSpeed2Modifiers(0.2, 0.2);
+      SetColorToleranceSpeed(1);
+      SetToleranceSpeed2Modifiers(0.2, 0.2);
       dens[i] := Length(tpa);
     end;
     QuickSort(dens);

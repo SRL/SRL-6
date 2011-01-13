@@ -85,8 +85,8 @@ begin
   
   fT := GetTimeRunning + 300000;
   
-  cts := GetColorToleranceSpeed;
-  ColorToleranceSpeed(1);
+  cts := GetToleranceSpeed;
+  SetColorToleranceSpeed(1);
   while ClickContinue(True, True) do
     Wait(50 + Random(25));
 
@@ -127,5 +127,5 @@ begin
   until TabExists(tab_Stats) or (GetTimeRunning > fT);
   
   Result := TabExists(tab_Stats);
-  ColorToleranceSpeed(cts);
+  SetColorToleranceSpeed(CTS);
 end;

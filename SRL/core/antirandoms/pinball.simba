@@ -42,13 +42,13 @@ begin
   Result := false;
   Bitmap := -1;
   try
-    Temp := GetColorToleranceSpeed;
-    ColorToleranceSpeed(2);
-    SetColorSpeed2Modifiers(0.14, 3.06);
+    Temp := GetToleranceSpeed;
+    SetColorToleranceSpeed(2);
+    SetToleranceSpeed2Modifiers(0.14, 3.06);
     FindColorsTolerance(Points, 8440943, MSX1, MMY1, MSX2, MSY2, 10);
     HI := High(Points);
     Result := False;
-    ColorToleranceSpeed(Temp);
+    SetColorToleranceSpeed(Temp);
 
     if (Hi < 20) then
       Exit;
@@ -150,9 +150,9 @@ var
   TPA: TPointArray;
   ATPA: T2DPointArray;
 begin
-  CTS := GetColorToleranceSpeed;
-  ColorToleranceSpeed(2);
-  SetColorSpeed2Modifiers(0.57, 0.67);
+  CTS := GetToleranceSpeed;
+  SetColorToleranceSpeed(2);
+  SetToleranceSpeed2Modifiers(0.57, 0.67);
   if (FindColorsTolerance(TPA, 8359275, MSX1, MSY1, MSX2, MSY2, 8)) then
   begin
     ATPA := SplitTPA(TPA, 30);
@@ -178,8 +178,8 @@ begin
       Wait(500 + Random(1000));
     end;
   end;
-  ColorToleranceSpeed(CTS);
-  SetColorSpeed2Modifiers(0.2, 0.2);
+  SetColorToleranceSpeed(CTS);
+  SetToleranceSpeed2Modifiers(0.2, 0.2);
 end;
 
 {*******************************************************************************

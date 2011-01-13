@@ -19,13 +19,13 @@ var
   Pts: TPointArray;
   cts: Integer;
 begin
-  cts := GetColorToleranceSpeed;
-  ColorToleranceSpeed(1);
+  cts := GetToleranceSpeed;
+  SetColorToleranceSpeed(1);
   FindColorsTolerance(Pts, 0, MMX1, MMY1, MMX2, MMY2, 20);
   FilterPointsPie(Pts, 0, 360, 50, 76, MMCX, MMCY);
   //FilterPointsPie is more precise in Simba.
   Result := InRange(Length(Pts), 10100, 10200);
-  ColorToleranceSpeed(cts);
+  SetColorToleranceSpeed(CTS);
   //Writeln('InAbyss returned ' + IntToStr(Length(Pts)) + '.');
 end;
 
@@ -75,13 +75,13 @@ begin   //NW (N)          NE (E)          SE (S)           SW (W)
   Sec := [Point(149, 73), Point(354, 66), Point(375, 268), Point(137, 279)];
   Levers := ['Eye', 0.01, 0.71, 5423374, 17, 'Gray', 0.04, 0.48, 8819879, 19, 'Pink', 0.10, 0.08, 5394279, 10, 'Arm'];
   Locs := ['North', 'East', 'South', 'West'];
-  ColorToleranceSpeed(2);
+  SetColorToleranceSpeed(2);
   for I := 0 to 3 do
   begin
     B := IntToBox(Sec[I].X - 45, Sec[I].Y - 45, Sec[I].X + 45, Sec[I].Y + 45);
     for II := 0 to 2 do
     begin
-      SetColorSpeed2Modifiers(Levers[1 + (II * 5)], Levers[2 + (II * 5)]);
+      SetToleranceSpeed2Modifiers(Levers[1 + (II * 5)], Levers[2 + (II * 5)]);
       FindColorsTolerance(TPA[I][II], Levers[3 + (II * 5)], B.X1, B.Y1, B.X2, B.Y2, Levers[4 + (II * 5)]);
       if (Length(TPA[I][II]) > 0) then
       begin
@@ -93,8 +93,8 @@ begin   //NW (N)          NE (E)          SE (S)           SW (W)
       Wait(100); //avoid loop lag
     end;
   end;
-  SetColorSpeed2Modifiers(0.2, 0.2);
-  ColorToleranceSpeed(1);
+  SetToleranceSpeed2Modifiers(0.2, 0.2);
+  SetColorToleranceSpeed(1);
   for I := 0 to 3 do
   begin
     if (LeverType[I] = '') then //Arm had no color, so by process of elimination its plain arm

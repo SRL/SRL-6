@@ -19,9 +19,9 @@ var
    CTS, I: Integer;
 begin
   CTS := GetToleranceSpeed;
-  ColorToleranceSpeed(2);
+  SetColorToleranceSpeed(2);
   FindColorsSpiralTolerance(MSCX, MSCY, TPA, 3815998, MSX1, MSY1, MSX2, MSY2, 10);
-  ColorToleranceSpeed(CTS);
+  SetColorToleranceSpeed(CTS);
   TPAA := TPAToATPAEx(TPA, 50, 50);
   SortATPASize(TPAA, True);
   for I := 0 To High(TPAA) Do
@@ -45,7 +45,7 @@ end;
 *******************************************************************************}
 function SmeltingScreen: Boolean;
 begin
-  Result := GetTextAtEx(158, 367, 0, NPCChars, False, False, 0, 0, 128, 4, True, tr_Letters) = 'What';
+  Result := GetTextAtEx(158, 367, 0, CharsNPC, False, False, 0, 0, 128, 4, True, tr_Letters) = 'What';
 end;
 
 {*******************************************************************************

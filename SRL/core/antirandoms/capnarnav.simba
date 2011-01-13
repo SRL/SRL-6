@@ -76,7 +76,7 @@ var
   b: TBox;
   Col: array[0..2] of Boolean;
 begin
-  ColorToleranceSpeed(2);
+  SetColorToleranceSpeed(2);
   Result := False;
   if (not arnav_LockScreen) then
     Exit;
@@ -106,7 +106,7 @@ begin
       for r := 0 to 2 do
       begin
         b := IntToBox(91 + (88 * c), 45 + (88 * r), 166 + (88 * c), 112 + (88 * r));
-        SetColorSpeed2Modifiers(0.02, 0.22);
+        SetToleranceSpeed2Modifiers(0.02, 0.22);
         FindColorsTolerance(tpa, 803162, b.x1, b.y1, b.x2, b.y2, 20);
         if (Length(tpa) > 400) then
         begin
@@ -114,7 +114,7 @@ begin
           Col[c] := True;
           Break;
         end;
-        SetColorSpeed2Modifiers(0.02, 0.05);
+        SetToleranceSpeed2Modifiers(0.02, 0.05);
         FindColorsTolerance(tpa, 2281971, b.x1, b.y1, b.x2, b.y2, 20);
         if (Length(tpa) > 400) then
         begin
@@ -144,13 +144,13 @@ var
   TPA: TPointArray;
   CA: TPoint;
 begin
-  CTS := GetColorToleranceSpeed;
-  GetColorspeed2Modifiers(TempHue, TempSat);
-  ColorToleranceSpeed(2);
-  SetColorSpeed2Modifiers(0.31, 0.13);
+  CTS := GetToleranceSpeed;
+  GetToleranceSpeed2Modifiers(TempHue, TempSat);
+  SetColorToleranceSpeed(2);
+  SetToleranceSpeed2Modifiers(0.31, 0.13);
   FindColorsTolerance(TPA, 3752258, MSX1, MSY1, MSX2, MSY2, 6);
-  SetColorSpeed2Modifiers(TempHue, TempSat);
-  ColorToleranceSpeed(CTS);
+  SetToleranceSpeed2Modifiers(TempHue, TempSat);
+  SetColorToleranceSpeed(CTS);
   repeat
     if (Length(TPA) < 1) then
       Break;
@@ -197,17 +197,17 @@ var
   I, CTS: LongInt;
   EP: TPoint;
 begin
-  CTS := GetColorToleranceSpeed;
+  CTS := GetToleranceSpeed;
   {$IFNDEF Simba}
   GetColorspeed2Modifiers(TempHue, TempSat);
   {$ELSE}
   GetToleranceSpeed2Modifiers(TempHue, TempSat);
   {$ENDIF}
-  ColorToleranceSpeed(2);
-  SetColorSpeed2Modifiers(0.20, 2.14);
+  SetColorToleranceSpeed(2);
+  SetToleranceSpeed2Modifiers(0.20, 2.14);
   FindColorsTolerance(TPA, 9430204, MSX1, MSY1, MSX2, MSY2, 2);
-  SetColorSpeed2Modifiers(TempHue, TempSat);
-  ColorToleranceSpeed(CTS);
+  SetToleranceSpeed2Modifiers(TempHue, TempSat);
+  SetColorToleranceSpeed(CTS);
   repeat
     if (Length(TPA) < 1) then
       Break;
@@ -255,7 +255,7 @@ begin
     Exit;
   end;
 
-  cts := GetColorToleranceSpeed;
+  cts := GetToleranceSpeed;
   deg := Round(rs_GetCompassAngleDegrees);
   MakeCompass('n');
   t := GetSystemTime;
@@ -269,8 +269,8 @@ begin
       if FindNPCChatText('hop through', ClickLeft) then
       begin
         arnav_ExitPortal;
-        SetColorSpeed2Modifiers(0.2, 0.2);
-        ColorToleranceSpeed(cts);
+        SetToleranceSpeed2Modifiers(0.2, 0.2);
+        SetColorToleranceSpeed(CTS);
         Exit;
       end;
       if (not ClickContinue(True,True)) then
@@ -283,8 +283,8 @@ begin
   if (not arnav_FixLock) then
   begin
     WriteLn('Could not identify arnav objects!');
-    SetColorSpeed2Modifiers(0.2, 0.2);
-    ColorToleranceSpeed(cts);
+    SetToleranceSpeed2Modifiers(0.2, 0.2);
+    SetColorToleranceSpeed(CTS);
     Exit;
   end;
 
@@ -317,6 +317,6 @@ begin
 
   arnav_ExitPortal;
   MakeCompass(Deg);
-  SetColorSpeed2Modifiers(0.2, 0.2);
-  ColorToleranceSpeed(cts);
+  SetToleranceSpeed2Modifiers(0.2, 0.2);
+  SetColorToleranceSpeed(CTS);
 end;

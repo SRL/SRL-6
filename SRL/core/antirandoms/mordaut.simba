@@ -45,19 +45,19 @@ var
   P: TPoint;
 begin
   Result := False;
-  if FindTextTpa(clBlack, 0, MCX1, MCY1, MCX2, MCY2, 'ext question', NPCChars, Nothing) then Exit;
-  if (not FindTextTpa(clBlack, 0, MCX1, MCY1, MCX2, MCY2, 'exit', NPCChars, Nothing)) then
+  if FindTextTpa(clBlack, 0, MCX1, MCY1, MCX2, MCY2, 'ext question', CharsNPC, Nothing) then Exit;
+  if (not FindTextTpa(clBlack, 0, MCX1, MCY1, MCX2, MCY2, 'exit', CharsNPC, Nothing)) then
     while ClickContinue(True, True) do
     begin
-      if FindTextTpa(clBlack, 0, MCX1, MCY1, MCX2, MCY2, 'exit', NPCChars, Nothing) then Break;
+      if FindTextTpa(clBlack, 0, MCX1, MCY1, MCX2, MCY2, 'exit', CharsNPC, Nothing) then Break;
       Wait(50);
     end;
 
   repeat
     if fCount = 5 then Break;
     Inc(fCount);
-    if FindTextTpa(clBlack, 0, MCX1, MCY1, MCX2, MCY2, 'exit', NPCChars, Nothing) then
-      Str := GetTextAtEx(125, 388, 0, NPCChars, False, False, 0, 1, 0, 80, False, tr_NormalChars)
+    if FindTextTpa(clBlack, 0, MCX1, MCY1, MCX2, MCY2, 'exit', CharsNPC, Nothing) then
+      Str := GetTextAtEx(125, 388, 0, CharsNPC, False, False, 0, 1, 0, 80, False, tr_NormalChars)
     else
     begin
       Wait(3000);
@@ -95,8 +95,8 @@ begin
     sR := sR + tS + ' on the glass.';
     Writeln(sR);
 
-    cts := GetColorToleranceSpeed;
-    ColorToleranceSpeed(1);
+    cts := GetToleranceSpeed;
+    SetColorToleranceSpeed(1);
 
     //FindColorsPie(Pts, 237, 17, A - 6, A + 6, 10, 60, MMX1, MMY1, MMX2, MMY2, MMCX, MMCY);
     FindColorsTolerance(Pts, 237, MMX1, MMY1, MMX2, MMY2, 17);
@@ -114,7 +114,7 @@ begin
 
     FindColorsTolerance(Pts, C, MSX1, MSY1, MSX2, MSY2, 10);
     //DebugTPA(Pts, '');
-    ColorToleranceSpeed(cts);
+    SetColorToleranceSpeed(CTS);
     aPts := SplitTPA(Pts, 3);
     SortATPASize(aPts, True);
     h := High(aPts);
@@ -312,7 +312,7 @@ begin
              '002488AA86879911550D1B901025A006E4161E5435E2DC2C286A0' +
              '0ACBB06F0');
 
-  cts := GetColorToleranceSpeed;
+  cts := GetToleranceSpeed;
 
   T := GetSystemTime;
   repeat
@@ -340,7 +340,7 @@ begin
     M := GetSystemTime;
     while (not(InConvo)) and (GetSystemTime - M < 20000) do
       Wait(3000 + Random(2000));
-    if FindTextTpa(clBlack, 0, MCX1, MCY1, MCX2, MCY2, 'ext question', NPCChars, Nothing) then
+    if FindTextTpa(clBlack, 0, MCX1, MCY1, MCX2, MCY2, 'ext question', CharsNPC, Nothing) then
     begin
       while (ClickContinue(True, True)) do
         Wait(100);
@@ -352,5 +352,5 @@ begin
   until (Result) or (GetSystemTime - T > 300000);
 
   FreeDTM(HandDTM);
-  ColorToleranceSpeed(cts);
+  SetColorToleranceSpeed(CTS);
 end;

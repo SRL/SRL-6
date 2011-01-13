@@ -110,8 +110,8 @@ Begin
   If Not LoggedIn Then Exit;
 
   Wait(600 + Random(400));        //waits for char to stop moving
-  ColorToleranceSpeed(2);                      //sets mods
-  SetColorSpeed2Modifiers(Maze_Hue, Maze_Sat);
+  SetColorToleranceSpeed(2);                      //sets mods
+  SetToleranceSpeed2Modifiers(Maze_Hue, Maze_Sat);
   FindColorsSpiralTolerance(MSCX, MSCY, TPA, Maze_DoorColor, MSCX - 120,     //searches for gray colors
                  MSCY - 120, MSCX + 120, MSCY + 113, Maze_DoorTolerance);  //in a box around the character
 
@@ -273,8 +273,8 @@ Var
 Begin                                        //gets the black color by using a related colour
   If Not LoggedIn Then Exit;
 
-  CTS := GetColorToleranceSpeed;
-  ColorToleranceSpeed(Maze_BlackBackCTS);
+  CTS := GetToleranceSpeed;
+  SetColorToleranceSpeed(Maze_BlackBackCTS);
   FindColorsTolerance(TPA, ClBlack, MMX1, MMY1, MMX2, MMY2, Maze_BlackTol);
 
   FilterPointsPie(TPA, 0.0, 360.0, 10.0, 76.0, MMCX, MMCY);
@@ -283,7 +283,7 @@ Begin                                        //gets the black color by using a r
     Result := GetColor(TPA[0].X, TPA[0].Y);
 
   WriteLn('Maze Background color = '+IntToStr(Result));
-  ColorToleranceSpeed(CTS);
+  SetColorToleranceSpeed(CTS);
 End;
 
 {*******************************************************************************

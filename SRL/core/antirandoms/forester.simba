@@ -24,12 +24,12 @@ var
   tmpCTS: Integer;
   P: TPoint;
 begin
-  tmpCTS := GetColorToleranceSpeed;
-  ColorToleranceSpeed(0);
+  tmpCTS := GetToleranceSpeed;
+  SetColorToleranceSpeed(0);
 
   if not(FindColorsTolerance(arP, 195836, MMX1, MMY1, MMX2, MMY2, 25)) then
   begin
-    ColorToleranceSpeed(tmpCTS);
+    SetColorToleranceSpeed(tmpCTS);
     Exit;
   end;
 
@@ -83,8 +83,8 @@ var
   Hue, Sat: Extended;
   Pts: TPointArray;
 begin
-  GetColorspeed2Modifiers(Hue, Sat);
-  CTS := GetColorToleranceSpeed;
+  GetToleranceSpeed2Modifiers(Hue, Sat);
+  CTS := GetToleranceSpeed;
   if (CountColorTolerance(15726327, MMX1, MMY1, MMX2, MMY2, 30) < 40) and //White walls
     (not (InBlack)) then
     begin
@@ -99,14 +99,14 @@ begin
 
       if (Length(Pts) = count) then
       begin
-        ColorToleranceSpeed(2);
-        SetColorspeed2Modifiers(0.67, 1.68);
+        SetColorToleranceSpeed(2);
+        SetToleranceSpeed2Modifiers(0.67, 1.68);
         if (PercentColorMM(1397036, 8) > 10) then
           Result := True;
       end;
   end;
-  ColorToleranceSpeed(CTS);
-  SetColorspeed2Modifiers(Hue, Sat);
+  SetColorToleranceSpeed(CTS);
+  SetToleranceSpeed2Modifiers(Hue, Sat);
 end;
 
 {*******************************************************************************
@@ -123,13 +123,13 @@ var
   TPA: TPointArray;
   TTFF: TPoint;
 begin
-  CTS := GetColorToleranceSpeed;
-  GetColorspeed2Modifiers(TempHue, TempSat);
-  ColorToleranceSpeed(2);
-  SetColorSpeed2Modifiers(0.03, 0.21);
+  CTS := GetToleranceSpeed;
+  GetToleranceSpeed2Modifiers(TempHue, TempSat);
+  SetColorToleranceSpeed(2);
+  SetToleranceSpeed2Modifiers(0.03, 0.21);
   FindColorsTolerance(TPA, 1262986, MSX1, MSY1, MSX2, MSY2, 8);
-  SetColorSpeed2Modifiers(TempHue, TempSat);
-  ColorToleranceSpeed(CTS);
+  SetToleranceSpeed2Modifiers(TempHue, TempSat);
+  SetColorToleranceSpeed(CTS);
   repeat
     if (Length(TPA) < 1) then
       Break;
@@ -258,8 +258,8 @@ begin
   MarkTime(t);
   repeat
     Wait(200);
-    ColorToleranceSpeed(2);
-    SetColorspeed2Modifiers(0.37, 0.33);
+    SetColorToleranceSpeed(2);
+    SetToleranceSpeed2Modifiers(0.37, 0.33);
     if FindColorsTolerance(Tail, 9740459, MSX1+20, MSY1+20, MSX2-20, MSY2-20, 2) then //White tail tip
     begin
       Pheasant := TPAtoATPA(Tail, 25);
@@ -278,7 +278,7 @@ begin
         NTails := TPAtoATPA(Tail, 3);
         if (Tails = Length(NTails)) then
         begin
-          SetColorspeed2Modifiers(0.09, 0.74);
+          SetToleranceSpeed2Modifiers(0.09, 0.74);
           case Tails of
             1: if not InRange(CountColorTolerance(2641004, b.x1 - 5, b.y1 - 5, b.x2 + 5, b.y2 + 5, 12), 4, 8) then Continue;
             2: if not InRange(CountColorTolerance(2641004, b.x1 - 5, b.y1 - 5, b.x2 + 5, b.y2 + 5, 12), 10, 18) then Continue;
@@ -331,11 +331,11 @@ begin
 
 
   MarkTime(t);
-  cts := GetColorToleranceSpeed;
+  cts := GetToleranceSpeed;
 
   repeat;
-     ColorToleranceSpeed(2);
-     SetColorspeed2Modifiers(0.02, 0.09);
+     SetColorToleranceSpeed(2);
+     SetToleranceSpeed2Modifiers(0.02, 0.09);
      FindColorsSpiralTolerance(MSCX, MSCY, P, 2444664, MSCX - 100, MSCY - 100, MSCX + 100, MSCY + 100, 9);
      Objs := TPAtoATPA(P, 20);
 
@@ -348,7 +348,7 @@ begin
          MiddleTPAEx(Objs[I], rx, ry);
          MMouse(rx, ry, 0, 0);
          wait(10 + random(20));
-         ColorToleranceSpeed(1);
+         SetColorToleranceSpeed(1);
          if (IsUpText('ake')) then
          begin
            Mouse(rx, ry, 0, 0, True);
@@ -361,7 +361,7 @@ begin
 
     Wait(500 + random(200));
   until (Done) or (TimeFromMark(t) > 30000);
-  ColorToleranceSpeed(cts);
+  SetColorToleranceSpeed(CTS);
 
   if (TimeFromMark(t) > 30000) or (not(done)) then
   begin
@@ -483,8 +483,8 @@ var
   TempHue, TempSat: Extended;
   ItemDropped: Boolean;
 begin
-  TempCTS := GetColorToleranceSpeed;
-  GetColorspeed2Modifiers(TempHue, TempSat);
+  TempCTS := GetToleranceSpeed;
+  GetToleranceSpeed2Modifiers(TempHue, TempSat);
   Task := forester_GetTask;
   if not InForesterRandom then Exit;
   if InvFull then
@@ -523,8 +523,8 @@ begin
     Wait(3000 + Random(1000));
     Result := LeaveForester;
   end;
-  ColorToleranceSpeed(TempCTS);
-  SetColorspeed2Modifiers(TempHue, TempSat);
+  SetColorToleranceSpeed(TempCTS);
+  SetToleranceSpeed2Modifiers(TempHue, TempSat);
   if Result then
   begin
     Writeln('Forester: Forester random solved.');

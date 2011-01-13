@@ -52,7 +52,7 @@ var
   ii, h : Integer;
 begin
   { To be replaced with global TAutoColorInfo array. }
-  SetColorspeed2Modifiers(0.21, 0.44);
+  SetToleranceSpeed2Modifiers(0.21, 0.44);
   FindColorsTolerance(TPA, 7838641, MSX1, MSY1, MSX2, MSY2, 15);
   ATPA := TPAToATPAEx(TPA, srl_Molly_DoorW, srl_Molly_DoorH);
 
@@ -77,7 +77,7 @@ begin
         end;
       end;
     end;
-  SetColorspeed2Modifiers(0.2, 0.2);
+  SetToleranceSpeed2Modifiers(0.2, 0.2);
 end;
 
 {*******************************************************************************
@@ -289,8 +289,8 @@ Var P : TPoint;
     CTS, CompassAngle : Integer;
 Begin
   SetAngle(True);
-  CTS := GetColorToleranceSpeed;
-  ColorToleranceSpeed(2);
+  CTS := GetToleranceSpeed;
+  SetColorToleranceSpeed(2);
   CompassAngle := Round(rs_GetCompassAngleDegrees);
   If CompassAngle <> 0 Then
     ClickNorth(True);
@@ -309,7 +309,7 @@ Begin
   Else
   Begin
     WriteLn('Molly : Could NOT Open Door');
-    ColorToleranceSpeed(CTS);
+    SetColorToleranceSpeed(CTS);
     Result := False;
     Exit;
   End;
@@ -331,7 +331,7 @@ Begin
     Else
     Begin
       WriteLn('Molly : Could NOT Find Machine');
-      ColorToleranceSpeed(CTS);
+      SetColorToleranceSpeed(CTS);
       Result := False;
       Exit;
     End;
@@ -347,7 +347,7 @@ Begin
   If (GetColor(561, 221) <> 6918288) Then
   Begin
     WriteLn('Molly : Could NOT Get To Machine');
-    ColorToleranceSpeed(CTS);
+    SetColorToleranceSpeed(CTS);
     Result := False;
     Exit;
   End;
@@ -404,7 +404,7 @@ Begin
     Begin
       Result := False;
       WriteLn('Could NOT find Molly!');
-      ColorToleranceSpeed(CTS);
+      SetColorToleranceSpeed(CTS);
       Players[CurrentPlayer].Loc := 'NoMolly';
       MakeCompass(CompassAngle);
       Exit;
@@ -424,7 +424,7 @@ Begin
 
         If Not FindMollyDoor(P, -1) Then
         Begin
-          ColorToleranceSpeed(CTS);
+          SetColorToleranceSpeed(CTS);
           MakeCompass(CompassAngle);
           Exit;
         End;
@@ -450,7 +450,7 @@ Begin
         WriteLn('Solved Molly Random Event.');
         MakeCompass(CompassAngle);
         Wait(10000);
-        ColorToleranceSpeed(CTS);
+        SetColorToleranceSpeed(CTS);
         while (ClickContinue(True, True)) do
           Wait(500 + Random(1000));
       End;

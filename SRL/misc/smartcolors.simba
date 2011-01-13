@@ -228,16 +228,16 @@ var
   CTS: integer;
   //H, S: extended;
 begin
-  CTS := GetColorToleranceSpeed;
+  CTS := GetToleranceSpeed;
   //GetColorspeed2Modifiers(H, S);
 
-  ColorToleranceSpeed(2);
-  SetColorspeed2Modifiers(Rock.Hue, Rock.Sat);
+  SetColorToleranceSpeed(2);
+  SetToleranceSpeed2Modifiers(Rock.Hue, Rock.Sat);
 
   Result := SimilarColors(Color, Rock.Color, Rock.Tol);
 
-  ColorToleranceSpeed(CTS);
-  //SetColorspeed2Modifiers(H, S);
+  SetColorToleranceSpeed(CTS);
+  //SetToleranceSpeed2Modifiers(H, S);
 end;
 
 {*******************************************************************************
@@ -250,8 +250,8 @@ var
   CTS, L : integer;
   TPA : TPointArray;
 begin
-  CTS := GetColorToleranceSpeed;
-  ColorToleranceSpeed(1);
+  CTS := GetToleranceSpeed;
+  SetColorToleranceSpeed(1);
 
   FindColors(TPA, Color, MSX1, MSY1, MSX2, MSY2)
 
@@ -262,7 +262,7 @@ begin
 
   SC_Debug('Analyse '+IntToStr(Color)+': '+IntToStr(L));
   Result := L;
-  ColorToleranceSpeed(CTS);
+  SetColorToleranceSpeed(CTS);
 end;
 
 {*******************************************************************************
@@ -319,12 +319,12 @@ begin
 
   SC_Debug('in color gatherer');
   GetMousePos(x, y);
-  CTS := GetColorToleranceSpeed;
+  CTS := GetToleranceSpeed;
   //GetColorspeed2Modifiers(H, S);
   
   //scanning colors around in a HALF_BOX_SIZE*2 box
-    ColorToleranceSpeed(2);
-    SetColorSpeed2Modifiers(Rock.Hue, Rock.Sat);
+    SetColorToleranceSpeed(2);
+    SetToleranceSpeed2Modifiers(Rock.Hue, Rock.Sat);
     if not FindColorsTolerance(
                                 TPA, Rock.Color,
                                 x - Rock.Details.HALF_BOX_SIZE, y - Rock.Details.HALF_BOX_SIZE,
@@ -332,8 +332,8 @@ begin
                                 Rock.Tol
                               ) then
     begin
-      ColorToleranceSpeed(CTS);
-      //SetColorspeed2Modifiers(H, S);
+      SetColorToleranceSpeed(CTS);
+      //SetToleranceSpeed2Modifiers(H, S);
       exit;
     end;
 
@@ -362,8 +362,8 @@ begin
     Rock.SCArray := OrganizeColors(Rock.SCArray, LengthArray);
     Result := (RockColorIndex > 2);
 
-    ColorToleranceSpeed(CTS);
-    //SetColorspeed2Modifiers(H, S);
+    SetColorToleranceSpeed(CTS);
+    //SetToleranceSpeed2Modifiers(H, S);
 end;
 
 {*******************************************************************************
@@ -418,18 +418,18 @@ begin
   Result := false;
   
   SC_Debug('first finder');
-  CTS := GetColorToleranceSpeed;
+  CTS := GetToleranceSpeed;
   //GetColorspeed2Modifiers(H, S);
 
-  ColorToleranceSpeed(2);
-  SetColorspeed2Modifiers(Rock.Hue, Rock.Sat);
+  SetColorToleranceSpeed(2);
+  SetToleranceSpeed2Modifiers(Rock.Hue, Rock.Sat);
 
   FindColorsSpiralTolerance(MSCX, MSCY, TPA, Rock.Color, MSX1, MSY1, MSX2, MSY2, Rock.Tol);
 
   if length(TPA) <= 0 then
   begin
-    ColorToleranceSpeed(CTS);
-    //SetColorspeed2Modifiers(H, S);
+    SetColorToleranceSpeed(CTS);
+    //SetToleranceSpeed2Modifiers(H, S);
     exit;
   end;
 
@@ -451,7 +451,7 @@ begin
         SC_Debug('Gathered Colors')
       else begin
         SC_Debug('unable to gather colors');
-        ColorToleranceSpeed(CTS);
+        SetColorToleranceSpeed(CTS);
         Result := CheckAndClick(TP, Rock);
         exit;
       end;
@@ -464,8 +464,8 @@ begin
     end else SC_Debug('Uptext: ' + GetUpText);
   end;
 
-  ColorToleranceSpeed(CTS);
-  //SetColorspeed2Modifiers(H, S);
+  SetColorToleranceSpeed(CTS);
+  //SetToleranceSpeed2Modifiers(H, S);
 end;
 
 {*******************************************************************************
@@ -519,11 +519,11 @@ begin
       exit;
     end;
 
-  CTS := GetColorToleranceSpeed;
+  CTS := GetToleranceSpeed;
   //GetColorspeed2Modifiers(Hue, Sat);
 
-  ColorToleranceSpeed(2);
-  SetColorspeed2Modifiers(Rock.Hue, Rock.Sat);
+  SetColorToleranceSpeed(2);
+  SetToleranceSpeed2Modifiers(Rock.Hue, Rock.Sat);
 
   UseTol := 0;
 
@@ -609,8 +609,8 @@ begin
 
   SCObjectsArray[Index] := Rock;   //updating global record
 
-  ColorToleranceSpeed(CTS);
-  SetColorspeed2Modifiers(Hue, Sat);
+  SetColorToleranceSpeed(CTS);
+  SetToleranceSpeed2Modifiers(Hue, Sat);
 end;
 
 {*******************************************************************************

@@ -552,12 +552,12 @@ begin
   if InStrArrEx('enchant crossbow bolt', t_spArr, II)then
    if (P > II)then
    begin
-     CTS := GetColorToleranceSpeed;
-     ColorToleranceSpeed(2);
-     SetColorSpeed2Modifiers(0.02, 0.70);
+     CTS := GetToleranceSpeed;
+     SetColorToleranceSpeed(2);
+     SetToleranceSpeed2Modifiers(0.02, 0.70);
      if (CountColorTolerance(1147846, MIX1, MIY1, MIX2, MIY2, 13) < 14) then
        Dec(P);
-     ColorToleranceSpeed(CTS);
+     SetColorToleranceSpeed(CTS);
      SetToleranceSpeed2Modifiers(2, 2);
    end;
 
@@ -593,17 +593,17 @@ begin
 
   colArr := GetColors(TPAFromBox(Coords));
   ClearSameIntegers(colArr);
-  CTS := GetColorToleranceSpeed;
-  ColorToleranceSpeed(2);
-  SetColorSpeed2Modifiers(0.72, 1.05);
+  CTS := GetToleranceSpeed;
+  SetColorToleranceSpeed(2);
+  SetToleranceSpeed2Modifiers(0.72, 1.05);
   for II := 0 to High(colArr) do
   begin
     if (SimilarColors(colArr[II], 3292228, 3)) then Continue;
     ColorToHSL(colArr[II], H, S, L);
     Lum := MaxE(Lum, L);
   end;
-  SetColorSpeed2Modifiers(0.2, 0.2);
-  ColorToleranceSpeed(CTS);
+  SetToleranceSpeed2Modifiers(0.2, 0.2);
+  SetColorToleranceSpeed(CTS);
   Result := (Lum > 40.0);
 end;
 

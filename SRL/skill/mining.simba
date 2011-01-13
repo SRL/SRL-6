@@ -172,8 +172,8 @@ begin  // checks for Blue ClickToContinue, but doesnt handle ClickToContinue.
           if not (LoggedIn) then Exit;
           x := Random(510) + 5;
           y := Random(330) + 5;
-          cts := GetColorToleranceSpeed;
-          ColorToleranceSpeed(2);
+          cts := GetToleranceSpeed;
+          SetColorToleranceSpeed(2);
           if (FindColorSpiralTolerance(x, y, hc1, MSx1, MSy1, MSx2, MSy2, 10)) or
             (FindColorSpiralTolerance(x, y, hc2, MSx1, MSy1, MSx2, MSy2, 10)) or
             (FindColorSpiralTolerance(x, y, hc3, MSx1, MSy1, MSx2, MSy2, 10)) or
@@ -192,7 +192,7 @@ begin  // checks for Blue ClickToContinue, but doesnt handle ClickToContinue.
           c := c + 1;
         until ((FindBitmapMaskTolerance(PickAxeHead, x, y, MIx1, MIy1, MIx2, MIy2, 10, 10))
           or (c >= 10));
-        ColorToleranceSpeed(cts);
+        SetColorToleranceSpeed(CTS);
 
         if not FindBitmapMaskTolerance(PickAxeHead, x, y, MIx1, MIy1, MIx2, MIy2, 10, 10) then
         begin

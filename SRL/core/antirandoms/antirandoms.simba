@@ -105,9 +105,9 @@ Begin
     if (CurrentInt < 1) then
       Continue;
     CurrentStr := IntToStr(CurrentInt);
-    AddToReport(PadR(Name, 30 - Length(CurrentStr)) + CurrentStr + ' |');
+    //(PadR(Name, 30 - Length(CurrentStr)) + CurrentStr + ' |');
   end;
-  AddToReport('\~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~/');
+  //AddToReport('\~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~/');
   //SendSRLReport;
 end;
 
@@ -316,8 +316,8 @@ begin
     LoadSRLBitMaps;
   if (FindColorTolerance(tX, tY, 14737632, MCX1, MCY1, MCX1 + 40, MCY2, 15)) or
        (FindColorTolerance(tX, tY, 589815, MCX1, MCY1, MCX1 + 40, MCY2, 15)) then
-    if (FindTransparentBitmapTolerance(bmpMod, tX, tY, clBlack, MCX1, MCY1, MCX1 + 40, MCY2, 15)) or
-     (FindTransparentBitmapTolerance(bmpAdmin, tx, ty, clBlack, MCX1, MCY1, MCX1 + 40, MCY2, 15)) then
+    if (FindBitmapToleranceIn(bmpMod, tX, tY, MCX1, MCY1, MCX1 + 40, MCY2, 15)) or //was transparent  clblack
+     (FindBitmapToleranceIn(bmpAdmin, tx, ty, MCX1, MCY1, MCX1 + 40, MCY2, 15)) then  //was transparent  clblack
     begin
       Result := True;
       //AddToSRLLog('******** FOUND MOD ********');
@@ -478,7 +478,7 @@ begin
     IsInRandom := @InLeoGraveyard;
     Texts := ['Leo'];
     TextColors := [128];
-    TextFonts := [NPCChars];
+    TextFonts := [CharsNPC];
     TextBoxes := [IntToBox(MCX1, MCY1, MCX2, MCY2)];
     SolveRandom := @SolveLeo;
     RandIndex := rand_Leo;
@@ -492,7 +492,7 @@ begin
     IsInRandom := @InForesterRandom;
     Texts := ['orester'];
     TextColors := [128];
-    TextFonts := [NPCChars];
+    TextFonts := [CharsNPC];
     TextBoxes := [IntToBox(MCX1, MCY1, MCX2, MCY2)];
     SolveRandom := @SolveForester;
     RandIndex := rand_Forester;
@@ -506,7 +506,7 @@ begin
     IsInRandom := @InMaze;
     Texts := ['maze', 'centre of the maze'];
     TextColors := [0, 0];
-    TextFonts := [NPCChars, SmallChars];
+    TextFonts := [CharsNPC, SmallChars];
     TextBoxes := [IntToBox(MCX1, MCY1, MCX2, MCY2), IntToBox(MCX1, MCY1, MCX2, MCY2)];
     SolveRandom := @SolveMaze;
     RandIndex := rand_Maze;
@@ -534,7 +534,7 @@ begin
     IsInRandom := @InEvilBobsIsland;
     Texts := ['ScapeRune','ask to come here'];
     TextColors := [clMessage,0];
-    TextFonts := [SmallChars,NPCChars];
+    TextFonts := [SmallChars,CharsNPC];
     TextBoxes := [IntToBox(MCX1,MCY1,MCX2,MCY2),IntToBox(MCX1,MCY1,MCX2,MCY2)];
     SolveRandom := @SolveEvilBob;
     RandIndex := rand_ScapeRune;
@@ -548,7 +548,7 @@ begin
     IsInRandom := @Demon_InRandom;
     Texts := ['amien', 'amien'];
     TextColors := [128, 0];
-    TextFonts := [NPCChars, NPCChars];
+    TextFonts := [CharsNPC, CharsNPC];
     TextBoxes := [IntToBox(MCX1, MCY1, MCX2, MCY2), IntToBox(MCX1, MCY1, MCX2, MCY2)];
     SolveRandom := @SolveDemon;
     RandIndex := rand_Demon;
@@ -562,7 +562,7 @@ begin
     IsInRandom := nil;
     Texts := ['uiz', 'uiz'];
     TextColors := [128, 0];
-    TextFonts := [NPCChars, NPCChars];
+    TextFonts := [CharsNPC, CharsNPC];
     TextBoxes := [IntToBox(MCX1, MCY1, MCX2, MCY2), IntToBox(MCX1, MCY1, MCX2, MCY2)];
     SolveRandom := @SolveQuiz;
     RandIndex := rand_Quiz;
@@ -576,7 +576,7 @@ begin
     IsInRandom := @InQuizRandom;
     Texts := ['uiz', 'uiz'];
     TextColors := [128, 0];
-    TextFonts := [NPCChars, NPCChars];
+    TextFonts := [CharsNPC, CharsNPC];
     TextBoxes := [IntToBox(MCX1, MCY1, MCX2, MCY2), IntToBox(MCX1, MCY1, MCX2, MCY2)];
     SolveRandom := @SolveQuiz;
     RandIndex := rand_Quiz;
@@ -590,7 +590,7 @@ begin
     IsInRandom := nil;
     Texts := ['ordaut'];
     TextColors := [128];
-    TextFonts := [NPCChars];
+    TextFonts := [CharsNPC];
     TextBoxes := [IntToBox(MCX1, MCY1, MCX2, MCY2)];
     SolveRandom := nil;
     RandIndex := rand_Mordaut;
@@ -604,7 +604,7 @@ begin
     IsInRandom := nil;
     Texts := ['olly'];
     TextColors := [128];
-    TextFonts := [NPCChars];
+    TextFonts := [CharsNPC];
     TextBoxes := [IntToBox(MCX1, MCY1, MCX2, MCY2)];
     SolveRandom := @SolveMolly;
     RandIndex := rand_Molly;
@@ -618,7 +618,7 @@ begin
     IsInRandom := @Pinball_InRandom;
     Texts := ['lashing'];
     TextColors := [8323072];
-    TextFonts := [NPCChars];
+    TextFonts := [CharsNPC];
     TextBoxes := [IntToBox(MCX1, MCY1, MCX2, MCY2)];
     SolveRandom := @SolvePinball;
     RandIndex := rand_Pinball;
@@ -632,7 +632,7 @@ begin
     IsInRandom := nil;
     Texts := ['andwich'];
     TextColors := [128];
-    TextFonts := [NPCChars];
+    TextFonts := [CharsNPC];
     TextBoxes := [IntToBox(MCX1, MCY1, MCX2, MCY2)];
     SolveRandom := @SolveSandwichLady;
     RandIndex := rand_Sandwich;
@@ -646,7 +646,7 @@ begin
     IsInRandom := nil;
     Texts := ['keeper'];
     TextColors := [128];
-    TextFonts := [NPCChars];
+    TextFonts := [CharsNPC];
     TextBoxes := [IntToBox(MCX1, MCY1, MCX2, MCY2)];
     SolveRandom := @SolveBeeKeeper;
     RandIndex := rand_BeeKeeper;
@@ -660,7 +660,7 @@ begin
     IsInRandom := nil;
     Texts := ['swinging', 'pillory'];
     TextColors := [127, 0];
-    TextFonts := [NPCChars, NPCChars];
+    TextFonts := [CharsNPC, CharsNPC];
     TextBoxes := [IntToBox(MCX1, MCY1, MCX2, MCY2), IntToBox(MCX1, MCY1, MCX2, MCY2)];
     SolveRandom := @SolvePilloryPuzzle;
     RandIndex := rand_Pillory;
@@ -674,7 +674,7 @@ begin
     IsInRandom := @arnav_InRandom;
     Texts := ['rnav'];
     TextColors := [128];
-    TextFonts := [NPCChars];
+    TextFonts := [CharsNPC];
     TextBoxes := [IntToBox(MCX1, MCY1, MCX2, MCY2)];
     SolveRandom := @SolveArnav;
     RandIndex := rand_CapnArnav;
@@ -688,7 +688,7 @@ begin
     IsInRandom := nil;
     Texts := ['appendage'];
     TextColors := [128];
-    TextFonts := [NPCChars];
+    TextFonts := [CharsNPC];
     TextBoxes := [IntToBox(MCX1, MCY1, MCX2, MCY2)];
     SolveRandom := @SolveAbyss;
     RandIndex := rand_Abyss;
@@ -702,7 +702,7 @@ begin
     IsInRandom := @certer_InRandom;
     Texts := ['iles'];
     TextColors := [128];
-    TextFonts := [NPCChars];
+    TextFonts := [CharsNPC];
     TextBoxes := [IntToBox(MCX1, MCY1, MCX2, MCY2)];
     SolveRandom := @SolveCerter;
     RandIndex := rand_Certer;
@@ -717,7 +717,7 @@ begin
     IsInRandom := nil;
     Texts := ['Mime'];
     TextColors := [0];
-    TextFonts := [NPCChars];
+    TextFonts := [CharsNPC];
     TextBoxes := [IntToBox(MCX1, MCY1, MCX2, MCY2)];
     SolveRandom := nil;
     RandIndex := rand_Mime;
@@ -731,7 +731,7 @@ begin
     IsInRandom := @Frog_InRandom;
     Texts := ['erald'];
     TextColors := [128];
-    TextFonts := [NPCChars];
+    TextFonts := [CharsNPC];
     TextBoxes := [IntToBox(MCX1, MCY1, MCX2, MCY2)];
     SolveRandom := @SolveFrog;
     RandIndex := rand_Frog;

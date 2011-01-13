@@ -59,7 +59,7 @@ begin
         begin
           ATPA := SplitTPAEx(Pts, 5, 5);
           if (Length(ATPA) >= 4)and (Length(ATPA) < 12)then //There are 7 dots on the island
-            Result := IsChatBoxTextAnyLine('ScapeRune', clMessage) or (FindTextTpa(clBlack, 0, MCX1, MCY1, MCX2, MCY2, 'ask to come here', NPCChars, Nothing));
+            Result := IsChatBoxTextAnyLine('ScapeRune', clMessage) or (FindTextTpa(clBlack, 0, MCX1, MCY1, MCX2, MCY2, 'ask to come here', CharsNPC, Nothing));
         end;
     end;
   end;
@@ -105,8 +105,8 @@ Var
 Begin
   If Not LoggedIn Then Exit;
 
-  ColorToleranceSpeed(2);
-  SetColorspeed2Modifiers(0.07, 0.58);      //gets all servent like colors with 17 tol
+  SetColorToleranceSpeed(2);
+  SetToleranceSpeed2Modifiers(0.07, 0.58);      //gets all servent like colors with 17 tol
   FindColorsSpiralTolerance(MSCX + 10, MSCY, TPA, 4940926, MSX1, MSY1, MSX2, MSY2, 17);
   ATPA := TPAToATPAEx(TPA, 10, 8); //splits it into boxes of 10x8
 
@@ -164,8 +164,8 @@ Var TPA : TPointArray;
 Begin
   If Not LoggedIn Then Exit;
 
-  ColorToleranceSpeed(2);
-  SetColorSpeed2Modifiers(0.01, 1.18);    //COREECT MODS
+  SetColorToleranceSpeed(2);
+  SetToleranceSpeed2Modifiers(0.01, 1.18);    //COREECT MODS
   MarkTime(Mark);                         //time mark
   Repeat
     FindColorsTolerance(TPA, 2401230, MSX1, MSY1, MSX2, MSY2, 16); //statue color
@@ -220,8 +220,8 @@ Var I, X, Y : Integer;
 Begin
   If Not LoggedIn Then Exit;
 
-  ColorToleranceSpeed(2);
-  SetColorSpeed2Modifiers(0.20, 0.77);      //11380643
+  SetColorToleranceSpeed(2);
+  SetToleranceSpeed2Modifiers(0.20, 0.77);      //11380643
   FindColorsTolerance(TPA, 11312790, MSX1, MSY1, MSX2, MSY2, 5);  //gets fishspot-like colors
   ATPA := SplitTPA(TPA, 6);    //splits the tpa with 'dist' of 6
   SortATPAFromSize(ATPA, 30, True);      //Sorts it by relative average size '30'
@@ -292,7 +292,7 @@ Begin
     Begin                                //goes to get a fishing net, near the right statue
       OldCount := InvCount;
       WriteLn('Retrieving a fishing net');
-      ColorToleranceSpeed(1);               //fast but less accurate
+      SetColorToleranceSpeed(1);               //fast but less accurate
 
       FindColorsTolerance(TPA, 237, MMX1, MMY1, MMX2, MMY2, 30);   //gets all red dots
 
@@ -309,8 +309,8 @@ Begin
       Wait(2345 + random(500));
       If Not IsMoving Then
       Begin
-        ColorToleranceSpeed(2);                    //finds the fishing net
-        SetColorSpeed2Modifiers(0.07, 0.19);
+        SetColorToleranceSpeed(2);                    //finds the fishing net
+        SetToleranceSpeed2Modifiers(0.07, 0.19);
         FindColorsTolerance(TPA, 2899019, MSX1, MSY1, MSX2, MSY2, 14); //fishing net like colors
         ATPA := SplitTPA(TPA, 8);       //splittpa with dist of 6
         SortATPAFromFirstPoint(ATPA, Point(MSCX, MSCY));  //sorts all of the ATPA's from mainscreen center
@@ -320,7 +320,7 @@ Begin
         Begin
           MMouse(X, Y, 2, 2);
           Wait(SRL_MaxWaitTime + Random(100));
-          ColorToleranceSpeed(1);
+          SetColorToleranceSpeed(1);
           If WaitUpTextMulti(['mall'], srl_MaxWaitTime) Then
           Begin
             GetMousePos(X, Y);
@@ -414,8 +414,8 @@ Var I, X, Y : Integer;
 Begin
   If Not LoggedIn Then Exit;
 
-  ColorToleranceSpeed(2);
-  SetColorSpeed2Modifiers(16.67, 1.62);      //correct mods
+  SetColorToleranceSpeed(2);
+  SetToleranceSpeed2Modifiers(16.67, 1.62);      //correct mods
 
   RetardedFish := BitmapFromString(2, 4, 'meJzTsI9St4vQcooDIj2P9As28oa+' +
         'uQbe2QBRGQbs');
@@ -474,8 +474,8 @@ Var I, X, Y : Integer;
 Begin
   If Not LoggedIn Then Exit;
 
-  ColorToleranceSpeed(2);               //medium speed, accurate
-  SetColorSpeed2Modifiers(0.93, 0.28);
+  SetColorToleranceSpeed(2);               //medium speed, accurate
+  SetToleranceSpeed2Modifiers(0.93, 0.28);
   FindColorsTolerance(TPA, 2960944, MSX1, MSY1, MSX2, MSY2, 11); //find's blck-liek colors
   ATPA := SplitTPA(TPA, 10);
 
@@ -545,8 +545,8 @@ Var I, X, Y, TX, TY : Integer;
     TPA : TPointArray;
     ATPA : T2DPointArray;
 Begin
-  ColorToleranceSpeed(2);
-  SetColorSpeed2Modifiers(0.06, 0.62);    //finds all portal like colors
+  SetColorToleranceSpeed(2);
+  SetToleranceSpeed2Modifiers(0.06, 0.62);    //finds all portal like colors
   FindColorsTolerance(TPA, 7388602, MSX1, MSY1, MSX2, MSY2, 7);
   ATPA := SplitTPA(TPA, 10);
 

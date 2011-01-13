@@ -34,7 +34,7 @@ begin
   begin
     if (BeeScreen) then Break;
     ClickContinue(True, True);
-    FindTextTpa(0, 0, MCX1, MCY1, MCX2, MCY2, 'Yeah', NPCChars, ClickLeft);
+    FindTextTpa(0, 0, MCX1, MCY1, MCX2, MCY2, 'Yeah', CharsNPC, ClickLeft);
     Wait(100 + Random(500));
   end;
   Result := BeeScreen;
@@ -59,13 +59,13 @@ begin           //lwr mid                         lid                           
   DestP := [Point(260, 151), Point(260, 48), Point(258, 204), Point(259, 98)];
   for I := 0 to 2 do
   begin
-    ColorToleranceSpeed(2);
-    SetColorspeed2Modifiers(PartColors[1 + (3 * I)], PartColors[2 + (3 * I)]);
+    SetColorToleranceSpeed(2);
+    SetToleranceSpeed2Modifiers(PartColors[1 + (3 * I)], PartColors[2 + (3 * I)]);
     T := GetSystemTime;
     while ((not (FindColorsTolerance(TPA, PartColors[3 * I], 30, 31, 124, 219, 1))) and ((GetSystemTime - T) < 7000)) do
       Wait(RandomRange(500, 750));
-    SetColorSpeed2Modifiers(0.2, 0.2);
-    ColorToleranceSpeed(1);
+    SetToleranceSpeed2Modifiers(0.2, 0.2);
+    SetColorToleranceSpeed(1);
     if (Length(TPA) < 1) then
       Continue;
     P := MiddleTPA(TPA);
@@ -105,7 +105,7 @@ begin           //lwr mid                         lid                           
     if (GetSystemTime - T > 5000) then Break;
     Wait(100);
   end;
-  Result := FindTextTpa(0, 0, MCX1, MCY1, MCX2, MCY2, 'move', NPCChars, Nothing);
+  Result := FindTextTpa(0, 0, MCX1, MCY1, MCX2, MCY2, 'move', CharsNPC, Nothing);
   if Result then
   begin
     T := GetSystemTime;

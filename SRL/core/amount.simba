@@ -96,7 +96,8 @@ begin
   SetLength(Tol, 2);
   case Lowercase(IdentType) of
     'bitmap mask', 'bmpmask', 'bmp mask', 'mask': Result := FindBitmapMaskTolerance(Ident, x, y, Area.x1, Area.y1, Area.x2, Area.y2, Tol[0], Tol[1]);
-    'bitmap', 'bmp': Result := FindTransparentBitmapTolerance(Ident, x, y, 0, Area.x1, Area.y1, Area.x2, Area.y2, Tol[0]);
+    //'bitmap', 'bmp': Result := FindTransparentBitmapTolerance(Ident, x, y, 0, Area.x1, Area.y1, Area.x2, Area.y2, Tol[0]);
+    'bitmap', 'bmp': Result := FindBitmapToleranceIn(Ident, x, y, Area.x1, Area.y1, Area.x2, Area.y2, Tol[0]);
     'dtm': Result := FindDTM(Ident, x, y, Area.x1, Area.y1, Area.x2, Area.y2);
     'colour', 'color':
       begin
@@ -514,13 +515,13 @@ begin
   end;
   V[0] := [1606307, 4, 0.09, 1.32]; //Darker colour (top of coins)
   V[1] := [2209251, 8, 0.04, 1.08]; //Lighter colour (rest of the coins)
-  CTS := GetColorToleranceSpeed;
-  ColorToleranceSpeed(2);
+  CTS := GetToleranceSpeed;
+  SetColorToleranceSpeed(2);
   SetLength(tPts, 0);
   try
     for I := 0 to 1 do
     begin
-      SetColorSpeed2Modifiers(V[I][2], V[I][3]);
+      SetToleranceSpeed2Modifiers(V[I][2], V[I][3]);
       FindColorsTolerance(Pts, V[I][0], B.X1, B.Y1, B.X2, B.Y2, V[I][1]);
       if (Length(Pts) < 10) then Exit;
       ATPA := SplitTPAEx(Pts, 10, 10);
@@ -539,8 +540,8 @@ begin
     Result := True;
     MiddleTPAEx(ATPA[I], X, Y);
   finally
-    ColorToleranceSpeed(CTS);
-    SetColorSpeed2Modifiers(0.2, 0.2);
+    SetColorToleranceSpeed(CTS);
+    SetToleranceSpeed2Modifiers(0.2, 0.2);
   end;
 end;
 

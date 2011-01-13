@@ -91,6 +91,49 @@ begin
   KeyUp(k);
 end;
 
+procedure SendArrow(Key: Byte);
+begin
+  if not InRange(Key,0,3) then
+    Writeln('KEY IS NOT INRANGE!!')
+  else
+    case key of
+      0 : PressKey(vk_up);
+      1 : PressKey(vk_right);
+      2 : PressKey(vk_down);
+      3 : PressKey(vk_left);
+    end;
+end;
+
+procedure SendArrowWait(Key: Byte; WaitTime: Integer);
+var
+  KeyCode : integer;
+begin;
+  if not InRange(Key,0,3) then
+    Writeln('KEY IS NOT INRANGE!!')
+  else
+  begin
+    case key of
+      0 : Keycode := (vk_up);
+      1 : Keycode := (vk_right);
+      2 : Keycode := (vk_down);
+      3 : Keycode := (vk_left);
+    end;
+    KeyDown(keycode);
+    wait(waittime);
+    KeyUp(keycode);
+  end;
+end;
+
+procedure SendArrowSilentWait(Key : byte; WaitTime : integer);
+begin
+  SendArrowWait(key,waittime);
+end;
+
+procedure SendArrowSilent(Key : byte);
+begin
+  SendArrow(key);
+end;
+
 (*
 TypeSendEx
 ~~~~~~~~~~
@@ -291,6 +334,72 @@ begin
   end;
 end;
 
+function IsTextInAreaEx(xs, ys, xe, ye: Integer; var x, y: Integer; S: string; Tolerance: Integer; Chars: String; CheckShadow, CheckOutline: Boolean; MinSpacing, MaxSpacing: Integer; TextColor: Integer): Boolean;
+var
+  TextTPA,SearchTPA, Matches: TPointArray;
+  Box : TBox;
+  xx,yy,i,len : integer;
+begin
+  if TextColor = -1 then
+    raiseexception(ercustomerror,'IsTextInArea with color = -1, is not supported');
+  Result := False;
+  FindColorsTolerance(SearchTPA,TextColor,xs,ys,xe,ye,tolerance);
+  if Length(SearchTPA) < 1 then
+    Exit;
+  TextTPA:= TPAFromText(S,Chars,xx,yy);
+  Result := FindTextTPAinTPA(yy ,TextTPA,SearchTPA,Matches);
+  x := 0; y:=0;
+  if Result = False then
+    Exit;
+  Box := GetTPABounds(TextTPA);
+  SortTPAFrom(Matches, Point(Box.x1, Box.y1));
+  x := matches[0].x;
+  yy := 500000;
+  len := High(TextTPA);
+  for i := 0 to Len do
+    if TextTPA[i].x = Box.x1 then
+      yy := min(yy,TextTPA[i].y);
+  y := matches[0].y-yy;
+  {$ifdef SimbaDebug}
+  Writeln(Format('IsTextInAreaEx: (%d,%d)',[x,y]));
+  {$endif}
+end;
+
+(*
+GetNumbers
+~~~~~~~~
+
+.. code-block:: pascal
+
+    function GetNumbers(text : string) : string;
+
+Returns the characters of a string that are numbers.
+
+*)
+
+function GetNumbers(text : string) : string;
+begin;
+  result := ExtractFromStr(text,numbers);
+end;
+
+function GetTextAtEx(x, y: Integer; Tolerance: Integer; Chars: String; CheckShadow, CheckOutline: Boolean; MinSpacing, MaxSpacing: Integer; TextColor: Integer; TextLength: Integer; Strict: Boolean; Range: longword): anystring;
+begin
+ // no hspacing, defaulting to 4. (with 4 ' and : will work)
+  // Defaulting MaxSpacing to 3
+  if TextColor = -1 then
+    raiseexception(ercustomerror,'GetTextAtEx with color = -1, is not supported');
+  Maxspacing := 3;
+  {$ifdef SimbaDebug}
+  Writeln([x, y, minSpacing, maxSpacing, 4, textcolor, tolerance, textlength, Chars]);
+  {$endif}
+  Result := GetTextAt(x, y, minSpacing, maxSpacing, 4, textcolor, tolerance, textlength, Chars);
+ {$ifdef SimbaDebug}
+  Writeln('GetTextAt result: ' + Result);
+  {$endif}
+  if Range = tr_Digits then
+    result := GetNumbers(result);
+end;
+
 (*
 GetUpText
 ~~~~~~~~~
@@ -437,7 +546,7 @@ begin
     srl_Warn('FindNPCChatText', 'txt is empty', warn_AllVersions);
     Exit;
   end;
-  S := CreateBitmapMaskFromText(txt, CharsNPC);
+  S := BitmapFromText(txt, CharsNPC);
   if FindBitmapMaskTolerance(S, tx, ty, 9, 348, 523, 471, 50, 10) then
   begin
     Result := True;
@@ -474,7 +583,7 @@ function FindText(var cx, cy: Integer; txt,font: string; xs, ys, xe, ye:
 var
   S: Integer;
 begin
-  S := CreateBitmapMaskFromText(txt, font);
+  S := BitmapFromText(txt, font);
   if (xs < 0) then xs := 0;
   if (ys < 0) then ys := 0;
   Result := FindBitmapMaskTolerance(S, cx, cy, xs, ys, xe, ye, 30, 30);
@@ -505,7 +614,7 @@ var
   Mask, w, h, tx, ty: Integer;
 begin
   try
-    Mask:= CreateBitmapMaskFromText(Text, Chars);
+    Mask:= BitmapFromText(Text, Chars);
   except
     srl_Warn('ClickText', 'Invalid Character Names', warn_AllVersions);
     Exit;
@@ -1027,4 +1136,27 @@ begin
     if Pos(arrS[I], Str) > 0 then
       Exit;
   Result := False;
+end;
+
+function InStrArr(Str: string; Arr: TStringArray; CaseSensitive: Boolean): Boolean;
+var
+  i : integer;
+begin;
+  result := true;
+  if not casesensitive then
+  begin
+    str := lowercase(str);
+    for i := high(arr) downto 0 do
+      if lowercase(arr[i]) = str then
+        exit;
+  end else
+    for i := high(arr) downto 0 do
+      if arr[i] = str then
+        exit;
+  result := false;
+end;
+
+function Replace(Text, FindStr, ReplaceStr: string): string;
+begin;
+  result := ReplaceWrap(Text,FindStr,ReplaceStr,[rfReplaceAll]);
 end;

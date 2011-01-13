@@ -568,14 +568,14 @@ begin
   TP := SkillToCoords(Skill);
   if (not(Amount)) then
     TP := Point(TP.x + 15,TP.y + 12);
-  CTS := GetColorToleranceSpeed;
-  ColorToleranceSpeed(0);
+  CTS := GetToleranceSpeed;
+  SetColorToleranceSpeed(0);
   if not FindColors(TPA, 65535, TP.x - 2, TP.y - 2, TP.x + 15, TP.y + 15) then
     exit;
   Box := GetTPABounds(TPA);
   Result := StrToIntDef(GetNumbers(GetTextAtEx(Box.x1 - 2, Box.y1 -1, 100,
     StatChars, False, True, 0, 3,65535, 3, True, tr_Digits)), -1);
-  ColorToleranceSpeed(CTS);
+  SetColorToleranceSpeed(CTS);
 end;
 
 (*

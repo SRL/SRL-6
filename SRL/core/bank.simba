@@ -1234,8 +1234,8 @@ var
   c, Speed, Col: Integer;
 begin
   result := false;
-  Speed := GetColorToleranceSpeed;
-  ColorToleranceSpeed(2);
+  Speed := GetToleranceSpeed;
+  SetColorToleranceSpeed(2);
   if ChangeAngle then SetAngle(True);
   if ChangeCompass then
   begin
@@ -1275,7 +1275,7 @@ begin
           InPin(Players[CurrentPlayer].Pin);
       Result := (BankScreen) or (PinScreen);
     end;
-  ColorToleranceSpeed(Speed);
+  SetColorToleranceSpeed(Speed);
 end;
 
 (*
@@ -1359,13 +1359,13 @@ begin
   end;
 
   MakeCompass('n');
-  z := GetColorToleranceSpeed;
-  ColorToleranceSpeed(2);
-  SetColorSpeed2Modifiers(Info[4], Info[5]);
+  z := GetToleranceSpeed;
+  SetColorToleranceSpeed(2);
+  SetToleranceSpeed2Modifiers(Info[4], Info[5]);
 
   FindColorsSpiralTolerance(Info[0], Info[1], Booths, Info[2], MSX1, MSY1, MSX2, MSY2, Info[3]);
-  ColorToleranceSpeed(z);
-  SetColorSpeed2Modifiers(0.2, 0.2);
+  SetColorToleranceSpeed(z);
+  SetToleranceSpeed2Modifiers(0.2, 0.2);
 
   { Split to ATPA. }
   if Info[7] then
@@ -1450,8 +1450,8 @@ begin
   Result := (LoggedIn) and (BankScreen or PinScreen);
   if (Result) then exit;
 
-  Speed := GetColorToleranceSpeed;
-  ColorToleranceSpeed(2);
+  Speed := GetToleranceSpeed;
+  SetColorToleranceSpeed(2);
   ColFace := 7774419; // Face Color
   ColGrey := 6381925; // Grey Color [ Clothes ]
   ColBlue := 2429979; // Blue Color [ Clothes ]
@@ -1467,7 +1467,7 @@ begin
         InPin(Players[CurrentPlayer].Pin);
     Result := (BankScreen) or (PinScreen);
   end;
-  ColorToleranceSpeed(Speed);
+  SetColorToleranceSpeed(Speed);
 end;
 
 (*

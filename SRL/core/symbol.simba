@@ -660,8 +660,8 @@ var
   TheColor, c, Speed, x, y: Integer;
   acc: Extended;
 begin
-  Speed := GetColorToleranceSpeed;
-  ColorToleranceSpeed(1);
+  Speed := GetToleranceSpeed;
+  SetColorToleranceSpeed(1);
   TheColor := LoadSymbolBitmapColor(LowerCase(Name));
   if (TheColor <> 0) then
   begin
@@ -681,7 +681,7 @@ begin
   try
     FreeBitmap(SymbolBitmap);
   finally
-    ColorToleranceSpeed(Speed);
+    SetColorToleranceSpeed(Speed);
   except
     Result := 0;
   end;
@@ -827,8 +827,8 @@ begin
   aP := TPAtoATPA(P, 10);
   Hi := High(aP);
   LoadSymbolBitmapColor(LowerCase(SymbolName));
-  CTS := GetColorToleranceSpeed;
-  ColorToleranceSpeed(1);
+  CTS := GetToleranceSpeed;
+  SetColorToleranceSpeed(1);
   SetLength(AnsTPA, Hi+1);
   for i := 0 to Hi do
   begin
@@ -848,7 +848,7 @@ begin
   try
     FreeBitmap(SymbolBitmap);
   finally
-    ColorToleranceSpeed(CTS);
+    SetColorToleranceSpeed(CTS);
   end;
 end;
 

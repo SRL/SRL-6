@@ -68,7 +68,7 @@ begin
       Exit;
     end;
   end;
-  SetColorSpeed2Modifiers(Info[3], Info[4]);
+  SetToleranceSpeed2Modifiers(Info[3], Info[4]);
 
   case s of
     'kebab', 'chocolate bar', 'roll', 'bread roll', 'meat pie', 'pie', 'doughnut':
@@ -235,12 +235,12 @@ begin
     MinCount := 100;
   end;
 
-  cts := GetColorToleranceSpeed;
+  cts := GetToleranceSpeed;
   deg := Round(rs_GetCompassAngleDegrees);
   MakeCompass('n');
   SetAngle(True);
-  ColorToleranceSpeed(2);
-  SetColorSpeed2Modifiers(0.2, 0.2);
+  SetColorToleranceSpeed(2);
+  SetToleranceSpeed2Modifiers(0.2, 0.2);
   t := GetSystemTime;
 
   SetAngle(True);
@@ -273,8 +273,8 @@ begin
   if (s = '') then
   begin
     WriteLn('Sandwich Lady: Could not find target!');
-    SetColorSpeed2Modifiers(0.2, 0.2);
-    ColorToleranceSpeed(cts);
+    SetToleranceSpeed2Modifiers(0.2, 0.2);
+    SetColorToleranceSpeed(CTS);
     CloseWindow;
     Exit;
   end;
@@ -338,6 +338,6 @@ begin
   end;
   Writeln('SolveSandwich result: ' + booltostr(result) + 'time took: ' + inttostr(GetSystemTime - t));
   MakeCompass(Deg);
-  SetColorSpeed2Modifiers(0.2, 0.2);
-  ColorToleranceSpeed(cts);
+  SetToleranceSpeed2Modifiers(0.2, 0.2);
+  SetColorToleranceSpeed(CTS);
 end;

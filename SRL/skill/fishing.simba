@@ -48,13 +48,13 @@ var
 begin
   Result := False;
   if (not LoggedIn) then exit;
-  tmpCTS := GetColorToleranceSpeed;
-  ColorToleranceSpeed(2);
-  SetColorSpeed2Modifiers(1.21, 1.58);
+  tmpCTS := GetToleranceSpeed;
+  SetColorToleranceSpeed(2);
+  SetToleranceSpeed2Modifiers(1.21, 1.58);
 
   FindColorsTolerance(arP, 13940675, X - 25, Y - 25, X + 25, Y + 25, 15);
-  ColorToleranceSpeed(tmpCTS);
-  SetColorSpeed2Modifiers(0.2, 0.2);
+  SetColorToleranceSpeed(tmpCTS);
+  SetToleranceSpeed2Modifiers(0.2, 0.2);
     
   if (Length(arP) < 1) then exit;
 
@@ -87,14 +87,14 @@ var
 begin
   if not LoggedIn then exit;
   Result := False;
-  tmpCTS := GetColorToleranceSpeed;
-  ColorToleranceSpeed(2);
-  SetColorSpeed2Modifiers(1.21, 1.58);
+  tmpCTS := GetToleranceSpeed;
+  SetColorToleranceSpeed(2);
+  SetToleranceSpeed2Modifiers(1.21, 1.58);
 
   FindColorsTolerance(arP, 13940675, MSCX - 50, MSCY - 50, MSCX + 50, MSCY + 50, 15);
   begin
-    ColorToleranceSpeed(tmpCTS);
-    SetColorSpeed2Modifiers(0.2, 0.2);
+    SetColorToleranceSpeed(tmpCTS);
+    SetToleranceSpeed2Modifiers(0.2, 0.2);
     Exit;
   end;
 
@@ -112,8 +112,8 @@ begin
     end;
   end;
 
-  ColorToleranceSpeed(tmpCTS);
-  SetColorSpeed2Modifiers(0.2, 0.2);
+  SetColorToleranceSpeed(tmpCTS);
+  SetToleranceSpeed2Modifiers(0.2, 0.2);
 end;
 
 {*******************************************************************************
@@ -163,9 +163,9 @@ begin
   Result := False;
   if (not LoggedIn) then exit;
 
-  tmpCTS := GetColorToleranceSpeed;
-  ColorToleranceSpeed(2);
-  SetColorSpeed2Modifiers(0.12, 0.27);
+  tmpCTS := GetToleranceSpeed;
+  SetColorToleranceSpeed(2);
+  SetToleranceSpeed2Modifiers(0.12, 0.27);
 
   T := GetSystemTime + 700;
   repeat
@@ -173,8 +173,8 @@ begin
     TPA := CombineTPA(tempTPA, TPA);
   until(GetSystemTime > T);
 
-  ColorToleranceSpeed(tmpCTS);
-  SetColorSpeed2Modifiers(0.2, 0.2);
+  SetColorToleranceSpeed(tmpCTS);
+  SetToleranceSpeed2Modifiers(0.2, 0.2);
 
   if (Length(TPA) < 1) then exit;
 

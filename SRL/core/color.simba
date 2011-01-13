@@ -99,6 +99,11 @@ begin
     FilterPointsPie(Points, StartD, EndD, MinR, MaxR, Mx, My);
 end;
 
+function FindDTMRotated(DTM: Integer; var x, y: Integer; x1, y1, x2, y2: Integer; sAngle, eAngle, aStep: Extended; out aFound: Extended): Boolean;
+begin;
+  result := FindDTMRotatedAlternating(DTM,x,y,x1,y1,x2,y2,sangle,eangle,astep,afound);
+end;
+
 (*
 DTMRotated
 ~~~~~~~~~~

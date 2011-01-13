@@ -116,20 +116,20 @@ var
 begin
   WriteLn('Entering function: Frog_ClickFrog');
   Result := False;
-  if (FindTextTpa(128, 0, MCX1, MCY1, MCX2, MCY2, 'Princ', NPCChars, Nothing)) then
+  if (FindTextTpa(128, 0, MCX1, MCY1, MCX2, MCY2, 'Princ', CharsNPC, Nothing)) then
   begin
     Result := True;
     Exit;
   end;
-  cts := GetColorToleranceSpeed;
-  ColorToleranceSpeed(2);
+  cts := GetToleranceSpeed;
+  SetColorToleranceSpeed(2);
 
-  SetColorSpeed2Modifiers(0.05, 1.1);
+  SetToleranceSpeed2Modifiers(0.05, 1.1);
   FindColorsTolerance(tpa, 2476797, MSX1, MSY1, MSX2, MSY2, 10);
   atpa := SplitTPAEx(tpa, 5, 5);
   SortATPAFromFirstPoint(atpa, Point(MSCX, MSCY));
 
-  SetColorSpeed2Modifiers(0.05, 0.15);
+  SetToleranceSpeed2Modifiers(0.05, 0.15);
   for i := 0 to High(atpa) do
   begin
     //WriteLn('Len: '+IntToStr(Length(atpa[i])));
@@ -154,9 +154,9 @@ begin
     Break;
   end;
 
-  SetColorSpeed2Modifiers(0.2, 0.2);
-  ColorToleranceSpeed(cts);
-  Result := (FindTextTpa(128, 0, MCX1, MCY1, MCX2, MCY2, 'Princ', NPCChars, Nothing));
+  SetToleranceSpeed2Modifiers(0.2, 0.2);
+  SetColorToleranceSpeed(CTS);
+  Result := (FindTextTpa(128, 0, MCX1, MCY1, MCX2, MCY2, 'Princ', CharsNPC, Nothing));
   if (Result) then WriteLn('Talking to Frog Prince(ss).');
 end;}
 

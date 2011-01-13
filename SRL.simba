@@ -16,9 +16,9 @@
 //----------------------------------------------------------------------------//
 
 //----------------------------------------------------------------------------//
-//--                         SRL Level 1 Includes                           --//
+//--                          SRL Optional SMART                            --//
 //--                                                                        --//
-//--        Low Level Math, Mouse Movement and Color routines.              --//
+//--                SRL Minimizable Autoing Resource Thing                  --//
 //----------------------------------------------------------------------------//
 
 {$IFDEF SMART}
@@ -27,9 +27,11 @@
     {$ENDIF}
 {$ENDIF}
 
-
-// XXX: Remove? Replace?     Res:IF908-A: Not yet, it's pretty crucial.
-{$I SRL/SRL/core/simba.simba}
+//----------------------------------------------------------------------------//
+//--                         SRL Level 1 Includes                           --//
+//--                                                                        --//
+//--        Low Level Math, Mouse Movement and Color routines.              --//
+//----------------------------------------------------------------------------//
 
 {$I SRL/core/globals.simba}
 {$I SRL/core/math.simba}
@@ -88,35 +90,32 @@
 {$I SRL/core/antirandoms/mime.simba}
 {$I SRL/core/antirandoms/antirandoms.simba}
 
-{$DEFINE SRL_OPENDEV}
+(*
+SetUpSRL
+~~~~~~~~~~~
 
-{*******************************************************************************
-procedure  FreeSRL;
-by: SRL Dev Team
-Description: Tries to free all the variables it allocated during runtime.
-*******************************************************************************}
-procedure FreeSRL;
-begin
-  FreeSRLBitmaps;
-  //FreeSRLFonts;
-  //FreeSRLLog;
-end;
+.. code-block:: pascal
 
-{*******************************************************************************
-procedure  SetupSRL;
-by: SRL Dev Team
-Last Edit: 22 June 2010 -- Nava2
-Description: Sets up all variables needed to run SRL.
-*******************************************************************************}
+    procedure SetUpSRL;
 
-procedure SetupSRL;
+Initiates  SRL
+
+.. note::
+
+  by SRL Dev Team
+
+*)
+
+procedure SetUpSRL;
 var
-  t: Integer;
+  T: Integer;
 begin
-  SetupBoxes; //Sets up box variables in globals.simba
-  t := GetTimeRunning;
+  SetUpBoxes; //Sets up box variables in globals.simba
+  T := GetTimeRunning;
   MouseSpeed := 15;
-  {$IFDEF UseLaptopMouse}LMouse_MissChance := 75;{$ENDIF}
+  {$IFDEF UseLaptopMouse}
+    LMouse_MissChance := 75;
+  {$ENDIF}
   CheckHPFirst := True;
   Reincarnate := False;
   TalkAfterRandoms := False;
@@ -125,56 +124,42 @@ begin
   WaterColor := 0;
   BankColor := 0;
   LampSkill := 'mining';
-  //SetUpSRLReport;
   LoadCosineArrays;
   SymbolAccuracy:= 0.8;
-  LoadSRLBitMaps;
-  //LoadSRLFonts;
   LoadTeleRandoms;
   SolveSRLRandoms := True;
-  //SetupSRLAutoResponder;
   UseFindMod := True;
   LogoutOnMod := True;
   UseFindTrade := True;
-  //UseAutoResponder := True;
   Screenshots := False;
   GraphicsSet := False;
   AllowPVP    := False;
   ScreenShots := True;
   WarnSensitivity := -2;
   SetupAutoColors;
-
-  //InitializeSRLLogFile;
-
-  // Add the On Terminate
   AddOnTerminate('FreeSRL');
   SetSupressExceptions(true);
-
-  Writeln ('SRL Compiled in '+  IntToStr(GetTimeRunning - t) + ' msec');
-
-{$IFDEF SRL_SMART}
-  if (Smart_Server = 0) then
-  begin
-    Smart_Server := RandomWorld(Smart_Members, False);
+  Writeln ('SRL Compiled in '+  IntToStr(GetTimeRunning - T) + ' ms.');
+ {$IFDEF SRL_SMART}
+    if (Smart_Server = 0) then
+    begin
+      Smart_Server := 1
+      Smart_Signed := True;
+      Smart_SuperDetail := False;
+    end;
+    Writeln('SMART Initialized.' + #10 + 'Loaded: Server ' + IntToStr(Smart_Server) + ', Members: ' + BoolToStr(Smart_Members)
+            + ', Signed: ' + BoolToStr(Smart_Signed) + ', Super Detail: ' + BoolToStr(Smart_SuperDetail) + '.');
+    SmartSetupEx(Smart_Server, Smart_Members, Smart_Signed, Smart_SuperDetail);
+    SetTargetArray(SmartImageArray, 765,503);
+    repeat
+      Wait(100);
+      if (GetTimeRunning - T) > 120000 then
+        Break;
+    until (RSReady);
+  {$ELSE}
+    Smart_Server := 0;
+    Smart_Members := False;
     Smart_Signed := True;
     Smart_SuperDetail := False;
-  end;
-  Writeln('SMART Initialized.' + #10 + 'Loaded: Server ' + IntToStr(Smart_Server) + ', Members: ' + BoolToStr(Smart_Members)
-                 + ', Signed: ' + BoolToStr(Smart_Signed) + ', Super Detail: ' + BoolToStr(Smart_SuperDetail) + '.');
-  SmartSetupEx(Smart_Server, Smart_Members, Smart_Signed, Smart_SuperDetail);
-
-  // Smart size = (765,503)
-  SetTargetArray(SmartImageArray, 765,503);
-  repeat
-    Wait(100);
-    if (GetTimeRunning - t) > 120000 then
-      Break;
-  until(RSReady);
-{$ELSE}
-  Smart_Server := 0;
-  Smart_Members := false;
-  Smart_Signed := True;
-  Smart_SuperDetail := false;
-{$ENDIF}
-
+  {$ENDIF}
 end;

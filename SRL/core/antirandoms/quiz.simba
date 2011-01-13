@@ -302,8 +302,8 @@ Var
    cts: Integer;
 
 Begin
-  Cts := GetColorToleranceSpeed;
-  ColorToleranceSpeed(1);
+  Cts := GetToleranceSpeed;
+  SetColorToleranceSpeed(1);
   SearchB := QuizItemBox(Index);
   FindColorsTolerance(TPA, 7807248 , SearchB.X1, SearchB.Y1, SearchB.X2, SearchB.Y2, 35);
   FindColorsTolerance(TPA2, 11040367 , SearchB.X1, SearchB.Y1, SearchB.X2, SearchB.Y2, 35);
@@ -321,7 +321,7 @@ Begin
   Result.Width := ObjB.X2 - ObjB.X1;
   Result.Height := ObjB.Y2 - ObjB.Y1;
   Result.TotalCount := (ObjB.X2 - ObjB.X1) * (ObjB.Y2 - ObjB.Y1);
-  ColorToleranceSpeed(cts);
+  SetColorToleranceSpeed(CTS);
 End;
 
 {*******************************************************************************
@@ -537,11 +537,11 @@ begin
     Flag;
   end;
   Wait(1000 + Random(500));
-  ColorToleranceSpeed(2);
-  SetColorSpeed2Modifiers(0.16, 1.80);
+  SetColorToleranceSpeed(2);
+  SetToleranceSpeed2Modifiers(0.16, 1.80);
   FindColorsSpiralTolerance(MSCX, MSCY, TPA, 6670489, MSX1, MSY1, MSX2, MSY2, 11);
-  ColorToleranceSpeed(1);
-  SetColorSpeed2Modifiers(0.2, 0.2);
+  SetColorToleranceSpeed(1);
+  SetToleranceSpeed2Modifiers(0.2, 0.2);
   TPAA := TPAToATPAEx(TPA, 30, 30);
   SortATPAFromFirstPoint(TPAA, Point(MSCX, MSCY));
   for I := 0 to High(TPAA) do

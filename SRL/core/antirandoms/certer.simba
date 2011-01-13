@@ -44,7 +44,7 @@ Description: Returns True if the Certer screen is open.
 
 function CerterScreen: Boolean;
 begin
-  Result := (FindTextTpa(1060404, 0, 118, 23, 169, 42, 'this', NPCChars, Nothing)) and (LoggedIn);
+  Result := (FindTextTpa(1060404, 0, 118, 23, 169, 42, 'this', CharsNPC, Nothing)) and (LoggedIn);
 end;
 
 {*******************************************************************************
@@ -240,7 +240,7 @@ begin
   FindColorsTolerance(textPts, 1060404, 124, 45, 294, 142, 0);
   for I := 0 to High(CerterItems) do
   begin
-    textTPA := LoadTextTPA(CerterItems[I].Name, NPCChars, TH);
+    textTPA := LoadTextTPA(CerterItems[I].Name, CharsNPC, TH);
     if (FindTextTPAInTPA(TH, textTPA, textPts, Matches)) then
     begin
       SetLength(Possibilities, Length(Possibilities) + 1);
@@ -326,12 +326,12 @@ var
   x, y, hATPA, CTS, i: integer;
 begin
   if not LoggedIn then exit;
-  CTS := GetColorToleranceSpeed;
-  ColorToleranceSpeed(2);
-  SetColorSpeed2Modifiers(0.19, 0.37);
+  CTS := GetToleranceSpeed;
+  SetColorToleranceSpeed(2);
+  SetToleranceSpeed2Modifiers(0.19, 0.37);
   FindColorsTolerance(TPA, 6988174, msx1, msy1, msx2, msy2, 13); //green portal color
-  SetColorSpeed2Modifiers(0.2, 0.2);
-  ColorToleranceSpeed(CTS);
+  SetToleranceSpeed2Modifiers(0.2, 0.2);
+  SetColorToleranceSpeed(CTS);
   ATPA := SplitTPA(TPA, 30);
   if (Length(ATPA) = 0) then exit;
   hATPA := High(ATPA);
@@ -421,10 +421,10 @@ begin
   mouse(middle.x + 10,middle.y+2,1,0,true);
   FFlag(0);
   Wait(2000 + random(500));
-  CTS := GetColorToleranceSpeed;
-  ColorToleranceSpeed(2);
+  CTS := GetToleranceSpeed;
+  SetColorToleranceSpeed(2);
   FindColorsTolerance(TPA,5855581,MSX1,MsY1,MSX2,MSy2,8);
-  ColorToleranceSpeed(CTS);
+  SetColorToleranceSpeed(CTS);
   ATPA := SplitTPA(TPA,5);
   SortATPAFrom(ATPA,Point(MSCX - 80,MSCY));
   for i :=  0 to high(ATPA) do
@@ -506,7 +506,7 @@ begin
     Wait(1000 + Random(1000));
     if (Answer <> '') then
     begin
-      if FindText(X, Y, Answer, NPCChars, 124, 44, 270, 140) then
+      if FindText(X, Y, Answer, CharsNPC, 124, 44, 270, 140) then
       begin
         Mouse(X, Y, 15, 10, True);
         WriteLn('Solved Certer: ' + Answer);
@@ -516,7 +516,7 @@ begin
           Wait(1000);
       end;
 
-      Result := FindTextTpa(0, 0, MCX1, MCY1, MCX2, MCY2, 'orrect', NPCChars, Nothing);
+      Result := FindTextTpa(0, 0, MCX1, MCY1, MCX2, MCY2, 'orrect', CharsNPC, Nothing);
       while (ClickContinue(True, True)) do
         Wait(100 + Random(500));
       Result := (LeaveCerter);//If we can leave the certer, we we're good for sure :)
