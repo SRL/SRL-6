@@ -7,6 +7,8 @@ The Inventory include contains all inventory-related functions
 *)
 
 {.include_once amount.simba}
+{.include_once bank.simba}
+{.include_once gametab.simba}
 
 { type TInvenItem;
   Description: Holds data regarding an inventory item }
@@ -108,6 +110,12 @@ begin
   SetArrayLength(Result, 28);
   for I := 0 to 27 do
    Result[I] := GetInven(i + 1);
+end;
+
+function isInventoryPresent: Boolean;
+begin
+  Result := (BankScreen) or (ShopScreen) or (TradeScreen > 0);
+  if (not(Result)) then Result := GameTab(tab_Inv);
 end;
 
 (*
