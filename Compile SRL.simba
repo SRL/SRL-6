@@ -9,7 +9,7 @@ make changes and test to see if SRL compiles successfully.
 
 {$DEFINE SMART}
 
-{.include_once SRL/SRL.simba}
+{$I SRL/SRL.simba}
 
 {$I SRL/skill/agility.simba}
 {$I SRL/skill/construction.simba}

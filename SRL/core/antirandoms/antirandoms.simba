@@ -216,7 +216,7 @@ begin
   for I := 1 to 28 do
   begin
     B := InvBox(I);
-    if FindItemEx(fx, fy, 'dtm', bDTM, B, []) then
+    if FindItemEx(fx, fy, srl_ITEM_IDENT_DTM, bDTM, B, []) then
     begin
       InvMouse(I, 3);
       Wait(RandomRange(100, 150));

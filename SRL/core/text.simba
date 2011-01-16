@@ -1160,3 +1160,17 @@ function Replace(Text, FindStr, ReplaceStr: string): string;
 begin;
   result := ReplaceWrap(Text,FindStr,ReplaceStr,[rfReplaceAll]);
 end;
+
+function StartsWith(prefix, s: string): Boolean;
+var
+  i,l : integer;
+begin
+  result := false;
+  l := length(prefix);
+  if l > length(s) then
+    exit;
+  for i := 1 to l do
+    if s[i] <> prefix[i] then
+      exit;
+  result := true;
+end;

@@ -768,38 +768,3 @@ end;
 procedure WaitNone;
 begin
 end;
-
-function AddOnTerminate(const proc : string) : boolean;
-var
-  OldProcs : TVariantArray;
-  i : integer;
-begin
-  result := false;
-  GetScriptProp(SP_OnTerminate,OldProcs);
-  for i := 0 to high(OldProcs) do
-    if lowercase(OldProcs[i]) = lowercase(proc) then
-      exit;
-  setlength(OldProcs,Length(OldProcs)+1);
-  OldProcs[high(OldProcs)] := proc;
-  SetScriptProp(SP_OnTerminate,oldprocs);
-  result := True;
-end;
-
-function DeleteOnTerminate(const proc : string) : boolean;
-var
-  OldProcs : TVariantArray;
-  NewProcs : TVariantArray;
-  i : integer;
-begin
-  result := False;
-  GetScriptProp(SP_OnTerminate,OldProcs);
-  for i := 0 to high(OldProcs) do
-    if lowercase(OldProcs[i]) = lowercase(proc) then
-      result := true
-    else
-    begin
-      setlength(NewProcs,Length(NewProcs)+1);
-      NewProcs[high(NewProcs)] := lowercase(OldProcs[i]);
-    end;
-  SetScriptProp(SP_OnTerminate,NewProcs);
-end;
