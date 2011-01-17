@@ -6,12 +6,9 @@ The Inventory include contains all inventory-related functions
 
 *)
 
-{.include_once amount.simba}
-{.include_once bank.simba}
-{.include_once gametab.simba}
-
 { type TInvenItem;
   Description: Holds data regarding an inventory item }
+
 type
   TInvenItem  = record
     Width, Height : Integer; // the width and height of the item
@@ -50,7 +47,7 @@ var
   P: TPointArray;
   MinP, MaxP: TPoint;
 begin
-  GameTab(tab_Inv);
+  //GameTab(tab_Inv);   // .. FIX
   Inven := Inven - 1;
   Slot := Inven mod 4;
   Row := Inven div 4;
@@ -114,7 +111,7 @@ end;
 
 function isInventoryPresent: Boolean;
 begin
-  Result := (BankScreen) or (ShopScreen) or (TradeScreen > 0);
+  Result := (BankScreen) or (ShopScreen) or (TradeScreen); // ... FIX
   if (not(Result)) then Result := GameTab(tab_Inv);
 end;
 
@@ -582,10 +579,10 @@ Example:
 
 
 *)
-function CountItems(ItemType: string; Identifier: Integer; tol: TIntegerArray): Integer;
+function CountItems(ItemType, Identifier: Integer; tol: TIntegerArray): Integer;  // ... FIX
 begin
   GameTab(tab_Inv);
-  Result := CountItemsIn('inv', ItemType, Identifier, Tol)
+  Result := CountItemsIn(srl_AREA_INVENTORY, ItemType, Identifier, Tol); // ... FIX
 end;
 
 (*
@@ -618,7 +615,7 @@ Example:
 
 *)
 
-function ClickAllItemsExcept(ItemType: String; Identifier: Integer; option: string; SlotIgnores: TIntegerArray; waitnum: Integer; tol: TIntegerArray):Integer;
+function ClickAllItemsExcept(ItemType, Identifier: Integer; option: string; SlotIgnores: TIntegerArray; waitnum: Integer; tol: TIntegerArray):Integer; // ... FIX
 var
   arr: TIntegerArray;
   I, X, Y: Integer;
@@ -672,7 +669,7 @@ Example:
 
 *)
 
-function ClickAllItems(ItemType: String; Identifier: Integer; option: string; waitnum: Integer; tol: TIntegerArray):Integer;
+function ClickAllItems(ItemType, Identifier: Integer; option: string; waitnum: Integer; tol: TIntegerArray):Integer;
 begin
   Result := ClickAllItemsExcept(ItemType, Identifier, option, [], waitnum, tol);
 end;
@@ -912,7 +909,7 @@ Example:
 
 
 *)
-procedure DropItemsByIdentifier(ItemType: string; Identifier: Integer; Tol: TIntegerArray);
+procedure DropItemsByIdentifier(ItemType, Identifier: Integer; Tol: TIntegerArray); // ... FIX
 begin
   ClickAllItems(ItemType, Identifier, 'rop', 250, Tol);
 end;

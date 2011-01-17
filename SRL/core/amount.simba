@@ -7,7 +7,16 @@ Items can be in your bank or in your inventory.
 
 *)
 
-{.include_once bank.simba}
+const
+  srl_AREA_INVENTORY = 0; // ... FIX
+  srl_AREA_SHOP = 1; // ... FIX
+  srl_AREA_BANK = 2; // ... FIX
+  srl_AREA_DEPOSITBOX = 3; // ... FIX
+  srl_AREA_TRADE = 4; // ... FIX
+  srl_AREA_TRADE_YOUR = 5; // ... FIX
+
+function BankScreen: Boolean; forward; // ... FIX
+function DepositScreen: Boolean; forward; // ... FIX
 
 (*
 
@@ -417,7 +426,7 @@ begin
         colnumber := 4;
         rownumber := 7;
 
-        valid := @isInventoryPresent;
+        //valid := @isInventoryPresent;  //FIX
       end;
 
     srl_AREA_SHOP:
@@ -526,7 +535,7 @@ begin
   case area of
     srl_AREA_INVENTORY:
       begin
-        Result := (BankScreen) or (ShopScreen) or (TradeScreen > 0);
+        Result := (BankScreen) or (ShopScreen) or (TradeScreen);  // ... FIX
         if (not(Result)) then Result := GameTab(tab_Inv);
       end;
     srl_AREA_SHOP:
@@ -536,7 +545,7 @@ begin
     srl_AREA_DEPOSITBOX:
       Result := DepositScreen;
     srl_AREA_TRADE, srl_AREA_TRADE_YOUR:
-      Result := (TradeScreen > 0);
+      Result := (TradeScreen); // ... FIX
     else
       srl_Warn(
         'CheckArea', toStr(Area) + ' is an invalid option.', warn_AllVersions
@@ -596,6 +605,7 @@ var
   info: srl_TItemInterface;
   x1, y1, x2, y2: Integer;
   itemx, itemy, L: Integer;
+  row, col: Integer; // ... FIX
 begin
   if (CheckArea(area)) then
   begin
@@ -608,9 +618,7 @@ begin
         y1 := info.start.y + row * info.rowsize;
         x2 := x1 + info.colsize;
         y2 := y1 + info.rowsize;
-        if (FindItem(
-            Itemx, Itemy, ItemType, Item_IDENT, x1, y1, x2, y2, Tol
-          ) then
+        if (FindItem(Itemx, Itemy, ItemType, Item_IDENT, x1, y1, x2, y2, Tol)) then // ... FIX
         begin
           Result[L].x := ItemX;
           Result[L].y := ItemY;
@@ -658,9 +666,7 @@ Example:
 
 *)
 
-function CountItemsIn(
-    area, ItemType, Item_IDENT: Integer; Tol: TIntegerArray
-  ): Integer;
+function CountItemsIn(area, ItemType, Item_IDENT: Integer; Tol: TIntegerArray): Integer;
 begin
   Result := Length(ItemCoordinates(Area, ItemType, Item_IDENT, Tol));
 end;
@@ -780,7 +786,7 @@ var
   V: array [0..1] of TVariantArray;
   hMod, sMod: Extended;
 begin
-  case Lowercase(Area) of
+  case Area of // ... FIX
     srl_ITEMINT_INVENTORY:
       B := IntToBox(MIX1, MIY1, MIX2, MIY2);
     srl_ITEMINT_BANK:

@@ -6,8 +6,6 @@ The Bank include contains Bank finders, and all banking routines.
 
 *)
 
-{.include_once inventory.simba}
-
 { const Bnk Constants;
   Description: Constants representing the different types of Banks }
 
@@ -882,7 +880,7 @@ Example:
 *)
 
 
-function WithdrawItemEx(Ident: integer; IdentType: string; var Index: integer; Amount: integer; UpText: string; Tol: TIntegerArray): Boolean;
+function WithdrawItemEx(Ident, IdentType: integer; var Index: integer; Amount: integer; UpText: string; Tol: TIntegerArray): Boolean;
 var
   x, y: integer;
   BPoint: TPoint;
@@ -937,7 +935,7 @@ begin
   end else
   begin
     Index := 0;
-    SRL_Warn('WithdrawItem', 'Could not Find ' + IdentType + ' in Bank. [Uptext: ' + UpText + ']', Warn_AllVersions);
+    SRL_Warn('WithdrawItem', 'Could not Find ' + IntToStr(IdentType) + ' in Bank. [Uptext: ' + UpText + ']', Warn_AllVersions);
   end;
 end;
 
@@ -961,7 +959,7 @@ Example:
 
 *)
 
-function WithdrawItem(Ident: integer; IdentType: string; Amount: integer; UpText: String; Tol: TIntegerArray): boolean;
+function WithdrawItem(Ident, IdentType: integer; Amount: integer; UpText: String; Tol: TIntegerArray): boolean;
 var
   I : Integer;
 begin

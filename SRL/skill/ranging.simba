@@ -49,7 +49,7 @@ var
   i, headx, heady: Integer;
 begin
   GameTab(tab_Inv);
-  tailcoords := ItemCoordinates('inv', 'color', tailcolor, [0]); //finds all arrow stacks
+  tailcoords := ItemCoordinates(srl_AREA_INVENTORY, srl_ITEM_IDENT_COLOUR, tailcolor, [0]); //finds all arrow stacks
   if (GetArrayLength(tailcoords) > 0) then
   begin
     for i := 0 to GetArrayLength(tailcoords) - 1 do

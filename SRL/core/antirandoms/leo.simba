@@ -260,9 +260,9 @@ var
 begin
   Time := GetSystemTime;
   First := false;
-  if CountItems('dtm',LeoDTM_Coffin,[]) = 0 then
+  if CountItems(srl_ITEM_IDENT_DTM,LeoDTM_Coffin,[]) = 0 then
     First := True;
-  while (CountItems('dtm', LeoDTM_Coffin, []) < 5) and ((GetSystemTime - Time) <= (60 * 1000)) and (f < 5) do
+  while (CountItems(srl_ITEM_IDENT_DTM, LeoDTM_Coffin, []) < 5) and ((GetSystemTime - Time) <= (60 * 1000)) and (f < 5) do
   begin
     SetColorToleranceSpeed(2);
     SetToleranceSpeed2Modifiers(Leo_CoffinHue, Leo_CoffinSat);
@@ -406,7 +406,7 @@ var
   B: TBox;
 begin
   Leo_GrabCoffins;
-  if (CountItems('dtm', LeoDTM_Coffin, []) < 5) then
+  if (CountItems(srl_ITEM_IDENT_DTM, LeoDTM_Coffin, []) < 5) then
   begin
     WriteLn('Could not find all coffins!');
     LogOut;
