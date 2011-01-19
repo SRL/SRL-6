@@ -21,15 +21,18 @@ function DepositScreen: Boolean; forward; // ... FIX
 (*
 
 srl_ITEM_IDENT Consts
-~~~~~~~~~~~~~~~~~
+~~~~~~~~~~~~~~~~~~~~~
 
 Constants associated with the different finding methods.
 These consist of:
 
 - *BITMAP*
+
 - *DTM*
+
 - *COLOUR*, *COLOR*
-- *MASK*[*]_
+
+- *MASK* [*]_
 
 .. [*] Refers to bitmap masks.
 
@@ -49,24 +52,26 @@ Record holding information of an interface of items. The record is structured as
 follows:
 
 start: **TPoint**
-  The coordinates associated with the Item Interface. Typically, this denotes
-  the origin of the colums and rows.
+	The coordinates associated with the Item Interface. Typically, this denotes
+	the origin of the colums and rows.
 
 rowsize,colsize: **Integer**
-  The dimensions of the rows or columns respectively. This is a measurement in
-  pixels.
+	The dimensions of the rows or columns respectively. This is a measurement in
+	pixels.
 
 rownumber,colnumber: **Integer**
-  The number of rows or colums respectively present in the ItemInterface
-  which creates the grid.
+	The number of rows or colums respectively present in the ItemInterface
+	which creates the grid.
 
 valid: **function: Boolean**
-  Functional pointer to check if the respective ItemInterface is available at
-  this time. For example:
-  .. code-block:: pascal
-    bankArea := AreaInfo(srl_ITEMINT_BANK);
-    if (bankArea.valid()) then
-    //...
+	Functional pointer to check if the respective ItemInterface is available at
+	this time. For example:
+  
+	.. code-block:: pascal
+
+		bankArea := AreaInfo(srl_ITEMINT_BANK);
+		if (bankArea.valid()) then
+		//...
 
 *)
 
@@ -83,21 +88,28 @@ type
 srl_ITEMINT Consts
 ~~~~~~~~~~~~~~~~~~
 
-Constants created for selecting precreated TItemInterfaces's_. Use these
+Constants created for selecting precreated `TItemInterfaces\'s`_. Use these
 constants for loading SRL's TItemInterfaces.
 
 The constant suffixes[#]_ are as follows:
+
 - *INVENTORY*
+
 - *SHOP*
+
 - *BANK*
+
 - *DEPOSITBOX*
+
 - *TRADE*
+
 - *TRADE_YOUR*
 
 .. note::
-  Modified: 13 Jan 2011 - Nava2
+	Modified: 13 Jan 2011 - Nava2
 
-.. _TItemInterfaces's: `srl_TItemInterface Record`
+.. _TItemInterfaces\'s: `srl_TItemInterface Record`
+
 .. [#] All constants here are prepended with ``srl_ITEMINT_``.
 
 *)
@@ -116,23 +128,25 @@ TradeScreen
 
 .. code-block:: pascal
 
-    function TradeScreen: Integer;
+   function TradeScreen: Integer;
 
-Returns srl_ITEMINT_TRADE or srl_ITEMINT_TRADE_YOUR for the respective
-tradescreens, -1 if neither is open.
+Returns ``srl_ITEMINT_TRADE`` or ``srl_ITEMINT_TRADE_YOUR`` for the respective
+tradescreens, ``-1`` if neither is open.
+
+.. note::
+
+	by Zephyrsfury
 
 .. note::
 
-  by Zephyrsfury
-
-.. note::
-  Modified: 13 Jan 2011 - Nava2
+	Modified: 13 Jan 2011 - Nava2
 
 Example:
 
 .. code-block:: pascal
-  if (TradeScreen > 0) then
-    WriteLn('We''re at a trade screen!');
+
+	if (TradeScreen > 0) then
+	  WriteLn('We''re at a trade screen!');
 
 *)
 
@@ -152,18 +166,21 @@ isTradeScreen
 ~~~~~~~~~~~~~
 
 .. code-block:: pascal
-  function isTradeScreen: Boolean;
+
+	function isTradeScreen: Boolean;
 
 Returns true if one of the trade screens is open.
 
 Example:
 
 .. code-block:: pascal
-  if (isTradeScreen) then
-    clickConfirm;
+
+	if (isTradeScreen) then
+	  clickConfirm;
 
 .. note::
-  Modified: 13 Jan 2011 - Nava2
+
+	Modified: 13 Jan 2011 - Nava2
 *)
 
 function TradeScreen: Boolean;
@@ -177,20 +194,21 @@ ShopScreen
 
 .. code-block:: pascal
 
-    Function ShopScreen : Boolean;
+    function ShopScreen : Boolean;
 
 Returns true if a shop interface is opened.
 
 .. note::
 
-  by ZephyrsFury fixed by NCDS
+	by ZephyrsFury fixed by NCDS
 
 Example:
 
 .. code-block:: pascal
 
 .. note::
-  Modified: 13 Jan 2011 - Nava2
+
+	Modified: 13 Jan 2011 - Nava2
 
 *)
 
@@ -207,41 +225,46 @@ FindItemEx
 
 .. code-block:: pascal
 
-  function FindItemEx(
-      var x, y: Integer;
-      IdentType, Ident: Integer;
-      Area: TBox;
-      Tol: TIntegerArray
-  ): Boolean;
+	function FindItemEx(
+	    var x, y: Integer;
+	    IdentType, Ident: Integer;
+	    Area: TBox;
+	    Tol: TIntegerArray
+	): Boolean;
 
 Finds an item_IDENT in Area specified by TBox in Area.
-Valid IdentTypes are the `ITEM_IDENT Constants`_.
+Valid IdentTypes are the `srl_ITEM_IDENT Consts`_.
 
 The tolerance parameter works as follows:
-  - *Tol[0]*: Color Tolerance;
-  - *Tol[1]*: Contour Tolerance or minimum Colors to Find to be True.
+
+- *Tol[0]*: Color Tolerance;
+
+- *Tol[1]*: Contour Tolerance or minimum Colors to Find to be True.
 
 The main purpose of this and `FindItem`_ are for generalizing helpers in the
 different files in these includes. They can easily be used outside for different
 generalizations as well, though.
 
 .. note::
-  by Nava2
+
+	by Nava2
 
 Example:
 
 .. code-block:: pascal
-  var
-    x,y: Integer;
-    b: TBox;
-  begin
-    b:= IntToBox(MMX1, MMY1, MMX2, MMY2);
-    if (FindItemEx(x,y, srl_ITEMIDENT_BITMAP, the_bmp, b, [4])) then
-      Mouse(x,y,5,5,mouse_right);
-  end;
+
+	var
+	  x,y: Integer;
+	  b: TBox;
+	begin
+	  b:= IntToBox(MMX1, MMY1, MMX2, MMY2);
+	  if (FindItemEx(x,y, srl_ITEMIDENT_BITMAP, the_bmp, b, [4])) then
+	    Mouse(x,y,5,5,mouse_right);
+	end;
 
 .. note::
-  Modified: 13 Jan 2011 - Nava2
+
+	Modified: 13 Jan 2011 - Nava2
 *)
 
 function FindItemEx(
@@ -292,12 +315,12 @@ FindItem
 
 .. code-block:: pascal
 
-  function FindItem(
-      var x, y: Integer;
-      IdentType, Ident: Integer;
-      x1, y1, x2, y2: Integer;
-      Tol: TIntegerArray
-    ): Boolean;
+	function FindItem(
+	    var x, y: Integer;
+	    IdentType, Ident: Integer;
+	    x1, y1, x2, y2: Integer;
+	    Tol: TIntegerArray
+	  ): Boolean;
 
 
 Finds an item in Area specified by x1, y1, x2, y2 in the Area.
@@ -305,20 +328,22 @@ Please see `FindItemEx`_ for more information.
 
 .. note::
 
-  by Nava2
+	by Nava2
 
 Example:
 
 .. code-block:: pascal
-  var
-    x,y: Integer;
-  begin
-    if (FindItem(x,y,srl_ITEMIDENT_DTM, DTM, MSX1,MSY1,MSX2,MSY2, [])) then
-      Mouse(x,y,0,0,mouse_Left);
-  end;
+
+	var
+	  x,y: Integer;
+	begin
+	  if (FindItem(x,y,srl_ITEMIDENT_DTM, DTM, MSX1,MSY1,MSX2,MSY2, [])) then
+	    Mouse(x,y,0,0,mouse_Left);
+	end;
 
 .. note::
-  Modified: 13 Jan 2011
+
+	Modified: 13 Jan 2011
 *)
 
 function FindItem(
@@ -337,20 +362,22 @@ GetAmount
 
 .. code-block:: pascal
 
-  function GetAmount(ItemX, ItemY: Integer): Integer;
+	function GetAmount(ItemX, ItemY: Integer): Integer;
 
 
-Returns the amount of an item_IDENT at coordinates (ItemX, ItemY).
+Returns the amount of an item at coordinates (ItemX, ItemY).
 Returns approximate values for 'K' and 'M'.
 
 .. note::
 
-  by Zeph, N1ke & Narcle
+	by Zeph, N1ke & Narcle
 
 Example:
 
 .. code-block:: pascal
 
+.. note::
+	Modified: Unknown
 *)
 
 function GetAmount(ItemX, ItemY: Integer): Integer;
@@ -393,23 +420,22 @@ AreaInfo
 
 .. code-block:: pascal
 
-  function AreaInfo(area: Integer): srl_TItemInterface;
+	function AreaInfo(area: Integer): srl_TItemInterface;
 
-
-Returns info on certain interfaces as an srl_TItemInterface.
+Returns info on certain interfaces as an `srl_TItemInterface Record`_.
 Row and col amounts, startcoords, sizes for inventory, banks, shop, ...
 
 .. note::
 
-  by masquerader, and Nava2
-
-.. note::
-  Modified: 13 Jan 2011 - Nava2
+	by masquerader and Nava2
 
 Example:
 
 .. code-block:: pascal
 
+.. note::
+
+	Modified: 13 Jan 2011 - Nava2
 *)
 
 function AreaInfo(area: Integer): srl_TItemInterface;
@@ -511,21 +537,21 @@ CheckArea
 
 .. code-block:: pascal
 
-  function CheckArea(area: Integer): Boolean;
-
+	function CheckArea(area: Integer): Boolean;
 
 Checks if the given interface is opened.
 
 .. note::
 
-  by masquerader, and EvilChicken!
-
-.. note::
-  Modified: 13 Jan 2011 - Nava2
+	by masquerader, and EvilChicken!
 
 Example:
 
 .. code-block:: pascal
+
+.. note::
+
+	Modified: 13 Jan 2011 - Nava2
 
 *)
 
@@ -561,38 +587,48 @@ ItemCoordinates
 
 .. code-block:: pascal
 
-  function ItemCoordinates(
-      Area, ItemType, Item_IDENT: Integer;
-      Tol: TIntegerArray
-    ): TPointArray;
+	function ItemCoordinates(
+	    Area, ItemType, Item_IDENT: Integer;
+	    Tol: TIntegerArray
+	  ): TPointArray;
 
 Returns a TPA with the positions of all occurances of Item_IDENT.
 
 Parameters:
 
 - Area:
+
   See `srl_ITEMINT Consts`_
+
 - ItemType:
+
   See `srl_ITEM_IDENT Consts`_
+
 - Item_IDENT:
+
   name/value of your dtm/bmp/color/bmpmask.
+
 - Tol:
-  + *srl_ITEM_IDENT_DTM*: [][#]_.
-  + *srl_ITEM_IDENT_BITMAP*: [BMPTol].
-  + *srl_ITEM_IDENT_COLOUR*: [COLOUR Tol, Minimum Colour Count].
-  + *srl_ITEM_IDENT_MASK*: [BMPTol, ContourTol].
+	
+	+ *srl_ITEM_IDENT_DTM*: [][#]_.
+	
+	+ *srl_ITEM_IDENT_BITMAP*: [BMPTol].
+	
+	+ *srl_ITEM_IDENT_COLOUR*: [COLOUR Tol, Minimum Colour Count].
+	
+	+ *srl_ITEM_IDENT_MASK*: [BMPTol, ContourTol].
 
 .. note::
 
-  by masquerader modified by ZephyrsFury
-
-.. note::
-  Modified: 13 Jan 2011 - Nava2
+	by masquerader modified by ZephyrsFury
 
 Example:
 
 .. code-block:: pascal
 
+.. note::
+
+	Modified: 13 Jan 2011 - Nava2
 
 .. [#] DTMs do not have a *global* tolerance, its all done per point.
 
@@ -635,32 +671,45 @@ CountItemsIn
 
 .. code-block:: pascal
 
-  function CountItemsIn(
-      Area, ItemType: string; Item_IDENT: Integer; Tol: TIntegerArray
-    ): Integer;
+	function CountItemsIn(
+	    Area, ItemType, Item_IDENT: Integer; Tol: TIntegerArray
+	  ): Integer;
 
 Counts the number of items found within the Area. (Does not count stacks)
 Parameters:
 
 - Area:
+
   See `srl_ITEMINT Consts`_
+
 - ItemType:
+
   See `srl_ITEM_IDENT Consts`_
+
 - Item_IDENT:
-  name/value of your dtm/bmp/color/bmpmask.
+
+  Name/value of your dtm/bmp/color/mask.
+
 - Tol:
-  + *srl_ITEM_IDENT_DTM*: [][#]_.
-  + *srl_ITEM_IDENT_BITMAP*: [BMPTol].
-  + *srl_ITEM_IDENT_COLOUR*: [COLOUR Tol, Minimum Colour Count].
-  + *srl_ITEM_IDENT_MASK*: [BMPTol, ContourTol].
+	
+	+ *srl_ITEM_IDENT_DTM*: [][#]_.
+
+	+ *srl_ITEM_IDENT_BITMAP*: [BMPTol].
+
+	+ *srl_ITEM_IDENT_COLOUR*: [COLOUR Tol, Minimum Colour Count].
+
+	+ *srl_ITEM_IDENT_MASK*: [BMPTol, ContourTol].
 
 .. note::
 
-  by masquerader modified by ZephyrsFury
+	by masquerader modified by ZephyrsFury
 
 Example:
 
 .. code-block:: pascal
+
+.. note::
+	Modified: Unknown
 
 .. [#] DTMs do not have a *global* tolerance, its all done per point.
 
@@ -677,13 +726,13 @@ CountItemsArea
 
 .. code-block:: pascal
 
-  function CountItemsArea(area: Integer): Integer;
+	function CountItemsArea(area: Integer): Integer;
 
 Counts items in a specified area. Does **not** count stacks.
 
 .. note::
 
-  by masquerader
+	By masquerader
 
 Example:
 
@@ -705,33 +754,46 @@ ItemAmount
 
 .. code-block:: pascal
 
-  function ItemAmount(
-      Area, ItemType, Item_IDENT: Integer; Tol: TIntegerArray
-    ): Integer;
+	function ItemAmount(
+	    Area, ItemType, Item_IDENT: Integer; Tol: TIntegerArray
+	  ): Integer;
 
 Counts the number of items found with a color in a certain area. (Counts stacks)
+
 Parameters:
 
 - Area:
+
   See `srl_ITEMINT Consts`_
+
 - ItemType:
+
   See `srl_ITEM_IDENT Consts`_
+
 - Item_IDENT:
+
   name/value of your dtm/bmp/color/bmpmask.
+
 - Tol:
-  + *srl_ITEM_IDENT_DTM*: [][#]_.
-  + *srl_ITEM_IDENT_BITMAP*: [BMPTol].
-  + *srl_ITEM_IDENT_COLOUR*: [COLOUR Tol, Minimum Colour Count].
-  + *srl_ITEM_IDENT_MASK*: [BMPTol, ContourTol].
+	
+	+ *srl_ITEM_IDENT_DTM*: [][#]_.
+
+	+ *srl_ITEM_IDENT_BITMAP*: [BMPTol].
+
+	+ *srl_ITEM_IDENT_COLOUR*: [COLOUR Tol, Minimum Colour Count].
+
+	+ *srl_ITEM_IDENT_MASK*: [BMPTol, ContourTol].
 
 .. note::
 
-  by masquerader modified by ZephyrsFury.
+	by masquerader modified by ZephyrsFury.
 
 Example:
 
 .. code-block:: pascal
 
+.. note::
+	Modified: Unknown
 *)
 
 function ItemAmount(
@@ -754,26 +816,28 @@ FindCoins
 
 .. code-block:: pascal
 
-  function FindCoins(var X, Y: Integer; Area: Integer): Boolean;
+	function FindCoins(var X, Y: Integer; Area: Integer): Boolean;
 
 Finds coins in Area and stores the coords in x and y.
 
 .. note::
 
-  by ZephyrsFury.
+	by ZephyrsFury.
 
 Example:
 
 .. code-block:: pascal
-  var
-    cx, cy, numCoins: Integer;
-  begin
-    if (FindCoins(cx, cy, srl_ITEMINT_INVENTORY)) then
-      numCoins := getAmount(cx, cy);
-  end;
+
+	var
+	  cx, cy, numCoins: Integer;
+	begin
+	  if (FindCoins(cx, cy, srl_ITEMINT_INVENTORY)) then
+	    numCoins := getAmount(cx, cy);
+	end;
 
 .. note::
-  Modified: 13 Jan 2011 - Nava2
+
+	Modified: 13 Jan 2011 - Nava2
 
 *)
 
@@ -837,24 +901,27 @@ CoinAmount
 
 .. code-block:: pascal
 
-  function CoinAmount(Area: Integer): Integer;
+	function CoinAmount(Area: Integer): Integer;
 
 Returns the amount of coins in a specified interface.
 
 .. note::
-  by ZephyrsFury.
+
+	by ZephyrsFury.
 
 Example:
 
 .. code-block:: pascal
-  var
-    numCoins: Integer;
-  begin
-    numCoins := CoinAmount(srl_ITEMINT_TRADE);
-  end;
+
+	var
+	  numCoins: Integer;
+	begin
+	  numCoins := CoinAmount(srl_ITEMINT_TRADE);
+	end;
 
 .. note::
-  Modified: unknown
+
+	Modified: unknown
 
 *)
 
@@ -872,20 +939,23 @@ ShopSwitchTab
 
 .. code-block:: pascal
 
-  procedure ShopSwitchTab(name:string);
+	procedure ShopSwitchTab(name:string);
 
 Switches the shop tab to the one you want, only moves mouse if
-  neccessary ShopSwitchTab('main') or ShopSwitchTab('player').
+neccessary ShopSwitchTab('main') or ShopSwitchTab('player').
 
 .. note::
 
-  by Rasta Magician & ZephyrsFury
+	by Rasta Magician & ZephyrsFury
 
 Example:
 
 .. code-block:: pascal
-  ShopSwitchTab('main');
 
+	ShopSwitchTab('main');
+
+.. note::
+	Modified: Unknown
 *)
 
 procedure ShopSwitchTab(Name: string);

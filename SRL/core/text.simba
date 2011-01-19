@@ -367,7 +367,7 @@ end;
 
 (*
 GetNumbers
-~~~~~~~~
+~~~~~~~~~~
 
 .. code-block:: pascal
 
