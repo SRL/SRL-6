@@ -1,6 +1,8 @@
 TODO
 
-Updated: 19 Jan 2011 -- Nava2
+Please tag completed things with commit identities (those ugly hashes). Feel free to just add progress as well. 
+
+Updated: 23 Jan 2011 -- Nava2
 
 HIGH:
 
@@ -25,8 +27,10 @@ MED:
 
 - Implement Luff's custom waiting settings, keyboard settings, all that jazz
 	- Perhaps use an extension for all of these settings and read from a file? Would need to be fast.
+	- Loading these into a ``dictionary'' of sorts would be a nice way to implement this. 
 
 - Correct SRL Stats issues
+	- fixed in Stats v1.3 --- please confirm. 
 
 
 
@@ -38,5 +42,6 @@ MED:
 LOW:
 
 - API setup for implementing reflection alternatives over top of SRL if needed
+	- Considering moving this to SRL6 when we do the complete restructure. -- Nava2
 
 
