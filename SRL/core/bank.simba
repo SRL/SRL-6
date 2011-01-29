@@ -416,16 +416,15 @@ procedure FixBank;
 var
   Timer   : Integer;
 begin
-  if (SimilarColors(GetColor(481, 110), 723981, 20)) then      //Short circuit?
-    if (BankScreen) then
-      if (not (SimilarColors(GetColor(489, 101), 1316634, 5))) then
-      begin
-        Timer := GetTimeRunning + 5000;
-        MouseBox(482, 101, 488, 111, 1);
-        while ((not (SimilarColors(GetColor(489, 101), 1316634, 5))) and (GetTimeRunning < Timer)) do
-          Wait(50 + Random(50));
-        Wait(RandomRange(100, 200));
-      end;
+  if (SimilarColors(GetColor(481, 110), 723981, 20)) and (BankScreen) and
+       (not (SimilarColors(GetColor(489, 101), 1316634, 5))) then
+        begin
+          Timer := GetTimeRunning + 5000;
+          MouseBox(482, 101, 488, 111, 1);
+          while ((not (SimilarColors(GetColor(489, 101), 1316634, 5))) and (GetTimeRunning < Timer)) do
+            Wait(50 + Random(50));
+          Wait(RandomRange(100, 200));
+        end;
 end;
 
 (*
@@ -1676,4 +1675,4 @@ begin
     Writeln('Could not find the deposit box');
   end;
 end;
-                                                                     
+                                                       
