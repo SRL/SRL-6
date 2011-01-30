@@ -10,24 +10,24 @@ The Bank include contains Bank finders, and all banking routines.
   Description: Constants representing the different types of Banks }
 
 const
-  Bank_LB = 'lb'; // (Lumbridge Bank)
-  Bank_FE = 'feb'; // (Falador East Bank)
-  Bank_FW = 'fwb'; // (Falador West Bank)
-  Bank_VE = 'veb'; // (Varrock East Bank)
-  Bank_VW = 'vwb'; // (Varrock West Bank)
-  Bank_GE = 'geb'; // (Varrock GE Bank)
-  Bank_DR = 'db' ; // (Draynor Bank)
-  Bank_AK = 'akb'; // (Al-Kharid Bank)
-  Bank_EV = 'eb' ; // (Edgeville Bank)
-  Bank_CT = 'ctb'; // (Catherby bank)
-  Bank_CM = 'clt'; // (Camelot bank)
-  Bank_NA = 'nab'; // (North Ardougne bank)
-  Bank_SA = 'sab'; // (South Ardougne bank)
-  Bank_YN = 'ynb'; // (Yanille bank)
-  Bank_NG = 'ngb'; // (North gnome bank)
-  Bank_SG = 'sgb'; // (South gnome bank)
-  Bank_WG = 'wgb'; // (Warrior guild bank)
-  Bank_FG = 'fgb'; // (Fishing guild bank)
+  Bank_LB = 1;   //'lb';   (Lumbridge Bank)
+  Bank_FE = 2;   //'feb';  (Falador East Bank)
+  Bank_FW = 3;   //'fwb';  (Falador West Bank)
+  Bank_VE = 4;   //'veb';  (Varrock East Bank)
+  Bank_VW = 5;   //'vwb';  (Varrock West Bank)
+  Bank_GE = 6;   //'geb';  (Varrock GE Bank)
+  Bank_DR = 7;   //'db' ;  (Draynor Bank)
+  Bank_AK = 8;   //'akb';  (Al-Kharid Bank)
+  Bank_EV = 9;   //'eb' ;  (Edgeville Bank)
+  Bank_CT = 10;  //'ctb';  (Catherby bank)
+  Bank_CM = 11;  //'clt';  (Camelot bank)
+  Bank_NA = 12;  //'nab';  (North Ardougne bank)
+  Bank_SA = 13;  //'sab';  (South Ardougne bank)
+  Bank_YN = 14;  //'ynb';  (Yanille bank)
+  Bank_NG = 15;  //'ngb';  (North gnome bank)
+  Bank_SG = 16;  //'sgb';  (South gnome bank)
+  Bank_WG = 17;  //'wgb';  (Warrior guild bank)
+  Bank_FG = 18;  //'fgb';  (Fishing guild bank)
 
 (*
 BankScreen
@@ -156,8 +156,10 @@ begin
     srl_Warn('InPin', 'Pin must be 4 digits long', warn_AllVersions);
     Exit;
   end;
-  Boxes := [IntToBox(37, 107, 100, 170), IntToBox(131, 107, 194, 170), IntToBox(225, 107, 288, 170), IntToBox(309, 107, 372, 170),
-            IntToBox(37, 179, 100, 242), IntToBox(131, 179, 194, 242), IntToBox(225, 179, 288, 242), IntToBox(37, 251, 100, 314),
+  Boxes := [IntToBox(37, 107, 100, 170), IntToBox(131, 107, 194, 170),
+            IntToBox(225, 107, 288, 170), IntToBox(309, 107, 372, 170),
+            IntToBox(37, 179, 100, 242), IntToBox(131, 179, 194, 242),
+            IntToBox(225, 179, 288, 242), IntToBox(37, 251, 100, 314),
             IntToBox(131, 251, 194, 314), IntToBox(225, 251, 288, 314)];
   TMouseSpeed := MouseSpeed;
   MouseSpeed := 25;
@@ -896,7 +898,7 @@ begin
     Start:
     for Index := 1 to 50 do
     begin
-      if FindItemEx(x, y, IdentType, Ident, BankIndexToMSBox(Index), Tol) then
+     // if FindItemEx(x, y, IdentType, Ident, BankIndexToMSBox(Index), Tol) then
       begin
         MMouse(x, y, 4, 4);
         if WaitUpText(UpText, 300) then
@@ -1040,7 +1042,7 @@ OpenBankQuiet
 
 .. code-block:: pascal
 
-    function OpenBankQuiet(WhichBank: string): Boolean;
+    function OpenBankQuiet(WhichBank: Integer): Boolean;
 
 Opens any given bank in the free world using FindDeformedBitmapToleranceIn.
 Avoids strange mouse movements.
@@ -1048,13 +1050,13 @@ Will causesignificant lag (approx. 1 second), but finds the bank with one click.
 
 Valid arguments are:
 
-    - 'feb'/Bank_FE (Falador East Bank)
-    - 'fwb'/Bank_FW (Falador West Bank)
-    - 'veb'/Bank_VE (Varrock East Bank)
-    - 'vwb'/Bank_VW (Varrock West Bank)
-    - 'db'/Bank_DR  (Draynor Bank)
-    - 'eb'/Bank_EV  (Edgeville Bank)
-    - 'akb'/Bank_AK (Al-Kharid Bank)
+    - Bank_FE (Falador East Bank)
+    - Bank_FW (Falador West Bank)
+    - Bank_VE (Varrock East Bank)
+    - Bank_VW (Varrock West Bank)
+    - Bank_DR  (Draynor Bank)
+    - Bank_EV  (Edgeville Bank)
+    - Bank_AK (Al-Kharid Bank)
 
 .. note::
 
@@ -1066,7 +1068,7 @@ Example:
 
 *)
 
-function OpenBankQuiet(WhichBank: string): Boolean;
+function OpenBankQuiet(WhichBank: Integer): Boolean;
 var
   TheCounter, dx, dy, tol, Mark2, Mark3: Integer;
   acc, accthres: Extended;
@@ -1086,7 +1088,7 @@ begin
        '85558504D60504D58504D58504D58504D58504D605855');
   else
     begin
-      srl_Warn('OpenBankQuiet', 'Unknown bank: ' + WhichBank, warn_AllVersions);
+      srl_Warn('OpenBankQuiet', 'Unknown bank', warn_AllVersions);
       Exit;
     end;
   end;
@@ -1191,28 +1193,28 @@ OpenBankGlass
 
 .. code-block:: pascal
 
-    function OpenBankGlass(WhichBank: String; ChangeCompass, ChangeAngle: Boolean): Boolean;
+    function OpenBankGlass(WhichBank: Integer; ChangeCompass, ChangeAngle: Boolean): Boolean;
 
 
 Opens the bank.
 Valid arguments are:
 
-    - 'feb'/Bank_FE (Falador East Bank)
-    - 'fwb'/Bank_FW (Falador West Bank)
-    - 'veb'/Bank_VE (Varrock East Bank)
-    - 'vwb'/Bank_VW (Varrock West Bank)
-    - 'db'/Bank_DR  (Draynor Bank)
-    - 'akb'/Bank_AK (Al-Kharid Bank)
-    - 'eb'/Bank_EV  (Edgeville Bank)
-    - 'ctb'/Bank_CT (Catherby bank)
-    - 'clt'/Bank_CM (Camelot bank)
-    - 'nab'/Bank_NA (North Ardougne bank)
-    - 'sab'/Bank_SA (South Ardougne bank)
-    - 'ynb'/Bank_YN (Yanille bank)
-    - 'ngb'/Bank_NG (North gnome bank)
-    - 'sgb'/Bank_SG (South gnome bank)
-    - 'wgb'/Bank_WG (Warrior guild bank)
-    - 'fgb'/Bank_FG (Fishing guild bank)
+    - Bank_FE (Falador East Bank)
+    - Bank_FW (Falador West Bank)
+    - Bank_VE (Varrock East Bank)
+    - Bank_VW (Varrock West Bank)
+    - Bank_DR  (Draynor Bank)
+    - Bank_AK (Al-Kharid Bank)
+    - Bank_EV  (Edgeville Bank)
+    - Bank_CT (Catherby bank)
+    - Bank_CM (Camelot bank)
+    - Bank_NA (North Ardougne bank)
+    - Bank_SA (South Ardougne bank)
+    - Bank_YN (Yanille bank)
+    - Bank_NG (North gnome bank)
+    - Bank_SG (South gnome bank)
+    - Bank_WG (Warrior guild bank)
+    - Bank_FG (Fishing guild bank)
 
 .. note::
 
@@ -1225,7 +1227,7 @@ Example:
 *)
 
 
-function OpenBankGlass(WhichBank: string; ChangeCompass, ChangeAngle: Boolean): Boolean;
+function OpenBankGlass(WhichBank: Integer; ChangeCompass, ChangeAngle: Boolean): Boolean;
 var
   OBC: TPoint;
   c, Speed, Col: Integer;
@@ -1238,9 +1240,14 @@ begin
   begin
     c := Random(2);
     case WhichBank of
-      Bank_FE, Bank_FW, Bank_VE, Bank_CT, Bank_CM, Bank_NA: if c = 0 then MakeCompass('N') else MakeCompass('S');
-      Bank_AK, Bank_DR, Bank_EV, Bank_VW, Bank_SA, Bank_YN, Bank_SG, Bank_WG, Bank_FG: if c = 0 then MakeCompass('E') else MakeCompass('W');
-      Bank_NG: if c = 0 then MakeCompass(45) else MakeCompass(225);
+      Bank_FE, Bank_FW, Bank_VE, Bank_CT, Bank_CM, Bank_NA:
+        if c = 0 then MakeCompass('N') else MakeCompass('S');
+
+      Bank_AK, Bank_DR, Bank_EV, Bank_VW, Bank_SA, Bank_YN, Bank_SG, Bank_WG, Bank_FG:
+        if c = 0 then MakeCompass('E') else MakeCompass('W');
+
+      Bank_NG:
+        if c = 0 then MakeCompass(45) else MakeCompass(225);
     end;
   end;
   Col := 10070458;
@@ -1281,27 +1288,27 @@ OpenBankFast
 
 .. code-block:: pascal
 
-    function OpenBankFast(Location: String): Boolean;
+    function OpenBankFast(Location: Integer): Boolean;
 
 Description: Opens the bank.
 Valid arguments are:
 
-    - 'feb'/Bank_FE, 'falador east bank'
-    - 'fwb'/Bank_FW, 'falador west bank'
-    - 'veb'/Bank_VE, 'varrock east bank'
-    - 'vwb'/Bank_VW, 'varrock west bank'
-    - 'db'/Bank_DR , 'draynor bank'
-    - 'akb'/Bank_AK, 'al-kharid bank'
-    - 'eb'/Bank_EV  (Edgeville Bank)
-    - 'ctb'/Bank_CT, 'catherby bank'
-    - 'clt'/Bank_CM, 'camelot bank'
-    - 'nab'/Bank_NA, 'north ardougne bank'
-    - 'sab'/Bank_SA, 'south ardougne bank'
-    - 'ynb'/Bank_YN, 'yanille bank'
-    - 'ngb'/Bank_NG, 'north gnome bank'
-    - 'sgb'/Bank_SG, 'south gnome bank'
-    - 'wgb'/Bank_WG, 'warrior guild bank'
-    - 'fgb'/Bank_FG, 'fishing guild bank'
+    - Bank_FE (falador east bank)
+    - Bank_FW (falador west bank)
+    - Bank_VE (varrock east bank)
+    - Bank_VW (varrock west bank)
+    - Bank_DR (draynor bank)
+    - Bank_AK (al-kharid bank)
+    - Bank_EV (Edgeville Bank)
+    - Bank_CT (catherby bank)
+    - Bank_CM (camelot bank)
+    - Bank_NA (north ardougne bank)
+    - Bank_SA (south ardougne bank)
+    - Bank_YN (yanille bank)
+    - Bank_NG (north gnome bank)
+    - Bank_SG (south gnome bank)
+    - Bank_WG (warrior guild bank)
+    - Bank_FG (fishing guild bank)
 
 .. note::
 
@@ -1313,7 +1320,7 @@ Example:
 
 *)
 
-function OpenBankFast(Location: String): Boolean;
+function OpenBankFast(Location: Integer): Boolean;
 var
   bo, i, l, c, z: Integer;
   Info: TVariantArray;
@@ -1330,27 +1337,27 @@ begin
     Exit;
   end;
 
-  case LowerCase(Location) of {            Sort X     Sort Y     Color    Tol   Hue   Sat   Count  SplitTPA?  W   H }
-    Bank_AK, 'al kharid':           Info := [MSCX - 50, MSCY,      11196157, 20,   0.20, 1.15, 100,   False,   10, 10]; // Fixed 12/7, #40
-    Bank_LB, 'lumbridge':            Info := [MSCX,      MSCY - 50, 6780805,  10,   0.19, 0.27, 100,   False,   10, 10]; // Fixed 12/7, #40
-    Bank_VE, 'varrock east':        Info := [MSCX,      MSCY + 50, 3037545,  5,    0.41, 1.32, 100,   False,   10, 10]; // Fixed 12/7, #40
-    Bank_VW, 'varrock west':        Info := [MSCX,      MSCY,      3037545,  5,    0.41, 1.32, 100,   False,   10, 10]; // Fixed 12/7, #40
-    Bank_FE, 'falador east':        Info := [MSCX,      MSCY + 50, 5008519,  10,   0.22, 0.67, 100,   False,   10, 10]; // Fixed 12/7, #40
-    Bank_FW, 'falador west':        Info := [MSCX,      MSCY + 50, 5074569,  15,   0.22, 0.67, 50,    False,   10, 10]; // Fixed 12/7, #40
-    Bank_DR, 'draynor':              Info := [MSCX - 50, MSCY,      5527389,  7,    0.20, 0.20, 10,    False,   5,  10]; // Fixed 12/7, #40
-    Bank_EV, 'edgeville bank':       Info := [MSCX + 20, MSCY,      3561835,  20,   0.32, 0.61, 50,    False,   10, 10]; // Fixed 12/7, #40
-    Bank_CT, 'catherby bank':       Info := [MSCX,      MSCY,      3239049,  8,    0.20, 0.20, 100,   False,   10, 10];
-    Bank_CM, 'camelot bank':        Info := [MSCX,      MSCY,      7636882,  5,    0.20, 0.20, 100,   False,   10, 10];
-    Bank_NA, 'north ardougne bank': Info := [MSCX,      MSCY,      4084572,  5,    0.20, 0.20, 100,   False,   10, 10];
-    Bank_SA, 'south ardougne bank': Info := [MSCX,      MSCY,      4084572,  5,    0.20, 0.20, 100,   False,   10, 10];
-    Bank_YN, 'yanille bank':        Info := [MSCX,      MSCY,      3239049,  7,    0.20, 0.20, 100,   False,   10, 10];
-    Bank_NG, 'north gnome bank':    Info := [MSCX,      MSCY,      3239049,  7,    0.20, 0.20, 100,   False,   10, 10];
-    Bank_SG, 'south gnome bank':    Info := [MSCX,      MSCY,      3239049,  7,    0.20, 0.20, 100,   False,   10, 10];
-    Bank_WG, 'warrior guild bank':  Info := [MSCX,      MSCY,      2578286,  7,    0.20, 0.20, 100,   False,   10, 10];
-    Bank_FG, 'fishing guild bank':  Info := [MSCX,      MSCY,      2908796,  10,   0.20, 0.20, 100,   False,   10, 10];
+  case Location of  { Sort X     Sort Y      Color     Tol   Hue   Sat  Count  SplitTPA?  W   H }
+    Bank_AK:  Info := [MSCX - 50, MSCY,      11196157, 20,   0.20, 1.15, 100,   False,   10, 10]; // Fixed 12/7, #40
+    Bank_LB:  Info := [MSCX,      MSCY - 50, 6780805,  10,   0.19, 0.27, 100,   False,   10, 10]; // Fixed 12/7, #40
+    Bank_VE:  Info := [MSCX,      MSCY + 50, 3037545,  5,    0.41, 1.32, 100,   False,   10, 10]; // Fixed 12/7, #40
+    Bank_VW:  Info := [MSCX,      MSCY,      3037545,  5,    0.41, 1.32, 100,   False,   10, 10]; // Fixed 12/7, #40
+    Bank_FE:  Info := [MSCX,      MSCY + 50, 5008519,  10,   0.22, 0.67, 100,   False,   10, 10]; // Fixed 12/7, #40
+    Bank_FW:  Info := [MSCX,      MSCY + 50, 5074569,  15,   0.22, 0.67, 50,    False,   10, 10]; // Fixed 12/7, #40
+    Bank_DR:  Info := [MSCX - 50, MSCY,      5527389,  7,    0.20, 0.20, 10,    False,   5,  10]; // Fixed 12/7, #40
+    Bank_EV:  Info := [MSCX + 20, MSCY,      3561835,  20,   0.32, 0.61, 50,    False,   10, 10]; // Fixed 12/7, #40
+    Bank_CT:  Info := [MSCX,      MSCY,      3239049,  8,    0.20, 0.20, 100,   False,   10, 10];
+    Bank_CM:  Info := [MSCX,      MSCY,      7636882,  5,    0.20, 0.20, 100,   False,   10, 10];
+    Bank_NA:  Info := [MSCX,      MSCY,      4084572,  5,    0.20, 0.20, 100,   False,   10, 10];
+    Bank_SA:  Info := [MSCX,      MSCY,      4084572,  5,    0.20, 0.20, 100,   False,   10, 10];
+    Bank_YN:  Info := [MSCX,      MSCY,      3239049,  7,    0.20, 0.20, 100,   False,   10, 10];
+    Bank_NG:  Info := [MSCX,      MSCY,      3239049,  7,    0.20, 0.20, 100,   False,   10, 10];
+    Bank_SG:  Info := [MSCX,      MSCY,      3239049,  7,    0.20, 0.20, 100,   False,   10, 10];
+    Bank_WG:  Info := [MSCX,      MSCY,      2578286,  7,    0.20, 0.20, 100,   False,   10, 10];
+    Bank_FG:  Info := [MSCX,      MSCY,      2908796,  10,   0.20, 0.20, 100,   False,   10, 10];
     else
     begin
-      srl_Warn('OpenBankFast', 'Unknown bank: '+Location, warn_AllVersions);
+      srl_Warn('OpenBankFast', 'Unknown bank', warn_AllVersions);
       Exit;
     end;
   end;
@@ -1473,28 +1480,28 @@ OpenBank
 
 .. code-block:: pascal
 
-    function OpenBank(WhichBank: String, ChangeCompass, ChangeAngle: Boolean): Boolean;
+    function OpenBank(WhichBank: Integer, ChangeCompass, ChangeAngle: Boolean): Boolean;
 
 Opens the bank if possible.
 Valid arguments are:
 
-    - 'feb'/Bank_FE (Falador East Bank)
-    - 'fwb'/Bank_FW (Falador West Bank)
-    - 'veb'/Bank_VE (Varrock East Bank)
-    - 'vwb'/Bank_VW (Varrock West Bank)
-    - 'db'/Bank_DR  (Draynor Bank)
-    - 'akb'/Bank_AK (Al-Kharid Bank)
-    - 'eb'/Bank_EV  (Edgeville Bank)
-    - 'lb'/Bank_LB  (Lumbridge Bank)
-    - 'ctb'/Bank_CT (Catherby bank)
-    - 'clt'/Bank_CM (Camelot bank)
-    - 'nab'/Bank_NA (North Ardougne bank)
-    - 'sab'/Bank_SA (South Ardougne bank)
-    - 'ynb'/Bank_YN (Yanille bank)
-    - 'ngb'/Bank_NG (North gnome bank)
-    - 'sgb'/Bank_SG (South gnome bank)
-    - 'wgb'/Bank_WG (Warrior guild bank)
-    - 'fgb'/Bank_FG (Fishing guild bank)
+    - Bank_FE (Falador East Bank)
+    - Bank_FW (Falador West Bank)
+    - Bank_VE (Varrock East Bank)
+    - Bank_VW (Varrock West Bank)
+    - Bank_DR (Draynor Bank)
+    - Bank_AK (Al-Kharid Bank)
+    - Bank_EV (Edgeville Bank)
+    - Bank_LB (Lumbridge Bank)
+    - Bank_CT (Catherby bank)
+    - Bank_CM (Camelot bank)
+    - Bank_NA (North Ardougne bank)
+    - Bank_SA (South Ardougne bank)
+    - Bank_YN (Yanille bank)
+    - Bank_NG (North gnome bank)
+    - Bank_SG (South gnome bank)
+    - Bank_WG (Warrior guild bank)
+    - Bank_FG (Fishing guild bank)
 
 .. note::
 
@@ -1506,7 +1513,7 @@ Example:
 
 *)
 
-function OpenBank(WhichBank: string; ChangeCompass, ChangeAngle: Boolean): Boolean;
+function OpenBank(WhichBank: Integer; ChangeCompass, ChangeAngle: Boolean): Boolean;
 var
   I: Integer;
 begin
@@ -1537,26 +1544,26 @@ FindBank
 
 .. code-block:: pascal
 
-    function FindBank(TheBank: String): Boolean;
+    function FindBank(TheBank: Integer): Boolean;
 
 Finds and opens any given bank in the free world.
 If the MM DTM is found it will find and open the bank.
 Valid arguments are:
 
-    - 'feb'/Bank_FE (Falador East Bank)
-    - 'fwb'/Bank_FW (Falador West Bank)
-    - 'veb'/Bank_VE (Varrock East Bank)
-    - 'vwb'/Bank_VW (Varrock West Bank)
-    - 'db'/Bank_DR  (Draynor Bank)
-    - 'akb'/Bank_AK (Al-Kharid Bank)
-    - 'ctb'/Bank_CT (Catherby bank)
-    - 'clt'/Bank_CM (Camelot bank)
-    - 'nab'/Bank_NA (North Ardougne bank)
-    - 'sab'/Bank_SA (South Ardougne bank)
-    - 'ynb'/Bank_YN (Yanille bank)
-    - 'ngb'/Bank_NG (North gnome bank)
-    - 'sgb'/Bank_SG (South gnome bank)
-    - 'fgb'/Bank_FG (Fishing guild bank)
+    - Bank_FE (Falador East Bank)
+    - Bank_FW (Falador West Bank)
+    - Bank_VE (Varrock East Bank)
+    - Bank_VW (Varrock West Bank)
+    - Bank_DR  (Draynor Bank)
+    - Bank_AK (Al-Kharid Bank)
+    - Bank_CT (Catherby bank)
+    - Bank_CM (Camelot bank)
+    - Bank_NA (North Ardougne bank)
+    - Bank_SA (South Ardougne bank)
+    - Bank_YN (Yanille bank)
+    - Bank_NG (North gnome bank)
+    - Bank_SG (South gnome bank)
+    - Bank_FG (Fishing guild bank)
 
 .. note::
 
@@ -1568,13 +1575,12 @@ Example:
 
 *)
 
-function FindBank(TheBank: string): Boolean;
+function FindBank(TheBank: Integer): Boolean;
 var
   bx, by, TheDTM: Integer;
   WhichAngle: Extended;
 begin
   result := false;
-  TheBank := LowerCase(TheBank);
   case TheBank of
     Bank_FE: TheDTM := DTMFromString('78DA63AC67626088634001FFFFFD63F80FA41' +
         '9416C2060AC01AA4987C83141D5FCF9C3C4C0055503028CAD44A8' +
@@ -1675,4 +1681,4 @@ begin
     Writeln('Could not find the deposit box');
   end;
 end;
-                                                       
+                                                                             
