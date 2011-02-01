@@ -163,3 +163,7 @@ begin
     Smart_SuperDetail := False;
   {$ENDIF}
 end;
+
+procedure FreeSRL;
+begin
+end;

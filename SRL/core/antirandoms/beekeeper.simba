@@ -27,8 +27,42 @@ Description: Handles the conversation with the Bee Keeper.
 
 function Bee_Convo: Boolean;
 var
-  T: integer;
+  T, CTS, i, Hi, x, y, Tries: integer;
+  hMod, sMod: Extended;
+  TPA: TPointArray;
+  ATPA: T2DPointArray;
+  mid: TPoint;
 begin
+
+  //talk to beekeeper if not already
+  while not(FindColor(x, y, 128, MCX1, MCY1, MCX2, MCY2) or BeeScreen) do
+  begin
+    Inc(Tries);
+    if Tries > 5 then Exit;
+
+    CTS := GetToleranceSpeed;
+    SetColorToleranceSpeed(2);
+    GetToleranceSpeed2Modifiers(hMod, sMod);
+    SetToleranceSpeed2Modifiers(0.35, 0.61);
+    FindColorsSpiralTolerance(MSCX, MSCY, TPA, 3092535, MSX1, MSY1, MSX2, MSY2, 10);
+    ATPA := SplitTPA(TPA, 1);
+    writeln(length(atpa));
+    Hi := High(ATPA);
+    for i := Hi downto 0 do
+    begin
+      mid := MiddleTPA(ATPA[i]);
+      MMouse(mid.x, mid.y, 1, 1);
+      if WaitUpTextMulti(['-To', 'ee', 'eeper', 'eep'], 1200) then
+      begin
+        ClickMouse2(True);
+        Wait(2000);
+        Break;
+      end;
+    end;
+    SetToleranceSpeed2Modifiers(hMod, sMod);
+    SetColorToleranceSpeed(CTS);
+  end;
+
   T := GetSystemTime;
   while (GetSystemTime - T < 20000) do
   begin
@@ -105,21 +139,17 @@ begin           //lwr mid                         lid                           
     if (GetSystemTime - T > 5000) then Break;
     Wait(100);
   end;
-  Result := FindTextTpa(0, 0, MCX1, MCY1, MCX2, MCY2, 'move', CharsNPC, Nothing);
-  if Result then
+  T := GetSystemTime;
+  while (PercentBlackMM = 100) do
   begin
-    T := GetSystemTime;
-    while (PercentBlackMM = 100) do
+    if (ClickContinue(True, True)) then
     begin
-      if (ClickContinue(True, True)) then
-      begin
-        Wait(500 + Random(100));
-        T := GetSystemTime;
-      end;
-      if GetSystemTime - T > 15000 then Exit;
-      Wait(100);
+      Wait(500 + Random(100));
     end;
+    if (GetSystemTime - T > 15000) or BeeScreen then Exit;
+    Wait(100);
   end;
+
   Wait(RandomRange(5000, 10000));
   Result := (PercentBlackMM < 95);
 end;
@@ -134,7 +164,7 @@ function SolveBeeKeeper: Boolean;
 var
   Tries: Integer;
 begin
-  for Tries := 0 to 3 do
+  for Tries := 0 to 5 do
   begin
 
     if (PercentBlackMM < 100) then
@@ -149,7 +179,7 @@ begin
     if (Result) then
       Exit;
 
-    if (Tries < 3) then
+    if (Tries < 5) then
       WriteLn('Failed to solve, retrying...');
   end;
 end;

@@ -37,6 +37,7 @@ begin
   Result := True;
   x := P.x;
   y := P.y;
+  SetColorToleranceSpeed(tmpCTS);
 end;
 
 {*******************************************************************************
@@ -47,9 +48,12 @@ Date: February 7, 2010
 *******************************************************************************}
 function PickUpDroppedItem: Boolean;
 var
-  cx, cy: Integer;
+  cx, cy, CTS: Integer;
 begin
-  if FindColor(cx, cy, 237, MMX1, MMY1, MMX2, MMY2) then
+  CTS := GetToleranceSpeed;
+  SetColorToleranceSpeed(1);
+  //trying to find a drop dot
+  if FindColorSpiralTolerance(cx, cy, 1776606, MMX1, MMY1, MMX2, MMY2, 52) then
   begin
     Mouse(cx, cy, 0, 0, True);
     Flag;
@@ -57,17 +61,21 @@ begin
     MMouse(MSCX, MSCY, 0, 0);
     if (not IsUpText('ere')) then
     begin
-      Result := True;
-      if IsUpText('ake') then Mouse(MSCX, MSCX, 0, 0, True)
-      else
+      if IsUpText('ake') then
       begin
-        Mouse(MSCX, MSCY, 0, 0, False);
-        Wait(250 + Random(100));
-        Result := ChooseOption('ake');
-      end;
+        Mouse(MSCX, MSCX, 0, 0, True);
+        Result := True;
+      end
+      else
+        begin
+          Mouse(MSCX, MSCY, 0, 0, False);
+          Wait(250 + Random(100));
+          Result := ChooseOption('ake');
+        end;
       Wait(500 + Random(250));
     end;
   end;
+  SetColorToleranceSpeed(CTS);
 end;
 
 {*******************************************************************************
@@ -327,11 +335,13 @@ var
   P: TPointArray;
   Objs: T2DPointArray;
   Done, B: Boolean;
+  hMod, sMod: Extended;
 begin
 
 
   MarkTime(t);
   cts := GetToleranceSpeed;
+  GetToleranceSpeed2Modifiers(hMod, sMod);
 
   repeat;
      SetColorToleranceSpeed(2);
@@ -362,6 +372,7 @@ begin
     Wait(500 + random(200));
   until (Done) or (TimeFromMark(t) > 30000);
   SetColorToleranceSpeed(CTS);
+  SetToleranceSpeed2Modifiers(hMod, sMod);
 
   if (TimeFromMark(t) > 30000) or (not(done)) then
   begin
@@ -498,6 +509,8 @@ begin
     Writeln('Forester: ForesterSolver failed to find the pheasant.');
     if ItemDropped then PickUpDroppedItem;
     LogOut;
+    SetColorToleranceSpeed(TempCTS);
+    SetToleranceSpeed2Modifiers(TempHue, TempSat);
     Exit;
   end;
 
