@@ -155,6 +155,9 @@ var
   T, Tries: Integer;
 
 begin
+  if (not LoggedIn) then
+    Exit;
+
   Result := false;
   if (not(InRange(Tab, Tab_Combat, Tab_LogOut))) then
   begin
