@@ -28,7 +28,7 @@ Description: Finds if your in Mr.Mordaut random
 *******************************************************************************}
 function InMordaut: Boolean;
 Begin
-  Result := (CountColor(128, 258, 358, 352, 372) = 191);
+  Result := iAbs(190 - CountColor(128, 258, 358, 352, 372)) < 7;
 end;
 
 {*******************************************************************************
@@ -217,10 +217,12 @@ Description: Solves the small puzzle, choose the next in the sequence.
 function M_SmallPuzzle: integer;
 var
   i: integer;
+  img:TTarget_Exported;
 begin
   for i := 0 to 4 do
   begin
-    Result := Mordaut_GetSlotNr(M_ScanningTime, ExportImageTarget);
+    img := ExportImageTarget;
+    Result := Mordaut_GetSlotNr(M_ScanningTime, img);
     Wait(RandomRange(1000, 2000));
     if (Result <> 0) then Exit;
   end;
@@ -317,7 +319,7 @@ begin
   T := GetSystemTime;
   repeat
     if not LoggedIn then Break;
-    
+
     if (FindDTM(HandDTM, X, Y, MSX1, MSY1, MSX2, MSY2)) then
     begin
       WriteLn('[Mordaut] Found Large Puzzle');

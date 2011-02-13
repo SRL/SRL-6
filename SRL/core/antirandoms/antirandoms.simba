@@ -641,7 +641,7 @@ begin
   with TeleRandoms[12] do    //
   begin
     Name := 'bee keeper';
-    Music := ['horizon'];
+    Music := ['horizon', 'workshop'];
     TypeID := [2];
     IsInRandom := nil;
     Texts := ['keeper'];

@@ -24,7 +24,6 @@ Var
    QuizItems: Array Of QuizObj;
    QuizAccuracy: Integer;
 
-
 {*******************************************************************************
 function InQuizRandom : Boolean;
 by: ZephyrsFury
@@ -46,9 +45,9 @@ Description: Returns a TBox of the Quiz Item Slow defined by Index.
 Function QuizItemBox(Index: Integer): TBox;
 
 Begin
-  Result.X1 := 46 + 174 * (Index-1);
+  Result.X1 := 46 + 174 * (Index - 1);
   Result.Y1 := 417;
-  Result.X2 := 46 + 174 * (Index-1) + 80;
+  Result.X2 := 46 + 174 * (Index - 1) + 80;
   Result.Y2 := 417 + 33;
 End;
 
@@ -353,7 +352,7 @@ Begin
   Result.Width := Result.Width div Times;
   Result.Height := Result.Height div Times;
   Result.TotalCount := Result.TotalCount div Times;
-  Result.CoverPercentage := Result.Count div Result.TotalCount * 100.0;
+  Result.CoverPercentage := Result.Count * 1.0 div Result.TotalCount * 100.0;
 End;
 
 {$IFDEF DebugQuiz}
@@ -370,7 +369,7 @@ Begin
   WriteLn('Width: ' + IntToStr(Obj.Width));
   WriteLn('Height: ' + IntToStr(Obj.Height));
   WriteLn('TotalCount: ' + IntToStr(Obj.TotalCount));
-  WriteLn('Cover Percent: ' + FloatToStr(Obj.Count / Obj.TotalCount * 100.0));
+  WriteLn('Cover Percent: ' + FloatToStr(Obj.Count * 1.0 / Obj.TotalCount * 100.0));
 End;
 {$ENDIF}
 
@@ -511,58 +510,6 @@ Begin
 End;
 
 {*******************************************************************************
-function Quiz_Leave: Boolean;
-by: IceFire908
-Description: Leaves the quiz random, true if portal found.
-*******************************************************************************}
-
-function Quiz_Leave: Boolean;
-var
-  TPAA: T2DPointArray;
-  TPA: TPointArray;
-  QL, QP: TPoint;
-  I: LongInt;
-begin
-  MakeCompass('N');
-  SetAngle(True);
-  FindColorsTolerance(TPA, clWhite, MMX1, MMY1, MMX2, MMY2, 421);
-
-  // XXX, Wizzup: Why not pie???
-  FilterPointsDist(TPA,0,75,MMCX,MMCY);
-  //FilterPointsPie(TPA, 0, 360, 0, 75, MMCX, MMCY);
-  QL := MiddleTPA(TPA);
-  if (Distance(MMCX, MMCY, QL.X + 15, QL.Y) > 7) then
-  begin
-    Mouse(QL.X + 15, QL.Y, 0, 0, True);
-    Flag;
-  end;
-  Wait(1000 + Random(500));
-  SetColorToleranceSpeed(2);
-  SetToleranceSpeed2Modifiers(0.16, 1.80);
-  FindColorsSpiralTolerance(MSCX, MSCY, TPA, 6670489, MSX1, MSY1, MSX2, MSY2, 11);
-  SetColorToleranceSpeed(1);
-  SetToleranceSpeed2Modifiers(0.2, 0.2);
-  TPAA := TPAToATPAEx(TPA, 30, 30);
-  SortATPAFromFirstPoint(TPAA, Point(MSCX, MSCY));
-  for I := 0 to High(TPAA) do
-  begin
-    if (Length(TPAA[I]) < 50) then
-      Continue;
-    QP := MiddleTPA(TPAA[I]);
-    MMouse(QP.X, QP.Y, 0, 0);
-    Wait(RandomRange(250, 350));
-    if (CountColorTolerance(14342657, 7, 7, 100, 25, 70) > 100) then
-    begin
-      Result := True;
-      GetMousePos(QP.X, QP.Y);
-      Mouse(QP.X, QP.Y, 0, 0, True);
-      Wait(RandomRange(5000, 7000));
-      Exit;
-    end;
-  end;
-end;
-
-{*******************************************************************************
 Function SolveQuiz: Boolean;
 by: Wizzup? and ZephyrsFury
 Description: Solves the quiz random and returns true if solved.
@@ -571,21 +518,14 @@ Description: Solves the quiz random and returns true if solved.
 Function SolveQuiz: Boolean;
 
 Var
-   NonBlackC: TPointArray;
    TimeMarker: LongInt;
    X, Y: Integer;
 Begin
   Result := False;
-  LoadQuizArray;
-  FindColorsTolerance(NonBlackC, clWhite, MMX1, MMY1, MMX2, MMY2, 421);
 
-  // XXX: Wizzup, why not pie??
-  FilterPointsDist(NonBlackC,0,70,MMCX,MMCY);
-  //FilterPointsPie(NonBlackC, 0, 360, 0, 70, MMCX, MMCY);
-
-  TimeMarker := GetSystemTime;
-  while ((GetSystemTime - TimeMarker) < 15000) and FindNPCChatText('Talk to',nothing) do
-    wait(500 + random(1000));
+  TimeMarker := GetSystemTime;                                    //Quiz Master
+  while ((GetSystemTime - TimeMarker) < 15000) and FindNPCChatText('ast',nothing) do
+    wait(500);
   While GetSystemTime - TimeMarker < 300000 Do
   Begin
     while (ClickContinue(True, True)) do
@@ -595,18 +535,11 @@ Begin
       SolveQuizQuestion;
       Wait(2000 + Random (1000));
     end;
-    if (Length(NonBlackC) > 50) then
-      if (FindNPCChatText('hank y', Nothing)) then
-        begin
-          Result := Quiz_Leave;
-          Exit;
-        end;
-    if (Length(NonBlackC) < 50) then
-      if (PercentBlackMM < 95) then
-      begin
-        Result := True;
-        Exit;
-      end;
+    if (PercentBlackMM < 95) then
+    begin
+      Result := True;
+      Exit;
+    end;
   End;
 End;
 
@@ -620,7 +553,6 @@ Function FindQuiz: Boolean;
 Begin
   LoadQuizArray;
   Players[CurrentPlayer].Rand := 'Quiz';
-  Wait(10000);
   If SolveQuiz Then
     Result := True
   Else
@@ -628,8 +560,10 @@ Begin
     Result := False;
     Players[CurrentPlayer].Active := False;
     Players[CurrentPlayer].Rand := 'NoQuiz';
+    Logout;
     Repeat
       Wait(1000);
     Until Not LoggedIn;
   End;
+  SetLength(QuizItems, 0);
 End;
