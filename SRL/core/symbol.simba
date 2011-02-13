@@ -12,32 +12,101 @@ var
   SymbolAccuracy: Extended;
   SymbolBitmap: Integer;
 
-// Comment fix by drizzt:
-{*******************************************************************************
-Valid Arguments are:
-  - agility                  - furnace                    - rare trees, tree
-  - altar                    - gem stall                  - rest, resting spot
-  - anvil                    - guide                      - sandpit
-  - apothecary               - hair dresser               - saw mill
-  - archery shop             - herbalist                  - scimitar shop
-  - arrow                    - house                      - shield
-  - axe shop                 - hunter store               - shop, store
-  - bar                      - hunter training            - short cut
-  - bank                     - jewelery                   - silk stall
-  - candle shop              - kebab shop                 - silver stall
-  - churn                    - mace shop                  - slayer master
-  - clothes shop             - magic shop                 - spice stall
-  - cookery shop             - makeover mage              - spinning wheel, spin
-  - cookery, cook            - mill                       - staff shop
-  - crafing shop             - minigame                   - summoning store
-  - dungeon                  - mining shop                - sword shop
-  - farming shop             - pet shop                   - tanner
-  - farming spot             - platebody shop             - training dummy
-  - fishing shop, fish store - plateskirt shop            - underground
-  - fishing spot, fish       - portal (to player owned houses) - water source, water
-  - food shop                - pottery, pot               - weave
-  - fur trader               - quest                      - windmill
+const
+  Symbol_Agility         = 1;
+  Symbol_Altar           = 2;
+  Symbol_Anvil           = 3;
+  Symbol_Apothecary      = 4;
+  Symbol_ArcheryShop     = 5;
+  Symbol_Arrow           = 6;
+  Symbol_AxeShop         = 7;
+  Symbol_Bar             = 8;
+  Symbol_Bank            = 9;
+  Symbol_CandleShop      = 10;
+  Symbol_Churn           = 11;
+  Symbol_ClothesShop     = 12;
+  Symbol_CookeryShop     = 13;
+  Symbol_Cookery         = 14; Symbol_Cook = Symbol_Cookery;
+  Symbol_CraftingShop    = 15;
+  Symbol_Dungeon         = 16;
+  Symbol_FarmingShop     = 17;
+  Symbol_FarmingSpot     = 18;
+  Symbol_FishingShop     = 19; Symbol_FishStore = Symbol_FishingShop;
+  Symbol_FishingSpot     = 20; Symbol_Fish = Symbol_FishingSpot;
+  Symbol_FoodShop        = 21; Symbol_FoodStore = Symbol_FoodShop;
+  Symbol_FurTrader       = 22;
+  Symbol_Furnace         = 23;
+  Symbol_GemStall        = 24;
+  Symbol_Guide           = 25;
+  Symbol_HairDresser     = 26;
+  Symbol_Herbalist       = 27;
+  Symbol_House           = 28;
+  Symbol_HunterStore     = 29;
+  Symbol_HunterTraining  = 30;
+  Symbol_Jewelery        = 31;
+  Symbol_KebabShop       = 32;
+  Symbol_MaceShop        = 33;
+  Symbol_MagicShop       = 34;
+  Symbol_MakeoverMage    = 35;
+  Symbol_Mill            = 36;
+  Symbol_Mine            = 37; Symbol_MiningSpot = Symbol_Mine; Symbol_MiningSite = Symbol_Mine;
+  Symbol_MiniGame        = 38;
+  Symbol_MiningShop      = 39;
+  Symbol_PetShop         = 40;
+  Symbol_PlatebodyShop   = 41;
+  Symbol_PlateskirtShop  = 42;
+  Symbol_Portal          = 43;
+  Symbol_Pottery         = 44; Symbol_Pot = Symbol_Pottery;
+  Symbol_Quest           = 45;
+  Symbol_RareTrees       = 46; Symbol_Tree = Symbol_RareTrees;
+  Symbol_Rest            = 47; Symbol_RestingSpot = Symbol_Rest;
+  Symbol_SandPit         = 48;
+  Symbol_SawMill         = 49;
+  Symbol_ScimitarShop    = 50;
+  Symbol_Shield          = 51;
+  Symbol_Shop            = 52; Symbol_Store = Symbol_Shop;
+  Symbol_ShortCut        = 53;
+  Symbol_SilkStall       = 54;
+  Symbol_SilverStall     = 55;
+  Symbol_SlayerMaster    = 56;
+  Symbol_SpiceStall      = 57;
+  Symbol_SpinningWheel   = 58; Symbol_Spin = Symbol_SpinningWheel;
+  Symbol_StaffShop       = 59;
+  Symbol_SummoningStore  = 60;
+  Symbol_SwordShop       = 61;
+  Symbol_Tanner          = 62;
+  Symbol_Transportation  = 63;
+  Symbol_TrainingDummy   = 64;
+  Symbol_UnderGround     = 65;
+  Symbol_WaterSource     = 66; Symbol_Water = Symbol_WaterSource;
+  Symbol_Weave           = 67;
+  Symbol_Windmill        = 68;
 
+{*******************************************************************************
+Valid Arguments following the 'Symbol_' prefix are:
+  - Agility                  - Furnace                    - RareTrees, Tree
+  - Altar                    - GemStall                   - Rest, RestingSpot
+  - Anvil                    - Guide                      - Sandpit
+  - Apothecary               - HairDresser                - SawMill
+  - ArcheryShop              - Herbalist                  - ScimitarShop
+  - Arrow                    - House                      - Shield
+  - AxeShop                  - HunterStore                - Shop, Store
+  - Bar                      - HunterTraining             - ShortCut
+  - Bank                     - Jewelery                   - SilkStall
+  - CandleShop               - KebabShop                  - SilverStall
+  - Churn                    - MaceShop                   - SlayerMaster
+  - ClothesShop              - MagicShop                  - SpiceStall
+  - CookeryShop              - MakeoverMage               - SpinningWheel, Spin
+  - Cookery, Cook            - Mill                       - StaffShop
+  - CrafingShop              - Minigame                   - SummoningStore
+  - Dungeon                  - MiningShop                 - SwordShop
+  - FarmingShop              - PetShop                    - Tanner
+  - FarmingSpot              - PlatebodyShop              - TrainingDummy
+  - FishingShop, FishStore   - PlateskirtShop             - Transportation
+  - FishingSpot, Fish        - Portal (to player houses)  - Underground
+  - FoodShop, FoodStore      - Pottery, Pot               - WaterSource, Water
+  - FurTrader                - Quest                      - Weave
+                                                          - Windmill
 *******************************************************************************}
 
 (*
@@ -47,7 +116,7 @@ LoadSymbolBitmapColor
 .. code-block:: pascal
 
 
-    function LoadSymbolBitmapColor(Name: String): Integer;
+    function LoadSymbolBitmapColor(Name: Integer): Integer;
 
 Loads Bitmap and Color of a Specific Symbol.
 
@@ -60,17 +129,17 @@ Example:
 .. code-block:: pascal
 
 *)
-function LoadSymbolBitmapColor(Name: string): Integer;
+function LoadSymbolBitmapColor(Name: Integer): Integer;
 begin
-  case LowerCase(Name) of
-    'bank':
+  case Name of
+    Symbol_Bank:
       begin
        SymbolBitmap := BitmapFromString(15, 5, 'beNpjYGRgYDwAAxsWun/9NjnbX' +
        '/D9BUUgOR8GILJAlWiKIcogJBAdQAKYiiHqIQiiHpfJyOqRHYNLMa' +
        'ZjEIoBKZB32A==');
         result := 2216175;
       end;
-    'mining spot', 'mining site', 'mine':
+    Symbol_MiningSpot, Symbol_MiningSite, Symbol_Mine:
       begin
         SymbolBitmap := BitmapFromString(15, 5, 'beNpjYGRgYDyAAXqrfB' +
        'vCddIzMsrKSiMiIiCCQJWYiufk2INUWova2dkD1Xv7ec+fPx+rYrj' +
@@ -78,7 +147,7 @@ begin
        'ADVlcCo=');
         Result := 5077645;
       end;
-    'transportation':
+    Symbol_Transportation:
       begin
         SymbolBitmap := BitmapFromString(15, 5, 'z78DA33303534347074353' +
           '4B73032219E34763173348592A62E666E66A6C8B20660330D904C' +
@@ -86,7 +155,7 @@ begin
           '124A69910715C269317CEC866229B0C00B3496273');
         Result := 2650848;
       end;
-    'magic shop':
+    Symbol_MagicShop:
       begin
         SymbolBitmap := BitmapFromString(15, 5, 'z78DA95D0510A80300806' +
           'E02B9906B6C77F3AEF7FA4A0066DABC17A1111FD1469A74CC5C46' +
@@ -95,14 +164,14 @@ begin
           '5BBFF312D915399C927AF756C82');
         Result := 1714669;
       end;
-    'water source', 'water':
+    Symbol_WaterSource, Symbol_Water:
       begin
         SymbolBitmap := BitmapFromString(15, 5, 'beNpjYGRgYDyABFJrHmt' +
      'm/ACi+fPnH0AFQJW4FAMRfsUQlYfPPgSS7Hb30QzHVAxUCVcMRHgUQ2xHVoxs' +
      'OAMAbyOCjQ==');
         Result := 16279593;
       end;
-    'furnace':
+    Symbol_Furnace:
       begin
         SymbolBitmap := BitmapFromString(15, 5, 'z78DA3334353435B470' +
           '3101423308696A028466E6C6A6A626E66E6E1640062E12A206A2D' +
@@ -110,7 +179,7 @@ begin
           '3F34882171990C0058F36390');
         Result := 3508223;
       end;
-    'anvil':
+    Symbol_Anvil:
       begin
         SymbolBitmap := BitmapFromString(15, 5, 'z78DA95CF510AC0300803D02B' +
           'A59DE0F2D9F6FE771A2CFB10CAC4FE04117C443434D8E4C2EA4A8' +
@@ -118,14 +187,14 @@ begin
           '3773F92F2BE6A91CBFD05CE9FC00C9DB6164');
         Result := 4012591;
       end;
-    'rare trees', 'tree':
+    Symbol_RareTrees, Symbol_Tree:
       begin
         SymbolBitmap := BitmapFromString(15, 5, 'beNpjYGRgYDwABmw+jCx5' +
        'vBDE08sOQZK7GYAkRAFQJX7FcISpGK4eKIumZf78+ZiKsZo/HwyQF' +
        'cPVA8Xd1XmAJLJKkDMAo5RFgw==');
         Result := 494860;
       end;
-    'fishing spot', 'fish':
+    Symbol_FishingSpot, Symbol_Fish:
       begin
         SymbolBitmap := BitmapFromString(15, 5, 'z78DA8DCE410E80300844D12B4D5BA' +
           '9BAA404EE7F2413675343AA6EFE82D217D061682636ACCCADA779' +
@@ -134,7 +203,7 @@ begin
           'BB6B6878');
         Result := 16743189;
       end;
-    'cook', 'cookery':
+    Symbol_Cook, Symbol_Cookery:
       begin
         SymbolBitmap := BitmapFromString(15, 5, 'z78DAA590410AC0200C04BFB41' +
           'B4D5B8F2ACDFF9FD4D25008885EBC0C21EC0E211010EC6CD66EE7' +
@@ -143,14 +212,14 @@ begin
           '3E40632F');
         Result := 1194607;
       end;
-    'quest':
+    Symbol_Quest:
       begin
         SymbolBitmap := BitmapFromString(15, 5, 'beNpjYGRgYDwAA22Tnkzffim1' +
      '5jEQAdmmPvuB5Pz58yGyQJVwxUBxIAIqg6iHqIQgNMUQ0/AgrCbDXQI0GeIYi' +
      'EuAAFkx3M0Qx8BdAlEJMhkAMoB+aA==');
         Result := 14908517;
       end;
-    'mill':
+    Symbol_Mill:
       begin
         SymbolBitmap := BitmapFromString(15, 5, 'z78DAB58F3B0AC0300C43AF24A' +
           '75D3CD621BEFF9102D52228822C5D1EC69F878C8140CCA8AEE5D8' +
@@ -158,13 +227,13 @@ begin
           '26DF2973F323B33C9A9D26573A47303B52569D1');
         Result := 655103;
       end;
-    'dungeon':
+    Symbol_Dungeon:
       begin
         SymbolBitmap := BitmapFromString(15, 5, 'beNpjYGRgYDyABH5oa8LRBja' +
      '2+fPnw6WAKilR/HHhQrjKr1lZ+BVD1GOqxKUYAuaDAYpiABPBf1k=');
         Result := 2698232;
       end;
-    'weave':
+    Symbol_Weave:
       begin
         SymbolBitmap := BitmapFromString(15, 5, 'z78DA33303230343074367472' +
           '73724526CD0C4C0C8CDC1C0D2DDD2C5D8DDD8C4C0CA0E2103644D' +
@@ -172,7 +241,7 @@ begin
           'ECC1E966649793EA6600F03E685F');
         Result := 926783;
       end;
-    'pottery', 'pot':
+    Symbol_Pottery, Symbol_Pot:
       begin
         SymbolBitmap := BitmapFromString(15, 5, 'z78DA8DCE5B0AC0200C44D1' +
           '2D6592691B3F2DD5FD2FA98F08554A410217C9C73102B966673E7' +
@@ -181,14 +250,14 @@ begin
           'AECE76FEEFD55D5A50983FFBCB76A807CE5139EC460AC');
         Result := 270148;
       end;
-    'spinning wheel', 'spin':
+    Symbol_SpinningWheel, Symbol_Spin:
       begin
         SymbolBitmap := BitmapFromString(15, 5, 'beNpjYGRgYDwABtn' +
      '+gvPnz28I1wGygSQaG8gAqoQoDrIQAJIQQbgauMiEWGs0xenWokAE0QVXD0dA' +
      'XciK58MAUAvIVcHaEJMh7kFWDAQQNZgk3D0MAH8HZ/A=');
         Result := 2710649;
       end;
-    'guide':
+    Symbol_Guide:
       begin
         SymbolBitmap := BitmapFromString(15, 5, 'z78DA33303400424717470B27' +
           '33086961E168E4EC64E866E264EE0C614349170B0B4B336411143' +
@@ -196,7 +265,7 @@ begin
           '8869F8CD24C664E2431E533DC44C00EBA66771');
         Result := 13345416;
       end;
-    'shop', 'store':
+    Symbol_Shop, Symbol_Store:
       begin
         SymbolBitmap := BitmapFromString(15, 5, 'z78DA95D0410EC4200' +
           '840D12B2102C25290DEFF486DCA2C4C9A6666363F46E2D308020D' +
@@ -206,7 +275,7 @@ begin
           '484FA9B6C69689FB37FBFF9FEC35D3E01559765AB');
         Result := 3176384;
       end;
-    'shield':
+    Symbol_Shield:
       begin
         SymbolBitmap := BitmapFromString(15, 5, 'z78DACDCC3112C0200844D12' +
           'B611484920DE4FE47CA8CA63085BDCD9F6DF6511614BE233CEADA' +
@@ -214,7 +283,7 @@ begin
           '339595EFD9D3CCD9DFC02CAE26976');
         Result := 9542286;
       end;
-    'altar':
+    Symbol_Altar:
       begin
         SymbolBitmap := BitmapFromString(15, 5, 'z78DA33703574323475767171' +
           '7431B670B574B2A4888498630036D300C96464F3DD880610F58E2' +
@@ -222,7 +291,7 @@ begin
           '06006E357035');
         Result := 9542286;
       end;
-    'arrow':
+    Symbol_Arrow:
       begin
         SymbolBitmap := BitmapFromString(15, 5, 'z78DA33303570333470353437' +
           '3372249E343633B33475829026161646E626C8B20660330D904C8' +
@@ -230,7 +299,7 @@ begin
           '24A69910715C269317CEC866229B0C001E5A61CB');
         Result := 2782945;
       end;
-    'bar':
+    Symbol_Bar:
       begin
         SymbolBitmap := BitmapFromString(15, 5, 'z78DAB5CC310EC0200C43D12B41' +
           'E3001D0389EF7FA44ACD82D4952E5F968757B5B4E28EA56B66E33' +
@@ -238,7 +307,7 @@ begin
           '24E73E25A7F99F9CE659F96BEEF2031A5D69A8');
         Result := 4433385;
       end;
-    'underground':
+    Symbol_Underground:
       begin
         SymbolBitmap := BitmapFromString(15, 5, 'z78DA33303400422743' +
           '272727134CD2D5C2C8D4D01993B47033303630B434B474B2C4A2C' +
@@ -246,7 +315,7 @@ begin
           '24D5646412622631260300830265FA');
         Result := 1844712;
       end;
-    'tanner':
+    Symbol_Tanner:
       begin
         SymbolBitmap := BitmapFromString(15, 5, 'z78DA8D904B0EC0200805AF0' +
           '4F85F4ABDFF991AFB162521D26E26462703919898BAAACEAB82B5' +
@@ -255,7 +324,7 @@ begin
           '47D9FFF30DFAEB6308');
         Result := 3363443;
       end;
-    'churn':
+    Symbol_Churn:
       begin
         SymbolBitmap := BitmapFromString(15, 5, 'z78DA9590410A00210845AFA4' +
           'A5FE5A564CF73FD240CE40502DDA3C5CE8031F318150D1ACE94C4' +
@@ -264,7 +333,7 @@ begin
           '8BAC6A8FAF927AEB5338A958DF905A105631F');
         Result := 1720403;
       end;
-    'house':
+    Symbol_House:
       begin
         SymbolBitmap := BitmapFromString(15, 5, 'z78DA9D90410AC0300804BF6' +
           '41B2DF66863F3FF2715BA978560A0BD0C32E2B228F766123D53BB' +
@@ -273,7 +342,7 @@ begin
           'F5');
         Result := 4740173
       end;
-    'axe shop':
+    Symbol_AxeShop:
       begin
         SymbolBitmap := BitmapFromString(15, 5, 'z78DA95D04B0EC3300804D02B91' +
           '0033F6127F72FF23A52A1BA4AA55BA1959483C036202E953A74F7' +
@@ -283,7 +352,7 @@ begin
           'EB356E4B7C6439');
         Result := 6841956;
       end;
-    'cookery shop':
+    Symbol_CookeryShop:
       begin
         SymbolBitmap := BitmapFromString(15, 5, 'z78DA8DCE410AC0300804C0' +
           '2F194CDCE42896FCFF49856E0F421072D983BA83D2C56485C608E' +
@@ -292,7 +361,7 @@ begin
           'B137B3CDAB290E76797E60B5A736560');
         Result := 7565679
       end;
-    'windmill':
+    Symbol_Windmill:
       begin
         SymbolBitmap := BitmapFromString(15, 5, 'z78DA3330313033B074367' +
           '6367536C745BA0181A11132E968EC68EA8853BD01D84C0324930D' +
@@ -300,7 +369,7 @@ begin
           '8E1665C264348882C3289CB6DB848889900AC8467DB');
         Result := 1245183;
       end;
-    'minigame':
+    Symbol_Minigame:
       begin
         SymbolBitmap := BitmapFromString(15, 5, 'z78DA8D90410EC0200804B' +
           'FB4AD22E568B1FFFF52132129C6DAF432214626CB22A340342929' +
@@ -309,7 +378,7 @@ begin
           '8E7FAC13E3CAFCD2B3DD1BB34D3DC7B6CD79039CA16371');
         Result := 4670928;
       end;
-    'fur trader':
+    Symbol_FurTrader:
       begin
         SymbolBitmap := BitmapFromString(15, 5, 'z78DA3330313033B0743' +
           '67636753647262D2C4C8C0D2C31497357A07A0B64D2D1D8D1D4D1' +
@@ -317,7 +386,7 @@ begin
           'B16BF7A52438378F321660200DE126419');
         Result := 607112;
       end;
-    'archery shop':
+    Symbol_ArcheryShop:
       begin
         SymbolBitmap := BitmapFromString(15, 5, 'z78DAA5CE490AC0201' +
           '044D12BB5560F71E910EF7FA4403A0B8318846CFEAA78143129A5' +
@@ -326,7 +395,7 @@ begin
           '37477FF5F35BBE0049C36545');
         Result := 4945565;
       end;
-    'staff shop':
+    Symbol_StaffShop:
       begin
         SymbolBitmap := BitmapFromString(15, 5, 'z78DAA5D03B0AC0300C0' +
           '3D02BD9F1AF198D83EF7FA442BCB6C1B48B26F110020685191412' +
@@ -334,7 +403,7 @@ begin
           'B7DD0D9ECCBFD9DDFE4F3AB6FF20D38E96664');
         Result := 4286358;
       end;
-    'clothes shop':
+    Symbol_ClothesShop:
       begin
         SymbolBitmap := BitmapFromString(15, 5, 'z78DA8DD04B0AC0200' +
           'C45D12D3DF2D13A0CE9FED754681CA4484A267720CF8308C1C072' +
@@ -343,14 +412,14 @@ begin
           '012BE4618A');
         Result := 5935156;
       end;
-    'farming spot':
+    Symbol_FarmingSpot:
       begin
         SymbolBitmap := BitmapFromString(15, 5, 'beNpjYGRgYDyAAwRZC' +
      'Lir87iJ8c2fPx/IBarEpRiicj4M4FGMrBIuiKm4rKw0PSMDqBhNJaZiiEoIQl' +
      'MJUgwAOf97Lg==');
         Result := 12632256;
       end;
-    'apothecary':
+    Symbol_Apothecary:
       begin
         SymbolBitmap := BitmapFromString(15, 5, 'z78DA9DD0310AC030088' +
           '5E12B69A3A68ED6D6FB1FA9D02C4230942CFF241F0F814040BD39' +
@@ -358,7 +427,7 @@ begin
           '5EFE05926C5F3D23DB932B33C7FE6FFE66AED5A7E01E72B65AE');
         Result := 16737938;
       end;
-    'sword shop':
+    Symbol_SwordShop:
       begin
         SymbolBitmap := BitmapFromString(15, 5, 'z78DA95D0410AC030080' +
           '4C02FD9C66CE25125FFFF524BBD08A5C520EC41964124269078F3' +
@@ -367,7 +436,7 @@ begin
           'DB6637');
         Result := 10067100;
       end;
-    'platebody shop':
+    Symbol_PlatebodyShop:
       begin
         SymbolBitmap := BitmapFromString(15, 5, 'z78DA8DD0410AC02' +
           '00C44D12BA56832761902BDFF910A9DCD8055DCFC850C4FD1BA85' +
@@ -376,7 +445,7 @@ begin
           '97E77F7E014609646B');
         Result := 8157816;
       end;
-    'scimitar shop':
+    Symbol_ScimitarShop:
       begin
         SymbolBitmap := BitmapFromString(15, 5, 'z78DA9DD04D0AC340' +
           '0805E02B8D7FCF71399349EF7FA4A6B8A825109A203C5CE887D8A' +
@@ -386,7 +455,7 @@ begin
           '65625E');
         Result := 8752522;
       end;
-    'gem stall':
+    Symbol_GemStall:
       begin
         SymbolBitmap := BitmapFromString(15, 5, 'z78DAA58E4B0AC0300844' +
           'AFA4F96719F3B9FF919A640A154A3729836F21FA18629A1196201' +
@@ -395,7 +464,7 @@ begin
           '6C4DA8C9E306B1653E29C4D6DBE0027B7630B');
         Result := 1777896;
       end;
-    'silk stall':
+    Symbol_SilkStall:
       begin
         SymbolBitmap := BitmapFromString(15, 5, 'z78DA333034004227432' +
           '733276364D2C2C4C0D0D488181253AF81210262CA42484B67030B' +
@@ -403,7 +472,7 @@ begin
           '62486849889CB6400B4306127');
         Result := 5374340;
       end;
-    'plateskirt shop':
+    Symbol_PlateskirtShop:
       begin
         SymbolBitmap := BitmapFromString(15, 5, 'z78DA3330340042' +
           '2743273327634CD2D9D8CCC2D9009974323235763282909686966' +
@@ -411,13 +480,13 @@ begin
           '709843BCC900457662CC');
         Result := 12609731;
       end;
-    'agility':
+    Symbol_Agility:
       begin
         SymbolBitmap := BitmapFromString(15, 5, 'beNpjYGRgYDwABkAGEM2fPx' +
      '+NAWHDFRyAAbgssgIIA1Mxsnq4GjyK0czHFMcUmQ8G6I4EAIrAWyc=');
         Result := 65536;
       end;
-    'training dummy':
+    Symbol_TrainingDummy:
       begin
         SymbolBitmap := BitmapFromString(15, 5, 'z78DAA5CC5B0AC43' +
           '00805D02D69468DF9BC6DEAFE97D401032384F92845B8888F434C' +
@@ -426,7 +495,7 @@ begin
           'A6EC1FB73E6BBE974D6572403C74F9AB2F9769DEA32D69B5');
         Result := 1586538;
       end;
-    'food shop', 'food store':
+    Symbol_FoodShop, Symbol_FoodStore:
       begin
         SymbolBitmap := BitmapFromString(15, 5, 'z78DAA5D0610AC0200806' +
           'D02B559ADA4F37DAFD8F3499C11C6D63B02F900A79882959B28AC' +
@@ -435,7 +504,7 @@ begin
           '77A9183F945BED9C66F396EC385D91F321AD29FE41DF6B66191');
         Result := 7837098;
       end;
-    'fishing shop', 'fish store':
+    Symbol_FishingShop, Symbol_FishStore:
       begin
         SymbolBitmap := BitmapFromString(15, 5, 'z78DA3330340042470B470B' +
           '27134CD2D2C2C4C8C010425A0081A509844456832962608880E49' +
@@ -443,7 +512,7 @@ begin
           '19D9765C6E8698894C62BA193334304D0600DE086263');
         Result := 9734280;
       end;
-    'jewelery':
+    Symbol_Jewelery:
       begin
         SymbolBitmap := BitmapFromString(15, 5, 'z78DA9D904B0AC0300844A' +
           'F646843E2D24FBCFF911A6217820DB4DD0C32EA43070A28B08088' +
@@ -452,7 +521,7 @@ begin
           '479E471FB395F2DCE59FC917FB9B6AAB');
         Result := 4829105;
       end;
-    'crafting shop':
+    Symbol_CraftingShop:
       begin
         SymbolBitmap := BitmapFromString(15, 5, 'z78DA95CEC10AC020' +
           '0C03D05F8AD3D979AC71FFFF4BC27A29C8A45E420EE111240C748' +
@@ -461,7 +530,7 @@ begin
           'C');
         Result := 3159851;
       end;
-    'portal':
+    Symbol_Portal:
       begin
         SymbolBitmap := BitmapFromString(15, 5, 'z78DAA5D04B0AC0300805' +
           'C02B69D2D6B8D47CEE7FA4045CD442ED22457848D0410208AB549' +
@@ -470,7 +539,7 @@ begin
           'BD3CB13F26764CE');
         Result := 15287202;
       end;
-    'makeover mage':
+    Symbol_MakeoverMage:
       begin
         SymbolBitmap := BitmapFromString(15, 5, 'z78DA333034703170' +
           '7236707676B68490066011571367734B174CD2D2D8CCD5C418993' +
@@ -478,7 +547,7 @@ begin
           'DD499EC9F8CDC76526A6C9003E5F6688');
         Result := 10340324;
       end;
-    'mace shop':
+    Symbol_MaceShop:
       begin
         SymbolBitmap := BitmapFromString(15, 5, 'z78DA9DD14B0A80300C04' +
           'D02B4D4CF3E93226DEFF4A82155404296EB21A1E330484C29AC8C' +
@@ -487,7 +556,7 @@ begin
           'A8C7CDFFEEE39F39161EE1ADD6893');
         Result := 8817273;
       end;
-    'hair dresser':
+    Symbol_HairDresser:
       begin
         SymbolBitmap := BitmapFromString(15, 5, 'z78DA33303470317072' +
           '36707676B68490066011030C71E2D5E0977534707476C4A206998' +
@@ -495,7 +564,7 @@ begin
           '4CF7E37233005E916796');
         Result := 13225152;
       end;
-    'mining shop':
+    Symbol_MiningShop:
       begin
         SymbolBitmap := BitmapFromString(15, 5, 'z78DA33B03430313074' +
           'B670367672C5241D2D1C8D2DA1A40158258474737473333285909' +
@@ -503,7 +572,7 @@ begin
           '5998BAC0447099499EC9C498896C022E9301172B6823');
         Result := 10396584;
       end;
-    'silver stall':
+    Symbol_SilverStall:
       begin
         SymbolBitmap := BitmapFromString(15, 5, 'z78DA958E410AC0400' +
           '803BF14D1823D6E6DF3FF2715EA4510A17B09C198211008347031' +
@@ -511,7 +580,7 @@ begin
           '976FBF2F4F9B370726D90FBB64977C913BFA6D3E61755066363');
         Result := 8749956;
       end;
-    'spice stall':
+    Symbol_SpiceStall:
       begin
         SymbolBitmap := BitmapFromString(15, 5, 'z78DA9DD0C10E80200C' +
           '03D05FEA06883B22D2FFFF2413F140B240D44BD3C3FA0E8340102' +
@@ -520,7 +589,7 @@ begin
           '1BE002BE06493');
         Result := 157167;
       end;
-    'farming shop':
+    Symbol_FarmingShop:
       begin
         SymbolBitmap := BitmapFromString(15, 5, 'z78DA95CE410E80200' +
           'C44D12B4D5B405C160CF73F92C461D1C498E0E6D374F1280402EB' +
@@ -529,7 +598,7 @@ begin
           '9CE7128332E72FEDAF1C2FDF91A319E51BD93562F0');
         Result := 1918090;
       end;
-    'slayer master':
+    Symbol_SlayerMaster:
       begin
         SymbolBitmap := BitmapFromString(15, 5, 'z78DAA5D04B0AC030' +
           '0804D02B8D89A5CD320D9DFB1FA9BF8D622D8582B810E6210381A' +
@@ -538,7 +607,7 @@ begin
           'E019F8C655C');
         Result := 7666933;
       end;
-    'herbalist':
+    Symbol_Herbalist:
       begin
         SymbolBitmap := BitmapFromString(15, 5, 'z78DA7D8E5D0AC0300883' +
           'AFA4FDD33E5AC6EE7FA415C258C0D10A22267E8DA8EC5A253C9CB' +
@@ -547,7 +616,7 @@ begin
           'C3FF3393954EEFC2327CFE4CCCFC933136A263F5CC35F29');
         Result := 682309
       end;
-    'candle shop':
+    Symbol_CandleShop:
       begin
         SymbolBitmap := BitmapFromString(15, 5, 'z78DA33303400422723' +
           '470B470B4CD2CDD0C2D5C01042BA9ABB9A9A3A218BE0D26560888' +
@@ -555,7 +624,7 @@ begin
           '8390B8CC1CEA26030022F6653F');
         Result := 6022631;
       end;
-    'saw mill':
+    Symbol_SawMill:
       begin
         SymbolBitmap := BitmapFromString(15, 5, 'z78DAB58EB10DC03008045' +
           '70A600C2EFDF1FE33450A299088A53469AEB08FD3D3498D7861C9' +
@@ -564,7 +633,7 @@ begin
           'A76EBE00CD48658B');
         Result := 8882835;
       end;
-    'kebab shop':
+    Symbol_KebabShop:
       begin
         SymbolBitmap := BitmapFromString(15, 5, 'beNpj4OBg4Dh37BgQZTtJRDFwZM8' +
           'xhKD/mpo9DAwgEScJiAKgSohioIjEFJBKIAlEQJUQxcjqkRUDVULE' +
@@ -572,7 +641,7 @@ begin
           '2Q=');
         Result := 7316427;
       end;
-    'short cut':
+    Symbol_ShortCut:
       begin
         SymbolBitmap := BitmapFromString(15, 5, 'z78DA8D90410AC0300804' +
           'BFA421A1E95137EDFF9F54E8F62088259741161D64C5B4E98573E' +
@@ -581,7 +650,7 @@ begin
           '756682E');
         Result := 5286667
       end;
-    'hunter store':
+    Symbol_HunterStore:
       begin
         SymbolBitmap := BitmapFromString(15, 5, 'z78DA95D0510AC3300' +
           '806E02BC558CDEFA309F6FE47DAC08E3942A143F041934FB1517B' +
@@ -591,7 +660,7 @@ begin
           '96443');
         Result := 1261916;
       end;
-    'hunter training':
+    Symbol_HunterTraining:
       begin
         SymbolBitmap := BitmapFromString(15, 5, 'z78DA8DCF410A00' +
           '210C03C02FC52D76E9B18AFFFF92B0EB2150025E728876AC78916' +
@@ -600,7 +669,7 @@ begin
           'B');
         Result := 10398118
       end;
-    'sandpit':
+    Symbol_Sandpit:
       begin
         SymbolBitmap := BitmapFromString(15, 5, 'z78DA8DCF4B0AC0300' +
           '804D02B8DA9F9B84CA4BDFF91526A16820D64330CA20F0481208A' +
@@ -609,7 +678,7 @@ begin
           '8794BE952DFDFE49DA95972794856206');
         Result := 7717352;
       end;
-    'pet shop':
+    Symbol_PetShop:
       begin
        SymbolBitmap := BitmapFromString(15, 5, 'beNpj42Nm4zt87GxnbWFhUkh' +
          'skCsQ7dm7CYIgXKB4dUkYUA1QJVwxULyypllFSQMoBUEQLlAcyF68' +
@@ -617,7 +686,7 @@ begin
          'TomBhAEVAnkAo0FGg5SDADYtlua');
         result:= 11713980;
       end;
-    'summoning store':
+    Symbol_SummoningStore:
       begin
        SymbolBitmap := BitmapFromString(15, 5, 'beNpj42Nm4zt87CwE2SVP1' +
          'XaoKeidC0SeUTWfHj4AiixetgYoCCSBKuGKgSKVNc1AZXMO3AOpWf' +
@@ -625,7 +694,7 @@ begin
          'VAI0FqgeSEBMwFQNVAo0FigPVgxjrnwB1Obj4IBQDAImMdLM=');
         result:= 10325360;
       end;
-    'resting spot', 'rest':
+    Symbol_RestingSpot, Symbol_Rest:
       begin
        SymbolBitmap := BitmapFromString(15, 5, 'beNptjUENwDAMAw2lU' +
          'AylUAyljwEZtFryukVd7xHpYisBzF2wjnEdFfjKWCTdtJY9exfJpJ' +
@@ -641,7 +710,7 @@ GetSymbolColorIn
 
 .. code-block:: pascal
 
-    function GetSymbolColorIn(var rx, ry: Integer; Name: string; xs, ys, xe, ye: Integer): Integer;
+    function GetSymbolColorIn(var rx, ry: Integer; Name, xs, ys, xe, ye: Integer): Integer;
 
 Returns the Color of the Chosen Symbol, Searching in a selected area
 of the Minimap
@@ -655,14 +724,14 @@ Example:
 .. code-block:: pascal
 
 *)
-function GetSymbolColorIn(var rx, ry: Integer; Name: string; xs, ys, xe, ye: Integer): Integer;
+function GetSymbolColorIn(var rx, ry: Integer; Name, xs, ys, xe, ye: Integer): Integer;
 var
   TheColor, c, Speed, x, y: Integer;
   acc: Extended;
 begin
   Speed := GetToleranceSpeed;
   SetColorToleranceSpeed(1);
-  TheColor := LoadSymbolBitmapColor(LowerCase(Name));
+  TheColor := LoadSymbolBitmapColor(Name);
   if (TheColor <> 0) then
   begin
     FindDeformedBitmapToleranceIn(SymbolBitmap, x, y, xs, ys, xe, ye, 70, 0, True, acc);
@@ -677,7 +746,7 @@ begin
         end;
       until (Result > 0) or (c > 70);
   end else
-    srl_Warn('GetSymbolColorIn', Name + ' is not a valid name.', warn_AllVersions);
+    srl_Warn('GetSymbolColorIn', 'Invalid name.', warn_AllVersions);
   try
     FreeBitmap(SymbolBitmap);
   finally
@@ -693,7 +762,7 @@ GetSymbolColor
 
 .. code-block:: pascal
 
-    function GetSymbolColor(var rx, ry: Integer; Name: string): Integer;
+    function GetSymbolColor(var rx, ry: Integer; Name: Integer): Integer;
 
 Returns the Color of the Chosen Symbol, searching the whole Minimap
 
@@ -706,9 +775,9 @@ Example:
 .. code-block:: pascal
 
 *)
-function GetSymbolColor(var rx, ry: Integer; Name: string): Integer;
+function GetSymbolColor(var rx, ry: Integer; Name: Integer): Integer;
 begin
-  Result := GetSymbolColorIn(rx, ry, LowerCase(Name), MMX1, MMY1, MMX2, MMY2);
+  Result := GetSymbolColorIn(rx, ry, Name, MMX1, MMY1, MMX2, MMY2);
 end;
 
 (*
@@ -717,7 +786,7 @@ FindSymbol
 
 .. code-block:: pascal
 
-    function FindSymbol(var rx, ry: Integer; Name: String): Boolean;
+    function FindSymbol(var rx, ry: Integer; Name: Integer): Boolean;
 
 Finds a minimap Symbol and returns a Boolean if True.
 
@@ -730,9 +799,9 @@ Example:
 .. code-block:: pascal
 
 *)
-function FindSymbol(var rx, ry: Integer; Name: string): Boolean;
+function FindSymbol(var rx, ry: Integer; Name: Integer): Boolean;
 begin
-  Result := (GetSymbolColor(rx, ry, LowerCase(Name)) > 0);
+  Result := (GetSymbolColor(rx, ry, Name) > 0);
 end;
 
 (*
@@ -741,7 +810,7 @@ FindSymbolIn
 
 .. code-block:: pascal
 
-    function FindSymbolIn(var rx, ry: Integer; Name: string; xs, ys, xe, ye: Integer): Boolean;
+    function FindSymbolIn(var rx, ry: Integer; Name, xs, ys, xe, ye: Integer): Boolean;
 
 Finds a minimap Symbol and returns a Boolean if True.
 Searches a selected area of the Minimap
@@ -755,9 +824,9 @@ Example:
 .. code-block:: pascal
 
 *)
-function FindSymbolIn(var rx, ry: Integer; Name: string; xs, ys, xe, ye: Integer): Boolean;
+function FindSymbolIn(var rx, ry: Integer; Name, xs, ys, xe, ye: Integer): Boolean;
 begin
-  Result := (GetSymbolColorIn(rx, ry, LowerCase(Name), xs, ys, xe, ye) > 0);
+  Result := (GetSymbolColorIn(rx, ry, Name, xs, ys, xe, ye) > 0);
 end;
 
 (*
@@ -798,7 +867,7 @@ FindSymbolsIn
 
 .. code-block:: pascal
 
-    function FindSymbolsIn(var AnsTPA: TPointArray; SymbolName: string; x1, y1, x2, y2: integer): Boolean;
+    function FindSymbolsIn(var AnsTPA: TPointArray; SymbolName, x1, y1, x2, y2: integer): Boolean;
 
 Finds a symbol in multiple places within the search coords. Results
 true if at least 1 symbol is found.
@@ -812,7 +881,7 @@ Example:
 .. code-block:: pascal
 
 *)
-function FindSymbolsIn(var AnsTPA: TPointArray; SymbolName: string; x1, y1, x2, y2: integer): Boolean;
+function FindSymbolsIn(var AnsTPA: TPointArray; SymbolName, x1, y1, x2, y2: integer): Boolean;
 var
   CTS, Col, Hi, i, x, y, fx, fy, L: integer;
   aP: T2DPointArray;
@@ -826,7 +895,7 @@ begin
   FindColorsTolerance(P, Col, x1, y1, x2, y2, 0);
   aP := TPAtoATPA(P, 10);
   Hi := High(aP);
-  LoadSymbolBitmapColor(LowerCase(SymbolName));
+  LoadSymbolBitmapColor(SymbolName);
   CTS := GetToleranceSpeed;
   SetColorToleranceSpeed(1);
   SetLength(AnsTPA, Hi+1);
@@ -858,7 +927,7 @@ FindSymbols
 
 .. code-block:: pascal
 
-    function FindSymbols(var AnsTPA: TPointArray; SymbolName: string): Boolean;
+    function FindSymbols(var AnsTPA: TPointArray; SymbolName: Integer): Boolean;
 
 Finds a symbol in multiple places searching the whole minimap.
 Results true if at least 1 symbol is found.
@@ -872,7 +941,7 @@ Example:
 .. code-block:: pascal
 
 *)
-function FindSymbols(var AnsTPA: TPointArray; SymbolName: string): Boolean;
+function FindSymbols(var AnsTPA: TPointArray; SymbolName: Integer): Boolean;
 begin
   Result := FindSymbolsIn(AnsTPA, SymbolName, MMX1, MMY1, MMX2, MMY2);
 end;
@@ -883,7 +952,7 @@ FindSymbolsMultiIn
 
 .. code-block:: pascal
 
-    function FindSymbolsMultiIn(var aTPA: TPointArray; Symbols: TStringArray; x1, y1, x2, y2: integer): Boolean;
+    function FindSymbolsMultiIn(var aTPA: TPointArray; Symbols: TIntegerArray; x1, y1, x2, y2: integer): Boolean;
 
 Finds multiple symbols the specified area. Results true if at least
 1 symbol is found.
@@ -897,7 +966,7 @@ Example:
 .. code-block:: pascal
 
 *)
-function FindSymbolsMultiIn(var aTPA: TPointArray; Symbols: TStringArray; x1, y1, x2, y2: integer): Boolean;
+function FindSymbolsMultiIn(var aTPA: TPointArray; Symbols: TIntegerArray; x1, y1, x2, y2: integer): Boolean;
 var
   gTPA: TPointArray;
   I, H: Integer;
@@ -918,7 +987,7 @@ FindSymbolsMulti
 .. code-block:: pascal
 
 
-    function FindSymbolsMulti(var aTPA: TPointArray; Symbols: TStringArray): Boolean
+    function FindSymbolsMulti(var aTPA: TPointArray; Symbols: TIntegerArray): Boolean
 
 Finds multiple symbols in multiple places. Results true if at least
 1 symbol is found.
@@ -932,7 +1001,8 @@ Example:
 .. code-block:: pascal
 
 *)
-function FindSymbolsMulti(var aTPA: TPointArray; Symbols: TStringArray): Boolean;
+function FindSymbolsMulti(var aTPA: TPointArray; Symbols: TIntegerArray): Boolean;
 begin
   Result := FindSymbolsMultiIn(aTPA, Symbols, MMx1, MMy1, MMx2, MMy2);
 end;
+                                                                         
