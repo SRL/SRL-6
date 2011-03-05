@@ -113,7 +113,7 @@ begin
 
   { By default throw exceptions on faulty arguments passed to find* functions. }
   {$IFDEF SRL_DEBUG}
-  SetSuppresExceptions(True);
+  SetSupressExceptions(True);
   {$ELSE}
   SetSupressExceptions(False);
   {$ENDIF}
