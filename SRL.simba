@@ -110,6 +110,13 @@ procedure SetUpSRL;
 var
   T: Integer;
 begin
+
+  { By default throw exceptions on faulty arguments passed to find* functions. }
+  {$IFDEF SRL_DEBUG}
+  SetSuppresExceptions(True);
+  {$ELSE}
+  SetSupressExceptions(False);
+  {$ENDIF}
   SetUpBoxes; //Sets up box variables in globals.simba
   T := GetTimeRunning;
   MouseSpeed := 15;
