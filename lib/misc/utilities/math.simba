@@ -6,65 +6,6 @@ Supporting math functions.
 
 *)
 
-var
-   SineArray, Cosearray: array[0..360] of Extended;
-   
-(*
-LoadCoSineArrays
-~~~~~~~~~~~~~~~~
-
-.. code-block:: pascal
-
-    procedure LoadCoSineArrays;
-
-Load default sin/cos values.
-
-.. note::
-
-    by Mutant Squirrle
-
-Example:
-
-.. code-block:: pascal
-
-*)
-procedure LoadCoSineArrays;
-var
-  i: Integer;
-begin
-  for i := 0 to 360 do
-  begin
-    Sinearray[i] := Sin(i * Pi / 180);
-    Cosearray[i] := Cos(i * Pi / 180);
-  end;
-end;
-
-(*
-CreateTPAFromText
-~~~~~~~~~~~~~~~~~
-
-.. code-block:: pascal
-
-    function CreateTPAFromText(Txt : string; Chars : string) : TPointArray;
-
-Returns the TPointArray of the inputted Text. Needs Wizzyplugin
-
-.. note::
-
-    by MastaRaymond
-
-Example:
-
-.. code-block:: pascal
-
-*)
-function CreateTPAFromText(Txt : string; Chars : string) : TPointArray;
-var
-  w,h : integer;
-begin;
-  result := TPAFromText(Txt,Chars,w,h);
-end;
-
 (*
 GetSplitPt
 ~~~~~~~~~~
@@ -518,39 +459,6 @@ Example:
 function MiddleBox(b : TBox) : TPoint;
 begin
   result := point((b.x2+b.x1) div 2,(b.y2+b.y1) div 2);
-end;
-
-(*
-GroupDigits
-~~~~~~~~~~~~~~~
-
-.. code-block:: pascal
-
-    function GroupDigits(n: integer; token: String): String;
-
-Adds midpoints to Path so no distance on it is greater than MaxDist
-
-.. note::
-
-    by PriSoner and Nava2
-
-Example:
-
-.. code-block:: pascal
-
-*)
-function GroupDigits(n: integer; token: String): String;
-var
-  b: integer;
-begin
-  Result := IntToStr(n);
-  b := length(Result) + 1;
-  if b > 3 then
-  repeat
-    b := b - 3;
-    if b > 1 then
-      insert(token, Result, b);
-  until (b < 3);
 end;
 
 // TODO: FIX DOC FOR AMAX
