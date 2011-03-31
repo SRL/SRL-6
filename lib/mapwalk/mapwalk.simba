@@ -6,6 +6,8 @@ The Mapwalk include contains all Mapwalking functions
 
 *)
 
+// TODO: SEPARATE INTO MINIMAP, ANGLES, AND ERR.. YEAH!
+
 (*
 rs_GetCompassAngleDegrees
 ~~~~~~~~~~~~~~~~~~~~~~~~~
