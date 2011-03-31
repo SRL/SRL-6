@@ -568,6 +568,14 @@ begin
   until (False);
   WriteLn('Welcome to Runescape.');
 
+                   {New graphics have changed box}
+
+  case CountColor(LOGIN_TEXTCOLOUR, 198, 192, 567, 259) of
+    1079: MouseBox(347, 295, 414, 303, 1);
+    1745: MouseBox(347, 305, 414, 312, 1); // "Available graphics options have been changed..."
+    1801: MouseBox(347, 305, 414, 312, 1); // "There was a problem with your current graphics settings..."
+  end;
+
                    {Click less info if needed.}
 
   if (not (SimilarColors(GetColor(382, 11), 14285562, 20))) then //Runescae sword green bead
