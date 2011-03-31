@@ -906,3 +906,5 @@ begin
     end;
   end;
 end;
+
+{$I ./abyss.simba}
