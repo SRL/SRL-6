@@ -7,6 +7,8 @@ using text in RS. It also contains a few useful input routines
 
 *)
 
+// TODO: WEED OUT THIS FILE, THERES TOO MUCH GOING ON
+
 { const clMessage, clChat, clTrade, clFriend
   Description: Text colour constants. }
 const
@@ -334,6 +336,8 @@ begin
   end;
 end;
 
+// TODO: DOC FOR ISTEXTINAREAEX.. Wizzup/Ray?
+
 function IsTextInAreaEx(xs, ys, xe, ye: Integer; var x, y: Integer; S: string; Tolerance: Integer; Chars: String; CheckShadow, CheckOutline: Boolean; MinSpacing, MaxSpacing: Integer; TextColor: Integer): Boolean;
 var
   TextTPA,SearchTPA, Matches: TPointArray;
@@ -366,6 +370,39 @@ begin
 end;
 
 (*
+GroupDigits
+~~~~~~~~~~~~~~~
+
+.. code-block:: pascal
+
+    function GroupDigits(n: integer; token: String): String;
+
+Adds midpoints to Path so no distance on it is greater than MaxDist
+
+.. note::
+
+    by PriSoner and Nava2
+
+Example:
+
+.. code-block:: pascal
+
+*)
+function GroupDigits(n: integer; token: String): String;
+var
+  b: integer;
+begin
+  Result := IntToStr(n);
+  b := length(Result) + 1;
+  if b > 3 then
+  repeat
+    b := b - 3;
+    if b > 1 then
+      insert(token, Result, b);
+  until (b < 3);
+end;
+
+(*
 GetNumbers
 ~~~~~~~~~~
 
@@ -381,6 +418,8 @@ function GetNumbers(text : string) : string;
 begin;
   result := ExtractFromStr(text,numbers);
 end;
+
+// TODO: DOC FOR GETTEXTATEX.. its complicated.
 
 function GetTextAtEx(x, y: Integer; Tolerance: Integer; Chars: String; CheckShadow, CheckOutline: Boolean; MinSpacing, MaxSpacing: Integer; TextColor: Integer; TextLength: Integer; Strict: Boolean; Range: longword): anystring;
 begin
