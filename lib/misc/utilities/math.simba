@@ -388,123 +388,6 @@ begin
 end;
 
 (*
-DeleteValueInStrArray
-~~~~~~~~~~~~~~~~~~~~~
-
-.. code-block:: pascal
-
-    procedure DeleteValueInStrArray(var Arr: TStringArray; ValuePosition: Integer);
-
-Deletes value with ValuePosition in "Arr" string array.
-
-.. note::
-
-    by EvilChicken!
-
-Example:
-
-.. code-block:: pascal
-
-*)
-procedure DeleteValueInStrArray(var Arr: TStringArray; ValuePosition: Integer);
-var
-  ArrLen, I: Integer;
-begin
-  ArrLen := High(Arr);
-  for I := ValuePosition to ArrLen - 1 do
-    Swap(Arr[I], Arr[I + 1]);
-  SetArrayLength(Arr, ArrLen);
-end;
-
-(*
-DeleteValueInIntArray
-~~~~~~~~~~~~~~~~~~~~~
-
-.. code-block:: pascal
-
-    procedure DeleteValueInIntArray(var Arr: TIntegerArray; ValuePosition: Integer);
-
-Deletes value with ValuePosition in "Arr" Integer array.
-
-.. note::
-
-    by EvilChicken!
-
-Example:
-
-.. code-block:: pascal
-
-*)
-procedure DeleteValueInIntArray(var Arr: TIntegerArray; ValuePosition: Integer);
-var
-  ArrLen, I: Integer;
-begin
-  ArrLen := High(Arr);
-  for I := ValuePosition to ArrLen - 1 do
-    Swap(Arr[I], Arr[I + 1]);
-  SetArrayLength(Arr, ArrLen);
-end;
-
-(*
-DeleteValueInFloatArray
-~~~~~~~~~~~~~~~~~~~~~~~
-
-.. code-block:: pascal
-
-    procedure DeleteValueInFloatArray(var Arr: TExtendedArray; ValuePosition: Integer);
-
-
-Deletes value with ValuePosition in "Arr" Float array.
-
-.. note::
-
-    by EvilChicken!
-
-Example:
-
-.. code-block:: pascal
-
-*)
-procedure DeleteValueInFloatArray(var Arr: TExtendedArray; ValuePosition: Integer);
-var
-  ArrLen, I: Integer;
-begin
-  ArrLen := High(Arr);
-  for I := ValuePosition to ArrLen - 1 do
-    Swap(Arr[I], Arr[I + 1]);
-  SetArrayLength(Arr, ArrLen);
-end;
-
-(*
-DeleteValueInBoolArray
-~~~~~~~~~~~~~~~~~~~~~~
-
-.. code-block:: pascal
-
-    procedure DeleteValueInBoolArray(var Arr: TBooleanArray; ValuePosition: Integer);
-
-Deletes value with ValuePosition in "Arr" Boolean array.
-
-.. note::
-
-    by EvilChicken!
-
-Example:
-
-.. code-block:: pascal
-
-*)
-procedure DeleteValueInBoolArray(var Arr: array of boolean; ValuePosition: Integer);
-var
-  ArrLen, I: Integer;
-begin
-  ArrLen := High(Arr);
-  for I := ValuePosition to ArrLen - 1 do
-    Swap(Arr[I], Arr[I + 1]);
-  SetArrayLength(Arr, ArrLen);
-end;
-
-(*
 BoxClosestPoint
 ~~~~~~~~~~~~~~~
 
@@ -612,6 +495,7 @@ begin
   else
     result := TPA[random(length(tpa))];
 end;
+
 (*
 MiddleBox
 ~~~~~~~~~
@@ -669,10 +553,7 @@ begin
   until (b < 3);
 end;
 
-function InCircle(x, y, mx, my, r: Integer): Boolean;
-begin
-  Result := (Distance(X, Y, mX, mY) <= R);
-end;
+// TODO: FIX DOC FOR AMAX
 
 function AMax(Data: TIntegerArray): Integer;
 var
@@ -686,52 +567,4 @@ begin;
   result := data[0];
   for i := high(data) downto 1 do
     result := max(result,data[i]);
-end;
-
-(*
-RBoolEx
-~~~~~~~
-
-.. code-block:: pascal
-
-    function RBoolEx(chance: integer): boolean;
-
-Returns a boolean, with a chance of 1 / chance
-
-.. note::
-
-    by Rasta Magician
-
-Example:
-
-.. code-block:: pascal
-
-*)
-function RBoolEx(chance: Integer): Boolean;
-begin
-  Result := (0 = Random(chance));
-end;
-
-(*
-RBool
-~~~~~
-
-.. code-block:: pascal
-
-    function RBool: boolean;
-
-Returns a boolean, with a 50% chance
-
-.. note::
-
-    by Rasta Magician
-
-Example:
-
-.. code-block:: pascal
-
-*)
-function RBool: boolean;
-begin
-  Result := RBoolEx(2);
 end;
