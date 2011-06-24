@@ -15,7 +15,6 @@ const
   srl_AREA_TRADE = 4; // ... FIX
   srl_AREA_TRADE_YOUR = 5; // ... FIX
 
-function BankScreen: Boolean; forward; // ... FIX
 function DepositScreen: Boolean; forward; // ... FIX
 
 (*
@@ -150,7 +149,7 @@ Example:
 
 *)
 
-function getTradeScreen: Integer;
+function GetTradeScreen: Integer;
 begin
   if (CountColor(16776960, 127, 32, 373, 51) > 20) then
     Result := srl_ITEMINT_TRADE
@@ -162,8 +161,8 @@ end;
 
 (*
 
-isTradeScreen
-~~~~~~~~~~~~~
+TradeScreen
+~~~~~~~~~~~
 
 .. code-block:: pascal
 

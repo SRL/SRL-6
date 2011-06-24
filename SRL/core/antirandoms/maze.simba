@@ -169,6 +169,8 @@ Begin
 
         Wait(800 + Random(400));
          Exit;
+         SetToleranceSpeed2Modifiers(0.2, 0.2);
+         SetColorToleranceSpeed(1);
        End;
      End;
    End;
@@ -219,7 +221,6 @@ begin
         end;
 
     DisplayDebugImgWindow(MSX2 - MSX1, MSY2 - MSY1);
-
     DrawBitmapDebugImg(Bmp1);
 
     ararP := SplitTPA(arP, 1);
@@ -283,6 +284,7 @@ Begin                                        //gets the black color by using a r
     Result := GetColor(TPA[0].X, TPA[0].Y);
 
   WriteLn('Maze Background color = '+IntToStr(Result));
+  SetToleranceSpeed2Modifiers(0.2, 0.2);
   SetColorToleranceSpeed(CTS);
 End;
 
@@ -383,7 +385,7 @@ Begin
     SearchBox := IntToBox(550, 84, 626, 166);
     Counts := [3500, 9999];
   End;
-  
+
   With StartSpots[TurquoisePath] Do //Turquoise Path
   Begin
     Name := 'Turquoise Path';

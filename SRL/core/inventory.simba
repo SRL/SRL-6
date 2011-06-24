@@ -109,10 +109,11 @@ begin
    Result[I] := GetInven(i + 1);
 end;
 
-function isInventoryPresent: Boolean;
+function IsInventoryPresent: Boolean;
 begin
   Result := (BankScreen) or (ShopScreen) or (TradeScreen); // ... FIX
-  if (not(Result)) then Result := GameTab(tab_Inv);
+  if (not(Result)) then
+    Result := GameTab(tab_Inv);
 end;
 
 (*
@@ -982,20 +983,19 @@ Example:
 *)
 function CountItemsBlackLine(Count, Tol: Integer): Integer;
 var
-  TPA: TPointArray;
-  I, H: Integer;
-  TPAA: T2DPointArray;
+  I, B: Integer;
+  Search:TBox;
 begin
   GameTab(tab_Inv);
   result := 0;
-  FindColors(TPA, srl_outline_black, MIX1, MIY1, MIX2, MIY2);
-  TPAA := TPAToATPAEx(TPA, 42, 36);
-  H := High(TPAA);
-  for I := 0 to H do
-    if InRange(GetArrayLength(TPAA[i]), Count - Tol, Count + Tol) then
+  for i:=1 to 28 do
+  begin
+    Search:= InvBox(i);
+    B:= CountColor(SRL_OUTLINE_BLACK, Search.X1, Search.Y1, Search.X2, Search.Y2 );
+    if InRange(B,  Count - Tol, Count + Tol) then
       Inc(Result);
+  end;
 end;
-
 
 (*
 ClickAllItemsBlackLine

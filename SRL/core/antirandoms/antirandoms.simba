@@ -120,7 +120,7 @@ player array. Will find text in order of occurance in the array.
 
 function FindBoxOption(var Box: TBox; var RewardInd: Integer): Boolean;
 var
-  x, y, H, L, II, i, LL, Col: Integer;
+  x, y, H, L, II, i, LL, Col, t: Integer;
   Text, TPA, xTPA: TPointArray;
   ATPA: T2DPointArray;
   Scroll: Boolean;
@@ -160,17 +160,18 @@ begin
       MMouse(X, Y, 0, 0);
       Wait(RandomRange(30, 60));
 
+      t := (getSystemTime + 5000);
       HoldMouse(X, y, mouseaction(True));
       while (GetColor(P.X, P.Y) <> Col) and (GetColor(385, 70) = 592137) and (not(Result)) do
       begin
-        if (not LoggedIn) then Break;
+        if (getSystemTime > t) then
+          break;
         FindColorsTolerance(TPA, 2070783, 35, 69, 362, 311, 3);
         Result := FindTextTPAInTPA(H, Text, TPA, xTPA);
         Wait(RandomRange(40, 50));
       end;
       ReleaseMouse(X, Y, mouseaction(True));
     end;
-
     if (Result) then
     begin
       if (II < L + 1) then
@@ -348,7 +349,7 @@ Description: handles Genie. Results True if lamp found and handled.
 skill: Skill to use with lamp eg. 'strength', 'attack', etc.
 *******************************************************************************}
 
-function FindLamp(skill: string): Boolean;
+function FindLamp(skill: integer): Boolean;
 var
   LampTime, X, Y, I: Integer;
 begin
@@ -367,31 +368,31 @@ begin
     MarkTime(LampTime);
     for I := 1 to 4 do
     begin
-      case (LowerCase(Skill)) of
-        'attack': Mouse(81, 109, 12, 12, True);
-        'strength': Mouse(139, 110, 12, 12, True);
-        'ranged': Mouse(196, 113, 12, 12, True);
-        'magic': Mouse(257, 117, 12, 12, True);
-        'defence': Mouse(319, 109, 12, 12, True);
-        'crafting', 'craft': Mouse(376, 111, 12, 12, True);
-        'hitpoints', 'hp': Mouse(436, 112, 12, 12, True);
-        'prayer', 'pray': Mouse(79, 166, 12, 12, True);
-        'agility': Mouse(141, 166, 12, 12, True);
-        'herblore': Mouse(199, 171, 12, 12, True);
-        'thieving', 'thief': Mouse(258, 167, 12, 12, True);
-        'fishing', 'fish': Mouse(325, 164, 12, 12, True);
-        'runecraft', 'runecrafting': Mouse(375, 167, 12, 12, True);
-        'slayer', 'slay': Mouse(436, 173, 12, 12, True);
-        'farming', 'farm': Mouse(83, 224, 12, 12, True);
-        'mining', 'mine': Mouse(137, 222, 12, 12, True);
-        'smithing', 'smith': Mouse(197, 220, 12, 12, True);
-        'hunting', 'hunt', 'hunter': Mouse(257, 222, 12, 12, True);
-        'cooking', 'cook': Mouse(318, 227, 12, 12, True);
-        'firemaking', 'fire': Mouse(378, 226, 12, 12, True);
-        'woodcutting', 'wc': Mouse(439, 222, 12, 12, True);
-        'fletching', 'fletch': Mouse(199, 275, 12, 12, True);
-        'construction': Mouse(255, 277, 12, 12, True);
-        'summoning': Mouse(323, 276, 12, 12, True);
+      case skill of
+        SKILL_ATTACK: Mouse(81, 109, 12, 12, True);
+        SKILL_STRENGTH: Mouse(139, 110, 12, 12, True);
+        SKILL_RANGE: Mouse(196, 113, 12, 12, True);
+        SKILL_MAGIC: Mouse(257, 117, 12, 12, True);
+        SKILL_DEFENCE: Mouse(319, 109, 12, 12, True);
+        SKILL_CRAFTING: Mouse(376, 111, 12, 12, True);
+        SKILL_HP: Mouse(436, 112, 12, 12, True);
+        SKILL_PRAYER, 'pray': Mouse(79, 166, 12, 12, True);
+        SKILL_AGILITY: Mouse(141, 166, 12, 12, True);
+        SKILL_HERBLORE: Mouse(199, 171, 12, 12, True);
+        SKILL_THIEVING: Mouse(258, 167, 12, 12, True);
+        SKILL_FISHING: Mouse(325, 164, 12, 12, True);
+        SKILL_RUNECRAFTING: Mouse(375, 167, 12, 12, True);
+        SKILL_SLAYER: Mouse(436, 173, 12, 12, True);
+        SKILL_FARMING: Mouse(83, 224, 12, 12, True);
+        SKILL_MINING: Mouse(137, 222, 12, 12, True);
+        SKILL_SMITHING: Mouse(197, 220, 12, 12, True);
+        SKILL_HUNTER: Mouse(257, 222, 12, 12, True);
+        SKILL_COOKING: Mouse(318, 227, 12, 12, True);
+        SKILL_FIREMAKING: Mouse(378, 226, 12, 12, True);
+        SKILL_WOODCUTTING: Mouse(439, 222, 12, 12, True);
+        SKILL_FLETCHING: Mouse(199, 275, 12, 12, True);
+        SKILL_CONSTRUCTION: Mouse(255, 277, 12, 12, True);
+        SKILL_SUMMONING: Mouse(323, 276, 12, 12, True);
       else
         Mouse(438, 113, 12, 12, True);
       end;
@@ -885,13 +886,17 @@ begin
     if not Cont then
       exit;
   end;
+
+  if (players[currentPlayer].lampSkill = 0) then
+    players[currentPlayer].lampSkill := SKILL_MINING;
+
   for I := 1 to 6 do
   begin
     case I of
       1: Result := SolveTeleportRandoms;
       //2: Respond;
       2: Result := FindDead;
-      3: Result := FindLamp(LampSkill);
+      3: Result := FindLamp(Players[CurrentPlayer].LampSkill);
       //5: Result :=  RC;
       4: Result := FindMod;
       5: if (SRL_Procs[srl_OnRandomCall] <> nil) then

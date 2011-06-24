@@ -1,0 +1,15 @@
+Please update the change log when you make an update so we ensure the end users get as much information as possible.
+
+CHANGE LOG:
+
+- Updates 
+        - banking routines only take integer parameters
+        - lampSkill is now player specific and is set to a skill constant, not string
+
+- Functions Removed
+        - CheckUsersNick (login.simba)
+
+- Function name changes
+        - ClearCanvas -> SMART_ClearCanvas
+        - ClearRSCanvas -> SMART_ClearRSCanvas
+        - DrawDotsMulti -> SMART_DrawDotsMulti

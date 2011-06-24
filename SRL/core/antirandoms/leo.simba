@@ -1,6 +1,6 @@
 //-----------------------------------------------------------------//
 //--               Scar Standard Resource Library                --//
-//--               » Leo The Grave Digger Routines               --//
+//--               Â» Leo The Grave Digger Routines               --//
 //-----------------------------------------------------------------//
 // * procedure Leo_LoadDTMs;                                     // * by ZephyrsFury
 // * function InLeoGraveyard: Boolean;                           // * by ZephyrsFury
@@ -64,7 +64,7 @@ begin
           SetToleranceSpeed2Modifiers(100.0, 100.0);
           FindColorsTolerance(Pts, 0, B.X1, B.Y1, B.X2, B.Y2, 3);
           SetToleranceSpeed2Modifiers(0.2, 0.2);
-          SetColorToleranceSpeed(CTS);
+          SetColorToleranceSpeed(cts);
           ATPA := SplitTPAEx(Pts, 1, 1);
           for II := 0 to High(ATPA) do
             if (Length(ATPA[II]) < 50) then
@@ -310,6 +310,7 @@ begin
       Inc(f);
       Leo_ToCenter;
     end;
+    SetToleranceSpeed2Modifiers(0.2, 0.2);
     SetColorToleranceSpeed(1);
   end;
 end;
@@ -331,7 +332,8 @@ begin
   SetColorToleranceSpeed(2);
   SetToleranceSpeed2Modifiers(0.03, 0.33);
   FindColorsTolerance(p, 4609120, MSX1, MSY1, MSX2, MSY2, 13);
-  SetToleranceSpeed2Modifiers(0.1, 0.2);
+  SetToleranceSpeed2Modifiers(0.2, 0.2);
+  SetColorToleranceSpeed(1);
   t := SplitTPAEx(p, 3, 3);
   SortATPAFrom(t, Point(cx, cy));
   SortATPAFromFirstPoint(t, Point(cx, cy));
@@ -524,7 +526,7 @@ begin
     if (GraveName[I] <> Coffin_empty) then
       Continue;
     for II := 0 to 4 do
-    if (not (InIntArray(GraveName,GraveSkills[ii]))) then
+      if (not (InIntArray(GraveName,GraveSkills[ii]))) then
       begin
         GraveName[I] := GraveSkills[II];
         Break;

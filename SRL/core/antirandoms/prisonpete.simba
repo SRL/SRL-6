@@ -1,6 +1,6 @@
 //-----------------------------------------------------------------//
 //--               Scar Standard Resource Library                --//
-//--               » Prison Pete Solver Routines                 --//
+//--               Â» Prison Pete Solver Routines                 --//
 //-----------------------------------------------------------------//
 // * function InPrisonPete: Boolean;                                          // * by ZephyrsFury, modded by TRiLeZ
 // * function Pete_WalkTo: Boolean;                                           // * by IceFire908
@@ -211,6 +211,8 @@ begin
     end;
     Writeln('Could not analyze animal, randomly choosing: ' + ToStr(AnimalName));
   end;
+  SetToleranceSpeed2Modifiers(0.2, 0.2);
+  SetColorToleranceSpeed(1);
 end;
 
 {*******************************************************************************

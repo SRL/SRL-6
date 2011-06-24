@@ -140,7 +140,7 @@ Example:
 
 function InPin(Pin: string): Boolean;
 var
-  TMouseSpeed, iNumber, Tx, Ty, Counter, i: Integer;
+  TMouseSpeed, iNumber, Tx, Ty, Counter, colorCount, i: Integer;
   Boxes: array of TBox;
   OnBox: Boolean;
 begin
@@ -167,6 +167,9 @@ begin
   repeat
     if (PinScreen) then
     begin
+      // Counts the "Now click the NUM_X digit.". This is used later on.
+      ColorCount := CountColorTolerance(clWhite, 150, 80, 380, 100, 10);
+
       for iNumber := 1 to Length(Pin) do
       begin
         if OnBox then
@@ -206,11 +209,15 @@ begin
       end;
     end;
     Wait(1000 + Random(500));
-    if (BankScreen) then
+    while (CountColorTolerance(clWhite, 150, 80, 380, 100, 10) = ColorCount) do
     begin
-      Result := True;
-      MouseSpeed := TMouseSpeed;
-      Exit;
+      Wait(500);
+      if (BankScreen) then
+      begin
+        Result := True;
+        MouseSpeed := TMouseSpeed;
+        Exit;
+      end;
     end;
     ClickContinue(True, True);
     while (not(FindColor(Tx, Ty, 0, 7, 460, 69, 474))) do
@@ -650,7 +657,6 @@ Example:
 .. code-block:: pascal
 
 *)
-
 function DepositAll: Boolean;
 var
   T, X, Y: Integer;
@@ -669,6 +675,9 @@ begin
       while (InvCount > 0) or (FindColor(X, Y, srl_outline_black, 98, 68, 436, 257) and (DSCreen)) and (GetSystemTime - T < 2000) do
         Wait(100);
       Result := (InvEmpty) or (not(FindColor(X, Y, srl_outline_black, 98, 68, 436, 257)) and (DScreen));
+    end else begin
+      srl_Warn('DepositAll', 'No items to deposit ', warn_AllVersions);
+      result := true;
     end;
 end;
 
@@ -694,8 +703,6 @@ Example:
 .. code-block:: pascal
 
 *)
-
-
 procedure Deposit(SlotFrom, SlotTo: Integer; vType: Variant);
 var
    DepositX, BScreen, DScreen: Boolean;
@@ -788,7 +795,6 @@ var
 begin
   Result := False;
   FixBank;
-  FixBankTab;
 
   BBox := BankIndexToMSBox(BankPointToBankIndex(Point(Col, Row)));
   GetMousePos(X, Y);
@@ -1326,6 +1332,7 @@ var
   Info: TVariantArray;
   Booths: TPointArray;
   ABooths: T2DPointArray;
+  UpText: TStringArray;
   B: TBox;
 begin
   result := false;
@@ -1336,6 +1343,7 @@ begin
     Result := True;
     Exit;
   end;
+  UpText := ['ooth', 'Bo', 'ot'];
 
   case Location of  { Sort X     Sort Y      Color     Tol   Hue   Sat  Count  SplitTPA?  W   H }
     Bank_AK:  Info := [MSCX - 50, MSCY,      11196157, 20,   0.20, 1.15, 100,   False,   10, 10]; // Fixed 12/7, #40
@@ -1344,7 +1352,10 @@ begin
     Bank_VW:  Info := [MSCX,      MSCY,      3037545,  5,    0.41, 1.32, 100,   False,   10, 10]; // Fixed 12/7, #40
     Bank_FE:  Info := [MSCX,      MSCY + 50, 5008519,  10,   0.22, 0.67, 100,   False,   10, 10]; // Fixed 12/7, #40
     Bank_FW:  Info := [MSCX,      MSCY + 50, 5074569,  15,   0.22, 0.67, 50,    False,   10, 10]; // Fixed 12/7, #40
-    Bank_DR:  Info := [MSCX - 50, MSCY,      5527389,  7,    0.20, 0.20, 10,    False,   5,  10]; // Fixed 12/7, #40
+    Bank_DR:  begin
+                Uptext := [['ount', 'unte', 'oun', 'unter']];
+                Info := [MSCX - 50, MSCY,      5527389,  7,    0.20, 0.20, 10,    False,   5,  10]; // Fixed 12/7, #40
+              end;
     Bank_EV:  Info := [MSCX + 20, MSCY,      3561835,  20,   0.32, 0.61, 50,    False,   10, 10]; // Fixed 12/7, #40
     Bank_CT:  Info := [MSCX,      MSCY,      3239049,  8,    0.20, 0.20, 100,   False,   10, 10];
     Bank_CM:  Info := [MSCX,      MSCY,      7636882,  5,    0.20, 0.20, 100,   False,   10, 10];
@@ -1405,7 +1416,7 @@ begin
   begin
 
     MMouse(Booths[i].X, Booths[i].Y, 3, 3);
-    if WaitUpTextMulti(['nk bo', 'ooth'], 1200) Then
+    if WaitUpTextMulti(UpText, 1000) Then
     begin
       GetMousePos(Booths[i].X, Booths[i].Y);
       Mouse(Booths[i].X, Booths[i].Y, 0, 0, False);

@@ -68,13 +68,47 @@ Example:
 .. code-block:: pascal
 
 *)
-
 function PixelShift(B: TBox; Time: Integer): Integer;
 var
   TIA: TIntegerArray;
 begin
   TIA := PixelShiftMulti([B], Time);
   Result := TIA[0];
+end;
+
+(*
+AveragePixelShift
+~~~~~~~~~~~~~~~~~
+
+.. code-block:: pascal
+
+    function AveragePixelShift(b: TBox; waitPerLoop, maxTime: integer): integer;
+
+Gets the average pixel shift every 'waitPerLoop' ms over the time 'maxTime'.
+
+.. note::
+
+  by Coh3n (updated Mar. 31st, 2011)
+
+Example:
+
+.. code-block:: pascal
+
+*)
+function AveragePixelShift(b: TBox; waitPerLoop, maxTime: integer): integer;
+var
+  t: integer;
+  shifts: TIntegerArray;
+begin
+  t := (getSystemTime + maxTime);
+
+  while (getSystemTime < t) do
+  begin
+    setLength(shifts, length(shifts)+1);
+    shifts[high(shifts)] := pixelShift(b, waitPerLoop);
+  end;
+
+  result := averageTIA(shifts);
 end;
 
 (*

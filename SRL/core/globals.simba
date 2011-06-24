@@ -28,11 +28,6 @@ var
 var
   RoadColor, WaterColor, BankColor: Integer;
 
-{ var LampSkill: String;
-  Description: Set Lamp skill. }
-var
-  LampSkill: string;
-
 (*
 
 srl_OUTLINE
@@ -155,6 +150,7 @@ var
 const
   tab_Combat = 21;
   tab_Diary = 22;
+  tab_Task = 22;
   tab_Stats = 23;
   tab_Quest = 24;
   tab_Inv = 25;
@@ -163,7 +159,8 @@ const
   tab_Magic = 28;
   tab_Objectives = 29;
   tab_Friends = 30;
-  tab_Ignore = 31;
+  tab_Ignore = 30;
+  tab_FriendChat = 31;
   tab_Clan = 32;
   tab_Options = 33;
   tab_Emotes = 34;
@@ -349,12 +346,12 @@ end;
 
 procedure srl_Warn(ProcName, ErrorMessage: String; wVersion: Integer);
 begin
-  if (wVersion > WarnSensitivity) then
+  if (wVersion >= WarnSensitivity) then
     if (wVersion <> warn_Debug) then
       WriteLn('** Warning in ' + ProcName + ': ' + ErrorMessage + '**')
     else
       WriteLn('Debugging ' + ProcName + ': ' + ErrorMessage);
-  if wVersion = -1 then
+  if wVersion = warn_Terminate then
     TerminateScript;
 end;
 

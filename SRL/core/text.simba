@@ -619,7 +619,7 @@ begin
     srl_Warn('ClickText', 'Invalid Character Names', warn_AllVersions);
     Exit;
   end;
-  Result:= FindBitmapMaskTolerance(Mask, tx, ty, x1, y1, x2, 502, 10, 10);
+  Result:= FindBitmapMaskTolerance(Mask, tx, ty, x1, y1, x2, y2, 10, 10);
   GetBitmapSize(Mask, W, H);
   FreeBitmap(Mask);
   if(Result)then

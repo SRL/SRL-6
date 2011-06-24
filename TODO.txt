@@ -13,6 +13,9 @@ HIGH:
 	- See amount.simba for examples of documenation
 	- Try to make sure docs compile before committing them
 
+        - Files that still need to be done
+                  
+
 - Clean up files
 
 - Remove ``string-cases'', replace with constants (and document :))

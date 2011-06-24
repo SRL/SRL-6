@@ -505,6 +505,64 @@ begin
 end;
 
 (*
+DeleteValueInTPA
+~~~~~~~~~~~~~~~~
+
+.. code-block:: pascal
+
+    procedure DeleteValueInTPA(var Arr: TPointArray; ValuePosition: Integer);
+
+Deletes value with ValuePosition in "Arr" TPointArray.
+
+.. note::
+
+    by EvilChicken! & Coh3n
+
+Example:
+
+.. code-block:: pascal
+
+*)
+procedure DeleteValueInTPA(var Arr: TPointArray; ValuePosition: Integer);
+var
+  ArrLen, I: Integer;
+begin
+  ArrLen := High(Arr);
+  for I := ValuePosition to ArrLen - 1 do
+    tSwap(Arr[I], Arr[I + 1]);
+  SetArrayLength(Arr, ArrLen);
+end;
+
+(*
+DeleteValueInATPA
+~~~~~~~~~~~~~~~~~
+
+.. code-block:: pascal
+
+    procedure DeleteValueInATPA(var Arr: T2DPointArray; ValuePosition: Integer);
+
+Deletes value with ValuePosition in "Arr" T2DPointArray.
+
+.. note::
+
+    by EvilChicken! & Coh3n
+
+Example:
+
+.. code-block:: pascal
+
+*)
+procedure DeleteValueInATPA(var Arr: T2DPointArray; ValuePosition: Integer);
+var
+  ArrLen, I: Integer;
+begin
+  ArrLen := High(Arr);
+  for I := ValuePosition to ArrLen - 1 do
+    tpaSwap(Arr[I], Arr[I + 1]);
+  SetArrayLength(Arr, ArrLen);
+end;
+
+(*
 BoxClosestPoint
 ~~~~~~~~~~~~~~~
 
@@ -612,6 +670,7 @@ begin
   else
     result := TPA[random(length(tpa))];
 end;
+
 (*
 MiddleBox
 ~~~~~~~~~
@@ -638,7 +697,7 @@ end;
 
 (*
 GroupDigits
-~~~~~~~~~~~~~~~
+~~~~~~~~~~~
 
 .. code-block:: pascal
 

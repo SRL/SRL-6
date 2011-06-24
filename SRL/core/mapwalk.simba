@@ -226,16 +226,16 @@ Example:
 
 
 *)
-
 procedure ClickNorth(AngleHigh: boolean);
 begin
-  if Random(4) = 1 then
-  begin
-    Mouse(542, 24, 15, 15, False);
-    WaitOptionMulti(['ace', 'orth'], 1200);
-  end else
-    Mouse(542, 24, 15, 15, True);
-  SetAngle(AngleHigh);
+  if rs_GetCompassAngleDegrees <> 0 then
+    if Random(4) = 1 then
+    begin
+      Mouse(542, 24, 15, 15, False);
+      WaitOptionMulti(['ace', 'orth'], 1200);
+    end else
+      Mouse(542, 24, 15, 15, True);
+    SetAngle(AngleHigh);
 end;
 
 {$DEFINE WALL_ANGLELEFT}

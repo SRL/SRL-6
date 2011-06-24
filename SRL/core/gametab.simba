@@ -12,13 +12,13 @@ type
   
 { const LobbyTab Constants;
   Description: Constants representing lobbytab numbers. }
-
 const
   L_PlayerInfo = 1;
   L_WorldSelect = 2;
   L_FriendsList = 3;
-  L_ClanChat = 4;
-  L_Options = 5;
+  L_FriendsChat = 4;
+  L_ClanChat = 5;
+  L_Options = 6;
 
 (*
 GetCurrentTab
@@ -79,9 +79,11 @@ Example:
 function TabExists(Tab: Integer): Boolean;
 var
   tP: TPoint;
-
 begin
   Result := false;
+  if (not loggedIn) then
+    exit;
+
   if (tab < 20) then
   begin
     SRL_Warn('TabExists', 'Tab ' + IntToStr(Tab) + ' is not using the new constants! Please upgrade your script.', warn_AllVersions);
@@ -100,8 +102,8 @@ begin
     Exit;
   end;
 
-  tP := Point(((Tab - 21) mod 8 * 30) + 536, ((Tab - 21) div 8 * 298) + 187);
-  Result := FindColorTolerance(tP.X, tP.Y, 591881, tP.X - 12, tP.Y - 12, tP.X + 12, tP.Y + 12, 15);
+  tP := Point(((Tab - 21) mod 8 * 30) + 537, ((Tab - 21) div 8 * 298) + 186);
+  Result := CountColorTolerance(5597817, tp.x-12, tp.y-12, tp.x+12, tp.y+12, 10) < 81; // the count when no icons are overlapping the GameTab.
 end;
 
 (*
@@ -564,7 +566,6 @@ var
   Box : TBox;
   TPA : TPointArray;
   Cts : Integer;
-
 begin
   Result := -1;
   GameTab(tab_Stats);
@@ -572,13 +573,16 @@ begin
   if (not(Amount)) then
     TP := Point(TP.x + 15,TP.y + 12);
   CTS := GetToleranceSpeed;
-  SetColorToleranceSpeed(0);
+  setColorToleranceSpeed(0);
   if not FindColors(TPA, 65535, TP.x - 2, TP.y - 2, TP.x + 15, TP.y + 15) then
+  begin
+    setColorToleranceSpeed(CTS);
     exit;
+  end;
   Box := GetTPABounds(TPA);
   Result := StrToIntDef(GetNumbers(GetTextAtEx(Box.x1 - 2, Box.y1 -1, 100,
     StatChars, False, True, 0, 3,65535, 3, True, tr_Digits)), -1);
-  SetColorToleranceSpeed(CTS);
+  setColorToleranceSpeed(CTS);
 end;
 
 (*
@@ -1477,14 +1481,14 @@ Example:
 
 *)
 function SetRun(Run: Boolean): Boolean;
-Begin
+begin
   Result := false;
-  if ((CountColorTolerance(3467501 , 720, 117, 723, 119, 80) > 1)) xor (Run) then
+  if (((CountColorTolerance(3467501, 720, 117, 723, 119, 80) > 1) or (SimilarColors(GetColor(725, 111), 6608616, 10)))  xor (Run)) then
   begin
     Mouse(715, 95, 10, 10, True);
     Result := True;
   end;
-End;
+end;
 
 (*
 RunEnergy
@@ -2053,7 +2057,7 @@ Gets current lobby tab.
 
 .. note::
 
-    by Bionicle1800
+    by Bionicle1800, NCDS
 
 Example:
 
@@ -2062,9 +2066,9 @@ Example:
 *)
 function GetLobbyTab: Integer;
 begin
-  for result := 1 to 5 do
-    if GetColor(97 + (result-1)*123, 31) = 7375258 then
-     Exit;
+  for result := 1 to 6 do
+    if GetColor(63 + (result-1)*102, 32) = 11516354 then
+      Exit;
   Result := -1;
 end;
 
@@ -2100,9 +2104,9 @@ begin
   result := GetLobbyTab = Tab;
   if result then
    Exit;
-  if GetColor(97 + (Tab-1)*123, 31) = 4410194 then
+  if GetColor(63 + (Tab-1)*102, 32) = 8029324 then
   begin
-    Mouse(97 + (Tab-1)*123, 31, 6, 6, true);
+    Mouse(63 + (Tab-1)*102, 32, 10, 6, true);
     result := true;
   end;
 end;
