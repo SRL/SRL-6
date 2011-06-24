@@ -8,6 +8,8 @@ Updated: 31 Mar 2011 -- Nava2
 
 HIGH:
 
+- MAKE IT COMPILE!
+
 - Documentation
 	- Update all documentation
 	- All headers should have examples, credits, and modified dates.
