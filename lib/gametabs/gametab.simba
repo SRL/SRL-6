@@ -7,6 +7,8 @@ This Include contains all Gametab Routines.
 
 *)
 
+// TODO: SPLIT INTO RESPECTIVE FILES, ONE FOR EACH TAB. CONSTANTS ARE IN EACH FILE RESPECTIVELY
+
 type
   TSMSetting = (Stereo, Mono, NoChange);
   

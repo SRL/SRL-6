@@ -1,0 +1,138 @@
+(*
+Search
+======
+
+The Color include contains all Colorfinding routines.
+
+*)
+
+(*
+FindColorsPie
+~~~~~~~~~~~~~
+
+.. code-block:: pascal
+
+
+    function FindColorsPie(var Points: TPointArray; Color, Tol: Integer; StartD,
+    EndD, MinR, MaxR: Extended; x1, y1, x2, y2, Mx, My: Integer): Boolean;
+
+Finds all Colors with tolerance in the Pie, defined by x1, y1, x2, y2, Mx, My,
+StartDegree, EndDegree, MinRadius and MaxRadius.
+
+.. note::
+
+    by Wizzup?, edit by EvilChicken!
+
+Example:
+
+.. code-block:: pascal
+
+
+*)
+
+function FindColorsPie(var Points: TPointArray; Color, Tol: Integer; StartD,
+  EndD, MinR, MaxR: Extended; x1, y1, x2, y2, Mx, My: Integer): Boolean;
+begin
+  Result := FindColorsTolerance(Points, Color, x1, y1, x2, y2, Tol);
+  if (Result) then
+    FilterPointsPie(Points, StartD, EndD, MinR, MaxR, Mx, My);
+end;
+
+function FindDTMRotated(DTM: Integer; var x, y: Integer; x1, y1, x2, y2: Integer; sAngle, eAngle, aStep: Extended; out aFound: Extended): Boolean;
+begin;
+  result := FindDTMRotatedAlternating(DTM,x,y,x1,y1,x2,y2,sangle,eangle,astep,afound);
+end;
+
+(*
+PercentColorMMEx
+~~~~~~~~~~~~~~~~
+
+.. code-block:: pascal
+
+    function PercentColorMMEx(Color, Tol, StartRadial, EndRadial, StartRadius, EndRadius: Integer): integer;
+
+Returns the percentage of colour on the minimap section defined by
+StartRadial, EndRadial, StartRadius, and EndRadius.
+
+
+.. note::
+
+    by Richard, and Nava2
+
+Example:
+
+.. code-block:: pascal
+
+
+*)
+
+function PercentColorMMEx(Color, Tol, StartRadial, EndRadial, StartRadius, EndRadius: Integer): integer;
+var
+  TPA: TPointArray;
+begin
+  FindColorsTolerance(TPA, Color, MMX1, MMY1, MMX2, MMY2, Tol);
+  FilterPointsPie(TPA, StartRadial, EndRadial, StartRadius, EndRadius, MMCX, MMCY);
+  Result := ceil((Length(TPA) * 100) / ((Pi * (EndRadius * EndRadius)) * ((EndRadial - StartRadial) / 360.0)-((Pi * (StartRadius * StartRadius)) * ((EndRadial - StartRadial) / 360.0))));
+end;
+
+(*
+PercentColorMM
+~~~~~~~~~~~~~~
+
+.. code-block:: pascal
+
+    function PercentColorMM(Color, Tol: Integer): Integer;
+
+Returns the percent of a colour on the whole minimap.
+
+
+.. note::
+
+    by Richard
+
+Example:
+
+.. code-block:: pascal
+
+
+*)
+
+function PercentColorMM(Color, Tol: Integer): Integer;
+begin
+  Result := PercentColorMMEx(Color, Tol, 0, 360, 0, 76);
+end;
+
+function LoggedIn: Boolean; forward;
+
+(*
+FindMMColorsTolerance
+~~~~~~~~~~~~~~~~~~~~~
+
+.. code-block:: pascal
+
+    function FindMMColorsTolerance(var Points: TPointArray; Color, Tol: Integer): Boolean;
+
+
+Finds all colors within "Tol" tolerance in the minimap circle and if
+successful, returns a TPointArray containing them, sorted from MMCX, MMCY.
+
+.. note::
+
+    by EvilChicken!
+
+Example:
+
+.. code-block:: pascal
+
+
+*)
+
+function FindMMColorsSpiralTolerance(var Points: TPointArray; Color, Tol: Integer): Boolean;
+begin
+  FindColorsSpiralTolerance(MMCX, MMCY, Points, Color, MMX1, MMY1, MMX2, MMY2, Tol);
+
+  FilterPointsDist(Points,0,76,MMCX,MMCY);
+  Result := (Length(Points) > 0);
+end;
+
+

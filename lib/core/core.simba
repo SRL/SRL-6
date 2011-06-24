@@ -1,0 +1,18 @@
+(* 
+
+Core.simba
+==========
+
+Includes the `core` package
+
+*)
+
+{$include_once ./amount.simba}
+{$include_once ./bitmaps.simba}
+{$include_once ./debug.simba}
+{$include_once ./globals.simba}
+{$include_once ./mouse.simba}
+{$include_once ./players.simba}
+{$include_once ./stats.simba}
+{$include_once ./text.simba}
+{$include_once ./timing.simba}

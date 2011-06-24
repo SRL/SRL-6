@@ -1,72 +1,15 @@
 (*
-Color
-=====
+Search
+======
 
 The Color include contains all Colorfinding routines.
 
-.. note::
-
-    Remove?:
-    
-        -   FindDeformed
-        -   DTMRotated
-        -   GetColorsBox?
-
-*)
-
-(*
-FindDeformed
-~~~~~~~~~~~~
-
-.. code-block:: pascal
-
-    function FindDeformed(var Xoff, Yoff: Integer; BMP, a, b, c, d: Integer): Boolean;
-
-Finds Bitmap in Box a,b,c,d. Returns coords in ObjX and ObjY.
-Uses Deformed Bitmap. FindDeformed will gradually lower Tol and reduce Accuracy.
-Functon can cause severe Lag when using bitmaps bigger then 16 pixels. Works but Lags.
-Useful for MM-clicking. For ObjectFinding use FindObjectDeformed.
-
-
-.. note::
-
-    by WT-Fakawi
-
-Example:
-
-.. code-block:: pascal
-
-
 *)
 
 
-function FindDeformed(var Xoff, Yoff: Integer; BMP, a, b, c, d: Integer):
-  Boolean;
-var
-  acc, ref: Extended;
-  XT, YT, times, tol: Integer;
-begin
-  result := false;
-  ref := 0.9;
-  tol := 0;
-  for times := 1 to 50 do
-  begin
-    FindDeformedBitmapToleranceIn(BMP, XT, YT, a, b, c, d, tol, 2, True, acc);
-    if (acc >= ref) then
-    begin
-      Xoff := XT;
-      YOff := YT;
-      Result := True;
-      Exit;
-    end;
-    if (Times mod 5 = 0) then
-    begin
-      ref := ref - 0.1;
-      tol := tol + 10;
-    end;
-    Wait(1);
-  end;
-end;
+{$include_once autocolor.simba}
+{$include_once smartcolors.simba}
+
 (*
 FindColorsPie
 ~~~~~~~~~~~~~
@@ -102,82 +45,6 @@ end;
 function FindDTMRotated(DTM: Integer; var x, y: Integer; x1, y1, x2, y2: Integer; sAngle, eAngle, aStep: Extended; out aFound: Extended): Boolean;
 begin;
   result := FindDTMRotatedAlternating(DTM,x,y,x1,y1,x2,y2,sangle,eangle,astep,afound);
-end;
-
-(*
-DTMRotated
-~~~~~~~~~~
-
-.. code-block:: pascal
-
-    function DTMRotated(DTM: Integer; var x, y: Integer; x1, y1, x2, y2: Integer): Boolean;
-
-First looks for a DTM without rotation, then increases the amount
-of rotation around 0 gradually until it finds the DTM. A bit like the
-ProgressiveTol Bitmap Engines.
-
-.. note::
-
-    by Yakman
-
-Example:
-
-.. code-block:: pascal
-
-
-*)
-
-function DTMRotated(DTM: Integer; var x, y: Integer; x1, y1, x2, y2: Integer): Boolean;
-var
-  t, s, AngleFound: Extended;
-begin
-  result := false;
-  if (FindDTM(DTM, x, y, x1, y1, x2, y2)) then
-  begin
-    Result := True;
-    Exit;
-  end;
-  repeat
-    s := 0.3;
-    repeat
-      if (FindDTMRotated(DTM, x, y, x1, y1, x2, y2, 0 - t, 0 + t, s, AngleFound)) then
-      begin
-        Result := True;
-        Exit;
-      end;
-      s := s - 0.1;
-    until (s <= 0.1);
-    t := t + (Pi / 20);
-  until (t >= Pi / 3);
-end;
-
-(*
-GetColorsBox
-~~~~~~~~~~~~~
-
-.. code-block:: pascal
-
-    function GetColorsBox(x1, y1, x2, y2: Integer; ClearSameColors: Boolean): TIntegerArray;
-
-Returns an array of all colors within box ((x1, y1), (x2, y2)).
-If ClearSameColors is set to True, all duplicate colors will be deleted.
-
-.. note::
-
-    by Rasta Magician
-
-Example:
-
-.. code-block:: pascal
-
-
-*)
-
-function GetColorsBox(x1, y1, x2, y2: Integer; ClearSameColors: Boolean): TIntegerArray;
-begin
-  Result := GetColors(TPAFromBox(IntToBox(x1, y1, x2, y2)));
-  if (ClearSameColors) then
-    ClearSameIntegers(Result);
 end;
 
 (*
@@ -268,9 +135,7 @@ function FindMMColorsSpiralTolerance(var Points: TPointArray; Color, Tol: Intege
 begin
   FindColorsSpiralTolerance(MMCX, MMCY, Points, Color, MMX1, MMY1, MMX2, MMY2, Tol);
 
-  // XXX, Wizzup: Why dist and not pie ?? 
   FilterPointsDist(Points,0,76,MMCX,MMCY);
-  //FilterPointsPie(Points, 0.0, 360.0, 0.0, 76.0, MMCX, MMCY);
   Result := (Length(Points) > 0);
 end;
 
@@ -435,7 +300,6 @@ var
 begin
   ClearSameIntegers(Colors);
   GetColorArrayInfo(Colors, BestColours, Tols, Speed2Modifiers, RGB, HSL, XYZ);
-  if CTS <> 3 then Tol := Tols[CTS] else Writeln('ColorSpeed3Tolerance not supported.');
   if CTS <> 2 then Speed2Modifiers := [];
   if CTS = 0 then CTS := 1;
   Result := BestColours[CTS - 1];

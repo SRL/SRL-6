@@ -6,65 +6,6 @@ Supporting math functions.
 
 *)
 
-var
-   SineArray, Cosearray: array[0..360] of Extended;
-   
-(*
-LoadCoSineArrays
-~~~~~~~~~~~~~~~~
-
-.. code-block:: pascal
-
-    procedure LoadCoSineArrays;
-
-Load default sin/cos values.
-
-.. note::
-
-    by Mutant Squirrle
-
-Example:
-
-.. code-block:: pascal
-
-*)
-procedure LoadCoSineArrays;
-var
-  i: Integer;
-begin
-  for i := 0 to 360 do
-  begin
-    Sinearray[i] := Sin(i * Pi / 180);
-    Cosearray[i] := Cos(i * Pi / 180);
-  end;
-end;
-
-(*
-CreateTPAFromText
-~~~~~~~~~~~~~~~~~
-
-.. code-block:: pascal
-
-    function CreateTPAFromText(Txt : string; Chars : string) : TPointArray;
-
-Returns the TPointArray of the inputted Text. Needs Wizzyplugin
-
-.. note::
-
-    by MastaRaymond
-
-Example:
-
-.. code-block:: pascal
-
-*)
-function CreateTPAFromText(Txt : string; Chars : string) : TPointArray;
-var
-  w,h : integer;
-begin;
-  result := TPAFromText(Txt,Chars,w,h);
-end;
-
 (*
 GetSplitPt
 ~~~~~~~~~~
@@ -732,6 +673,7 @@ function InCircle(x, y, mx, my, r: Integer): Boolean;
 begin
   Result := (Distance(X, Y, mX, mY) <= R);
 end;
+// TODO: FIX DOC FOR AMAX
 
 function AMax(Data: TIntegerArray): Integer;
 var
@@ -745,52 +687,4 @@ begin;
   result := data[0];
   for i := high(data) downto 1 do
     result := max(result,data[i]);
-end;
-
-(*
-RBoolEx
-~~~~~~~
-
-.. code-block:: pascal
-
-    function RBoolEx(chance: integer): boolean;
-
-Returns a boolean, with a chance of 1 / chance
-
-.. note::
-
-    by Rasta Magician
-
-Example:
-
-.. code-block:: pascal
-
-*)
-function RBoolEx(chance: Integer): Boolean;
-begin
-  Result := (0 = Random(chance));
-end;
-
-(*
-RBool
-~~~~~
-
-.. code-block:: pascal
-
-    function RBool: boolean;
-
-Returns a boolean, with a 50% chance
-
-.. note::
-
-    by Rasta Magician
-
-Example:
-
-.. code-block:: pascal
-
-*)
-function RBool: boolean;
-begin
-  Result := RBoolEx(2);
 end;

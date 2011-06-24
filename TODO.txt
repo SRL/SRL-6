@@ -2,7 +2,9 @@ TODO
 
 Please tag completed things with commit identities (those ugly hashes). Feel free to just add progress as well. 
 
-Updated: 23 Jan 2011 -- Nava2
+Try to grep the include for TODO marks, these are mainly smaller things.
+
+Updated: 31 Mar 2011 -- Nava2
 
 HIGH:
 
@@ -17,6 +19,7 @@ HIGH:
                   
 
 - Clean up files
+	- Largely, we need to remove unecessary functions. (one liners etc)
 
 - Remove ``string-cases'', replace with constants (and document :))
 
@@ -34,7 +37,6 @@ MED:
 
 - Correct SRL Stats issues
 	- fixed in Stats v1.3 --- please confirm. 
-
 
 
 

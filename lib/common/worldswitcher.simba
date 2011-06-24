@@ -5,6 +5,9 @@ Worldswitcher
 The Worldswitcher include contains all kinds of functions to control the built-in RS world switcher.
 
 *)
+
+// TODO: add required includes, fix worlds.ini
+
 type
   TWorld = record
     Number, PlayerNo: Integer;
@@ -100,6 +103,10 @@ Example:
 .. code-block::pascal
 
 *)
+
+// TODO: FIX THIS TO WORK WITH NEW WORLD LISTS
+// TODO: WORLDS.INI PARSER:: COMMENT MORE FOR FUTURE UPDATING, perhaps use regex?
+
 function UpdateWorlds: Boolean;
 var
   worldList: TWorldArray;
