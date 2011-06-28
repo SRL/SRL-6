@@ -536,11 +536,13 @@ Example:
 function LoginPlayerToLob: Boolean;
 var
   Members, RetryLogin: Boolean;
-  typtmp: integer;
+  typtmp, t, w: integer;
   Actions: TVariantArray;
-  T, Attempts{, I}: LongInt;
+  Attempts: LongInt;
+  p: TPoint;
   //ATPA: T2dPointArray;
   TPA: TPointArray;
+  Boxes : TIntegerArray;
   //B: TBox;
 label
   ProcStart;
@@ -585,23 +587,13 @@ begin
   until (False);
   WriteLn('Welcome to Runescape.');
 
-
                    {New graphics have changed box}
+
   Case CountColor(LOGIN_TEXTCOLOUR, 198, 192, 567, 259) of
     1079: MouseBox(347, 295, 414, 303, 1);
     1745: MouseBox(347, 305, 414, 312, 1); // "Available graphics options have been changed..."
     1801: MouseBox(347, 305, 414, 312, 1); // "There was a problem with your current graphics settings..."
   end;
-
-                   {Click less info if needed.}
-  {
-  if (not (SimilarColors(GetColor(382, 11), 14285562, 20))) then //Runescae sword green bead
-  begin
-    MouseBox(212, 479, 550, 495, 1); //Less info button
-    Wait(RandomRange(1000, 2000));
-  end;
-  }
-                      {Click Members/free.}
 
   Members := Players[CurrentPlayer].Member;
   if (Length(Players[CurrentPlayer].WorldInfo) > 0) then
@@ -609,84 +601,47 @@ begin
 
   ProcStart:
 
-  {if (Members) then
-    I := 1;
-
-  if (GetColor(248, 359) <> 1381653) then //Black outline on forgotten pwd button.
+                       {Type in username and pass}
+  for W:= 0 to 1 do
   begin
-    FindColors(TPA, 9291999, 10, 370, 675, 475);
-    ATPA := SplitTPA(TPA, 4);
-    if (Length(ATPA) > 2) then
-    begin
-      if (I = 1) then
-        I := 0
-      else
-        I := 1;
-      B := GetTPABounds(ATPA[1 + I]); //If demo mode is still up
-    end
+    if W = 0 then
+      Boxes:= [UBX1, UBY1, UBX2, UBY2]
     else
-      if (Length(ATPA) = 2) then
-        B := GetTPABounds(ATPA[0 + I]) //When there's no demo mode
-      else
-        B := IntToBox(210, 424, 367, 446);
+      Boxes:= [PBX1, PBY1, PBX2, PBY2];
 
-    with B do
-      MouseBox(X1 + 20, Y1 + 10, X2 - 20, Y2 + 8, 1);
+    t := (getSystemTime + (60000 * 2));
+    FindColors(TPA, LOGIN_TEXTCOLOUR, Boxes[0], Boxes[1], Boxes[2], Boxes[3]);
+    repeat
+      if (Length(TPA) > 0) then
+      begin
+        SortTPAFrom(TPA, Point(Boxes[2], Boxes[1] + (Boxes[3] - Boxes[2]) div 2));
+        p := point(TPA[0].X + 20, TPA[0].Y);
+        if (not pointInBox(p, intToBox(Boxes[0], Boxes[1], Boxes[2], Boxes[3]))) then
+          p := point(UBX2 - (10 + random(10)), p.y);
+        Mouse(p.x, p.y, 5, 5, True);
+      end else
+        MouseBox(Boxes[0], Boxes[1], Boxes[2], Boxes[3], 1);
 
-    T := GetSystemTime;                  //Black outline on forgotten pwd button.
-    while ((GetSystemTime - T < 3000) and (GetColor(248, 359) <> 1381653)) do
-      Wait(RandomRange(100, 200));
+      typtmp := 0;
+      while (CountColor(LOGIN_TEXTCOLOUR, Boxes[0], Boxes[1], Boxes[2], Boxes[3]) > 0) do
+      begin
+        Inc(typtmp);
+        TypeByte(VK_BACK);
+        Wait(50+Random(50));
+        if (typtmp >= RandomRange(20, 24)) then
+          Break;
+      end;
+    until(not FindColors(TPA, LOGIN_TEXTCOLOUR, Boxes[0], Boxes[1], Boxes[2], Boxes[3]) or (getSystemTime > t));
 
-  end;    }
-
-                       {Type in username}
-
-  FindColors(TPA, LOGIN_TEXTCOLOUR, UBx1, UBy1, UBx2, UBy2);
-  if (Length(TPA) > 0) then
-  begin
-    SortTPAFrom(TPA, Point(UBx2, UBy1+(UBy2-UBy1) div 2));
-    Mouse(TPA[0].X + 20, TPA[0].Y, 5, 5, True);
-  end
-  else
-    MouseBox(UBx1, UBy1, UBx2, UBy2, 1); //Username box
-
-  typtmp := 0;
-  while (CountColor(LOGIN_TEXTCOLOUR, UBx1, UBy1, UBx2, UBy2) > 0) do
-  begin
-    TypeByte(VK_BACK);
-    Wait(50+Random(50));
-    inc(typtmp);
-    if (typtmp > 500) then
-      Break;
+    Wait(100 + Random(200));
+    if W = 0 then
+    begin
+      WriteLn(Capitalize(Players[CurrentPlayer].Name));
+      TypeSend(Players[CurrentPlayer].Name);
+    end else
+      TypeSend(Players[CurrentPlayer].Pass);
+    Wait(100 + Random(50));
   end;
-  Wait(100 + Random(200));
-  WriteLn(Capitalize(Players[CurrentPlayer].Name));
-  TypeSend(Players[CurrentPlayer].Name);
-  Wait(100 + Random(50));
-
-                       {Type in password}
-
-  FindColors(TPA, LOGIN_TEXTCOLOUR, PBx1, PBy1, PBx2, PBy2);
-  if (Length(TPA) > 0) then
-  begin
-    SortTPAFrom(TPA, Point(PBx2, PBy1+(PBy2-PBy1) div 2));
-    Mouse(TPA[0].X + 20, TPA[0].Y, 5, 5, True);
-  end
-  else
-    MouseBox(PBx1, PBy1, PBx2, PBy2, 1); //Password box
-  typtmp := 0;
-  while (CountColor(LOGIN_TEXTCOLOUR, PBx1, PBy1, PBx2, PBy2) > 0) do
-  begin
-    TypeByte(VK_BACK);
-    Wait(50 + Random(50));
-    inc(typtmp);
-    if (typtmp > 500) then
-      Break;
-  end;
-  Wait(100 + Random(200));
-  TypeSend(Players[CurrentPlayer].Pass);
-  Wait(100 + Random(50));
-  Wait(500 + Random(300));
 
                         {Check responses}
 
