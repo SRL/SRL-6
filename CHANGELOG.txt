@@ -3,13 +3,38 @@ Please update the change log when you make an update so we ensure the end users 
 CHANGE LOG:
 
 - Updates 
-        - banking routines only take integer parameters
-        - lampSkill is now player specific and is set to a skill constant, not string
+        - anything that took string parameters for cases, now take integer constants
+        - lampSkill is now player specific and is set to a skill constant, not string       
 
-- Functions Removed
+- Files added
+        - interfaces.simba has been added to include anything to do with RS interfaces
+
+- Files removed
+        - all skill files removed with the exception of fighting and magic      
+
+- Functions removed
         - CheckUsersNick (login.simba)
 
 - Function name changes
         - ClearCanvas -> SMART_ClearCanvas
         - ClearRSCanvas -> SMART_ClearRSCanvas
         - DrawDotsMulti -> SMART_DrawDotsMulti
+        - rs_OnMinimap -> OnMiniMap
+        - rs_GetCompassAngleDegrees -> GetCompassAngleDegrees
+        - rs_GetCompassAngleRadians -> GetCompassAngleRadians 
+        - srl_InFight -> InFight
+        - ClickMouse2 -> HUmanClickMouse
+
+- Functions moved
+        - GetTradeScreen (amount -> interfaces)
+        - TradeScreen (amount -> interfaces)
+        - ShopScreen (amount -> interfaces)
+        - SwitchShopTab (amount -> interfaces)
+        - CountItems (inventory -> amount)
+        - CountItemsBlackLine (inventory -> amount)
+        - ArrangeInv (inventory -> antiban) 
+        - InFight (globals -> fighting)
+        - IdleTime (mouse -> antiban)
+        - SleepAndMoveMouse (mouse -> antiban) 
+        - PlayersWorked (players -> reports)
+        - LoggedIn (players -> login) 

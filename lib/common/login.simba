@@ -15,9 +15,6 @@ var
   SRL_Logs: Integer;
   RandomPlayer, GraphicsSet, AllowPVP: Boolean;
 
-procedure NextPlayer(Active: Boolean); forward;
-procedure RandomNextPlayer(Active: Boolean); forward;
-
 const
   UBX1 = 279; // Username tBox - in use now
   UBY1 = 180;
@@ -53,6 +50,31 @@ const                       //GetScreen
   LOGIN_TA_Y2 = 228;
 
   LOGIN_TEXTCOLOUR = 12378347; //Colour of text
+
+(*
+LoggedIn
+~~~~~~~~
+
+.. code-block:: pascal
+
+    function LoggedIn: Boolean;
+
+Returns True if Logged in.
+
+.. note::
+
+    by NCDS
+
+Example:
+
+.. code-block:: pascal
+
+*)
+function LoggedIn: Boolean;
+begin
+  //White text on Report Abuse Button
+  Result := (GetColor(472, 490) = 16777215);
+end;
 
 (*
 LobbyScreen

@@ -10,6 +10,9 @@ HIGH:
 
 - MAKE IT COMPILE!
 
+- Make sure all constants are UPPERCASE
+- Keep lines less than 80 characters long except function/procedure declarations (function a: boolean)
+
 - Documentation
 	- Update all documentation
 	- All headers should have examples, credits, and modified dates.
@@ -18,10 +21,18 @@ HIGH:
 	- Try to make sure docs compile before committing them
 
         - Files that still need to be done
-                  
+                - all antirandom files
+                - files in lib/skills/
+                - progressreports.simba
+
+- Functions to fix
+        - FixChat
+        - GetChatBoxText
+
 
 - Clean up files
 	- Largely, we need to remove unecessary functions. (one liners etc)
+        - see http://villavu.com/forum/showthread.php?p=814118#post814118
 
 - Remove ``string-cases'', replace with constants (and document :))
 
@@ -50,5 +61,16 @@ LOW:
 
 - API setup for implementing reflection alternatives over top of SRL if needed
 	- Considering moving this to SRL6 when we do the complete restructure. -- Nava2
+
+
+
+Once all TO-DO's are done:
+
+- Test EVERYTHING individually
+
+- Functions already tested:
+        -
+        -
+        -
 
 

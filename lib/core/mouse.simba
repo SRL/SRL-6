@@ -198,12 +198,12 @@ begin
 end;
 
 (*
-ClickMouse2
+HumanClickMouse
 ~~~~~~~~~~~
 
 .. code-block:: pascal
 
-    procedure ClickMouse2(left : boolean);
+    procedure HumanClickMouse(left : boolean);
 
 Clicks the mouse in a human way on the current mouse spot.
 
@@ -216,7 +216,7 @@ Example:
 .. code-block:: pascal
 
 *)
-procedure ClickMouse2(left : boolean);
+procedure HumanClickMouse(left : boolean);
 var
   a,b,c : integer;
 begin
@@ -254,7 +254,7 @@ procedure Mouse(mousex, mousey, ranx, rany: Integer; left: Boolean);
 begin
   MMouse(mousex, mousey, ranx, rany);
   Wait(60 + Random(30));
-  ClickMouse2(left);
+  HumanClickMouse(left);
   Wait(50 + Random(50));
 end;
 
@@ -286,131 +286,6 @@ begin
   else
     srl_Warn('MouseBox', 'ClickType is NOT a valid number!', warn_AllVersions);
   end;
-end;
-
-(*
-SleepAndMoveMouse
-~~~~~~~~~~~~~~~~~
-
-.. code-block:: pascal
-
-    procedure SleepAndMoveMouse(Time: Integer);
-
-Waits for specified time and moves mouse around like bored human would.
-
-.. note::
-
-    by RsN
-
-Example:
-
-.. code-block:: pascal
-
-*)
-procedure SleepAndMoveMouse(Time: Integer);
-var
-  Moving: Boolean;
-  mx, my: Integer;
-  x, y, xv, yv: Extended;
-  gx, gy: Extended;
-  T: Integer;
-begin
-  GetMousePos(mx, my);
-  x := mx;
-  y := my;
-  if (Random(2) = 0) then
-    Moving := False
-  else
-    Moving := True;
-  gx := 130 + Random(500);
-  gy := 130 + Random(300);
-  T := GetTickCount;
-  repeat
-    Sleep(10);
-    if (Moving) then
-    begin
-      if (gx > x) then
-        xv := xv + 0.1
-      else
-        xv := xv - 0.1;
-      if (gy > y) then
-        yv := yv + 0.1
-      else
-        yv := yv - 0.1;
-      x := x + xv;
-      y := y + yv;
-      MoveMouse(Round(x), Round(y));
-    end;
-    if (Random(100) = 0) then
-      Moving := not Moving;
-    if (Random(30) = 0) then
-    begin
-      gx := 130 + Random(500);
-      gy := 130 + Random(300);
-    end;
-  until (Abs(GetTickCount - T) >= Time);
-end;
-
-(*
-IdleTime
-~~~~~~~~
-
-.. code-block:: pascal
-
-    procedure IdleTime(Time, Rand: integer; Gravity: extended);
-
-Randomly moves the mouse (Rand, and Gravity) for Time milliseconds
-
-.. note::
-
-    by BenLand100
-
-Example:
-
-.. code-block:: pascal
-
-*)
-procedure IdleTime(Time, Rand: Integer; Gravity: Extended);
-var
-  H, W, Cx, Cy, i, n, St: Integer;
-  Controls, Path: TPointArray;
-  LastC, LastP: TPoint;
-begin
-  St := GetSystemTime;
-  GetClientDimensions(W, H);
-  SetArrayLength(Controls, 4);
-  GetMousePos(Cx, Cy);
-  LastP.x := Cx;
-  LastP.y := Cy;
-  LastC.x := LastP.x + (Random(Rand * 2) - Rand);
-  LastC.y := LastP.y + (Random(Rand * 2) - Rand);
-  repeat
-    Controls[0].x := LastP.x;
-    Controls[0].y := LastP.y;
-    Controls[1].x := LastP.x + -(LastC.x - LastP.x);
-    Controls[1].y := LastP.y + -(LastC.y - lastP.y);
-    Controls[2].x := Controls[1].x + (Random(Rand * 2) - Rand);
-    Controls[2].y := Controls[1].y + (Random(Rand * 2) - Rand);
-    Controls[3].x := Controls[2].x + (Random(Rand * 2) - Rand);
-    Controls[3].x := Controls[3].x + Round(-(Controls[3].x - (W / 2)) *
-      (Gravity));
-    Controls[3].y := Controls[2].y + (Random(Rand * 2) - Rand);
-    Controls[3].y := Controls[3].y + Round(-(Controls[3].y - (H / 2)) *
-      (Gravity));
-    LastC.x := Controls[2].x;
-    LastC.y := Controls[2].y;
-    LastP.x := Controls[3].x;
-    LastP.y := Controls[3].y;
-    Path := MakeSplinePath(Controls, 0.01);
-    Path := MidPoints(Path, 5);
-    n := GetArrayLength(Path);
-    for i := 0 to n - 1 do
-    begin
-      MoveMouse(Path[i].x, Path[i].y);
-      Wait(Random(2) + 2);
-      if (GetSystemTime - St >= Time) then Break
-    end;
-  until (GetSystemTime - St >= Time)
 end;
 
 function WaitUpTextMulti(S: TStringArray; Time: Integer): Boolean; Forward;

@@ -27,7 +27,7 @@ Example:
 .. code-block:: pascal
 
 *)
-function rs_GetCompassAngleDegrees: Extended;
+function GetCompassAngleDegrees: Extended;
 var
    Compass: TPointArray;
    MyPoint: TPoint;
@@ -61,7 +61,7 @@ Example:
 .. code-block:: pascal
 
 *)
-function rs_GetCompassAngleRadians: Extended;
+function GetCompassAngleRadians: Extended;
 begin
   Result := Radians(rs_GetCompassAngleDegrees);
 end;
@@ -85,7 +85,7 @@ Example:
 .. code-block:: pascal
 
 *)
-function rs_OnMinimap(x, y: Integer): Boolean;
+function OnMinimap(x, y: Integer): Boolean;
 begin
   Result := InCircle(x, y, MMCX, MMCY, 75);
 end;

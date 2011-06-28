@@ -78,6 +78,32 @@ const
 [=========================]
 }
 
+(*
+PlayerWorked
+~~~~~~~~~~~~
+
+.. code-block:: pascal
+
+    function PlayerWorked(player : integer) : integer;
+
+Returns the time a player has worked..
+
+.. note::
+
+    by SRL Community
+
+Example:
+
+.. code-block:: pascal
+
+*)
+function PlayerWorked(player : integer) : integer;
+begin
+  result := Players[player].Worked;
+  if Player = CurrentPlayer then
+    result := result + (GetSystemTime - PlayerStartTime);
+end;
+
 {*******************************************************************************
 function SRLProgressReport(
                            ResultType:integer; ScriptName, ScriptAuthor, ScriptVersion: String;

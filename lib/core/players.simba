@@ -103,31 +103,6 @@ var
   PlayerCurTime, PlayerStartTime: LongInt;
 
 (*
-LoggedIn
-~~~~~~~~
-
-.. code-block:: pascal
-
-    function LoggedIn: Boolean;
-
-Returns True if Logged in.
-
-.. note::
-
-    by NCDS
-
-Example:
-
-.. code-block:: pascal
-
-*)
-function LoggedIn: Boolean;
-begin
-  //White text on Report Abuse Button
-  Result := (GetColor(472, 490) = 16777215);
-end;
-
-(*
 NumberOfPlayers
 ~~~~~~~~~~~~~~~
 
@@ -217,28 +192,3 @@ begin
   Result := (PlayersActive = 0);
 end;
 
-(*
-PlayerWorked
-~~~~~~~~~~~~
-
-.. code-block:: pascal
-
-    function PlayerWorked(player : integer) : integer;
-
-Returns the time a player has worked..
-
-.. note::
-
-    by SRL Community
-
-Example:
-
-.. code-block:: pascal
-
-*)
-function PlayerWorked(player : integer) : integer;
-begin
-  result := Players[player].Worked;
-  if Player = CurrentPlayer then
-    result := result + (GetSystemTime - PlayerStartTime);
-end;

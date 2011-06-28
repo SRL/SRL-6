@@ -552,41 +552,6 @@ begin
 end;
 
 (*
-CountItems
-~~~~~~~~~~
-
-.. code-block:: pascal
-
-      function CountItems(ItemType: string; Identifier: Integer; tol: TIntegerArray): Integer;
-
-Counts Items in the inventory.
-    - ItemType
-        - 'dtm', 'bitmap', 'bitmap mask', 'color'
-    - Item
-        - name/value of your dtm/bmp/color/bmpmask.
-    - Tol
-        - 'dtm' - [] (dtm's can't have tolerance).
-        - 'bmp' - [BMPTol].
-        - 'color' - [COLOUR Tol, Colour Count].
-        - 'bmpmask' - [BMPTol, ContourTol].
-
-.. note::
-
-    by WT-Fakawi / Sumilion
-
-Example:
-
-.. code-block:: pascal
-
-
-*)
-function CountItems(ItemType, Identifier: Integer; tol: TIntegerArray): Integer;  // ... FIX
-begin
-  GameTab(tab_Inv);
-  Result := CountItemsIn(srl_AREA_INVENTORY, ItemType, Identifier, Tol); // ... FIX
-end;
-
-(*
 ClickAllItemsExcept
 ~~~~~~~~~~~~~~~~~~~
 
@@ -913,88 +878,6 @@ Example:
 procedure DropItemsByIdentifier(ItemType, Identifier: Integer; Tol: TIntegerArray); // ... FIX
 begin
   ClickAllItems(ItemType, Identifier, 'rop', 250, Tol);
-end;
-
-
-(*
-ArrangeInv
-~~~~~~~~~~
-
-.. code-block:: pascal
-
-    procedure ArrangeInv;
-
-Arrange's inventory in an orderly fashion.
-
-.. note::
-
-    by Cheesehunk
-
-Example:
-
-.. code-block:: pascal
-
-
-*)
-procedure ArrangeInv;
-var
-  InvSpace, i, c, OpenSpace: Integer;
-  InvSpotFull: array[1..28] of Boolean;
-begin
-  InvSpace := InvCount;
-  if (InvSpace <= 0) or (InvSpace >= 28) then
-    Exit;
-  for i := 1 to 28 do
-    InvSpotFull[i] := ExistsItem(i);
-  for i := 1 to 28 do
-    if InvSpotFull[i] then
-      for c := 1 to 28 do
-        if not ExistsItem(c) then
-        begin
-          OpenSpace := c;
-          if (i > 1) and (c < i) then
-          begin
-            DragItem(i, c);
-            Break;
-          end;
-        end;
-end;
-
-(*
-CountItemsBlackLine
-~~~~~~~~~~~~~~~~~~~
-
-.. code-block:: pascal
-
-    function CountItemsBlackLine(Count, Tol: Integer): Integer;
-
-Returns the number of items in inventory with Count amount of
-blackline points and Tol tolerance in the amount of points.
-
-.. note::
-
-    by n3ss3s
-
-Example:
-
-.. code-block:: pascal
-
-
-*)
-function CountItemsBlackLine(Count, Tol: Integer): Integer;
-var
-  I, B: Integer;
-  Search:TBox;
-begin
-  GameTab(tab_Inv);
-  result := 0;
-  for i:=1 to 28 do
-  begin
-    Search:= InvBox(i);
-    B:= CountColor(SRL_OUTLINE_BLACK, Search.X1, Search.Y1, Search.X2, Search.Y2 );
-    if InRange(B,  Count - Tol, Count + Tol) then
-      Inc(Result);
-  end;
 end;
 
 (*

@@ -391,62 +391,6 @@ begin
   MBBox := IntToBox(MBX1, MBY1, MBX2, MBY2);
 end;
 
-
-{ const HP_BAR constants;
-   Global contants storing width, height and tolerance for HP bars.
-   Used in srl_InFight. }
-const
-  HP_BAR_TOL = 3;
-  HP_BAR_WIDTH = 57;
-  HP_BAR_HEIGHT = 7;
-
-(*
-SetupBoxes
-~~~~~~~~~~
-
-.. code-block:: pascal
-
-    function srl_InFight: Boolean;
-
-
-Checks whether player currently is in a fight, using mainscreen
-HP bar presence detection. Returns True if Player's HP bar is detected.
-
-.. note::
-
-    by SRL Dev Team & MylesMadness
-
-Example:
-
-.. code-block:: pascal
-
-*)
-
-function srl_InFight: Boolean;
-var
-  HP_BAR_GREEN, HP_BAR_RED, HP_BAR_HITS: TIntegerArray;
-  I, C, HP_BAR_MIN, HP_BAR_MAX: Integer;
-  TPA1, TPA2: TPointArray;
-  Colors: T2DIntegerArray;
-begin
-  HP_BAR_GREEN := [49499, 52611, 51081, 52641, 47667];
-  HP_BAR_RED := [590010, 590002, 131211, 524453, 594402];
-  HP_BAR_HITS := [1325811, 1320341, 16294162, 12937740, 14185741, 4297620];
-  HP_BAR_MIN := HP_BAR_WIDTH * HP_BAR_HEIGHT div 10 - HP_BAR_TOL;
-  HP_BAR_MAX := HP_BAR_WIDTH * HP_BAR_HEIGHT * 3 div 2 + HP_BAR_TOL;
-
-  Colors := [HP_BAR_GREEN, HP_BAR_RED, HP_BAR_HITS];
-  for I := 0 to 1 do
-    for C := High(Colors[i]) downto 0 do
-    begin
-      FindColorsTolerance(TPA1, Colors[I][C],
-        MSCX - 25, MSCY - 40, MSCX + 25, MSCY - 15, 30);
-      TPA2 := CombineTPA(TPA1, TPA2);
-    end;
-
-  Result := InRange(GetArrayLength(TPA2), HP_BAR_MIN, HP_BAR_MAX);
-end;
-
 function AddOnTerminate(const proc : string) : boolean;
 var
   OldProcs : TVariantArray;
