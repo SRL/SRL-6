@@ -398,7 +398,6 @@ Begin
       End;
       Result := (GetSystemTime > T);
     End;
-    If Not MCaught Then GoTo IfNot_CivilianCaught;
 
     If GetSystemTime > T Then
     Begin
@@ -409,6 +408,8 @@ Begin
       MakeCompass(CompassAngle);
       Exit;
     End;
+
+    If Not MCaught Then GoTo IfNot_CivilianCaught;
 
     If MCaught Then
     Begin
