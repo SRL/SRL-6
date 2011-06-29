@@ -674,6 +674,7 @@ Scrolls ChatText scrollbar down.
 .. note::
 
     by WT-Fakawi
+    Last updated June 29th, 2011 by JPHamlett
 
 Example:
 
@@ -681,20 +682,19 @@ Example:
 
 
 *)
-
 procedure FixChat;
 var
   ScrollX, ScrollY: Integer;
 begin
-  ScrollX := 499 + Random(8);
-  ScrollY := 445 + Random(8);
-  if (GetColor(500, 441) = 1975337) then
+  ScrollX := 507 + Random(8);
+  ScrollY := 451 + Random(8);
+  if (GetColor(505, 439) = 2041131) then
   begin
     MMouse(ScrollX, ScrollY, 0, 0);
-    HoldMouse(ScrollX, ScrollY, MouseAction(True));	
-    while (GetColor(500, 441) = 1975337)  do
-      Wait(10 + random(15)); 
-	Wait(50+random(50));
+    HoldMouse(ScrollX, ScrollY, MouseAction(True));
+    while (GetColor(505, 439) = 2041131)  do
+      Wait(10 + random(15));
+	  Wait(50+random(50));
     ReleaseMouse(ScrollX, ScrollY, MouseAction(true));
     Wait(100+random(50));
   end;

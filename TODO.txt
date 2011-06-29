@@ -26,7 +26,6 @@ HIGH:
                 - progressreports.simba
 
 - Functions to fix
-        - FixChat
         - GetChatBoxText
 
 
