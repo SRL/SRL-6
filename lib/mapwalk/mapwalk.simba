@@ -1122,9 +1122,9 @@ var
 begin
   WhatDot := LowerCase(WhatDot);
   case WhatDot Of
-    'npc', 'yellow': Color := 60909;
+    'npc', 'yellow': Color := 61937; //60909
     'cape', 'blue': Color := 12742980;
-    'item', 'red': Color := 789758;
+    'item', 'red': Color := 592381; //789758
     'player', 'white': Color := 16711422;
     'friend', 'green': Color := 61440;
   else
