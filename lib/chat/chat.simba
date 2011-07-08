@@ -9,9 +9,10 @@ const
   CHAT_GAME    = 0;
   CHAT_PUBLIC  = 1;
   CHAT_PRIVATE = 2;
-  CHAT_CLAN    = 3;
-  CHAT_TRADE   = 4;
-  CHAT_ASSIST  = 5;
+  CHAT_FREINDS = 3;
+  CHAT_CLAN    = 4;
+  CHAT_TRADE   = 5;
+  CHAT_ASSIST  = 6;
 
 (*
 .. code-block:: pascal
@@ -20,9 +21,10 @@ const
   CHAT_GAME    = 0;
   CHAT_PUBLIC  = 1;
   CHAT_PRIVATE = 2;
-  CHAT_CLAN    = 3;
-  CHAT_TRADE   = 4;
-  CHAT_ASSIST  = 5;
+  CHAT_FREINDS = 3;
+  CHAT_CLAN    = 4;
+  CHAT_TRADE   = 5;
+  CHAT_ASSIST  = 6;
 *)
 
 (*
@@ -34,8 +36,8 @@ SetChat
     function SetChat(state: string; chat: Integer): Boolean;
 
 Sets Chat to desired state
-Game  Public  Private  Clan  Trade  Assist
-0       1       2       3     4       5
+Game  Public  Private Friends Clan  Trade  Assist
+0       1       2       3      4      5      6
 
 
 .. note::
@@ -109,17 +111,17 @@ Example:
 
 .. code-block:: pascal
 
-    SetAlChats('all', 'Hide', '', 'Off', '', 'Friend');
+    SetAllChats('all', 'Hide', '', 'Off', '', 'Friend', '');
 
 *)
-procedure SetAllChats(Game, Pub, Priv, Clan, Trade, Assist: string);
+procedure SetAllChats(Game, Pub, Priv, Friends, Clan, Trade, Assist: string);
 var
   States: TStringArray;
   II: Integer;
 begin
   if (not(LoggedIn)) then Exit;
-  States := [Game, Pub, Priv, Clan, Trade, Assist];
-  for II := 0 to 5 do
+  States := [Game, Pub, Priv, Friends, Clan, Trade, Assist];
+  for II := 0 to 6 do
   begin
     if (States[II] = '') then Continue;
     SetChat(States[II], II);
@@ -153,7 +155,7 @@ procedure ChatsOff;
 var
   i: Integer;
 begin
-  for i := 1 to 5 do
+  for i := 1 to 6 do
     SetChat('off', i);
 end;
 
@@ -674,7 +676,7 @@ Scrolls ChatText scrollbar down.
 .. note::
 
     by WT-Fakawi
-    Last updated June 29th, 2011 by JPHamlett
+    Last updated July 7th, 2011 by NCDS
 
 Example:
 
@@ -688,11 +690,11 @@ var
 begin
   ScrollX := 507 + Random(8);
   ScrollY := 451 + Random(8);
-  if (GetColor(505, 439) = 2041131) then
+  if (GetColor(500, 441) = 1909544) then
   begin
     MMouse(ScrollX, ScrollY, 0, 0);
     HoldMouse(ScrollX, ScrollY, MouseAction(True));
-    while (GetColor(505, 439) = 2041131)  do
+    while (GetColor(500, 441) = 1909544)  do
       Wait(10 + random(15));
 	  Wait(50+random(50));
     ReleaseMouse(ScrollX, ScrollY, MouseAction(true));
