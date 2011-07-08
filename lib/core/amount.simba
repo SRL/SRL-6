@@ -188,31 +188,36 @@ Example:
 .. note::
 	Modified: Unknown
 *)
+function invBox(i: integer): TBox; forward;
+function CoordsToItem(X, Y: Integer): Integer; forward;
 function GetAmount(ItemX, ItemY: Integer): Integer;
 var
   Col: TIntegerArray;
   X, Y, I: Integer;
-  B: TBox;
+  B, slot: TBox;
   TPA: TPointArray;
   S: String;
 begin
   Result := 0;
-  If Not FindColor(X, Y, srl_outline_black, ItemX-30, ItemY-30, ItemX+30, ItemY+30)then
+  slot := invBox(coordsToItem(itemX, itemY));
+
+  If Not FindColor(X, Y, srl_outline_black, slot.x1, slot.y1, slot.x2, slot.y2) then
     Exit;
   Inc(Result);
   Col := [65535, 65278, 16777215, 8453888];
+
   For I := 0 to High(Col) do
-   If FindColor(X, Y, Col[I], ItemX-22, ItemY-22, ItemX+22, ItemY+22)then
+   If FindColor(X, Y, Col[I], slot.x1, slot.y1, slot.x2, slot.y2)then
    begin
-     FindColors(TPA, Col[i], ItemX-22, ItemY-22, ItemX+22, ItemY+22);
+     FindColors(TPA, Col[i], slot.x1, slot.y1, slot.x2, slot.y2);
      B := GetTPABounds(TPA);
-     S := Trim(
-        GetTextAtEx(
-            B.X1-1, B.Y1-1, 0, StatChars,
-            False, False, 0, 1,
-            Col[I], 5, True, tr_AllChars
-          )
-      );
+     //SMART_DrawBoxEx(False, b, clYellow);
+     {$IFDEF SIMBA}
+     B := IntToBox(b.x1-2, b.y1-2, b.x2+2, b.y2+2);
+     S := GetTextAtExWrap(b.x1, b.y1, b.x2, b.y2, 0, 1, 1, Col[i], 0, StatChars);
+     {$ELSE}
+     S := Trim(GetTextAtEx(B.X1-1, B.Y1-1, 0, StatChars, False, False, 0, 1, Col[I], 5, True, tr_AllChars));
+     {$ENDIF}
      Result := StrToIntDef(GetNumbers(S), 1);
      Case I of
        2: Result := Result * 1000;
