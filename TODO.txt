@@ -4,7 +4,7 @@ Please tag completed things with commit identities (those ugly hashes). Feel fre
 
 Try to grep the include for TODO marks, these are mainly smaller things.
 
-Updated: 31 Mar 2011 -- Nava2
+Updated: 12 July 2011 -- Coh3n
 
 HIGH:
 
@@ -32,6 +32,8 @@ HIGH:
 - Clean up files
 	- Largely, we need to remove unecessary functions. (one liners etc)
         - see http://villavu.com/forum/showthread.php?p=814118#post814118
+        - Merge all the "Wait" methods with the the non-wait methods 
+        - reorganize login.simba
 
 - Remove ``string-cases'', replace with constants (and document :))
 

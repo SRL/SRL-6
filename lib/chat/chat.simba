@@ -129,37 +129,6 @@ begin
 end;
 
 (*
-ChatsOff
-~~~~~~~~
-
-.. code-block:: pascal
-
-    procedure ChatsOff;
-
-
-Sets all Chats to off.
-
-.. note::
-
-    by Starblaster100
-
-Example:
-
-.. code-block:: pascal
-
-
-
-*)
-
-procedure ChatsOff;
-var
-  i: Integer;
-begin
-  for i := 1 to 6 do
-    SetChat('off', i);
-end;
-
-(*
 PleaseWait
 ~~~~~~~~~~
 
@@ -288,33 +257,6 @@ begin
     if Result then
       Break;
   end;
-end;
-
-(*
-ClickToContinue
-~~~~~~~~~~~~~~~
-
-.. code-block:: pascal
-
-    function ClickToContinue: Boolean;
-
-Click the blue 'Click To Continue' text in the chat box.
-
-.. note::
-
-    by ZephyrsFury
-
-Example:
-
-.. code-block:: pascal
-
-
-
-*)
-
-function ClickToContinue: Boolean;
-begin
-  Result := ClickContinue(True, False);
 end;
 
 (*

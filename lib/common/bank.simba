@@ -30,94 +30,6 @@ const
   Bank_FG = 18;  //'fgb';  (Fishing guild bank)
 
 (*
-BankScreen
-~~~~~~~~~~
-
-.. code-block:: pascal
-
-    function BankScreen: Boolean;
-
-Finds Bankscreen. Returns true if Found.
-
-.. note::
-
-    by The SRL Dev Team
-
-Example:
-
-.. code-block:: pascal
-
-*)
-
-function BankScreen: Boolean;
-var
-  c: Integer;
-begin
-  if (CountColor(0, MSX1, MSY1, MSX2, MSY2) > 113000) then
-  begin
-    MouseBox(26, 138, 489, 157, 1);
-    c := GetTimeRunning + 45000;
-    while (not BankScreen) and (GetTimeRunning < c) do
-      Wait(50);
-    Wait(RandomRange(100, 150));
-  end;
-  Result := FindTextTPA(4106994, 20, 20, 22, 400, 45, 'Bank', upchars, Nothing);
-end;
-
-(*
-DepositScreen
-~~~~~~~~~~~~~
-
-.. code-block:: pascal
-
-    function DepositScreen: Boolean;
-
-Returns true if deposit screen is Found.
-
-.. note::
-
-    by Shuttleu
-
-Example:
-
-.. code-block:: pascal
-
-*)
-
-function DepositScreen: Boolean;
-var
-  X, Y: Integer;
-begin
-  Result := FindText(x, y, 'Deposit Box', upchars, 92, 29, 396, 54);
-end;
-
-(*
-PinScreen
-~~~~~~~~~
-
-.. code-block:: pascal
-
-    function PinScreen: Boolean;
-
-Finds Pin Screen. Returns true if Found.
-
-.. note::
-
-    by NaumanAkhlaq
-
-Example:
-
-.. code-block:: pascal
-
-*)
-
-
-function PinScreen : Boolean;
-begin
-  Result := FindTextTPA(2070783, 0, 90, 50, 160, 85, 'Please', UpChars, Nothing);
-end;
-
-(*
 InPin
 ~~~~~
 
@@ -769,12 +681,12 @@ begin
 end;
 
 (*
-WithdrawEx
-~~~~~~~~~~
+WithdrawSlot
+~~~~~~~~~~~~
 
 .. code-block:: pascal
 
-    function WithdrawEx(Col, Row, Amount: Integer; Uptexts: TStringArray): Boolean;
+    function WithdrawSlot(Col, Row, Amount: Integer; Uptexts: TStringArray): Boolean;
 
 Withdraws Amount at Column/Row.
 
@@ -788,7 +700,7 @@ Example:
 
 *)
 
-function WithdrawEx(Col, Row, Amount: Integer; Uptexts: TStringArray): Boolean;
+function WithdrawSlot(Col, Row, Amount: Integer; Uptexts: TStringArray): Boolean;
 var
   BBox: TBox;
   X, Y: Integer;
@@ -834,36 +746,12 @@ begin
 end;
 
 (*
-Withdraw
-~~~~~~~~
+WithdrawItem
+~~~~~~~~~~~~
 
 .. code-block:: pascal
 
-    function Withdraw(Col, Row, Amount: Integer): Boolean;
-
-Withdraws Amount at Column/Row.
-
-.. note::
-
-    by Starblaster100, Town, Wizzup? and Narcle
-
-Example:
-
-.. code-block:: pascal
-
-*)
-
-function Withdraw(col, row, Amount: Integer): Boolean;
-begin
-  Result := WithdrawEx(Col, Row, Amount,[]);
-end;
-(*
-WithdrawItemEx
-~~~~~~~~~~~~~~
-
-.. code-block:: pascal
-
-    function WithdrawItemEx(Ident: integer; IdentType: string; var Index: integer; Amount: integer; UpText: String; Tol: TIntegerArray): boolean;
+    function WithdrawItem(Ident: integer; IdentType: string; var Index: integer; Amount: integer; UpText: String; Tol: TIntegerArray): boolean;
 
 Withdraws an item from the bank by using "Ident" with
     - tol[0] as color tolerance,
@@ -885,7 +773,7 @@ Example:
 *)
 
 
-function WithdrawItemEx(Ident, IdentType: integer; var Index: integer; Amount: integer; UpText: string; Tol: TIntegerArray): Boolean;
+function WithdrawItem(Ident, IdentType: integer; var Index: integer; Amount: integer; UpText: string; Tol: TIntegerArray): Boolean;
 var
   x, y: integer;
   BPoint: TPoint;
@@ -942,33 +830,6 @@ begin
     Index := 0;
     SRL_Warn('WithdrawItem', 'Could not Find ' + IntToStr(IdentType) + ' in Bank. [Uptext: ' + UpText + ']', Warn_AllVersions);
   end;
-end;
-
-(*
-WithdrawItem
-~~~~~~~~~~~~
-
-.. code-block:: pascal
-
-    function WithdrawItem(Ident: integer; IdentType: string; Amount: integer; UpText: TStringArray; Tol: TIntegerArray): boolean;
-
-Withdraws an item using WithdrawItemEx, but removes the Index check.
-
-.. note::
-
-    by Nava2
-
-Example:
-
-.. code-block:: pascal
-
-*)
-
-function WithdrawItem(Ident, IdentType: integer; Amount: integer; UpText: String; Tol: TIntegerArray): boolean;
-var
-  I : Integer;
-begin
-  Result := WithdrawItemEx(Ident, IdentType, I, Amount, UpText, Tol);
 end;
 
 (*
@@ -1040,252 +901,6 @@ begin
       Wait(Random(100));
     until (GetTimeRunning > Timer) or Result;
   end;
-end;
-
-(*
-OpenBankQuiet
-~~~~~~~~~~~~~
-
-.. code-block:: pascal
-
-    function OpenBankQuiet(WhichBank: Integer): Boolean;
-
-Opens any given bank in the free world using FindDeformedBitmapToleranceIn.
-Avoids strange mouse movements.
-Will causesignificant lag (approx. 1 second), but finds the bank with one click.
-
-Valid arguments are:
-
-    - Bank_FE (Falador East Bank)
-    - Bank_FW (Falador West Bank)
-    - Bank_VE (Varrock East Bank)
-    - Bank_VW (Varrock West Bank)
-    - Bank_DR  (Draynor Bank)
-    - Bank_EV  (Edgeville Bank)
-    - Bank_AK (Al-Kharid Bank)
-
-.. note::
-
-    by WT-Fakawi
-
-Example:
-
-.. code-block:: pascal
-
-*)
-
-function OpenBankQuiet(WhichBank: Integer): Boolean;
-var
-  TheCounter, dx, dy, tol, Mark2, Mark3: Integer;
-  acc, accthres: Extended;
-begin
-  result := false;
-  case WhichBank of
-    Bank_FE, Bank_FW: TheCounter := BitmapFromString(1, 10, '6C583296897A948779948779736' +
-        'C63A59E968C7F6F9686749B8A7685663E');
-    // varrock west
-    Bank_VW: TheCounter:= BitmapFromString(10, 1, 'A0997F504A49504A49504A495E4' +
-       'F215E4F215E4F215E4F212C250EA0997F');
-    // varrock east
-    Bank_VE: TheCounter := BitmapFromString(1, 10, '5E4D1589826D88806D88806D867' +
-       'F6C9996907C7664847D648C836891876B');
-    // draynor, alkharid, Edgeville
-    Bank_AK, Bank_DR, Bank_EV: TheCounter:= BitmapFromString(12, 1, '584209735C29735C29735C29605' +
-       '85558504D60504D58504D58504D58504D58504D605855');
-  else
-    begin
-      srl_Warn('OpenBankQuiet', 'Unknown bank', warn_AllVersions);
-      Exit;
-    end;
-  end;
-
-  MarkTime(Mark3);
-  tol := 1;
-  accthres := 0.6;
-  repeat
-    if (Length(Players) > 0) then
-      if (Players[CurrentPlayer].Pin <> '') then
-        InPin(Players[CurrentPlayer].Pin);
-    if BankScreen or PinScreen then
-    begin
-      Result := True;
-      FreeBitmap(TheCounter);
-      Exit;
-    end;
-    if WaitUpTextMulti(['ank', 'Bo', 'ot'], 300) then
-    begin
-      GetMousePos(dx, dy);
-      Mouse(dx, dy, 0, 0, False);
-      if WaitOptionMulti(['uic', 'kly', 'ickl', 'uickly'], 300) then
-      begin
-        MarkTime(Mark2);
-        repeat
-          Wait(10);
-          if TimeFromMark(Mark2) > 20000 then
-          begin
-            WriteLn('Couldn''t find the bank. Exiting');
-            FreeBitmap(TheCounter);
-            Exit;
-          end;
-        until BankScreen or PinScreen;
-        if (Length(Players) > 0) then
-          if (Players[CurrentPlayer].Pin <> '') then
-            InPin(Players[CurrentPlayer].Pin);
-        Result := True;
-        FreeBitmap(TheCounter);
-        Exit;
-      end;
-    end;
-
-    FindDeformedBitmapToleranceIn(TheCounter, dx, dy, MSX1 + 50, MSY1 + 50, MSX2
-      - 50, MSY2 - 50, tol, 4, True, acc);
-    if (acc >= accthres) then
-    begin
-      if (Length(Players) > 0) then
-        if (Players[CurrentPlayer].Pin <> '') then
-          InPin(Players[CurrentPlayer].Pin);
-      if BankScreen or PinScreen then
-      begin
-        Result := True;
-        FreeBitmap(TheCounter);
-        Exit;
-      end;
-      MMouse(dx, dy, 0, 0);
-      if WaitUptextMulti(['ank', 'Bo', 'ot'], 300) then
-      begin
-        GetMousePos(dx, dy);
-        Mouse(dx, dy, 0, 0, False);
-        if WaitOptionMulti(['uic', 'kly', 'ickl', 'uickly'], 200) then
-        begin
-          MarkTime(Mark2);
-          repeat
-            Wait(10);
-            if TimeFromMark(Mark2) > 20000 then
-            begin
-              WriteLn('Couldn''t find the bank. Exiting');
-              FreeBitmap(TheCounter);
-              Exit;
-            end;
-          until BankScreen or PinScreen;
-        end;
-        if (Length(Players) > 0) then
-          if (Players[CurrentPlayer].Pin <> '') then
-            InPin(Players[CurrentPlayer].Pin);
-        Result := True;
-        FreeBitmap(TheCounter);
-        Exit;
-      end;
-    end;
-    Wait(100);
-    tol := tol + 4;
-    if tol >= 20 then
-    begin
-      tol := 1;
-      accthres := accthres - 0.1;
-      if accthres < 0.2 then
-      begin
-        WriteLn('Couldn''t find the bank. Exiting');
-        FreeBitmap(TheCounter);
-        Exit;
-      end;
-    end;
-  until TimeFromMark(Mark3) > 60000;
-  FreeBitmap(TheCounter);
-end;
-
-(*
-OpenBankGlass
-~~~~~~~~~~~~~
-
-.. code-block:: pascal
-
-    function OpenBankGlass(WhichBank: Integer; ChangeCompass, ChangeAngle: Boolean): Boolean;
-
-
-Opens the bank.
-Valid arguments are:
-
-    - Bank_FE (Falador East Bank)
-    - Bank_FW (Falador West Bank)
-    - Bank_VE (Varrock East Bank)
-    - Bank_VW (Varrock West Bank)
-    - Bank_DR  (Draynor Bank)
-    - Bank_AK (Al-Kharid Bank)
-    - Bank_EV  (Edgeville Bank)
-    - Bank_CT (Catherby bank)
-    - Bank_CM (Camelot bank)
-    - Bank_NA (North Ardougne bank)
-    - Bank_SA (South Ardougne bank)
-    - Bank_YN (Yanille bank)
-    - Bank_NG (North gnome bank)
-    - Bank_SG (South gnome bank)
-    - Bank_WG (Warrior guild bank)
-    - Bank_FG (Fishing guild bank)
-
-.. note::
-
-    by Wizzup? and modified by Ron updated to P2p banks by N1ke!
-
-Example:
-
-.. code-block:: pascal
-
-*)
-
-
-function OpenBankGlass(WhichBank: Integer; ChangeCompass, ChangeAngle: Boolean): Boolean;
-var
-  OBC: TPoint;
-  c, Speed, Col: Integer;
-begin
-  result := false;
-  Speed := GetToleranceSpeed;
-  SetColorToleranceSpeed(2);
-  if ChangeAngle then SetAngle(True);
-  if ChangeCompass then
-  begin
-    c := Random(2);
-    case WhichBank of
-      Bank_FE, Bank_FW, Bank_VE, Bank_CT, Bank_CM, Bank_NA:
-        if c = 0 then MakeCompass('N') else MakeCompass('S');
-
-      Bank_AK, Bank_DR, Bank_EV, Bank_VW, Bank_SA, Bank_YN, Bank_SG, Bank_WG, Bank_FG:
-        if c = 0 then MakeCompass('E') else MakeCompass('W');
-
-      Bank_NG:
-        if c = 0 then MakeCompass(45) else MakeCompass(225);
-    end;
-  end;
-  Col := 10070458;
-  If (WhichBank = Bank_NA) or (WhichBank = Bank_SA)then
-    Col := 8095371;
-  if FindColorSpiralTolerance(OBC.x, OBC.y, Col, MSX1, MSY1, MSX2, MSY2, 10) then
-  begin
-    MMouse(OBC.x, OBC.y, 4, 4);
-    if WaitUpTextMulti(['nk', 'bo', 'ot'], 300) then
-    begin
-      Mouse(OBC.x, OBC.y, 0, 0, False);
-      WaitOptionMulti(['uic', 'kly', 'ickl', 'uickly'], 300);
-      FFlag(0);
-      Wait(2000 + Random(500));
-      if (Length(Players) > 0) then
-        if (Players[CurrentPlayer].Pin <> '') then
-          InPin(Players[CurrentPlayer].Pin);
-      Result := (BankScreen) or (PinScreen);
-    end;
-  end else
-    if FindObj(OBC.x, OBC.y, 'ank', 10070458, 20) then
-    begin
-      Mouse(OBC.x, OBC.y, 0, 0, False);
-      WaitOptionMulti(['uic', 'kly', 'ickl', 'uickly'], 300);
-      FFlag(0);
-      Wait(2000 + Random(500));
-      if (Length(Players) > 0) then
-        if (Players[CurrentPlayer].Pin <> '') then
-          InPin(Players[CurrentPlayer].Pin);
-      Result := (BankScreen) or (PinScreen);
-    end;
-  SetColorToleranceSpeed(Speed);
 end;
 
 (*
@@ -1439,8 +1054,8 @@ begin
 end;
 
 (*
-Home
-~~~~
+OpenBankNPC
+~~~~~~~~~~~
 
 .. code-block:: pascal
 

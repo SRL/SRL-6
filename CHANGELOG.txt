@@ -5,15 +5,29 @@ CHANGE LOG:
 - Updates 
         - anything that took string parameters for cases, now take integer constants
         - lampSkill is now player specific and is set to a skill constant, not string       
+        - added Friends chat tab to all SetChat functions.     
 
 - Files added
         - interfaces.simba has been added to include anything to do with RS interfaces
+        - awareness.simba added and includes functions that gather information about the player's surroundings
 
 - Files removed
         - all skill files removed with the exception of fighting and magic      
+        - object.simba; if users don't want to write their own methods, can use smartcolors.simba
+        - search.simba; was a duplicate of color.simba
+        - bitmaps.simba; horribly outdated and never used 
 
 - Functions removed
         - CheckUsersNick (login.simba)
+        - ChatsOff (chat.simba)
+        - ClickToContinue (chat.simba)
+        - Withdraw (bank.simba)
+        - WithdrawItem (bank.simba) 
+        - OpenBankQuite (bank.simba)
+        - OpenBankGlass (bank.simba)
+        - FindDTMRotated (color.simba)
+        - FindMMSpiralTolerance (color.simba)
+        - PercentColorMM (color.simba)
 
 - Function name changes
         - ClearCanvas -> SMART_ClearCanvas
@@ -24,6 +38,9 @@ CHANGE LOG:
         - rs_GetCompassAngleRadians -> GetCompassAngleRadians 
         - srl_InFight -> InFight
         - ClickMouse2 -> HUmanClickMouse
+        - WithdrawEx -> WithdrawSlot
+        - WithdrawItemEx -> WithdrawItem 
+        - PercentColorMMEx -> PercentColorMM
 
 - Functions moved
         - GetTradeScreen (amount -> interfaces)
@@ -38,3 +55,9 @@ CHANGE LOG:
         - SleepAndMoveMouse (mouse -> antiban) 
         - PlayersWorked (players -> reports)
         - LoggedIn (players -> login) 
+        - GetMinimapDotsIn (mapwalk -> awareness)
+        - GetMinimapDots (mapwalk -> awareness)
+        - CountDots (mapwalk -> awareness)
+        - BankScreen (bank -> interfaces)
+        - DepositScreen (bank -> interfaces)
+        - PinScreen (bank -> interfaces)
