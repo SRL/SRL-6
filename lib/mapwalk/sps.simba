@@ -123,7 +123,7 @@ begin
     LoadSPS;
   
   // we should just rotate the minimap according to the minimap angle.
-  MakeCompass('N');
+  ClickNorth(True);
 
   t := getSystemTime;
   Minimap := SPS_GatherMinimap;
