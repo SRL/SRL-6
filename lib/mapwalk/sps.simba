@@ -85,6 +85,12 @@ begin
   timer := getSystemTime;
   L := Length(SPS_Areas);
 
+  if (L <= 0) then
+  begin
+    writeln('[SPS] WARNDING: SPS_Areas hasn''t been set');
+    exit;
+  end;
+
   // clean up the old one just in case, we do not want copies in wrong places.
   SetLength(SPS_WorldMap, 0);
   SetLength(SPS_Worldmap, L);
