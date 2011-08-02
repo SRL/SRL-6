@@ -945,7 +945,7 @@ Returns TBox of eqquipped item in which.
 
 .. note::
 
-    by Nava2
+    by Nava2 & Dgby714
 
 Example:
 
@@ -954,38 +954,48 @@ Example:
 *)
 function GetEquippedItemBounds(Which: Variant): TBox;
 var
-  P : TPoint;
-  I : Byte;
+  P: TPoint;
+  I: Integer;
 begin
-  Which := LowerCase(Which);
-  case Which of
-    1, 'helm', 'helmet' :
-      I := 1;
-    2, 'cape' :
-      I := 2;
-    3, 'amulet', 'neck', 'necklace' :
-      I := 3;
-    4, 'arrows', 'bolts' :
-      I := 4;
-    5, 'right hand', 'weapon' :
-      I := 5;
-    6, 'plate', 'chest', 'platebody' :
-      I := 6;
-    7, 'left hand', 'sheild', 'shield' :
-      I := 7;
-    8, 'legs', 'platelegs', 'skirt', 'plateskirt' :
-      I := 8;
-    9, 'gloves', 'gauntlets' :
-      I := 9;
-    10, 'ring' :
-      I := 10;
-    else
-    begin
-      SRL_Warn('GetEquiptItemBounds', 'Invalid entry ('+string(Which)+')', Warn_AllVersions);
-      Result := IntToBox(0, 0, 0, 0);
-      Exit;
-    end;
+  Result := IntToBox(0, 0, 0, 0);
+  I := -1;
+
+  case VarType(Which) of
+    varInteger: if (InRange(Which, 1, 11)) then
+        I := Which;
+
+    varString: case Which of
+        'helm', 'helmet' :
+          I := 1;
+        'cape' :
+          I := 2;
+        'amulet', 'neck', 'necklace' :
+          I := 3;
+        'arrows', 'bolts' :
+          I := 4;
+        'right hand', 'weapon' :
+          I := 5;
+        'plate', 'chest', 'platebody' :
+          I := 6;
+        'left hand', 'sheild', 'shield' :
+          I := 7;
+        'legs', 'platelegs', 'skirt', 'plateskirt' :
+          I := 8;
+        'gloves', 'gauntlets' :
+          I := 9;
+        'boots':
+          I := 10;
+        'ring' :
+          I := 11;
+      end;
   end;
+
+  if (I = -1) then
+  begin
+    SRL_Warn('GetEquiptItemBounds', 'Invalid entry (' + ToStr(Which) + ')', Warn_AllVersions);
+    Exit;
+  end;
+
   P := EquipmentCoords(I);
   Result := IntToBox(P.x - 11, P.y - 11, P.x + 11, P.y + 11);
 end;
