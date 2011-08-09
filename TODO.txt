@@ -1,12 +1,6 @@
-TODO
+Updated: 09 August 2011 -- Coh3n
 
-Please tag completed things with commit identities (those ugly hashes). Feel free to just add progress as well. 
-
-Try to grep the include for TODO marks, these are mainly smaller things.
-
-Updated: 12 July 2011 -- Coh3n
-
-HIGH:
+PRE-RELEASE TODO's:
 
 - MAKE IT COMPILE!
 
@@ -40,8 +34,7 @@ HIGH:
 - Fix Random Solvers
 
 
-
-MED:
+POST-RELEASE TODO's:
 
 - Implement Hobbit's antiban system.
 
@@ -49,29 +42,7 @@ MED:
 	- Perhaps use an extension for all of these settings and read from a file? Would need to be fast.
 	- Loading these into a ``dictionary'' of sorts would be a nice way to implement this. 
 
-- Correct SRL Stats issues
-	- fixed in Stats v1.3 --- please confirm. 
+- Blacklists
 
-
-
-
-
-
-
-LOW:
-
-- API setup for implementing reflection alternatives over top of SRL if needed
-	- Considering moving this to SRL6 when we do the complete restructure. -- Nava2
-
-
-
-Once all TO-DO's are done:
-
-- Test EVERYTHING individually
-
-- Functions already tested:
-        -
-        -
-        -
 
 
