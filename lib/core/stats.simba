@@ -180,11 +180,7 @@ begin
   ExtraTime := ExtraTime - (Worked*60000);
 
   stats_Timer := GetSystemTime - ExtraTime;
-  {$IFDEF Simba}
-  SRLClient := InitializeHTTPClientWrap(False);
-  {$ELSE}
-  SRLClient := InitializeHTTPClient(False, False);
-  {$ENDIF}
+  SRLClient := InitializeHTTPClient(False);
   ClearPostData(SRLClient);
 
   AddPostVariable(SRLClient, 'user', stats_UserName);
@@ -217,11 +213,7 @@ begin
   S := PostHTTPPageEx(SRLClient, 'http://stats.villavu.com/api/commit');
   FreeHTTPClient(SRLClient);
   Result := False;
-  {$IFDEF Simba}
   case StrToIntDef(ExtractFromStr(S, Numbers), -1) of
-  {$ELSE}
-  case StrToIntDef(GetNumbers(S), -1) of
-  {$ENDIF}
     100: Result := True; // successful commit.
     110: Writeln('SRL_Stats: Incorrect user and/or password');
     120: Writeln('SRL_Stats: Incorrect script ID');

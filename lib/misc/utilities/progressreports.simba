@@ -509,3 +509,86 @@ begin
     end;
   end;
 end;
+
+{$IFDEF srl_lib_antirandoms}
+
+{*******************************************************************************
+procedure SRLRandomsReport;
+by: Starblaster100
+Description: Displays Randoms Report.
+*******************************************************************************}
+
+procedure SRLRandomsReport;
+var
+  i, CurrentInt: Integer;
+  CurrentStr, Name: string;
+
+Begin
+  {$ifndef Simba}
+  ChangeReportWidth(280);
+  ClearReport;
+  {$endif}
+  //AddToReport('/~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~\');
+  //AddToReport('|     SRL Randoms Report       |');
+  //AddToReport('|       www.villavu.com        |');
+  //AddToReport('|~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~|');
+  For i := 1 to 44 do
+  Begin
+    Case i of
+      //0: begin CurrentInt := SRL_Logs;                     Name := '| SRL Logs          :'; end;
+      1: begin CurrentInt := RandSolved[rand_Trade];       Name := '| Trades Made       :'; end;
+      2: begin CurrentInt := RandFailed[rand_Trade];       Name := '| Trades Missed     :'; end;
+      3: begin CurrentInt := RandSolved[rand_Fight];       Name := '| Fights            :'; end;
+      4: begin CurrentInt := RandSolved[rand_Sandwich];    Name := '| Sandwiches Solved :'; end;
+      5: begin CurrentInt := RandFailed[rand_Sandwich];    Name := '| Sandwiches Missed :'; end;
+      6: begin CurrentInt := RandSolved[rand_Lamp];        Name := '| Lamps Solved      :'; end;
+      7: begin CurrentInt := RandFailed[rand_Lamp];        Name := '| Lamps Missed      :'; end;
+      8: begin CurrentInt := RandSolved[rand_Frog];        Name := '| Frog Solved       :'; end;
+      9: begin CurrentInt := RandFailed[rand_Frog];        Name := '| Frog Missed       :'; end;
+      10: begin CurrentInt := RandSolved[rand_Certer];     Name := '| Certers Solved    :'; end;
+      11: begin CurrentInt := RandFailed[rand_Certer];     Name := '| Certers Missed    :'; end;
+      12: begin CurrentInt := RandSolved[rand_Demon];      Name := '| Demons Solved     :'; end;
+      13: begin CurrentInt := RandFailed[rand_Demon];      Name := '| Demons Missed     :'; end;
+      14: begin CurrentInt := RandSolved[rand_Mod];        Name := '| Mods Found        :'; end;
+      15: begin CurrentInt := RandSolved[rand_Maze];       Name := '| Mazes Solved      :'; end;
+      16: begin CurrentInt := RandFailed[rand_Maze];       Name := '| Mazes Missed      :'; end;
+      17: begin CurrentInt := RandSolved[rand_Mime];       Name := '| Mimes Solved      :'; end;
+      18: begin CurrentInt := RandFailed[rand_Mime];       Name := '| Mimes Missed      :'; end;
+      19: begin CurrentInt := RandSolved[rand_Death];      Name := '| Deaths            :'; end;
+      20: begin CurrentInt := RandSolved[rand_Quiz];       Name := '| Quizes Solved     :'; end;
+      21: begin CurrentInt := RandFailed[rand_Quiz];       Name := '| Quizes Missed     :'; end;
+      22: begin CurrentInt := RandSolved[rand_ScapeRune];  Name := '| ScapeRunes Solved :'; end;
+      23: begin CurrentInt := RandFailed[rand_ScapeRune];  Name := '| ScapeRunes Missed :'; end;
+      24: begin CurrentInt := RandSolved[rand_BirdNest];   Name := '| Birds Nests       :'; end;
+      25: begin CurrentInt := RandSolved[rand_Pinball];    Name := '| Pinballs Solved   :'; end;
+      26: begin CurrentInt := RandFailed[rand_Pinball];    Name := '| Pinballs Missed   :'; end;
+      27: begin CurrentInt := RandSolved[rand_PrisonPete]; Name := '| Petes Solved      :'; end;
+      28: begin CurrentInt := RandFailed[rand_PrisonPete]; Name := '| Petes Missed      :'; end;
+      29: begin CurrentInt := RandSolved[rand_Forester];   Name := '| Foresters Solved  :'; end;
+      30: begin CurrentInt := RandFailed[rand_Forester];   Name := '| Foresters Missed  :'; end;
+      31: begin CurrentInt := RandSolved[rand_Leo];        Name := '| Leo''s Solved      :'; end; //Another space due to the ''
+      32: begin CurrentInt := RandFailed[rand_Leo];        Name := '| Leo''s Missed      :'; end;
+      33: begin CurrentInt := RandSolved[rand_Molly];      Name := '| Molly''s Solved    :'; end;
+      34: begin CurrentInt := RandFailed[rand_Molly];      Name := '| Molly''s Missed    :'; end;
+      35: begin CurrentInt := RandSolved[rand_Pillory];    Name := '| Pillory''s Solved  :'; end;
+      36: begin CurrentInt := RandFailed[rand_Pillory];    Name := '| Pillory''s Missed  :'; end;
+      37: begin CurrentInt := RandSolved[rand_CapnArnav];  Name := '| Capn Arnav Solved :'; end;
+      38: begin CurrentInt := RandFailed[rand_CapnArnav];  Name := '| Capn Arnav Missed :'; end;
+      39: begin CurrentInt := RandSolved[rand_Beekeeper];  Name := '| Beekeepers Solved :'; end;
+      40: begin CurrentInt := RandFailed[rand_Beekeeper];  Name := '| Beekeepers Missed :'; end;
+      41: begin CurrentInt := RandSolved[rand_Abyss];      Name := '| Abysses Solved    :'; end;
+      42: begin CurrentInt := RandFailed[rand_Abyss];      Name := '| Abysses Missed    :'; end;
+      43: begin CurrentInt := RandSolved[rand_Mordaut];    Name := '| Mordauts Solved   :'; end;
+      44: begin CurrentInt := RandFailed[rand_Mordaut];    Name := '| Mordauts Missed   :'; end;
+    end;
+
+    if (CurrentInt < 1) then
+      Continue;
+    CurrentStr := IntToStr(CurrentInt);
+    //(PadR(Name, 30 - Length(CurrentStr)) + CurrentStr + ' |');
+  end;
+  //AddToReport('\~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~/');
+  //SendSRLReport;
+end;
+
+{$ENDIF}

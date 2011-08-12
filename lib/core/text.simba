@@ -17,56 +17,6 @@ const
   clTrade   = clPurple;
   clFriend  = 128;
 
-function CloseBank: Boolean; Forward;
-
-(*
-srl_Explode
-~~~~~~~~~~~
-
-.. code-block:: pascal
-
-    function srl_Explode(str, del: string): TStringArray;
-
-Explodes a string into TStringArray, seperated by del.
-
-.. note::
-
-    by mixster
-
-Example:
-
-.. code-block:: pascal
-
-*)
-function srl_Explode(str, del: string): TStringArray;
-begin
-  result := Explode(del, str);
-end;
-
-(*
-srl_Implode
-~~~~~~~~~~~
-
-.. code-block:: pascal
-
-    function srl_Implode(Pieces: TStringArray; Glue: string): string;
-
-Combines Pieces in a single string seperated by Seperator
-
-.. note::
-
-    by ZephyrsFury & mixster
-
-Example:
-
-.. code-block:: pascal
-
-*)
-function srl_Implode(Pieces: TStringArray; Glue: string): string;
-begin
-  result := Implode(glue, pieces);
-end;
-
 (*
 TypeByte
 ~~~~~~~~
@@ -124,16 +74,6 @@ begin;
     wait(waittime);
     KeyUp(keycode);
   end;
-end;
-
-procedure SendArrowSilentWait(Key : byte; WaitTime : integer);
-begin
-  SendArrowWait(key,waittime);
-end;
-
-procedure SendArrowSilent(Key : byte);
-begin
-  SendArrow(key);
 end;
 
 (*
@@ -440,30 +380,6 @@ begin
 end;
 
 (*
-GetUpText
-~~~~~~~~~
-
-.. code-block:: pascal
-
-    function GetUpText : string;
-
-Returns the text in the upperleft corner (often referred to as UpText).
-
-.. note::
-
-    by Freddy1990
-
-Example:
-
-.. code-block:: pascal
-
-*)
-function GetUpText: string;
-begin
-  Result := rs_GetUpText
-end;
-
-(*
 IsUpText
 ~~~~~~~~
 
@@ -575,7 +491,7 @@ Example:
 .. code-block:: pascal
 
 *)
-function FindNPCChatText(txt: string; Action: fnct_ActionOptions): Boolean;
+function FindNPCChatText(txt: string; Action: TMouseAction): Boolean;
 var
   tx, ty, S: Integer;
 begin
@@ -590,9 +506,10 @@ begin
   begin
     Result := True;
     case Action of
-      Move: MMouse(tx, ty + 2, Random(Length(txt) * 5), 4);
-      ClickLeft: Mouse(tx, ty + 2, Random(Length(txt) * 5), 4, True);
-      ClickRight: Mouse(tx, ty + 2, Random(Length(txt) * 5), 4, False);
+      mouse_move: MMouse(tx, ty + 2, Random(Length(txt) * 5), 4);
+      mouse_none: ;
+    else:
+        Mouse(tx, ty + 2, Random(Length(txt) * 5), 4, Action);
     end;
   end;
   FreeBitmap(S);
@@ -623,8 +540,6 @@ var
   S: Integer;
 begin
   S := BitmapFromText(txt, font);
-  if (xs < 0) then xs := 0;
-  if (ys < 0) then ys := 0;
   Result := FindBitmapMaskTolerance(S, cx, cy, xs, ys, xe, ye, 30, 30);
   FreeBitmap(S);
 end;
@@ -648,7 +563,7 @@ Example
 .. code-block:: pascal
 
 *)
-function ClickText(Text, Chars: string;x1, y1, x2, y2: Integer; Left: Boolean): Boolean;
+function ClickText(Text, Chars: string;x1, y1, x2, y2: Integer; action: TMouseAction): Boolean;
 var
   Mask, w, h, tx, ty: Integer;
 begin
@@ -662,7 +577,7 @@ begin
   GetBitmapSize(Mask, W, H);
   FreeBitmap(Mask);
   if(Result)then
-    Mouse(TX + (W div 4), TY + (H div 4), (W div 2), (H div 2), Left);
+    Mouse(TX + (W div 4), TY + (H div 4), (W div 2), (H div 2), action);
 end;
 
 (*
@@ -717,7 +632,7 @@ Example:
 .. code-block:: pascal
 
 *)
-function FindTextTpaEx(Color,Tol,xs,ys,xe,ye : integer;var x,y : integer; Txt, Chars : string; Action  :fnct_ActionOptions ) : Boolean;
+function FindTextTPA(Color,Tol,xs,ys,xe,ye : integer;var x,y : integer; Txt, Chars : string; Action: TMouseAction ) : Boolean;
 var
   TextTPA,SearchTPA, Matches: TPointArray;
   Box : TBox;
@@ -735,78 +650,14 @@ begin
   SortTPAFrom(Matches, Point(Box.x1, Box.y1));
   x := matches[0].x;
   y := matches[0].y;
-  if Action = Nothing then
-    Exit;
-  GetMousePos(xx,yy);
-  if not IntInBox(xx,yy,IntToBox(matches[0].x,matches[0].y,matches[0].x + Box.x2,Matches[0].y + (Box.y2 shr 1))) then
-    MMouse(matches[0].x + Random(box.x2),Matches[0].y + Random(Box.y2 shr 1),0,0);
-  if Action = Move then
-    Exit;
+
   GetMousePos(xx,yy);
   Case Action of
-    ClickLeft : Mouse(xx,yy,0,0,true);
-    ClickRight: Mouse(xx,yy,0,0,false);
+    mouse_none: ;
+    mouse_move: MMouse(matches[0].x + Random(box.x2),Matches[0].y + Random(Box.y2 shr 1),0,0);
+    else:
+      Mouse(matches[0].x + Random(box.x2),Matches[0].y + Random(Box.y2 shr 1),0,0,action);
   end;
-end;
-
-(*
-FindTextTPA
-~~~~~~~~~~~
-
-.. code-block:: pascal
-
-    function FindTextTpa(Color,Tol,xs,ys,xe,ye : integer; Txt : string; Chars : Integer; Action  : (ClickLeft,ClickRight,Move,Nothing)) : Boolean;
-
-Just like FindTextTpaEx, but without the x and y pos returning.
-
-.. note::
-
-    by Raymond
-
-Example:
-
-.. code-block:: pascal
-
-*)
-
-function FindTextTpa(Color, Tol, xs, ys, xe, ye: integer; Txt, Chars: string; Action: fnct_ActionOptions): Boolean;
-var
-  x,y : integer;
-begin
-  Result := FindTextTPAEx(Color,Tol,xs,ys,xe,ye,x,y,Txt,chars,action);
-end;
-
-(*
-FindTextTPAMulti
-~~~~~~~~~~~~~~~~
-
-.. code-block:: pascal
-
-    function FindTextTPAMulti(Color, tol, xs, ys, xe, ye: integer; Texts: TStringArray; Chars: string;/integer; Action: fnct_ActionOptions): Boolean;
-
-Just like FindTextTPA, only that it takes an array of strings as text to search for.
-
-.. note::
-
-    by Cigue and EvilChicken!
-
-Example:
-
-.. code-block:: pascal
-
-*)
-function FindTextTPAMulti(Color, tol, xs, ys, xe, ye: integer;
-    Texts: TStringArray; Chars: string; Action: fnct_ActionOptions): Boolean;
-
-var
-  I: Integer;
-begin
-  for i := 0 to High(Texts) do
-    if FindTextTPA(Color, Tol, xs, ys, xe, ye, Texts[i], Chars, Action) then
-    begin
-      Result := True;
-      Exit;
-    end;
 end;
 
 (*
@@ -835,7 +686,7 @@ Example:
 .. code-block:: pascal
 
 *)
-function ChooseOptionMultiEx(Texts: TStringArray; TextType: String; Action: fnct_ActionOptions): Boolean;
+function ChooseOptionMulti(Texts: TStringArray; TextType: String; Action: TMouseAction): Boolean;
 var
    B,OptionBox: TBox;
    TPA, TPA1, TPA2, TextTPA: TPointArray;
@@ -885,71 +736,15 @@ begin
       If FindTextTPAInTPA(HH, TextTPA, aTPA[ii], TPA) Then
       begin
         Result := True;
-        case Action of
-          ClickLeft: MouseBoxEx(B.x1 + 5, TPA[0].Y, B.x2 - 5, TPA[0].Y + 5,5, 1);
-          Move:      MouseBoxEx(B.x1 + 5, TPA[0].Y, B.x2 - 5, TPA[0].Y + 5,5, 3);
-          Nothing:   begin end;
-          else
-            srl_warn('ChooseOptionMultiEx', 'ClickRight not a valid click for RS menus!', warn_AllVersions);
-        end;
+        MouseBoxPoint(B.x1 + 5, TPA[0].Y, B.x2 - 5, TPA[0].Y + 5,5, Action);
         Exit;
       end;
   end;
-  if Action <> Nothing then
+  if Action <> mouse_none then
   begin
     MMouse(B.X1 - 50, B.Y1 - 50, 40, B.Y2 - B.Y1);
     Wait(200 + Random(100));
   end;
-end;
-
-(*
-ChooseOptionMulti
-~~~~~~~~~~~~~~~~~
-
-.. code-block:: pascal
-
-    function ChooseOptionMulti(Txt: TStringArray): Boolean;
-
-Finds Popup menu, then clicks on it. Will look for the first string first and so on.
-
-.. note::
-
-    by Wizzup? & N1ke!
-
-Example:
-
-.. code-block:: pascal
-
-*)
-function ChooseOptionMulti(Txt: TStringArray): Boolean;
-begin
-  Result := ChooseOptionMultiEx(Txt, 'All', ClickLeft);
-end;
-
-(*
-ChooseOptionEx
-~~~~~~~~~~~~~~
-
-.. code-block:: pascal
-
-    function ChooseOptionEx(Txt, TextType: string): Boolean;
-
-Finds an option in a popup menu, then clicks on it. Searches for TextType.
-See ChooseOptionMultiEx for valid options.
-Default is 'all'.
-
-.. note::
-
-    by Wizzup?
-
-Example:
-
-.. code-block:: pascal
-
-*)
-function ChooseOptionEx(Txt, TextType: string): Boolean;
-begin
-  Result := ChooseOptionMultiEx([Txt], TextType, ClickLeft);
 end;
 
 (*
@@ -973,7 +768,7 @@ Example:
 *)
 function ChooseOption(Txt: String): Boolean;
 begin
-  Result := ChooseOptionMultiEx([Txt], 'All', ClickLeft);
+  Result := ChooseOptionMultiEx([Txt], 'All', mouse_left);
 end;
 
 (*
@@ -999,16 +794,11 @@ Example
 function OptionsExist(txt: TStringArray; MoveMouse: boolean): boolean;
 begin
   if MoveMouse then
-    Result := ChooseOptionMultiEx(Txt, 'All', Move)
+    Result := ChooseOptionMulti(Txt, 'All', mouse_move)
   else
-    Result := ChooseOptionMultiEx(Txt, 'All', Nothing);
+    Result := ChooseOptionMulti(Txt, 'All', mouse_none);
 end;
 
-{*******************************************************************************
-function CloseWindow: Boolean;
-By: NaumanAkhlaQ, Narcle, and Nava2
-Description: Closes any open windows.
-*******************************************************************************}
 (*
 CloseWindow
 ~~~~~~~~~~~
@@ -1017,7 +807,7 @@ CloseWindow
 
     function CloseWindow: Boolean;
 
-Closes any open windows. (In RS not your pc roflmaololz, j/k)
+Closes any open windows.
 
 .. note::
 
@@ -1028,6 +818,9 @@ Example:
 .. code-block:: pascal
 
 *)
+
+function WaitUpTextMulti(S: TStringArray; Time: Integer): Boolean; forward;
+
 function CloseWindow: Boolean;
 var
   Col: TIntegerArray;
@@ -1036,6 +829,13 @@ var
   Pa: TBox;
   I, ii, {h,} l: Integer;
 begin
+  if (FindTextTPA(4106994, 20, 20, 22, 400, 45, 'Bank', upchars, mouse_none)) then
+  begin
+    Mouse(483, 28, 10, 12, mouse_left);
+    Result := True;
+    Exit;
+  end;
+
   Result := CloseBank;
   Col := [1118997,  1449250,  {Main typ 1}
           8042720,  4160933,  {Skill}
@@ -1043,7 +843,7 @@ begin
           4282212, 2503226,  {Main typ 2}
           39423,    13567,    {Red X}
           1514271,  1580837,  {Deposit Box}
-          2106925,  1250584];
+          2106925,  1250584];   //TODO: Findout what this is?
   SetLength(b, 2);
   for I := 0 to 6 do
   begin
@@ -1061,13 +861,7 @@ begin
         Pa := GetTPABounds(a[ii]);
         if ((Pa.x2 - Pa.x1) > 50) or ((Pa.y2 - Pa.y1) > 50) then Continue;
         MMouse(RandomRange(Pa.x1, Pa.x2), RandomRange(Pa.y1, Pa.y2), 0, 0);
-        Result := (Pos('lose', GetUpText) > 0) or (Pos('ack', GetUpText) > 0);
-        Pa.x2 := GetTimeRunning + 2000;
-        while (not Result) and (GetTimeRunning < Pa.x2) do
-        begin
-          Wait(10);
-          Result := (Pos('lose', GetUpText) > 0);
-        end;
+        Result := WaitUpTextMulti(['lose', 'ack'], 2000);
         Wait(Random(300));
         if Result then
         begin

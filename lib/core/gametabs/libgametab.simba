@@ -1,0 +1,10 @@
+
+
+
+{$IFNDEF srl_lib_core_gametab}
+
+{$DEFINE srl_lib_core_gametab}
+
+{$i ./gametab.simba}
+{$i ./inventory.simba}
+{$ENDIF}

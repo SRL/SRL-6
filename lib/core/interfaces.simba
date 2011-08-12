@@ -83,7 +83,7 @@ const
   SRL_ITEMINT_BANK       = 2;
   SRL_ITEMINT_DEPOSITBOX = 3;
   SRL_ITEMINT_TRADE      = 4;
-  SRL_ITEMINT_TRADE_YOUR = 5; // rename?
+  SRL_ITEMINT_TRADE_YOUR = 5; // TODO: rename?
 
 (*
 BankScreen

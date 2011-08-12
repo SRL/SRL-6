@@ -78,30 +78,6 @@ begin
 end;
 
 (*
-TimeRunning
-~~~~~~~~~~~
-
-.. code-block:: pascal
-
-    function TimeRunning: String;
-
-Returns Time since the script was started (GetTimeRunning).
-
-.. note::
-
-  by Rasta Magician.
-
-Example:
-
-.. code-block:: pascal
-
-*)
-function TimeRunning: string;
-begin
-  Result := MsToTime(GetTimeRunning, Time_Formal);
-end;
-
-(*
 MarkTime
 ~~~~~~~~~~~
 
@@ -152,40 +128,31 @@ end;
 
 (*
 TheTime 
-~~~~~~~~
+~~~~~~~
 
 .. code-block:: pascal
 
-    function TheTime(FullTime : boolean) : string;
+    function TheTime:Integer;
 
-Returns current time as a string
-FullTime = True will return in 24 hours rather than 12 hours
-
+Returns the current time in MS. This is to be passed to functions like
+`MSToTime`.
 .. note::
 
-  by RsN (fixed by Ron, fixed by Markus)
+  by Nava2
 
 Example:
 
 .. code-block:: pascal
+    WriteLn('It is ' + MSToTime(TheTime, TIME_BARE));
 
 *)
-function TheTime: string;
+function TheTime: Integer;
 var
   Hour, Mins, Sec, MSec: Word;
   PAM: string;
 begin
   DecodeTime(Now, Hour, Mins, Sec, MSec);
-  PAM := 'AM';
-  if (Hour > 12) then
-  begin
-    Hour := Hour - 12;
-    PAM := 'PM';
-  end else if (Hour = 12) then
-    PAM := 'PM'
-  else if (Hour = 0) then
-    Hour := 12;
-  Result := (Padz(IntToStr(Hour), 2) + ':' + Padz(IntToStr(Mins), 2) + ':' + Padz(IntToStr(Sec), 2) + ' ' + PAM);
+  Result := ((Hour*60 + Mins)*60 + Sec)*1000 + MSec;
 end;
 
 (*
@@ -243,7 +210,7 @@ WaitOptionMultiEx
 
 .. code-block:: pascal
 
-    function WaitOptionMultiEx(S: TStringArray; TextType: string;
+    function WaitOptionMulti(S: TStringArray; TextType: string;
         Action: fnct_ActionOptions; Time: Integer): Boolean;
 
 Waits for a TStringArray of options and selects one of them.
@@ -264,7 +231,7 @@ Example:
 .. code-block:: pascal
 
 *)
-function WaitOptionMultiEx(S: TStringArray; TextType: string; Action: fnct_ActionOptions; Time: Integer): Boolean;
+function WaitOptionMulti(S: TStringArray; TextType: string; Action: TMouseAction; Time: Integer): Boolean;
 var
   T: Integer;
 begin
@@ -279,54 +246,6 @@ begin
     end;
     Wait(20 + Random(10));
   end;
-end;
-
-(*
-WaitOptionMulti
-~~~~~~~~~~~~~~~
-
-.. code-block:: pascal
-
-    function WaitOptionMulti(S: TStringArray; Time: Integer): Boolean;
-
-Waits for a TStringArray of options and selects one of them
-
-.. note::
-
-  by Marpis, N1ke! & Rasta Magician
-
-Example:
-
-.. code-block:: pascal
-
-*)
-function WaitOptionMulti(S: TStringArray; Time: Integer): Boolean;
-begin
-  Result := WaitOptionMultiEx(S, 'all', ClickLeft, Time);
-end;
-
-(*
-WaitOptionEx
-~~~~~~~~~~~~
-
-.. code-block:: pascal
-
-    function WaitOptionEx(S, TextType: String; Time: Integer): Boolean;
-
-Waits for an Option and selects it. Searches for TextType.
-
-.. note::
-
-  by Infantry001
-
-Example:
-
-.. code-block:: pascal
-
-*)
-function WaitOptionEx(S, TextType: string; Action: fnct_ActionOptions; Time: Integer): Boolean;
-begin
-  Result := WaitOptionMultiEx([S], TextType, Action, Time);
 end;
 
 (*
@@ -350,7 +269,7 @@ Example:
 *)
 function WaitOption(S: string; Time: Integer): Boolean;
 begin
-  Result := WaitOptionMultiEx([S], 'all', ClickLeft, Time);
+  Result := WaitOptionMultiEx([S], 'all', mouse_left, Time);
 end;
 
 (*
@@ -410,7 +329,7 @@ Example:
 *)
 function WaitUptext(S: string; Time: Integer): Boolean;
 begin
-  Result := WaitUptextMulti([S], Time);
+  Result := WaitUpTextMulti([S], Time);
 end;
 
 (*
@@ -529,7 +448,6 @@ var
   Time: Integer;
 begin
   Result := False;
-  if tol = 0 then tol := 1; //due to scar bug
   Time := GetSystemTime + MaxTime;
   while (Time > GetSystemTime) do
   begin
@@ -538,7 +456,7 @@ begin
       Result := True;
       Exit;
     end;
-    Wait(5 + Random(6));
+    Wait(16 + Random(6));
   end;
 end;
 
@@ -574,7 +492,7 @@ begin
       Result := True;
       Exit;
     end;
-    Wait(10 + Random(6));
+    Wait(16 + Random(6));
   end;
 end;
 
@@ -611,7 +529,7 @@ begin
       Result := True;
       Exit;
     end;
-    Wait(10 + Random(6));
+    Wait(16 + Random(6));
   end;
 end;
 
@@ -649,7 +567,7 @@ begin
         Result := True;
         Exit;
       end;
-    Wait(15 + Random(10));
+    Wait(16 + Random(9));
   end;
 end;
 
@@ -687,7 +605,7 @@ begin
       Result := True;
       Exit;
     end;
-    Wait(10);
+    Wait(16+Random(5));
   end;
 end;
 
@@ -716,7 +634,6 @@ var
   Time, CX, CY: Integer;
 begin
   Result := False;
-  if Tol = 0 then Tol := 1;
   Time := GetSystemTime + MaxTime;
   while (Time > GetSystemTime) do
   begin
@@ -725,7 +642,7 @@ begin
       Result := True;
       Exit;
     end;
-    Wait(10);
+    Wait(16+Random(5));
   end;
 end;
 
@@ -739,9 +656,6 @@ WaitFunc
 
 Waits for function Func to be true. WaitPerLoop is how often you
 want to call "Func" function.
-Example: "WaitFunc(@BankScreen, 10 + Random(15), 750);" will check if BankScreen
-is open every 10-25th millisecond, for a maximum of 750 milliseconds.
-Notice the '@'.
 
 .. note::
 
@@ -750,24 +664,16 @@ Notice the '@'.
 Example:
 
 .. code-block:: pascal
-
+    WaitFunc(@BankScreen, 10 + Random(15), 750);
 *)
 function WaitFunc(Func: function: Boolean; WaitPerLoop, MaxTime: Integer): Boolean;
 var
   T: Integer;
 begin
   T := GetSystemTime + MaxTime;
-  while (GetSystemTime < T) do
+  while ((not Result) and (GetSystemTime < T)) do
   begin
-    if (Func()) then
-    begin
-      Result := True;
-      Exit;
-    end;
+    Result := Func();
     Wait(WaitPerLoop);
   end;
-end;
-
-procedure WaitNone;
-begin
 end;

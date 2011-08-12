@@ -270,6 +270,9 @@ const
   warn_Notice = -3;
   warn_Debug = -4;
 
+// forwarding used for organizational purposes
+function AddOnTerminate(const proc : string) : boolean; forward;
+
 {var   SRLBitmapsLoaded : boolean;
   Description: True if SRL bmps/DTMs are loaded}
 var
@@ -311,6 +314,8 @@ begin
   SetBitmapName(bmpMod,'SRL - Mod bitmap');
   SetBitmapName(bmpAdmin,'SRL - Admin bitmap');
   SetDTMName(Lamp,'SRL - Lamp bitmap');
+
+  AddOnTerminate('FreeSRLBitmaps');
 end;
 
 (*

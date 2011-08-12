@@ -15,7 +15,8 @@ Player Management
   Description: The User Record. }
 type
   TUser = record
-    Name: string;                   // * User Name
+    Login: string;                  // * Login Name
+    CharName: string;               // * Human-readable name for progress reports, etc
     Pass: string;                   // * User Pass
     Pin: string;                    // * Current Users Pin Number
     Member: boolean;                // * For Login
@@ -48,7 +49,7 @@ const
     SKILL_ATTACK        = 10;
     SKILL_DEFENCE       = 11;
     SKILL_STRENGTH      = 12;
-    SKILL_HITPOINTS     = 13;    SKILL_HP = SKILL_HITPOINTS;
+    SKILL_LIFEPOINTS     = 13;    SKILL_HITPOINTS=SKILL_LIFEPOINTS;
     SKILL_RANGE         = 14;
     SKILL_PRAYER        = 15;
     SKILL_MAGIC         = 16;
