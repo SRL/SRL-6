@@ -125,11 +125,9 @@ GetAmount
 
 .. code-block:: pascal
 
-	function GetAmount(ItemX, ItemY: Integer): Integer;
+	function GetAmount(box: TBox): integer;
 
-
-Returns the amount of an item at coordinates (ItemX, ItemY).
-Returns approximate values for 'K' and 'M'.
+Returns the amount of an item found in the box 'box'.
 
 .. note::
 
@@ -140,12 +138,13 @@ Example:
 .. code-block:: pascal
 
 .. note::
-	Modified: Unknown
+
+	Modified: Sept. 21, 2011 by Coh3n
 *)
 {$IFNDEF srl_lib_core_gametabs}
 {$WARNING SRL-CORE-AMOUNT GAMETABS MUST BE INCLUDED BEFORE AMOUNT}
 {$ENDIF}
-function GetAmount(ItemX, ItemY: Integer): Integer;
+function GetAmount(box: TBox): integer;
 var
   Col: TIntegerArray;
   X, Y, I: Integer;
@@ -153,26 +152,20 @@ var
   TPA: TPointArray;
   S: String;
 begin
-  Result := 0;
-  slot := invBox(coordsToItem(itemX, itemY));
+  if (not FindColor(x, y, SRL_OUTLINE_BLACK, box.x1, box.y1, box.x2, box.y2) then
+    exit;
 
-  If Not FindColor(X, Y, srl_outline_black, slot.x1, slot.y1, slot.x2, slot.y2) then
-    Exit;
-  Inc(Result);
+  inc(result);
   Col := [65535, 65278, 16777215, 8453888];
 
   For I := 0 to High(Col) do
-   If FindColor(X, Y, Col[I], slot.x1, slot.y1, slot.x2, slot.y2)then
+   If FindColor(X, Y, Col[I], box.x1, box.y1, box.x2, box.y2)then
    begin
-     FindColors(TPA, Col[i], slot.x1, slot.y1, slot.x2, slot.y2);
+     FindColors(TPA, Col[i], box.x1, box.y1, box.x2, box.y2);
      B := GetTPABounds(TPA);
      //SMART_DrawBoxEx(False, b, clYellow);
-     {$IFDEF SIMBA}
      B := IntToBox(b.x1-2, b.y1-2, b.x2+2, b.y2+2);
      S := GetTextAtExWrap(b.x1, b.y1, b.x2, b.y2, 0, 1, 1, Col[i], 0, StatChars);
-     {$ELSE}
-     S := Trim(GetTextAtEx(B.X1-1, B.Y1-1, 0, StatChars, False, False, 0, 1, Col[I], 5, True, tr_AllChars));
-     {$ENDIF}
      Result := StrToIntDef(GetNumbers(S), 1);
      Case I of
        2: Result := Result * 1000;
@@ -551,14 +544,19 @@ Example:
 *)
 function ItemAmount(area, ItemType, Item_IDENT: Integer; Tol: TIntegerArray): Integer;
 var
+  areaInfo: srl_TItemInterface;
   Coords: TPointArray;
   i, h: Integer;
 begin
-  Result := 0;
-  Coords := ItemCoordinates(Area, ItemType, Item_IDENT, Tol);
+  areaInfo := areaInfo(area);
+
+  Coords := ItemCoordinates(Area, ItemType, Item, Tol);
   h := High(Coords);
   for i := 0 to h do
-    Result := Result + GetAmount(Coords[i].x, Coords[i].y);
+    Result := Result + GetAmountBox(IntToBox(Coords[i].x - floor(areaInfo.rowSize / 2),
+                                             Coords[i].y - floor(areaInfo.colSize / 2),
+                                             Coords[i].x + floor(areaInfo.rowSize / 2),
+                                             Coords[i].y + floor(areaInfo.colSize / 4)));
 end;
 
 (*
