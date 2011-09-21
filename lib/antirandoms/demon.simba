@@ -548,6 +548,8 @@ begin
   t := GetSystemTime + 15000;
   while (GetSystemTime < t) and Demon_InRandom do
     wait(100+random(200));
+  if GetSystemTime > t then
+    Writeln('timed out waiting to exit random');
   Result := (not(Demon_InRandom));
   if (Result) then
     Writeln('Demon random solved!');

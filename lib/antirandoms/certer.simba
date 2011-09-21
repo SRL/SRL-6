@@ -33,7 +33,9 @@ Description: Checks if we're in the Certer random.
 function InCerterRandom: Boolean;
 begin
   if (InBlack) then
-    Result := (InRange(PercentBlackMM, 85, 90));
+    Result := (InRange(PercentBlackMM, 85, 90)) and
+              (InRange(CountColorTolerance(15659757, Mmx1, Mmy1, Mmx2, Mmy2, 12), 125, 155)) and
+              (Length(GetMiniMapDotsIn('npc', MMx1, MMy1, MMx2, MMy2)) = 1);
 end;
 
 {*******************************************************************************

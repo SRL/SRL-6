@@ -29,20 +29,19 @@ Procedure EB_FindPortal; Forward;
 
 {********************************************************************************}
 { function InEvilBobsIsland: Boolean;                                            }
-{ By: ZephyrsFury                                                                }
+{ By: ZephyrsFury & NCDS                                                               }
 { Description: Checks if we're in Evil Bob's Island.                             }
 {********************************************************************************}
 
 function InEvilBobsIsland: Boolean;
 var
-  Pts: TPointArray;
-  ATPA: T2DPointArray;
-  X, Y, L: Integer;
+  pts: TPointArray;
+  x, y, L: Integer;
 begin
-  if (FindColor(X, Y, 60909, MMX1, MMY1, MMX2, MMY2)) then
+  if (FindColor(x, y, 61937, MMX1, MMY1, MMX2, MMY2)) then
   begin
-    FindColorsTolerance(Pts, 60909, MMX1, MMY1, MMX2, MMY2, 0);
-    L := Length(Pts);
+    pts := getMiniMapDotsIn('npc', MMX1, MMY1, MMX2, MMY2);
+    L := Length(pts);
     if InRange(L, 1, 2) then
     begin
       if L = 1 then
@@ -54,13 +53,11 @@ begin
         x := Pts[1].x;
         y := Pts[1].y;
       end;
-      if (InRange(Distance(Pts[0].X, Pts[0].Y, x, y), 9, 13)) then
-        if (FindColorsTolerance(Pts, 217, MMX1, MMY1, MMX2, MMY2, 0)) then
-        begin
-          ATPA := SplitTPAEx(Pts, 5, 5);
-          if (Length(ATPA) >= 4)and (Length(ATPA) < 12)then //There are 7 dots on the island
-            Result := IsChatBoxTextAnyLine('ScapeRune', clMessage) or (FindTextTpa(clBlack, 0, MCX1, MCY1, MCX2, MCY2, 'ask to come here', CharsNPC, Nothing));
-        end;
+      if (inRange(Distance(pts[0].x, pts[0].y, x, y), 9, 13)) then
+      begin
+        pts := getMiniMapDotsIn('item',  MMX1, MMY1, MMX2, MMY2);
+        Result := inRange(Length(pts), 4, 12);
+      end;
     end;
   end;
 end;
@@ -101,13 +98,16 @@ Var
   TPA : TPointArray;
   ATPA : T2DPointArray;
   I : Integer;
-  X, Y, II : Integer;
+  X, Y, II, CTS : Integer;
 Begin
   If Not LoggedIn Then Exit;
 
-  SetColorToleranceSpeed(2);
-  SetToleranceSpeed2Modifiers(0.07, 0.58);      //gets all servent like colors with 17 tol
+  CTS := GetColorToleranceSpeed;
+  ColorToleranceSpeed(2);
+  SetColorspeed2Modifiers(0.07, 0.58);      //gets all servent like colors with 17 tol
   FindColorsSpiralTolerance(MSCX + 10, MSCY, TPA, 4940926, MSX1, MSY1, MSX2, MSY2, 17);
+  ColorToleranceSpeed(1);
+  SetColorspeed2Modifiers(0.02, 0.02);
   ATPA := TPAToATPAEx(TPA, 10, 8); //splits it into boxes of 10x8
 
   SortATPASize(ATPA, True);  //Sorts the size 'big - first'
@@ -115,11 +115,11 @@ Begin
   If MiddleTPAEx(ATPA[I], X, Y) Then    //loops through all tpa's
   Begin
     MMouse(X, Y, 2, 2);
+    GetMousePos(X, Y);
     Wait(SRL_MaxWaitTime + Random(100));
     If WaitUpTextMulti(['erva', 'ant'], srl_MaxWaitTime) Then
     Begin
-      GetMousePos(X, Y);
-      Mouse(X, Y, 2, 2, True);       //clicks the servent
+      Mouse(X, Y, 0, 0, True);       //clicks the servent
       Wait(1400 + Random(1000));
                                               //incase already solved ;)
       If FindNPCChatText('uickly', Nothing) Then
@@ -164,13 +164,15 @@ Var TPA : TPointArray;
 Begin
   If Not LoggedIn Then Exit;
 
-  SetColorToleranceSpeed(2);
-  SetToleranceSpeed2Modifiers(0.01, 1.18);    //COREECT MODS
+  ColorToleranceSpeed(2);
+  SetColorSpeed2Modifiers(0.01, 1.18);    //COREECT MODS
   MarkTime(Mark);                         //time mark
   Repeat
     FindColorsTolerance(TPA, 2401230, MSX1, MSY1, MSX2, MSY2, 16); //statue color
     Wait(15);    //to avoid lag
   Until(Length(TPA) > 1900) Or (TimeFromMark(Mark) > 30000);    //waits until it's in the slot
+  ColorToleranceSpeed(1);
+  SetColorSpeed2Modifiers(0.02, 0.02);
   If Length(TPA) > 1900 Then
   Begin
     TB := GetTPABounds(TPA);      //gets the box
@@ -220,9 +222,11 @@ Var I, X, Y : Integer;
 Begin
   If Not LoggedIn Then Exit;
 
-  SetColorToleranceSpeed(2);
-  SetToleranceSpeed2Modifiers(0.20, 0.77);      //11380643
-  FindColorsTolerance(TPA, 11312790, MSX1, MSY1, MSX2, MSY2, 5);  //gets fishspot-like colors
+  ColorToleranceSpeed(2);
+  SetColorSpeed2Modifiers(0.37, 0.57);
+  FindColorsTolerance(TPA, 11643043, MSX1, MSY1, MSX2, MSY2, 6);  //gets fishspot-like colors
+  ColorToleranceSpeed(1);
+  SetColorSpeed2Modifiers(0.02, 0.02);
   ATPA := SplitTPA(TPA, 6);    //splits the tpa with 'dist' of 6
   SortATPAFromSize(ATPA, 30, True);      //Sorts it by relative average size '30'
 
@@ -253,65 +257,56 @@ End;
 {********************************************************************************}
 
 Function EB_PerformTask : Boolean;
-Var I, X, Y, TX, NetBmp,NetBMP2 : Integer;
-    RetardedFish : Integer;
-    OldCount : Integer;          //variables needed (bitmaps and params).
-    TPA : TPointArray;
-    ATPA : T2DPointArray;
-    TP : TPoint;
+Var
+  I, X, Y, TX : Integer;
+  OldCount, RetardedFish : Integer;          //variables needed (bitmaps and params).
+  TPA : TPointArray;
+  ATPA : T2DPointArray;
+  TP : TPoint;
 Begin
   If Not LoggedIn Then Exit;
 
   TP := TempInfo.StatueCoords;      //loading information
-  NetBmp := BitmapFromString(2, 6, 'meJxT1Lc29YhUN3MxcY9gYmCQ0TAB' +
-        'khLKelqWHkIS8qIyqryCogBvxwU4');
-  NetBMP2 := BitmapFromString(5, 3, 'meJyTUNBgYmDgFRRTMbQHMhT1rGQ1' +
-        'jIBcYWllMNeah19YRFpZQFSGV1AUAGD4BDI=');
+  RetardedFish := BitmapFromString(4, 2, 'meJxjYmCwDy28cvXe+fM3mBgYHMKL' +
+        'naLKnaMrAXEpCTs=');
 
-  RetardedFish := BitmapFromString(2, 4, 'meJzTsI9St4vQcooDIj2P9As28oa+' +
-        'uQbe2QBRGQbs');
-                                  // if we dont have a bitmap in the inventory
   GameTab(tab_inv);
-  If Not FindBitmapToleranceIn(NetBmp, X, Y, MIX1, MIY1, MIX2, MIY2, 30) Or (InvFull) Then
+  If InvCount >= 27 Then    //if the inventory is full
   Begin
-    GameTab(tab_inv);
-    If InvCount >= 27 Then    //if the inventory is full
+    WriteLn('Oops Inventory seems to be full.. Dropping items');
+
+    For I := 0 To 27 Do   //make room
     Begin
-      WriteLn('Oops Inventory seems to be full.. Dropping items');
-
-      For I := 0 To 27 Do   //make room
-      Begin
-        If DropItem(InvCount - I) Then
-          Inc(TX);                   //drop the last 2 items
-        If TX >= 2 Then Break;
-      End;
-
+      If DropItem(InvCount - I) Then
+        Inc(TX);                   //drop the last 2 items
+      If TX >= 2 Then Break;
     End;
+  End;
+
     Wait(1500 + Random(1000));
-    If Not FindBitmapToleranceIn(NetBmp, X, Y, MIX1, MIY1, MIX2, MIY2, 30) Then
-    Begin                                //goes to get a fishing net, near the right statue
+                                    //goes to get a fishing net, near the right statue
       OldCount := InvCount;
       WriteLn('Retrieving a fishing net');
-      SetColorToleranceSpeed(1);               //fast but less accurate
+      ColorToleranceSpeed(1);               //fast but less accurate
 
       FindColorsTolerance(TPA, 237, MMX1, MMY1, MMX2, MMY2, 30);   //gets all red dots
-
-      // XXX, Wizzup: Why not pie???
-      FilterPointsDist(TPA,13.20,75.00,MMCX,MMCY);
-      //FilterPointsPie(TPA, 0.0, 359.9, 13.20, 75.00, MMCX, MMCY);  //filters them so they're in a cirlce
+      FilterPointsDist(TPA, 13.20, 75.00, MMCX, MMCY);
       SortTPAFrom(TPA, TP);  //and so it does not pick up just dropped items
 
-      Mouse(TPA[0].X - 3, TPA[0].Y + 3, 3,3, True); //walks to it
-      Wait(4321 + random(500));
+      Mouse(TPA[0].X - 3, TPA[0].Y + 3, 3, 3, True); //walks to it
+      Wait(3000 + random(500));
       While IsMoving Do                         //while wallking, some mouse movement
       If Random(2) = 1 Then
         SleepAndMoveMouse(400 + Random(800));
-      Wait(2345 + random(500));
+      Wait(1000 + random(500));
+
       If Not IsMoving Then
       Begin
-        SetColorToleranceSpeed(2);                    //finds the fishing net
-        SetToleranceSpeed2Modifiers(0.07, 0.19);
+        ColorToleranceSpeed(2);                    //finds the fishing net
+        SetColorSpeed2Modifiers(0.07, 0.19);
         FindColorsTolerance(TPA, 2899019, MSX1, MSY1, MSX2, MSY2, 14); //fishing net like colors
+        ColorToleranceSpeed(1);
+        SetColorSpeed2Modifiers(0.02, 0.02);
         ATPA := SplitTPA(TPA, 8);       //splittpa with dist of 6
         SortATPAFromFirstPoint(ATPA, Point(MSCX, MSCY));  //sorts all of the ATPA's from mainscreen center
 
@@ -320,7 +315,7 @@ Begin
         Begin
           MMouse(X, Y, 2, 2);
           Wait(SRL_MaxWaitTime + Random(100));
-          SetColorToleranceSpeed(1);
+          ColorToleranceSpeed(1);
           If WaitUpTextMulti(['mall'], srl_MaxWaitTime) Then
           Begin
             GetMousePos(X, Y);
@@ -341,23 +336,18 @@ Begin
         FFlag(0);
         Wait(1800 + Random(100));
 
-        If FindBitmapToleranceIn(NetBmp, X, Y, MIX1, MIY1, MIX2, MIY2, 30) or
-           FindBitmapToleranceIn(NetBmp2, X, Y, MIX1, MIY1, MIX2, MIY2, 30) Then
+        If (InvCount > OldCount) Then
         Begin
           WriteLn('Retrieved the net!');     //if found the net in inventory
-          FreeBitmap(NetBmp);
-          FreeBitmap(NetBmp2);
+          Result := True;
         End Else
         Begin
           WriteLn('Could Not Retrieve Net');
-          FreeBitmap(NetBmp);             //if not found net
-          FreeBitmap(NetBmp2);
           Result := False;
           Exit;
         End;
       End;
-    End;
-  End;
+
 
     Begin
       Case TempInfo.StatueLoc Of
@@ -380,21 +370,15 @@ Begin
         SleepAndMoveMouse(400 + Random(800));
         Inc(I);                                  //waits until the fish appears in inv
       End;
-
-      If FindBitmapToleranceIn(RetardedFish, X, Y, MIX1, MIY1, MIX2, MIY2, 30) Then
+      If FindBitmapIn(RetardedFish, X, Y, MIX1, MIY1, MIX2, MIY2) Then
       Begin
         WriteLn('Fished the fish');
         Result := True;                 //double check
-        FreeBitmap(RetardedFish);
         Exit;
       End;
                                  //decides outcome
-      Begin
-        Result := False;
-        FreeBitmap(RetardedFish);
-        Exit;
-      End;
-
+      Result := False;
+      Exit;
     End;
   Wait(8);
 End;
@@ -414,24 +398,27 @@ Var I, X, Y : Integer;
 Begin
   If Not LoggedIn Then Exit;
 
-  SetColorToleranceSpeed(2);
-  SetToleranceSpeed2Modifiers(16.67, 1.62);      //correct mods
+  ColorToleranceSpeed(2);
+  SetColorSpeed2Modifiers(16.67, 1.62);      //correct mods
 
-  RetardedFish := BitmapFromString(2, 4, 'meJzTsI9St4vQcooDIj2P9As28oa+' +
-        'uQbe2QBRGQbs');
+  RetardedFish := BitmapFromString(4, 2, 'meJxjYmCwDy28cvXe+fM3mBgYHMKL' +
+        'naLKnaMrAXEpCTs=');
 
-  If FindBitmapToleranceIn(RetardedFish, X, Y, MIX1, MIY1, MIX2, MIY2, 30) Then
+  If FindBitmapIn(RetardedFish, X, Y, MIX1, MIY1, MIX2, MIY2) Then
     Mouse(X, Y, 2, 2, True)                    //clicks the fish so we can cook
   Else
   Begin
     WriteLn('Could not find retarded fish in inventory');
     FreeBitmap(RetardedFish);               //if it's not there..
+    Result := False;
     Exit;
   End;
 
   FindColorsTolerance(TPA, 1710617, MSX1, MSY1, MSX2, MSY2, 2); //finds all cooking pot like colors
   ATPA := TPAToATPA(TPA, 15);         //splits it into 15 radius circles
   SortATPAFromFirstPoint(ATPA, Point(MSCX - 20, MSCY));  //sorts it, close to the player
+  ColorToleranceSpeed(1);
+  SetColorSpeed2Modifiers(0.02, 0.02);
 
   For I := 0 To High(ATPA) Do
   If Length(ATPA[I]) > 20 Then
@@ -443,7 +430,7 @@ Begin
     Begin
       GetMousePos(X, Y);
       Result := True;
-      Mouse(X, Y, 2, 2, True);       //clicks on the pot
+      Mouse(X, Y, 0, 0, True);       //clicks on the pot
       Break;
     End Else
       Continue;
@@ -451,9 +438,9 @@ Begin
   FreeBitmap(RetardedFish);
 
   Wait(6000 + Random(1200));     //wait while the player cooks it
-  CookedRetardedFish := BitmapFromString(2, 4, 'meJxbFS+5NEZiS6o0EB3Klb1gI3++' +
-        'WA6IAHuqCds=');
-  Result := FindBitmapToleranceIn(CookedRetardedFish, X, Y, MIX1, MIY1, MIX2, MIY2, 30);
+  CookedRetardedFish := BitmapFromString(4, 2, 'meJxjYmC4WCx7/MTFo0fPMTEwXC2V' +
+        'u3L13vnzNwCDOAyD');
+  Result := FindBitmapIn(CookedRetardedFish, X, Y, MIX1, MIY1, MIX2, MIY2);
   FreeBitmap(CookedRetardedFish);
   If Result Then                               //when its cooked..
     WriteLn('Un cooked the retarded fish :)');
@@ -474,9 +461,11 @@ Var I, X, Y : Integer;
 Begin
   If Not LoggedIn Then Exit;
 
-  SetColorToleranceSpeed(2);               //medium speed, accurate
-  SetToleranceSpeed2Modifiers(0.93, 0.28);
+  ColorToleranceSpeed(2);               //medium speed, accurate
+  SetColorSpeed2Modifiers(0.93, 0.28);
   FindColorsTolerance(TPA, 2960944, MSX1, MSY1, MSX2, MSY2, 11); //find's blck-liek colors
+  ColorToleranceSpeed(1);
+  SetColorSpeed2Modifiers(0.02, 0.02);
   ATPA := SplitTPA(TPA, 10);
 
   SortATPAFromSize(ATPA, 72, True);   //sorts it by average length
@@ -485,34 +474,35 @@ Begin
   If MiddleTPAEx(ATPA[I], X, Y) Then       //another object finding loop
   Begin
     MMouse(X, Y, 2, 2);
+    GetMousePos(X, Y);
     Wait(SRL_MaxWaitTime + Random(100));
     If WaitUpTextMulti(['vil', 'ob'], srl_MaxWaitTime) Then
     Begin
-      GetMousePos(X, Y);
-      Mouse(X, Y, 2, 2, True);       //clicks on bob
+      Mouse(X, Y, 0, 0, True);       //clicks on bob
       Result := True;
 
       While IsMoving Do Wait(100);
 
       Begin
-        TSA := ['no-good', 'hungry'];      //the responses to see if we need to get another fish
+        TSA := ['no-good', 'hungry', 'human'];      //the responses to see if we need to get another fish
         Begin
           ClickContinue(True, True);      //gets rid of first chat dialouge 'i got the fish...'
-          ClickContinue(True, True);
-          Wait(SRL_MaxWaitTime + Random(300));
+         // disguise('clicked');
+          Wait(1000 + Random(300));
 
           EB_Solved := True;          //If its proven false in the next part then it isn't, else it is
-
+         // writeln('set result comin 2 loop');
           For I := 0 To High(TSA) Do
           If FindNPCChatText(TSA[I], Nothing) Then
           Begin
             EB_Solved := False;        //if any of those phrases are found in bob's speech
+          //  writeln('found text');
             Break;                     //then we need to get another one
           End;
           If (Not (EB_Solved)) Then
             WriteLn('Going to get another fish');    //debugs we need to get another one.
 
-          If FindNPCChatText('isgu', Nothing) Then
+          If FindNPCChatText('isgust', Nothing) Then
           Begin
             WriteLn('Whoops! Got the wrong fish..');   // we got the wrong fish -_-
             EB_Solved := False;
@@ -520,6 +510,7 @@ Begin
 
           If Random(2) = 1 Then
           Begin
+         //   writeln('in random loop');
             ClickContinue(True, True);       //does random click to continue.
             If Random(2) = 1 Then
               ClickContinue(True, True);
@@ -545,9 +536,11 @@ Var I, X, Y, TX, TY : Integer;
     TPA : TPointArray;
     ATPA : T2DPointArray;
 Begin
-  SetColorToleranceSpeed(2);
-  SetToleranceSpeed2Modifiers(0.06, 0.62);    //finds all portal like colors
+  ColorToleranceSpeed(2);
+  SetColorSpeed2Modifiers(0.06, 0.62);    //finds all portal like colors
   FindColorsTolerance(TPA, 7388602, MSX1, MSY1, MSX2, MSY2, 7);
+  ColorToleranceSpeed(1);
+  SetColorSpeed2Modifiers(0.02, 0.02);
   ATPA := SplitTPA(TPA, 10);
 
   SortTPAFrom(TPA, Point(MSCX - 20, MSCY));           //sorts the tpa's within the ATPA's
@@ -591,7 +584,7 @@ Begin
   SetAngle(True);
   SetRun(True);
   GameTab(tab_inv);
-  
+
   Repeat
     EB_MiddleIsland;       //walks to the middle of the island
 
