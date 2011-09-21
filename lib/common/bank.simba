@@ -123,7 +123,7 @@ begin
     Wait(1000 + Random(500));
     while (CountColorTolerance(clWhite, 150, 80, 380, 100, 10) = ColorCount) do
     begin
-      Wait(500);
+      Wait(RandomRange(300, 600));
       if (BankScreen) then
       begin
         Result := True;
