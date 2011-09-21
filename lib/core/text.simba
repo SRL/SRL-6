@@ -508,7 +508,7 @@ begin
     case Action of
       mouse_move: MMouse(tx, ty + 2, Random(Length(txt) * 5), 4);
       mouse_none: ;
-    else:
+    else
         Mouse(tx, ty + 2, Random(Length(txt) * 5), 4, Action);
     end;
   end;
@@ -655,7 +655,7 @@ begin
   Case Action of
     mouse_none: ;
     mouse_move: MMouse(matches[0].x + Random(box.x2),Matches[0].y + Random(Box.y2 shr 1),0,0);
-    else:
+    else
       Mouse(matches[0].x + Random(box.x2),Matches[0].y + Random(Box.y2 shr 1),0,0,action);
   end;
 end;
