@@ -745,6 +745,9 @@ begin
     MMouse(B.X1 - 50, B.Y1 - 50, 40, B.Y2 - B.Y1);
     Wait(200 + Random(100));
   end;
+
+  if (not result) then
+    chooseOptionMulti(['Cancel', 'ancel', 'ncel'], 'All', clickLeft);
 end;
 
 (*
