@@ -679,7 +679,7 @@ begin
                         // WriteLn Error                  Wait for   Retrys     Action      Player[CurrentPlayer].Loc
       763, 2348, 2299: Actions :=  ['Invalid Username / Password',     0,    2,    'PlayerFalse',   'Wrong User/Pass'];
       1088: Actions := ['Your account has been disabled',        0,    0,    'PlayerFalse',   'Acc Disabled'];
-       951: Actions := ['Your account is already logged in',     5,    0,    'PlayerTrue',    'Already logged in'];
+       951: Actions := ['Your account is already logged in', 15000,    5,    '',    'Already logged in'];
       1239: Actions := ['Not a Members Account',                 0,    1,    'PlayerTrue',    ''];
        364: Actions := ['Error Connecting.',                 20000,    9,    'Terminate',     'Error Connecting'];
       1057: Actions := ['Too many incorrect logins.',    5 * 60000,    2,    'PlayerFalse',   'Too many logins'];
