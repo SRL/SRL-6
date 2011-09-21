@@ -4,6 +4,8 @@ PRE-RELEASE TODO's:
 
 - MAKE IT COMPILE!
 
+- TEST EVERY FUNCTION!
+
 - Make sure all constants are UPPERCASE
 - Keep lines less than 80 characters long except function/procedure declarations (function a: boolean)
 
