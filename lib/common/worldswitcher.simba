@@ -82,6 +82,8 @@ const
   SRL_WS_ARROWCOLOR = 1008783;//Arrow color that can order the worlds;
   SRL_WS_WHITECOLOR = 16579836;//White text color, (f2p);
   SRL_WS_YELLOWCOLOR = 6618364;//Yellow text color, (p2p);
+  SRL_WS_SCROLLCOLOR1 = 1250841;//Black color on the left side of scroll area
+  SRL_WS_SCROLLCOLOR2 = 592137;//Black color under scroll bar
 
 
 (*
@@ -168,7 +170,7 @@ begin
         end;
         LootShare := Between('"', '"', tsb[4]) = 'd';
         QuickChat := Activity = 'Quick Chat';
-        PvP := Activity = 'PvP World';
+        PvP := Activity = 'High-risk Wilderness Worlds';
         Members := Between('"', '"', tsb[5]) = 'm';
       end;
     //Writeln('Writing to the INI File. T: ' + IntToStr(GetTimeRunning - W));
@@ -304,7 +306,10 @@ Example:
 function FindWorld(W: integer): Boolean;
 Var
   WPos, SPos, CurPos, i, H, CurW, TextColor: integer;
+  BarHeight, WorldsOnScreen: integer;
   p: TPoint;
+  TPA, TPA2, TPA3: TPointArray;
+  SP, SB: TBox;
 begin
   if not WorldScreen then
    Exit;
@@ -320,15 +325,34 @@ begin
     srl_Warn('FindWorld', 'World Number cannot be 0', warn_AllVersions);
     Exit;
   end;
+
+  FindColorsTolerance(TPA, SRL_WS_SCROLLCOLOR1, 680, 1, 705, 500, 0);//These coords determine the scroll bars general area, it deviates everything.
+  SB := GetTPABounds(TPA);
+  With SB do
+  begin
+    FindColorsTolerance(TPA2, SRL_WS_SCROLLCOLOR1, x1+3, y1, x1+3, y2, 0);//SRL_WS_SCROLLCOLOR1
+    FindColorsTolerance(TPA3, SRL_WS_SCROLLCOLOR2, x1+3, y1, x1+3, y2, 0);//SRL_WS_SCROLLCOLOR2
+  end;
+  TPA2 := CombineTPA(TPA2, TPA3);
+  SP := GetTPABounds(TPA2);
+
+  BarHeight := (SP.Y2-SP.Y1);
+  WorldsOnScreen := (SB.y2-SB.y1+32)/42;//This is HALF of the worlds on screen. I don't use the full amount.
+
+
   if Length(WorldArray) < 1 then
-   LoadWorldArrays;
+    LoadWorldArrays;
+  WPos := -1;
+
   H := High(WorldArray);
   for i := 0 to H do
    if (WorldArray[i].Number = W) then
    begin
-     if (i+1) < ((H+1)/2) then
-       WPos := i else WPos := i + 2;//compensate for scrolling
-     //if (WPos < 0) then WPos := 0;
+     WPos := i;
+     if i < (WorldsOnScreen) then
+       WPos := 0;
+     if i > (H+1-(WorldsOnScreen)) then
+       WPos := (H+1);
      if WorldArray[i].Members then
        TextColor := SRL_WS_YELLOWCOLOR
      else
@@ -336,22 +360,25 @@ begin
      Break;
    end;
 
-  FindColor(p.x, p.y, 1250841, 698, 153, 702, 400);//Checks for Scroll Position
-  if p.y > 0 then
-    CurPos := p.y + 13;
-  //Writeln('CurPos: '+ToStr(CurPos)+' WPos: '+ToStr(WPos)+' H+1: '+ToSTr(H+1));
-  SPos := 166+Round((WPos+0.0)/(H+1.0)*241.0);//need the 0.0 to make it extended inside ()
+  if WPos = -1 then
+  begin
+    srl_Warn('FindWorld', 'World '+IntToStr(W)+' does not exist in worlds.ini ', warn_AllVersions);
+    Exit;
+  end;
 
-  if InRange(SPos, CurPos - 15, CurPos + 15) then
+  SPos := (SB.y1+BarHeight/2) + (WPos)*(SB.y2-SB.y1-BarHeight)/(H+1-WorldsOnScreen);//need the 0.0 to make it extended inside ()
+  CurPos := (SP.y1 + BarHeight/2);
+  Debugln('SCROLLINFO: CurPos: '+ToStr(CurPos)+' WPos: '+ToStr(WPos)+' H+1: '+ToSTr(H+1)+' SPos: '+ToStr(SPos));
+  if InRange(SPos, CurPos - BarHeight, CurPos + BarHeight) then
   begin//if its too close the scroll bar won't move to correct position
-    if (CurPos < 286) then//286 = half point
-      Mouse(700, 408, 0, 0, true)
+    if (CurPos < ((SB.y1+BarHeight/2)+ (SB.y2-SB.y1-BarHeight)/2)) then//half point
+      Mouse((SB.x1 + (SB.x2-SB.x1)/2), SB.y2, 0, 0, true)
     else
-      Mouse(700, 165, 0, 0, true);
+      Mouse((SB.x1 + (SB.x2-SB.x1)/2), SB.y1, 0, 0, true);
   end;
 
   //Writeln('SPos := '+ToStr(SPos));
-  Mouse(700, SPos, 0, 0, true);
+  Mouse((SB.x1 + (SB.x2-SB.x1)/2), SPos, 0, 0, true);
   wait(300+Random(100));
   Result := IsTextInAreaEx(84, 134, 134, 440, p.X, p.Y, IntToStr(W) + ' ', 0, StatChars, False, False, -1, 2, TextColor);
 end;
@@ -434,7 +461,7 @@ begin
     T := GetSystemTime + 60000;
     Repeat
       Wait(100+random(100));
-    until InRange(CountColorTolerance(SRL_WS_ARROWCOLOR, 0, 0, 716, 141, 1), 550, 650) or (GetSystemTime > T);
+    until InRange(CountColorTolerance(SRL_WS_ARROWCOLOR, 0, 0, 716, 240, 1), 550, 650) or (GetSystemTime > T);
     if (GetSystemTime > T) then
     begin
       Writeln('World screen did not load after a minute, please refreash.');
@@ -505,8 +532,8 @@ var
   i, H, l: integer;
   wArray: TWorldArray;
 begin
-  if High(WorldArray) < 0 then
-   LoadWorldArrays;
+  if Length(WorldArray) < 1 then
+    LoadWorldArrays;
   H := High(WorldArray);
   SetLength(wArray, H + 1);
   for i := 0 to H do
@@ -576,9 +603,9 @@ begin
   for I := 0 To High(Arr) do
   if InStrArr(Lowercase(By), Arr[i], False) then
     Break;
-  FindColorsTolerance(TPA, 1074576, 0, 0, 716, 141, 1);
+  FindColorsTolerance(TPA, SRL_WS_ARROWCOLOR, 92, 0, 716, 200, 1);
   ATPA := SplitTPA(TPA, 2);
-  SortATPAFromFirstPoint(ATPA, Point(91, 124));
+  SortATPAFromFirstPoint(ATPA, Point(92, 166));
   TB := GetTPABounds(ATPA[(I * 2) + Integer(Descending)]);
   MouseBox(TB.x1, TB.y1, TB.x2, TB.y2, 1);
 end;
