@@ -8,11 +8,8 @@ Mouse routines.
 *)
 
 const
-  //mouse_Right   = 0;
-  //mouse_Left    = 1; Defined in the MML
-  //mouse_Middle  = 2;
-  mouse_Move      = 3;
-  mouse_None      = 4;
+  mouse_Move = 3;
+  mouse_None = 4;
 
 var
   MouseSpeed: Integer;
@@ -194,7 +191,7 @@ Example:
 .. code-block:: pascal
 
 *)
-procedure HumanClickMouse(mouseButton: Integer);
+procedure HumanClickMouse(mouseButton: integer);
 var
   a,b,c : integer;
 begin
@@ -229,7 +226,7 @@ Example:
 .. code-block:: pascal
 
 *)
-procedure Mouse(mousex, mousey, ranx, rany: Integer; mouseButton: Integer);
+procedure Mouse(mousex, mousey, ranx, rany: Integer; mouseButton: integer);
 begin
   MMouse(mousex, mousey, ranx, rany);
   Wait(60 + Random(30));

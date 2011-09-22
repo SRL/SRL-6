@@ -28,7 +28,7 @@ Example:
 
 procedure RandomRClick;
 var
-  I: TBooleanArray;
+  I: array of boolean;
   II, M, R: Byte;
   Inv: Boolean;
 begin

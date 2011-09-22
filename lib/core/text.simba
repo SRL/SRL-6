@@ -400,7 +400,7 @@ Example:
 *)
 function IsUpText(UpText: string): Boolean;
 begin
-  Result := (Pos(UpText, GetUpText) > 0);
+  Result := (Pos(UpText, rs_GetUpText) > 0);
 end;
 
 (*
@@ -429,7 +429,7 @@ var
   TheText: string;
   i, n: Integer;
 begin
-  TheText := GetUpText;
+  TheText := rs_GetUpText;
   n := High(Text);
   for i := 0 to n do
     if (Pos(Text[i], TheText) > 0) then
@@ -463,7 +463,7 @@ function GetLevelAtPos(x, y: Integer): integer;
 begin
   MMouse(x, y, 0, 0);
   Wait(RandomRange(80, 150));
-  Result := StrToIntDef(Between('l: ', ')', GetUpText), -1);
+  Result := StrToIntDef(Between('l: ', ')', rs_GetUpText), -1);
 end;
 
 
@@ -491,7 +491,7 @@ Example:
 .. code-block:: pascal
 
 *)
-function FindNPCChatText(txt: string; Action: TMouseAction): Boolean;
+function FindNPCChatText(txt: string; Action: integer): Boolean;
 var
   tx, ty, S: Integer;
 begin
@@ -509,7 +509,7 @@ begin
       mouse_move: MMouse(tx, ty + 2, Random(Length(txt) * 5), 4);
       mouse_none: ;
     else
-        Mouse(tx, ty + 2, Random(Length(txt) * 5), 4, Action);
+      Mouse(tx, ty + 2, Random(Length(txt) * 5), 4, Action);
     end;
   end;
   FreeBitmap(S);
@@ -563,7 +563,7 @@ Example
 .. code-block:: pascal
 
 *)
-function ClickText(Text, Chars: string;x1, y1, x2, y2: Integer; action: TMouseAction): Boolean;
+function ClickText(Text, Chars: string;x1, y1, x2, y2: Integer; action: integer): Boolean;
 var
   Mask, w, h, tx, ty: Integer;
 begin
@@ -632,7 +632,7 @@ Example:
 .. code-block:: pascal
 
 *)
-function FindTextTPA(Color,Tol,xs,ys,xe,ye : integer;var x,y : integer; Txt, Chars : string; Action: TMouseAction ) : Boolean;
+function FindTextTPA(Color,Tol,xs,ys,xe,ye : integer;var x,y : integer; Txt, Chars : string; Action: integer ) : Boolean;
 var
   TextTPA,SearchTPA, Matches: TPointArray;
   Box : TBox;
@@ -686,7 +686,7 @@ Example:
 .. code-block:: pascal
 
 *)
-function ChooseOptionMulti(Texts: TStringArray; TextType: String; Action: TMouseAction): Boolean;
+function ChooseOptionMulti(Texts: TStringArray; TextType: String; Action: integer): Boolean;
 var
    B,OptionBox: TBox;
    TPA, TPA1, TPA2, TextTPA: TPointArray;
@@ -747,7 +747,7 @@ begin
   end;
 
   if (not result) then
-    chooseOptionMulti(['Cancel', 'ancel', 'ncel'], 'All', clickLeft);
+    chooseOptionMulti(['Cancel', 'ancel', 'ncel'], 'All', mouse_left);
 end;
 
 (*
@@ -771,7 +771,7 @@ Example:
 *)
 function ChooseOption(Txt: String): Boolean;
 begin
-  Result := ChooseOptionMultiEx([Txt], 'All', mouse_left);
+  Result := ChooseOptionMulti([Txt], 'All', mouse_left);
 end;
 
 (*
@@ -821,18 +821,15 @@ Example:
 .. code-block:: pascal
 
 *)
-
-function WaitUpTextMulti(S: TStringArray; Time: Integer): Boolean; forward;
-
 function CloseWindow: Boolean;
 var
   Col: TIntegerArray;
   b: T2DPointArray;
   a: T2DPointArray;
   Pa: TBox;
-  I, ii, {h,} l: Integer;
+  I, ii, x, y, l: Integer;
 begin
-  if (FindTextTPA(4106994, 20, 20, 22, 400, 45, 'Bank', upchars, mouse_none)) then
+  if (FindTextTPA(4106994, 20, 20, 22, 400, 45, x, y, 'Bank', upchars, mouse_none)) then
   begin
     Mouse(483, 28, 10, 12, mouse_left);
     Result := True;

@@ -10,6 +10,8 @@ Includes the `core` package
 {$IFNDEF srl_lib_core}
 {$DEFINE srl_lib_core}
 
+{$include_once ../common/libcommon.simba}
+
 // subpackage for gametabs
 {$include_once ./gametab/libgametab.simba}
 
@@ -17,6 +19,8 @@ Includes the `core` package
 {$include_once ./globals.simba}
 
 {$include_once ./mouse.simba}
+{$include_once ./text.simba}
+{$include_once ./interfaces.simba}
 {$include_once ./amount.simba}
 {$include_once ./bitmaps.simba}
 {$include_once ./debug.simba}
@@ -24,7 +28,6 @@ Includes the `core` package
 {$include_once ./players.simba}
 {$include_once ./stats.simba}
 
-{$include_once ./text.simba}
 {$include_once ./timing.simba}
 {$ENDIF}
 

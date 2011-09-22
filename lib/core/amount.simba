@@ -148,11 +148,11 @@ function GetAmount(box: TBox): integer;
 var
   Col: TIntegerArray;
   X, Y, I: Integer;
-  B, slot: TBox;
+  B: TBox;
   TPA: TPointArray;
   S: String;
 begin
-  if (not FindColor(x, y, SRL_OUTLINE_BLACK, box.x1, box.y1, box.x2, box.y2) then
+  if (not FindColor(x, y, SRL_OUTLINE_BLACK, box.x1, box.y1, box.x2, box.y2)) then
     exit;
 
   inc(result);
@@ -166,7 +166,7 @@ begin
      //SMART_DrawBoxEx(False, b, clYellow);
      B := IntToBox(b.x1-2, b.y1-2, b.x2+2, b.y2+2);
      S := GetTextAtExWrap(b.x1, b.y1, b.x2, b.y2, 0, 1, 1, Col[i], 0, StatChars);
-     Result := StrToIntDef(GetNumbers(S), 1);
+     Result := StrToIntDef(ExtractFromStr(s, numbers), 1);
      Case I of
        2: Result := Result * 1000;
        3: Result := Result * 1000000;

@@ -23,7 +23,7 @@
 
 {$IFDEF SMART}
     {$IFNDEF SRL_SMART}
-        {$I SRL/misc/smart.simba}
+        {$i srl-5/smart.simba}
     {$ENDIF}
 {$ENDIF}
 
@@ -33,11 +33,11 @@
 //--        Low Level Math, Mouse Movement and Color routines.              --//
 //----------------------------------------------------------------------------//
 
-{$I SRL/core/globals.simba}
-{$I SRL/core/math.simba}
-{$I SRL/core/mouse.simba}
-{$I SRL/core/color.simba}
-{$I SRL/core/players.simba}
+{$i srl-5/lib/core/globals.simba}
+{$i srl-5/lib/misc/utilities/math.simba}
+{$i srl-5/lib/core/mouse.simba}
+{$i srl-5/lib/color/color.simba}
+{$i srl-5/lib/core/players.simba}
 
 //----------------------------------------------------------------------------//
 //--                         SRL Level 2 Includes                           --//
@@ -45,10 +45,10 @@
 //--                     Interface and OCR routines.                        --//
 //----------------------------------------------------------------------------//
 
-{$I SRL/core/text.simba}
-{$I SRL/core/timing.simba}
-{$I SRL/core/chat.simba}
-{$I SRL/core/gametab.simba}
+{$i srl-5/lib/core/text.simba}
+{$i srl-5/lib/core/timing.simba}
+{$i srl-5/lib/chat/chat.simba}
+{$i srl-5/lib/core/gametabs/gametab.simba}
 
 //----------------------------------------------------------------------------//
 //--                         SRL Level 3 Includes                           --//
@@ -56,39 +56,37 @@
 //--   MapWalking, AntiRandoms, Objects, Bank, Symbol and many more...      --//
 //----------------------------------------------------------------------------//
 
-{$I SRL/core/animation.simba}
-{$I SRL/core/flag.simba}
-{$I SRL/core/worldswitcher.simba}
-{$I SRL/core/login.simba}
-{$I SRL/core/autocolor.simba}
-{$I SRL/core/mapwalk.simba}
-{$I SRL/core/object.simba}
-{$I SRL/core/amount.simba}
-{$I SRL/core/inventory.simba}
-{$I SRL/core/bank.simba}
-{$I SRL/core/symbol.simba}
-{$I SRL/core/globalstats.simba}
-{$I SRL/core/antiban.simba}
-{$I SRL/core/antirandoms/common.simba}
-{$I SRL/core/antirandoms/certer.simba}
-{$I SRL/core/antirandoms/demon.simba}
-{$I SRL/core/antirandoms/forester.simba}
-{$I SRL/core/antirandoms/quiz.simba}
-{$I SRL/core/antirandoms/sandwich.simba}
-{$I SRL/core/antirandoms/evilbob.simba}
-{$I SRL/core/antirandoms/leo.simba}
-{$I SRL/core/antirandoms/frog.simba}
-{$I SRL/core/antirandoms/molly.simba}
-{$I SRL/core/antirandoms/pillory.simba}
-{$I SRL/core/antirandoms/pinball.simba}
-{$I SRL/core/antirandoms/maze.simba}
-{$I SRL/core/antirandoms/capnarnav.simba}
-{$I SRL/core/antirandoms/beekeeper.simba}
-{$I SRL/core/antirandoms/abyss.simba}
-{$I SRL/core/antirandoms/mordaut.simba}
-{$I SRL/core/antirandoms/prisonpete.simba}
-{$I SRL/core/antirandoms/mime.simba}
-{$I SRL/core/antirandoms/antirandoms.simba}
+{$i srl-5/lib/misc/animation.simba}
+{$i srl-5/lib/mapwalk/flag.simba}
+{$i srl-5/lib/common/worldswitcher.simba}
+{$i srl-5/lib/common/login.simba}
+{$i srl-5/lib/color/autocolor.simba}
+{$i srl-5/lib/mapwalk/mapwalk.simba}
+{$i srl-5/lib/core/amount.simba}
+{$i srl-5/lib/core/gametabs/inventory.simba}
+{$i srl-5/lib/common/bank.simba}
+{$i srl-5/lib/common/symbol.simba}
+{$i srl-5/lib/common/antiban.simba}
+{$i srl-5/lib/antirandoms/common.simba}
+{$i srl-5/lib/antirandoms/certer.simba}
+{$i srl-5/lib/antirandoms/demon.simba}
+{$i srl-5/lib/antirandoms/forester.simba}
+{$i srl-5/lib/antirandoms/quiz.simba}
+{$i srl-5/lib/antirandoms/sandwich.simba}
+{$i srl-5/lib/antirandoms/evilbob.simba}
+{$i srl-5/lib/antirandoms/leo.simba}
+{$i srl-5/lib/antirandoms/frog.simba}
+{$i srl-5/lib/antirandoms/molly.simba}
+{$i srl-5/lib/antirandoms/pillory.simba}
+{$i srl-5/lib/antirandoms/pinball.simba}
+{$i srl-5/lib/antirandoms/maze.simba}
+{$i srl-5/lib/antirandoms/capnarnav.simba}
+{$i srl-5/lib/antirandoms/beekeeper.simba}
+{$i srl-5/lib/antirandoms/abyss.simba}
+{$i srl-5/lib/antirandoms/mordaut.simba}
+{$i srl-5/lib/antirandoms/prisonpete.simba}
+{$i srl-5/lib/antirandoms/mime.simba}
+{$i srl-5/lib/antirandoms/antirandoms.simba}
 
 (*
 SetUpSRL
@@ -173,3 +171,6 @@ end;
 procedure FreeSRL;
 begin
 end;
+
+begin
+end.
