@@ -106,7 +106,7 @@ Example:
 *)
 function BankScreen: Boolean;
 var
-  c: Integer;
+  c, x, y: Integer;
 begin
   if (CountColor(0, MSX1, MSY1, MSX2, MSY2) > 113000) then
   begin
@@ -116,7 +116,7 @@ begin
       Wait(50);
     Wait(RandomRange(100, 150));
   end;
-  Result := FindTextTPA(4106994, 20, 20, 22, 400, 45, 'Bank', upchars, Nothing);
+  Result := FindTextTPA(4106994, 20, 20, 22, 400, 45, x, y, 'Bank', upchars, mouse_none);
 end;
 
 (*
@@ -165,8 +165,10 @@ Example:
 
 *)
 function PinScreen : Boolean;
+var
+  x, y: integer;
 begin
-  Result := FindTextTPA(2070783, 0, 90, 50, 160, 85, 'Please', UpChars, Nothing);
+  Result := FindTextTPA(2070783, 0, 90, 50, 160, 85, x, y, 'Please', UpChars, mouse_none);
 end;
 
 (*
@@ -260,9 +262,11 @@ Example:
 *)
 
 function ShopScreen : Boolean;
+var
+  x, y: integer;
 begin
   Result := FindTextTPA(
-      2070783, 10, 58, 303, 85, 317, 'Right', StatChars, Nothing
+      2070783, 10, 58, 303, 85, 317, x, y, 'Right', StatChars, mouse_none
     );
 end;
 
@@ -292,6 +296,8 @@ Example:
 *)
 
 procedure ShopSwitchTab(Name: string);
+var
+  x, y: integer;
 begin
   if (not(InStrArr(Name, ['main', 'player'], False))) then
   begin
@@ -299,5 +305,5 @@ begin
     Exit;
   end;
   if (ShopScreen) then
-    FindTextTpa(1930687, 0, 50, 65, 225, 83, Capitalize(Name), SmallChars, ClickLeft);
+    FindTextTpa(1930687, 0, 50, 65, 225, 83, x, y, Capitalize(Name), SmallChars, mouse_left);
 end;

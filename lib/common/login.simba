@@ -5,6 +5,10 @@ Login
 The Login include contains all Login related functions
 
 *)
+
+type
+  TSMSetting = (Stereo, Mono, NoChange);
+
 const
   SM_Color = 8115338;
 
@@ -75,33 +79,6 @@ begin
   //White text on Report Abuse Button
   Result := (GetColor(472, 490) = 16777215);
 end;
-
-(*
-LobbyScreen
-~~~~~~~~~~~
-
-.. code-block:: pascal
-
-    function LobbyScreen: Boolean;
-
-Returns true if we are at the Lobby Screen
-
-.. note::
-
-    by IceFire908 & Bionicle1800
-
-Example:
-
-.. code-block:: pascal
-
-
-*)
-
-function LobbyScreen: Boolean;
-begin
-  Result := InRange(GetLobbyTab, L_PlayerInfo, L_Options);
-end;
-
 
 (*
 RSReady
@@ -188,7 +165,7 @@ begin
   while (not(FindBitmapToleranceIn(AudioMask, X, Y, 717, 458, 760, 498, 10))) and (GetSystemTime - T < 5000) do
     Wait(100);
   if (FindBitmapToleranceIn(AudioMask, X, Y, 717, 458, 760, 498, 10)) then
-    Mouse(X, Y, 20, 20, True)
+    Mouse(X, Y, 20, 20, mouse_left)
   else
   begin
     FreeBitmap(AudioMask);
@@ -210,14 +187,14 @@ begin
     Ty := round(II * 22.5) + 397; //I THINK this is the formula, but I don't care.
     //Ty := //Round(3.5 * II * II + 46.5 * II + 245);
     if (GetColor(Tx, Ty) = 1315860) then
-      Mouse(Tx - 10, Ty - 0, 10, 5, True);   //bit of randomness never hurts
+      Mouse(Tx - 10, Ty - 0, 10, 5, mouse_left);   //bit of randomness never hurts
     Wait(50);
   end;
   if (GetColor(527, 433) = 4473924) and (SMSetting = Mono) then   //if set at stereomode
-    Mouse(527, 433, 10, 10, True)
+    Mouse(527, 433, 10, 10, mouse_left)
   else
   if (GetColor(527, 411) = 499676) and (SMSetting = Stereo) then
-    Mouse(527, 411, 10, 10, True);
+    Mouse(527, 411, 10, 10, mouse_left);
   Wait(100);
   TypeByte(vk_Escape);
   FreeBitmap(AudioMask);
@@ -260,7 +237,7 @@ begin
   while (not(FindBitmapToleranceIn(graphicsslice, X, Y, 717, 458, 760, 498,10))) and (GetSystemTime - T < 5000) do
     Wait(100);
   if (FindBitmapToleranceIn(graphicsslice, X, Y, 717, 458, 760, 498, 10)) then
-    Mouse(X, Y, 20, 20, True)
+    Mouse(X, Y, 20, 20, mouse_left)
   else
   begin
     FreeBitmap(graphicsslice);
@@ -271,7 +248,7 @@ begin
   for i := 0 to 2 do
   begin
     //Checks for the green arrow, clicks middle of box
-    Mouse(260, 162, 5, 5, True);
+    Mouse(260, 162, 5, 5, mouse_left);
     if WaitColor(340, 115, SM_Color, 0, 2000) then
       Break;
     if i = 2 then
@@ -290,7 +267,7 @@ begin
       P := Point(328 + (Brightness-1) * 32, 222);//coords of some thing
       if (GetColor(P.x, P.y) = 1315860) then
       begin
-        Mouse(P.x, P.y, 3, 3, True);
+        Mouse(P.x, P.y, 3, 3, mouse_left);
         if WaitColor(P.x, P.Y, 3976149, 1, 1000) then
           break;
         Inc(x);
@@ -301,9 +278,9 @@ begin
   repeat
     if FindColor(x, y, 14790912, 361,234, 673,373) then  //wtf is this
     begin
-      Mouse(x + 10, y + 3, 10, 7, True);
+      Mouse(x + 10, y + 3, 10, 7, mouse_left);
       getmousepos(tx, ty);
-      mouse(tx, ty + 10, 4, 4, true);
+      mouse(tx, ty + 10, 4, 4, mouse_left);
       wait(300);
     end;
   until(not(FindColor(x, y, 14790912, 361,234, 673,373)));

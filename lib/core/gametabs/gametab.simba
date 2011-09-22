@@ -8,9 +8,6 @@ This Include contains all Gametab Routines.
 *)
 
 // TODO: SPLIT INTO RESPECTIVE FILES, ONE FOR EACH TAB. CONSTANTS ARE IN EACH FILE RESPECTIVELY
-
-type
-  TSMSetting = (Stereo, Mono, NoChange);
   
 { const LobbyTab Constants;
   Description: Constants representing lobbytab numbers. }
@@ -2055,6 +2052,31 @@ begin
   X := 550 + (44 * (Col - 1));
   Y := 219 + (49 * (Row - 1));
   Mouse(X, Y, 26, 39, True);
+end;
+
+(*
+LobbyScreen
+~~~~~~~~~~~
+
+.. code-block:: pascal
+
+    function LobbyScreen: Boolean;
+
+Returns true if we are at the Lobby Screen
+
+.. note::
+
+    by IceFire908 & Bionicle1800
+
+Example:
+
+.. code-block:: pascal
+
+
+*)
+function LobbyScreen: Boolean;
+begin
+  Result := InRange(GetLobbyTab, L_PlayerInfo, L_Options);
 end;
 
 (*

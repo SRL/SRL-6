@@ -36,7 +36,6 @@
 {$i srl-5/lib/core/globals.simba}
 {$i srl-5/lib/misc/utilities/math.simba}
 {$i srl-5/lib/core/mouse.simba}
-{$i srl-5/lib/color/color.simba}
 {$i srl-5/lib/core/players.simba}
 
 //----------------------------------------------------------------------------//
@@ -46,9 +45,12 @@
 //----------------------------------------------------------------------------//
 
 {$i srl-5/lib/core/text.simba}
+{$i srl-5/lib/core/interfaces.simba}
+{$i srl-5/lib/common/login.simba}
+{$i srl-5/lib/core/gametabs/gametab.simba}
 {$i srl-5/lib/core/timing.simba}
 {$i srl-5/lib/chat/chat.simba}
-{$i srl-5/lib/core/gametabs/gametab.simba}
+{$i srl-5/lib/color/color.simba}
 
 //----------------------------------------------------------------------------//
 //--                         SRL Level 3 Includes                           --//
@@ -59,34 +61,14 @@
 {$i srl-5/lib/misc/animation.simba}
 {$i srl-5/lib/mapwalk/flag.simba}
 {$i srl-5/lib/common/worldswitcher.simba}
-{$i srl-5/lib/common/login.simba}
 {$i srl-5/lib/color/autocolor.simba}
 {$i srl-5/lib/mapwalk/mapwalk.simba}
 {$i srl-5/lib/core/amount.simba}
-{$i srl-5/lib/core/gametabs/inventory.simba}
 {$i srl-5/lib/common/bank.simba}
+{$i srl-5/lib/core/gametabs/inventory.simba}
 {$i srl-5/lib/common/symbol.simba}
 {$i srl-5/lib/common/antiban.simba}
-{$i srl-5/lib/antirandoms/common.simba}
-{$i srl-5/lib/antirandoms/certer.simba}
-{$i srl-5/lib/antirandoms/demon.simba}
-{$i srl-5/lib/antirandoms/forester.simba}
-{$i srl-5/lib/antirandoms/quiz.simba}
-{$i srl-5/lib/antirandoms/sandwich.simba}
-{$i srl-5/lib/antirandoms/evilbob.simba}
-{$i srl-5/lib/antirandoms/leo.simba}
-{$i srl-5/lib/antirandoms/frog.simba}
-{$i srl-5/lib/antirandoms/molly.simba}
-{$i srl-5/lib/antirandoms/pillory.simba}
-{$i srl-5/lib/antirandoms/pinball.simba}
-{$i srl-5/lib/antirandoms/maze.simba}
-{$i srl-5/lib/antirandoms/capnarnav.simba}
-{$i srl-5/lib/antirandoms/beekeeper.simba}
-{$i srl-5/lib/antirandoms/abyss.simba}
-{$i srl-5/lib/antirandoms/mordaut.simba}
-{$i srl-5/lib/antirandoms/prisonpete.simba}
-{$i srl-5/lib/antirandoms/mime.simba}
-{$i srl-5/lib/antirandoms/antirandoms.simba}
+{$i srl-5/lib/antirandoms/libantirandoms.simba}
 
 (*
 SetUpSRL

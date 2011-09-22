@@ -836,7 +836,6 @@ begin
     Exit;
   end;
 
-  Result := CloseBank;
   Col := [1118997,  1449250,  {Main typ 1}
           8042720,  4160933,  {Skill}
           6854059,  2902100,  {Quest}
@@ -866,7 +865,7 @@ begin
         if Result then
         begin
           GetMousePos(Pa.x1, Pa.y1);
-          Mouse(Pa.x1, Pa.y1, 0, 0, True);
+          Mouse(Pa.x1, Pa.y1, 0, 0, mouse_left);
           Result := True;
           //Writeln('Close Window Type ' + IntToStr(i));
           Exit;

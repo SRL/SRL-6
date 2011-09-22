@@ -75,14 +75,14 @@ begin
 
   if (not FindColor(x, y, Color, mx - 10, 486, mx + 10, 502)) then
   begin
-    Mouse(mx, 496, 4, 4, False);
+    Mouse(mx, 496, 4, 4, mouse_right);
     Wait(RandomRange(50, 150));
 
     if (Lowercase(State) = 'off') then
     begin
       case chat of
-        CHAT_PUBLIC: Mouse(mx, 496 - 33, 8, 3, True);
-        CHAT_PRIVATE..CHAT_ASSIST: Mouse(mx, 496 - 20, 8, 3, True);
+        CHAT_PUBLIC: Mouse(mx, 496 - 33, 8, 3, mouse_left);
+        CHAT_PRIVATE..CHAT_ASSIST: Mouse(mx, 496 - 20, 8, 3, mouse_left);
       end;
 
       Wait(RandomRange(50, 150));

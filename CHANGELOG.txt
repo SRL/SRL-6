@@ -28,6 +28,8 @@ CHANGE LOG:
         - FindDTMRotated (color.simba)
         - FindMMSpiralTolerance (color.simba)
         - PercentColorMM (color.simba)
+        - Cose (math.simba)
+        - Sine (math.simba)
 
 - Function name changes
         - ClearCanvas -> SMART_ClearCanvas

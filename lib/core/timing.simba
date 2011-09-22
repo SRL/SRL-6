@@ -21,12 +21,6 @@ const
   Description: Used when ever WaitFunc is used in SRL. Increase for slow computers. }
   srl_MaxWaitTime = 400;
 
-function InvCount: Integer; forward;
-function GetCurrentTab: Integer; forward;
-function TabExists(Tab: Integer): Boolean; forward;
-function GameTab(Tab: Integer): Boolean; forward;
-function BankScreen(): boolean; forward;
-
 (*
 MsToTime
 ~~~~~~~~
@@ -231,7 +225,7 @@ Example:
 .. code-block:: pascal
 
 *)
-function WaitOptionMulti(S: TStringArray; TextType: string; Action: TMouseAction; Time: Integer): Boolean;
+function WaitOptionMulti(S: TStringArray; TextType: string; Action: integer; Time: Integer): Boolean;
 var
   T: Integer;
 begin
@@ -239,7 +233,7 @@ begin
   T := GetSystemTime + Time;
   while (GetSystemTime < T) do
   begin
-    if (ChooseOptionMultiEx(S, TextType, Action)) then
+    if (ChooseOptionMulti(S, TextType, Action)) then
     begin
       Result := True;
       Exit;
@@ -269,7 +263,7 @@ Example:
 *)
 function WaitOption(S: string; Time: Integer): Boolean;
 begin
-  Result := WaitOptionMultiEx([S], 'all', mouse_left, Time);
+  Result := WaitOptionMulti([S], 'all', mouse_left, Time);
 end;
 
 (*
