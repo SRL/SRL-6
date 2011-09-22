@@ -385,7 +385,7 @@ begin
     Inc(c);
     if(FindText(x, y, 'obb', UpChars, MIX1, MIY1, MIX2, MIY2))then
     begin
-      MouseBox(574, 362, 705, 388, 1);
+      MouseBox(566, 346, 715, 373, 1);
       for i := 0 to 10 do
       begin
         Wait(1000);
