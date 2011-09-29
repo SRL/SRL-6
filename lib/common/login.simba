@@ -654,9 +654,10 @@ begin
     else
     case (CountColor(LOGIN_TEXTCOLOUR, 260, 140, 510, 400)) of //text colour points
                         // WriteLn Error                  Wait for   Retrys     Action      Player[CurrentPlayer].Loc
-      763, 2348, 2299: Actions :=  ['Invalid Username / Password',     0,    2,    'PlayerFalse',   'Wrong User/Pass'];
+      763, 2348, 2299:
+            Actions := ['Invalid Username / Password',           0,    2,    'PlayerFalse',   'Wrong User/Pass'];
       1088: Actions := ['Your account has been disabled',        0,    0,    'PlayerFalse',   'Acc Disabled'];
-       951: Actions := ['Your account is already logged in', 15000,    5,    '',    'Already logged in'];
+       951: Actions := ['Your account is already logged in',  5000,    5,    'PlayerTrue',    'Already logged in'];
       1239: Actions := ['Not a Members Account',                 0,    1,    'PlayerTrue',    ''];
        364: Actions := ['Error Connecting.',                 20000,    9,    'Terminate',     'Error Connecting'];
       1057: Actions := ['Too many incorrect logins.',    5 * 60000,    2,    'PlayerFalse',   'Too many logins'];
@@ -695,7 +696,13 @@ begin
         Players[CurrentPlayer].Loc := Actions[4];
       case Actions[3] of
         'PlayerFalse': NextPlayer(False);
-        'PlayerTrue': NextPlayer(True);
+
+        'PlayerTrue':
+          begin
+            LeaveLobby();
+            NextPlayer(True);
+          end;
+
         'Terminate': TerminateScript;
       end;
       Exit;
@@ -805,24 +812,30 @@ begin
        850: Actions := ['You need skill total of 1000.',               0,     9,  'PlayerTrue',   '1000 skill club'];
       1028: Actions := ['You are standing in a members-only area.',    0,     1,  'PlayerFalse',  'In Mems-Only Area'];
       1239: Actions := ['Not a Members Account',                       0,     1,  'PlayerFalse',  'Non-member'];
-        -1: Actions := ['You need skill total of 1500.',               0,     9,  'PlayerTrue',   '1500 skill club'];
+	     777: Actions := ['Login limit exceeded.',                       0,     10, '',             'Waiting for login.'];
+       951: Actions := ['Your account is already logged in',        5000,     5,  'PlayerTrue',   'Already logged in'];              -1: Actions := ['You need skill total of 1500.',               0,     9,  'PlayerTrue',   '1500 skill club'];
         -1: Actions := ['You need 20 combat for PvP',                  0,     1,  'PlayerFalse',  'PvP warning'];
     end;
 
-    if (CountColor(clWhite, 415, 336, 476, 356)= 210) then //PVP login button white colour points
+    if (CountColor(clWhite, 415, 336, 476, 356) = 82) then // HRW login button white colour points
     begin
+      Wait(RandomRange(500, 1000));
       if (Length(Players[CurrentPlayer].WorldInfo) > 2) then
       begin
         if (Players[CurrentPlayer].WorldInfo[2]) then
-          MouseBox(389, 332, 502, 354, 1) //PvP login button
-        else
-          MouseBox(263, 335, 372, 354, 1); //Go back
+          MouseBox(391, 361, 498, 383, 1)
+        else begin
+          MouseBox(263, 362, 372, 383, 1);
+          Players[CurrentPlayer].WorldInfo := [False, 0, AllowPVP];
+          RetryLogin := True;
+          Break;
+        end;
       end
       else
         if (AllowPVP) then
-          MouseBox(389, 332, 502, 354, 1)
+          MouseBox(391, 361, 498, 383, 1)
         else
-          MouseBox(263, 335, 372, 354, 1);
+          MouseBox(263, 362, 372, 383, 1);
       Wait(3000 + Random(2000));
     end;
 
@@ -845,6 +858,13 @@ begin
                                        Players[CurrentPlayer].Member := False;
                                        Players[CurrentPlayer].WorldInfo := [False, 0, AllowPVP];
                                      end;
+		       	'Login limit exceeded.': begin
+											                 Writeln('Runescape is lagging or we''re logged in too many times.  Keep trying!');
+                                       Players[CurrentPlayer].WorldInfo := [players[currentPlayer].member, 0, AllowPVP];
+                                       Wait(5000+Random(10000));
+											               end;
+            'You need skill total of 1000.': players[currentPlayer].worldInfo := [players[currentPlayer].member, 0, allowPVP];
+
           end;
           RetryLogin := True;
           Wait(2000 + Random(1000));
@@ -854,7 +874,11 @@ begin
         Players[CurrentPlayer].Loc := Actions[4];
       case Actions[3] of
         'PlayerFalse': NextPlayer(False);
-        'PlayerTrue': NextPlayer(True);
+        'PlayerTrue':
+          begin
+            LeaveLobby();
+            NextPlayer(True);
+          end;
         'Terminate': TerminateScript;
       end;
       Exit;
