@@ -580,6 +580,7 @@ begin
     if ((GetSystemTime - T) > 180000) then
     begin
       WriteLn('It has been 3 minutes and Runescape is not yet ready... Terminating.');
+      Writeln('Make sure your settings are set to fixed screen');
       TerminateScript;
     end;
     Wait(RandomRange(1000, 2000));
