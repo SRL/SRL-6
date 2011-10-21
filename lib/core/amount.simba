@@ -7,6 +7,19 @@ Items can be in your bank or in your inventory.
 
 *)
 
+(*
+SRL_AREA Constants
+~~~~~~~~~~~~~~~~~~
+
+Constants associated with the different finding methods.
+These consist of:
+
+- *Inventory*
+- *Shop*
+- *Deposit Box*
+- *Trade Screen*
+- *Your Trade Screen*
+*)
 const
   SRL_AREA_INVENTORY  = 0;
   SRL_AREA_SHOP       = 1;
@@ -24,15 +37,11 @@ Constants associated with the different finding methods.
 These consist of:
 
 - *BITMAP*
-
 - *DTM*
-
 - *COLOUR*, *COLOR*
-
 - *MASK* [*]_
 
 .. [*] Refers to bitmap masks.
-
 *)
 const
   SRL_ITEM_IDENT_BITMAP = 0;
@@ -41,12 +50,12 @@ const
   SRL_ITEM_IDENT_MASK   = 3;
 
 (*
-FindItemEx
-~~~~~~~~~~
+FindItem
+~~~~~~~~
 
 .. code-block:: pascal
 
-	function FindItemEx(var x, y: Integer; IdentType, Ident: Integer; Area: TBox; Tol: TIntegerArray): Boolean;
+	function FindItem(var x, y: Integer; IdentType, Ident: Integer; Area: TBox; Tol: TIntegerArray): Boolean;
 
 Finds an item_IDENT in Area specified by TBox in Area.
 Valid IdentTypes are the `SRL_ITEM_IDENT Consts`_.
@@ -63,7 +72,8 @@ generalizations as well, though.
 
 .. note::
 
-	by Nava2
+	Author: Nava2
+  Last Modified: 13 Jan 2011 by Nava2
 
 Example:
 
@@ -77,10 +87,6 @@ Example:
 	  if (FindItemEx(x,y, SRL_ITEMIDENT_BITMAP, the_bmp, b, [4])) then
 	    Mouse(x,y,5,5,mouse_right);
 	end;
-
-.. note::
-
-	Modified: 13 Jan 2011 - Nava2
 *)
 function FindItem(var x, y: Integer; IdentType, Ident: Integer; Area: TBox; Tol: TIntegerArray): Boolean;
 var
@@ -127,19 +133,24 @@ GetAmount
 
 	function GetAmount(box: TBox): integer;
 
-Returns the amount of an item found in the box 'box'.
+Returns the amount of an item at in the box 'box'. Returns approximate values
+for 'K' and 'M'.
 
 .. note::
 
-	by Zeph, N1ke & Narcle
+	Author: Zeph, N1ke & Narcle
+  Last Modified: Unknown
 
 Example:
 
 .. code-block:: pascal
 
-.. note::
-
-	Modified: Sept. 21, 2011 by Coh3n
+	var
+	  i: Integer;
+	begin
+	  i := GetAmount(InvBox(1)); // Gets the amount in inventory slot 1
+    Writeln('Amount = '+toStr(i));
+	end;
 *)
 {$IFNDEF srl_lib_core_gametabs}
 {$WARNING SRL-CORE-AMOUNT GAMETABS MUST BE INCLUDED BEFORE AMOUNT}
@@ -185,18 +196,28 @@ AreaInfo
 
 Returns info on certain interfaces as an `srl_TItemInterface Record`_.
 Row and col amounts, startcoords, sizes for inventory, banks, shop, ...
+Valid Areas:
+  - SRL_AREA_INVENTORY
+  - SRL_AREA_SHOP
+  - SRL_AREA_BANK
+  - SRL_AREA_DEPOSITBOX
+  - SRL_AREA_TRADE
+  - SRL_AREA_TRADE_YOUR
 
 .. note::
 
-	by masquerader and Nava2
+	Author: masquerader and Nava2
+  Last Modified: 13 Jan 2011 by Nava2
 
 Example:
 
 .. code-block:: pascal
 
-.. note::
-
-	Modified: 13 Jan 2011 - Nava2
+	var
+	  info: srl_TItemInterface;
+  begin
+    info := AreaInfo(SRL_AREA_INVENTORY);
+	end;
 *)
 function AreaInfo(area: Integer): srl_TItemInterface;
 begin
@@ -297,22 +318,21 @@ CheckArea
 
 .. code-block:: pascal
 
-	function CheckArea(area: Integer): Boolean;
+	function CheckArea(area: String): Boolean;
 
-Checks if the given interface is opened.
+Checks if the given area is opened.
 
 .. note::
 
-	by masquerader, and EvilChicken!
+	Author: masquerader
+  Last Modified: Unknown by EvilChicken
 
 Example:
 
 .. code-block:: pascal
 
-.. note::
-
-	Modified: 13 Jan 2011 - Nava2
-
+	if (CheckArea('shop')) then
+    writeln('Shop is open!');
 *)
 function CheckArea(area: Integer): Boolean;
 begin
@@ -427,43 +447,23 @@ CountItemsIn
 	function CountItemsIn(area, ItemType, Item_IDENT: Integer; Tol: TIntegerArray): Integer;
 
 Counts the number of items found within the Area. (Does not count stacks)
-Parameters:
-
-- Area:
-
-  See `SRL_ITEMINT Consts`_
-
-- ItemType:
-
-  See `SRL_ITEM_IDENT Consts`_
-
-- Item_IDENT:
-
-  Name/value of your dtm/bmp/color/mask.
-
-- Tol:
-	
-	+ *SRL_ITEM_IDENT_DTM*: [][#]_.
-
-	+ *SRL_ITEM_IDENT_BITMAP*: [BMPTol].
-
-	+ *SRL_ITEM_IDENT_COLOUR*: [COLOUR Tol, Minimum Colour Count].
-
-	+ *SRL_ITEM_IDENT_MASK*: [BMPTol, ContourTol].
+Parameters are exactly the same as ItemCoordinates.
 
 .. note::
 
-	by masquerader modified by ZephyrsFury
+	Author: masquerader
+  Last Modified: Unknown by ZephyrsFury
 
 Example:
 
 .. code-block:: pascal
 
-.. note::
-	Modified: Unknown
-
-.. [#] DTMs do not have a *global* tolerance, its all done per point.
-
+  var
+    itemsFound: integer;
+  begin
+	  itemsFound := CountItemsArea(SRL_AREA_INVENTORY);
+    writeln('Items found: '+toStr(itemsFound));
+  end;
 *)
 function CountItemsIn(area, ItemType, Item_IDENT: Integer; Tol: TIntegerArray): Integer;
 begin
@@ -476,18 +476,26 @@ CountItemsArea
 
 .. code-block:: pascal
 
-	function CountItemsArea(area: Integer): Integer;
+	function CountItemsArea(area: string): Integer;
 
-Counts items in a specified area. Does **not** count stacks.
+Counts the number of items (no matter which item) found in the given area. Looks
+for the black outline color.
 
 .. note::
 
-	By masquerader
+	Author: masquerader
+  Last Modified: Unknown
 
 Example:
 
 .. code-block:: pascal
 
+  var
+    itemsFound: integer;
+  begin
+	  itemsFound := CountItemsArea('inv');
+    writeln('Items found: '+toStr(itemsFound));
+  end;
 *)
 function CountItemsArea(area: Integer): Integer;
 begin
@@ -505,42 +513,23 @@ ItemAmount
 	function ItemAmount(area, ItemType, Item_IDENT: Integer; Tol: TIntegerArray): Integer;
 
 Counts the number of items found with a color in a certain area. (Counts stacks)
-
-Parameters:
-
-- Area:
-
-  See `SRL_ITEMINT Consts`_
-
-- ItemType:
-
-  See `SRL_ITEM_IDENT Consts`_
-
-- Item_IDENT:
-
-  name/value of your dtm/bmp/color/bmpmask.
-
-- Tol:
-	
-	+ *SRL_ITEM_IDENT_DTM*: [][#]_.
-
-	+ *SRL_ITEM_IDENT_BITMAP*: [BMPTol].
-
-	+ *SRL_ITEM_IDENT_COLOUR*: [COLOUR Tol, Minimum Colour Count].
-
-	+ *SRL_ITEM_IDENT_MASK*: [BMPTol, ContourTol].
+Parameters are exactly the same as ItemCoordinates.
 
 .. note::
 
-	by masquerader modified by ZephyrsFury.
+	Author: masquerader
+  Modified: Unknown by ZephyrsFury
 
 Example:
 
 .. code-block:: pascal
 
-.. note::
-	Modified: Unknown
-
+  var
+    itemsFound: integer;
+  begin
+	  itemsFound := ItemAmount(SRL_AREA_INVENOTORY, SRL_ITEM_IDENT_DTM, dtm_Ore, []);
+    writeln('Ore found: '+toStr(itemsFound));
+  end;
 *)
 function ItemAmount(area, ItemType, Item_IDENT: Integer; Tol: TIntegerArray): Integer;
 var
@@ -565,29 +554,26 @@ FindCoins
 
 .. code-block:: pascal
 
-	function FindCoins(var X, Y: Integer; Area: Integer): Boolean;
+	function FindCoins(var X, Y: Integer; Area: string): Boolean;
 
-Finds coins in Area and stores the coords in x and y.
+Returns true if coins are found in the given area (Area). If found, stores their
+coordinates in X, Y.
 
 .. note::
 
-	by ZephyrsFury.
+	Author: ZephyrsFury
+  Last Modified: Unknown
 
 Example:
 
 .. code-block:: pascal
 
-	var
-	  cx, cy, numCoins: Integer;
-	begin
-	  if (FindCoins(cx, cy, SRL_ITEMINT_INVENTORY)) then
-	    numCoins := getAmount(cx, cy);
-	end;
-
-.. note::
-
-	Modified: 13 Jan 2011 - Nava2
-
+  var
+    x, y: integer;
+  begin
+    if (FindCoins(x, y, 'inv')) then
+      writeln('Coins found: '+toStr(GetAmount(x, y)));
+  end;
 *)
 function FindCoins(var X, Y: Integer; Area: Integer): Boolean;
 var
@@ -649,28 +635,20 @@ CoinAmount
 
 .. code-block:: pascal
 
-	function CoinAmount(Area: Integer): Integer;
+	function CoinAmount(Area: string): Integer;
 
-Returns the amount of coins in a specified interface.
+Returns the amount of coins found in the given area.
 
 .. note::
 
-	by ZephyrsFury.
+	Author: ZephyrsFury
+  Last Modified: Unknown
 
 Example:
 
 .. code-block:: pascal
 
-	var
-	  numCoins: Integer;
-	begin
-	  numCoins := CoinAmount(SRL_ITEMINT_TRADE);
-	end;
-
-.. note::
-
-	Modified: unknown
-
+  writeln('Coins found: '+toStr(CoinAmount('inv')));
 *)
 function CoinAmount(Area: Integer): Integer;
 var
