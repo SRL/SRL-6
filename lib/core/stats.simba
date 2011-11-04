@@ -16,6 +16,8 @@ type
     Value: integer;
   end;
 
+const
+  stats_ShowStatsDialog = 'stats_ShowStatsDialog'; // Name for the Setting that will be set
 
 var
   stats_Vars: Array of TStats_Vars;
@@ -23,6 +25,174 @@ var
   stats_Timer: integer;
   stats_RandNames: Array of String;
   stats_RandSolved: Array of Integer;
+  stats_RandFailed: Array of Integer;
+  stats_form: TForm;
+  stats_txtUser, stats_txtPass, stats_txtEmail: TEdit;
+  stats_btnRegister, stats_btnCancel: TButton;
+  stats_lblUser, stats_lblPass, stats_lblEmail: TLabel;
+
+
+procedure stats_btnRegisterClick(Sender: TObject);
+var
+  stats_Client: integer;
+  stats_PostData, stats_strError, stats_strSuccess: string;
+  stats_Success: boolean;
+begin
+  // Check to make sure the user has filled in the Username and Password fields
+  if (Length(stats_txtUser.TEXT) = 0) OR (Length(stats_txtPass.TEXT) = 0) then
+  begin
+    MessageDlg('Error While Registering!', 'Please make sure you have entered a Username and Password into the appropriate fields.', mtError, [mbOk]);
+  end else
+  begin
+    try
+      stats_Client := InitializeHTTPClient(false, false);
+
+      // Set Post Data
+      stats_PostData := 'user=' + stats_txtUser.TEXT + '&pass=' + stats_txtPass.TEXT;
+      if Length(stats_txtEmail.TEXT) > 0 then
+        stats_PostData := stats_PostData + '&mail=' + stats_txtEmail.TEXT;
+
+      // Post data to STATS URL and receive response
+      stats_PostData := PostHTTPPage(stats_Client, 'http://stats.villavu.com/register', stats_PostData);
+      // Trim down the response to a bite size chunk
+      stats_PostData := Between('<div class="content">', '</form>', stats_PostData);
+
+      // If there is an error, strip out just the error message(s)
+      // (I know the replacement of <li> with <ERROR> is silly, but I'm tired
+      // and this fits at the time)
+      stats_strError := Replace(Between('<ul>', '</ul>', stats_PostData), 'li', 'ERROR');
+      // If successful, get the success response
+      stats_strSuccess := Between('<p>', '</p>', stats_PostData);
+
+      // This next part is weird, I know, but it's the only way I could figure
+      // out how to show right message(s)
+      if Length(stats_strError) > 0 then
+        MessageDlg('Error While Registering!', stats_strError + '!', mtError, [mbOk])
+      else if Length(stats_strSuccess) > 0 then
+      begin
+        MessageDlg('Registration Successful!', stats_strSuccess + ' You may find your account at: [url]http://stats.villavu.com[/url]' + Between('href="', '">', stats_PostData) + '. Please fill in the SRL Stats information in your script and run again, this script is now ending.', mtConfirmation, [mbOk]);
+        stats_Success := true;
+      end;
+    finally
+      FreeHTTPClient(stats_Client);
+
+      if stats_Success then
+        stats_form.CLOSE;
+    end;
+  end;
+end;
+
+procedure stats_btnCancelClick(Sender: TObject);
+begin
+  stats_form.CLOSE;
+end;
+
+procedure stats_formInit;
+begin
+  stats_form := TForm.create(nil);
+  with stats_form do
+  begin
+    caption := 'Register for SRL Stats';
+    setBounds(100, 100, 280, 130);
+  end;
+
+  stats_lblUser := TLabel.Create(stats_form);
+  with stats_lblUser do
+  begin
+    parent  := stats_form;
+    caption := 'Username: ';
+    top     := 10;
+    left    := 10;
+  end;
+
+  stats_lblPass := TLabel.Create(stats_form);
+  with stats_lblPass do
+  begin
+    parent  := stats_form;
+    caption := 'Password: ';
+    top     := 40;
+    left    := 10;
+  end;
+
+  stats_lblEmail := TLabel.Create(stats_form);
+  with stats_lblEmail do
+  begin
+    parent  := stats_form;
+    caption := 'Email (Opt): ';
+    top     := 70;
+    left    := 10;
+  end;
+
+  stats_txtUser := TEdit.Create(stats_form);
+  with stats_txtUser do
+  begin
+    parent    := stats_form;
+    setBounds(75, 7, 200, 25);
+    Hint      := 'Limit of 20 characters.';
+    ShowHint  := true;
+    MaxLength := 20;
+  end;
+
+  stats_txtPass := TEdit.Create(stats_form);
+  with stats_txtPass do
+  begin
+    parent        := stats_form;
+    setBounds(75, 37, 200, 25);
+    Hint          := 'Limit of 20 characters.';
+    ShowHint      := true;
+    MaxLength     := 20;
+    PASSWORDCHAR  := '*';
+  end;
+
+  stats_txtEmail := TEdit.Create(stats_form);
+  with stats_txtEmail do
+  begin
+    parent    := stats_form;
+    setBounds(75, 67, 200, 25);
+    Hint      := 'Limit of 40 characters, and also allows the characters email addresses can contain.';
+    ShowHint  := true;
+    MaxLength := 40;
+  end;
+
+  stats_btnRegister := TButton.Create(stats_form);
+  with stats_btnRegister do
+  begin
+    parent  := stats_form;
+    width   := 100;
+    height  := 25;
+    top     := 100;
+    left    := 10;
+    caption := 'Register';
+    onClick := @stats_btnRegisterClick;
+  end;
+
+  stats_btnCancel := TButton.Create(stats_form);
+  with stats_btnCancel do
+  begin
+    parent  := stats_form;
+    width   := 100;
+    height  := 25;
+    top     := 100;
+    left    := 175;
+    caption := 'Cancel';
+    onClick := @stats_btnCancelClick;
+  end;
+
+  stats_form.showModal;
+end;
+
+procedure stats_formSafeCall(proc: string);
+var
+  stats_v: TVariantArray;
+begin
+  setLength(stats_v, 0);
+  threadSafeCall(proc, stats_v);
+end;
+
+procedure stats_formFree();
+begin
+  stats_form.free();
+end;
 
 
 (*
@@ -44,14 +214,38 @@ begin
   stats_Timer := GetSystemTime;
   stats_ScriptID := IntToStr(ScriptID);
   stats_Username := LowerCase(UserName);
-  stats_UserPass := LowerCase(UserPass);
-  stats_RandNames := ['leo the gravedigger', 'freaky forester', 'maze',
-                      'prison pete', 'evil bob''s island', 'drill demon',
-                      'quiz', 'surprise exam', 'mollys evil twin', 'pinball',
-                      'sandwich lady', 'bee keeper', 'pillory', 'capn arnav',
-                      'abyssal teleport', 'certer', 'mime', 'frog', 'trade',
-                      'mod', 'fight', 'lamp', 'bird nest', 'death'];
+  stats_UserPass := UserPass;
+  stats_RandNames := ['Leo', 'Forester', 'Maze', 'P. Pete', 'Evil Bob',
+                      'Demon', 'Quiz', 'Mordaut', 'Molly', 'Pinball',
+                      'Sandwich', 'Beekeeper', 'Pillory', 'Arnav', 'Abyss',
+                      'Certer', 'Mime', 'Frog'];
   SetArrayLength(stats_RandSolved, Length(stats_RandNames));
+  SetArrayLength(stats_RandFailed, Length(stats_RandNames));
+  if ((stats_Username = '') AND (stats_UserPass = '')) AND (StrToBoolDef(GetSettingValue(stats_ShowStatsDialog), True)) then
+  begin
+    case MessageBox('No Stats account entered, would you like to set one up?', 'SRL Stats', mbYesNoCancel) of
+      mrYes:
+      begin
+        try
+          stats_formSafeCall('stats_formInit');
+        except
+          writeln(exceptionToString(exceptionType, exceptionParam));
+        finally
+          stats_formSafeCall('stats_formFree');
+        end;
+      end;
+      mrNo:
+      begin
+        case MessageBox('Would you want to disable this dialog from showing again in the future? (Not Recommended)', 'Disable this dialog?', mbYesNoCancel) of
+          mrYes: SetSettingValue(stats_ShowStatsDialog, 'FALSE');
+          mrNo, mrCancel: Exit;
+        end;
+            stats_Username := 'Anonymous';
+            stats_UserPass := 'anon1337';
+      end;
+      mrCancel: TerminateScript;
+    end;
+  end;
 end;
 
 (*
@@ -170,7 +364,7 @@ Example:
 *)
 function stats_Commit: Boolean;
 var
-  SRLClient, Worked, i, ExtraTime: integer;
+  SRLClient, Worked, i, ExtraTime, Increment: integer;
   S: String;
 begin
   ExtraTime := GetSystemTime - stats_Timer;
@@ -180,7 +374,7 @@ begin
   ExtraTime := ExtraTime - (Worked*60000);
 
   stats_Timer := GetSystemTime - ExtraTime;
-  SRLClient := InitializeHTTPClient(False);
+  SRLClient := InitializeHTTPClientWrap(False);
   ClearPostData(SRLClient);
 
   AddPostVariable(SRLClient, 'user', stats_UserName);
@@ -188,16 +382,23 @@ begin
   AddPostVariable(SRLClient, 'script', stats_ScriptID);
   AddPostVariable(SRLClient, 'time', IntToStr(Worked));
 
-  for i := 0 to 23 do
-    if (RandSolved[i] > stats_RandSolved[i]) then
+  for i := rand_Leo to rand_Frog do
+  begin
+    // Update solved stats.
+    Increment := RandSolved[i] - stats_RandSolved[i];
+    if (Increment > 0) then
     begin
-      AddPostVariable(
-          SRLClient,
-          stats_RandNames[i],
-          IntToStr(RandSolved[i]-stats_RandSolved[i])
-      );
-      stats_RandSolved[i]:= RandSolved[i];
+      stats_IncVariable(stats_RandNames[i] + ' (Solved)', Increment);
+      stats_RandSolved[i] := RandSolved[i];
     end;
+    // Update unsolved stats.
+    Increment := RandFailed[i] - stats_RandFailed[i];
+    if (Increment > 0) then
+    begin
+      stats_IncVariable(stats_RandNames[i] + ' (Unsolved)', Increment);
+      stats_RandFailed[i] := RandFailed[i];
+    end;
+  end;
 
   if (Length(stats_Vars) > 0) then
    for i :=  High(stats_Vars) downto 0 do
