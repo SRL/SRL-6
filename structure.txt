@@ -1,0 +1,22 @@
+-- SRL/
+   -- doc/
+   -- info/
+      -- authors.txt
+      -- license.txt
+      -- readme.txt
+   -- lib/  
+      -- antirandoms/
+      -- core/
+         -- globals, stats, mouse, login, worldswitcher, players
+      -- gametabs/
+         -- inventory, magic, equipment, etc.
+      -- minimap/
+         -- mapwalk, flag, symbol
+      -- interfaces/
+         -- lobby, bank, shop, chat
+      -- items/
+         -- amount  
+      -- misc/
+   -- logs/
+   -- tools/
+   -- srl.simba
