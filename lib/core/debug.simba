@@ -1,0 +1,227 @@
+(*
+Debug
+=====
+
+The debug file holds any files used for SRL debugging and logging.
+
+*)
+
+var
+  debugLevel = 1; // used for the nice debug formatting
+  disableSRLDebug = false;
+  logPath = includePath + 'SRL-6/logs/';
+  scriptStartTime = '0:0:0';
+  disableSRLLog = false;
+
+(*
+OpenLogFile
+~~~~~~~~~~~
+
+.. code-block:: pascal
+
+    function OpenLogFile(): integer;
+
+Creates the SRL log file.
+
+.. note::
+
+    by Coh3n
+    Last Modified: Feb. 20th, 2012 by Coh3n
+
+Example:
+
+.. code-block:: pascal
+
+  OpenLogFile();
+
+*)
+function OpenLogFile(): integer;
+var
+  fileName: string;
+begin
+  if (disableSRLLog) then
+    exit;
+
+  if (not directoryExists(logPath)) then
+    forceDirectories(logPath);
+
+  // make sure it's a valid file name (Windows)
+  fileName := 'SRL log ('+scriptStartTime+').txt';
+  fileName := replace(fileName, '/', '-', [rfReplaceAll]);
+  fileName := replace(fileName, ':', '-', [rfReplaceAll]);
+  fileName := logPath + fileName;
+
+  try
+    if (fileExists(fileName)) then
+      result := appendFile(fileName)
+    else
+      result := createFile(fileName);
+  except
+    writeln('Could not open log file');
+  end;
+end;
+
+(*
+AddToLog
+~~~~~~~~
+
+.. code-block:: pascal
+
+    procedure AddToLog(s : string);
+
+Writes the string 's' to the SRL log file.
+
+.. note::
+
+    by Markus
+    Last Modified: Feb. 20th, 2012 by Coh3n
+
+Example:
+
+.. code-block:: pascal
+
+  AddToLog('Adding to SRL log file!');
+
+*)
+procedure AddToLog(s: string);
+var
+  tmpFile: integer;
+begin
+  if (disableSRLLog) then
+    exit;
+
+  tmpFile := OpenLogFile();
+
+  if (tmpFile >= 0) then
+    try
+      writeFileString(tmpFile, '['+msToTime(getTimeRunning(), TIME_BARE)+']: '+s+#13+#10);
+    except
+      writeln('Could not write to log file');
+    finally
+      closeFile(tmpFile);
+    end;
+end;
+
+(*
+Debug
+~~~~~
+
+.. code-block:: pascal
+
+    procedure Debug(txt: string);
+
+Prints 'txt' to the debug box in the SRL debug format.
+
+.. note::
+
+  by Coh3n
+
+Example:
+
+.. code-block:: pascal
+
+  Debug(TheDate);
+
+*)
+procedure Debug(txt: string);
+var
+  debugMSG: string;
+begin
+  if (disableSRLDebug) then
+    exit;
+
+  debugMSG := debugMSG + Replicate('-', debugLevel * 2) + ' ';
+  debugMSG := debugMSG + txt;
+
+  if (not disableSRLLog) then
+    AddToLog(debugMSG);
+
+  writeln(debugMSG)
+end;
+
+(*
+AddHeader
+~~~~~~~~~
+
+.. code-block:: pascal
+
+    procedure AddHeader(header: string);
+
+Creates a new header in the debug box. Means that all following debugs will be
+indented 2 spaces with respect to the header. Should be called at the beginning
+of a procedure or function.
+
+.. note::
+
+  by Sir R. Magician
+
+Example:
+
+.. code-block:: pascal
+
+  AddHeader('OpenBank()');
+
+*)
+procedure AddHeader(header: string);
+begin
+  Debug(header);
+  inc(debugLevel);
+end;
+
+(*
+CloseHeader
+~~~~~~~~~~~
+
+.. code-block:: pascal
+
+    procedure CloseHeader(closer: string);
+
+Closes the current proceudre or function. Will print "closer" to the debug box.
+This should be called at the end of a function or procedure.
+
+.. note::
+
+  by Sir R. Magician
+
+Example:
+
+.. code-block:: pascal
+
+  CloseHeader('OpenBank(): '+result);
+
+*)
+procedure CloseHeader(closer: string);
+begin
+  Dec(debugLevel);
+  Debug(closer);
+end;
+
+(*
+SubDebug
+~~~~~~~~
+
+.. code-block:: pascal
+
+    procedure SubDebug(txt: string);
+
+Allows a one-time-only indented debug.  Used in smaller procedures that don't
+call Add/CloseHeader
+
+.. note::
+
+  by Sir R. Magician
+
+Example:
+
+.. code-block:: pascal
+
+  SubDebug('BankScreen: screen not open');
+
+*)
+procedure SubDebug(txt: string);
+begin
+  inc(debugLevel);
+  Debug(txt);
+  dec(debugLevel);
+end;
+

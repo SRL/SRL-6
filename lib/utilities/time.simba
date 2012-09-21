@@ -1,0 +1,249 @@
+(*
+Time
+====
+
+The time file includes any functions that have anything to do with time: timers,
+the time of day, conversions, etc.
+
+*)
+
+const
+  TIME_FORMAL = 0;
+  TIME_SHORT  = 1;
+  TIME_ABBREV = 2;
+  TIME_BARE   = 3;
+  TIME_FSTOP  = 4;
+
+  DATE_FORMAL = 1;
+  DATE_MONTH  = 2;
+  DATE_DAY    = 3;
+
+(*
+MsToTime
+~~~~~~~~
+
+.. code-block:: pascal
+
+    function MsToTime(MS, StrType: Integer): string;
+
+Takes MS in milliseconds and outputs a string with hours, mins and
+seconds. Different styles can be created with different StrType values:
+Str Type:
+
+    -  TIME_FORMAL: 2 Hours, 47 Minutes and 28 Seconds
+    -  TIME_SHORT: 02h, 47m, 28s
+    -  TIME_ABBREV: 2 hr, 47 min, 28 sec
+    -  TIME_BARE: 02:47:28
+    -  TIME_FSTOP: 12.04.40
+
+.. note::
+
+  by Zephyrsfury, Nava2 and Rasta Magician.
+
+Example:
+
+.. code-block:: pascal
+
+  writeln(500000, TIME_SHORT);
+
+*)
+function MsToTime(MS, TheType: Integer): string;
+var
+  STA: array [0..4] of TVariantArray;
+  Time: array [0..2] of Integer;
+  i: Integer;
+begin
+  Result := '';
+
+  if (not(InRange(TheType, 0, High(STA)))) then
+    TheType := TIME_BARE;
+
+  STA[TIME_FORMAL] := [' Hours, ', ' Minutes and ', ' Seconds', False, 0];
+  STA[TIME_SHORT] := ['h ', 'm ', 's', False, 2];
+  STA[TIME_ABBREV] := [' hr ', ' min ', ' sec', False, 0];
+  STA[TIME_BARE] := [':', ':', '', True, 2];
+  STA[TIME_FSTOP] := ['.', '.', '', True, 2];
+
+  ConvertTime(MS, Time[0], Time[1], Time[2]);
+
+  for i := 0 to 2 do
+    if (Time[i] > 0) or (STA[TheType][3]) or (i = 2) then
+      Result := Result + PadZ(IntToStr(Time[i]), STA[TheType][4]) + STA[TheType][i];
+end;
+
+(*
+TimeRunning
+~~~~~~~~~~~
+
+.. code-block:: pascal
+
+    function TimeRunning: String;
+
+Returns Time since the script was started (GetTimeRunning).
+
+.. note::
+
+  by Rasta Magician.
+
+Example:
+
+.. code-block:: pascal
+
+  writeln('Script time: '+timeRunning);
+*)
+function TimeRunning: string;
+begin
+  Result := MsToTime(GetTimeRunning, TIME_FORMAL);
+end;
+
+(*
+MarkTime
+~~~~~~~~
+
+.. code-block:: pascal
+
+    procedure MarkTime(var TimeMarker: Integer);
+
+Sets TimeMarker to current system time.
+
+.. note::
+
+  by Stupid3ooo
+
+Example:
+
+.. code-block:: pascal
+
+  var
+    timer: integer;
+  begin
+    markTime(timer);
+    .
+    .
+    .
+  end;
+
+*)
+procedure MarkTime(var TimeMarker: Integer);
+begin
+  TimeMarker := GetSystemTime;
+end;
+
+(*
+TimeFromMark
+~~~~~~~~~~~~
+
+.. code-block:: pascal
+
+    function TimeFromMark(TimeMarker: Integer): Integer;
+
+Returns Milliseconds since MarkTime was set
+
+.. note::
+
+  by Stupid3ooo
+
+Example:
+
+.. code-block:: pascal
+
+  writeln('Time from mark: '+timeFromMark(timer));
+
+*)
+function TimeFromMark(TimeMarker: Integer): Integer;
+begin
+  Result := GetSystemTime - TimeMarker;
+end;
+
+(*
+TheTime
+~~~~~~~~
+
+.. code-block:: pascal
+
+    function TheTime: string;
+
+Returns current time as a string.
+
+.. note::
+
+  by RsN (fixed by Ron and Markus)
+
+Example:
+
+.. code-block:: pascal
+
+  writeln(TheTime);
+
+*)
+function TheTime: string;
+var
+  Hour, Mins, Sec, MSec: Word;
+  PAM: string;
+begin
+  DecodeTime(Now, Hour, Mins, Sec, MSec);
+  PAM := 'AM';
+  if (Hour > 12) then
+  begin
+    Hour := Hour - 12;
+    PAM := 'PM';
+  end else if (Hour = 12) then
+    PAM := 'PM'
+  else if (Hour = 0) then
+    Hour := 12;
+  Result := (Padz(IntToStr(Hour), 2) + ':' + Padz(IntToStr(Mins), 2) + ':' + Padz(IntToStr(Sec), 2) + ' ' + PAM);
+end;
+
+(*
+TheDate
+~~~~~~~
+
+.. code-block:: pascal
+
+    function TheDate(DateFormat: Integer): String;
+
+Returns the current date. DateFormats can be:
+
+    -   DATE_FORMAL = April 2nd, 2007  Month Day, Year
+    -   DATE_MONTH  = 04/02/07         Month/Day/Year
+    -   DATE_DAY    = 02-04-07         Day-Month-Year
+
+.. note::
+
+  by Ron, Nava2 & Narcle
+
+Example:
+
+.. code-block:: pascal
+
+  writeln(TheDate);
+
+*)
+function TheDate(DateFormat: Integer): string;
+var
+  Year, Month, Day: Word;
+  D: string;
+  Mnths, sfx: TStringArray;
+begin
+  DecodeDate(Date, Year, Month, Day);
+  Mnths := ['January', 'February', 'March', 'April', 'May', 'June', 'July',
+            'August', 'September', 'October', 'November', 'December'];
+  sfx := ['st', 'nd', 'rd'];
+
+  case DateFormat of
+    DATE_FORMAL:
+      begin
+        if InRange(Day mod 10, 1, 3) and not InRange(Day, 11, 13) then
+          D := sfx[(Day mod 10)-1]
+        else
+          D := 'th';
+        Result := Mnths[Month - 1] + ' ' + IntToStr(Day) + D +', ' + IntToStr(Year);
+      end;
+
+    DATE_MONTH:
+      Result := Padz(IntToStr(Month), 2) + '/' + Padz(IntToStr(Day), 2) + '/' + Copy(IntToStr(Year), 3, 4);
+
+    DATE_DAY:
+      Result := Padz(IntToStr(Day), 2) + '-' + Padz(IntToStr(Month), 2) + '-' + Copy(IntToStr(Year), 3, 4);
+  end;
+end;

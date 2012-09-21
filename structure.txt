@@ -1,3 +1,5 @@
+A structure of SRL-6.  Only includes the files that have been finished.
+
 -- SRL/
    -- doc/
    -- info/
@@ -7,16 +9,14 @@
    -- lib/  
       -- antirandoms/
       -- core/
-         -- globals, stats, mouse, login, worldswitcher, players
+         -- debug.simba
       -- gametabs/
-         -- inventory, magic, equipment, etc.
       -- minimap/
-         -- mapwalk, flag, symbol
       -- interfaces/
-         -- lobby, bank, shop, chat
       -- items/
-         -- amount  
       -- misc/
+      -- utilities/
+         -- time.simba
    -- logs/
    -- tools/
    -- srl.simba

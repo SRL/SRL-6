@@ -1,0 +1,11 @@
+Changes from SRL5
+~~~~~~~~~~~~~~~~~
+
+EVERYTHING should be recorded here: new features, function name changes,
+user-defined variables... everything! Everything here will be explained in the
+SRL6 release thread.
+
+- new debug system
+  - variables
+    - disableSRLDebug, disableSRLLog: boolean;
+  - logs are automatically saved in srl/logs/

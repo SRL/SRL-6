@@ -1,0 +1,19 @@
+(*
+SRL
+===
+
+The SRL file is the most important file in SRL.  It's the file included in
+every script that requires an SRL function.  Without this file included, the
+SRL library isn't available to you.
+
+*)
+
+{$i lib/utilities/time.simba}
+
+{$i lib/core/debug.simba} // requires time.simba **
+
+function SetupSRL(): boolean;
+begin
+  scriptStartTime := replace(theDate(DATE_DAY)+' at '+theTime(), ':', '.', [rfReplaceAll]);
+  result := true;
+end;
