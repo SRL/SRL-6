@@ -1,0 +1,34 @@
+(*
+Login
+=====
+
+The Login file holds any functions that have anything to do with logging a
+player into the game.
+*)
+
+(*
+LoggedIn
+~~~~~~~~
+
+.. code-block:: pascal
+
+    function LoggedIn: Boolean;
+
+Returns true if a player is logged in.
+
+.. note::
+
+    by WT-Fakawi
+    Last updated: 30/09/2012 by Coh3n
+
+Example:
+
+.. code-block:: pascal
+
+  if (loggedIn) then
+    writeln('We are logged in!');
+*)
+function LoggedIn: Boolean;
+begin
+  Result := (GetColor(478, 543) = 16777215); // white text on report abuse button
+end;

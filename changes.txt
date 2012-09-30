@@ -5,7 +5,18 @@ EVERYTHING should be recorded here: new features, function name changes,
 user-defined variables... everything! Everything here will be explained in the
 SRL6 release thread.
 
-- new debug system
+- debug.simba
   - variables
     - disableSRLDebug, disableSRLLog: boolean;
   - logs are automatically saved in srl/logs/
+- players.simba
+  - TUser renamed to TPlayer
+  - attributes removed: worldInfo, nick, status, skill, banked, rand, arrays, boxRewards
+  - attributes renamed: loginName, bankPin, password, location
+  - attributes added: displayName, findMod, findTrade, reincarnate, variants
+  - removed var checkHPFirst
+  - removed var logoutOnMod
+  - removed var reincarnate
+  - removed function allPlayersInactive();
+  - removed function numberOfPlayers(number: integer);
+  - moved function loggedIn() to login.simba

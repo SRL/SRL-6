@@ -1,0 +1,172 @@
+(*
+Player Management
+=================
+
+The Players file stores the functions related to the Players array. It also
+stores properties of the TPlayer type.
+*)
+
+(*
+Constant: Skills
+~~~~~~~~~~~~~~~~
+
+Integer constants that represent each skill.
+
+Example:
+
+.. code-block:: pascal
+
+  players[currentPlayer].skillLevel[SKILL_ATTACK] := 50;
+
+*)
+const
+  SKILL_COUNT = 25;
+    SKILL_ATTACK = 0;
+    SKILL_DEFENCE = 1;
+    SKILL_STRENGTH = 2;
+    SKILL_HITPOINTS = 3;
+    SKILL_RANGE = 4;
+    SKILL_PRAYER = 5;
+    SKILL_MAGIC = 6;
+    SKILL_COOKING = 7;
+    SKILL_WOODCUTTING = 8;
+    SKILL_FLETCHING = 9;
+    SKILL_FISHING = 10;
+    SKILL_FIREMAKING = 11;
+    SKILL_CRAFTING = 12;
+    SKILL_SMITHING = 13;
+    SKILL_MINING = 14;
+    SKILL_HERBLORE = 15;
+    SKILL_AGILITY = 16;
+    SKILL_THIEVING = 17;
+    SKILL_SLAYER = 18;
+    SKILL_FARMING = 19;
+    SKILL_RUNECRAFTING = 20;
+    SKILL_HUNTER = 21;
+    SKILL_CONSTRUCTION = 22;
+    SKILL_SUMMONING = 23;
+    SKILL_DUNGEONEERING = 24;
+
+(*
+Type: TPlayer
+~~~~~~~~~~~~~
+
+A record that stores useful information about the current players.  It is up to
+the scripter to set these attributes in their scripts.
+
+Example:
+
+.. code-block:: pascal
+
+  with players[0] do
+  begin
+    loginName := 'example@example.com';
+    displayName := 'Sir Example III';
+    password := 'thisismypassword12345';
+  end;
+
+*)
+type
+  TPlayer = record
+    loginName: string;
+    displayName: string;
+    password: string;
+    bankPin: string;
+    location: string;
+    active: boolean;
+    member: boolean;
+    findMod: boolean;
+    findTrade: boolean;
+    reincarnate: boolean;
+    worked: integer;
+    skillLevel: array[0..(SKILL_COUNT - 1)] of integer;
+    booleans: array[0..99] of boolean;
+    integers: array[0..99] of integer;
+    strings: array[0..99] of string;
+    extendeds: array[0..99] of extended;
+    variants: array[0..99] of variant;
+  end;
+
+(*
+Player Variables
+~~~~~~~~~~~~~~~~
+
+All the variables associated with players.simba.
+
+  * players: used to store player information.
+  * currentPlayer: the player currently running.
+  * numberOfPlayers: how many players to run.
+  * playerCurTime, playerStartTime: used to calcualte players[].worked.
+
+*)
+var
+  players: array of TPlayer;
+  currentPlayer, numberOfPlayers: integer;
+  playerCurTime, playerStartTime: longInt;
+
+(*
+PlayersActive
+~~~~~~~~~~~~~
+
+.. code-block:: pascal
+
+    function PlayersActive: Integer;
+
+Returns the number of players that are still active.
+
+.. note::
+
+    by ss23
+
+Example:
+
+.. code-block:: pascal
+
+  while (playersActive > 0) do
+    mainloop();
+*)
+function PlayersActive: Integer;
+var
+  i, h: Integer;
+begin
+  Result := 0;
+  h := High(Players);
+
+  for i := 0 to h do
+    if (Players[i].Active) then
+      Inc(Result);
+end;
+
+(*
+PlayerWorked
+~~~~~~~~~~~~
+
+.. code-block:: pascal
+
+    function PlayerWorked(player: integer): integer;
+
+Returns the time a player has worked in milliseconds. Usually used for progress
+reports and max timers.
+
+.. note::
+
+    by SRL Community
+
+Example:
+
+.. code-block:: pascal
+
+  writeln('Player '+0+': has worked '+player[0].worked+' ms.');
+
+*)
+function PlayerWorked(player: integer): integer;
+begin
+  if (player = currentPlayer) then
+    if (playerStartTime > 0) then // if it's been set at all
+    begin
+      incEx(players[player].worked, (getSystemTime - playerStartTime));
+      playerStartTime := getSystemTime;
+    end;
+
+  result := players[player].worked;
+end;

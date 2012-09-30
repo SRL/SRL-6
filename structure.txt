@@ -10,6 +10,8 @@ A structure of SRL-6.  Only includes the files that have been finished.
       -- antirandoms/
       -- core/
          -- debug.simba
+         -- players.simba
+         -- login.simba
       -- gametabs/
       -- minimap/
       -- interfaces/
