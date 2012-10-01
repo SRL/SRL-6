@@ -14,9 +14,6 @@ SRL6 release thread.
   - attributes removed: worldInfo, nick, status, skill, banked, rand, arrays, boxRewards
   - attributes renamed: loginName, bankPin, password, location
   - attributes added: displayName, findMod, findTrade, reincarnate, variants
-  - removed var checkHPFirst
-  - removed var logoutOnMod
-  - removed var reincarnate
-  - removed function allPlayersInactive();
-  - removed function numberOfPlayers(number: integer);
+  - removed variables checkHPFirst, logoutOnMod, reincarnate
+  - removed functions allPlayersInactive, numberOfPlayers
   - moved function loggedIn() to login.simba
