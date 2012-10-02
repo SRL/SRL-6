@@ -6,6 +6,8 @@ The debug file holds any files used for SRL debugging and logging.
 
 *)
 
+{$include_once ../utilities/time.simba}
+
 var
   debugLevel = 1; // used for the nice debug formatting
   disableSRLDebug = false;
@@ -81,7 +83,6 @@ Example:
 .. code-block:: pascal
 
   AddToLog('Adding to SRL log file!');
-
 *)
 procedure AddToLog(s: string);
 var

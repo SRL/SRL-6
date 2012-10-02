@@ -1,0 +1,85 @@
+(*
+Lobby
+=====
+
+The lobby file holds functions and procedures that are used in the Runescape
+lobby.
+*)
+
+(*
+Constant: Lobby
+~~~~~~~~~~~~~~~
+
+Integer constants that representing the different lobby tabs.
+
+Example:
+
+.. code-block:: pascal
+
+  if (GetLobbyScreen() = LOBBY_CLAN) then
+    writeln('The clan chat tab is open!');
+*)
+const
+  LOBBY_COUNT = 6;
+    LOBBY_PLAYER = 0;
+    LOBBY_WORLD = 1;
+    LOBBY_FRIENDS = 2;
+    LOBBY_CHAT = 3;
+    LOBBY_CLAN = 4;
+    LOBBY_OPTIONS = 5;
+
+(*
+GetLobbyTab
+~~~~~~~~~~~
+
+.. code-block:: pascal
+
+    function GetLobbyTab: Integer;
+
+Gets current lobby tab.
+
+.. note::
+
+    by Bionicle1800, NCDS
+
+Example:
+
+.. code-block:: pascal
+
+*)
+function GetLobbyTab: Integer;
+begin
+  for result := 0 to (LOBBY_COUNT - 1) do
+    if (GetColor(63 + result * 102, 32) = 11516354) then
+      exit;
+
+  Result := -1;
+end;
+
+(*
+LobbyScreen
+~~~~~~~~~~~
+
+.. code-block:: pascal
+
+    function LobbyScreen: Boolean;
+
+Returns true if we are at the lobby screen is loaded.
+
+.. note::
+
+    by IceFire908 & Bionicle1800
+
+Example:
+
+.. code-block:: pascal
+
+    // wait for the Lobby Screen to appear!
+    while (not LobbyScreen) do
+      Wait(100 + Random(400));
+
+*)
+function LobbyScreen: Boolean;
+begin
+  Result := InRange(GetLobbyTab, LOBBY_PLAYER, LOBBY_OPTIONS);
+end;

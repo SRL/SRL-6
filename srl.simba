@@ -8,22 +8,27 @@ SRL library isn't available to you.
 
 *)
 
-{$i lib/utilities/time.simba}
+{$include_once lib/core/globals.simba}
+{$include_once lib/core/debug.simba}
+{$include_once lib/core/players.simba}
+{$include_once lib/core/login.simba}
 
-{$i lib/core/debug.simba} // requires time.simba **
-{$i lib/core/players.simba}
-{$i lib/core/login.simba}
+{$include_once lib/interfaces/lobby.simba}
+
+{$include_once lib/utilities/time.simba}
 
 function SetupSRL(): boolean;
+var
+  t: integer;
 begin
+  t := getSystemTime();
+
   scriptStartTime := replace(theDate(DATE_DAY)+' at '+theTime(), ':', '.', [rfReplaceAll]);
 
-  setLength(players, numberOfPlayers);
-
+  writeln('Set up SRL in ', (getSystemTime - t), 'ms');
   result := true;
 end;
 
 begin
-  clearDebug();
-  setupSRL();
+  SetupSRL();
 end;

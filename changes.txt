@@ -5,10 +5,13 @@ EVERYTHING should be recorded here: new features, function name changes,
 user-defined variables... everything! Everything here will be explained in the
 SRL6 release thread.
 
+- no longer need to call SetupSRL since Lape has initialization (see the end of srl.simba for details)
+
 - debug.simba
   - variables
     - disableSRLDebug, disableSRLLog: boolean;
   - logs are automatically saved in srl/logs/
+
 - players.simba
   - TUser renamed to TPlayer
   - attributes removed: worldInfo, nick, status, skill, banked, rand, arrays, boxRewards
@@ -17,3 +20,10 @@ SRL6 release thread.
   - removed variables checkHPFirst, logoutOnMod, reincarnate
   - removed functions allPlayersInactive, numberOfPlayers
   - moved function loggedIn() to login.simba
+
+- globals.simba
+  - renamed variable SRL_Proc to events
+  - renamed constant onRSUpdate to RS_UPDATE
+
+- lobby.simba
+  - renamed constants to LOBBY_PLAYER/WORLD/FRIENDS/CHAT/CLAN/OPTIONS

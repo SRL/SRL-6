@@ -1,0 +1,43 @@
+(*
+Globals
+=======
+
+The globals file holds any variables used throughout multiple files in SRL.
+
+*)
+
+(*
+Constant: Events
+~~~~~~~~~~~~~~~~
+
+Integer constants of all the events called througout SRL.
+
+Example:
+
+.. code-block:: pascal
+
+  events[RS_UPDATE] := @SixHourFix;
+
+*)
+const
+  EVENT_COUNT = 1;
+    RS_UPDATE = 0;
+
+(*
+Variable: Events
+~~~~~~~~~~~~~~~~
+
+Events that are called throuhgout SRL. These events can be set in any script
+so custom procedures can be called in certain areas of SRL.
+
+Example:
+
+.. code-block:: pascal
+
+  events[RS_UPDATE] := @SixHourFix;
+
+*)
+var
+  events: array[0..(EVENT_COUNT - 1)] of procedure;
+
+

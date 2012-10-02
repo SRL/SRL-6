@@ -12,9 +12,11 @@ A structure of SRL-6.  Only includes the files that have been finished.
          -- debug.simba
          -- players.simba
          -- login.simba
+         -- globals.simba
       -- gametabs/
       -- minimap/
       -- interfaces/
+         -- lobby.simba
       -- items/
       -- misc/
       -- utilities/
