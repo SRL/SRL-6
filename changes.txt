@@ -27,3 +27,8 @@ SRL6 release thread.
 
 - lobby.simba
   - renamed constants to LOBBY_PLAYER/WORLD/FRIENDS/CHAT/CLAN/OPTIONS
+
+- inventory.simba
+  - TIventItem renamed TItem
+  - attributes added: ColorArr, Name, TPACount, CheckSum
+  - TInvenItemArr renamed TItems
