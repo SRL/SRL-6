@@ -17,3 +17,7 @@ SRL6 release thread.
   - removed variables checkHPFirst, logoutOnMod, reincarnate
   - removed functions allPlayersInactive, numberOfPlayers
   - moved function loggedIn() to login.simba
+- inventory.simba
+  - TIventItem renamed TItem
+  - attributes added: ColorArr, Name, TPACount, CheckSum
+  - TInvenItemArr renamed TItems
