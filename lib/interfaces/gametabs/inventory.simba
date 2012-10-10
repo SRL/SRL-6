@@ -8,41 +8,94 @@ The Inventory include contains all inventory-related functions.
 
 *)
 
-{ const srl_outline_black
-  Description: Black Color outline}
+(*
+Constant: SRL_Outline
+~~~~~~~~~~~~~~~~
+
+Integer constants that represents item outline color.
+
+Example:
+
+.. code-block:: pascal
+
+  FindColorsTolerance(P, SRL_OUTLINE_BLACK, Box.X1, Box.Y1, Box.X2, Box.Y2, 0);
+
+*)
 const
   SRL_OUTLINE_BLACK = 131072;
   SRL_OUTLINE_WHITE = 16777215;
 
-{ const MIX1, MIY1, MIX2, MIY2;
-  Description: Inventory EdgePoints. }
+(*
+Constant: Inventory TBox Coordinates
+~~~~~~~~~~~~~~~~
+
+Integer constants that represents TBox coordinates for the inventory.
+
+Example:
+
+.. code-block:: pascal
+
+  Result := (not FindColor(X, Y, SRL_OUTLINE_BLACK, MIX1, MIY1, MIX2, MIY2));
+
+*)
 const
   MIX1 = 547;
   MIY1 = 252;
   MIX2 = 737;
   MIY2 = 506;
 
-{ const MICX, MICY;
-  Description: Inventory Centre Points. }
+(*
+Constant: Center Inventory Coordinates
+~~~~~~~~~~~~~~~~
+
+Integer constants that represents center point of the inventory
+
+Example:
+
+.. code-block:: pascal
+
+  Result := (not FindColor(X, Y, SRL_OUTLINE_BLACK, MIX1, MIY1, MIX2, MIY2));
+
+*)
 const
   MICX = 642;
   MICY = 384;
+
+(*
+Type: TItem
+~~~~~~~~~~~~~
+
+A record that stores useful information about inventory Items.  It is up to
+the scripter to use these attributes in their scripts.
+
+Example:
+
+.. code-block:: pascal
+
+  with TItem do
+  begin
+    Name := 'Log';
+    Slot := 1;
+    Stack := False;
+  end;
+
+*)
 
 { type TInvenItem;
   Description: Holds data regarding an inventory item }
 type
   TItem  = record
-    Width, Height : Integer; // the width and height of the item
-    Count : Integer;         // the count of the item
-    ItemBox : TBox;          // the exact box around the item
-    CenterPoint : TPoint;    // the center point inside the item
-    ItemExist : Boolean;     // to define the item Exists
-    Name : String;           // to define name of an item.
-    ColorArr : TIntegerArray;// to define an array of colors
-    CheckSum : Integer;      // to define the checksum used in Item scanning
+    width, height : Integer; // the width and height of the item
+    count : Integer;         // the count of the item
+    itemBox : TBox;          // the exact box around the item
+    centerPoint : TPoint;    // the center point inside the item
+    itemExist : Boolean;     // to define the item Exists
+    name : String;           // to define name of an item.
+    colorArr : TIntegerArray;// to define an array of colors
+    checkSum : Integer;      // to define the checksum used in Item scanning
     TPACount : Integer;      // the length of the Items TPA
-    Slot : Integer;          // the Slot the item is in.
-    Stack : Boolean;         // to define if the item stacks
+    slot : Integer;          // the Slot the item is in.
+    stack : Boolean;         // to define if the item stacks
   end;
   TItemArray = array of TItem;
 
@@ -175,7 +228,7 @@ function getInventoryArray : TItemArray;
 var
   I: Byte;
 begin
-  SetArrayLength(Result, 28);
+  SetLength(Result, 28);
   for I := 0 to 27 do
    Result[I] := GetInven(i + 1);
 end;
