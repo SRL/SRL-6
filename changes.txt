@@ -19,5 +19,16 @@ SRL6 release thread.
   - moved function loggedIn() to login.simba
 - inventory.simba
   - TIventItem renamed TItem
-  - attributes added: ColorArr, Name, TPACount, CheckSum
-  - TInvenItemArr renamed TItems
+  - attributes added: ColorArr, Name, TPACount, CheckSum, Slot, Stack
+  - attributes renamed: ItemExist,
+  - TInvenItemArr renamed TItemArray
+  - Change function Parameter I to Slot
+  - added CONST
+    - SRL_BLACK_OUTLINE, SRL_WHITE_OUTLINE
+    - MIX1, MIY1, MIX2, MIY2, MICX, MICY
+  - invBox moved
+  - modified getInven, coordsToItem, itemExist, activatedItem
+  - renamed itemExist
+  - removed InvMouse, MMouseItem, MouseItem, DragItem, ClickAllItemsExcept, ClickAllItems,
+      DropItem, DropArray, DropPattern, DropAll, DropAllExcept, DropItemsByIdent,
+      ArrangeInv, CountItemsBlackList, ClickItemsBlackList
