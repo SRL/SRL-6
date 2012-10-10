@@ -25,10 +25,10 @@ begin
 
   scriptStartTime := replace(theDate(DATE_DAY)+' at '+theTime(), ':', '.', [rfReplaceAll]);
 
-  writeln('Set up SRL in ', (getSystemTime - t), 'ms');
+  writeln('Set up SRL in ', (getSystemTime - t), 'ms.');
   result := true;
 end;
 
 begin
-  SetupSRL();
+  setupSRL();
 end;

@@ -34,7 +34,7 @@ getLobbyTab
 
 .. code-block:: pascal
 
-    function getLobbyTab: Integer;
+    function getLobbyTab: integer;
 
 Gets current lobby tab.
 
@@ -46,11 +46,13 @@ Example:
 
 .. code-block:: pascal
 
+  if (getLobbyTab = LOBBY_WORLD) then
+    writeln('The world list is open!');
 *)
-function getLobbyTab: Integer;
+function getLobbyTab: integer;
 begin
   for result := 0 to (LOBBY_COUNT - 1) do
-    if (GetColor(63 + result * 102, 32) = 11516354) then
+    if (GetColor(63 + result * 102, 82) = 11516354) then
       exit;
 
   Result := -1;
@@ -62,7 +64,7 @@ lobbyScreen
 
 .. code-block:: pascal
 
-    function lobbyScreen: Boolean;
+    function lobbyScreen: boolean;
 
 Returns true if we are at the lobby screen is loaded.
 
@@ -76,10 +78,9 @@ Example:
 
     // wait for the Lobby Screen to appear!
     while (not lobbyScreen) do
-      Wait(100 + Random(400));
-
+      wait(100 + Random(400));
 *)
-function lobbyScreen: Boolean;
+function lobbyScreen: boolean;
 begin
-  Result := InRange(getLobbyTab, LOBBY_PLAYER, LOBBY_OPTIONS);
+  result := inRange(getLobbyTab, LOBBY_PLAYER, LOBBY_OPTIONS);
 end;
