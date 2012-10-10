@@ -9,8 +9,8 @@ The Inventory include contains all inventory-related functions.
 *)
 
 (*
-Constant: SRL_Outline
-~~~~~~~~~~~~~~~~
+Constant: Outline
+~~~~~~~~~~~~~~~~~
 
 Integer constants that represents item outline color.
 
@@ -18,16 +18,16 @@ Example:
 
 .. code-block:: pascal
 
-  FindColorsTolerance(P, SRL_OUTLINE_BLACK, Box.X1, Box.Y1, Box.X2, Box.Y2, 0);
+  FindColorsTolerance(P, OUTLINE_BLACK, Box.X1, Box.Y1, Box.X2, Box.Y2, 0);
 
 *)
 const
-  SRL_OUTLINE_BLACK = 131072;
-  SRL_OUTLINE_WHITE = 16777215;
+  OUTLINE_BLACK = 131072;
+  OUTLINE_WHITE = 16777215;
 
 (*
 Constant: Inventory TBox Coordinates
-~~~~~~~~~~~~~~~~
+~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
 
 Integer constants that represents TBox coordinates for the inventory.
 
@@ -35,7 +35,7 @@ Example:
 
 .. code-block:: pascal
 
-  Result := (not FindColor(X, Y, SRL_OUTLINE_BLACK, MIX1, MIY1, MIX2, MIY2));
+  Result := (not FindColor(X, Y, OUTLINE_BLACK, MIX1, MIY1, MIX2, MIY2));
 
 *)
 const
@@ -46,7 +46,7 @@ const
 
 (*
 Constant: Center Inventory Coordinates
-~~~~~~~~~~~~~~~~
+~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
 
 Integer constants that represents center point of the inventory
 
@@ -54,7 +54,7 @@ Example:
 
 .. code-block:: pascal
 
-  Result := (not FindColor(X, Y, SRL_OUTLINE_BLACK, MIX1, MIY1, MIX2, MIY2));
+  Result := (not FindColor(X, Y, OUTLINE_BLACK, MIX1, MIY1, MIX2, MIY2));
 
 *)
 const
@@ -63,7 +63,7 @@ const
 
 (*
 Type: TItem
-~~~~~~~~~~~~~
+~~~~~~~~~~~
 
 A record that stores useful information about inventory Items.  It is up to
 the scripter to use these attributes in their scripts.
@@ -80,9 +80,6 @@ Example:
   end;
 
 *)
-
-{ type TInvenItem;
-  Description: Holds data regarding an inventory item }
 type
   TItem  = record
     width, height : Integer; // the width and height of the item
@@ -122,8 +119,8 @@ Example:
 
 .. code-block:: pascal
 
-    iBox := invBox;
-    MMouse(randomRange(iBox.x1, iBox.x2), randomRange(iBox.y1, iBox.y2), 0, 0);
+  iBox := invBox;
+  MMouse(randomRange(iBox.x1, iBox.x2), randomRange(iBox.y1, iBox.y2), 0, 0);
 
 *)
 function invBox(Slot :Integer): TBox;
@@ -161,8 +158,8 @@ Example:
 
 .. code-block:: pascal
 
-    TItem := getInven(InvSlot);
-    MMouse(TItem.centerPoint.x, TItem.centerPoint.y, 2, 2);
+  TItem := getInven(InvSlot);
+  MMouse(TItem.centerPoint.x, TItem.centerPoint.y, 2, 2);
 
 *)
 function getInven(Slot: Integer) : TItem;
@@ -174,7 +171,7 @@ var
 begin
 //  GameTab(tab_Inv);
   Box := invBox(Slot);
-  FindColorsTolerance(P, SRL_OUTLINE_BLACK, Box.X1, Box.Y1, Box.X2, Box.Y2, 0);
+  FindColorsTolerance(P, OUTLINE_BLACK, Box.X1, Box.Y1, Box.X2, Box.Y2, 0);
   Result.Count := Length(P);
   if (Result.Count = 0) then Exit;
   Result.ItemExist := True;
@@ -219,9 +216,9 @@ Example:
 
 .. code-block:: pascal
 
-    invItems := getInventoryArray);
-    for i := 3 to 7 do
-      MMouse(invItems[i].centerPoint.x, invItems[i].centerPoint.y, 2, 2);
+  invItems := getInventoryArray);
+  for i := 3 to 7 do
+    MMouse(invItems[i].centerPoint.x, invItems[i].centerPoint.y, 2, 2);
 
 *)
 function getInventoryArray : TItemArray;
@@ -251,8 +248,8 @@ Example:
 
 .. code-block:: pascal
 
-    Coords := itemCoords(3);
-    MMouse(Coords.x, Coords.y, 2, 2);
+  Coords := itemCoords(3);
+  MMouse(Coords.x, Coords.y, 2, 2);
 
 *)
 function itemCoords(Slot: Integer): TPoint;
@@ -283,7 +280,7 @@ Example:
 
 .. code-block:: pascal
 
-    Writeln('Item found in slot '+IntToStr(coordsToItem(point.x, point.y)));
+  Writeln('Item found in slot '+IntToStr(coordsToItem(point.x, point.y)));
 
 *)
 function coordsToItem(X, Y: Integer): Integer;
@@ -314,9 +311,9 @@ Example:
 
 .. code-block:: pascal
 
-    for i := 1 to 7 do
-      if getInvItemBounds(i, iBox) then
-        Writeln('Item found in slot '+IntToStr(i));
+  for i := 1 to 7 do
+    if getInvItemBounds(i, iBox) then
+      Writeln('Item found in slot '+IntToStr(i));
 
 *)
 function getInvItemBounds(Slot: Integer; var T: TBox): Boolean;
@@ -324,7 +321,7 @@ var
   TPA: TPointArray;
 begin
 //  GameTab(tab_inv);                                                           //Off until Gametab is done
-  if (not FindColors(TPA, SRL_OUTLINE_BLACK, T.x1, T.y1, T.x2, T.y2)) then      //No shortcut elevation
+  if (not FindColors(TPA, OUTLINE_BLACK, T.x1, T.y1, T.x2, T.y2)) then          //No shortcut elevation
   begin
     Result := False;
     T := invBox(Slot);
@@ -336,7 +333,7 @@ end;
 
 (*
 itemExist
-~~~~~~~~~~
+~~~~~~~~~
 
 .. code-block:: pascal
 
@@ -352,9 +349,9 @@ Example:
 
 .. code-block:: pascal
 
-    for i := 1 to 28 do
-      if itemExist(i) then
-        Inc(Count);
+  for i := 1 to 28 do
+    if itemExist(i) then
+      Inc(Count);
 
 *)
 function itemExist(Slot: Integer): Boolean;
@@ -410,7 +407,7 @@ Example:
 
 .. code-block:: pascal
 
-    totalCount := invCount;
+  totalCount := invCount;
 
 *)
 function invCount: Integer;
@@ -442,8 +439,8 @@ Example:
 
 .. code-block:: pascal
 
-    if invEmpty then
-      CloseBank;
+  if invEmpty then
+    CloseBank;
 
 *)
 function invEmpty: Boolean;
@@ -451,7 +448,7 @@ var
   X, Y: Integer;
 begin
   //GameTab(tab_Inv);                                                           //Off until Gametab is done
-  Result := (not FindColor(X, Y, SRL_OUTLINE_BLACK, MIX1, MIY1, MIX2, MIY2));
+  Result := (not FindColor(X, Y, OUTLINE_BLACK, MIX1, MIY1, MIX2, MIY2));
 end;
 
 (*
@@ -472,8 +469,8 @@ Example:
 
 .. code-block:: pascal
 
-    if InvFull then
-      walkToBank;
+  if InvFull then
+    walkToBank;
 
 *)
 function invFull: Boolean;
@@ -510,7 +507,7 @@ Example:
 
 .. code-block:: pascal
 
-    Result := itemActivated(4);
+  Result := itemActivated(4);
 
 *)
 function itemActivated(Slot: Integer): Boolean;
@@ -522,7 +519,7 @@ begin
 //  if not GameTab(tab_Inv) then
 //    exit;
   TB := invBox(Slot);
-  Result := FindColor(x, y, SRL_OUTLINE_WHITE, TB.x1, TB.y1, TB.x2, TB.y2);
+  Result := FindColor(x, y, OUTLINE_WHITE, TB.x1, TB.y1, TB.x2, TB.y2);
 end;
 
 (*
@@ -543,7 +540,7 @@ Example:
 
 .. code-block:: pascal
 
-    item := ActivatedItem;
+  item := ActivatedItem;
 
 *)
 function activatedItem: integer;
