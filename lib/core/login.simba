@@ -7,7 +7,7 @@ player into the game.
 *)
 
 (*
-LoggedIn
+loggedIn
 ~~~~~~~~
 
 .. code-block:: pascal
@@ -28,7 +28,7 @@ Example:
   if (loggedIn) then
     writeln('We are logged in!');
 *)
-function LoggedIn: Boolean;
+function loggedIn: Boolean;
 begin
   Result := (GetColor(478, 543) = 16777215); // white text on report abuse button
 end;

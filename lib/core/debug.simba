@@ -1,5 +1,5 @@
 (*
-Debug
+debug
 =====
 
 The debug file holds any files used for SRL debugging and logging.
@@ -10,18 +10,18 @@ The debug file holds any files used for SRL debugging and logging.
 
 var
   debugLevel = 1; // used for the nice debug formatting
-  disableSRLDebug = false;
+  disableSRLdebug = false;
   logPath = includePath + 'SRL-6/logs/';
   scriptStartTime = '0:0:0';
   disableSRLLog = false;
 
 (*
-OpenLogFile
+openLogFile
 ~~~~~~~~~~~
 
 .. code-block:: pascal
 
-    function OpenLogFile(): integer;
+    function openLogFile(): integer;
 
 Creates the SRL log file.
 
@@ -34,10 +34,10 @@ Example:
 
 .. code-block:: pascal
 
-  OpenLogFile();
+  openLogFile();
 
 *)
-function OpenLogFile(): integer;
+function openLogFile(): integer;
 var
   fileName: string;
 begin
@@ -64,12 +64,12 @@ begin
 end;
 
 (*
-AddToLog
+addToLog
 ~~~~~~~~
 
 .. code-block:: pascal
 
-    procedure AddToLog(s : string);
+    procedure addToLog(s : string);
 
 Writes the string 's' to the SRL log file.
 
@@ -82,16 +82,16 @@ Example:
 
 .. code-block:: pascal
 
-  AddToLog('Adding to SRL log file!');
+  addToLog('Adding to SRL log file!');
 *)
-procedure AddToLog(s: string);
+procedure addToLog(s: string);
 var
   tmpFile: integer;
 begin
   if (disableSRLLog) then
     exit;
 
-  tmpFile := OpenLogFile();
+  tmpFile := openLogFile();
 
   if (tmpFile >= 0) then
     try
@@ -104,12 +104,12 @@ begin
 end;
 
 (*
-Debug
+debug
 ~~~~~
 
 .. code-block:: pascal
 
-    procedure Debug(txt: string);
+    procedure debug(txt: string);
 
 Prints 'txt' to the debug box in the SRL debug format.
 
@@ -121,32 +121,32 @@ Example:
 
 .. code-block:: pascal
 
-  Debug(TheDate);
+  debug(TheDate);
 
 *)
-procedure Debug(txt: string);
+procedure debug(txt: string);
 var
   debugMSG: string;
 begin
-  if (disableSRLDebug) then
+  if (disableSRLdebug) then
     exit;
 
   debugMSG := debugMSG + Replicate('-', debugLevel * 2) + ' ';
   debugMSG := debugMSG + txt;
 
   if (not disableSRLLog) then
-    AddToLog(debugMSG);
+    addToLog(debugMSG);
 
   writeln(debugMSG)
 end;
 
 (*
-AddHeader
+addHeader
 ~~~~~~~~~
 
 .. code-block:: pascal
 
-    procedure AddHeader(header: string);
+    procedure addHeader(header: string);
 
 Creates a new header in the debug box. Means that all following debugs will be
 indented 2 spaces with respect to the header. Should be called at the beginning
@@ -160,22 +160,22 @@ Example:
 
 .. code-block:: pascal
 
-  AddHeader('OpenBank()');
+  addHeader('OpenBank()');
 
 *)
-procedure AddHeader(header: string);
+procedure addHeader(header: string);
 begin
-  Debug(header);
+  debug(header);
   inc(debugLevel);
 end;
 
 (*
-CloseHeader
+closeHeader
 ~~~~~~~~~~~
 
 .. code-block:: pascal
 
-    procedure CloseHeader(closer: string);
+    procedure closeHeader(closer: string);
 
 Closes the current proceudre or function. Will print "closer" to the debug box.
 This should be called at the end of a function or procedure.
@@ -188,25 +188,25 @@ Example:
 
 .. code-block:: pascal
 
-  CloseHeader('OpenBank(): '+result);
+  closeHeader('OpenBank(): '+result);
 
 *)
-procedure CloseHeader(closer: string);
+procedure closeHeader(closer: string);
 begin
   Dec(debugLevel);
-  Debug(closer);
+  debug(closer);
 end;
 
 (*
-SubDebug
+subDebug
 ~~~~~~~~
 
 .. code-block:: pascal
 
-    procedure SubDebug(txt: string);
+    procedure subDebug(txt: string);
 
 Allows a one-time-only indented debug.  Used in smaller procedures that don't
-call Add/CloseHeader
+call Add/closeHeader
 
 .. note::
 
@@ -216,13 +216,13 @@ Example:
 
 .. code-block:: pascal
 
-  SubDebug('BankScreen: screen not open');
+  subDebug('BankScreen: screen not open');
 
 *)
-procedure SubDebug(txt: string);
+procedure subDebug(txt: string);
 begin
   inc(debugLevel);
-  Debug(txt);
+  debug(txt);
   dec(debugLevel);
 end;
 

@@ -105,7 +105,7 @@ var
   playerCurTime, playerStartTime: longInt;
 
 (*
-PlayersActive
+playersActive
 ~~~~~~~~~~~~~
 
 .. code-block:: pascal
@@ -125,7 +125,7 @@ Example:
   while (playersActive > 0) do
     mainloop();
 *)
-function PlayersActive: Integer;
+function playersActive: Integer;
 var
   i, h: Integer;
 begin
@@ -138,7 +138,7 @@ begin
 end;
 
 (*
-PlayerWorked
+playerWorked
 ~~~~~~~~~~~~
 
 .. code-block:: pascal
@@ -159,7 +159,7 @@ Example:
   writeln('Player '+0+': has worked '+player[0].worked+' ms.');
 
 *)
-function PlayerWorked(player: integer): integer;
+function playerWorked(player: integer): integer;
 begin
   if (player = currentPlayer) then
     if (playerStartTime > 0) then // if it's been set at all

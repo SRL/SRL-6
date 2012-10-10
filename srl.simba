@@ -17,7 +17,7 @@ SRL library isn't available to you.
 
 {$include_once lib/utilities/time.simba}
 
-function SetupSRL(): boolean;
+function setupSRL(): boolean;
 var
   t: integer;
 begin

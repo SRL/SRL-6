@@ -16,7 +16,7 @@ Example:
 
 .. code-block:: pascal
 
-  if (GetLobbyScreen() = LOBBY_CLAN) then
+  if (GetlobbyScreen() = LOBBY_CLAN) then
     writeln('The clan chat tab is open!');
 *)
 const
@@ -29,12 +29,12 @@ const
     LOBBY_OPTIONS = 5;
 
 (*
-GetLobbyTab
+getLobbyTab
 ~~~~~~~~~~~
 
 .. code-block:: pascal
 
-    function GetLobbyTab: Integer;
+    function getLobbyTab: Integer;
 
 Gets current lobby tab.
 
@@ -47,7 +47,7 @@ Example:
 .. code-block:: pascal
 
 *)
-function GetLobbyTab: Integer;
+function getLobbyTab: Integer;
 begin
   for result := 0 to (LOBBY_COUNT - 1) do
     if (GetColor(63 + result * 102, 32) = 11516354) then
@@ -57,12 +57,12 @@ begin
 end;
 
 (*
-LobbyScreen
+lobbyScreen
 ~~~~~~~~~~~
 
 .. code-block:: pascal
 
-    function LobbyScreen: Boolean;
+    function lobbyScreen: Boolean;
 
 Returns true if we are at the lobby screen is loaded.
 
@@ -75,11 +75,11 @@ Example:
 .. code-block:: pascal
 
     // wait for the Lobby Screen to appear!
-    while (not LobbyScreen) do
+    while (not lobbyScreen) do
       Wait(100 + Random(400));
 
 *)
-function LobbyScreen: Boolean;
+function lobbyScreen: Boolean;
 begin
-  Result := InRange(GetLobbyTab, LOBBY_PLAYER, LOBBY_OPTIONS);
+  Result := InRange(getLobbyTab, LOBBY_PLAYER, LOBBY_OPTIONS);
 end;
