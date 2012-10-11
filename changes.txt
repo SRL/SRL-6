@@ -43,3 +43,6 @@ SRL6 release thread.
   - removed InvMouse, MMouseItem, MouseItem, DragItem, ClickAllItemsExcept, ClickAllItems,
       DropItem, DropArray, DropPattern, DropAll, DropAllExcept, DropItemsByIdent,
       ArrangeInv, CountItemsBlackList, ClickItemsBlackList, ExistItemDTM
+
+- gametab.simba
+  - Added Placeholder.
