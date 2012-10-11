@@ -29,37 +29,33 @@ const
 Constant: Inventory TBox Coordinates
 ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
 
-Integer constants that represents TBox coordinates for the inventory.
+TBox constants that represents the TBox coordinates for the inventory border.
 
 Example:
 
 .. code-block:: pascal
 
-  Result := (not FindColor(X, Y, OUTLINE_BLACK, MIX1, MIY1, MIX2, MIY2));
+  Result := (not FindColor(X, Y, OUTLINE_BLACK, MI_BOX.X1, MI_BOX.Y1, MI_BOX.X2, MI_BOX.Y2));
 
 *)
 const
-  MIX1 = 547;
-  MIY1 = 252;
-  MIX2 = 737;
-  MIY2 = 506;
+  MI_BOX := IntToBox(547, 252, 737, 506);
 
 (*
 Constant: Center Inventory Coordinates
 ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
 
-Integer constants that represents center point of the inventory
+TPoint constant that represents the center point of the inventory
 
 Example:
 
 .. code-block:: pascal
 
-  Result := (not FindColor(X, Y, OUTLINE_BLACK, MIX1, MIY1, MIX2, MIY2));
+  SortTPAFrom(TPA, Point(MI_CP.X, MI_CP.Y));
 
 *)
 const
-  MICX = 642;
-  MICY = 384;
+  MI_CP := point(642, 384);
 
 (*
 Type: TItem
@@ -86,7 +82,7 @@ type
     count : Integer;         // the count of the item
     itemBox : TBox;          // the exact box around the item
     centerPoint : TPoint;    // the center point inside the item
-    itemExist : Boolean;     // to define the item Exists
+    itemExists : Boolean;     // to define the item Exists
     name : String;           // to define name of an item.
     colorArr : TIntegerArray;// to define an array of colors
     checkSum : Integer;      // to define the checksum used in Item scanning
@@ -141,12 +137,12 @@ begin
 end;
 
 (*
-getInven
-~~~~~~~~
+getItem
+~~~~~~~
 
 .. code-block:: pascal
 
-    function getInven(Slot: Integer) : TItem;
+    function getItem(Slot: Integer) : TItem;
 
 Returns The Width, Height, Count, ItemBox and CenterPoint of the given Item Slot.
 
@@ -158,11 +154,11 @@ Example:
 
 .. code-block:: pascal
 
-  TItem := getInven(InvSlot);
+  TItem := getItem(InvSlot);
   MMouse(TItem.centerPoint.x, TItem.centerPoint.y, 2, 2);
 
 *)
-function getInven(Slot: Integer) : TItem;
+function getItem(Slot: Integer) : TItem;
 var
   I, Cx, Cy : Integer;
   P : TPointArray;
@@ -174,7 +170,7 @@ begin
   FindColorsTolerance(P, OUTLINE_BLACK, Box.X1, Box.Y1, Box.X2, Box.Y2, 0);
   Result.Count := Length(P);
   if (Result.Count = 0) then Exit;
-  Result.ItemExist := True;
+  Result.ItemExists := True;
   MinP := P[0];
   MaxP := P[Result.Count-1];
   Cx := P[0].x + P[Result.Count-1].x;
@@ -227,16 +223,16 @@ var
 begin
   SetLength(Result, 28);
   for I := 0 to 27 do
-   Result[I] := GetInven(i + 1);
+   Result[I] := GetItem(i + 1);
 end;
 
 (*
-itemCoords
+slotCoords
 ~~~~~~~~~~
 
 .. code-block:: pascal
 
-    function itemCoords(i: Integer): TPoint;
+    function slotCoords(i: Integer): TPoint;
 
 Returns X and Y of Specified Inventory Slot
 
@@ -248,11 +244,11 @@ Example:
 
 .. code-block:: pascal
 
-  Coords := itemCoords(3);
+  Coords := slotCoords(3);
   MMouse(Coords.x, Coords.y, 2, 2);
 
 *)
-function itemCoords(Slot: Integer): TPoint;
+function slotCoords(Slot: Integer): TPoint;
 var
   Box: TBox;
 begin
@@ -262,12 +258,12 @@ begin
 end;
 
 (*
-coordsToItem
+coordsToSlot
 ~~~~~~~~~~~~
 
 .. code-block:: pascal
 
-    function coordsToItem(X, Y: Integer): Integer;
+    function coordsToSlot(X, Y: Integer): Integer;
 
 Returns which Inventory slot the X and Y coords are in. If the
 coords are between slots (or not in the inventory area at all) it will return 0.
@@ -280,12 +276,12 @@ Example:
 
 .. code-block:: pascal
 
-  Writeln('Item found in slot '+IntToStr(coordsToItem(point.x, point.y)));
+  Writeln('Item found in slot '+IntToStr(coordsToSlot(point.x, point.y)));
 
 *)
-function coordsToItem(X, Y: Integer): Integer;
+function coordsToSlot(X, Y: Integer): Integer;
 begin
-  if not PointInBox(Point(X, Y), IntToBox(MIX1, MIY1, MIX2, MIY2)) then
+  if not PointInBox(Point(X, Y), IntToBox(MI_BOX.X1, MI_BOX.Y1, MI_BOX.X2, MI_BOX.Y2)) then
     exit;
   for Result := 1 to 28 do
     if PointInBox(Point(X, Y), InvBox(result)) then
@@ -332,12 +328,12 @@ begin
 end;
 
 (*
-itemExist
+itemExists
 ~~~~~~~~~
 
 .. code-block:: pascal
 
-    function itemExist(Slot: Integer): Boolean;
+    function itemExists(Slot: Integer): Boolean;
 
 Checks if item in inventory at specified position exists
 
@@ -350,43 +346,14 @@ Example:
 .. code-block:: pascal
 
   for i := 1 to 28 do
-    if itemExist(i) then
+    if itemExists(i) then
       Inc(Count);
 
 *)
-function itemExist(Slot: Integer): Boolean;
+function itemExists(Slot: Integer): Boolean;
 begin
 //  GameTab(tab_Inv);                                                            //Off until Gametab is done
-  result := getInven(Slot).ItemExist;
-end;
-
-(*
-existsItemDTM
-~~~~~~~~~~~~~
-
-.. code-block:: pascal
-
-    function existsItemDTM(dtm: Integer; var x, y: Integer): Boolean;
-
-Checks if the dtm is in the inventory. Returns the item's coordinates.
-
-.. note::
-
-    by NCDS
-
-Example:
-
-.. code-block:: pascal
-
-    if existsItemDTM(OreDTM, x, y) then
-      MMouse(x, y, 3, 3);
-
-*)
-function existsItemDTM(dtm: Integer; var x, y: Integer): Boolean;
-begin
-//  Gametab(tab_Inv);                                                           //Off until Gametab is done
-  Wait(300 + Random(300));
-  Result := FindDTM(dtm, x, y, MIx1, MIy1, MIx2, MIy2);
+  result := getItem(Slot).itemExists;
 end;
 
 (*
@@ -417,7 +384,7 @@ begin
   Result := 0;
   //GameTab(tab_inv);                                                           //Off until Gametab is done
   for I := 1 to 28 do
-    if (itemExist(I)) then
+    if (itemExists(I)) then
       Inc(Result);
 end;
 
@@ -448,7 +415,7 @@ var
   X, Y: Integer;
 begin
   //GameTab(tab_Inv);                                                           //Off until Gametab is done
-  Result := (not FindColor(X, Y, OUTLINE_BLACK, MIX1, MIY1, MIX2, MIY2));
+  Result := (not FindColor(X, Y, OUTLINE_BLACK, MI_BOX.X1, MI_BOX.Y1, MI_BOX.X2, MI_BOX.Y2));
 end;
 
 (*
@@ -469,7 +436,7 @@ Example:
 
 .. code-block:: pascal
 
-  if InvFull then
+  if invFull then
     walkToBank;
 
 *)
@@ -481,7 +448,7 @@ begin
   Result := True;
 
   for i := 1 to 28 do
-    if (not itemExist(i)) then
+    if (not itemExists(i)) then
     begin
       Result := False;
       exit;
@@ -489,7 +456,7 @@ begin
 end;
 
 (*
-itemsActivated
+itemActivated
 ~~~~~~~~~~~~~~
 
 .. code-block:: pascal
@@ -523,12 +490,12 @@ begin
 end;
 
 (*
-activatedItem
-~~~~~~~~~~~~~
+getActivatedItem
+~~~~~~~~~~~~~~~~
 
 .. code-block:: pascal
 
-    function ActivatedItem : integer;
+    function getActivatedItem : integer;
 
 Returns the selected item in invetory (if any), else returns -1.
 
@@ -540,10 +507,10 @@ Example:
 
 .. code-block:: pascal
 
-  item := ActivatedItem;
+  Slot := getActivatedItem;
 
 *)
-function activatedItem: integer;
+function getActivatedItem: integer;
 begin
   for result := 1 to 28 do
     if itemActivated(result) then
