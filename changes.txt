@@ -31,15 +31,15 @@ SRL6 release thread.
 - inventory.simba
   - TIventItem renamed TItem
   - attributes added: ColorArr, Name, TPACount, CheckSum, Slot, Stack
-  - attributes renamed: ItemExist,
+  - attributes renamed: ItemExists,
   - TInvenItemArr renamed TItemArray
   - Change function Parameter I to Slot
   - added CONST
-    - SRL_BLACK_OUTLINE, SRL_WHITE_OUTLINE
-    - MIX1, MIY1, MIX2, MIY2, MICX, MICY
+    - BLACK_OUTLINE, WHITE_OUTLINE
+    - MI_BOX, MI_CP
   - invBox moved
-  - modified getInven, coordsToItem, itemExist, activatedItem
-  - renamed itemExist
+  - modified getItem, coordsToSlot, itemExists, getActivatedItem
+  - renamed itemExists, getItem, coordsToSlot, getActivatedItem
   - removed InvMouse, MMouseItem, MouseItem, DragItem, ClickAllItemsExcept, ClickAllItems,
       DropItem, DropArray, DropPattern, DropAll, DropAllExcept, DropItemsByIdent,
-      ArrangeInv, CountItemsBlackList, ClickItemsBlackList
+      ArrangeInv, CountItemsBlackList, ClickItemsBlackList, ExistItemDTM
