@@ -25,8 +25,17 @@ var
   LMouse_MissChance: Integer;
   {$ENDIF}
 
+{
+ Used in place of other mouse button constants to move the mouse
+ without actually clicking.
+}
 const
-  mouse_Move = -1;
+  mouse_Move   = -1;
+{
+ Used to determine the 'style' in which the mouse moves
+ Values are used as modifiers in mouse()
+}
+const
   mmBrake    = 8;
   mmAccurate = 14;
   mmHuman    = 7;
@@ -285,7 +294,28 @@ begin
   mouseSpeed := MSP;
 end;
 
-procedure fastClick(button: Integer);
+{*
+fastClick
+~~~~~~~~~~~~~~~~
+
+.. code-block:: pascal
+
+    procedure fastClick(button: integer);
+
+Description: Quickly click the mouse with any button.
+
+.. note::
+
+    by Flight
+
+Example:
+
+.. code-block:: pascal
+
+    fastClick(mouse_left);
+
+*}
+procedure fastClick(button: integer);
 var
   x, y: integer;
 begin
@@ -299,12 +329,32 @@ begin
   releaseMouse(x, y, button);
 end;
 
-procedure mouse(pnt: TPoint; mmType: integer); overload;
+{*
+mouse
+~~~~~~~~~~~~~~~~
+
+.. code-block:: pascal
+
+    procedure mouse(pnt: TPoint; button: integer; mmType: integer = mmHuman); overload;
+
+Description: Moves the mouse to 'pnt' using specified 'mmType' then clicks the mouse 'button'.
+
+.. note::
+
+    by NCDS & Flight
+
+Example:
+
+.. code-block:: pascal
+
+    fastClick(mouse_left);
+
+*}
+procedure mouse(pnt: TPoint; button: integer; mmType: integer = mmHuman); overload;
 var
   randSpeed: extended;
   x,y,ms: integer;
 begin
-  // TODO: Error handling -> mmType check
   ms := mouseSpeed;
   randSpeed := (random(mouseSpeed) / 2.0 + mouseSpeed) / 10.0;
   getMousePos(x,y);
@@ -313,13 +363,13 @@ begin
   else
     brakeWindMouse(x, y, 0, 0, mmType, 3, 10.0/randSpeed, 15.0/randSpeed, 10.0*randSpeed, false);
   mouseSpeed := ms;
-  // TODO: decide how to pass 'button'
-  //fastClick(button);
+  fastClick(button);
 end;
 
+//Are we documenting overloaded functions?
 procedure mouse(pnt: TPoint); overload;
 begin
-  mouse(pnt, mmHuman);
+  mouse(pnt, mouse_move, mmHuman);
 end;
 
 
