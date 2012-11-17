@@ -20,7 +20,7 @@ Example:
 
 *)
 var
-  mouseSpeed: Integer;
+  mouseSpeed: Integer = 15;
   {$IFDEF UseLaptopMouse}
   LMouse_MissChance: Integer;
   {$ENDIF}
@@ -93,9 +93,9 @@ begin
     nModB := 0.10;
   end;
 
-  markTime(T);
+  t := getSystemTime + 5000;
   repeat
-    if (timeFromMark(T)>5000) then
+    if (getSystemTime > t) then
       break;
 
     dist:= hypot(xs - xe, ys - ye);
@@ -224,9 +224,9 @@ begin
   sqrt5:= sqrt(5);
 
   TDist := distance(round(xs), round(ys), round(xe), round(ye));
-  markTime(T);
+  t := getSystemTime + 10000;
   repeat
-    if (timeFromMark(T)>10000) then
+    if (getSystemTime > t) then
       break;
 
     dist:= hypot(xs - xe, ys - ye);
@@ -347,7 +347,7 @@ Example:
 
 .. code-block:: pascal
 
-    fastClick(mouse_left);
+    mouse(point, mouse_Left, mmAccurate);
 
 *}
 procedure mouse(pnt: TPoint; button: integer; mmType: integer = mmHuman); overload;
@@ -359,21 +359,81 @@ begin
   randSpeed := (random(mouseSpeed) / 2.0 + mouseSpeed) / 10.0;
   getMousePos(x,y);
   if mmType = mmHuman then
-    HumanWindMouse(x, y, 0, 0, mmHuman, 5, 10.0/randSpeed, 15.0/randSpeed, 10.0*randSpeed)
+    humanWindMouse(x, y, pnt.x, pnt.y, mmHuman, 5, 10.0/randSpeed, 15.0/randSpeed, 10.0*randSpeed)
   else
-    brakeWindMouse(x, y, 0, 0, mmType, 3, 10.0/randSpeed, 15.0/randSpeed, 10.0*randSpeed, false);
+    brakeWindMouse(x, y, pnt.x, pnt.y, mmType, 3, 10.0/randSpeed, 15.0/randSpeed, 10.0*randSpeed, false);
   mouseSpeed := ms;
   fastClick(button);
 end;
 
-//Are we documenting overloaded functions?
+{*
+mouse overload;
+~~~~~~~~~~~~~~~~
+
+.. code-block:: pascal
+
+    procedure mouse(pnt: TPoint); overload;
+
+Description: Moves the mouse to 'pnt'.
+
+.. note::
+
+    by NCDS & Flight
+
+Example:
+
+.. code-block:: pascal
+
+    mouse(point);
+
+*}
 procedure mouse(pnt: TPoint); overload;
 begin
-  mouse(pnt, mouse_move, mmHuman);
+  mouse(pnt, mouse_move);
 end;
 
+{*
+missMouse
+~~~~~~~~~~~~~~~~
 
+.. code-block:: pascal
 
+    procedure missMouse(pnt: TPoint);
+
+Description: Initially misses the target
+             point (miss area determined by dist & speed) then corrects itself.
+
+.. note::
+
+    by Flight
+
+Example:
+
+.. code-block:: pascal
+
+    missMouse(point);
+
+*}
+procedure missMouse(pnt: TPoint);
+var
+  randSpeed: extended;
+  x,y,x2,y2,a,dist,mp: integer;
+begin
+  a := mouseSpeed;
+  getMousePos(x, y);
+  dist := distance(x, y, pnt.x, pnt.y);
+  mp := round(dist/150);
+  if mp < 0 then
+    mp := 1;
+
+  randSpeed := (random(mouseSpeed) / 2.0 + mouseSpeed) / 10.0;
+  x2 := randomRange(Pnt.x-(a*mp), Pnt.x+(a*mp));
+  y2 := randomRange(Pnt.y-(a*mp), Pnt.y+(a*mp));
+  humanWindMouse(x, y, x2, y2, mmHuman, 5, 10.0/randSpeed, 15.0/randSpeed, 10.0*randSpeed);
+  getMousePos(x, y);
+  mouse(pnt);
+  mouseSpeed := a;
+end;
 
 
 
