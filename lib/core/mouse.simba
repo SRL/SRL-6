@@ -435,6 +435,40 @@ begin
   mouseSpeed := a;
 end;
 
+{*
+dragMouse
+~~~~~~~~~~~~~~~~
+
+.. code-block:: pascal
+
+    procedure dragMouse(dest: TPoint);
+
+Description: Clicks mouse_Left at current position and drags to dest(ination).
+
+.. note::
+
+    by NCDS
+
+Example:
+
+.. code-block:: pascal
+
+    dragMouse(point);
+
+*}
+procedure dragMouse(dest: TPoint);
+var
+  x, y: integer;
+begin
+  getMousePos(x, y);
+  holdMouse(x, y, mouse_Left);
+  wait(random(100));
+  mouse(dest);
+  getMousePos(x, y);
+  wait(random(100));
+  releaseMouse(x, y, mouse_Left);
+end;
+
 
 
 
