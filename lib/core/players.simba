@@ -96,21 +96,21 @@ All the variables associated with players.simba.
   * players: used to store player information.
   * currentPlayer: the player currently running.
   * numberOfPlayers: how many players to run.
-  * playerCurTime, playerStartTime: used to calcualte players[].worked.
+  * playerStartTime: used to calcualte players[].worked.
 
 *)
 var
   players: array of TPlayer;
   currentPlayer, numberOfPlayers: integer;
-  playerCurTime, playerStartTime: longInt;
+  playerStartTime: longInt;
 
 (*
-playersActive
-~~~~~~~~~~~~~
+getPlayersActive()
+~~~~~~~~~~~~~~~~~~
 
 .. code-block:: pascal
 
-    function PlayersActive: Integer;
+    function getPlayersActive(): Integer;
 
 Returns the number of players that are still active.
 
@@ -122,10 +122,10 @@ Example:
 
 .. code-block:: pascal
 
-  while (playersActive > 0) do
+  while (getPlayersActive() > 0) do
     mainloop();
 *)
-function playersActive: Integer;
+function getPlayersActive(): Integer;
 var
   i, h: Integer;
 begin
@@ -138,35 +138,33 @@ begin
 end;
 
 (*
-playerWorked
-~~~~~~~~~~~~
+TPlayer.addWorked()
+~~~~~~~~~~~~~~~~~~~
 
 .. code-block:: pascal
 
-    function PlayerWorked(player: integer): integer;
+    procedure TPlayer.addWorked();
 
-Returns the time a player has worked in milliseconds. Usually used for progress
-reports and max timers.
+Increased the player's .worked property so it can be accessed later.
 
 .. note::
 
     by SRL Community
+    Last updated: Nov. 1st, 2012 by Coh3n
 
 Example:
 
 .. code-block:: pascal
 
-  writeln('Player '+0+': has worked '+player[0].worked+' ms.');
+  if (bankedLogs = true) then
+    players[currentPlayer].addWorked();
 
 *)
-function playerWorked(player: integer): integer;
+procedure TPlayer.addWorked();
 begin
-  if (player = currentPlayer) then
-    if (playerStartTime > 0) then // if it's been set at all
-    begin
-      incEx(players[player].worked, (getSystemTime - playerStartTime));
-      playerStartTime := getSystemTime;
-    end;
-
-  result := players[player].worked;
+  if (playerStartTime > 0) then // if it's been set at all
+  begin
+    incEx(self.worked, (getSystemTime - playerStartTime));
+    playerStartTime := getSystemTime();
+  end;
 end;

@@ -24,9 +24,12 @@ SRL6 release thread.
   - attributes removed: worldInfo, nick, status, skill, banked, rand, arrays, boxRewards
   - attributes renamed: loginName, bankPin, password, location
   - attributes added: displayName, findMod, findTrade, reincarnate, variants
-  - removed variables checkHPFirst, logoutOnMod, reincarnate
+  - removed variables checkHPFirst, logoutOnMod, reincarnate, playerCurTime
   - removed functions allPlayersInactive, numberOfPlayers
+  - renamed function playersActive to getPlayersActive
   - moved function loggedIn() to login.simba
+  - function PlayerWorked is now a procedure of the TPlayer type and has been renamed to addWorked
+    - should be called when you want to add to a player's .worked attribute
 
 - inventory.simba
   - TIventItem renamed TItem

@@ -19,12 +19,12 @@ const
   DATE_DAY    = 3;
 
 (*
-MsToTime
+msToTime
 ~~~~~~~~
 
 .. code-block:: pascal
 
-    function MsToTime(MS, StrType: Integer): string;
+    function msToTime(MS, StrType: Integer): string;
 
 Takes MS in milliseconds and outputs a string with hours, mins and
 seconds. Different styles can be created with different StrType values:
@@ -47,7 +47,7 @@ Example:
   writeln(500000, TIME_SHORT);
 
 *)
-function MsToTime(MS, TheType: Integer): string;
+function msToTime(MS, TheType: Integer): string;
 var
   STA: array [0..4] of TVariantArray;
   Time: array [0..2] of Integer;
@@ -72,12 +72,12 @@ begin
 end;
 
 (*
-TimeRunning
+timeRunning
 ~~~~~~~~~~~
 
 .. code-block:: pascal
 
-    function TimeRunning: String;
+    function timeRunning: String;
 
 Returns Time since the script was started (GetTimeRunning).
 
@@ -91,18 +91,18 @@ Example:
 
   writeln('Script time: '+timeRunning);
 *)
-function TimeRunning: string;
+function timeRunning: string;
 begin
-  Result := MsToTime(GetTimeRunning, TIME_FORMAL);
+  Result := msToTime(GetTimeRunning, TIME_FORMAL);
 end;
 
 (*
-MarkTime
+markTime
 ~~~~~~~~
 
 .. code-block:: pascal
 
-    procedure MarkTime(var TimeMarker: Integer);
+    procedure markTime(var TimeMarker: Integer);
 
 Sets TimeMarker to current system time.
 
@@ -124,20 +124,20 @@ Example:
   end;
 
 *)
-procedure MarkTime(var TimeMarker: Integer);
+procedure markTime(var TimeMarker: Integer);
 begin
   TimeMarker := GetSystemTime;
 end;
 
 (*
-TimeFromMark
+timeFromMark
 ~~~~~~~~~~~~
 
 .. code-block:: pascal
 
-    function TimeFromMark(TimeMarker: Integer): Integer;
+    function timeFromMark(TimeMarker: Integer): Integer;
 
-Returns Milliseconds since MarkTime was set
+Returns Milliseconds since markTime was set
 
 .. note::
 
@@ -150,18 +150,18 @@ Example:
   writeln('Time from mark: '+timeFromMark(timer));
 
 *)
-function TimeFromMark(TimeMarker: Integer): Integer;
+function timeFromMark(TimeMarker: Integer): Integer;
 begin
   Result := GetSystemTime - TimeMarker;
 end;
 
 (*
-TheTime
+theTime
 ~~~~~~~~
 
 .. code-block:: pascal
 
-    function TheTime: string;
+    function theTime: string;
 
 Returns current time as a string.
 
@@ -173,10 +173,10 @@ Example:
 
 .. code-block:: pascal
 
-  writeln(TheTime);
+  writeln(theTime);
 
 *)
-function TheTime: string;
+function theTime: string;
 var
   Hour, Mins, Sec, MSec: Word;
   PAM: string;
@@ -195,12 +195,12 @@ begin
 end;
 
 (*
-TheDate
+theDate
 ~~~~~~~
 
 .. code-block:: pascal
 
-    function TheDate(DateFormat: Integer): String;
+    function theDate(DateFormat: Integer): String;
 
 Returns the current date. DateFormats can be:
 
@@ -216,10 +216,10 @@ Example:
 
 .. code-block:: pascal
 
-  writeln(TheDate);
+  writeln(theDate);
 
 *)
-function TheDate(DateFormat: Integer): string;
+function theDate(DateFormat: Integer): string;
 var
   Year, Month, Day: Word;
   D: string;
