@@ -1,0 +1,478 @@
+(*
+Mouse
+=======
+
+The Mouse include contains all Mouse movement and clicking functions
+
+*)
+
+(*
+Constants and Vars
+~~~~~~~~~~~~~~~~~
+
+Constants and Variables used locally within mouse.simba
+
+Example:
+
+.. code-block:: pascal
+
+  Example here
+
+*)
+var
+  mouseSpeed: Integer = 15;
+  {$IFDEF UseLaptopMouse}
+  LMouse_MissChance: Integer;
+  {$ENDIF}
+
+{
+ Used in place of other mouse button constants to move the mouse
+ without actually clicking.
+}
+const
+  mouse_Move   = -1;
+{
+ Used to determine the 'style' in which the mouse moves
+ Values are used as modifiers in mouse()
+}
+const
+  mmBrake    = 8;
+  mmAccurate = 14;
+  mmHuman    = 7;
+
+{*
+brakeWindMouse
+~~~~~~~~~~~~~~~~
+
+.. code-block:: pascal
+
+    procedure Procedure brakeWindMouse(xs, ys, xe, ye, gravity, wind, minWait,
+  maxWait, targetArea: extended; reverse: boolean);
+
+Mouse movement based on distance to determine speed. Default slowed
+speed at 20% from destination, if Double is set to true then slowed
+speed also starts at origin and ends 80% to destination.
+
+.. note::
+
+    by BenLand100 & Flight
+
+Example:
+
+.. code-block:: pascal
+
+    Emaple here
+
+*}
+Procedure brakeWindMouse(xs, ys, xe, ye, gravity, wind, minWait, maxWait,
+          targetArea: extended; double: boolean);
+var
+  veloX,veloY,windX,windY,veloMag,dist,randomDist,lastDist,D: extended;
+  lastX,lastY,MSP,W,TDist,T: integer;
+  sqrt2,sqrt3,sqrt5,PDist,maxStep,dModA,dModB,nModA,nModB: extended;
+begin
+  MSP  := mouseSpeed;
+  sqrt2:= sqrt(2);
+  sqrt3:= sqrt(3);
+  sqrt5:= sqrt(5);
+
+  TDist := distance(round(xs), round(ys), round(xe), round(ye));
+  if (TDist < 1) then
+    TDist := 1;
+
+  dModA := 0.88; //.80
+  dModB := 0.95; //.90
+
+  if (TDist > 220) then
+  begin
+    nModA := 0.08;
+    nModB := 0.04;
+  end else if (TDist <= 220) then
+  begin
+    nModA := 0.20;
+    nModB := 0.10;
+  end;
+
+  t := getSystemTime + 5000;
+  repeat
+    if (getSystemTime > t) then
+      break;
+
+    dist:= hypot(xs - xe, ys - ye);
+    wind:= minE(wind, dist);
+    if (dist < 1) then
+      dist := 1;
+    PDist := (dist/TDist);
+    if (PDist < 0.01) then
+      PDist := 0.01;
+
+    if double then
+    begin
+      if (PDist <= dModA) then
+      begin
+        D := (round((round(dist)*0.3))/5);
+        if (D < 20) then
+          D := 20;
+
+      end else if (PDist > dModA) then
+      begin
+        if (PDist < dModB) then
+          D := randomRange(5, 8)
+        else if (PDist >= dModB) then
+          D := randomRange(3, 4);
+      end;
+    end;
+
+    if (PDist >= nModA) then
+    begin
+       D := (round((round(dist)*0.3))/5);
+      if (D < 20) then
+        D := 20;
+    end else if (PDist < nModA) then
+    begin
+      if (PDist >= nModB) then
+        D := randomRange(5, 8)
+      else if (PDist < nModB) then
+        D := randomRange(3, 4);
+    end;
+
+    if (D <= round(dist)) then
+      maxStep := D
+    else
+      maxStep := round(dist);
+
+    if dist >= targetArea then
+    begin
+      windX:= windX / sqrt3 + (random(round(wind) * 2 + 1) - wind) / sqrt5;
+      windY:= windY / sqrt3 + (random(round(wind) * 2 + 1) - wind) / sqrt5;
+    end else
+    begin
+      windX:= windX / sqrt2;
+      windY:= windY / sqrt2;
+    end;
+
+    veloX:= veloX + windX;
+    veloY:= veloY + windY;
+    veloX:= veloX + gravity * (xe - xs) / dist;
+    veloY:= veloY + gravity * (ye - ys) / dist;
+
+    if (hypot(veloX, veloY) > maxStep) then
+    begin
+      randomDist:= maxStep / 2.0 + random(round(maxStep) div 2);
+      veloMag:= sqrt(veloX * veloX + veloY * veloY);
+      veloX:= (veloX / veloMag) * randomDist;
+      veloY:= (veloY / veloMag) * randomDist;
+    end;
+
+    lastX:= round(xs);
+    lastY:= round(ys);
+    xs:= xs + veloX;
+    ys:= ys + veloY;
+
+    if (lastX <> round(xs)) or (lastY <> round(ys)) then
+      moveMouse(round(xs), round(ys));
+
+    W := (random((round(100/MSP)))*6);
+    if (W < 5) then
+      W := 5;
+    if double then
+      if (PDist > dModA) then
+        W := round(W*2.5)
+    else
+      W := round(W*1.2);
+    wait(W);
+    lastdist:= dist;
+  until(hypot(xs - xe, ys - ye) < 1)
+
+  if (round(xe) <> round(xs)) or (round(ye) <> round(ys)) then
+    moveMouse(round(xe), round(ye));
+
+  mouseSpeed := MSP;
+end;
+
+{*
+humanWindMouse
+~~~~~~~~~~~~~~~~
+
+.. code-block:: pascal
+
+    procedure humanWindMouse(xs, ys, xe, ye, gravity, wind, minWait,
+  maxWait, targetArea: extended);
+
+Description: FLIGHT YOU NEED TO GIVE ME SOMETHING FOR THIS! ;)
+
+.. note::
+
+    by BenLand100 & Flight
+
+Example:
+
+.. code-block:: pascal
+
+    Emaple here
+
+*}
+procedure humanWindMouse(xs, ys, xe, ye, gravity, wind, minWait, maxWait, targetArea: extended);
+var
+  veloX,veloY,windX,windY,veloMag,dist,randomDist,lastDist,D: extended;
+  lastX,lastY,MSP,W,T,TDist: integer;
+  sqrt2,sqrt3,sqrt5,maxStep,rCnc: extended;
+begin
+  MSP  := mouseSpeed;
+  sqrt2:= sqrt(2);
+  sqrt3:= sqrt(3);
+  sqrt5:= sqrt(5);
+
+  TDist := distance(round(xs), round(ys), round(xe), round(ye));
+  t := getSystemTime + 10000;
+  repeat
+    if (getSystemTime > t) then
+      break;
+
+    dist:= hypot(xs - xe, ys - ye);
+    wind:= minE(wind, dist);
+    if (dist < 1) then
+      dist := 1;
+
+    D := (round((round(TDist)*0.3))/7);
+    if (D > 25) then
+      D := 25;
+    if (D < 5) then
+      D := 5;
+
+    rCnc := random(6);
+    if (rCnc = 1) then
+      D := randomRange(2,3);
+
+    if (D <= round(dist)) then
+      maxStep := D
+    else
+      maxStep := round(dist);
+
+    if dist >= targetArea then
+    begin
+      windX:= windX / sqrt3 + (random(round(wind) * 2 + 1) - wind) / sqrt5;
+      windY:= windY / sqrt3 + (random(round(wind) * 2 + 1) - wind) / sqrt5;
+    end else
+    begin
+      windX:= windX / sqrt2;
+      windY:= windY / sqrt2;
+    end;
+
+    veloX:= veloX + windX;
+    veloY:= veloY + windY;
+    veloX:= veloX + gravity * (xe - xs) / dist;
+    veloY:= veloY + gravity * (ye - ys) / dist;
+
+    if (hypot(veloX, veloY) > maxStep) then
+    begin
+      randomDist:= maxStep / 2.0 + random(round(maxStep) div 2);
+      veloMag:= sqrt(veloX * veloX + veloY * veloY);
+      veloX:= (veloX / veloMag) * randomDist;
+      veloY:= (veloY / veloMag) * randomDist;
+    end;
+
+    lastX:= round(xs);
+    lastY:= round(ys);
+    xs:= xs + veloX;
+    ys:= ys + veloY;
+
+    if (lastX <> round(xs)) or (lastY <> round(ys)) then
+      moveMouse(round(xs), round(ys));
+
+    W := (random((round(100/MSP)))*6);
+    if (W < 5) then
+      W := 5;
+    W := round(W*0.9);
+    wait(W);
+    lastdist:= dist;
+  until(hypot(xs - xe, ys - ye) < 1)
+
+  if (round(xe) <> round(xs)) or (round(ye) <> round(ys)) then
+    moveMouse(round(xe), round(ye));
+
+  mouseSpeed := MSP;
+end;
+
+{*
+fastClick
+~~~~~~~~~~~~~~~~
+
+.. code-block:: pascal
+
+    procedure fastClick(button: integer);
+
+Description: Quickly click the mouse with any button.
+
+.. note::
+
+    by Flight
+
+Example:
+
+.. code-block:: pascal
+
+    fastClick(mouse_left);
+
+*}
+procedure fastClick(button: integer);
+var
+  x, y: integer;
+begin
+  if (button = mouse_move) then Exit;
+  getMousePos(x, y);
+  holdMouse(x, y, button);
+
+  wait(randomRange(60, 150));
+
+  getMousePos(x, y);
+  releaseMouse(x, y, button);
+end;
+
+{*
+mouse
+~~~~~~~~~~~~~~~~
+
+.. code-block:: pascal
+
+    procedure mouse(pnt: TPoint; button: integer; mmType: integer = mmHuman); overload;
+
+Description: Moves the mouse to 'pnt' using specified 'mmType' then clicks the mouse 'button'.
+
+.. note::
+
+    by NCDS & Flight
+
+Example:
+
+.. code-block:: pascal
+
+    mouse(point, mouse_Left, mmAccurate);
+
+*}
+procedure mouse(pnt: TPoint; button: integer; mmType: integer = mmHuman); overload;
+var
+  randSpeed: extended;
+  x,y,ms: integer;
+begin
+  ms := mouseSpeed;
+  randSpeed := (random(mouseSpeed) / 2.0 + mouseSpeed) / 10.0;
+  getMousePos(x,y);
+  if mmType = mmHuman then
+    humanWindMouse(x, y, pnt.x, pnt.y, mmHuman, 5, 10.0/randSpeed, 15.0/randSpeed, 10.0*randSpeed)
+  else
+    brakeWindMouse(x, y, pnt.x, pnt.y, mmType, 3, 10.0/randSpeed, 15.0/randSpeed, 10.0*randSpeed, false);
+  mouseSpeed := ms;
+  fastClick(button);
+end;
+
+{*
+mouse overload;
+~~~~~~~~~~~~~~~~
+
+.. code-block:: pascal
+
+    procedure mouse(pnt: TPoint); overload;
+
+Description: Moves the mouse to 'pnt'.
+
+.. note::
+
+    by NCDS & Flight
+
+Example:
+
+.. code-block:: pascal
+
+    mouse(point);
+
+*}
+procedure mouse(pnt: TPoint); overload;
+begin
+  mouse(pnt, mouse_move);
+end;
+
+{*
+missMouse
+~~~~~~~~~~~~~~~~
+
+.. code-block:: pascal
+
+    procedure missMouse(pnt: TPoint);
+
+Description: Initially misses the target
+             point (miss area determined by dist & speed) then corrects itself.
+
+.. note::
+
+    by Flight
+
+Example:
+
+.. code-block:: pascal
+
+    missMouse(point);
+
+*}
+procedure missMouse(pnt: TPoint);
+var
+  randSpeed: extended;
+  x,y,x2,y2,a,dist,mp: integer;
+begin
+  a := mouseSpeed;
+  getMousePos(x, y);
+  dist := distance(x, y, pnt.x, pnt.y);
+  mp := round(dist/150);
+  if mp < 0 then
+    mp := 1;
+
+  randSpeed := (random(mouseSpeed) / 2.0 + mouseSpeed) / 10.0;
+  x2 := randomRange(Pnt.x-(a*mp), Pnt.x+(a*mp));
+  y2 := randomRange(Pnt.y-(a*mp), Pnt.y+(a*mp));
+  humanWindMouse(x, y, x2, y2, mmHuman, 5, 10.0/randSpeed, 15.0/randSpeed, 10.0*randSpeed);
+  getMousePos(x, y);
+  mouse(pnt);
+  mouseSpeed := a;
+end;
+
+{*
+dragMouse
+~~~~~~~~~~~~~~~~
+
+.. code-block:: pascal
+
+    procedure dragMouse(dest: TPoint);
+
+Description: Clicks mouse_Left at current position and drags to dest(ination).
+
+.. note::
+
+    by NCDS
+
+Example:
+
+.. code-block:: pascal
+
+    dragMouse(point);
+
+*}
+procedure dragMouse(dest: TPoint);
+var
+  x, y: integer;
+begin
+  getMousePos(x, y);
+  holdMouse(x, y, mouse_Left);
+  wait(random(100));
+  mouse(dest);
+  getMousePos(x, y);
+  wait(random(100));
+  releaseMouse(x, y, mouse_Left);
+end;
+
+
+
+
+
+
+
+
