@@ -46,3 +46,19 @@ SRL6 release thread.
 
 - gametab.simba
   - Added Placeholder.
+
+- mouse.simba
+  - windMouse -> humanWindMouse() & brakeWindMouse()
+  - mouse_move const set to -1 rather than 3 which would interfere with simba internal constants
+  - MMouse() & Mouse() -> mouse() overload;
+  - ClickMouse2() -> fastClick()
+
+
+
+
+
+
+
+
+
+

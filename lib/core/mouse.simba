@@ -46,7 +46,7 @@ brakeWindMouse
 
 .. code-block:: pascal
 
-    procedure Procedure brakeWindMouse(xs, ys, xe, ye, gravity, wind, minWait,
+    procedure brakeWindMouse(xs, ys, xe, ye, gravity, wind, minWait,
   maxWait, targetArea: extended; reverse: boolean);
 
 Mouse movement based on distance to determine speed. Default slowed
@@ -64,7 +64,7 @@ Example:
     Emaple here
 
 *}
-Procedure brakeWindMouse(xs, ys, xe, ye, gravity, wind, minWait, maxWait,
+procedure brakeWindMouse(xs, ys, xe, ye, gravity, wind, minWait, maxWait,
           targetArea: extended; double: boolean);
 var
   veloX,veloY,windX,windY,veloMag,dist,randomDist,lastDist,D: extended;
@@ -468,8 +468,6 @@ begin
   wait(random(100));
   releaseMouse(x, y, mouse_Left);
 end;
-
-
 
 
 
