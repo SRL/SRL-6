@@ -1,6 +1,6 @@
 (*
-Math
-=======
+Type
+====
 
 The Math include contains math functions used throughout SRL.
 
@@ -8,7 +8,7 @@ The Math include contains math functions used throughout SRL.
 
 {*
 TPoint.Rand
-~~~~~~~~~~~~~~~~
+~~~~~~~~~~~
 
 .. code-block:: pascal
 
@@ -43,7 +43,7 @@ end;
 
 {*
 TPoint.Rand overload;
-~~~~~~~~~~~~~~~~
+~~~~~~~~~~~~~~~~~~~~~
 
 .. code-block:: pascal
 
@@ -69,7 +69,7 @@ end;
 
 {*
 TPoint.Coords
-~~~~~~~~~~~~~~~~
+~~~~~~~~~~~~~
 
 .. code-block:: pascal
 
