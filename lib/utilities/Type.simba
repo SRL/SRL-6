@@ -1,0 +1,99 @@
+(*
+Math
+=======
+
+The Math include contains math functions used throughout SRL.
+
+*)
+
+{*
+TPoint.Rand
+~~~~~~~~~~~~~~~~
+
+.. code-block:: pascal
+
+    function TPoint.Rand(xx,yy: integer): TPoint;
+
+Used to apply separate randomness to both the 'x' and 'y' coordinates of a TPoint.
+
+.. note::
+
+    by NCDS
+
+Example:
+
+.. code-block:: pascal
+
+    mouse(point.Rand(5,5));
+
+*}
+function TPoint.Rand(xx,yy: integer): TPoint; overload;
+var
+  nx, ny, rx, ry: integer;
+begin
+  nx := xx div abs(xx);   //div by self to determine positive or negative
+  ny := yy div abs(yy);
+
+  rx := random(xx) * nx;
+  ry := random(yy) * ny;
+
+  result.x := self.x + rx;
+  result.y := self.y + ry;
+end;
+
+{*
+TPoint.Rand overload;
+~~~~~~~~~~~~~~~~
+
+.. code-block:: pascal
+
+    function TPoint.Rand(ran: integer): TPoint; overload;
+
+Used to apply THE SAME randomness to both the 'x' and 'y' coordinates of a TPoint.
+
+.. note::
+
+    by NCDS
+
+Example:
+
+.. code-block:: pascal
+
+    mouse(point.Rand(5));
+
+*}
+function TPoint.Rand(ran: integer): TPoint; overload;
+begin
+  result := self.Rand(ran, ran);
+end;
+
+{*
+TPoint.Coords
+~~~~~~~~~~~~~~~~
+
+.. code-block:: pascal
+
+    function TPoint.Coords(x, y): TPoint;
+
+Used to assign values to both the 'x' and 'y' coordinates of a TPoint.
+
+.. note::
+
+    by NCDS
+
+Example:
+
+.. code-block:: pascal
+
+    point.Coords(x,y);
+    mouse(point.Rand(5));
+
+*}
+function TPoint.Coords(x,y: integer): TPoint;
+begin
+  result.x := x;
+  result.y := y;
+end;
+
+
+
