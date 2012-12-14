@@ -1,0 +1,398 @@
+(*
+SMART
+=====
+
+SMART is what SRL uses so Simba doesn't occupy the users mouse.  It is
+completely optional and can be added to any script by defining SMART
+{$DEFINE SMART} before including SRL.  This file stores all SMART related
+functions for SRL.
+
+*)
+
+{$loadlib libsmartremote}
+
+(*
+Variables
+~~~~~~~~~
+
+All the variables associated with smart.simba.
+
+  * useSMARTsixHourFix: default set to true.
+  * SMART_CurrentClient: the SMART client for the current script.
+  * SMART_ForceNew: force a new SMART client to be loaded. Default is false.
+  * SMART_FixSpeed: fixes SMART's refresh rate. Default is true.
+
+*)
+var
+  useSMARTsixHourFix = true;
+  SMART_CurrentClient = 0;
+  SMART_ForceNew = false;
+  SMART_FixSpeed = true;
+
+(*
+getSmartParams
+~~~~~~~~~~~~~~
+
+.. code-block:: pascal
+
+    function getSmartParams: TStringArray;
+
+Grabs The Correct Parameters for passing to the SmartClient.
+
+.. note::
+
+  By: Brandon.
+  Modified By: Mormanman, Benland100.
+
+Example:
+
+.. code-block:: pascal
+
+*)
+function getSmartParams: TStringArray;
+var
+  Params: TStringArray;
+  Page: String;
+begin
+  Page := Between('<iframe id="game" src="', '"', GetPage('http://www.runescape.com/game.ws?j=1'));
+  Params := Explode(',', Page);
+  Result := Params;
+end;
+
+(*
+fixSmartSpeed
+~~~~~~~~~~~~~
+
+.. code-block:: pascal
+
+    procedure fixSmartSpeed;
+
+Fixes Smart's Loading Speed.  Moves the Mouse & Adjusting the Canvas Refresh
+rate.
+
+.. note::
+
+  By: Brandon.
+
+Example:
+
+.. code-block:: pascal
+
+*)
+procedure fixSmartSpeed;
+var
+  T: Integer;
+begin
+  T:= GetSystemTime + 2000;
+  while (not SmartEnabled) do
+  begin
+    if (GetSystemTime >= T) Then
+      Break;
+    Wait(500);
+  end;
+
+  while (GetColor(382, 252) = 0) do
+  begin
+    if isClientReady() then
+      Break;
+    SmartSetRefresh(SmartGetRefresh + 1);
+    mouse(point(4, 4));
+    SmartSetRefresh(SmartGetRefresh - 1);
+    if (GetSystemTime >= T) Then
+      Break;
+    Wait(500);
+  end;
+end;
+
+(*
+smartGetClientIDs
+~~~~~~~~~~~~~~~~~
+
+.. code-block:: pascal
+
+    function smartGetClientIDs: TIntegerArray;
+
+Grabs All Client ID's of the current remote.
+
+.. note::
+
+  By: Mormanman.
+
+Example:
+
+.. code-block:: pascal
+
+*)
+function smartGetClientIDs: TIntegerArray;
+var
+  I, Count: Integer;
+begin
+  Count := SmartGetClients(True);
+  SetLength(Result, Count);
+  if (Count > 0) then
+    for I:= 0 to (Count - 1) do
+      Result[I] := SmartClientID(I);
+end;
+
+(*
+smartKillClients
+~~~~~~~~~~~~~~~~
+
+.. code-block:: pascal
+
+    procedure smartKillClients;
+
+Kills all SMART clients.
+
+.. note::
+
+  By: Mormanman.
+
+Example:
+
+.. code-block:: pascal
+
+*)
+procedure smartKillClients;
+var
+  IDs: TIntegerArray;
+  I: Integer;
+begin
+  IDs := smartGetClientIDs;
+  for I := High(IDs) DownTo 0 do
+    if SmartKillClient(IDs[I]) Then
+      Writeln('Killed Client: ' + ToStr(IDs[I]))
+    else
+      Writeln('Failed To Kill Client: ' + ToStr(IDs[I]));
+end;
+
+(*
+sixHourFix
+~~~~~~~~~~
+
+.. code-block:: pascal
+
+    procedure sixHourFix;
+
+Kills the current SMART and restarts it.  Used to fix the 6 hour client limit.
+
+.. note::
+
+  By: Brandon.
+
+Example:
+
+.. code-block:: pascal
+
+*)
+procedure sixHourFix;
+var
+  Trash: TVariantArray;
+  Refresh: Integer;
+begin
+  Refresh := SmartGetRefresh;
+  SmartKillClient(SmartCurrentClient);
+  try
+    VariantInvoke('DeclarePlayers', Trash);
+  except
+    Writeln('Could not DeclarePlayers');
+    TerminateScript;
+  end;
+
+  try
+    VariantInvoke('SMART_FreeDebug', Trash);
+    VariantInvoke('SMART_SetupDebug', Trash);
+  except
+  end;
+
+  SmartSetRefresh(Refresh);
+
+  if (not players[currentPlayer].login()) then
+  begin
+    Writeln('~sixHourFix~ Could not Login Player');
+    TerminateScript;
+  end;
+end;
+
+(*
+pairSmart
+~~~~~~~~~
+
+.. code-block:: pascal
+
+    function pairSmart(ID: Integer): Boolean;
+
+Pairs A Client To The Current Controller.
+
+.. note::
+
+  By: Benland100, Brandon.
+
+Example:
+
+.. code-block:: pascal
+
+*)
+function pairSmart(ID: Integer): Boolean;
+var
+  I, Count: Integer;
+  IDs: TIntegerArray;
+begin
+  IDs := smartGetClientIDs;
+  Count := Length(IDs);
+  if (Count > 0) then
+    for I:= 0 To (Count - 1) do
+      if (IDs[I] = ID) and SmartPairClient(ID) then
+      begin
+        SetEIOSTarget('libsmartremote', ToStr(ID));
+        Writeln('Paired with SMART[' + ToStr(ID) + ']');
+        Result := True;
+        Exit;
+      end;
+  Writeln('** Failed To Pair Client: ' + ToStr(ID) + '; Client Does not exist **');
+end;
+
+(*
+initSmart
+~~~~~~~~~
+
+.. code-block:: pascal
+
+    function initSmart(ForceNew: Boolean): Integer;
+
+Initializes A Smart Remote Client. Terminates the current script upon failure.
+Terminates all clients of the current remote upon failure. ForceNew Creates a
+new client.
+
+.. note::
+
+  By: Benland100, Mormanman, Brandon.
+
+Example:
+
+.. code-block:: pascal
+
+*)
+function initSmart(ForceNew: Boolean): Integer;
+var
+  I, Count: Integer;
+  IDs: TIntegerArray;
+  Params: TStringArray;
+begin
+  if (not ForceNew) then
+  begin
+    Ids := smartGetClientIDs;
+    Count := Length(IDs);
+    if (Count > 0) then
+      for I:= 0 To (Count - 1) do
+      begin
+        if SmartPairClient(IDs[I]) then
+        begin
+          Result := IDs[I];
+          SetEIOSTarget('libsmartremote', ToStr(Result));
+          Writeln('Paired with SMART[' + ToStr(Result) + ']');
+          Exit;
+        end;
+      end;
+  end;
+
+  Params := getSmartParams;
+  if (Length(Params) > 2) then
+  begin
+    Writeln('** Failed To Grab Smart Parameters **');
+    TerminateScript;
+    Exit;
+  end;
+
+  Result:= SmartSpawnClient(StringReplace(PluginPath, '\', '/', [rfReplaceAll]), Params[0], ',' + Params[1], 765, 553, 's', '', '');
+  if (Result > 0) Then
+  begin
+    try
+      SetEIOSTarget('libsmartremote', ToStr(Result));
+      Writeln('Loading SMART: ' + Params[0] + Params[1]);
+    except
+      WriteLn('** Fatal Error: Pairing Clients; Terminating Script **');
+      TerminateScript;
+    end;
+  end else
+    begin
+      Writeln('** Smart Cannot Spawn Clients **');
+      TerminateScript;
+    end;
+end;
+
+(*
+setupSmart
+~~~~~~~~~~
+
+.. code-block:: pascal
+
+    procedure setupSmart(ForceNewClient: Boolean);
+
+Sets up a new Smart Client and waits until it's on screen. Terminates The
+current script upon failure.
+
+.. note::
+
+  By: Mormanman.
+  Modified By: Brandon.
+
+Example:
+
+.. code-block:: pascal
+
+*)
+procedure setupSmart(ForceNewClient: Boolean);
+var
+  T: Integer;
+begin
+  T := GetSystemTime + 120000;
+  Smart_CurrentClient:= initSmart(ForceNewClient);
+
+  if (Smart_CurrentClient <= 0) then
+  begin
+    writeln('*** Smart failed to load ***');
+    terminateScript;
+  end;
+end;
+
+(*
+findAndSetTarget
+~~~~~~~~~~~~~~~~
+
+.. code-block:: pascal
+
+    function findAndSetTarget(TitlePrefix: String; SetAsTarget: Boolean): Boolean;
+
+Finds a Windows by partial title and sets it as the target.
+
+.. note::
+
+  By: Unknown
+
+Example:
+
+.. code-block:: pascal
+
+*)
+function findAndSetTarget(TitlePrefix: String; SetAsTarget: Boolean): Boolean;
+var
+  T : TSysProcArr;
+  I : Integer;
+begin
+  T := GetProcesses;
+  for I := High(T) downto 0 do
+    if Pos(TitlePrefix, T[I].Title) <> 0 then
+    begin
+      Result := True;
+      if SetAsTarget then SetTarget(T[I]);
+      Exit;
+    end;
+end;
+
+begin
+  setupSmart(Smart_ForceNew);
+
+  if (useSMARTsixHourFix) then
+    events[RS_UPDATE] := @sixHourFix;
+end;

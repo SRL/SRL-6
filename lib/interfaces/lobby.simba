@@ -59,12 +59,12 @@ begin
 end;
 
 (*
-lobbyScreen
-~~~~~~~~~~~
+isLobbyScreenOpen
+~~~~~~~~~~~~~~~~~
 
 .. code-block:: pascal
 
-    function lobbyScreen: boolean;
+    function isLobbyScreenOpen: boolean;
 
 Returns true if we are at the lobby screen is loaded.
 
@@ -77,10 +77,10 @@ Example:
 .. code-block:: pascal
 
     // wait for the Lobby Screen to appear!
-    while (not lobbyScreen) do
+    while (not isLobbyScreenOpen) do
       wait(100 + Random(400));
 *)
-function lobbyScreen: boolean;
+function isLobbyScreenOpen(): boolean;
 begin
   result := inRange(getLobbyTab, LOBBY_PLAYER, LOBBY_OPTIONS);
 end;

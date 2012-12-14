@@ -13,20 +13,31 @@ SRL library isn't available to you.
 {$include_once lib/core/debug.simba}
 {$include_once lib/core/players.simba}
 {$include_once lib/core/login.simba}
+{$include_once lib/core/client.simba}
 
 {$include_once lib/interfaces/lobby.simba}
 
 {$include_once lib/utilities/time.simba}
 
+{$IFDEF SMART}
+  {$include_once lib/misc/smart.simba}
+{$ENDIF}
+
 function setupSRL(): boolean;
 var
-  t: integer;
+  t := getTickCount();
 begin
-  t := getSystemTime();
-
+  clearDebug();
   scriptStartTime := replace(theDate(DATE_DAY)+' at '+theTime(), ':', '.', [rfReplaceAll]);
+  writeln('Set up SRL in ', (getTickCount() - t), 'ms.');
 
-  writeln('Set up SRL in ', (getSystemTime - t), 'ms.');
+  if (waitClientReady()) then
+    writeln('Client is ready.')
+  else begin
+    writeln('Client is taking too long to load, terminating...');
+    halt();
+  end;
+
   result := true;
 end;
 

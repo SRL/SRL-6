@@ -1,0 +1,90 @@
+(*
+Client
+======
+
+The Client file holds functions that have anything to do with the RS client or
+client settings.
+
+*)
+
+{$include_once ../interfaces/lobby.simba}
+
+(*
+isClientReady
+~~~~~~~~~~~~~
+
+.. code-block:: pascal
+
+    function isClientReady: Boolean;
+
+Returns true if we are ready to auto (on loginscreen or logged in).
+Useful for waiting until RS has fully loaded.
+
+.. note::
+
+    by ZephyrsFury
+    Last updated: 13/12/2012 by Coh3n
+
+Example:
+
+.. code-block:: pascal
+
+    while (not isClientReady) do
+      SleepAndMoveMouse(100 + Random(500));
+*)
+function isClientReady(): boolean;
+var
+  w, h: integer;
+begin
+  Result := (loggedIn) or (isLobbyScreenOpen);
+
+  if (not Result) then
+  begin
+    ImageResetClientArea;
+    Result := (GetColor(745, 17) = 16645629); // X button in top right
+  end;
+end;
+
+(*
+waitClientLoaded()
+~~~~~~~~~~~~~~~~~~
+
+.. code-block:: pascal
+
+    function waitClientLoaded(): boolean;
+
+Waits for the client to load.  Will terminate the script if the client loaded
+isn't set to fixed size.
+
+.. note::
+
+    by Coh3n
+    Last updated: 13/12/2012 by Coh3n
+
+Example:
+
+.. code-block:: pascal
+
+    if (waitClientReady()) then
+      writeln('Client is ready!');
+*)
+function waitClientReady(): boolean;
+const
+  t := getTickCount();
+begin
+  writeln('NOTE: if RS is loaded and nothing is happening, set your RS client'+
+          ' to "Fixed Size."');
+  writeln('Waiting for RS to load...');
+
+  while ((getTickCount - t) < (5 * 60000)) do // 5 minutes
+  begin
+    if (isClientReady()) then
+    begin
+      result := true;
+      break;
+    end;
+
+    wait(250);
+  end;
+end;
+

@@ -168,3 +168,8 @@ begin
     playerStartTime := getSystemTime();
   end;
 end;
+
+function TPlayer.login(): boolean;
+begin
+  result := false;
+end;

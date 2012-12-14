@@ -18,6 +18,7 @@ SRL6 release thread.
 
 - lobby.simba
   - renamed constants to LOBBY_PLAYER/WORLD/FRIENDS/CHAT/CLAN/OPTIONS
+  - lobbyScreen renamed to isLobbyScreenOpen()
 
 - players.simba
   - TUser renamed to TPlayer
@@ -27,7 +28,6 @@ SRL6 release thread.
   - removed variables checkHPFirst, logoutOnMod, reincarnate, playerCurTime
   - removed functions allPlayersInactive, numberOfPlayers
   - renamed function playersActive to getPlayersActive
-  - moved function loggedIn() to login.simba
   - function PlayerWorked is now a procedure of the TPlayer type and has been renamed to addWorked
     - should be called when you want to add to a player's .worked attribute
 
@@ -55,6 +55,19 @@ SRL6 release thread.
   - mouse_move const set to -1 rather than 3 which would interfere with simba internal constants
   - MMouse() & Mouse() -> mouse() overload;
   - ClickMouse2() -> fastClick()
+
+- smart.simba
+  - renamed variable SRL_SixHourFix to useSMARTSixHourFix (default set to true)
+  - removed function isRealMouseInBox
+  - removed function getReadMousePos because TClient isn't yet supported in Lape
+
+- login.simba
+  - LoggedIn renamed to loggedIn
+  - RSReady renamed to isClientReady and added to core/client.simba
+
+- new file, client.simba
+  - added function isClientReady (replaces RSReady)
+  - added function waitClientReady, which is called in setupSRL
 
 
 
