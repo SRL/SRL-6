@@ -17,14 +17,14 @@ Variables
 
 All the variables associated with smart.simba.
 
-  * useSMARTsixHourFix: default set to true.
+  * SMART_SixHourFix: Restart SMART after the 6 hour login error. Default is true.
   * SMART_CurrentClient: the SMART client for the current script.
   * SMART_ForceNew: force a new SMART client to be loaded. Default is false.
   * SMART_FixSpeed: fixes SMART's refresh rate. Default is true.
 
 *)
 var
-  useSMARTsixHourFix = true;
+  SMART_SixHourFix = true;
   SMART_CurrentClient = 0;
   SMART_ForceNew = false;
   SMART_FixSpeed = true;
@@ -393,6 +393,6 @@ end;
 begin
   setupSmart(Smart_ForceNew);
 
-  if (useSMARTsixHourFix) then
+  if (SMART_SixHourFix) then
     events[RS_UPDATE] := @sixHourFix;
 end;
