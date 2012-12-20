@@ -394,5 +394,5 @@ begin
   setupSmart(Smart_ForceNew);
 
   if (SMART_SixHourFix) then
-    events[RS_UPDATE] := @sixHourFix;
+    SRL_Events[RS_UPDATE] := @sixHourFix;
 end;
