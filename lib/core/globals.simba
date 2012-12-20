@@ -16,7 +16,7 @@ Example:
 
 .. code-block:: pascal
 
-  events[RS_UPDATE] := @SixHourFix;
+  SRL_Events[RS_UPDATE] := @SixHourFix;
 
 *)
 const
@@ -24,8 +24,8 @@ const
     RS_UPDATE = 0;
 
 (*
-Variable: Events
-~~~~~~~~~~~~~~~~
+Variable: SRL_Events
+~~~~~~~~~~~~~~~~~~~~
 
 Events that are called throuhgout SRL. These events can be set in any script
 so custom procedures can be called in certain areas of SRL.
@@ -34,10 +34,10 @@ Example:
 
 .. code-block:: pascal
 
-  events[RS_UPDATE] := @SixHourFix;
+  SRL_Events[RS_UPDATE] := @SixHourFix;
 
 *)
 var
-  events: array[0..(EVENT_COUNT - 1)] of procedure;
+  SRL_Events: array[0..(EVENT_COUNT - 1)] of procedure;
 
 
