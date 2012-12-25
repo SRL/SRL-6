@@ -1,9 +1,7 @@
 Changes from SRL5
 ~~~~~~~~~~~~~~~~~
 
-EVERYTHING should be recorded here: new features, function name changes,
-user-defined variables... everything! Everything here will be explained in the
-SRL6 release thread.
+EVERYTHING should be recorded here: new features, function name changes, user-defined variables... everything! Everything here will be explained in the SRL6 release thread.
 
 -- no longer need to call SetupSRL since Lape has initialization (see the end of srl.simba for details)
 
@@ -34,7 +32,7 @@ SRL6 release thread.
 - inventory.simba
   - TIventItem renamed TItem
   - attributes added: ColorArr, Name, TPACount, CheckSum, Slot, Stack
-  - attributes renamed: ItemExists,
+  - attributes renamed: ItemExists
   - TInvenItemArr renamed TItemArray
   - Change function Parameter I to Slot
   - added CONST
@@ -43,9 +41,7 @@ SRL6 release thread.
   - invBox moved
   - modified getItem, coordsToSlot, itemExists, getActivatedItem
   - renamed itemExists, getItem, coordsToSlot, getActivatedItem
-  - removed InvMouse, MMouseItem, MouseItem, DragItem, ClickAllItemsExcept, ClickAllItems,
-      DropItem, DropArray, DropPattern, DropAll, DropAllExcept, DropItemsByIdent,
-      ArrangeInv, CountItemsBlackList, ClickItemsBlackList, ExistItemDTM
+  - removed InvMouse, MMouseItem, MouseItem, DragItem, ClickAllItemsExcept, ClickAllItems, DropItem, DropArray, DropPattern, DropAll, DropAllExcept, DropItemsByIdent, ArrangeInv, CountItemsBlackList, ClickItemsBlackList, ExistItemDTM
 
 - gametab.simba
   - Added Placeholder.
@@ -64,12 +60,13 @@ SRL6 release thread.
 - login.simba
   - LoggedIn renamed to loggedIn
   - RSReady renamed to isClientReady and added to core/client.simba
-  - TPlayerArray functions
-    - TPlayerArray.getActive (from PlayersActive)
-    - TPlayerArray.add: adds a player to the array
-    - TPlayerArray.setup: sets up a player array based on nicknames in player_info.simba
-  - TPlayer functions
-    - TPlayer.addWorked: replaced PlayerWorked
+  - renamed function PlayersActive to TPlayerArray.getActive
+  - added function TPlayerArray.add
+  - added function TPlayerArray.setup
+  - renamed function PlayerWorked to TPlayer.addWorked
+
+- new file, login_info.simba
+  - this file is to be used for player declaration.  Users will enter in their player information once and can choose which players to use in scripts.  This means the user only enters their player information in one file rather than every script they use.
 
 - new file, client.simba
   - added function isClientReady (replaces RSReady)
