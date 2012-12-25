@@ -73,8 +73,10 @@ const
   t := getTickCount();
 begin
   writeln('NOTE: if RS is loaded and nothing is happening, set your RS client'+
-          ' to "Fixed Size."');
-  writeln('Waiting for RS to load...');
+          ' to "Fixed Size".');
+  writeln('NOTE: if you''re not using SMART, be sure to use Simba''s crosshairs'+
+          ' to select the RS client.');
+  writeln('Waiting up to 5 minutes for RS to load...');
 
   while ((getTickCount - t) < (5 * 60000)) do // 5 minutes
   begin
