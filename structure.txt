@@ -7,22 +7,27 @@ A structure of SRL-6.  Only includes the files that have been finished.
       -- license.txt
       -- readme.txt
    -- lib/  
-      -- antirandoms/
       -- core/
+         -- client.simba
          -- debug.simba
-         -- players.simba
-         -- login.simba
          -- globals.simba
+         -- login.simba
          -- mouse.simba
-      -- minimap/
+         -- players.simba
       -- interfaces/
          -- gametabs/
+            -- gametab.simba
             -- inventory.simba
          -- lobby.simba
       -- items/
+      -- minimap/
       -- misc/
+         -- smart.simba
       -- utilities/
          -- time.simba
+         -- types.simba
    -- logs/
    -- tools/
+      -- autocolor_aid.exe
    -- srl.simba
+   -- player_info.simba
