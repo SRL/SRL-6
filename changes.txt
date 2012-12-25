@@ -66,7 +66,7 @@ EVERYTHING should be recorded here: new features, function name changes, user-de
   - renamed function PlayerWorked to TPlayer.addWorked
 
 - new file, login_info.simba
-  - this file is to be used for player declaration.  Users will enter in their player information once and can choose which players to use in scripts.  This means the user only enters their player information in one file rather than every script they use.
+  - This file is to replace the traditional DeclarePlayers.  Users will enter in their player information only one time and can choose which players to use in scripts.  Any other attributes (i.e. integers, booleans, etc.) will be edited in the script's DeclarePlayers like always.
 
 - new file, client.simba
   - added function isClientReady (replaces RSReady)
