@@ -62,14 +62,15 @@ Example:
   begin
     loginName := 'example@example.com';
     displayName := 'Sir Example III';
+    nickname := 'fighter1';
     password := 'thisismypassword12345';
   end;
-
 *)
 type
   TPlayer = record
     loginName: string;
     displayName: string;
+    nickname: string;
     password: string;
     bankPin: string;
     location: string;
@@ -87,6 +88,8 @@ type
     variants: array[0..99] of variant;
   end;
 
+  TPlayerArray = array of TPlayer;
+
 (*
 Player Variables
 ~~~~~~~~~~~~~~~~
@@ -100,41 +103,166 @@ All the variables associated with players.simba.
 
 *)
 var
-  players: array of TPlayer;
-  currentPlayer, numberOfPlayers: integer;
+  players: TPlayerArray;
+  currentPlayer: integer;
   playerStartTime: longInt;
 
+function getPlayers(): TPlayerArray; forward; // from player_info.simba
+
 (*
-getPlayersActive()
-~~~~~~~~~~~~~~~~~~
+TPlayerArray.getActive()
+~~~~~~~~~~~~~~~~~~~~~~~~
 
 .. code-block:: pascal
 
-    function getPlayersActive(): Integer;
+    function TPlayerArray.getActive(): integer;
 
-Returns the number of players that are still active.
+Returns the number of players that are still active in the TPlayerArray.
 
 .. note::
 
-    by ss23
+    by ss23 & Coh3n
+    Last updated: Dec. 22nd, 2012 by Coh3n
 
 Example:
 
 .. code-block:: pascal
 
-  while (getPlayersActive() > 0) do
+  while (players.getActive() > 0) do
     mainloop();
 *)
-function getPlayersActive(): Integer;
+function TPlayerArray.getActive(): integer;
 var
-  i, h: Integer;
+  i, h: integer;
 begin
-  Result := 0;
-  h := High(Players);
+  result := 0;
+  h := high(self);
 
   for i := 0 to h do
-    if (Players[i].Active) then
-      Inc(Result);
+    if (self[i].active) then
+      inc(result);
+end;
+
+(*
+TPlayerArray.add
+~~~~~~~~~~~~~~~~
+
+.. code-block:: pascal
+
+    procedure TPlayerArray.add(info: TPlayer);
+
+Adds the player with 'info' to the TPlayerArray.
+
+.. note::
+
+    by Zyt3x & Coh3n
+    Last updated: Dec. 22nd, 2012 by Coh3n
+
+Example:
+
+.. code-block:: pascal
+
+  var
+    P: TPlayer;
+    Players: TPlayerArray;
+  begin
+    with P do
+    begin
+      loginName := 'example@example.com';
+      password := 'examplepassword123';
+    end;
+
+    Players.add(P);
+  end;
+*)
+procedure TPlayerArray.add(info: TPlayer);
+var
+  h: integer;
+begin
+  setLength(self, length(self) + 1);
+  self[high(self)] := info;
+
+  h := high(self);
+  self[h] := info;
+  self[h].active := true;
+  self[h].findMod := true;
+end;
+
+(*
+TPlayerArray.setup
+~~~~~~~~~~~~~~~~~~
+
+.. code-block:: pascal
+
+    procedure TPlayerArray.setup(names: TStringArray);
+
+Sets up the players with login name, display name, or nickname that match
+elements of 'names'.  Called only in DeclarePlayers().
+
+.. note::
+
+    by Zyt3x & Coh3n
+    Last updated: Dec. 22nd, 2012 by Coh3n
+
+Example:
+
+.. code-block:: pascal
+
+  players.setup(['woodcutter5', 'miner3', 'fisher6']);
+
+*)
+procedure TPlayerArray.setup(names: TStringArray);
+var
+  i, j: integer;
+  tmp: TPlayerArray;
+begin
+  tmp := getPlayers();
+
+  for i := 0 to high(names) do
+    for j := 0 to high(tmp) do
+    begin
+      if (names[i] = tmp[j].loginName) or (names[i] = tmp[j].displayName) or (names[i] = tmp[j].nickname) then
+      begin
+        self.add(tmp[j]);
+        //setLength(self, length(self) + 1);
+        //self[high(self)] := tmp[j];
+        break;
+      end;
+
+      if (j = high(tmp)) then
+        debug('Invalid player name: '+names[i]);
+    end;
+end;
+
+(*
+TPlayer.debug()
+~~~~~~~~~~~~~~~
+
+.. code-block:: pascal
+
+    procedure TPlayer.debug();
+
+Debugs the standard information about the player.
+
+.. note::
+
+    by Coh3n
+    Last updated: Dec. 22nd, 2012 by Coh3n
+
+Example:
+
+.. code-block:: pascal
+
+  players[currentPlayer].debug();
+
+*)
+procedure TPlayer.debug();
+begin
+  writeln('Login Name: ', self.loginName);
+  writeln('Display Name: ', self.displayName);
+  writeln('Nickname: ', self.nickname);
+  writeln('Member: ', self.member);
+  writeln('Active: ', self.active);
 end;
 
 (*

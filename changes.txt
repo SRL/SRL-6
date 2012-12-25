@@ -64,6 +64,12 @@ SRL6 release thread.
 - login.simba
   - LoggedIn renamed to loggedIn
   - RSReady renamed to isClientReady and added to core/client.simba
+  - TPlayerArray functions
+    - TPlayerArray.getActive (from PlayersActive)
+    - TPlayerArray.add: adds a player to the array
+    - TPlayerArray.setup: sets up a player array based on nicknames in player_info.simba
+  - TPlayer functions
+    - TPlayer.addWorked: replaced PlayerWorked
 
 - new file, client.simba
   - added function isClientReady (replaces RSReady)
