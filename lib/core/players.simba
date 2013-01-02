@@ -175,7 +175,7 @@ Example:
     Players.add(P);
   end;
 *)
-procedure TPlayerArray.add(info: TPlayer);
+procedure TPlayerArray.add(const info: TPlayer);
 var
   h: integer;
 begin
@@ -224,8 +224,6 @@ begin
       if (names[i] = tmp[j].loginName) or (names[i] = tmp[j].displayName) or (names[i] = tmp[j].nickname) then
       begin
         self.add(tmp[j]);
-        //setLength(self, length(self) + 1);
-        //self[high(self)] := tmp[j];
         break;
       end;
 
