@@ -1,0 +1,23 @@
+SRL Variables
+~~~~~~~~~~~~~
+
+File used to keep track of SRL's variables and defines. A thread will be made when SRL-6 is released. Include only the variables and defines that can be (or are meant to) be set by the scripter. No need to inlcude internal SRL variables.
+
+DEFINES:
+
+
+VARIABLES:
+	mouseSpeed: integer; - the speed at which the mouse moves. Default 15.
+	disableSRLDebug: boolean; - disables SRL debugging. Default false.
+	disableSRLLog: boolean; - disables the SRL logging system. Default false.
+	logPath: string; - the path where SRL log files are saved. Default SRL/logs/.
+	SRL_Events: array of procedure - procedures called throughout SRL (i.e. on RS update, on login etc.). Full list of events found in SRL/lib/core/globals.simba.
+	players: array of TPlayer - the default TPlayerArray.
+	currentPlayer: integer; - the current active player
+	SMART_SixHourFix: boolean; - restart SMART after 6 hours. Default true.
+	SMART_ForceNew: boolean; - force a new SMART client when a script is started. Default false.
+	
+	
+	
+
+

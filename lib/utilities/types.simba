@@ -7,12 +7,12 @@ The Math include contains math functions used throughout SRL.
 *)
 
 {*
-TPoint.Rand
+TPoint.rand
 ~~~~~~~~~~~
 
 .. code-block:: pascal
 
-    function TPoint.Rand(xx,yy: integer): TPoint;
+    function TPoint.rand(xx,yy: integer): TPoint;
 
 Used to apply separate randomness to both the 'x' and 'y' coordinates of a TPoint.
 
@@ -24,10 +24,10 @@ Example:
 
 .. code-block:: pascal
 
-    mouse(point.Rand(5,5));
+    mouse(point.rand(5,5));
 
 *}
-function TPoint.Rand(xx,yy: integer): TPoint; overload;
+function TPoint.rand(xx,yy: integer): TPoint; overload;
 var
   nx, ny, rx, ry: integer;
 begin
@@ -42,12 +42,12 @@ begin
 end;
 
 {*
-TPoint.Rand overload;
+TPoint.rand overload;
 ~~~~~~~~~~~~~~~~~~~~~
 
 .. code-block:: pascal
 
-    function TPoint.Rand(ran: integer): TPoint; overload;
+    function TPoint.rand(ran: integer): TPoint; overload;
 
 Used to apply THE SAME randomness to both the 'x' and 'y' coordinates of a TPoint.
 
@@ -59,21 +59,21 @@ Example:
 
 .. code-block:: pascal
 
-    mouse(point.Rand(5));
+    mouse(point.rand(5));
 
 *}
-function TPoint.Rand(ran: integer): TPoint; overload;
+function TPoint.rand(ran: integer): TPoint; overload;
 begin
-  result := self.Rand(ran, ran);
+  result := self.rand(ran, ran);
 end;
 
 {*
-TPoint.Coords
+TPoint.coords
 ~~~~~~~~~~~~~
 
 .. code-block:: pascal
 
-    function TPoint.Coords(x, y): TPoint;
+    function TPoint.roords(x, y): TPoint;
 
 Used to assign values to both the 'x' and 'y' coordinates of a TPoint.
 
@@ -85,11 +85,11 @@ Example:
 
 .. code-block:: pascal
 
-    point.Coords(x,y);
-    mouse(point.Rand(5));
+    point.coords(x,y);
+    mouse(point.rand(5));
 
 *}
-function TPoint.Coords(x,y: integer): TPoint;
+function TPoint.coords(x,y: integer): TPoint;
 begin
   result.x := x;
   result.y := y;

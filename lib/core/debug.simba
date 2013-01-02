@@ -10,7 +10,7 @@ The debug file holds any files used for SRL debugging and logging.
 
 var
   debugLevel = 1; // used for the nice debug formatting
-  disableSRLdebug = false;
+  disableSRLDebug = false;
   logPath = includePath + 'SRL-6/logs/';
   scriptStartTime = '0:0:0';
   disableSRLLog = false;

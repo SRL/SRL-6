@@ -72,6 +72,10 @@ EVERYTHING should be recorded here: new features, function name changes, user-de
   - added function isClientReady (replaces RSReady)
   - added function waitClientReady, which is called in setupSRL
 
+- new file, types.simba
+  - new function TPoint.rand that will add a random integer to a TPoint
+  - new function TPoint.coords that will assign the x and y values of a TPoint
+
 
 
 

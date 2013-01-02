@@ -21,24 +21,21 @@ Example:
 *)
 var
   mouseSpeed: Integer = 15;
-  {$IFDEF UseLaptopMouse}
-  LMouse_MissChance: Integer;
-  {$ENDIF}
 
 {
  Used in place of other mouse button constants to move the mouse
  without actually clicking.
 }
 const
-  mouse_Move   = -1;
+  MOUSE_MOVE = -1;
 {
  Used to determine the 'style' in which the mouse moves
  Values are used as modifiers in mouse()
 }
 const
-  mmBrake    = 8;
-  mmAccurate = 14;
-  mmHuman    = 7;
+  MOUSE_BREAK    = 8;
+  MOUSE_ACCURATE = 14;
+  MOUSE_HUMAN    = 7;
 
 {*
 brakeWindMouse
@@ -319,7 +316,7 @@ procedure fastClick(button: integer);
 var
   x, y: integer;
 begin
-  if (button = mouse_move) then Exit;
+  if (button = MOUSE_MOVE) then Exit;
   getMousePos(x, y);
   holdMouse(x, y, button);
 
@@ -335,7 +332,7 @@ mouse
 
 .. code-block:: pascal
 
-    procedure mouse(pnt: TPoint; button: integer; mmType: integer = mmHuman); overload;
+    procedure mouse(pnt: TPoint; button: integer; mmType: integer = MOUSE_HUMAN); overload;
 
 Description: Moves the mouse to 'pnt' using specified 'mmType' then clicks the mouse 'button'.
 
@@ -347,10 +344,10 @@ Example:
 
 .. code-block:: pascal
 
-    mouse(point, mouse_Left, mmAccurate);
+    mouse(point, mouse_Left, MOUSE_ACCURATE);
 
 *}
-procedure mouse(pnt: TPoint; button: integer; mmType: integer = mmHuman); overload;
+procedure mouse(pnt: TPoint; button: integer; mmType: integer = MOUSE_HUMAN); overload;
 var
   randSpeed: extended;
   x,y,ms: integer;
@@ -358,8 +355,8 @@ begin
   ms := mouseSpeed;
   randSpeed := (random(mouseSpeed) / 2.0 + mouseSpeed) / 10.0;
   getMousePos(x,y);
-  if mmType = mmHuman then
-    humanWindMouse(x, y, pnt.x, pnt.y, mmHuman, 5, 10.0/randSpeed, 15.0/randSpeed, 10.0*randSpeed)
+  if mmType = MOUSE_HUMAN then
+    humanWindMouse(x, y, pnt.x, pnt.y, MOUSE_HUMAN, 5, 10.0/randSpeed, 15.0/randSpeed, 10.0*randSpeed)
   else
     brakeWindMouse(x, y, pnt.x, pnt.y, mmType, 3, 10.0/randSpeed, 15.0/randSpeed, 10.0*randSpeed, false);
   mouseSpeed := ms;
@@ -389,7 +386,7 @@ Example:
 *}
 procedure mouse(pnt: TPoint); overload;
 begin
-  mouse(pnt, mouse_move);
+  mouse(pnt, MOUSE_MOVE);
 end;
 
 {*
@@ -429,7 +426,7 @@ begin
   randSpeed := (random(mouseSpeed) / 2.0 + mouseSpeed) / 10.0;
   x2 := randomRange(Pnt.x-(a*mp), Pnt.x+(a*mp));
   y2 := randomRange(Pnt.y-(a*mp), Pnt.y+(a*mp));
-  humanWindMouse(x, y, x2, y2, mmHuman, 5, 10.0/randSpeed, 15.0/randSpeed, 10.0*randSpeed);
+  humanWindMouse(x, y, x2, y2, MOUSE_HUMAN, 5, 10.0/randSpeed, 15.0/randSpeed, 10.0*randSpeed);
   getMousePos(x, y);
   mouse(pnt);
   mouseSpeed := a;
@@ -468,9 +465,3 @@ begin
   wait(random(100));
   releaseMouse(x, y, mouse_Left);
 end;
-
-
-
-
-
-
