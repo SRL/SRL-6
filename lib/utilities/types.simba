@@ -2,9 +2,11 @@
 Type
 ====
 
-The Math include contains math functions used throughout SRL.
+The Type include contains type editing functions used throughout SRL.
 
 *)
+
+{$include_once ../utilities/wrappers.simba}
 
 {*
 TPoint.rand
@@ -68,32 +70,1002 @@ begin
 end;
 
 {*
-TPoint.coords
+TPoint.create
 ~~~~~~~~~~~~~
 
 .. code-block:: pascal
 
-    function TPoint.roords(x, y): TPoint;
+    procedure TPoint.create(const pX, pY : Integer);
 
 Used to assign values to both the 'x' and 'y' coordinates of a TPoint.
 
 .. note::
 
-    by NCDS
+    by Zyt3x
 
 Example:
 
 .. code-block:: pascal
 
-    point.coords(x,y);
+    point.create(x,y);
     mouse(point.rand(5));
 
 *}
-function TPoint.coords(x,y: integer): TPoint;
+procedure TPoint.create(const pX, pY : Integer);
 begin
-  result.x := x;
-  result.y := y;
+  X := pX;
+  Y := pY;
 end;
 
+{*
+TStringArray.addIndex
+~~~~~~~~~~~~~~~~~~~~~
 
+.. code-block:: pascal
 
+    procedure TStringArray.addIndex(const str : String; const index : Integer);
+
+Used to add a value to a TStringArray at a chosen index.
+
+.. note::
+
+    by Zyt3x
+
+Example:
+
+.. code-block:: pascal
+
+    TSA.addIndex('new entry', 0);
+
+*}
+procedure TStringArray.addIndex(const str : String; const index : Integer);
+var
+  I : Integer;
+begin
+  if index > length(self) then
+  begin
+    WriteLn('ERROR: addIndex: index larger than array length.');
+    Exit;
+  end;
+
+  setLength(self, length(self)+1);
+  for I := high(self)-1 downto index do
+    self[I+1] := self[I];
+  self[index] := str;
+end;
+
+{*
+TStringArray.deleteIndex
+~~~~~~~~~~~~~~~~~~~~~~~~
+
+.. code-block:: pascal
+
+    procedure TStringArray.deleteIndex(const index : Integer);
+
+Used to delete a value of a TStringArray at a chosen index.
+
+.. note::
+
+    by Zyt3x
+
+Example:
+
+.. code-block:: pascal
+
+    TSA.deleteIndex(0);
+
+*}
+procedure TStringArray.deleteIndex(const index : Integer);
+var
+  I : Integer;
+begin
+  if index > length(self) then
+  begin
+    WriteLn('ERROR: deleteIndex: index larger than array length.');
+    Exit;
+  end;
+
+  for I := index to high(self)-1 do
+    self[I] := self[I+1];
+  setLength(self, length(self)-1);
+end;
+
+{*
+TStringArray.append
+~~~~~~~~~~~~~~~~~~~
+
+.. code-block:: pascal
+
+    procedure TStringArray.append(const str : String);
+
+Used to append a value to a TStringArray.
+
+.. note::
+
+    by Zyt3x
+
+Example:
+
+.. code-block:: pascal
+
+    TSA.append('new entry');
+
+*}
+procedure TStringArray.append(const str : String);
+begin
+  addIndex(str, length(self));
+end;
+
+{*
+TStringArray.returnInArray
+~~~~~~~~~~~~~~~~~~~~~~~~~~
+
+.. code-block:: pascal
+
+    function TStringArray.returnInArray(const str : String) : Integer;
+
+Returns the index of where the value was found in a TStringArray.  Returns -1 if not found.
+
+.. note::
+
+    by Zyt3x
+
+Example:
+
+.. code-block:: pascal
+
+    writeLn(TSA.returnInArray('new entry'));
+
+*}
+function TStringArray.returnInArray(const str : String) : Integer;
+var
+  I : Integer;
+begin
+  result := -1;
+  for I := 0 to high(self) do
+    if self[I] = str then
+    begin
+      result := I;
+      exit;
+    end;
+end;
+
+{*
+TStringArray.isInArray
+~~~~~~~~~~~~~~~~~~~~~~
+
+.. code-block:: pascal
+
+    function TStringArray.isInArray(const str : String) : Boolean;
+
+Returns True if the value is present in the TStringArray.
+
+.. note::
+
+    by Zyt3x
+
+Example:
+
+.. code-block:: pascal
+
+    writeLn(TSA.returnInArray('new entry'));
+
+*}
+function TStringArray.isInArray(const str : String) : Boolean;
+begin
+  result := returnInArray(str) > -1;
+end;
+
+{*
+TStringArray.clearSame
+~~~~~~~~~~~~~~~~~~~~~~
+
+.. code-block:: pascal
+
+    procedure TStringArray.clearSame();
+
+Used to clear duplicates in a TStringArray.
+
+.. note::
+
+    by Zyt3x
+
+Example:
+
+.. code-block:: pascal
+
+    TSA.clearSame();
+
+*}
+procedure TStringArray.clearSame();
+var
+  I : Integer;
+  arr : TStringArray;
+begin
+  for I := 0 to high(self) do
+    if not arr.isInArray(self[I]) then
+      arr.append(self[I]);
+  self := arr;
+end;
+
+{*
+TStringArray.invert
+~~~~~~~~~~~~~~~~~~~
+
+.. code-block:: pascal
+
+    procedure TStringArray.invert();
+
+Used to invert the TStringArray.
+
+.. note::
+
+    by Zyt3x
+
+Example:
+
+.. code-block:: pascal
+
+    TSA.invert();
+
+*}
+procedure TStringArray.invert();
+var
+  I : Integer;
+  arr : TStringArray;
+begin
+  for I := high(self) downto 0 do
+    arr.append(self[I]);
+  self := arr;
+end;
+
+{*
+TStringArray.toString
+~~~~~~~~~~~~~~~~~~~~~
+
+.. code-block:: pascal
+
+    function TStringArray.toString() : String;
+
+Used to turn a TStringArray into a string.
+
+.. note::
+
+    by Zyt3x
+
+Example:
+
+.. code-block:: pascal
+
+    writeLn(TSA.toString());
+
+*}
+function TStringArray.toString() : String;
+var
+  I : Integer;
+begin
+  for I := 0 to high(self) do
+    result := result + self[I];
+end;
+
+{*
+TIntegerArray.addIndex
+~~~~~~~~~~~~~~~~~~~~~~
+
+.. code-block:: pascal
+
+    procedure TIntegerArray.addIndex(const int : Integer; const index : Integer);
+
+Used to add a value to a TIntegerArray at a chosen index.
+
+.. note::
+
+    by Zyt3x
+
+Example:
+
+.. code-block:: pascal
+
+    TIA.addIndex(1337, 0);
+
+*}
+procedure TIntegerArray.addIndex(const int : Integer; const index : Integer);
+var
+  I : Integer;
+begin
+  if index > length(self) then
+  begin
+    WriteLn('ERROR: addIndex: index larger than array length.');
+    Exit;
+  end;
+
+  setLength(self, length(self)+1);
+  for I := high(self)-1 downto index do
+    self[I+1] := self[I];
+  self[index] := int;
+end;
+
+{*
+TIntegerArray.deleteIndex
+~~~~~~~~~~~~~~~~~~~~~~~~~
+
+.. code-block:: pascal
+
+    procedure TIntegerArray.deleteIndex(const index : Integer);
+
+Used to delete a value of a TIntegerArray at a chosen index.
+
+.. note::
+
+    by Zyt3x
+
+Example:
+
+.. code-block:: pascal
+
+    TIA.deleteIndex(0);
+
+*}
+procedure TIntegerArray.deleteIndex(const index : Integer);
+var
+  I : Integer;
+begin
+  if index > length(self) then
+  begin
+    WriteLn('ERROR: deleteIndex: index larger than array length.');
+    Exit;
+  end;
+
+  for I := index to high(self)-1 do
+    self[I] := self[I+1];
+  setLength(self, length(self)-1);
+end;
+
+{*
+TIntegerArray.append
+~~~~~~~~~~~~~~~~~~~~
+
+.. code-block:: pascal
+
+    procedure TIntegerArray.append(const int : Integer);
+
+Used to append a value to a TIntegerArray.
+
+.. note::
+
+    by Zyt3x
+
+Example:
+
+.. code-block:: pascal
+
+    TIA.append(1337);
+
+*}
+procedure TIntegerArray.append(const int : Integer);
+begin
+  addIndex(int, length(self));
+end;
+
+{*
+TIntegerArray.returnInArray
+~~~~~~~~~~~~~~~~~~~~~~~~~~~
+
+.. code-block:: pascal
+
+    function TIntegerArray.returnInArray(const int : Integer) : Integer;
+
+Returns the index of where the value was found in a TIntegerArray.  Returns -1 if not found.
+
+.. note::
+
+    by Zyt3x
+
+Example:
+
+.. code-block:: pascal
+
+    writeLn(TIA.returnInArray(1337));
+
+*}
+function TIntegerArray.returnInArray(const int : Integer) : Integer;
+var
+  I : Integer;
+begin
+  result := -1;
+  for I := 0 to high(self) do
+    if self[I] = int then
+    begin
+      result := I;
+      exit;
+    end;
+end;
+
+{*
+TIntegerArray.isInArray
+~~~~~~~~~~~~~~~~~~~~~~~
+
+.. code-block:: pascal
+
+    function TIntegerArray.isInArray(const int : Integer) : Boolean;
+
+Returns True if the value is present in the TIntegerArray.
+
+.. note::
+
+    by Zyt3x
+
+Example:
+
+.. code-block:: pascal
+
+    writeLn(TIA.returnInArray(1337));
+
+*}
+function TIntegerArray.isInArray(const int : Integer) : Boolean;
+begin
+  result := returnInArray(int) > -1;
+end;
+
+{*
+TIntegerArray.clearSame
+~~~~~~~~~~~~~~~~~~~~~~~
+
+.. code-block:: pascal
+
+    procedure TIntegerArray.clearSame();
+
+Used to clear duplicates in a TIntegerArray.
+
+.. note::
+
+    by Zyt3x
+
+Example:
+
+.. code-block:: pascal
+
+    TIA.clearSame();
+
+*}
+procedure TIntegerArray.clearSame();
+var
+  I : Integer;
+  arr : TIntegerArray;
+begin
+  for I := 0 to high(self) do
+    if not arr.isInArray(self[I]) then
+      arr.append(self[I]);
+  self := arr;
+end;
+
+{*
+TIntegerArray.invert
+~~~~~~~~~~~~~~~~~~~~
+
+.. code-block:: pascal
+
+    procedure TIntegerArray.invert();
+
+Used to invert the TIntegerArray.
+
+.. note::
+
+    by Zyt3x
+
+Example:
+
+.. code-block:: pascal
+
+    TIA.invert();
+
+*}
+procedure TIntegerArray.invert();
+var
+  I : Integer;
+  arr : TIntegerArray;
+begin
+  for I := high(self) downto 0 do
+    arr.append(self[I]);
+  self := arr;
+end;
+
+{*
+TIntegerArray.sum
+~~~~~~~~~~~~~~~~~
+
+.. code-block:: pascal
+
+    function TIntegerArray.sum() : Integer;
+
+Returns the sum of all values in a TIntegerArray.
+
+.. note::
+
+    by Zyt3x
+
+Example:
+
+.. code-block:: pascal
+
+    writeLn(toStr(TIA.sum()));
+
+*}
+function TIntegerArray.sum() : Integer;
+var
+  I : Integer;
+begin
+  for I := 0 to high(self) do
+    result := result + self[I];
+end;
+
+{*
+TIntegerArray.average
+~~~~~~~~~~~~~~~~~~~~~
+
+.. code-block:: pascal
+
+    function TIntegerArray.average() : Integer;
+
+Returns the average of all values in a TIntegerArray.
+
+.. note::
+
+    by Zyt3x
+
+Example:
+
+.. code-block:: pascal
+
+    writeLn(toStr(TIA.average()));
+
+*}
+function TIntegerArray.average() : Integer;
+var
+  I : Integer;
+begin
+  for I := 0 to high(self) do
+    result := result + self[I];
+  result := result div length(self);
+end;
+
+{*
+TIntegerArray.toExtendedArray
+~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+
+.. code-block:: pascal
+
+    function TIntegerArray.toExtendedArray() : TExtendedArray;
+
+Turns a TIntegerArray into a TExtendedArray.
+
+.. note::
+
+    by Zyt3x
+
+Example:
+
+.. code-block:: pascal
+
+    TEA := TIA.toExtended;
+
+*}
+function TIntegerArray.toExtendedArray() : TExtendedArray;
+var
+  I : Integer;
+begin
+  setLength(result, length(self));
+  for I := 0 to high(self) do
+    result[I] := self[I] * 1.0;
+end;
+
+{*
+TExtendedArray.addIndex
+~~~~~~~~~~~~~~~~~~~~~~~
+
+.. code-block:: pascal
+
+    procedure TExtendedArray.addIndex(const ext : Extended; const index : Integer);
+
+Used to add a value to a TExtendedArray at a chosen index.
+
+.. note::
+
+    by Zyt3x
+
+Example:
+
+.. code-block:: pascal
+
+    TEA.addIndex(1337.0, 0);
+
+*}
+procedure TExtendedArray.addIndex(const ext : Extended; const index : Integer);
+var
+  I : Integer;
+begin
+  if index > length(self) then
+  begin
+    WriteLn('ERROR: addIndex: index larger than array length.');
+    Exit;
+  end;
+
+  setLength(self, length(self)+1);
+  for I := high(self)-1 downto index do
+    self[I+1] := self[I];
+  self[index] := ext;
+end;
+
+{*
+TExtendedArray.deleteIndex
+~~~~~~~~~~~~~~~~~~~~~~~~~~
+
+.. code-block:: pascal
+
+    procedure TExtendedArray.deleteIndex(const index : Integer);
+
+Used to delete a value of a TExtendedArray at a chosen index.
+
+.. note::
+
+    by Zyt3x
+
+Example:
+
+.. code-block:: pascal
+
+    TEA.deleteIndex(0);
+
+*}
+procedure TExtendedArray.deleteIndex(const index : Integer);
+var
+  I : Integer;
+begin
+  if index > length(self) then
+  begin
+    WriteLn('ERROR: deleteIndex: index larger than array length.');
+    Exit;
+  end;
+
+  for I := index to high(self)-1 do
+    self[I] := self[I+1];
+  setLength(self, length(self)-1);
+end;
+
+{*
+TExtendedArray.append
+~~~~~~~~~~~~~~~~~~~~~
+
+.. code-block:: pascal
+
+    procedure TExtendedArray.append(const ext : Extended);
+
+Used to append a value to a TExtendedArray.
+
+.. note::
+
+    by Zyt3x
+
+Example:
+
+.. code-block:: pascal
+
+    TEA.append(1337.0);
+
+*}
+procedure TExtendedArray.append(const ext : Extended);
+begin
+  addIndex(ext, length(self));
+end;
+
+{*
+TExtendedArray.returnInArray
+~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+
+.. code-block:: pascal
+
+    function TExtendedArray.returnInArray(const ext : Extended) : Integer;
+
+Returns the index of where the value was found in a TExtendedArray.  Returns -1 if not found.
+
+.. note::
+
+    by Zyt3x
+
+Example:
+
+.. code-block:: pascal
+
+    writeLn(TEA.returnInArray(1337.0));
+
+*}
+function TExtendedArray.returnInArray(const ext : Extended) : Integer;
+var
+  I : Integer;
+begin
+  result := -1;
+  for I := 0 to high(self) do
+    if self[I] = ext then
+    begin
+      result := I;
+      exit;
+    end;
+end;
+
+{*
+TExtendedArray.isInArray
+~~~~~~~~~~~~~~~~~~~~~~~~
+
+.. code-block:: pascal
+
+    function TExtendedArray.isInArray(const ext : Extended) : Boolean;
+
+Returns True if the value is present in the TExtendedArray.
+
+.. note::
+
+    by Zyt3x
+
+Example:
+
+.. code-block:: pascal
+
+    writeLn(TEA.returnInArray(1337.0));
+
+*}
+function TExtendedArray.isInArray(const ext : Extended) : Boolean;
+begin
+  result := returnInArray(ext) > -1;
+end;
+
+{*
+TExtendedArray.clearSame
+~~~~~~~~~~~~~~~~~~~~~~~~
+
+.. code-block:: pascal
+
+    procedure TExtendedArray.clearSame();
+
+Used to clear duplicates in a TExtendedArray.
+
+.. note::
+
+    by Zyt3x
+
+Example:
+
+.. code-block:: pascal
+
+    TEA.clearSame();
+
+*}
+procedure TExtendedArray.clearSame();
+var
+  I : Integer;
+  arr : TExtendedArray;
+begin
+  for I := 0 to high(self) do
+    if not arr.isInArray(self[I]) then
+      arr.append(self[I]);
+  self := arr;
+end;
+
+{*
+TExtendedArray.invert
+~~~~~~~~~~~~~~~~~~~~~
+
+.. code-block:: pascal
+
+    procedure TExtendedArray.invert();
+
+Used to invert the TExtendedArray.
+
+.. note::
+
+    by Zyt3x
+
+Example:
+
+.. code-block:: pascal
+
+    TEA.invert();
+
+*}
+procedure TExtendedArray.invert();
+var
+  I : Integer;
+  arr : TExtendedArray;
+begin
+  for I := high(self) downto 0 do
+    arr.append(self[I]);
+  self := arr;
+end;
+
+{*
+TExtendedArray.sum
+~~~~~~~~~~~~~~~~~~
+
+.. code-block:: pascal
+
+    function TExtendedArray.sum() : Extended;
+
+Returns the sum of all values in a TExtendedArray.
+
+.. note::
+
+    by Zyt3x
+
+Example:
+
+.. code-block:: pascal
+
+    writeLn(toStr(TEA.sum()));
+
+*}
+function TExtendedArray.sum() : Extended;
+var
+  I : Integer;
+begin
+  for I := 0 to high(self) do
+    result := result + self[I];
+end;
+
+{*
+TExtendedArray.average
+~~~~~~~~~~~~~~~~~~~~~~
+
+.. code-block:: pascal
+
+    function TExtendedArray.average() : Extended;
+
+Returns the average of all values in a TExtendedArray.
+
+.. note::
+
+    by Zyt3x
+
+Example:
+
+.. code-block:: pascal
+
+    writeLn(toStr(TEA.average()));
+
+*}
+function TExtendedArray.average() : Extended;
+var
+  I : Integer;
+begin
+  for I := 0 to high(self) do
+    result := result + self[I];
+  result := result / length(self);
+end;
+
+{*
+TBoolArray.addIndex
+~~~~~~~~~~~~~~~~~~~
+
+.. code-block:: pascal
+
+    procedure TBoolArray.addIndex(const bool : Boolean; const index : Integer);
+
+Used to add a value to a TBoolArray at a chosen index.
+
+.. note::
+
+    by Zyt3x
+
+Example:
+
+.. code-block:: pascal
+
+    TBA.addIndex(True, 0);
+
+*}
+procedure TBoolArray.addIndex(const bool : Boolean; const index : Integer);
+var
+  I : Integer;
+begin
+  if index > length(self) then
+  begin
+    WriteLn('ERROR: addIndex: index larger than array length.');
+    Exit;
+  end;
+
+  setLength(self, length(self)+1);
+  for I := high(self)-1 downto index do
+    self[I+1] := self[I];
+  self[index] := bool;
+end;
+
+{*
+TBoolArray.deleteIndex
+~~~~~~~~~~~~~~~~~~~~~~
+
+.. code-block:: pascal
+
+    procedure TBoolArray.deleteIndex(const index : Integer);
+
+Used to delete a value of a TBoolArray at a chosen index.
+
+.. note::
+
+    by Zyt3x
+
+Example:
+
+.. code-block:: pascal
+
+    TBA.deleteIndex(0);
+
+*}
+procedure TBoolArray.deleteIndex(const index : Integer);
+var
+  I : Integer;
+begin
+  if index > length(self) then
+  begin
+    WriteLn('ERROR: deleteIndex: index larger than array length.');
+    Exit;
+  end;
+
+  for I := index to high(self)-1 do
+    self[I] := self[I+1];
+  setLength(self, length(self)-1);
+end;
+
+{*
+TBoolArray.append
+~~~~~~~~~~~~~~~~~
+
+.. code-block:: pascal
+
+    procedure TBoolArray.append(const bool : Boolean);
+
+Used to append a value to a TBoolArray.
+
+.. note::
+
+    by Zyt3x
+
+Example:
+
+.. code-block:: pascal
+
+    TBA.append(False);
+
+*}
+procedure TBoolArray.append(const bool : Boolean);
+begin
+  addIndex(bool, length(self));
+end;
+
+{*
+TBoolArray.invert
+~~~~~~~~~~~~~~~~~
+
+.. code-block:: pascal
+
+    procedure TBoolArray.invert();
+
+Used to invert the TBoolArray.
+
+.. note::
+
+    by Zyt3x
+
+Example:
+
+.. code-block:: pascal
+
+    TBA.invert();
+
+*}
+procedure TBoolArray.invert();
+var
+  I : Integer;
+  arr : TBoolArray;
+begin
+  for I := high(self) downto 0 do
+    arr.append(self[I]);
+  self := arr;
+end;

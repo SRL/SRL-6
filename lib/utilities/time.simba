@@ -38,13 +38,13 @@ Str Type:
 
 .. note::
 
-  by Zephyrsfury, Nava2 and Rasta Magician.
+    by Zephyrsfury, Nava2 and Rasta Magician.
 
 Example:
 
 .. code-block:: pascal
 
-  writeln(500000, TIME_SHORT);
+    writeln(500000, TIME_SHORT);
 
 *)
 function msToTime(MS, TheType: Integer): string;
@@ -83,13 +83,14 @@ Returns Time since the script was started (GetTimeRunning).
 
 .. note::
 
-  by Rasta Magician.
+    by Rasta Magician.
 
 Example:
 
 .. code-block:: pascal
 
-  writeln('Script time: '+timeRunning);
+    writeln('Script time: '+timeRunning);
+
 *)
 function timeRunning: string;
 begin
@@ -108,20 +109,18 @@ Sets TimeMarker to current system time.
 
 .. note::
 
-  by Stupid3ooo
+    by Stupid3ooo
 
 Example:
 
 .. code-block:: pascal
 
-  var
-    timer: integer;
-  begin
-    markTime(timer);
-    .
-    .
-    .
-  end;
+    var
+      timer: integer;
+    begin
+      markTime(timer);
+      .
+      .
 
 *)
 procedure markTime(var TimeMarker: Integer);
@@ -141,13 +140,16 @@ Returns Milliseconds since markTime was set
 
 .. note::
 
-  by Stupid3ooo
+    by Stupid3ooo
 
 Example:
 
 .. code-block:: pascal
 
-  writeln('Time from mark: '+timeFromMark(timer));
+      .
+      .
+      writeln('Time from mark: ' + timeFromMark(timer));
+    end;
 
 *)
 function timeFromMark(TimeMarker: Integer): Integer;
@@ -167,13 +169,13 @@ Returns current time as a string.
 
 .. note::
 
-  by RsN (fixed by Ron and Markus)
+    by RsN (fixed by Ron and Markus)
 
 Example:
 
 .. code-block:: pascal
 
-  writeln(theTime);
+    writeln(theTime);
 
 *)
 function theTime: string;
@@ -210,13 +212,13 @@ Returns the current date. DateFormats can be:
 
 .. note::
 
-  by Ron, Nava2 & Narcle
+    by Ron, Nava2 & Narcle
 
 Example:
 
 .. code-block:: pascal
 
-  writeln(theDate);
+    writeln(theDate);
 
 *)
 function theDate(DateFormat: Integer): string;

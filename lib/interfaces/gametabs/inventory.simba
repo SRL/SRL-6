@@ -4,8 +4,6 @@ Inventory
 
 The Inventory include contains all inventory-related functions.
 
-.. contents::
-
 *)
 
 (*
@@ -18,7 +16,7 @@ Example:
 
 .. code-block:: pascal
 
-  FindColorsTolerance(P, OUTLINE_BLACK, Box.X1, Box.Y1, Box.X2, Box.Y2, 0);
+    FindColorsTolerance(P, OUTLINE_BLACK, Box.X1, Box.Y1, Box.X2, Box.Y2, 0);
 
 *)
 const
@@ -35,7 +33,7 @@ Example:
 
 .. code-block:: pascal
 
-  Result := (not FindColor(X, Y, OUTLINE_BLACK, MI_BOX.X1, MI_BOX.Y1, MI_BOX.X2, MI_BOX.Y2));
+    Result := (not FindColor(X, Y, OUTLINE_BLACK, MI_BOX.X1, MI_BOX.Y1, MI_BOX.X2, MI_BOX.Y2));
 
 *)
 const
@@ -51,7 +49,7 @@ Example:
 
 .. code-block:: pascal
 
-  SortTPAFrom(TPA, Point(MI_CP.X, MI_CP.Y));
+    SortTPAFrom(TPA, Point(MI_CP.X, MI_CP.Y));
 
 *)
 const
@@ -68,12 +66,12 @@ Example:
 
 .. code-block:: pascal
 
-  with TItem do
-  begin
-    Name := 'Log';
-    Slot := 1;
-    Stack := False;
-  end;
+    with TItem do
+    begin
+      Name := 'Log';
+      Slot := 1;
+      Stack := False;
+    end;
 
 *)
 type
@@ -115,8 +113,8 @@ Example:
 
 .. code-block:: pascal
 
-  iBox := invBox;
-  MMouse(randomRange(iBox.x1, iBox.x2), randomRange(iBox.y1, iBox.y2), 0, 0);
+    iBox := invBox;
+    MMouse(randomRange(iBox.x1, iBox.x2), randomRange(iBox.y1, iBox.y2), 0, 0);
 
 *)
 function invBox(Slot :Integer): TBox;
@@ -154,8 +152,8 @@ Example:
 
 .. code-block:: pascal
 
-  TItem := getItem(InvSlot);
-  MMouse(TItem.centerPoint.x, TItem.centerPoint.y, 2, 2);
+    TItem := getItem(InvSlot);
+    MMouse(TItem.centerPoint.x, TItem.centerPoint.y, 2, 2);
 
 *)
 function getItem(Slot: Integer) : TItem;
@@ -212,9 +210,9 @@ Example:
 
 .. code-block:: pascal
 
-  invItems := getInventoryArray);
-  for i := 3 to 7 do
-    MMouse(invItems[i].centerPoint.x, invItems[i].centerPoint.y, 2, 2);
+    invItems := getInventoryArray);
+    for i := 3 to 7 do
+      MMouse(invItems[i].centerPoint.x, invItems[i].centerPoint.y, 2, 2);
 
 *)
 function getInventoryArray : TItemArray;
@@ -244,8 +242,8 @@ Example:
 
 .. code-block:: pascal
 
-  Coords := slotCoords(3);
-  MMouse(Coords.x, Coords.y, 2, 2);
+    Coords := slotCoords(3);
+    MMouse(Coords.x, Coords.y, 2, 2);
 
 *)
 function slotCoords(Slot: Integer): TPoint;
@@ -276,7 +274,7 @@ Example:
 
 .. code-block:: pascal
 
-  Writeln('Item found in slot '+IntToStr(coordsToSlot(point.x, point.y)));
+    Writeln('Item found in slot '+IntToStr(coordsToSlot(point.x, point.y)));
 
 *)
 function coordsToSlot(X, Y: Integer): Integer;
@@ -307,9 +305,9 @@ Example:
 
 .. code-block:: pascal
 
-  for i := 1 to 7 do
-    if getInvItemBounds(i, iBox) then
-      Writeln('Item found in slot '+IntToStr(i));
+    for i := 1 to 7 do
+      if getInvItemBounds(i, iBox) then
+        Writeln('Item found in slot '+IntToStr(i));
 
 *)
 function getInvItemBounds(Slot: Integer; var T: TBox): Boolean;
@@ -345,9 +343,9 @@ Example:
 
 .. code-block:: pascal
 
-  for i := 1 to 28 do
-    if itemExists(i) then
-      Inc(Count);
+    for i := 1 to 28 do
+      if itemExists(i) then
+        Inc(Count);
 
 *)
 function itemExists(Slot: Integer): Boolean;
@@ -374,7 +372,7 @@ Example:
 
 .. code-block:: pascal
 
-  totalCount := invCount;
+    totalCount := invCount;
 
 *)
 function invCount: Integer;
@@ -406,8 +404,8 @@ Example:
 
 .. code-block:: pascal
 
-  if invEmpty then
-    CloseBank;
+    if invEmpty then
+      CloseBank;
 
 *)
 function invEmpty: Boolean;
@@ -436,8 +434,8 @@ Example:
 
 .. code-block:: pascal
 
-  if invFull then
-    walkToBank;
+    if invFull then
+      walkToBank;
 
 *)
 function invFull: Boolean;
@@ -474,7 +472,7 @@ Example:
 
 .. code-block:: pascal
 
-  Result := itemActivated(4);
+    Result := itemActivated(4);
 
 *)
 function itemActivated(Slot: Integer): Boolean;
@@ -507,7 +505,7 @@ Example:
 
 .. code-block:: pascal
 
-  Slot := getActivatedItem;
+    Slot := getActivatedItem;
 
 *)
 function getActivatedItem: integer;

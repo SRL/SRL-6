@@ -16,7 +16,7 @@ Example:
 
 .. code-block:: pascal
 
-  SRL_Events[RS_UPDATE] := @SixHourFix;
+    SRL_Events[RS_UPDATE] := @SixHourFix;
 
 *)
 const
@@ -34,7 +34,7 @@ Example:
 
 .. code-block:: pascal
 
-  SRL_Events[RS_UPDATE] := @SixHourFix;
+    SRL_Events[RS_UPDATE] := @SixHourFix;
 
 *)
 var

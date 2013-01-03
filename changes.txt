@@ -76,12 +76,7 @@ EVERYTHING should be recorded here: new features, function name changes, user-de
   - new function TPoint.rand that will add a random integer to a TPoint
   - new function TPoint.coords that will assign the x and y values of a TPoint
 
-
-
-
-
-
-
-
-
-
+- new file, wrappers.simba
+  - new function overload FindColorsTolerance. Can now enter a TBox instead of x1, y1, x2, y2
+  - new function overload replicate. Can now enter a string instead of only one char.
+  - new functions overloads for lowercase, uppercase and capitalize. Can now enter a TStringArray instead of only one string.  

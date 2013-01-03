@@ -1,6 +1,6 @@
 (*
 Mouse
-=======
+=====
 
 The Mouse include contains all Mouse movement and clicking functions
 
@@ -8,7 +8,7 @@ The Mouse include contains all Mouse movement and clicking functions
 
 (*
 Constants and Vars
-~~~~~~~~~~~~~~~~~
+~~~~~~~~~~~~~~~~~~
 
 Constants and Variables used locally within mouse.simba
 
@@ -16,7 +16,7 @@ Example:
 
 .. code-block:: pascal
 
-  Example here
+    mouseSpeed := 10;
 
 *)
 var
@@ -39,12 +39,12 @@ const
 
 {*
 brakeWindMouse
-~~~~~~~~~~~~~~~~
+~~~~~~~~~~~~~~
 
 .. code-block:: pascal
 
     procedure brakeWindMouse(xs, ys, xe, ye, gravity, wind, minWait,
-  maxWait, targetArea: extended; reverse: boolean);
+      maxWait, targetArea: extended; reverse: boolean);
 
 Mouse movement based on distance to determine speed. Default slowed
 speed at 20% from destination, if Double is set to true then slowed
@@ -189,12 +189,12 @@ end;
 
 {*
 humanWindMouse
-~~~~~~~~~~~~~~~~
+~~~~~~~~~~~~~~
 
 .. code-block:: pascal
 
     procedure humanWindMouse(xs, ys, xe, ye, gravity, wind, minWait,
-  maxWait, targetArea: extended);
+      maxWait, targetArea: extended);
 
 Description: FLIGHT YOU NEED TO GIVE ME SOMETHING FOR THIS! ;)
 
@@ -206,7 +206,7 @@ Example:
 
 .. code-block:: pascal
 
-    Emaple here
+    Example here
 
 *}
 procedure humanWindMouse(xs, ys, xe, ye, gravity, wind, minWait, maxWait, targetArea: extended);
@@ -293,13 +293,13 @@ end;
 
 {*
 fastClick
-~~~~~~~~~~~~~~~~
+~~~~~~~~~
 
 .. code-block:: pascal
 
     procedure fastClick(button: integer);
 
-Description: Quickly click the mouse with any button.
+Quickly click the mouse with any button.
 
 .. note::
 
@@ -328,13 +328,13 @@ end;
 
 {*
 mouse
-~~~~~~~~~~~~~~~~
+~~~~~
 
 .. code-block:: pascal
 
     procedure mouse(pnt: TPoint; button: integer; mmType: integer = MOUSE_HUMAN); overload;
 
-Description: Moves the mouse to 'pnt' using specified 'mmType' then clicks the mouse 'button'.
+Moves the mouse to 'pnt' using specified 'mmType' then clicks the mouse 'button'.
 
 .. note::
 
@@ -364,14 +364,14 @@ begin
 end;
 
 {*
-mouse overload;
+mouse: overload;
 ~~~~~~~~~~~~~~~~
 
 .. code-block:: pascal
 
     procedure mouse(pnt: TPoint); overload;
 
-Description: Moves the mouse to 'pnt'.
+Moves the mouse to 'pnt'.
 
 .. note::
 
@@ -391,14 +391,13 @@ end;
 
 {*
 missMouse
-~~~~~~~~~~~~~~~~
+~~~~~~~~~
 
 .. code-block:: pascal
 
     procedure missMouse(pnt: TPoint);
 
-Description: Initially misses the target
-             point (miss area determined by dist & speed) then corrects itself.
+Moves the mouse, but initially misses the target point (miss area determined by dist & speed) then corrects itself.
 
 .. note::
 
@@ -434,13 +433,13 @@ end;
 
 {*
 dragMouse
-~~~~~~~~~~~~~~~~
+~~~~~~~~~
 
 .. code-block:: pascal
 
     procedure dragMouse(dest: TPoint);
 
-Description: Clicks mouse_Left at current position and drags to dest(ination).
+Clicks mouse_Left at current position and drags to dest(ination).
 
 .. note::
 

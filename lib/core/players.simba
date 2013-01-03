@@ -4,6 +4,7 @@ Player Management
 
 The Players file stores the functions related to the Players array. It also
 stores properties of the TPlayer type.
+
 *)
 
 (*
@@ -16,7 +17,7 @@ Example:
 
 .. code-block:: pascal
 
-  players[currentPlayer].skillLevel[SKILL_ATTACK] := 50;
+    players[currentPlayer].skillLevel[SKILL_ATTACK] := 50;
 
 *)
 const
@@ -58,13 +59,14 @@ Example:
 
 .. code-block:: pascal
 
-  with players[0] do
-  begin
-    loginName := 'example@example.com';
-    displayName := 'Sir Example III';
-    nickname := 'fighter1';
-    password := 'thisismypassword12345';
-  end;
+    with players[0] do
+    begin
+      loginName := 'example@example.com';
+      displayName := 'Sir Example III';
+      nickname := 'fighter1';
+      password := 'thisismypassword12345';
+    end;
+
 *)
 type
   TPlayer = record
@@ -110,8 +112,8 @@ var
 function getPlayers(): TPlayerArray; forward; // from player_info.simba
 
 (*
-TPlayerArray.getActive()
-~~~~~~~~~~~~~~~~~~~~~~~~
+TPlayerArray.getActive
+~~~~~~~~~~~~~~~~~~~~~~
 
 .. code-block:: pascal
 
@@ -128,8 +130,8 @@ Example:
 
 .. code-block:: pascal
 
-  while (players.getActive() > 0) do
-    mainloop();
+    while (players.getActive() > 0) do
+      mainloop();
 *)
 function TPlayerArray.getActive(): integer;
 var
@@ -162,18 +164,18 @@ Example:
 
 .. code-block:: pascal
 
-  var
-    P: TPlayer;
-    Players: TPlayerArray;
-  begin
-    with P do
+    var
+      P: TPlayer;
+      Players: TPlayerArray;
     begin
-      loginName := 'example@example.com';
-      password := 'examplepassword123';
-    end;
+      with P do
+      begin
+        loginName := 'example@example.com';
+        password := 'examplepassword123';
+      end;
 
-    Players.add(P);
-  end;
+      Players.add(P);
+    end;
 *)
 procedure TPlayerArray.add(const info: TPlayer);
 var
@@ -208,7 +210,7 @@ Example:
 
 .. code-block:: pascal
 
-  players.setup(['woodcutter5', 'miner3', 'fisher6']);
+   players.setup(['woodcutter5', 'miner3', 'fisher6']);
 
 *)
 procedure TPlayerArray.setup(names: TStringArray);
@@ -233,39 +235,39 @@ begin
 end;
 
 (*
-TPlayer.debug()
-~~~~~~~~~~~~~~~
+TPlayer.write
+~~~~~~~~~~~~~
 
 .. code-block:: pascal
 
-    procedure TPlayer.debug();
+    procedure TPlayer.write();
 
-Debugs the standard information about the player.
+Writes the standard information about the player.
 
 .. note::
 
     by Coh3n
-    Last updated: Dec. 22nd, 2012 by Coh3n
+    Last updated: Dec. 22nd, 2012 by Zyt3x
 
 Example:
 
 .. code-block:: pascal
 
-  players[currentPlayer].debug();
+    players[currentPlayer].write();
 
 *)
-procedure TPlayer.debug();
+procedure TPlayer.write();
 begin
-  writeln('Login Name: ', self.loginName);
-  writeln('Display Name: ', self.displayName);
-  writeln('Nickname: ', self.nickname);
-  writeln('Member: ', self.member);
-  writeln('Active: ', self.active);
+  writeln('Login Name: ', loginName);
+  writeln('Display Name: ', displayName);
+  writeln('Nickname: ', nickname);
+  writeln('Member: ', member);
+  writeln('Active: ', active);
 end;
 
 (*
-TPlayer.addWorked()
-~~~~~~~~~~~~~~~~~~~
+TPlayer.addWorked
+~~~~~~~~~~~~~~~~~
 
 .. code-block:: pascal
 
@@ -282,19 +284,34 @@ Example:
 
 .. code-block:: pascal
 
-  if (bankedLogs = true) then
-    players[currentPlayer].addWorked();
+    if (bankedLogs = true) then
+      players[currentPlayer].addWorked();
 
 *)
 procedure TPlayer.addWorked();
 begin
   if (playerStartTime > 0) then // if it's been set at all
-  begin
-    incEx(self.worked, (getSystemTime - playerStartTime));
-    playerStartTime := getSystemTime();
-  end;
+    incEx(worked, (getSystemTime - playerStartTime));
+  playerStartTime := getSystemTime();
 end;
 
+(*
+TPlayer.login
+~~~~~~~~~~~~~
+
+.. code-block:: pascal
+
+    function TPlayer.login(): boolean;
+
+Used to login the TPlayer into the game.
+
+Example:
+
+.. code-block:: pascal
+
+    players[currentPlayer].login();
+
+*)
 function TPlayer.login(): boolean;
 begin
   result := false;

@@ -31,10 +31,9 @@ Example:
 
     while (not isClientReady) do
       SleepAndMoveMouse(100 + Random(500));
+
 *)
 function isClientReady(): boolean;
-var
-  w, h: integer;
 begin
   Result := (loggedIn) or (isLobbyScreenOpen);
 
@@ -46,8 +45,8 @@ begin
 end;
 
 (*
-waitClientLoaded()
-~~~~~~~~~~~~~~~~~~
+waitClientLoaded
+~~~~~~~~~~~~~~~~
 
 .. code-block:: pascal
 
@@ -67,6 +66,7 @@ Example:
 
     if (waitClientReady()) then
       writeln('Client is ready!');
+
 *)
 function waitClientReady(): boolean;
 const

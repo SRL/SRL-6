@@ -1,0 +1,151 @@
+(*
+Wrappers
+========
+
+The Wrappers include contains wrapper functions used throughout SRL.  These functions should
+ be put inside Simba itself, and will be removed from SRL when that is done.
+
+*)
+
+{*
+lowerCase: overload;
+~~~~~~~~~~~~~~~~~~~~
+
+.. code-block:: pascal
+
+    function lowerCase(const sArr : TStringArray) : TStringArray; overload;
+
+Used to lowercase a TStringArray.
+
+.. note::
+
+    by Zyt3x
+
+Example:
+
+.. code-block:: pascal
+
+    TSA := lowerCase(TSA);
+
+*}
+function lowerCase(const sArr : TStringArray) : TStringArray; overload;
+var
+  I : Integer;
+begin
+  setLength(result, length(sArr));
+  for I := 0 to high(sArr) do
+    result[I] := lowerCase(sArr[I]);
+end;
+
+{*
+upperCase: overload;
+~~~~~~~~~~~~~~~~~~~~
+
+.. code-block:: pascal
+
+    function upperCase(const sArr : TStringArray) : TStringArray; overload;
+
+Used to uppercase a TStringArray.
+
+.. note::
+
+    by Zyt3x
+
+Example:
+
+.. code-block:: pascal
+
+    TSA := upperCase(TSA);
+
+*}
+function upperCase(const sArr : TStringArray) : TStringArray; overload;
+var
+  I : Integer;
+begin
+  setLength(result, length(sArr));
+  for I := 0 to high(sArr) do
+    result[I] := upperCase(sArr[I]);
+end;
+
+{*
+capitalize: overload;
+~~~~~~~~~~~~~~~~~~~~~
+
+.. code-block:: pascal
+
+    function capitalize(const sArr : TStringArray) : TStringArray; overload;
+
+Used to capitalize a TStringArray.
+
+.. note::
+
+    by Zyt3x
+
+Example:
+
+.. code-block:: pascal
+
+    TSA := capitalize(TSA);
+
+*}
+function capitalize(const sArr : TStringArray) : TStringArray; overload;
+var
+  I : Integer;
+begin
+  setLength(result, length(sArr));
+  for I := 0 to high(sArr) do
+    result[I] := capitalize(sArr[I]);
+end;
+
+{*
+FindColorsTolerance: overload;
+~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+
+.. code-block:: pascal
+
+    function FindColorsTolerance(var points : TPointArray; const color : Integer; const box : TBox; const tolerance : Integer): Boolean; overload;
+
+Takes a TBox variable instead of x1, y1, x2 and y2 variables.
+
+.. note::
+
+    by Zyt3x
+
+Example:
+
+.. code-block:: pascal
+
+    FindColorsTolerance(TPA, cl_White, MSBox, 10);
+
+*}
+function FindColorsTolerance(var points : TPointArray; const color : Integer; const box : TBox; const tolerance : Integer): Boolean; overload;
+begin
+  Result := FindColorsTolerance(points, color, box.X1, box.Y1, box.X2, box.Y2, tolerance);
+end;
+
+{*
+replicate: overload;
+~~~~~~~~~~~~~~~~~~~~
+
+.. code-block:: pascal
+
+    function replicate(const str : String; const times : Integer): String; overload;
+
+Used to replicate any string, as opposed to the former replicate() that replicates chars.
+
+.. note::
+
+    by Zyt3x
+
+Example:
+
+.. code-block:: pascal
+
+    writeLn(replicate('SRL', 10));
+
+*}
+function replicate(const str : String; const times : Integer): String; overload;
+begin
+  for 1 to times do
+    Result := Result + str;
+end;

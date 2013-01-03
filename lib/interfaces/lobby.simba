@@ -19,6 +19,7 @@ Example:
 
   if (GetlobbyScreen() = LOBBY_CLAN) then
     writeln('The clan chat tab is open!');
+
 *)
 const
   LOBBY_COUNT = 6;
@@ -47,8 +48,9 @@ Example:
 
 .. code-block:: pascal
 
-  if (getLobbyTab = LOBBY_WORLD) then
-    writeln('The world list is open!');
+    if (getLobbyTab = LOBBY_WORLD) then
+      writeln('The world list is open!');
+
 *)
 function getLobbyTab: integer;
 begin
@@ -77,9 +79,9 @@ Example:
 
 .. code-block:: pascal
 
-    // wait for the Lobby Screen to appear!
     while (not isLobbyScreenOpen) do
       wait(100 + Random(400));
+
 *)
 function isLobbyScreenOpen(): boolean;
 begin

@@ -26,8 +26,8 @@ Example:
 
 .. code-block:: pascal
 
-  if (loggedIn()) then
-    writeln('We are logged in!');
+    if (loggedIn()) then
+      writeln('We are logged in!');
 *)
 function loggedIn(): boolean;
 begin

@@ -1,5 +1,5 @@
 (*
-debug
+Debug
 =====
 
 The debug file holds any files used for SRL debugging and logging.
@@ -7,6 +7,7 @@ The debug file holds any files used for SRL debugging and logging.
 *)
 
 {$include_once ../utilities/time.simba}
+{$include_once ../utilities/wrappers.simba}
 
 var
   debugLevel = 1; // used for the nice debug formatting
@@ -34,7 +35,7 @@ Example:
 
 .. code-block:: pascal
 
-  openLogFile();
+    openLogFile();
 
 *)
 function openLogFile(): integer;
@@ -82,7 +83,8 @@ Example:
 
 .. code-block:: pascal
 
-  addToLog('Adding to SRL log file!');
+    addToLog('Adding to SRL log file!');
+
 *)
 procedure addToLog(s: string);
 var
@@ -115,28 +117,22 @@ Prints 'txt' to the debug box in the SRL debug format.
 
 .. note::
 
-  by Coh3n
+    by Coh3n
+    Last Modified: Jan. 03th, 2013 by Zyt3x
 
 Example:
 
 .. code-block:: pascal
 
-  debug(TheDate);
+    debug(TheDate);
 
 *)
 procedure debug(txt: string);
 var
-  debugMSG: string;
+  debugMSG := replicate('--', debugLevel) + ' ' + txt;
 begin
-  if (disableSRLdebug) then
-    exit;
-
-  debugMSG := debugMSG + Replicate('-', debugLevel * 2) + ' ';
-  debugMSG := debugMSG + txt;
-
-  if (not disableSRLLog) then
-    addToLog(debugMSG);
-
+  if (disableSRLdebug) then exit;
+  if (not disableSRLLog) then addToLog(debugMSG);
   writeln(debugMSG)
 end;
 
@@ -154,7 +150,7 @@ of a procedure or function.
 
 .. note::
 
-  by Sir R. Magician
+    by Sir R. Magician
 
 Example:
 
@@ -182,13 +178,13 @@ This should be called at the end of a function or procedure.
 
 .. note::
 
-  by Sir R. Magician
+    by Sir R. Magician
 
 Example:
 
 .. code-block:: pascal
 
-  closeHeader('OpenBank(): '+result);
+    closeHeader('OpenBank(): '+result);
 
 *)
 procedure closeHeader(closer: string);
@@ -210,13 +206,13 @@ call Add/closeHeader
 
 .. note::
 
-  by Sir R. Magician
+    by Sir R. Magician
 
 Example:
 
 .. code-block:: pascal
 
-  subDebug('BankScreen: screen not open');
+    subDebug('BankScreen: screen not open');
 
 *)
 procedure subDebug(txt: string);
