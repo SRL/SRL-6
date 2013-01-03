@@ -28,7 +28,7 @@ Example:
 
     mouse(point.rand(5,5));
 
-*}
+*)
 function TPoint.rand(xx,yy: integer): TPoint; overload;
 var
   nx, ny, rx, ry: integer;
@@ -63,7 +63,7 @@ Example:
 
     mouse(point.rand(5));
 
-*}
+*)
 function TPoint.rand(ran: integer): TPoint; overload;
 begin
   result := self.rand(ran, ran);
@@ -90,7 +90,7 @@ Example:
     point.create(x,y);
     mouse(point.rand(5));
 
-*}
+*)
 procedure TPoint.create(const pX, pY : Integer);
 begin
   X := pX;
@@ -117,7 +117,7 @@ Example:
 
     TSA.addIndex('new entry', 0);
 
-*}
+*)
 procedure TStringArray.addIndex(const str : String; const index : Integer);
 var
   I : Integer;
@@ -154,7 +154,7 @@ Example:
 
     TSA.deleteIndex(0);
 
-*}
+*)
 procedure TStringArray.deleteIndex(const index : Integer);
 var
   I : Integer;
@@ -190,7 +190,7 @@ Example:
 
     TSA.append('new entry');
 
-*}
+*)
 procedure TStringArray.append(const str : String);
 begin
   addIndex(str, length(self));
@@ -216,7 +216,7 @@ Example:
 
     writeLn(TSA.returnInArray('new entry'));
 
-*}
+*)
 function TStringArray.returnInArray(const str : String) : Integer;
 var
   I : Integer;
@@ -250,7 +250,7 @@ Example:
 
     writeLn(TSA.returnInArray('new entry'));
 
-*}
+*)
 function TStringArray.isInArray(const str : String) : Boolean;
 begin
   result := returnInArray(str) > -1;
@@ -276,7 +276,7 @@ Example:
 
     TSA.clearSame();
 
-*}
+*)
 procedure TStringArray.clearSame();
 var
   I : Integer;
@@ -308,7 +308,7 @@ Example:
 
     TSA.invert();
 
-*}
+*)
 procedure TStringArray.invert();
 var
   I : Integer;
@@ -317,6 +317,93 @@ begin
   for I := high(self) downto 0 do
     arr.append(self[I]);
   self := arr;
+end;
+
+(*
+TStringArray.toLowerCase
+~~~~~~~~~~~~~~~~~~~~~~~~
+
+.. code-block:: pascal
+
+    procedure TStringArray.toLowerCase();
+
+Used to lowercase a TStringArray.
+
+.. note::
+
+    by Zyt3x
+
+Example:
+
+.. code-block:: pascal
+
+    TSA.toLowerCase();
+
+*)
+procedure TStringArray.toLowerCase();
+var
+  I : Integer;
+begin
+  for I := 0 to high(self) do
+    self[I] := lowerCase(self[I]);
+end;
+
+(*
+TStringArray.toUpperCase
+~~~~~~~~~~~~~~~~~~~~~~~~
+
+.. code-block:: pascal
+
+    procedure TStringArray.toUpperCase();
+
+Used to uppercase a TStringArray.
+
+.. note::
+
+    by Zyt3x
+
+Example:
+
+.. code-block:: pascal
+
+    TSA.toUpperCase();
+
+*)
+procedure TStringArray.toUpperCase();
+var
+  I : Integer;
+begin
+  for I := 0 to high(self) do
+    self[I] := upperCase(self[I]);
+end;
+
+(*
+TStringArray.toCapitalize
+~~~~~~~~~~~~~~~~~~~~~~~~~
+
+.. code-block:: pascal
+
+    procedure TStringArray.toCapitalize();
+
+Used to capitalize a TStringArray.
+
+.. note::
+
+    by Zyt3x
+
+Example:
+
+.. code-block:: pascal
+
+    TSA.toCapitalize();
+
+*)
+procedure TStringArray.toCapitalize();
+var
+  I : Integer;
+begin
+  for I := 0 to high(self) do
+    self[I] := capitalize(self[I]);
 end;
 
 (*
@@ -339,7 +426,7 @@ Example:
 
     writeLn(TSA.toString());
 
-*}
+*)
 function TStringArray.toString() : String;
 var
   I : Integer;
@@ -368,7 +455,7 @@ Example:
 
     TIA.addIndex(1337, 0);
 
-*}
+*)
 procedure TIntegerArray.addIndex(const int : Integer; const index : Integer);
 var
   I : Integer;
@@ -405,7 +492,7 @@ Example:
 
     TIA.deleteIndex(0);
 
-*}
+*)
 procedure TIntegerArray.deleteIndex(const index : Integer);
 var
   I : Integer;
@@ -441,7 +528,7 @@ Example:
 
     TIA.append(1337);
 
-*}
+*)
 procedure TIntegerArray.append(const int : Integer);
 begin
   addIndex(int, length(self));
@@ -467,18 +554,10 @@ Example:
 
     writeLn(TIA.returnInArray(1337));
 
-*}
+*)
 function TIntegerArray.returnInArray(const int : Integer) : Integer;
-var
-  I : Integer;
 begin
-  result := -1;
-  for I := 0 to high(self) do
-    if self[I] = int then
-    begin
-      result := I;
-      exit;
-    end;
+  inIntArrayEx(self, result, int);
 end;
 
 (*
@@ -501,10 +580,10 @@ Example:
 
     writeLn(TIA.returnInArray(1337));
 
-*}
+*)
 function TIntegerArray.isInArray(const int : Integer) : Boolean;
 begin
-  result := returnInArray(int) > -1;
+  result := inIntArray(self, int);
 end;
 
 (*
@@ -527,7 +606,7 @@ Example:
 
     TIA.clearSame();
 
-*}
+*)
 procedure TIntegerArray.clearSame();
 var
   I : Integer;
@@ -559,15 +638,10 @@ Example:
 
     TIA.invert();
 
-*}
+*)
 procedure TIntegerArray.invert();
-var
-  I : Integer;
-  arr : TIntegerArray;
 begin
-  for I := high(self) downto 0 do
-    arr.append(self[I]);
-  self := arr;
+  invertTIA(self);
 end;
 
 (*
@@ -590,13 +664,36 @@ Example:
 
     writeLn(toStr(TIA.sum()));
 
-*}
+*)
 function TIntegerArray.sum() : Integer;
-var
-  I : Integer;
 begin
-  for I := 0 to high(self) do
-    result := result + self[I];
+  result := sumIntegerArray(self);
+end;
+
+(*
+TIntegerArray.sum64
+~~~~~~~~~~~~~~~~~~~
+
+.. code-block:: pascal
+
+    function TIntegerArray.sum64() : Integer;
+
+Returns the sum of all values in a TIntegerArray.  Returns the value in a Int64 variable.
+
+.. note::
+
+    by Zyt3x
+
+Example:
+
+.. code-block:: pascal
+
+    writeLn(toStr(TIA.sum64()));
+
+*)
+function TIntegerArray.sum64() : Int64;
+begin
+  result := sum64IntArr(self);
 end;
 
 (*
@@ -619,14 +716,10 @@ Example:
 
     writeLn(toStr(TIA.average()));
 
-*}
+*)
 function TIntegerArray.average() : Integer;
-var
-  I : Integer;
 begin
-  for I := 0 to high(self) do
-    result := result + self[I];
-  result := result div length(self);
+  result := averageTIA(self);
 end;
 
 (*
@@ -649,7 +742,7 @@ Example:
 
     TEA := TIA.toExtended;
 
-*}
+*)
 function TIntegerArray.toExtendedArray() : TExtendedArray;
 var
   I : Integer;
@@ -679,7 +772,7 @@ Example:
 
     TEA.addIndex(1337.0, 0);
 
-*}
+*)
 procedure TExtendedArray.addIndex(const ext : Extended; const index : Integer);
 var
   I : Integer;
@@ -716,7 +809,7 @@ Example:
 
     TEA.deleteIndex(0);
 
-*}
+*)
 procedure TExtendedArray.deleteIndex(const index : Integer);
 var
   I : Integer;
@@ -752,7 +845,7 @@ Example:
 
     TEA.append(1337.0);
 
-*}
+*)
 procedure TExtendedArray.append(const ext : Extended);
 begin
   addIndex(ext, length(self));
@@ -778,7 +871,7 @@ Example:
 
     writeLn(TEA.returnInArray(1337.0));
 
-*}
+*)
 function TExtendedArray.returnInArray(const ext : Extended) : Integer;
 var
   I : Integer;
@@ -812,7 +905,7 @@ Example:
 
     writeLn(TEA.returnInArray(1337.0));
 
-*}
+*)
 function TExtendedArray.isInArray(const ext : Extended) : Boolean;
 begin
   result := returnInArray(ext) > -1;
@@ -838,7 +931,7 @@ Example:
 
     TEA.clearSame();
 
-*}
+*)
 procedure TExtendedArray.clearSame();
 var
   I : Integer;
@@ -870,7 +963,7 @@ Example:
 
     TEA.invert();
 
-*}
+*)
 procedure TExtendedArray.invert();
 var
   I : Integer;
@@ -901,7 +994,7 @@ Example:
 
     writeLn(toStr(TEA.sum()));
 
-*}
+*)
 function TExtendedArray.sum() : Extended;
 var
   I : Integer;
@@ -930,14 +1023,10 @@ Example:
 
     writeLn(toStr(TEA.average()));
 
-*}
+*)
 function TExtendedArray.average() : Extended;
-var
-  I : Integer;
 begin
-  for I := 0 to high(self) do
-    result := result + self[I];
-  result := result / length(self);
+  result := averageExtended(self);
 end;
 
 (*
@@ -960,7 +1049,7 @@ Example:
 
     TBA.addIndex(True, 0);
 
-*}
+*)
 procedure TBoolArray.addIndex(const bool : Boolean; const index : Integer);
 var
   I : Integer;
@@ -997,7 +1086,7 @@ Example:
 
     TBA.deleteIndex(0);
 
-*}
+*)
 procedure TBoolArray.deleteIndex(const index : Integer);
 var
   I : Integer;
@@ -1033,7 +1122,7 @@ Example:
 
     TBA.append(False);
 
-*}
+*)
 procedure TBoolArray.append(const bool : Boolean);
 begin
   addIndex(bool, length(self));
