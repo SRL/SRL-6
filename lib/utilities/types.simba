@@ -8,7 +8,7 @@ The Type include contains type editing functions used throughout SRL.
 
 {$include_once ../utilities/wrappers.simba}
 
-{*
+(*
 TPoint.rand
 ~~~~~~~~~~~
 
@@ -43,7 +43,7 @@ begin
   result.y := self.y + ry;
 end;
 
-{*
+(*
 TPoint.rand overload;
 ~~~~~~~~~~~~~~~~~~~~~
 
@@ -69,7 +69,7 @@ begin
   result := self.rand(ran, ran);
 end;
 
-{*
+(*
 TPoint.create
 ~~~~~~~~~~~~~
 
@@ -97,7 +97,7 @@ begin
   Y := pY;
 end;
 
-{*
+(*
 TStringArray.addIndex
 ~~~~~~~~~~~~~~~~~~~~~
 
@@ -134,7 +134,7 @@ begin
   self[index] := str;
 end;
 
-{*
+(*
 TStringArray.deleteIndex
 ~~~~~~~~~~~~~~~~~~~~~~~~
 
@@ -170,7 +170,7 @@ begin
   setLength(self, length(self)-1);
 end;
 
-{*
+(*
 TStringArray.append
 ~~~~~~~~~~~~~~~~~~~
 
@@ -196,7 +196,7 @@ begin
   addIndex(str, length(self));
 end;
 
-{*
+(*
 TStringArray.returnInArray
 ~~~~~~~~~~~~~~~~~~~~~~~~~~
 
@@ -230,7 +230,7 @@ begin
     end;
 end;
 
-{*
+(*
 TStringArray.isInArray
 ~~~~~~~~~~~~~~~~~~~~~~
 
@@ -256,7 +256,7 @@ begin
   result := returnInArray(str) > -1;
 end;
 
-{*
+(*
 TStringArray.clearSame
 ~~~~~~~~~~~~~~~~~~~~~~
 
@@ -288,7 +288,7 @@ begin
   self := arr;
 end;
 
-{*
+(*
 TStringArray.invert
 ~~~~~~~~~~~~~~~~~~~
 
@@ -319,7 +319,7 @@ begin
   self := arr;
 end;
 
-{*
+(*
 TStringArray.toString
 ~~~~~~~~~~~~~~~~~~~~~
 
@@ -348,7 +348,7 @@ begin
     result := result + self[I];
 end;
 
-{*
+(*
 TIntegerArray.addIndex
 ~~~~~~~~~~~~~~~~~~~~~~
 
@@ -385,7 +385,7 @@ begin
   self[index] := int;
 end;
 
-{*
+(*
 TIntegerArray.deleteIndex
 ~~~~~~~~~~~~~~~~~~~~~~~~~
 
@@ -421,7 +421,7 @@ begin
   setLength(self, length(self)-1);
 end;
 
-{*
+(*
 TIntegerArray.append
 ~~~~~~~~~~~~~~~~~~~~
 
@@ -447,7 +447,7 @@ begin
   addIndex(int, length(self));
 end;
 
-{*
+(*
 TIntegerArray.returnInArray
 ~~~~~~~~~~~~~~~~~~~~~~~~~~~
 
@@ -481,7 +481,7 @@ begin
     end;
 end;
 
-{*
+(*
 TIntegerArray.isInArray
 ~~~~~~~~~~~~~~~~~~~~~~~
 
@@ -507,7 +507,7 @@ begin
   result := returnInArray(int) > -1;
 end;
 
-{*
+(*
 TIntegerArray.clearSame
 ~~~~~~~~~~~~~~~~~~~~~~~
 
@@ -539,7 +539,7 @@ begin
   self := arr;
 end;
 
-{*
+(*
 TIntegerArray.invert
 ~~~~~~~~~~~~~~~~~~~~
 
@@ -570,7 +570,7 @@ begin
   self := arr;
 end;
 
-{*
+(*
 TIntegerArray.sum
 ~~~~~~~~~~~~~~~~~
 
@@ -599,7 +599,7 @@ begin
     result := result + self[I];
 end;
 
-{*
+(*
 TIntegerArray.average
 ~~~~~~~~~~~~~~~~~~~~~
 
@@ -629,7 +629,7 @@ begin
   result := result div length(self);
 end;
 
-{*
+(*
 TIntegerArray.toExtendedArray
 ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
 
@@ -659,7 +659,7 @@ begin
     result[I] := self[I] * 1.0;
 end;
 
-{*
+(*
 TExtendedArray.addIndex
 ~~~~~~~~~~~~~~~~~~~~~~~
 
@@ -696,7 +696,7 @@ begin
   self[index] := ext;
 end;
 
-{*
+(*
 TExtendedArray.deleteIndex
 ~~~~~~~~~~~~~~~~~~~~~~~~~~
 
@@ -732,7 +732,7 @@ begin
   setLength(self, length(self)-1);
 end;
 
-{*
+(*
 TExtendedArray.append
 ~~~~~~~~~~~~~~~~~~~~~
 
@@ -758,7 +758,7 @@ begin
   addIndex(ext, length(self));
 end;
 
-{*
+(*
 TExtendedArray.returnInArray
 ~~~~~~~~~~~~~~~~~~~~~~~~~~~~
 
@@ -792,7 +792,7 @@ begin
     end;
 end;
 
-{*
+(*
 TExtendedArray.isInArray
 ~~~~~~~~~~~~~~~~~~~~~~~~
 
@@ -818,7 +818,7 @@ begin
   result := returnInArray(ext) > -1;
 end;
 
-{*
+(*
 TExtendedArray.clearSame
 ~~~~~~~~~~~~~~~~~~~~~~~~
 
@@ -850,7 +850,7 @@ begin
   self := arr;
 end;
 
-{*
+(*
 TExtendedArray.invert
 ~~~~~~~~~~~~~~~~~~~~~
 
@@ -881,7 +881,7 @@ begin
   self := arr;
 end;
 
-{*
+(*
 TExtendedArray.sum
 ~~~~~~~~~~~~~~~~~~
 
@@ -910,7 +910,7 @@ begin
     result := result + self[I];
 end;
 
-{*
+(*
 TExtendedArray.average
 ~~~~~~~~~~~~~~~~~~~~~~
 
@@ -940,7 +940,7 @@ begin
   result := result / length(self);
 end;
 
-{*
+(*
 TBoolArray.addIndex
 ~~~~~~~~~~~~~~~~~~~
 
@@ -977,7 +977,7 @@ begin
   self[index] := bool;
 end;
 
-{*
+(*
 TBoolArray.deleteIndex
 ~~~~~~~~~~~~~~~~~~~~~~
 
@@ -1013,7 +1013,7 @@ begin
   setLength(self, length(self)-1);
 end;
 
-{*
+(*
 TBoolArray.append
 ~~~~~~~~~~~~~~~~~
 
@@ -1039,7 +1039,7 @@ begin
   addIndex(bool, length(self));
 end;
 
-{*
+(*
 TBoolArray.invert
 ~~~~~~~~~~~~~~~~~
 
@@ -1059,7 +1059,7 @@ Example:
 
     TBA.invert();
 
-*}
+*)
 procedure TBoolArray.invert();
 var
   I : Integer;

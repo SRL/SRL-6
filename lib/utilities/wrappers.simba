@@ -7,7 +7,7 @@ The Wrappers include contains wrapper functions used throughout SRL.  These func
 
 *)
 
-{*
+(*
 lowerCase: overload;
 ~~~~~~~~~~~~~~~~~~~~
 
@@ -27,7 +27,7 @@ Example:
 
     TSA := lowerCase(TSA);
 
-*}
+*)
 function lowerCase(const sArr : TStringArray) : TStringArray; overload;
 var
   I : Integer;
@@ -37,7 +37,7 @@ begin
     result[I] := lowerCase(sArr[I]);
 end;
 
-{*
+(*
 upperCase: overload;
 ~~~~~~~~~~~~~~~~~~~~
 
@@ -57,7 +57,7 @@ Example:
 
     TSA := upperCase(TSA);
 
-*}
+*)
 function upperCase(const sArr : TStringArray) : TStringArray; overload;
 var
   I : Integer;
@@ -67,7 +67,7 @@ begin
     result[I] := upperCase(sArr[I]);
 end;
 
-{*
+(*
 capitalize: overload;
 ~~~~~~~~~~~~~~~~~~~~~
 
@@ -87,7 +87,7 @@ Example:
 
     TSA := capitalize(TSA);
 
-*}
+*)
 function capitalize(const sArr : TStringArray) : TStringArray; overload;
 var
   I : Integer;
@@ -97,7 +97,7 @@ begin
     result[I] := capitalize(sArr[I]);
 end;
 
-{*
+(*
 FindColorsTolerance: overload;
 ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
 
@@ -117,13 +117,13 @@ Example:
 
     FindColorsTolerance(TPA, cl_White, MSBox, 10);
 
-*}
+*)
 function FindColorsTolerance(var points : TPointArray; const color : Integer; const box : TBox; const tolerance : Integer): Boolean; overload;
 begin
   Result := FindColorsTolerance(points, color, box.X1, box.Y1, box.X2, box.Y2, tolerance);
 end;
 
-{*
+(*
 replicate: overload;
 ~~~~~~~~~~~~~~~~~~~~
 
@@ -143,7 +143,7 @@ Example:
 
     writeLn(replicate('SRL', 10));
 
-*}
+*)
 function replicate(const str : String; const times : Integer): String; overload;
 begin
   for 1 to times do
