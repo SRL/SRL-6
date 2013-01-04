@@ -262,7 +262,7 @@ TStringArray.swap
 
 .. code-block:: pascal
 
-    procedure TStringArray.swap(const arr : TStringArray);
+    procedure TStringArray.swap(var arr : TStringArray);
 
 Used to swap two TStringArray variables.
 
@@ -277,7 +277,7 @@ Example:
     TSA.swap(TSA2);
 
 *)
-procedure TStringArray.swap(const arr : TStringArray);
+procedure TStringArray.swap(var arr : TStringArray);
 var
   arr2 : TStringArray;
 begin
@@ -710,7 +710,7 @@ TIntegerArray.swap
 
 .. code-block:: pascal
 
-    procedure TIntegerArray.swap(const arr : TIntegerArray);
+    procedure TIntegerArray.swap(var arr : TIntegerArray);
 
 Used to swap two TIntegerArray variables.
 
@@ -725,7 +725,7 @@ Example:
     TIA.swap(TIA2);
 
 *)
-procedure TIntegerArray.swap(const arr : TIntegerArray);
+procedure TIntegerArray.swap(var arr : TIntegerArray);
 var
   arr2 : TIntegerArray;
 begin
@@ -1154,7 +1154,7 @@ TExtendedArray.swap
 
 .. code-block:: pascal
 
-    procedure TExtendedArray.swap(const arr : TExtendedArray);
+    procedure TExtendedArray.swap(var arr : TExtendedArray);
 
 Used to swap two TExtendedArray variables.
 
@@ -1169,7 +1169,7 @@ Example:
     TEA.swap(TEA2);
 
 *)
-procedure TExtendedArray.swap(const arr : TExtendedArray);
+procedure TExtendedArray.swap(var arr : TExtendedArray);
 var
   arr2 : TExtendedArray;
 begin
@@ -1430,7 +1430,7 @@ TBoolArray.swap
 
 .. code-block:: pascal
 
-    procedure TBoolArray.swap(const arr : TBoolArray);
+    procedure TBoolArray.swap(var arr : TBoolArray);
 
 Used to swap two TBoolArray variables.
 
@@ -1445,7 +1445,7 @@ Example:
     TBA.swap(TBA2);
 
 *)
-procedure TBoolArray.swap(const arr : TBoolArray);
+procedure TBoolArray.swap(var arr : TBoolArray);
 var
   arr2 : TBoolArray;
 begin
@@ -1554,7 +1554,7 @@ TPoint.rand: overload;
 
 .. code-block:: pascal
 
-    function TPoint.rand(ran: integer): TPoint; overload;
+    function TPoint.rand(ran: integer) : TPoint; overload;
 
 Used to apply THE SAME randomness to both the 'x' and 'y' coordinates of a TPoint.
 
@@ -1569,9 +1569,35 @@ Example:
     mouse(point.rand(5));
 
 *)
-function TPoint.rand(ran : Integer): TPoint; overload;
+function TPoint.rand(ran : Integer) : TPoint; overload;
 begin
   result := rand(ran, ran);
+end;
+
+(*
+TPoint.same
+~~~~~~~~~~~
+
+.. code-block:: pascal
+
+    function TPoint.same(const P : TPoint) : Boolean;
+
+Returns True if both TPoint variables are equal.
+
+.. note::
+
+    by Zyt3x
+
+Example:
+
+.. code-block:: pascal
+
+    writeLn(P.same(P2));
+
+*)
+function TPoint.same(const P : TPoint) : Boolean;
+begin
+  result := (self.X = P.X) and (self.Y = P.Y);
 end;
 
 (*
@@ -1668,7 +1694,7 @@ Example:
     TPA.append(1337.0);
 
 *)
-procedure TExtendedArray.append(const p : TPoint);
+procedure TPointArray.append(const p : TPoint);
 begin
   addIndex(p, length(self));
 end;
@@ -1726,7 +1752,7 @@ var
 begin
   result := -1;
   for I := 0 to high(self) do
-    if self[I] = p then
+    if self[I].same(p) then
     begin
       result := I;
       exit;
@@ -1754,7 +1780,7 @@ Example:
     writeLn(TPA.returnInArray(point(13, 37)));
 
 *)
-function TExtendedArray.isInArray(const p : TPoint) : Boolean;
+function TPointArray.isInArray(const p : TPoint) : Boolean;
 begin
   result := returnInArray(p) > -1;
 end;
@@ -1780,7 +1806,7 @@ Example:
     TPA := TPA2.include(TPA);
 
 *)
-function TExtendedArray.include(const arr : TPointArray) : TPointArray;
+function TPointArray.include(const arr : TPointArray) : TPointArray;
 var
   I : Integer;
 begin
@@ -1883,7 +1909,7 @@ TPointArray.swap
 
 .. code-block:: pascal
 
-    procedure TPointArray.swap(const arr : TPointArray);
+    procedure TPointArray.swap(var arr : TPointArray);
 
 Used to swap two TPointArray variables.
 
@@ -1898,7 +1924,7 @@ Example:
     TPA.swap(TPA2);
 
 *)
-procedure TPointArray.swap(const arr : TPointArray);
+procedure TPointArray.swap(var arr : TPointArray);
 begin
   tpaSwap(arr, self);
 end;
