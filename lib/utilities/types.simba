@@ -197,6 +197,35 @@ begin
 end;
 
 (*
+TStringArray.combine
+~~~~~~~~~~~~~~~~~~~~
+
+.. code-block:: pascal
+
+    procedure TStringArray.combine(const arr : TStringArray);
+
+Used to combine two TStringArray variables.
+
+.. note::
+
+    by Zyt3x
+
+Example:
+
+.. code-block:: pascal
+
+    TSA.combine(TSA2);
+
+*)
+procedure TStringArray.combine(const arr : TStringArray);
+var
+  I : Integer;
+begin
+  for I := 0 to high(arr) do
+    append(arr[I]);
+end;
+
+(*
 TStringArray.returnInArray
 ~~~~~~~~~~~~~~~~~~~~~~~~~~
 
@@ -254,6 +283,66 @@ Example:
 function TStringArray.isInArray(const str : String) : Boolean;
 begin
   result := returnInArray(str) > -1;
+end;
+
+(*
+TStringArray.include
+~~~~~~~~~~~~~~~~~~~~
+
+.. code-block:: pascal
+
+    function TStringArray.include(const arr : TStringArray) : TStringArray;
+
+Returns a TStringArray which contains values that are present in both arrays.
+
+.. note::
+
+    by Zyt3x
+
+Example:
+
+.. code-block:: pascal
+
+    TSA := TSA2.include(TSA);
+
+*)
+function TStringArray.include(const arr : TStringArray) : TStringArray;
+var
+  I : Integer;
+begin
+  for I := 0 to high(arr) do
+    if self.isInArray(arr[I]) then
+      result.append(arr[I]);
+end;
+
+(*
+TStringArray.exclude
+~~~~~~~~~~~~~~~~~~~~
+
+.. code-block:: pascal
+
+    function TStringArray.exclude(const arr : TStringArray) : TStringArray;
+
+Returns a TStringArray which contains values that are not present in both arrays.
+
+.. note::
+
+    by Zyt3x
+
+Example:
+
+.. code-block:: pascal
+
+    TSA := TSA2.exclude(TSA);
+
+*)
+function TStringArray.exclude(const arr : TStringArray) : TStringArray;
+var
+  I : Integer;
+begin
+  for I := 0 to high(arr) do
+    if not self.isInArray(arr[I]) then
+      result.append(arr[I]);
 end;
 
 (*
@@ -535,6 +624,35 @@ begin
 end;
 
 (*
+TIntegerArray.combine
+~~~~~~~~~~~~~~~~~~~~~
+
+.. code-block:: pascal
+
+    procedure TIntegerArray.combine(const arr : TIntegerArray);
+
+Used to combine two TIntegerArray variables.
+
+.. note::
+
+    by Zyt3x
+
+Example:
+
+.. code-block:: pascal
+
+    TIA.combine(TIA2);
+
+*)
+procedure TIntegerArray.combine(const arr : TIntegerArray);
+var
+  I : Integer;
+begin
+  for I := 0 to high(arr) do
+    append(arr[I]);
+end;
+
+(*
 TIntegerArray.returnInArray
 ~~~~~~~~~~~~~~~~~~~~~~~~~~~
 
@@ -584,6 +702,66 @@ Example:
 function TIntegerArray.isInArray(const int : Integer) : Boolean;
 begin
   result := inIntArray(self, int);
+end;
+
+(*
+TIntegerArray.include
+~~~~~~~~~~~~~~~~~~~~~
+
+.. code-block:: pascal
+
+    function TIntegerArray.include(const arr : TIntegerArray) : TIntegerArray;
+
+Returns a TIntegerArray which contains values that are present in both arrays.
+
+.. note::
+
+    by Zyt3x
+
+Example:
+
+.. code-block:: pascal
+
+    TIA := TIA2.include(TIA);
+
+*)
+function TIntegerArray.include(const arr : TIntegerArray) : TIntegerArray;
+var
+  I : Integer;
+begin
+  for I := 0 to high(arr) do
+    if self.isInArray(arr[I]) then
+      result.append(arr[I]);
+end;
+
+(*
+TIntegerArray.exclude
+~~~~~~~~~~~~~~~~~~~~~
+
+.. code-block:: pascal
+
+    function TIntegerArray.exclude(const arr : TIntegerArray) : TIntegerArray;
+
+Returns a TIntegerArray which contains values that are not present in both arrays.
+
+.. note::
+
+    by Zyt3x
+
+Example:
+
+.. code-block:: pascal
+
+    TIA := TIA2.exclude(TIA);
+
+*)
+function TIntegerArray.exclude(const arr : TIntegerArray) : TIntegerArray;
+var
+  I : Integer;
+begin
+  for I := 0 to high(arr) do
+    if not self.isInArray(arr[I]) then
+      result.append(arr[I]);
 end;
 
 (*
@@ -852,6 +1030,35 @@ begin
 end;
 
 (*
+TExtendedArray.combine
+~~~~~~~~~~~~~~~~~~~~~~
+
+.. code-block:: pascal
+
+    procedure TExtendedArray.combine(const arr : TExtendedArray);
+
+Used to combine two TExtendedArray variables.
+
+.. note::
+
+    by Zyt3x
+
+Example:
+
+.. code-block:: pascal
+
+    TEA.combine(TEA2);
+
+*)
+procedure TExtendedArray.combine(const arr : TExtendedArray);
+var
+  I : Integer;
+begin
+  for I := 0 to high(arr) do
+    append(arr[I]);
+end;
+
+(*
 TExtendedArray.returnInArray
 ~~~~~~~~~~~~~~~~~~~~~~~~~~~~
 
@@ -909,6 +1116,66 @@ Example:
 function TExtendedArray.isInArray(const ext : Extended) : Boolean;
 begin
   result := returnInArray(ext) > -1;
+end;
+
+(*
+TExtendedArray.include
+~~~~~~~~~~~~~~~~~~~~~~
+
+.. code-block:: pascal
+
+    function TExtendedArray.include(const arr : TExtendedArray) : TExtendedArray;
+
+Returns a TExtendedArray which contains values that are present in both arrays.
+
+.. note::
+
+    by Zyt3x
+
+Example:
+
+.. code-block:: pascal
+
+    TEA := TEA2.include(TEA);
+
+*)
+function TExtendedArray.include(const arr : TExtendedArray) : TExtendedArray;
+var
+  I : Integer;
+begin
+  for I := 0 to high(arr) do
+    if self.isInArray(arr[I]) then
+      result.append(arr[I]);
+end;
+
+(*
+TExtendedArray.exclude
+~~~~~~~~~~~~~~~~~~~~~~
+
+.. code-block:: pascal
+
+    function TExtendedArray.exclude(const arr : TExtendedArray) : TExtendedArray;
+
+Returns a TExtendedArray which contains values that are not present in both arrays.
+
+.. note::
+
+    by Zyt3x
+
+Example:
+
+.. code-block:: pascal
+
+    TEA := TEA2.exclude(TEA);
+
+*)
+function TExtendedArray.exclude(const arr : TExtendedArray) : TExtendedArray;
+var
+  I : Integer;
+begin
+  for I := 0 to high(arr) do
+    if not self.isInArray(arr[I]) then
+      result.append(arr[I]);
 end;
 
 (*
@@ -1126,6 +1393,35 @@ Example:
 procedure TBoolArray.append(const bool : Boolean);
 begin
   addIndex(bool, length(self));
+end;
+
+(*
+TBoolArray.combine
+~~~~~~~~~~~~~~~~~~
+
+.. code-block:: pascal
+
+    procedure TBoolArray.combine(const arr : TBoolArray);
+
+Used to combine two TBoolArray variables.
+
+.. note::
+
+    by Zyt3x
+
+Example:
+
+.. code-block:: pascal
+
+    TBA.combine(TBA2);
+
+*)
+procedure TBoolArray.combine(const arr : TBoolArray);
+var
+  I : Integer;
+begin
+  for I := 0 to high(arr) do
+    append(arr[I]);
 end;
 
 (*
