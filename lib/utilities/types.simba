@@ -9,95 +9,6 @@ The Type include contains type editing functions used throughout SRL.
 {$include_once ../utilities/wrappers.simba}
 
 (*
-TPoint.rand
-~~~~~~~~~~~
-
-.. code-block:: pascal
-
-    function TPoint.rand(xx,yy: integer): TPoint;
-
-Used to apply separate randomness to both the 'x' and 'y' coordinates of a TPoint.
-
-.. note::
-
-    by NCDS
-
-Example:
-
-.. code-block:: pascal
-
-    mouse(point.rand(5,5));
-
-*)
-function TPoint.rand(xx,yy: integer): TPoint; overload;
-var
-  nx, ny, rx, ry: integer;
-begin
-  nx := xx div abs(xx);   //div by self to determine positive or negative
-  ny := yy div abs(yy);
-
-  rx := random(xx) * nx;
-  ry := random(yy) * ny;
-
-  result.x := self.x + rx;
-  result.y := self.y + ry;
-end;
-
-(*
-TPoint.rand overload;
-~~~~~~~~~~~~~~~~~~~~~
-
-.. code-block:: pascal
-
-    function TPoint.rand(ran: integer): TPoint; overload;
-
-Used to apply THE SAME randomness to both the 'x' and 'y' coordinates of a TPoint.
-
-.. note::
-
-    by NCDS
-
-Example:
-
-.. code-block:: pascal
-
-    mouse(point.rand(5));
-
-*)
-function TPoint.rand(ran: integer): TPoint; overload;
-begin
-  result := self.rand(ran, ran);
-end;
-
-(*
-TPoint.create
-~~~~~~~~~~~~~
-
-.. code-block:: pascal
-
-    procedure TPoint.create(const pX, pY : Integer);
-
-Used to assign values to both the 'x' and 'y' coordinates of a TPoint.
-
-.. note::
-
-    by Zyt3x
-
-Example:
-
-.. code-block:: pascal
-
-    point.create(x,y);
-    mouse(point.rand(5));
-
-*)
-procedure TPoint.create(const pX, pY : Integer);
-begin
-  X := pX;
-  Y := pY;
-end;
-
-(*
 TStringArray.addIndex
 ~~~~~~~~~~~~~~~~~~~~~
 
@@ -311,7 +222,7 @@ var
   I : Integer;
 begin
   for I := 0 to high(arr) do
-    if self.isInArray(arr[I]) then
+    if isInArray(arr[I]) then
       result.append(arr[I]);
 end;
 
@@ -341,8 +252,38 @@ var
   I : Integer;
 begin
   for I := 0 to high(arr) do
-    if not self.isInArray(arr[I]) then
+    if not isInArray(arr[I]) then
       result.append(arr[I]);
+end;
+
+(*
+TStringArray.swap
+~~~~~~~~~~~~~~~~~
+
+.. code-block:: pascal
+
+    procedure TStringArray.swap(const arr : TStringArray);
+
+Used to swap two TStringArray variables.
+
+.. note::
+
+    by Zyt3x
+
+Example:
+
+.. code-block:: pascal
+
+    TSA.swap(TSA2);
+
+*)
+procedure TStringArray.swap(const arr : TStringArray);
+var
+  arr2 : TStringArray;
+begin
+  arr2 := self;
+  self := arr;
+  arr := arr2;
 end;
 
 (*
@@ -648,7 +589,7 @@ procedure TIntegerArray.combine(const arr : TIntegerArray);
 var
   I : Integer;
 begin
-  combineIntArrayWrap(self, arr, result);
+  combineIntArrayWrap(self, arr, self);
 end;
 
 (*
@@ -729,7 +670,7 @@ var
   I : Integer;
 begin
   for I := 0 to high(arr) do
-    if self.isInArray(arr[I]) then
+    if isInArray(arr[I]) then
       result.append(arr[I]);
 end;
 
@@ -759,8 +700,38 @@ var
   I : Integer;
 begin
   for I := 0 to high(arr) do
-    if not self.isInArray(arr[I]) then
+    if not isInArray(arr[I]) then
       result.append(arr[I]);
+end;
+
+(*
+TIntegerArray.swap
+~~~~~~~~~~~~~~~~~~
+
+.. code-block:: pascal
+
+    procedure TIntegerArray.swap(const arr : TIntegerArray);
+
+Used to swap two TIntegerArray variables.
+
+.. note::
+
+    by Zyt3x
+
+Example:
+
+.. code-block:: pascal
+
+    TIA.swap(TIA2);
+
+*)
+procedure TIntegerArray.swap(const arr : TIntegerArray);
+var
+  arr2 : TIntegerArray;
+begin
+  arr2 := self;
+  self := arr;
+  arr := arr2;
 end;
 
 (*
@@ -1143,7 +1114,7 @@ var
   I : Integer;
 begin
   for I := 0 to high(arr) do
-    if self.isInArray(arr[I]) then
+    if isInArray(arr[I]) then
       result.append(arr[I]);
 end;
 
@@ -1173,8 +1144,38 @@ var
   I : Integer;
 begin
   for I := 0 to high(arr) do
-    if not self.isInArray(arr[I]) then
+    if not isInArray(arr[I]) then
       result.append(arr[I]);
+end;
+
+(*
+TExtendedArray.swap
+~~~~~~~~~~~~~~~~~~~
+
+.. code-block:: pascal
+
+    procedure TExtendedArray.swap(const arr : TExtendedArray);
+
+Used to swap two TExtendedArray variables.
+
+.. note::
+
+    by Zyt3x
+
+Example:
+
+.. code-block:: pascal
+
+    TEA.swap(TEA2);
+
+*)
+procedure TExtendedArray.swap(const arr : TExtendedArray);
+var
+  arr2 : TExtendedArray;
+begin
+  arr2 := self;
+  self := arr;
+  arr := arr2;
 end;
 
 (*
@@ -1424,6 +1425,36 @@ begin
 end;
 
 (*
+TBoolArray.swap
+~~~~~~~~~~~~~~~
+
+.. code-block:: pascal
+
+    procedure TBoolArray.swap(const arr : TBoolArray);
+
+Used to swap two TBoolArray variables.
+
+.. note::
+
+    by Zyt3x
+
+Example:
+
+.. code-block:: pascal
+
+    TBA.swap(TBA2);
+
+*)
+procedure TBoolArray.swap(const arr : TBoolArray);
+var
+  arr2 : TBoolArray;
+begin
+  arr2 := self;
+  self := arr;
+  arr := arr2;
+end;
+
+(*
 TBoolArray.invert
 ~~~~~~~~~~~~~~~~~
 
@@ -1452,4 +1483,500 @@ begin
   for I := high(self) downto 0 do
     arr.append(self[I]);
   self := arr;
+end;
+
+(*
+TPoint.create
+~~~~~~~~~~~~~
+
+.. code-block:: pascal
+
+    procedure TPoint.create(const pX, pY : Integer);
+
+Used to assign values to both the 'x' and 'y' coordinates of a TPoint.
+
+.. note::
+
+    by Zyt3x
+
+Example:
+
+.. code-block:: pascal
+
+    point.create(x,y);
+    mouse(point.rand(5));
+
+*)
+procedure TPoint.create(const pX, pY : Integer);
+begin
+  X := pX;
+  Y := pY;
+end;
+
+(*
+TPoint.rand
+~~~~~~~~~~~
+
+.. code-block:: pascal
+
+    function TPoint.rand(xx,yy: integer): TPoint;
+
+Used to apply separate randomness to both the 'x' and 'y' coordinates of a TPoint.
+
+.. note::
+
+    by NCDS
+
+Example:
+
+.. code-block:: pascal
+
+    mouse(point.rand(5,5));
+
+*)
+function TPoint.rand(xx, yy : Integer): TPoint;
+var
+  nx, ny, rx, ry: integer;
+begin
+  nx := xx div abs(xx);   //div by self to determine positive or negative
+  ny := yy div abs(yy);
+
+  rx := random(xx) * nx;
+  ry := random(yy) * ny;
+
+  result.x := x + rx;
+  result.y := y + ry;
+end;
+
+(*
+TPoint.rand: overload;
+~~~~~~~~~~~~~~~~~~~~~~
+
+.. code-block:: pascal
+
+    function TPoint.rand(ran: integer): TPoint; overload;
+
+Used to apply THE SAME randomness to both the 'x' and 'y' coordinates of a TPoint.
+
+.. note::
+
+    by NCDS
+
+Example:
+
+.. code-block:: pascal
+
+    mouse(point.rand(5));
+
+*)
+function TPoint.rand(ran : Integer): TPoint; overload;
+begin
+  result := rand(ran, ran);
+end;
+
+(*
+TPointArray.addIndex
+~~~~~~~~~~~~~~~~~~~~
+
+.. code-block:: pascal
+
+    procedure TPointArray.addIndex(const p : TPoint; const index : Integer);
+
+Used to add a point to a TPointArray at a chosen index.
+
+.. note::
+
+    by Zyt3x
+
+Example:
+
+.. code-block:: pascal
+
+    TPA.addIndex(point(13, 37), 0);
+
+*)
+procedure TPointArray.addIndex(const p : TPoint; const index : Integer);
+var
+  I : Integer;
+begin
+  if index > length(self) then
+  begin
+    WriteLn('ERROR: addIndex: index larger than array length.');
+    Exit;
+  end;
+
+  setLength(self, length(self)+1);
+  for I := high(self)-1 downto index do
+    self[I+1] := self[I];
+  self[index] := p;
+end;
+
+(*
+TPointArray.deleteIndex
+~~~~~~~~~~~~~~~~~~~~~~~
+
+.. code-block:: pascal
+
+    procedure TPointArray.deleteIndex(const index : Integer);
+
+Used to delete a point of a TPointArray at a chosen index.
+
+.. note::
+
+    by Zyt3x
+
+Example:
+
+.. code-block:: pascal
+
+    TPA.deleteIndex(0);
+
+*)
+procedure TPointArray.deleteIndex(const index : Integer);
+var
+  I : Integer;
+begin
+  if index > length(self) then
+  begin
+    WriteLn('ERROR: deleteIndex: index larger than array length.');
+    Exit;
+  end;
+
+  for I := index to high(self)-1 do
+    self[I] := self[I+1];
+  setLength(self, length(self)-1);
+end;
+
+(*
+TPointArray.append
+~~~~~~~~~~~~~~~~~~
+
+.. code-block:: pascal
+
+    procedure TPointArray.append(const p : TPoint);
+
+Used to append a point to a TPointArray.
+
+.. note::
+
+    by Zyt3x
+
+Example:
+
+.. code-block:: pascal
+
+    TPA.append(1337.0);
+
+*)
+procedure TExtendedArray.append(const p : TPoint);
+begin
+  addIndex(p, length(self));
+end;
+
+(*
+TPointArray.combine
+~~~~~~~~~~~~~~~~~~~
+
+.. code-block:: pascal
+
+    procedure TPointArray.combine(const arr : TPointArray);
+
+Used to combine two TPointArray variables.
+
+.. note::
+
+    by Zyt3x
+
+Example:
+
+.. code-block:: pascal
+
+    TPA.combine(TPA2);
+
+*)
+procedure TPointArray.combine(const arr : TPointArray);
+begin
+  combineTPAWrap(self, arr, self);
+end;
+
+(*
+TPointArray.returnInArray
+~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+
+.. code-block:: pascal
+
+    function TPointArray.returnInArray(const p : TPoint) : Integer;
+
+Returns the index of where the point was found in a TPointArray.  Returns -1 if not found.
+
+.. note::
+
+    by Zyt3x
+
+Example:
+
+.. code-block:: pascal
+
+    writeLn(TPA.returnInArray(point(13, 37)));
+
+*)
+function TPointArray.returnInArray(const p : TPoint) : Integer;
+var
+  I : Integer;
+begin
+  result := -1;
+  for I := 0 to high(self) do
+    if self[I] = p then
+    begin
+      result := I;
+      exit;
+    end;
+end;
+
+(*
+TPointArray.isInArray
+~~~~~~~~~~~~~~~~~~~~~
+
+.. code-block:: pascal
+
+    function TPointArray.isInArray(const p : TPoint) : Boolean;
+
+Returns True if the point is present in the TPointArray.
+
+.. note::
+
+    by Zyt3x
+
+Example:
+
+.. code-block:: pascal
+
+    writeLn(TPA.returnInArray(point(13, 37)));
+
+*)
+function TExtendedArray.isInArray(const p : TPoint) : Boolean;
+begin
+  result := returnInArray(p) > -1;
+end;
+
+(*
+TPointArray.include
+~~~~~~~~~~~~~~~~~~~
+
+.. code-block:: pascal
+
+    function TPointArray.include(const arr : TPointArray) : TPointArray;
+
+Returns a TPointArray which contains points that are present in both arrays.
+
+.. note::
+
+    by Zyt3x
+
+Example:
+
+.. code-block:: pascal
+
+    TPA := TPA2.include(TPA);
+
+*)
+function TExtendedArray.include(const arr : TPointArray) : TPointArray;
+var
+  I : Integer;
+begin
+  for I := 0 to high(arr) do
+    if isInArray(arr[I]) then
+      result.append(arr[I]);
+end;
+
+(*
+TPointArray.exclude
+~~~~~~~~~~~~~~~~~~~
+
+.. code-block:: pascal
+
+    function TPointArray.exclude(const arr : TPointArray) : TPointArray;
+
+Returns a TPointArray which contains points that are not present in both arrays.
+
+.. note::
+
+    by Zyt3x
+
+Example:
+
+.. code-block:: pascal
+
+    TPA := TPA2.exclude(TEA);
+
+*)
+function TPointArray.exclude(const arr : TPointArray) : TPointArray;
+var
+  I : Integer;
+begin
+  for I := 0 to high(arr) do
+    if not isInArray(arr[I]) then
+      result.append(arr[I]);
+end;
+
+(*
+TPointArray.clearSame
+~~~~~~~~~~~~~~~~~~~~~
+
+.. code-block:: pascal
+
+    procedure TPointArray.clearSame();
+
+Used to clear duplicates in a TPointArray.
+
+.. note::
+
+    by Zyt3x
+
+Example:
+
+.. code-block:: pascal
+
+    TPA.clearSame();
+
+*)
+procedure TPointArray.clearSame();
+var
+  I : Integer;
+  arr : TPointArray;
+begin
+  for I := 0 to high(self) do
+    if not arr.isInArray(self[I]) then
+      arr.append(self[I]);
+  self := arr;
+end;
+
+(*
+TPointArray.invert
+~~~~~~~~~~~~~~~~~~
+
+.. code-block:: pascal
+
+    procedure TPointArray.invert();
+
+Used to invert the TPointArray.
+
+.. note::
+
+    by Zyt3x
+
+Example:
+
+.. code-block:: pascal
+
+    TPA.invert();
+
+*)
+procedure TPointArray.invert();
+begin
+  invertTPA(self);
+end;
+
+(*
+TPointArray.swap
+~~~~~~~~~~~~~~~~
+
+.. code-block:: pascal
+
+    procedure TPointArray.swap(const arr : TPointArray);
+
+Used to swap two TPointArray variables.
+
+.. note::
+
+    by Zyt3x
+
+Example:
+
+.. code-block:: pascal
+
+    TPA.swap(TPA2);
+
+*)
+procedure TPointArray.swap(const arr : TPointArray);
+begin
+  tpaSwap(arr, self);
+end;
+
+(*
+TPointArray.middle
+~~~~~~~~~~~~~~~~~~
+
+.. code-block:: pascal
+
+    function TPointArray.middle() : TPoint;
+
+Returns the point in the average middle of the TPA.
+
+.. note::
+
+    by Zyt3x
+
+Example:
+
+.. code-block:: pascal
+
+    mP := TPA.middle();
+
+*)
+function TPointArray.middle() : TPoint;
+begin
+  result := middleTPA(self);
+end;
+
+(*
+TPointArray.bounds
+~~~~~~~~~~~~~~~~~~
+
+.. code-block:: pascal
+
+    function TPointArray.bounds() : TPoint;
+
+Returns the box boundaries of the TPA.
+
+.. note::
+
+    by Zyt3x
+
+Example:
+
+.. code-block:: pascal
+
+    b := TPA.bounds();
+
+*)
+function TPointArray.bounds() : TBox;
+begin
+  result := getTPABounds(self);
+end;
+
+(*
+TPointArray.same
+~~~~~~~~~~~~~~~~
+
+.. code-block:: pascal
+
+    function TPointArray.same() : Boolean;
+
+Returns true if both TPointArrays are equal.
+
+.. note::
+
+    by Zyt3x
+
+Example:
+
+.. code-block:: pascal
+
+    b := TPA.same(TPA2);
+
+*)
+function TPointArray.same(const arr : TPointArray) : Boolean;
+begin
+  result := sameTPA(self, arr);
 end;
