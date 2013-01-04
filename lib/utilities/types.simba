@@ -648,8 +648,7 @@ procedure TIntegerArray.combine(const arr : TIntegerArray);
 var
   I : Integer;
 begin
-  for I := 0 to high(arr) do
-    append(arr[I]);
+  combineIntArrayWrap(self, arr, result);
 end;
 
 (*
