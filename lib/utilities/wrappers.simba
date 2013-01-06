@@ -7,6 +7,9 @@ The Wrappers include contains wrapper functions used throughout SRL.  These func
 
 *)
 
+var
+  maxInt := $FFFFFFF*8+7;
+
 (*
 FindColorsTolerance: overload;
 ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~

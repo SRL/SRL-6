@@ -287,12 +287,12 @@ begin
 end;
 
 (*
-TStringArray.clearSame
-~~~~~~~~~~~~~~~~~~~~~~
+TStringArray.clearEquals
+~~~~~~~~~~~~~~~~~~~~~~~~
 
 .. code-block:: pascal
 
-    procedure TStringArray.clearSame();
+    procedure TStringArray.clearEquals();
 
 Used to clear duplicates in a TStringArray.
 
@@ -304,10 +304,10 @@ Example:
 
 .. code-block:: pascal
 
-    TSA.clearSame();
+    TSA.clearEquals();
 
 *)
-procedure TStringArray.clearSame();
+procedure TStringArray.clearEquals();
 var
   I : Integer;
   arr : TStringArray;
@@ -735,12 +735,12 @@ begin
 end;
 
 (*
-TIntegerArray.clearSame
-~~~~~~~~~~~~~~~~~~~~~~~
+TIntegerArray.clearEquals
+~~~~~~~~~~~~~~~~~~~~~~~~~
 
 .. code-block:: pascal
 
-    procedure TIntegerArray.clearSame();
+    procedure TIntegerArray.clearEquals();
 
 Used to clear duplicates in a TIntegerArray.
 
@@ -752,10 +752,10 @@ Example:
 
 .. code-block:: pascal
 
-    TIA.clearSame();
+    TIA.clearEquals();
 
 *)
-procedure TIntegerArray.clearSame();
+procedure TIntegerArray.clearEquals();
 var
   I : Integer;
   arr : TIntegerArray;
@@ -868,6 +868,32 @@ Example:
 function TIntegerArray.average() : Integer;
 begin
   result := averageTIA(self);
+end;
+
+(*
+TIntegerArray.sortQuick
+~~~~~~~~~~~~~~~~~~~~~~~
+
+.. code-block:: pascal
+
+    procedure TIntegerArray.quickSort();
+
+Used to QuickSort the TIntegerArray.
+
+.. note::
+
+    by Zyt3x
+
+Example:
+
+.. code-block:: pascal
+
+    TIA.sortQuick();
+
+*)
+procedure TIntegerArray.sortQuick();
+begin
+  quickSort(self);
 end;
 
 (*
@@ -1179,12 +1205,12 @@ begin
 end;
 
 (*
-TExtendedArray.clearSame
-~~~~~~~~~~~~~~~~~~~~~~~~
+TExtendedArray.clearEquals
+~~~~~~~~~~~~~~~~~~~~~~~~~~
 
 .. code-block:: pascal
 
-    procedure TExtendedArray.clearSame();
+    procedure TExtendedArray.clearEquals();
 
 Used to clear duplicates in a TExtendedArray.
 
@@ -1196,10 +1222,10 @@ Example:
 
 .. code-block:: pascal
 
-    TEA.clearSame();
+    TEA.clearEquals();
 
 *)
-procedure TExtendedArray.clearSame();
+procedure TExtendedArray.clearEquals();
 var
   I : Integer;
   arr : TExtendedArray;
@@ -1575,12 +1601,12 @@ begin
 end;
 
 (*
-TPoint.same
-~~~~~~~~~~~
+TPoint.equal
+~~~~~~~~~~~~
 
 .. code-block:: pascal
 
-    function TPoint.same(const P : TPoint) : Boolean;
+    function TPoint.equal(const P : TPoint) : Boolean;
 
 Returns True if both TPoint variables are equal.
 
@@ -1592,12 +1618,42 @@ Example:
 
 .. code-block:: pascal
 
-    writeLn(P.same(P2));
+    writeLn(P.equal(P2));
 
 *)
-function TPoint.same(const P : TPoint) : Boolean;
+function TPoint.equal(const P : TPoint) : Boolean;
 begin
   result := (self.X = P.X) and (self.Y = P.Y);
+end;
+
+(*
+TPoint.swap
+~~~~~~~~~~~
+
+.. code-block:: pascal
+
+    procedure TPoint.swap(var p : TPoint);
+
+Used to swap two TPoint variables.
+
+.. note::
+
+    by Zyt3x
+
+Example:
+
+.. code-block:: pascal
+
+    P.swap(P);
+
+*)
+procedure TPoint.swap(var p : TPoint);
+var
+  p2 : TPoint;
+begin
+  p2 := self;
+  self := p;
+  P := p2;
 end;
 
 (*
@@ -1752,7 +1808,7 @@ var
 begin
   result := -1;
   for I := 0 to high(self) do
-    if self[I].same(p) then
+    if self[I].equal(p) then
     begin
       result := I;
       exit;
@@ -1846,12 +1902,12 @@ begin
 end;
 
 (*
-TPointArray.clearSame
-~~~~~~~~~~~~~~~~~~~~~
+TPointArray.clearEquals
+~~~~~~~~~~~~~~~~~~~~~~~
 
 .. code-block:: pascal
 
-    procedure TPointArray.clearSame();
+    procedure TPointArray.clearEquals();
 
 Used to clear duplicates in a TPointArray.
 
@@ -1863,10 +1919,10 @@ Example:
 
 .. code-block:: pascal
 
-    TPA.clearSame();
+    TPA.clearEquals();
 
 *)
-procedure TPointArray.clearSame();
+procedure TPointArray.clearEquals();
 var
   I : Integer;
   arr : TPointArray;
@@ -1956,12 +2012,12 @@ begin
 end;
 
 (*
-TPointArray.bounds
-~~~~~~~~~~~~~~~~~~
+TPointArray.boundaries
+~~~~~~~~~~~~~~~~~~~~~~
 
 .. code-block:: pascal
 
-    function TPointArray.bounds() : TPoint;
+    function TPointArray.boundaries() : TPoint;
 
 Returns the box boundaries of the TPA.
 
@@ -1976,18 +2032,18 @@ Example:
     b := TPA.bounds();
 
 *)
-function TPointArray.bounds() : TBox;
+function TPointArray.boundaries() : TBox;
 begin
   result := getTPABounds(self);
 end;
 
 (*
-TPointArray.same
-~~~~~~~~~~~~~~~~
+TPointArray.equal
+~~~~~~~~~~~~~~~~~
 
 .. code-block:: pascal
 
-    function TPointArray.same() : Boolean;
+    function TPointArray.equal() : Boolean;
 
 Returns true if both TPointArrays are equal.
 
@@ -1999,10 +2055,380 @@ Example:
 
 .. code-block:: pascal
 
-    b := TPA.same(TPA2);
+    b := TPA.equal(TPA2);
 
 *)
-function TPointArray.same(const arr : TPointArray) : Boolean;
+function TPointArray.equal(const arr : TPointArray) : Boolean;
 begin
   result := sameTPA(self, arr);
+end;
+
+(*
+TPointArray.isPointNear
+~~~~~~~~~~~~~~~~~~~~~~~
+
+.. code-block:: pascal
+
+    function TPointArray.isPointNear(const P : TPoint; const W, H : Integer): Boolean;
+
+Returns True if the point is near the array.
+
+.. note::
+
+    by Zyt3x
+
+Example:
+
+.. code-block:: pascal
+
+    TPA.isPointNear(P, 13, 37);
+
+*)
+function TPointArray.isPointNear(const P : TPoint; const W, H : Integer): Boolean;
+begin
+  result := nearbyPointInArrayEx(P, W, H, self);
+end;
+
+(*
+TPointArray.isPointNear: overload;
+~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+
+.. code-block:: pascal
+
+    function TPointArray.isPointNear(const P : TPoint; const D : Integer): Boolean; overload;
+
+Returns True if the point is near the array.
+
+.. note::
+
+    by Zyt3x
+
+Example:
+
+.. code-block:: pascal
+
+    TPA.isPointNear(P, 1337);
+
+*)
+function TPointArray.isPointNear(const P : TPoint; const D : Integer): Boolean; overload;
+begin
+  result := nearbyPointInArray(P, D, self);
+end;
+
+(*
+TPointArray.returnInTPA
+~~~~~~~~~~~~~~~~~~~~~~~
+
+.. code-block:: pascal
+
+    function TPointArray.returnInTPA(const arr : TPointArray) : TPointArray);
+
+Returns the TPA where the points in arr matches the points in the TPointArray.
+
+.. note::
+
+    by Zyt3x
+
+Example:
+
+..code-block:: pascal
+
+    matches := TPA.returnInTPA(TPA2);
+
+*)
+function TPointArray.returnInTPA(const arr : TPointArray) : TPointArray;
+begin
+  FindTPAinTPA(arr, self, result);
+end;
+
+(*
+TPointArray.returnInTPA; overload;
+~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+
+.. code-block:: pascal
+
+    function TPointArray.returnInTPA(const arr : TPointArray; var matches : TPointArray) : Boolean; overload;
+
+Returns True if the TPA where the points in arr matches the points in the TPointArray.
+  Also returns the matching points in the TPA "matches"
+
+.. note::
+
+    by Zyt3x
+
+Example:
+
+..code-block:: pascal
+
+    if TPA.returnInTPA(TPA2, resultTPA) then
+
+*)
+function TPointArray.returnInTPA(const arr : TPointArray; var matches : TPointArray) : Boolean; overload;
+begin
+  Result := FindTPAinTPA(arr, self, matches);
+end;
+
+(*
+TPointArray.sortQuick
+~~~~~~~~~~~~~~~~~~~~~
+
+.. code-block:: pascal
+
+    procedure TPointArray.sortQuick(const arr : TIntegerArray; const iLo, iHi : Integer; const sortUp : Boolean);
+
+Used to QuickSort the TPointArray.  PS: Using the TIntegerArray arr to sort.
+
+.. note::
+
+    by Zyt3x
+
+Example:
+
+.. code-block:: pascal
+
+    TPA.sortQuick(13, 37, True);
+
+*)
+procedure TPointArray.sortQuick(var arr : TIntegerArray; const iLo, iHi : Integer; const sortUp : Boolean);
+begin
+  quickTPASort(arr, self, iLo, iHi, sortUp);
+end;
+
+(*
+TPointArray.sortTPAbyXvalue
+~~~~~~~~~~~~~~~~~~~~~~~~~~~
+
+.. code-block:: pascal
+
+    procedure TPointArray.sortTPAbyXvalue(const lowToHigh : Boolean);
+
+Sorts the TPA from lowest X to highest X or highest X to lowest X, depending on lowToHigh
+
+.. note::
+
+    by Zyt3x
+
+Example:
+
+.. code-block:: pascal
+
+    TPA.sortTPAbyXvalue(True);
+
+*)
+procedure TPointArray.sortTPAbyXvalue(const lowToHigh : Boolean);
+begin
+  sortTPAByX(self, lowToHigh);
+end;
+
+(*
+TPointArray.sortTPAbyYvalue
+~~~~~~~~~~~~~~~~~~~~~~~~~~~
+
+.. code-block:: pascal
+
+    procedure TPointArray.sortTPAbyYvalue(const lowToHigh : Boolean);
+
+Sorts the TPA from lowest Y to highest Y or highest Y to lowest Y, depending on lowToHigh
+
+.. note::
+
+    by Zyt3x
+
+Example:
+
+.. code-block:: pascal
+
+    TPA.sortTPAbyYvalue(True);
+
+*)
+procedure TPointArray.sortTPAbyYvalue(const lowToHigh : Boolean);
+begin
+  sortTPAByY(self, lowToHigh);
+end;
+
+(*
+TPointArray.sortTPAfromPoint
+~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+
+.. code-block:: pascal
+
+    procedure TPointArray.sortTPAfromPoint(const P : TPoint);
+
+Sorts the TPA from a point
+
+.. note::
+
+    by Zyt3x
+
+Example:
+
+.. code-block:: pascal
+
+    TPA.sortTPAfromPoint(P);
+
+*)
+procedure TPointArray.sortTPAfromPoint(const P : TPoint);
+begin
+  sortTPAfrom(self, P);
+end;
+
+(*
+TPointArray.filterPointsBox
+~~~~~~~~~~~~~~~~~~~~~~~~~~~
+
+.. code-block:: pascal
+
+    procedure TPointArray.filterPointsBox(const W, H : Integer);
+
+Leaves one point per box with side lengths W and H to the TPA.  Lookup RAaSTPAEx for more information.
+
+.. note::
+
+    by Zyt3x
+
+Example:
+
+.. code-block:: pascal
+
+    TPA.filterPointsBox(13, 37);
+
+*)
+procedure TPointArray.filterPointsBox(const W, H : Integer);
+begin
+  RAaSTPAEx(self, W, H);
+end;
+
+(*
+TPointArray.filterPointsBox: overload;
+~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+
+.. code-block:: pascal
+
+    procedure TPointArray.filterPointsBox(const D : Integer); overload;
+
+Leaves one point per box with side lengths D to the TPA.  Lookup RAaSTPA for more information.
+
+.. note::
+
+    by Zyt3x
+
+Example:
+
+.. code-block:: pascal
+
+    TPA.filterPointsBox(1337);
+
+*)
+procedure TPointArray.filterPointsBox(const D : Integer); overload;
+begin
+  RAaSTPA(self, D);
+end;
+
+(*
+TPointArray.excludePointsCircle
+~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+
+.. code-block:: pascal
+
+    procedure TPointArray.excludePointsCircle(const startD, endD, minRadius, maxRadius : Extended; const mX, mY : Integer);
+
+Removes the points that are in the TPointArray Points that are not within the
+ degrees SD (Strat Degrees) and ED (End Degrees)  and
+ the radius’ MinR (Min Radius) and MaxR (Max Radius)  from
+ the origin Mx and My.  Lookup FilterPointsPie for more information.
+
+.. note::
+
+    by Zyt3x
+
+Example:
+
+.. code-block:: pascal
+
+    TPA.excludePointsCircle(13.0, 37.0, 13.0, 37.0, 13, 37);
+
+*)
+procedure TPointArray.excludePointsCircle(const startD, endD, minRadius, maxRadius : Extended; const mX, mY : Integer);
+begin
+  filterPointsPie(self, startD, endD, minRadius, maxRadius, mX, mY);
+end;
+
+(*
+TPointArray.excludePointsLine
+~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+
+.. code-block:: pascal
+
+    procedure TPointArray.excludePointsLine(const angle : Extended; const length, mX, mY : Integer);
+
+Removes the points in the TPointArray Points that are not on the line defined  by
+ angle, length and center.  Lookup FilterPointsLine for more information.
+
+.. note::
+
+    by Zyt3x
+
+Example:
+
+.. code-block:: pascal
+
+    TPA.excludePointsLine(13.0, 13, 33, 37);
+
+*)
+procedure TPointArray.excludePointsLine(const angle : Extended; const length, mX, mY : Integer);
+begin
+  filterPointsLine(self, angle, length, mX, mY);
+end;
+
+(*
+TPointArray.excludePointsDist
+~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+
+.. code-block:: pascal
+
+    procedure TPointArray.excludePointsDist(const minD, maxD : Extended; const mX, mY : Integer);
+
+Removes the points that don't have a dist between mindist/maxdist with (mx,my).
+  Lookup FilterPointsDist for more information.
+
+.. note::
+
+    by Zyt3x
+
+Example:
+
+.. code-block:: pascal
+
+    TPA.excludePointsDist(13.0, 13, 33, 37);
+
+*)
+procedure TPointArray.excludePointsDist(const minD, maxD : Extended; const mX, mY : Integer);
+begin
+  filterPointsDist(self, minD, maxD, mX, mY);
+end;
+
+(*
+TPointArray.findTextTPA
+~~~~~~~~~~~~~~~~~~~~~~~
+
+.. code-block:: pascal
+
+    function TPointArray.findTextTPA(const height : Integer; const searchTPA : TPointArray; var matches : TPointArray): Boolean;
+
+Returns True if the text TPA is found within TPointArray.  Also returns the matching points in the variable matches.
+
+.. note::
+
+    by Zyt3x
+
+Example:
+
+.. code-block:: pascal
+
+    TPA.findTextTPA(13.0, 13, 33, 37);
+
+*)
+function TPointArray.findTextTPA(const height : Integer; const searchTPA : TPointArray; var matches : TPointArray): Boolean;
+begin
+  Result := FindTextTPAinTPA(height, searchTPA, self, matches);
 end;
