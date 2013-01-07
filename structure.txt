@@ -26,7 +26,7 @@ A structure of SRL-6.  Only includes the files that have been finished.
       -- utilities/
          -- time.simba
          -- types.simba
-		 -- wrappers.simba
+	 -- wrappers.simba
    -- logs/
    -- tools/
       -- autocolor_aid.exe

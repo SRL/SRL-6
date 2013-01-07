@@ -133,7 +133,7 @@ var
 begin
   if (disableSRLdebug) then exit;
   if (not disableSRLLog) then addToLog(debugMSG);
-  writeln(debugMSG)
+  writeln(debugMSG);
 end;
 
 (*
@@ -220,5 +220,31 @@ begin
   inc(debugLevel);
   debug(txt);
   dec(debugLevel);
+end;
+
+(*
+takeScreenshot
+~~~~~~~~~~~~~~
+
+.. code-block:: pascal
+
+    procedure takeScreenshot(fileName: string);
+
+Saves a screenshot to fileName, and adds the time to avoid replacing images.
+
+.. note::
+
+    by Harry & Coh3n
+    Last updated: Jan. 6th, 2013 by Coh3n
+
+Example:
+
+.. code-block:: pascal
+
+    takeScreenshot('example.png');
+*)
+procedure takeScreenshot(fileName: string);
+begin
+  saveScreenshot(logPath + timeRunning + '_' + fileName);
 end;
 

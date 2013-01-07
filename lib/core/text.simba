@@ -1,0 +1,57 @@
+(*
+Text
+====
+
+The text file holds functions and procedures that are used in Runescape text
+recognition.
+
+*)
+
+(*
+findText
+~~~~~~~~
+
+.. code-block:: pascal
+
+    function findText(var x, y: integer; txt, fonts: TStringArray; b: TBox): boolean;
+
+Returns true if the text (txt) of given fonts (fonts) are found in the specified
+box (b).  If found, set's x and y to where the text was found.
+
+.. note::
+
+    by Stupid3ooo, modified by LordJashin
+
+Example:
+
+.. code-block:: pascal
+
+    var
+      x, y: integer;
+    begin
+      if (findText(x, y, ['obby'], [upCharsEx], intToBox(MIX1, MIY1, MIX2, MIY2))) then
+        writeln('Found exit to lobby text');
+      .
+      .
+      .
+    end;
+*)
+function findText(var x, y: integer; txt, fonts: TStringArray; b: TBox): boolean;
+var
+  s, i, j: integer;
+begin
+  for i := 0 to high(txt) do
+    for j := 0 to high(fonts) do
+    begin
+      s := bitmapFromText(toStr(txt[i]), toStr(fonts[j]));
+
+      if (b.x1 < 0) then b.x1 := 0;
+      if (b.y1 < 0) then b.y1 := 0;
+
+      result := findBitmapMaskTolerance(s, x, y, b.x1, b.y1, b.x2, b.y2, 30, 30);
+      freeBitmap(s);
+
+      if (result) then
+        exit;
+    end;
+end;

@@ -5,10 +5,12 @@ EVERYTHING should be recorded here: new features, function name changes, user-de
 
 -- no longer need to call SetupSRL since Lape has initialization (see the end of srl.simba for details)
 
-- debug.simba
+- debug.simba (merged with SRLLog.simba)
   - variables
     - disableSRLDebug, disableSRLLog: boolean;
   - logs are automatically saved in srl/logs/
+  - function removed TakeIPScreen (replaced with takeScreenshot)
+  - renamed TakeScreen to takeScreenshot
 
 - globals.simba
   - renamed variable SRL_Proc to events

@@ -11,6 +11,7 @@ SRL library isn't available to you.
 {$include_once lib/core/globals.simba}
 {$include_once lib/core/mouse.simba}
 {$include_once lib/core/debug.simba}
+{$include_once lib/core/text.simba}
 {$include_once lib/core/players.simba}
 {$include_once lib/core/login.simba}
 {$include_once lib/core/client.simba}
