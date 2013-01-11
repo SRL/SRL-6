@@ -7,6 +7,8 @@ lobby.
 
 *)
 
+{$include_once gametabs/gametab.simba}
+
 (*
 Constant: Lobby
 ~~~~~~~~~~~~~~~
@@ -55,7 +57,7 @@ Example:
 function getLobbyTab: integer;
 begin
   for result := 0 to (LOBBY_COUNT - 1) do
-    if (GetColor(63 + result * 102, 82) = 11516354) then
+    if (GetColor(63 + result * 102, 82) = 11582147) then
       exit;
 
   Result := -1;
@@ -86,4 +88,103 @@ Example:
 function isLobbyScreenOpen(): boolean;
 begin
   result := inRange(getLobbyTab, LOBBY_PLAYER, LOBBY_OPTIONS);
+end;
+
+(*
+exitToLobby
+~~~~~~~~~~~
+
+.. code-block:: pascal
+
+    function exitToLobby(): boolean;
+
+Exits to the lobby screen.
+
+.. note::
+
+    by Starblaster100, Raymond, IceFire908, Tarajunky, & Coh3n
+    Last Updated: Jan. 10th, by Co3n
+
+Example:
+
+.. code-block:: pascal
+
+    if (exitToLobby()) then
+      writeln('We''ve exited to the lobby!');
+*)
+function exitToLobby(): boolean;
+var
+  x, y: integer;
+  t := (getSystemTime + (15000));
+begin
+  addHeader('exitToLobby(): logging out to lobby');
+
+  if (isLobbyScreenOpen()) then
+  begin
+    closeHeader('exitToLobby(): lobby screen already open');
+    result := true;
+    exit;
+  end;
+
+  if (not gameTab(TAB_LOGOUT)) then
+    exit;
+
+  wait(100 + random(200));
+
+  if (findText(x, y, ['Lobby'], [UpCharsEx], MI_BOX, 1000)) then
+  begin
+    mouse(point(x, y).rand(3, 10), MOUSE_LEFT);
+
+    while (not result) and (getSystemTime < t) do
+    begin
+      debug('Waiting for lobby screen...');
+      result := isLobbyScreenOpen();
+      wait(700 + random(500));
+    end;
+  end;
+
+  closeHeader('exitToLobby(): ' + toStr(result));
+end;
+
+(*
+leaveLobby
+~~~~~~~~~~
+
+.. code-block:: pascal
+
+    function leaveLobby(): boolean;
+
+Leaves the lobby screen.
+
+.. note::
+
+    by IceFire908
+    Last Updated: Jan. 7th, 2013 by Coh3n
+
+Example:
+
+.. code-block:: pascal
+
+    if (isLobbyScreenOpen()) then
+      if (not leaveLobby()) then
+        writeln('Oh no, we didn''t make it out of the Lobby Screen.');
+*)
+function leaveLobby(): boolean;
+var
+  t := (getSystemTime() + 30000);
+  exitButton := point(690, 85).rand(3);
+begin
+  addHeader('leaveLobby(): leaving lobby');
+
+  result := (not isLobbyScreenOpen());
+
+  while (not result) and (getSystemTime() < t) do
+  begin
+    debug('Waiting for login screen...');
+    mouse(exitButton, MOUSE_LEFT);
+    wait(randomRange(1000, 2000));
+    result := (not isLobbyScreenOpen());
+  end;
+
+  closeHeader('leaveLobby(): ' + toStr(result));
 end;

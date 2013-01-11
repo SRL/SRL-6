@@ -5,3 +5,26 @@ Gametab
 This Include contains all Gametab Routines.
 
 *)
+
+{$include_once lib/interfaces/gametabs/inventory.simba}
+
+const
+  TAB_LOGOUT = 37;
+
+// just temporary to test logout functions
+function gameTab(tab: integer): boolean;
+var
+  x, y: integer;
+begin
+  result := findText(x, y, ['Lobby'], [UpCharsEx], MI_BOX);
+
+  if (tab = TAB_LOGOUT) and (not result) then
+    if (getColor(754, 61) = 3629683) then // color in the middle of the X
+    begin
+      mouse(point(754, 61).rand(5), MOUSE_LEFT);
+      result := true;
+    end;
+
+  subDebug('gameTab(' + toStr(tab) + '): ' + toStr(result));
+end;
+

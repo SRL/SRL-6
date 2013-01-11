@@ -8,6 +8,9 @@ SRL library isn't available to you.
 
 *)
 
+{$include_once lib/utilities/types.simba}
+{$include_once lib/utilities/time.simba}
+
 {$include_once lib/core/globals.simba}
 {$include_once lib/core/mouse.simba}
 {$include_once lib/core/debug.simba}
@@ -16,9 +19,9 @@ SRL library isn't available to you.
 {$include_once lib/core/login.simba}
 {$include_once lib/core/client.simba}
 
+{$include_once lib/interfaces/gametabs/inventory.simba}
+{$include_once lib/interfaces/gametabs/gametab.simba}
 {$include_once lib/interfaces/lobby.simba}
-
-{$include_once lib/utilities/time.simba}
 
 {$include_once player_info.simba}
 
