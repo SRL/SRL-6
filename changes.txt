@@ -66,6 +66,7 @@ EVERYTHING should be recorded here: new features, function name changes, user-de
   - added function TPlayerArray.add
   - added function TPlayerArray.setup
   - renamed function PlayerWorked to TPlayer.addWorked
+  - removed all audio/graphics functions (pointless to add possible error when they're never used)
 
 - new file, login_info.simba
   - This file is to replace the traditional DeclarePlayers.  Users will enter in their player information only one time and can choose which players to use in scripts.  Any other attributes (i.e. integers, booleans, etc.) will be edited in the script's DeclarePlayers like always.

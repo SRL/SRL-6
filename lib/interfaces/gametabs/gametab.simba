@@ -16,8 +16,6 @@ function gameTab(tab: integer): boolean;
 var
   x, y: integer;
 begin
-  result := findText(x, y, ['Lobby'], [UpCharsEx], MI_BOX);
-
   if (tab = TAB_LOGOUT) and (not result) then
     if (getColor(754, 61) = 3629683) then // color in the middle of the X
     begin

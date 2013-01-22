@@ -22,6 +22,7 @@ SRL library isn't available to you.
 {$include_once lib/interfaces/gametabs/inventory.simba}
 {$include_once lib/interfaces/gametabs/gametab.simba}
 {$include_once lib/interfaces/lobby.simba}
+{$include_once lib/interfaces/mainscreen.simba}
 
 {$include_once player_info.simba}
 

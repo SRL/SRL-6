@@ -7,6 +7,9 @@ player into the game.
 
 *)
 
+{$include_once ../interfaces/gametabs/gametab.simba}
+{$include_once ../interfaces/mainscreen.simba}
+
 (*
 loggedIn()
 ~~~~~~~~~~
@@ -32,4 +35,41 @@ Example:
 function loggedIn(): boolean;
 begin
   Result := (GetColor(478, 543) = 16777215); // white text on report abuse button
+end;
+
+function logout(): boolean;
+var
+  x, y: integer;
+  t := (getSystemTime + (15000));
+begin
+  if (not loggedIn()) then
+  begin
+    result := true;
+    exit;
+  end;
+
+  if (@SRL_Events[EVENT_LOGOUT] <> nil) then
+    SRL_Events[EVENT_LOGOUT]();
+
+  if (not gameTab(TAB_LOGOUT)) then
+  begin
+    closeWindow(); // incase the bank or another interface is open
+
+    if (not gameTab(TAB_LOGOUT)) then
+      exit;
+  end;
+
+  wait(100 + random(200));
+
+  if (findText(x, y, ['Login'], [UpCharsEx], MI_BOX, 1000)) then
+  begin
+    mouse(point(x, y).rand(3, 10), MOUSE_LEFT);
+
+    while (not result) and (getSystemTime < t) do
+    begin
+      subDebug('Waiting for login screen...');
+      result := (not loggedIn());
+      wait(700 + random(500));
+    end;
+  end;
 end;

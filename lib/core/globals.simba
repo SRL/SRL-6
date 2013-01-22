@@ -20,8 +20,9 @@ Example:
 
 *)
 const
-  EVENT_COUNT = 1;
-    RS_UPDATE = 0;
+  EVENT_COUNT = 2;
+    EVENT_RS_UPDATE = 0;
+    EVENT_LOGOUT    = 1;
 
 (*
 Variable: SRL_Events

@@ -1,0 +1,35 @@
+(*
+Mainscreen
+==========
+
+The mainscreen file holds functions and procedures that are used in the
+Runescape lobby mainscreen.
+
+*)
+
+(*
+closeWindow
+~~~~~~~~~~~
+
+.. code-block:: pascal
+
+    function closeWindow(): boolean;
+
+Closes any of the Runescape windows that could be open.
+
+.. note::
+
+    by
+    Last Updated:
+
+Example:
+
+.. code-block:: pascal
+
+    if (closeWindow()) then
+      debug('Window is closed');
+*)
+function closeWindow(): boolean;
+begin
+  result := true;
+end;
