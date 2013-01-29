@@ -312,6 +312,7 @@ begin
       Writeln('Loading SMART: ' + Params[0] + Params[1]);
     except
       WriteLn('** Fatal Error: Pairing Clients; Terminating Script **');
+      Writeln('** Try setting your folder permissions to Allow **');
       TerminateScript;
     end;
   end else
