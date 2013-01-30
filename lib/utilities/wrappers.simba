@@ -11,6 +11,32 @@ var
   maxInt := $FFFFFFF*8+7;
 
 (*
+FindColors: overload;
+~~~~~~~~~~~~~~~~~~~~~
+
+.. code-block:: pascal
+
+    function FindColors(var points : TPointArray; const color : Integer; const box : TBox): Boolean; overload;
+
+Takes a TBox variable instead of x1, y1, x2 and y2 variables.
+
+.. note::
+
+    by Coh3n
+
+Example:
+
+.. code-block:: pascal
+
+    FindColors(TPA, cl_White, MSBox);
+
+*)
+function FindColors(var points : TPointArray; const color : Integer; const box : TBox): Boolean; overload;
+begin
+  Result := FindColors(points, color, box.X1, box.Y1, box.X2, box.Y2);
+end;
+
+(*
 FindColorsTolerance: overload;
 ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
 
@@ -34,6 +60,32 @@ Example:
 function FindColorsTolerance(var points : TPointArray; const color : Integer; const box : TBox; const tolerance : Integer): Boolean; overload;
 begin
   Result := FindColorsTolerance(points, color, box.X1, box.Y1, box.X2, box.Y2, tolerance);
+end;
+
+(*
+CountColor: overload;
+~~~~~~~~~~~~~~~~~~~~~
+
+.. code-block:: pascal
+
+    function CountColor(Color: integer; box: TBox): Boolean; overload;
+
+Takes a TBox variable instead of x1, y1, x2 and y2 variables.
+
+.. note::
+
+    by Coh3n
+
+Example:
+
+.. code-block:: pascal
+
+    CountColor(clWhite, MSBOX);
+
+*)
+function CountColor(Color: integer; box: TBox): Boolean; overload;
+begin
+  Result := CountColor(color, box.X1, box.Y1, box.X2, box.Y2);
 end;
 
 (*
