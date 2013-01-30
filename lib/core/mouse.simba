@@ -464,3 +464,14 @@ begin
   wait(random(100));
   releaseMouse(x, y, mouse_Left);
 end;
+
+procedure mouseBox(b: TBox; button: integer = MOUSE_MOVE);
+var
+  p: TPoint;
+begin
+  // should be replaced with gaussBox when it's available in Simba
+  p.x := b.x1 + random(b.x2 - b.x1);
+  p.y := b.y1 + random(b.y2 - b.y1);
+  mouse(p, button);
+end;
+
