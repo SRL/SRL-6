@@ -20,6 +20,9 @@ EVERYTHING should be recorded here: new features, function name changes, user-de
   - renamed constants to LOBBY_PLAYER/WORLD/FRIENDS/CHAT/CLAN/OPTIONS
   - lobbyScreen renamed to isLobbyScreenOpen()
 
+- text.simba
+  - TypeSendEx removed and an optional pressEnter parameter added to typeSend
+
 - players.simba
   - TUser renamed to TPlayer
   - attributes removed: worldInfo, nick, status, skill, banked, rand, arrays, boxRewards

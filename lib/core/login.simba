@@ -10,6 +10,12 @@ player into the game.
 {$include_once ../interfaces/gametabs/gametab.simba}
 {$include_once ../interfaces/mainscreen.simba}
 
+const
+  LOGIN_COLOR_TEXT = 12378347;
+
+  UBOX := intToBox(279, 205, 486, 215); // username box
+  PBOX := intToBox(279, 250, 486, 265); // password box
+
 (*
 loggedIn()
 ~~~~~~~~~~
@@ -37,6 +43,28 @@ begin
   Result := (GetColor(478, 543) = 16777215); // white text on report abuse button
 end;
 
+(*
+logout()
+~~~~~~~~
+
+.. code-block:: pascal
+
+    function logout(): boolean;
+
+Returns true if the current player is successfully logged out.
+
+.. note::
+
+    by Starblaster100, Raymond, IceFire908, Tarajunky & NCDS
+    Last updated: 30/09/2012 by Coh3n
+
+Example:
+
+.. code-block:: pascal
+
+    if (logout()) then
+      writeln('We are logged out!');
+*)
 function logout(): boolean;
 var
   x, y: integer;
@@ -73,3 +101,84 @@ begin
     end;
   end;
 end;
+
+(*
+enterLoginInfo()
+~~~~~~~~~~~~~~~~
+
+.. code-block:: pascal
+
+    function enterLoginInfo(const inputBox: TBox; const info: string; clickBox: boolean = true): boolean;
+
+Used to enter a players username and password to login to RS.
+
+.. note::
+
+    by Starblaster100, Raymond, IceFire908, Tarajunky & NCDS
+    Last updated: 30/09/2012 by Coh3n
+
+Example:
+
+.. code-block:: pascal
+
+    if (logout()) then
+      writeln('We are logged out!');
+*)
+function enterLoginInfo(const inputBox: TBox; const info: string; clickBox: boolean = true): boolean;
+var
+  t := (getSystemTime + (60000 * 2));
+  tpa: TPointArray;
+  p: TPoint;
+  c: integer;
+begin
+  addHeader('enterLoginInfo');
+
+  // check to see if there is already text in the input box
+  findColors(tpa, LOGIN_COLOR_TEXT, inputBox);
+
+  repeat
+    debug('Clicking input box: '+toStr(inputBox));
+
+    // click input box; clicks to the right of existing text
+    if (length(tpa) > 0) then // if there's text in the box
+    begin
+      sortTPAFrom(tpa, point(inputBox.x2, (inputBox.y1 + inputBox.y2 div 2))); // the middle right of the input box
+      p := point(tpa[0].x + 20, tpa[0].y);
+
+      // make sure the point is in the inputBox
+      if (not pointInBox(p, inputBox)) then
+        p := point(inputBox.x2 - (10 + random(10)), p.y);
+
+      if (clickBox) then
+        mouse(p.rand(3), MOUSE_LEFT);
+    end else begin
+      if (clickBox) then
+        mouseBox(inputBox, MOUSE_LEFT);
+
+      break;
+    end;
+
+    // delete any existing text
+    c := 0;
+    debug('Removing existing text...');
+    while (countColor(LOGIN_COLOR_TEXT, inputBox) > 0) or (c > 20) do
+    begin
+      inc(c);
+      typeByte(VK_BACK);
+      wait(50+random(50));
+    end;
+
+  until(not findColors(tpa, LOGIN_COLOR_TEXT, inputBox) or (getSystemTime > t));
+
+  wait(100 + random(200));
+  debug('Entering info...');
+  typeSend(info);
+  result := true;
+
+  closeHeader('enterLoginInfo: '+toStr(result));
+end;
+
+
+
+
+

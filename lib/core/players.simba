@@ -7,6 +7,8 @@ stores properties of the TPlayer type.
 
 *)
 
+{$include_once client.simba}
+
 (*
 Constant: Skills
 ~~~~~~~~~~~~~~~~
@@ -314,5 +316,11 @@ Example:
 *)
 function TPlayer.login(): boolean;
 begin
-  result := false;
+  if (isClientReady()) then
+  begin
+    enterLoginInfo(UBOX, self.loginName);
+    enterLoginInfo(PBOX, self.password, false);
+  end;
+
+  result := true;
 end;

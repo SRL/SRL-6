@@ -8,6 +8,7 @@ client settings.
 *)
 
 {$include_once ../interfaces/lobby.simba}
+{$include_once ../core/login.simba}
 
 (*
 isClientReady

@@ -6,6 +6,9 @@ The globals file holds any variables used throughout multiple files in SRL.
 
 *)
 
+const
+  VK_ENTER = {$IFDEF LINUX}10{$ELSE}VK_RETURN{$ENDIF};
+
 (*
 Constant: Events
 ~~~~~~~~~~~~~~~~
