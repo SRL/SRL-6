@@ -61,3 +61,77 @@ begin
 
   subDebug('findText('+toStr(txt)+'): '+toStr(result));
 end;
+
+(*
+typeByte
+~~~~~~~~
+
+.. code-block:: pascal
+
+    procedure typeByte(k: byte);
+
+Types one character k.
+
+.. note::
+
+    by Mutant Squirrle
+
+Example:
+
+.. code-block:: pascal
+
+    typeByte(VK_ENTER);
+
+*)
+procedure typeByte(k: byte);
+begin
+  {$IFDEF SMART}
+  if (k = 13) then
+    k := 10;
+  {$ENDIF}
+
+  KeyDown(k);
+  Wait(10 + Random(50));
+  KeyUp(k);
+end;
+
+(*
+typeSend
+~~~~~~~~
+
+.. code-block:: pascal
+
+    procedure typeSend(text: string; pressEnter: boolean = true);
+
+Types text in a human-like way.  Optional parameter 'pressEnter'.  Will press
+enter by default.
+
+.. note::
+
+    by SKy Scripter
+    Last Updated: January 29th, 2013 by Coh3n
+
+Example:
+
+.. code-block:: pascal
+
+    // to type and press enter
+    typeSend('Hello');
+
+    // to type and not press enter
+    typeSend('Hello', false);
+
+*)
+procedure typeSend(text: string; pressEnter: boolean = true);
+var
+  i: Integer;
+begin
+  for i := 1 to Length(Text) do
+  begin
+    SendKeys(Text[i], 30 + Random(30), 30 + Random(30));
+    Wait(40 + Random(40));
+  end;
+
+  if (pressEnter) then
+    TypeByte(VK_ENTER);
+end;
