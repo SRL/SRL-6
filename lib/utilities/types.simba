@@ -1601,12 +1601,12 @@ begin
 end;
 
 (*
-TPoint.equal
-~~~~~~~~~~~~
+TPoint.equals
+~~~~~~~~~~~~~
 
 .. code-block:: pascal
 
-    function TPoint.equal(const P : TPoint) : Boolean;
+    function TPoint.equals(const P : TPoint) : Boolean;
 
 Returns True if both TPoint variables are equal.
 
@@ -1618,10 +1618,10 @@ Example:
 
 .. code-block:: pascal
 
-    writeLn(P.equal(P2));
+    writeLn(P.equals(P2));
 
 *)
-function TPoint.equal(const P : TPoint) : Boolean;
+function TPoint.equals(const P : TPoint) : Boolean;
 begin
   result := (self.X = P.X) and (self.Y = P.Y);
 end;
