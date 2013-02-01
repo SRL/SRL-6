@@ -6,7 +6,7 @@ This Include contains all Gametab Routines.
 
 *)
 
-{$include_once lib/interfaces/gametabs/inventory.simba}
+{$include_once inventory.simba}
 
 const
   TAB_LOGOUT = 37;

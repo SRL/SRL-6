@@ -1808,7 +1808,7 @@ var
 begin
   result := -1;
   for I := 0 to high(self) do
-    if self[I].equal(p) then
+    if self[I].equals(p) then
     begin
       result := I;
       exit;
@@ -2038,8 +2038,8 @@ begin
 end;
 
 (*
-TPointArray.equal
-~~~~~~~~~~~~~~~~~
+TPointArray.equals
+~~~~~~~~~~~~~~~~~~
 
 .. code-block:: pascal
 
@@ -2055,10 +2055,10 @@ Example:
 
 .. code-block:: pascal
 
-    b := TPA.equal(TPA2);
+    b := TPA.equals(TPA2);
 
 *)
-function TPointArray.equal(const arr : TPointArray) : Boolean;
+function TPointArray.equals(const arr : TPointArray) : Boolean;
 begin
   result := sameTPA(self, arr);
 end;
