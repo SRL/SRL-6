@@ -17,12 +17,12 @@ const
   PBOX := intToBox(279, 250, 486, 265); // password box
 
 (*
-loggedIn()
-~~~~~~~~~~
+isLoggedIn()
+~~~~~~~~~~~~
 
 .. code-block:: pascal
 
-    function loggedIn(): boolean;
+    function isLoggedIn(): boolean;
 
 Returns true if a player is logged in.
 
@@ -35,21 +35,21 @@ Example:
 
 .. code-block:: pascal
 
-    if (loggedIn()) then
+    if (isLoggedIn()) then
       writeln('We are logged in!');
 *)
-function loggedIn(): boolean;
+function isLoggedIn(): boolean;
 begin
   Result := (GetColor(478, 543) = 16777215); // white text on report abuse button
 end;
 
-(*
-logout()
-~~~~~~~~
+{*
+_logout()
+~~~~~~~~~
 
 .. code-block:: pascal
 
-    function logout(): boolean;
+    function _logout(): boolean;
 
 Returns true if the current player is successfully logged out.
 
@@ -62,10 +62,10 @@ Example:
 
 .. code-block:: pascal
 
-    if (logout()) then
+    if (players[currentPlayer].logout()) then
       writeln('We are logged out!');
-*)
-function logout(): boolean;
+*}
+function _logout(): boolean;
 var
   x, y: integer;
   t := (getSystemTime + (15000));
@@ -102,13 +102,43 @@ begin
   end;
 end;
 
-(*
-enterLoginInfo()
-~~~~~~~~~~~~~~~~
+const
+  __RES_DEBUG  = 0;
+  __RES_WAIT   = 1;
+  __RES_TRIES  = 2;
+  __RES_ACTION = 3;
+  __RES_LOC    = 4;
+function __getLoginResponse(colorCount, timer: integer): TVariantArray;
+begin
+  case (colorCount) of
+    //               debug message      |      wait time | tries | action | player[].location
+    763, 2348, 2299:
+          result := ['Invalid username/password',  0,         2,  'false',  'Wrong User/Pass'      ];
+    1088: result := ['Account has been disabled',  0,         0,  'false',  'Acc Disabled'         ];
+     951: result := ['Already logged in',          5000,      5,  'true',   'Already logged in'    ];
+    1239: result := ['Not a RS member',            0,         1,  'true',   ''                     ];
+     364: result := ['Error connecting',           20000,     9,  'halt',   'Error Connecting'     ];
+    1057: result := ['Too many incorrect logins',  5 * 60000, 2,  'false',  'Too many logins'      ];
+     732: result := ['Runescape has been updated', 0,         0,  'update', 'RS Updated'           ];
+     591: result := ['Client token changed',       0,         0,  'update', 'Client Token Changed' ];
+    1606: result := ['Game session expired',       0,         0,  'update', 'Session Expired'      ];
+     777: result := ['Login limit exceeded',       20000,     10, '',       'Waiting for login.'   ];
+     850: result := ['Skill level 1000+ required', 0,         9,  'true',   '1000 skill club'      ];
+    1028: result := ['Player in member-only area', 0,         1,  'false',  'In member-only area'  ];
+
+    else
+      if (getSystemTime() > timer) then
+        debug('One minute has passed... Color count: '+toStr(colorCount));
+  end;
+end;
+
+{*
+__enterLoginInfo()
+~~~~~~~~~~~~~~~~~~
 
 .. code-block:: pascal
 
-    function enterLoginInfo(const inputBox: TBox; const info: string; clickBox: boolean = true): boolean;
+    function __enterLoginInfo(const inputBox: TBox; const info: string; clickBox: boolean = true): boolean;
 
 Used to enter a players username and password to login to RS.
 
@@ -121,23 +151,18 @@ Example:
 
 .. code-block:: pascal
 
-    if (logout()) then
-      writeln('We are logged out!');
-*)
-function enterLoginInfo(const inputBox: TBox; const info: string; clickBox: boolean = true): boolean;
+    __enterLoginInfo(self.loginName);
+*}
+function __enterLoginInfo(const inputBox: TBox; const info: string; clickBox: boolean = true): boolean;
 var
   t := (getSystemTime + (60000 * 2));
   tpa: TPointArray;
   p: TPoint;
   c: integer;
 begin
-  addHeader('enterLoginInfo');
-
-  // check to see if there is already text in the input box
-  findColors(tpa, LOGIN_COLOR_TEXT, inputBox);
-
   repeat
-    debug('Clicking input box: '+toStr(inputBox));
+    // check to see if there is already text in the input box
+    findColors(tpa, LOGIN_COLOR_TEXT, inputBox);
 
     // click input box; clicks to the right of existing text
     if (length(tpa) > 0) then // if there's text in the box
@@ -160,8 +185,7 @@ begin
 
     // delete any existing text
     c := 0;
-    debug('Removing existing text...');
-    while (countColor(LOGIN_COLOR_TEXT, inputBox) > 0) or (c > 20) do
+    while (countColor(LOGIN_COLOR_TEXT, inputBox) > 0) and (c < 25) do
     begin
       inc(c);
       typeByte(VK_BACK);
@@ -171,14 +195,6 @@ begin
   until(not findColors(tpa, LOGIN_COLOR_TEXT, inputBox) or (getSystemTime > t));
 
   wait(100 + random(200));
-  debug('Entering info...');
   typeSend(info);
   result := true;
-
-  closeHeader('enterLoginInfo: '+toStr(result));
 end;
-
-
-
-
-

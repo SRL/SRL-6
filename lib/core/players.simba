@@ -7,7 +7,8 @@ stores properties of the TPlayer type.
 
 *)
 
-{$include_once client.simba}
+{$include_once ../core/login.simba}
+{$include_once ../interfaces/lobby.simba}
 
 (*
 Constant: Skills
@@ -267,6 +268,10 @@ begin
   writeln('Active: ', active);
 end;
 
+function TPlayer.next(active: boolean): boolean;
+begin
+end;
+
 (*
 TPlayer.addWorked
 ~~~~~~~~~~~~~~~~~
@@ -294,33 +299,117 @@ procedure TPlayer.addWorked();
 begin
   if (playerStartTime > 0) then // if it's been set at all
     incEx(worked, (getSystemTime - playerStartTime));
+
   playerStartTime := getSystemTime();
 end;
 
+function TPlayer.__loginActions(const action: string): boolean;
+begin
+  case (action) of
+    'false':
+      self.next(false);
+
+    'true':
+      self.next(true);
+
+    'halt':
+      halt();
+
+    'update':
+      begin
+        if (@SRL_Events[EVENT_RS_UPDATE] <> nil) then
+        begin
+          debug('Waiting 5 minutes before calling update procedure');
+          wait(5 * 60000);
+          SRL_Events[EVENT_RS_UPDATE];
+          exit(false);
+        end;
+
+        halt();
+      end;
+  end;
+end;
+
 (*
-TPlayer.login
-~~~~~~~~~~~~~
+TPlayer.loginToLobby
+~~~~~~~~~~~~~~~~~~~~
 
 .. code-block:: pascal
 
-    function TPlayer.login(): boolean;
+    function TPlayer.loginToLobby(): boolean;
 
-Used to login the TPlayer into the game.
+Logs the TPlayer into to lobby.
 
 Example:
 
 .. code-block:: pascal
 
-    players[currentPlayer].login();
+    players[currentPlayer].loginToLobby();
 
 *)
-function TPlayer.login(): boolean;
+function TPlayer.loginToLobby(): boolean;
+var
+  t := (getSystemTime + 60000);
+  arr: TVariantArray;
+  c, tries: integer;
 begin
-  if (isClientReady()) then
-  begin
-    enterLoginInfo(UBOX, self.loginName);
-    enterLoginInfo(PBOX, self.password, false);
-  end;
+  repeat
+    inc(tries);
 
-  result := true;
+    debug(capitalize(self.loginName)+' ('+capitalize(self.displayName)+')');
+    __enterLoginInfo(UBOX, self.loginName);
+    __enterLoginInfo(PBOX, self.password, false);
+
+    wait(800 + random(50));	// fixes the login spam recoveries bug
+
+    repeat
+      setLength(arr, 0);
+
+      // counts the colors in the lobby pop up screen
+      c := countColor(LOGIN_COLOR_TEXT, 260, 190, 510, 450);
+      arr := __getLoginResponse(c, t);
+
+      if (length(arr) > 0) then // if there was an error logging in
+      begin
+        debug('Login response: '+arr[__RES_DEBUG]);
+        wait(2000 + arr[__RES_WAIT] + randomRange(-200, 200));
+        typeByte(VK_ESCAPE); // exit response window
+
+        if (tries <= arr[__RES_TRIES]) then
+        begin
+          wait(500 + random(500));
+          break;
+        end;
+
+        if (arr[__RES_LOC] <> '') then
+          self.location := arr[__RES_LOC];
+
+        self.__loginActions(arr[__RES_ACTION]);
+      end;
+
+      // to handle the validate email screen
+      if (getColor(473, 468) = 1001495) then // gold border around the "confirm" button
+        mouseBox(intToBox(502, 474, 548, 485), MOUSE_LEFT); // the "skip" button
+
+      wait(100 + random(100));
+      result := (isLobbyScreenOpen());
+
+    until(result);
+  until(result);
+end;
+
+function TPlayer.login(): boolean;
+var
+  attempts: integer;
+begin
+  repeat
+    if (self.loginToLobby()) then
+    begin
+    end;
+  until(attempts >= 0);
+end;
+
+function TPlayer.logout(): boolean;
+begin
+  result := _logout();
 end;
