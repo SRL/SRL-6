@@ -468,10 +468,17 @@ end;
 procedure mouseBox(b: TBox; button: integer = MOUSE_MOVE);
 var
   p: TPoint;
+  x, y: integer;
 begin
-  // should be replaced with gaussBox when it's available in Simba
-  p.x := b.x1 + random(b.x2 - b.x1);
-  p.y := b.y1 + random(b.y2 - b.y1);
-  mouse(p, button);
+  getMousePos(x, y);
+
+  if (not pointInBox(point(x, y), b)) then
+  begin
+    // should be replaced with gaussBox when it's available in Simba
+    p.x := b.x1 + random(b.x2 - b.x1);
+    p.y := b.y1 + random(b.y2 - b.y1);
+    mouse(p, button);
+  end else
+    mouse(point(x, y), button);
 end;
 
