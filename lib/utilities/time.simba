@@ -249,3 +249,172 @@ begin
       Result := Padz(IntToStr(Day), 2) + '-' + Padz(IntToStr(Month), 2) + '-' + Copy(IntToStr(Year), 3, 4);
   end;
 end;
+
+{* 
+TTimeMarker
+
+.. code-block:: pascal
+    
+    type TTimeMarker = record
+        time, totalTime: LongWord;
+        paused: Boolean;
+    end;
+
+Timer type which is usefull for loops, timing and writing progress reports.
+
+
+.. note::
+
+    by Bart de Boer
+*}
+type
+  TTimeMarker = record
+    time, totalTime: LongWord;
+    paused: Boolean;
+  end; 
+
+{*
+procedure TTimeMarker.start
+
+.. code-block pascal
+
+    procedure TTimeMarker.start();
+
+Starts the timer. Can also be used when paused to continue where it left.
+
+.. note::
+
+    by Bart de Boer
+
+Example:
+
+.. code-block:: pascal
+
+    MyScriptTimer.start();  
+*}
+procedure TTimeMarker.start();
+begin
+  if Self.paused then
+    Self.time := GetSystemTime - Self.time
+  else
+  begin
+    Self.totalTime := GetSystemTime;
+    Self.time := GetSystemTime;
+  end;
+
+  Self.paused := False;
+end;
+
+{*
+procedure TTimeMarker.stop
+
+.. code-block pascal
+
+    procedure TTimeMarker.stop();
+
+Stops the timer and resets it to zero.
+
+.. note::
+
+    by Bart de Boer
+
+Example:
+
+.. code-block:: pascal
+
+    MyScriptTimer.stop();  
+*}
+procedure TTimeMarker.stop();
+begin
+  Self.paused := False;
+  Self.time := 0;
+  Self.totalTime := 0;
+end;
+
+{*
+procedure TTimeMarker.pause
+
+.. code-block pascal
+
+    procedure TTimeMarker.pause();
+
+Pauses the timer. It can be continued with start().
+
+.. note::
+
+    by Bart de Boer
+
+Example:
+
+.. code-block:: pascal
+
+    MyScriptTimer.pause();
+    TakeABreak(90000);
+    MyScriptTimer.start();
+*}
+procedure TTimeMarker.pause();
+begin
+  Self.time := GetSystemTime - Self.Time;
+  Self.paused := True;
+end;
+
+{*
+function TTimeMarker.getTime
+
+.. code-block pascal
+
+    function TTimeMarker.getTime(): LongWord;
+
+Gets the time from the timer. Returns zero if the timer was not set.
+
+.. note::
+
+    by Bart de Boer
+
+Example:
+
+.. code-block:: pascal
+
+    MyScriptTimer.start();
+    repeat
+        DoStuff;
+    until(MyScriptTimer.getTime() > 60000);
+
+*}
+function TTimeMarker.getTime(): LongWord;
+begin
+  if Self.time = 0 then
+    Result := 0
+  else if not Self.paused then
+    Result := GetSystemTime - Self.time
+  else
+    Result := Self.time;
+end; 
+
+{*
+function TTimeMarker.getTotalTime
+
+.. code-block pascal
+
+    function TTimeMarker.getTotalTime(): LongWord;
+
+Gets the time from the timer including the time it was paused. Returns zero if the timer was not set.
+
+.. note::
+
+    by Bart de Boer
+
+Example:
+
+.. code-block:: pascal
+
+    BreakTime := MyTimer.getTotalTime() - MyTimer.getTime();
+
+*}
+function TTimeMarker.getTotalTime(): LongWord;
+begin
+  if Self.totalTime = 0 then
+    Result := 0
+  else
+    Result := GetSystemTime - Self.totalTime;  
+end; 
