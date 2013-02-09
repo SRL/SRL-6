@@ -131,8 +131,12 @@ procedure debug(txt: string);
 var
   debugMSG := replicate('--', debugLevel) + ' ' + txt;
 begin
-  if (disableSRLdebug) then exit;
-  if (not disableSRLLog) then addToLog(debugMSG);
+  if (not disableSRLLog) then
+    addToLog(debugMSG);
+
+  if (disableSRLdebug) then
+    exit;
+
   writeln(debugMSG);
 end;
 
