@@ -486,6 +486,8 @@ begin
     wait(2000 + arr[__RES_WAIT] + randomRange(-200, 200));
     typeByte(VK_ESCAPE); // exit response window
 
+    // TODO: need self.world/self.member set here (see old LoginPlayer)
+
     if (tries <= arr[__RES_TRIES]) then
     begin
       wait(500 + random(500));
@@ -577,6 +579,9 @@ begin
 
     if (self.loginToLobby()) then
     begin
+      // TODO: need world switching code here (see old LoginPlayer)
+
+
       // the "Play" button
       mouseBox(intToBox(270, 500, 490, 520), MOUSE_LEFT);
 
