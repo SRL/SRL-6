@@ -8,7 +8,6 @@ client settings.
 *)
 
 {$include_once ../interfaces/lobby.simba}
-{$include_once ../core/login.simba}
 
 (*
 isClientReady
@@ -36,7 +35,7 @@ Example:
 *)
 function isClientReady(): boolean;
 begin
-  Result := (loggedIn) or (isLobbyScreenOpen);
+  Result := (isLoggedIn() or isLobbyScreenOpen());
 
   if (not Result) then
   begin
