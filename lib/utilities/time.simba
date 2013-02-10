@@ -257,7 +257,7 @@ TTimeMarker
 .. code-block:: pascal
     
     type TTimeMarker = record
-        time, totalTime: LongWord;
+        time, startTime: LongWord;
         paused: Boolean;
     end;
 
@@ -270,7 +270,7 @@ Timer type which is usefull for loops, timing and writing progress reports.
 *)
 type
   TTimeMarker = record
-    time, totalTime: LongWord;
+    time, startTime: LongWord;
     paused: Boolean;
   end; 
 
@@ -299,7 +299,7 @@ begin
     Self.time := GetSystemTime - Self.time
   else
   begin
-    Self.totalTime := GetSystemTime;
+    Self.startTime := GetSystemTime;
     Self.time := GetSystemTime;
   end;
 
@@ -329,7 +329,7 @@ procedure TTimeMarker.stop();
 begin
   Self.paused := False;
   Self.time := 0;
-  Self.totalTime := 0;
+  Self.startTime := 0;
 end;
 
 (*
@@ -417,8 +417,8 @@ Example:
 *)
 function TTimeMarker.getTotalTime(): LongWord;
 begin
-  if Self.totalTime = 0 then
+  if Self.startTime = 0 then
     Result := 0
   else
-    Result := GetSystemTime - Self.totalTime;  
+    Result := GetSystemTime - Self.startTime;  
 end; 
