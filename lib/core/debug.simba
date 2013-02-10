@@ -11,10 +11,11 @@ The debug file holds any files used for SRL debugging and logging.
 
 var
   debugLevel = 1; // used for the nice debug formatting
-  disableSRLDebug = false;
   logPath = includePath + 'SRL-6/logs/';
   scriptStartTime = '0:0:0';
   disableSRLLog = false;
+  disableSRLDebug = false;
+  disableSRLScreenshots = false;
 
 (*
 openLogFile
@@ -239,7 +240,7 @@ Saves a screenshot to fileName, and adds the time to avoid replacing images.
 .. note::
 
     by Harry & Coh3n
-    Last updated: Jan. 6th, 2013 by Coh3n
+    Last updated: Feb. 09, 2013 by Coh3n
 
 Example:
 
@@ -249,6 +250,7 @@ Example:
 *)
 procedure takeScreenshot(fileName: string);
 begin
-  saveScreenshot(logPath + timeRunning + '_' + fileName);
+  if (not disableSRLScreenshots) then
+    saveScreenshot(logPath + timeRunning + '_' + fileName);
 end;
 

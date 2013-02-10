@@ -20,7 +20,7 @@ Example:
 
 *)
 var
-  mouseSpeed: Integer = 15;
+  mouseSpeed: Integer = 20;
 
 {
  Used in place of other mouse button constants to move the mouse
