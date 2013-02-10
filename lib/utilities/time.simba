@@ -250,8 +250,9 @@ begin
   end;
 end;
 
-{* 
+(* 
 TTimeMarker
+~~~~~~~~~~~
 
 .. code-block:: pascal
     
@@ -266,14 +267,14 @@ Timer type which is usefull for loops, timing and writing progress reports.
 .. note::
 
     by Bart de Boer
-*}
+*)
 type
   TTimeMarker = record
     time, totalTime: LongWord;
     paused: Boolean;
   end; 
 
-{*
+(*
 procedure TTimeMarker.start
 
 .. code-block pascal
@@ -291,7 +292,7 @@ Example:
 .. code-block:: pascal
 
     MyScriptTimer.start();  
-*}
+*)
 procedure TTimeMarker.start();
 begin
   if Self.paused then
@@ -305,7 +306,7 @@ begin
   Self.paused := False;
 end;
 
-{*
+(*
 procedure TTimeMarker.stop
 
 .. code-block pascal
@@ -323,7 +324,7 @@ Example:
 .. code-block:: pascal
 
     MyScriptTimer.stop();  
-*}
+*)
 procedure TTimeMarker.stop();
 begin
   Self.paused := False;
@@ -331,8 +332,9 @@ begin
   Self.totalTime := 0;
 end;
 
-{*
-procedure TTimeMarker.pause
+(*
+TTimeMarker.pause
+~~~~~~~~~~~~~~~~~
 
 .. code-block pascal
 
@@ -351,15 +353,16 @@ Example:
     MyScriptTimer.pause();
     TakeABreak(90000);
     MyScriptTimer.start();
-*}
+*)
 procedure TTimeMarker.pause();
 begin
   Self.time := GetSystemTime - Self.Time;
   Self.paused := True;
 end;
 
-{*
-function TTimeMarker.getTime
+(*
+TTimeMarker.getTime
+~~~~~~~~~~~~~~~~~~~
 
 .. code-block pascal
 
@@ -380,7 +383,7 @@ Example:
         DoStuff;
     until(MyScriptTimer.getTime() > 60000);
 
-*}
+*)
 function TTimeMarker.getTime(): LongWord;
 begin
   if Self.time = 0 then
@@ -391,8 +394,9 @@ begin
     Result := Self.time;
 end; 
 
-{*
-function TTimeMarker.getTotalTime
+(*
+TTimeMarker.getTotalTime
+~~~~~~~~~~~~~~~~~~~~~~~~
 
 .. code-block pascal
 
@@ -410,7 +414,7 @@ Example:
 
     BreakTime := MyTimer.getTotalTime() - MyTimer.getTime();
 
-*}
+*)
 function TTimeMarker.getTotalTime(): LongWord;
 begin
   if Self.totalTime = 0 then
