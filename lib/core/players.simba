@@ -156,12 +156,12 @@ begin
 end;
 
 (*
-TPlayerArray.__add
-~~~~~~~~~~~~~~~~~~
+TPlayerArray._add
+~~~~~~~~~~~~~~~~~
 
 .. code-block:: pascal
 
-    procedure TPlayerArray.__add(info: TPlayer);
+    procedure TPlayerArray._add(info: TPlayer);
 
 Adds the player with 'info' to the TPlayerArray.
 
@@ -184,10 +184,10 @@ Example:
         password := 'examplepassword123';
       end;
 
-      Players.__add(P);
+      Players._add(P);
     end;
 *)
-procedure TPlayerArray.__add(const info: TPlayer);
+procedure TPlayerArray._add(const info: TPlayer);
 var
   h: integer;
 begin
@@ -235,7 +235,7 @@ begin
     begin
       if (names[i] = tmp[j].loginName) or (names[i] = tmp[j].displayName) or (names[i] = tmp[j].nickname) then
       begin
-        self.__add(tmp[j]);
+        self._add(tmp[j]);
         break;
       end;
 
