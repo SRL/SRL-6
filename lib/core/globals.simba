@@ -23,10 +23,11 @@ Example:
 
 *)
 const
-  EVENT_COUNT = 3;
-    EVENT_RS_UPDATE = 0;
-    EVENT_LOGOUT    = 1;
-    EVENT_LOGIN     = 2;
+  EVENT_COUNT = 4;
+    EVENT_RS_UPDATE   = 0;
+    EVENT_LOGOUT      = 1;
+    EVENT_LOGIN       = 2;
+    EVENT_PLAYER_NEXT = 3;
 
 (*
 Variable: SRL_Events

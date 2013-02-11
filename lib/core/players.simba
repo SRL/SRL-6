@@ -63,7 +63,7 @@ Type: TPlayer
 ~~~~~~~~~~~~~
 
 A record that stores useful information about the current players.  It is up to
-the scripter to set these attributes in their scripts.
+the scripter to set most these attributes in their scripts.
 
 Example:
 
@@ -119,7 +119,8 @@ var
   currentPlayer: integer;
   playerStartTime: longInt;
 
-function getPlayers(): TPlayerArray; forward; // from player_info.simba
+// from player_info.simba; can't be avoided :'(
+function getPlayers(): TPlayerArray; forward;
 
 (*
 TPlayerArray.getActive
@@ -155,7 +156,7 @@ begin
       inc(result);
 end;
 
-(*
+{*
 TPlayerArray._add
 ~~~~~~~~~~~~~~~~~
 
@@ -186,7 +187,7 @@ Example:
 
       Players._add(P);
     end;
-*)
+*}
 procedure TPlayerArray._add(const info: TPlayer);
 var
   h: integer;
@@ -209,7 +210,7 @@ TPlayerArray.setup
     procedure TPlayerArray.setup(names: TStringArray);
 
 Sets up the players with login name, display name, or nickname that match
-elements of 'names'.  Called only in DeclarePlayers().
+elements of 'names'.  Should only be called only in DeclarePlayers().
 
 .. note::
 
@@ -245,6 +246,136 @@ begin
 end;
 
 (*
+TPlayerArray.switchTo
+~~~~~~~~~~~~~~~~~~~~~
+
+.. code-block:: pascal
+
+    function TPlayerArray.switchTo(player: integer; active: boolean = true): boolean;
+
+Switches to the 'player' element in the TPlayerArray. Sets the previous player
+to optional parameter 'active'. Sets previous player to true by default.
+
+.. note::
+
+    by Dankness, Ron, Raymond, ZephyrsFury & Coh3n
+    Last updated: Feb. 10, 2013 by Coh3n
+
+Example:
+
+.. code-block:: pascal
+
+    players.switchTo(3);
+    // or
+    players.switchTo(3, false);
+
+*)
+function TPlayerArray.switchTo(player: integer; active: boolean = true): boolean;
+begin
+  self[currentPlayer].isActive := active;
+  self[currentPlayer].addWorked();
+  self[currentPlayer].logout();
+
+  if (self.getActive() <= 0) then
+  begin
+    debug('All players inactive...');
+    exit(false);
+  end;
+
+  debug('Switching to player '+toStr(player)+' ('+self[player].nickname+')');
+  currentPlayer := player;
+
+  if (@SRL_Events[EVENT_PLAYER_NEXT] <> nil) then
+    SRL_Events[EVENT_PLAYER_NEXT]();
+
+  result := self[currentPlayer].login();
+end;
+
+(*
+TPlayerArray.next
+~~~~~~~~~~~~~~~~~
+
+.. code-block:: pascal
+
+    function TPlayerArray.next(active: boolean = true): boolean;
+
+Switches to the next active player in the TPlayerArray. Sets the previous player
+to the optional parameter 'active'. Sets the previous player to true by default.
+
+.. note::
+
+    by ZephyrsFury & Coh3n
+    Last updated: Feb. 10, 2013 by Coh3n
+
+Example:
+
+.. code-block:: pascal
+
+    players.next();
+    // or
+    players.next(false);
+
+*)
+function TPlayerArray.next(active: boolean = true): boolean;
+var
+  nP: integer;
+begin
+  nP := (currentPlayer + 1) mod length(self);
+
+  // get the next active player index
+  while (not self[nP].isActive) do
+    nP := (nP + 1) mod length(self);
+
+  result := self.switchTo(nP, active);
+end;
+
+(*
+TPlayerArray.randomNext
+~~~~~~~~~~~~~~~~~~~~~~~
+
+.. code-block:: pascal
+
+    function TPlayerArray.randomNext(active: boolean = true): boolean;
+
+Switches to a random active player in the TPlayerArray. Sets the previous player
+to the optional parameter 'active'. Sets the previous player to true by default.
+
+.. note::
+
+    by ZephyrsFury & Coh3n
+    Last updated: Feb. 10, 2013 by Coh3n
+
+Example:
+
+.. code-block:: pascal
+
+    players.randomNext();
+    // or
+    players.randomNext(false);
+
+*)
+function TPlayerArray.randomNext(active: boolean = true): boolean;
+var
+  nP: integer;
+begin
+  nP := random(length(self));
+
+  // get an active random player index
+  while (not self[nP].isActive) or (nP = currentPlayer) do
+  begin
+    if (self.getActive() = 1) and (nP = currentPlayer) then // if there's only 1 player left
+    begin
+      debug('Current player is the last active player...');
+      exit(true);
+    end;
+
+    nP := random(length(self));
+  end;
+
+  result := self.switchTo(nP, active);
+end;
+
+(*
 TPlayer.write
 ~~~~~~~~~~~~~
 
@@ -252,7 +383,7 @@ TPlayer.write
 
     procedure TPlayer.write();
 
-Writes the standard information about the player.
+Writes the standard information about the player to the Simba debug box.
 
 .. note::
 
@@ -268,15 +399,11 @@ Example:
 *)
 procedure TPlayer.write();
 begin
-  writeln('Login Name: ', loginName);
-  writeln('Display Name: ', displayName);
-  writeln('Nickname: ', nickname);
-  writeln('Member: ', isMember);
-  writeln('Active: ', isActive);
-end;
-
-function TPlayer.next(active: boolean): boolean;
-begin
+  debug('Login Name: ' + loginName);
+  debug('Display Name: ' + displayName);
+  debug('Nickname: ' + nickname);
+  debug('Member: ' + toStr(isMember));
+  debug('Active: ' + toStr(isActive));
 end;
 
 (*
@@ -352,7 +479,7 @@ clickBox is set to true.  See TPlayer.loginToLobby for usage.
 
 .. note::
 
-    by Starblaster100, Raymond, IceFire908, Tarajunky & NCDS
+    by Starblaster100, Raymond, IceFire908, Tarajunky, NCDS & Coh3n
     Last updated: 30/09/2012 by Coh3n
 
 Example:
@@ -408,14 +535,38 @@ begin
   result := true;
 end;
 
-function TPlayer.__loginActions(const action: string): boolean;
+{*
+__loginActions
+~~~~~~~~~~~~~~
+
+.. code-block:: pascal
+
+    function __loginActions(const action: string): boolean;
+
+Used to perform different actions depending on which type of login message
+appears (if any) when a player is logged in.
+
+.. note::
+
+    by Starblaster100, Raymond, IceFire908, Tarajunky, NCDS & Coh3n
+    Last updated: Feb. 10, 2013 by Coh3n
+
+Example:
+
+.. code-block:: pascal
+
+    See __loginResponse();
+*}
+function __loginActions(const action: string): boolean;
 begin
+  result := true;
+
   case (action) of
     'false':
-      self.next(false);
+      result := players.next(false);
 
     'true':
-      self.next(true);
+      result := players.next(true);
 
     'halt':
       halt();
@@ -435,13 +586,34 @@ begin
   end;
 end;
 
+{*
+__getLoginResponse
+~~~~~~~~~~~~~~~~~~
+
+.. code-block:: pascal
+
+    function __getLoginResponse(colorCount, timer: integer): TVariantArray;
+
+Returns login response information depending on the login text color count.
+
+.. note::
+
+    by Starblaster100, Raymond, IceFire908, Tarajunky, NCDS & Coh3n
+    Last updated: Feb. 10, 2013 by Coh3n
+
+Example:
+
+.. code-block:: pascal
+
+    See TPlayer.__loginResponse();
+*}
 const
   __RES_DEBUG  = 0;
   __RES_WAIT   = 1;
   __RES_TRIES  = 2;
   __RES_ACTION = 3;
   __RES_LOC    = 4;
-function TPlayer.__getLoginResponse(colorCount, timer: integer): TVariantArray;
+function __getLoginResponse(colorCount, timer: integer): TVariantArray;
 begin
   case (colorCount) of
     //               debug message      |      wait time | tries | action | player[].location
@@ -469,6 +641,27 @@ begin
   end;
 end;
 
+{*
+TPlayer.__loginResponse
+~~~~~~~~~~~~~~~~~~~~~~~
+
+.. code-block:: pascal
+
+    function TPlayer.__loginResponse(const tries: integer; const timer: integer): boolean;
+
+Handles the login response pop ups that sometimes show when a player logs in.
+
+.. note::
+
+    by Starblaster100, Raymond, IceFire908, Tarajunky, NCDS & Coh3n
+    Last updated: Feb. 10, 2013 by Coh3n
+
+Example:
+
+.. code-block:: pascal
+
+    See TPlayer.loginToLobby();
+*}
 function TPlayer.__loginResponse(const tries: integer; const timer: integer): boolean;
 var
   c: integer;
@@ -478,7 +671,7 @@ begin
 
   // counts the colors in the lobby pop up screen
   c := countColor(LOGIN_COLOR_TEXT, 260, 190, 510, 450);
-  arr := self.__getLoginResponse(c, timer);
+  arr := __getLoginResponse(c, timer);
 
   if (length(arr) > 0) then // if there was an error logging in
   begin
@@ -497,7 +690,7 @@ begin
     if (arr[__RES_LOC] <> '') then
       self.location := arr[__RES_LOC];
 
-    self.__loginActions(arr[__RES_ACTION]);
+    __loginActions(arr[__RES_ACTION]);
   end;
 end;
 
@@ -509,7 +702,13 @@ TPlayer.loginToLobby
 
     function TPlayer.loginToLobby(): boolean;
 
-Logs the TPlayer into to lobby.
+Logs the TPlayer into to the lobby. Returns true when the lobby screen is
+visible.
+
+.. note::
+
+    by The SRL Developers Team
+    Last updated: Feb. 10, 2013 by Coh3n
 
 Example:
 
@@ -564,6 +763,29 @@ begin
     takeScreenshot('IP_address.png');
 end;
 
+(*
+TPlayer.login
+~~~~~~~~~~~~~
+
+.. code-block:: pascal
+
+    function TPlayer.login(): boolean;
+
+Completely logs the TPlayer into the game.  Returns true when they player is
+logged in.
+
+.. note::
+
+    by The SRL Developers Team
+    Last updated: Feb. 10, 2013 by Coh3n
+
+Example:
+
+.. code-block:: pascal
+
+    players[currentPlayer].login();
+
+*)
 function TPlayer.login(): boolean;
 var
   tries, t: integer;
@@ -669,6 +891,28 @@ begin
   end;
 end;
 
+(*
+TPlayer.logout
+~~~~~~~~~~~~~~
+
+.. code-block:: pascal
+
+    function TPlayer.logout(): boolean;
+
+Completely logs the player out of the game.
+
+.. note::
+
+    by Coh3n
+    Last updated: Feb. 10, 2013 by Coh3n
+
+Example:
+
+.. code-block:: pascal
+
+    players[currentPlayer].loginToLobby();
+
+*)
 function TPlayer.logout(): boolean;
 begin
   result := __logout();
