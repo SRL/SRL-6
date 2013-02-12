@@ -209,7 +209,7 @@ Timer type which is usefull for loops, timing and writing progress reports.
 *)
 type
   TTimeMarker = record
-    time, startTime: LongWord;
+    time, startTime, __prevMark: LongWord;
     paused: Boolean;
   end; 
 
@@ -235,12 +235,13 @@ Example:
 *)
 procedure TTimeMarker.start();
 begin
-  if Self.paused then
-    Self.time := GetSystemTime - Self.time
-  else
+  Self.__prevMark := GetSystemTime; // used for adding time after a pause
+
+  // if it hasn't been started yet
+  if not Self.paused then
   begin
     Self.startTime := GetSystemTime;
-    Self.time := GetSystemTime;
+    Self.time := 0;
   end;
 
   Self.paused := False;
@@ -297,7 +298,7 @@ Example:
 *)
 procedure TTimeMarker.pause();
 begin
-  Self.time := GetSystemTime - Self.Time;
+  Self.time := Self.time + (GetSystemTime - Self.__prevMark);
   Self.paused := True;
 end;
 
@@ -327,10 +328,8 @@ Example:
 *)
 function TTimeMarker.getTime(): LongWord;
 begin
-  if Self.time = 0 then
-    Result := 0
-  else if not Self.paused then
-    Result := GetSystemTime - Self.time
+  if not Self.paused then
+    Result := Self.time + (GetSystemTime - Self.__prevMark)
   else
     Result := Self.time;
 end; 
@@ -359,8 +358,5 @@ Example:
 *)
 function TTimeMarker.getTotalTime(): LongWord;
 begin
-  if Self.startTime = 0 then
-    Result := 0
-  else
-    Result := GetSystemTime - Self.startTime;  
+  Result := GetSystemTime - Self.startTime;
 end; 

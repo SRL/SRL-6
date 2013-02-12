@@ -91,7 +91,7 @@ type
     findMod: boolean;
     findTrade: boolean;
     reincarnate: boolean;
-    timeWorked: integer;
+    worked: TTimeMarker;
     world: integer;
     skillLevel: array[0..(SKILL_COUNT - 1)] of integer;
     booleans: array[0..99] of boolean;
@@ -111,13 +111,13 @@ All the variables associated with players.simba.
 
   * players: used to store player information.
   * currentPlayer: the player currently running.
-  * playerStartTime: used to calcualte players[].worked.
+  * disableIPScreenshots: disables the screenshots taken in the lobby screen.
 
 *)
 var
   players: TPlayerArray;
   currentPlayer: integer;
-  playerStartTime: longInt;
+  disableIPScreenshots: boolean;
 
 // from player_info.simba; can't be avoided :'(
 function getPlayers(): TPlayerArray; forward;
@@ -273,7 +273,6 @@ Example:
 function TPlayerArray.switchTo(player: integer; active: boolean = true): boolean;
 begin
   self[currentPlayer].isActive := active;
-  self[currentPlayer].addWorked();
   self[currentPlayer].logout();
 
   if (self.getActive() <= 0) then
@@ -364,10 +363,7 @@ begin
   while (not self[nP].isActive) or (nP = currentPlayer) do
   begin
     if (self.getActive() = 1) and (nP = currentPlayer) then // if there's only 1 player left
-    begin
-      debug('Current player is the last active player...');
-      exit(true);
-    end;
+      break;
 
     nP := random(length(self));
   end;
@@ -404,37 +400,8 @@ begin
   debug('Nickname: ' + nickname);
   debug('Member: ' + toStr(isMember));
   debug('Active: ' + toStr(isActive));
-end;
-
-(*
-TPlayer.addWorked
-~~~~~~~~~~~~~~~~~
-
-.. code-block:: pascal
-
-    procedure TPlayer.addWorked();
-
-Increased the player's .worked property so it can be accessed later.
-
-.. note::
-
-    by SRL Community
-    Last updated: Nov. 1st, 2012 by Coh3n
-
-Example:
-
-.. code-block:: pascal
-
-    if (bankedLogs = true) then
-      players[currentPlayer].addWorked();
-
-*)
-procedure TPlayer.addWorked();
-begin
-  if (playerStartTime > 0) then // if it's been set at all
-    incEx(self.timeWorked, (getSystemTime - playerStartTime));
-
-  playerStartTime := getSystemTime();
+  debug('Worked: ' + toStr(worked.getTime()));
+  debug('Total Worked: ' + toStr(worked.getTotalTime()));
 end;
 
 (*
@@ -759,7 +726,7 @@ begin
     until(result);
   until(result);
 
-  if (result) then
+  if (result) and (not disableIPScreenshots) then
     takeScreenshot('IP_address.png');
 end;
 
@@ -822,7 +789,7 @@ begin
   if (result) then
   begin
     debug('Logged in: '+self.nickname);
-    playerStartTime := getSystemTime();
+    self.worked.start();
     //__exitedSquealOfFortune := false;
 
     if (@SRL_Events[EVENT_LOGIN] <> nil) then
@@ -915,7 +882,11 @@ Example:
 *)
 function TPlayer.logout(): boolean;
 begin
-  result := __logout();
+  if (__logout()) then
+  begin
+    result := true;
+    self.worked.pause();
+  end;
 end;
 
 begin

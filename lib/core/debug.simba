@@ -15,7 +15,6 @@ var
   scriptStartTime = '0:0:0';
   disableSRLLog = false;
   disableSRLDebug = false;
-  disableSRLScreenshots = false;
 
 (*
 openLogFile
@@ -250,7 +249,6 @@ Example:
 *)
 procedure takeScreenshot(fileName: string);
 begin
-  if (not disableSRLScreenshots) then
-    saveScreenshot(logPath + timeRunning + '_' + fileName);
+  saveScreenshot(logPath + timeRunning + '_' + fileName);
 end;
 

@@ -29,10 +29,11 @@ EVERYTHING should be recorded here: new features, function name changes, user-de
   - attributes renamed: loginName, bankPin, password, location
   - attributes added: displayName, findMod, findTrade, reincarnate, variants
   - removed variables checkHPFirst, logoutOnMod, reincarnate, playerCurTime
+  - TPlayer.worked type changed to TTimeMarker
   - removed functions allPlayersInactive, numberOfPlayers
   - renamed function playersActive to getPlayersActive
-  - function PlayerWorked is now a procedure of the TPlayer type and has been renamed to addWorked
-    - should be called when you want to add to a player's .worked attribute
+  - Removed PlayerWorked and replaced with TPlayer.worked: TTimeMarker
+    - Get the player's time worked by calling players[currentPlayer].worked.getTime()
   - LoggedIn renamed to isLoggedIn
   - RSReady renamed to isClientReady and added to core/client.simba
   - renamed function PlayersActive to TPlayerArray.getActive
@@ -67,6 +68,9 @@ EVERYTHING should be recorded here: new features, function name changes, user-de
   - mouse_move const set to -1 rather than 3 which would interfere with simba internal constants
   - MMouse() & Mouse() -> mouse() overload;
   - ClickMouse2() -> fastClick()
+
+- timing.simba renamed to time.simba
+  - MarkTime/TimeFromMark replaced with TTimeMarker and TTimeMarker functions
 
 - smart.simba
   - renamed variable SRL_SixHourFix to useSMARTSixHourFix (default set to true)
