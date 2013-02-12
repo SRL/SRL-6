@@ -23,7 +23,7 @@ EVERYTHING should be recorded here: new features, function name changes, user-de
 - text.simba
   - TypeSendEx removed and an optional pressEnter parameter added to typeSend
 
-- players.simba
+- players.simba merged with login.simba
   - TUser renamed to TPlayer
   - attributes removed: worldInfo, nick, status, skill, banked, rand, arrays, boxRewards
   - attributes renamed: loginName, bankPin, password, location
@@ -33,6 +33,17 @@ EVERYTHING should be recorded here: new features, function name changes, user-de
   - renamed function playersActive to getPlayersActive
   - function PlayerWorked is now a procedure of the TPlayer type and has been renamed to addWorked
     - should be called when you want to add to a player's .worked attribute
+  - LoggedIn renamed to isLoggedIn
+  - RSReady renamed to isClientReady and added to core/client.simba
+  - renamed function PlayersActive to TPlayerArray.getActive
+  - added function TPlayerArray.setup
+  - renamed function PlayerWorked to TPlayer.addWorked
+  - removed all audio/graphics functions (pointless to add possible error when they're never used)
+  - Renamed LoginPlayerToLob TPlayer.loginToLobby()
+  - Renamed LoginPlayer TPlayer.login()
+  - NextPlayerIndex and NextPlayer merged to TPlayerArray.next()
+  - RandomPlayerIndex and RandomNextPlayer merged to TPlayerArray.randomNext()
+  - Logout renamed to TPlayer.logout()
 
 - inventory.simba
   - TIventItem renamed TItem
@@ -61,15 +72,6 @@ EVERYTHING should be recorded here: new features, function name changes, user-de
   - renamed variable SRL_SixHourFix to useSMARTSixHourFix (default set to true)
   - removed function isRealMouseInBox
   - removed function getReadMousePos because TClient isn't yet supported in Lape
-
-- login.simba
-  - LoggedIn renamed to loggedIn
-  - RSReady renamed to isClientReady and added to core/client.simba
-  - renamed function PlayersActive to TPlayerArray.getActive
-  - added function TPlayerArray.add
-  - added function TPlayerArray.setup
-  - renamed function PlayerWorked to TPlayer.addWorked
-  - removed all audio/graphics functions (pointless to add possible error when they're never used)
 
 - new file, login_info.simba
   - This file is to replace the traditional DeclarePlayers.  Users will enter in their player information only one time and can choose which players to use in scripts.  Any other attributes (i.e. integers, booleans, etc.) will be edited in the script's DeclarePlayers like always.
