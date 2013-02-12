@@ -56,7 +56,7 @@ const
   LOGIN_COLOR_TEXT = 12378347;
 
 var
-  boxUsername, boxPassword: TBox; // set at the end of this file
+  _boxUsername, _boxPassword: TBox; // set at the end of this file
 
 (*
 Type: TPlayer
@@ -91,6 +91,7 @@ type
     findMod: boolean;
     findTrade: boolean;
     reincarnate: boolean;
+    secureLogin: boolean;
     worked: TTimeMarker;
     world: integer;
     skillLevel: array[0..(SKILL_COUNT - 1)] of integer;
@@ -437,12 +438,13 @@ __enterLoginInfo()
 
 .. code-block:: pascal
 
-    function __enterLoginInfo(const inputBox: TBox; const info: string; clickBox: boolean = true): boolean;
+    function __enterLoginInfo(const inputBox: TBox; const info: string; clickBox: boolean = true; pressEnter: boolean = true): boolean;
 
 Used to enter a players username and password to login to RS. Input box can be
 any text box, but the username and password boxes are what it was designed for.
 The input text (info) is the username/password.  It will click the text box if
-clickBox is set to true.  See TPlayer.loginToLobby for usage.
+clickBox is set to true. Will press enter after text as been entered if
+pressEnter is set to true. See TPlayer.loginToLobby for usage.
 
 .. note::
 
@@ -455,7 +457,7 @@ Example:
 
     __enterLoginInfo(self.loginName);
 *}
-function __enterLoginInfo(const inputBox: TBox; const info: string; clickBox: boolean = true): boolean;
+function __enterLoginInfo(const inputBox: TBox; const info: string; clickBox: boolean = true; pressEnter: boolean = true): boolean;
 var
   tpa: TPointArray;
   p: TPoint;
@@ -498,8 +500,112 @@ begin
   until(not findColors(tpa, LOGIN_COLOR_TEXT, inputBox) or (getSystemTime > t));
 
   wait(100 + random(200));
-  typeSend(info);
+  typeSend(info, pressEnter);
   result := true;
+end;
+
+{*
+__secureEnterInfo
+~~~~~~~~~~~~~~~~~
+
+.. code-block:: pascal
+
+    function __secureEnterInfo(user, pass: string): boolean;
+
+An alternative to the standard login procedure. Will enter in only a few
+characters of the username and password at a time. This will add security
+against keyloggers.
+
+.. note::
+
+    by Coh3n & Flight
+    Last updated: Feb. 12, 2013 by Coh3n
+
+Example:
+
+.. code-block:: pascal
+
+    See __loginResponse();
+*}
+function __secureEnterInfo(user, pass: string): boolean;
+var
+  i, j, uL, pL, uH, pH, uLen, pLen, tmp: integer;
+  uTextExists, pTextExists: boolean;
+  uTPA, pTPA: TPointArray;
+begin
+  result := true;
+  tmp := mouseSpeed;
+  mouseSpeed := 13;
+
+  // remove existing text from the input boxes
+  uTextExists := findColors(uTPA, LOGIN_COLOR_TEXT, _boxUsername);
+  pTextExists := findColors(pTPA, LOGIN_COLOR_TEXT, _boxPassword);
+
+  if (uTextExists) then
+    __enterLoginInfo(_boxUsername, '', true, pTextExists);
+
+  if (pTextExists) then
+    __enterLoginInfo(_boxPassword, '', (not uTextExists), true);
+
+  if (not uTextExists) then
+    mouseBox(intToBox(_boxUsername.x2 - 15, _boxUsername.y1, _boxUsername.x2, _boxUsername.y2), MOUSE_LEFT);
+
+  uL := 0;
+  pL := 0;
+  uLen := length(user);
+  pLen := length(pass);
+
+  repeat
+    if (not (uH = uLen)) then
+    begin
+      // prevents "Out of string range" errors
+      uH := (uL + randomRange(1, 3));
+      if (uH > uLen) then
+        uH := uLen;
+
+      for i := uL to uH do
+      begin
+        wait(100 + random(100));
+        typeSend(user[i], false);
+      end;
+
+      uL := (uH + 1);
+
+      // press enter if entering the password isn't complete
+      if (not (pH = pLen)) then
+        typeByte(VK_ENTER);
+    end;
+
+    if (not (pH = pLen)) then
+    begin
+      // prevents "Out of string range" errors
+      pH := (pL + randomRange(1, 3));
+      if (pH > pLen) then
+        pH := pLen;
+
+      for j := pL to pH do
+      begin
+        wait(100 + random(100));
+        typeSend(pass[j], false);
+      end;
+
+      pL := (pH + 1);
+
+      // click the end of the username box only if entering the username isn't complete
+      if (not (uH = uLen)) then
+      begin
+        wait(250 + random(250));
+        mouseBox(intToBox(_boxUsername.x2 - 15, _boxUsername.y1, _boxUsername.x2, _boxUsername.y2), MOUSE_LEFT);
+      end;
+    end;
+
+  until((uH = uLen) and (pH = pLen));
+
+  typeByte(VK_ENTER);
+  wait(100 + random(200));
+  typeByte(VK_ENTER); // in case we were in the username box
+
+  mouseSpeed := tmp;
 end;
 
 {*
@@ -671,7 +777,6 @@ TPlayer.loginToLobby
 
 Logs the TPlayer into to the lobby. Returns true when the lobby screen is
 visible.
-
 .. note::
 
     by The SRL Developers Team
@@ -706,8 +811,13 @@ begin
     inc(tries);
 
     debug(capitalize(self.loginName)+' ('+capitalize(self.displayName)+')');
-    __enterLoginInfo(boxUsername, self.loginName);
-    __enterLoginInfo(boxPassword, self.password, false);
+
+    if (not self.secureLogin) then
+    begin
+      __enterLoginInfo(_boxUsername, self.loginName);
+      __enterLoginInfo(_boxPassword, self.password, false);
+    end else
+      __secureEnterInfo(self.loginName, self.password);
 
     wait(800 + random(50));	// fixes the login spam recoveries bug
 
@@ -890,6 +1000,6 @@ begin
 end;
 
 begin
-  boxUsername := intToBox(279, 205, 486, 215);
-  boxPassword := intToBox(279, 250, 486, 265);
+  _boxUsername := intToBox(279, 205, 486, 215);
+  _boxPassword := intToBox(279, 250, 486, 265);
 end;

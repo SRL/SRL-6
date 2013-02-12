@@ -3,14 +3,12 @@ Changes from SRL5
 
 EVERYTHING should be recorded here: new features, function name changes, user-defined variables... everything! Everything here will be explained in the SRL6 release thread.
 
--- no longer need to call SetupSRL since Lape has initialization (see the end of srl.simba for details)
+- no longer need to call SetupSRL since Lape has initialization (see the end of srl.simba for details)
 
 - debug.simba (merged with SRLLog.simba)
-  - variables
-    - disableSRLDebug, disableSRLLog: boolean;
-  - logs are automatically saved in srl/logs/
-  - function removed TakeIPScreen (replaced with takeScreenshot)
-  - renamed TakeScreen to takeScreenshot
+  - Added variable disableSRLDebug, disableSRLLog, disableIPScreenshots
+  - Logs are automatically saved to srl/logs/
+  - Function TakeIPScreen replaced with takeScreenshot()
 
 - globals.simba
   - renamed variable SRL_Proc to events
@@ -27,7 +25,7 @@ EVERYTHING should be recorded here: new features, function name changes, user-de
   - TUser renamed to TPlayer
   - attributes removed: worldInfo, nick, status, skill, banked, rand, arrays, boxRewards
   - attributes renamed: loginName, bankPin, password, location
-  - attributes added: displayName, findMod, findTrade, reincarnate, variants
+  - attributes added: displayName, findMod, findTrade, reincarnate, secureLoginvariants
   - removed variables checkHPFirst, logoutOnMod, reincarnate, playerCurTime
   - TPlayer.worked type changed to TTimeMarker
   - removed functions allPlayersInactive, numberOfPlayers

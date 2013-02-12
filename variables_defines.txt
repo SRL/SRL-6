@@ -10,9 +10,9 @@ VARIABLES:
 	mouseSpeed: integer; 			- the speed at which the mouse moves. Default 20.
 	disableSRLDebug: boolean; 		- disables SRL debugging. Default false.
 	disableSRLLog: boolean; 		- disables the SRL logging system. Default false.
-	disableSRLScreenshots: boolean;  	- disables screenshots taken within SRL
+	disableIPScreenshots: boolean;  	- disables screenshots taken of the users IP address
 	logPath: string; 			- the path where SRL log files are saved. Default SRL/logs/.
-	SRL_Events: array of procedure 	- procedures called throughout SRL (i.e. on RS update, on login etc.). Full list of events found in SRL/lib/core/globals.simba.
+	SRL_Events: array of procedure 		- procedures called throughout SRL (i.e. on RS update, on login etc.). Full list of events found in SRL/lib/core/globals.simba.
 	players: array of TPlayer 		- the default TPlayerArray.
 	currentPlayer: integer; 		- the current active player
 	SMART_SixHourFix: boolean; 		- restart SMART after 6 hours. Default true.
