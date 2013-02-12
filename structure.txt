@@ -15,8 +15,6 @@ A structure of SRL-6.  Only includes the files that have been finished.
          -- players.simba
       -- interfaces/
          -- gametabs/
-            -- gametab.simba
-            -- inventory.simba
          -- lobby.simba
       -- items/
       -- minimap/
