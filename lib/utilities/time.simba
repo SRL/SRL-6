@@ -98,66 +98,6 @@ begin
 end;
 
 (*
-markTime
-~~~~~~~~
-
-.. code-block:: pascal
-
-    procedure markTime(var TimeMarker: Integer);
-
-Sets TimeMarker to current system time.
-
-.. note::
-
-    by Stupid3ooo
-
-Example:
-
-.. code-block:: pascal
-
-    var
-      timer: integer;
-    begin
-      markTime(timer);
-      .
-      .
-
-*)
-procedure markTime(var TimeMarker: Integer);
-begin
-  TimeMarker := GetSystemTime;
-end;
-
-(*
-timeFromMark
-~~~~~~~~~~~~
-
-.. code-block:: pascal
-
-    function timeFromMark(TimeMarker: Integer): Integer;
-
-Returns Milliseconds since markTime was set
-
-.. note::
-
-    by Stupid3ooo
-
-Example:
-
-.. code-block:: pascal
-
-      .
-      .
-      writeln('Time from mark: ' + timeFromMark(timer));
-    end;
-
-*)
-function timeFromMark(TimeMarker: Integer): Integer;
-begin
-  Result := GetSystemTime - TimeMarker;
-end;
-
-(*
 theTime
 ~~~~~~~~
 
@@ -263,7 +203,6 @@ TTimeMarker
 
 Timer type which is usefull for loops, timing and writing progress reports.
 
-
 .. note::
 
     by Bart de Boer
@@ -275,7 +214,8 @@ type
   end; 
 
 (*
-procedure TTimeMarker.start
+TTimeMarker.start
+~~~~~~~~~~~~~~~~~
 
 .. code-block pascal
 
@@ -307,11 +247,12 @@ begin
 end;
 
 (*
-procedure TTimeMarker.stop
+TTimeMarker.reset
+~~~~~~~~~~~~~~~~~
 
 .. code-block pascal
 
-    procedure TTimeMarker.stop();
+    procedure TTimeMarker.reset();
 
 Stops the timer and resets it to zero.
 
@@ -323,9 +264,9 @@ Example:
 
 .. code-block:: pascal
 
-    MyScriptTimer.stop();  
+    MyScriptTimer.reset();
 *)
-procedure TTimeMarker.stop();
+procedure TTimeMarker.reset();
 begin
   Self.paused := False;
   Self.time := 0;
@@ -402,7 +343,8 @@ TTimeMarker.getTotalTime
 
     function TTimeMarker.getTotalTime(): LongWord;
 
-Gets the time from the timer including the time it was paused. Returns zero if the timer was not set.
+Gets the time from the timer including the time it was paused. Returns zero if
+the timer was not set.
 
 .. note::
 
