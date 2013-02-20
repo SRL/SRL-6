@@ -1,4 +1,6 @@
-A structure of SRL-6.  Only includes the files that have been finished.
+A structure of SRL-6.  Includes only the files that are currently in the repository. 
+
+X means the file is NOT finished.
 
 -- SRL/
    -- doc/
@@ -13,9 +15,13 @@ A structure of SRL-6.  Only includes the files that have been finished.
          -- globals.simba
          -- mouse.simba
          -- players.simba
+       X -- text.simba
       -- interfaces/
          -- gametabs/
+          X -- gametab.simba
+          X -- inventory.simbas
          -- lobby.simba
+       X -- mainscreen.simba
       -- items/
       -- minimap/
       -- misc/
