@@ -27,7 +27,9 @@ var
  without actually clicking.
 }
 const
-  MOUSE_MOVE = -1;
+  MOUSE_NONE = -1;
+  MOUSE_MOVE = 3;
+
 {
  Used to determine the 'style' in which the mouse moves
  Values are used as modifiers in mouse()
