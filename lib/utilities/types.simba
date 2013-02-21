@@ -2012,12 +2012,12 @@ begin
 end;
 
 (*
-TPointArray.boundaries
-~~~~~~~~~~~~~~~~~~~~~~
+TPointArray.getBounds
+~~~~~~~~~~~~~~~~~~~~~
 
 .. code-block:: pascal
 
-    function TPointArray.boundaries() : TPoint;
+    function TPointArray.getBounds() : TPoint;
 
 Returns the box boundaries of the TPA.
 
@@ -2029,10 +2029,10 @@ Example:
 
 .. code-block:: pascal
 
-    b := TPA.bounds();
+    b := TPA.getBounds();
 
 *)
-function TPointArray.boundaries() : TBox;
+function TPointArray.getBounds() : TBox;
 begin
   result := getTPABounds(self);
 end;
@@ -2195,12 +2195,12 @@ begin
 end;
 
 (*
-TPointArray.sortTPAbyXvalue
-~~~~~~~~~~~~~~~~~~~~~~~~~~~
+TPointArray.sortByXValue
+~~~~~~~~~~~~~~~~~~~~~~~~
 
 .. code-block:: pascal
 
-    procedure TPointArray.sortTPAbyXvalue(const lowToHigh : Boolean);
+    procedure TPointArray.sortByXValue(const lowToHigh : Boolean);
 
 Sorts the TPA from lowest X to highest X or highest X to lowest X, depending on lowToHigh
 
@@ -2212,21 +2212,21 @@ Example:
 
 .. code-block:: pascal
 
-    TPA.sortTPAbyXvalue(True);
+    TPA.sortByXValue(True);
 
 *)
-procedure TPointArray.sortTPAbyXvalue(const lowToHigh : Boolean);
+procedure TPointArray.sortByXValue(const lowToHigh : Boolean);
 begin
   sortTPAByX(self, lowToHigh);
 end;
 
 (*
-TPointArray.sortTPAbyYvalue
-~~~~~~~~~~~~~~~~~~~~~~~~~~~
+TPointArray.sortByYValue
+~~~~~~~~~~~~~~~~~~~~~~~~
 
 .. code-block:: pascal
 
-    procedure TPointArray.sortTPAbyYvalue(const lowToHigh : Boolean);
+    procedure TPointArray.sortByYValue(const lowToHigh : Boolean);
 
 Sorts the TPA from lowest Y to highest Y or highest Y to lowest Y, depending on lowToHigh
 
@@ -2238,21 +2238,21 @@ Example:
 
 .. code-block:: pascal
 
-    TPA.sortTPAbyYvalue(True);
+    TPA.sortByYValue(True);
 
 *)
-procedure TPointArray.sortTPAbyYvalue(const lowToHigh : Boolean);
+procedure TPointArray.sortByYValue(const lowToHigh : Boolean);
 begin
   sortTPAByY(self, lowToHigh);
 end;
 
 (*
-TPointArray.sortTPAfromPoint
-~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+TPointArray.sortFromPoint
+~~~~~~~~~~~~~~~~~~~~~~~~~
 
 .. code-block:: pascal
 
-    procedure TPointArray.sortTPAfromPoint(const P : TPoint);
+    procedure TPointArray.sortFromPoint(const P : TPoint);
 
 Sorts the TPA from a point
 
@@ -2264,12 +2264,12 @@ Example:
 
 .. code-block:: pascal
 
-    TPA.sortTPAfromPoint(P);
+    TPA.sortFromPoint(P);
 
 *)
-procedure TPointArray.sortTPAfromPoint(const P : TPoint);
+procedure TPointArray.sortFromPoint(const P : TPoint);
 begin
-  sortTPAfrom(self, P);
+  sortTPAFrom(self, P);
 end;
 
 (*
@@ -2408,12 +2408,12 @@ begin
 end;
 
 (*
-TPointArray.findTextTPA
-~~~~~~~~~~~~~~~~~~~~~~~
+TPointArray.findText
+~~~~~~~~~~~~~~~~~~~~
 
 .. code-block:: pascal
 
-    function TPointArray.findTextTPA(const height : Integer; const searchTPA : TPointArray; var matches : TPointArray): Boolean;
+    function TPointArray.findText(const height : Integer; const searchTPA : TPointArray; var matches : TPointArray): Boolean;
 
 Returns True if the text TPA is found within TPointArray.  Also returns the matching points in the variable matches.
 
@@ -2425,10 +2425,10 @@ Example:
 
 .. code-block:: pascal
 
-    TPA.findTextTPA(13.0, 13, 33, 37);
+    TPA.findText(13.0, 13, 33, 37);
 
 *)
-function TPointArray.findTextTPA(const height : Integer; const searchTPA : TPointArray; var matches : TPointArray): Boolean;
+function TPointArray.findTextIn(const height : Integer; const searchTPA : TPointArray; var matches : TPointArray): Boolean;
 begin
-  Result := FindTextTPAinTPA(height, searchTPA, self, matches);
+  Result := FindTextTPAInTPA(height, searchTPA, self, matches);
 end;
