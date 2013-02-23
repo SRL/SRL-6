@@ -13,37 +13,41 @@ findText
 
 .. code-block:: pascal
 
-    function findText(var x, y: integer; txt, fonts: TStringArray; b: TBox): boolean;
+    function findText(var p: TPoint; txt, fonts: TStringArray; b: TBox; waitTime: integer = 0): boolean;
 
-Returns true if the text (txt) of given fonts (fonts) are found in the specified
-box (b).  If found, set's x and y to where the text was found. Option parameter
-waitTime (default 0) will wait said ms for text to appear.
+Uses bitmap masks to find text on the screen. Returns true if the text (txt) of
+given fonts (fonts) are found in the specified box (b).  If found, set's the
+point (p) to where the top right of the text that is found. Optional parameter
+(waitTime, default 0) will wait said ms for text to appear.
 
 
 .. note::
 
-    by Stupid3ooo, modified by LordJashin
+    by Stupid3ooo, modified by LordJashin & Coh3n
+    Last Updated: Feb. 20, 2013 by Coh3n
 
 Example:
 
 .. code-block:: pascal
 
     var
-      x, y: integer;
+      p: TPoint;
     begin
-      if (findText(x, y, ['obby'], [upCharsEx], intToBox(MIX1, MIY1, MIX2, MIY2))) then
-        writeln('Found exit to lobby text');
+      if (findText(p, ['Lobby'], [upCharsEx], MI_BOX)) then
+        writeln('Found "Exit to Lobby" text');
       .
       .
       .
     end;
 *)
-function findText(var x, y: integer; txt, fonts: TStringArray; b: TBox; waitTime: integer = 0): boolean;
+function findText(var p: TPoint; txt, fonts: TStringArray; b: TBox; waitTime: integer = 0): boolean;
 var
-  s, i, j: integer;
-  t := (getSystemTime + waitTime);
+  s, i, j, t: integer;
 begin
-  while (getSystemTime < t) do
+  t := (getSystemTime + waitTime);
+  p := point(-1, -1);
+
+  repeat
     for i := 0 to high(txt) do
       for j := 0 to high(fonts) do
       begin
@@ -52,14 +56,97 @@ begin
         if (b.x1 < 0) then b.x1 := 0;
         if (b.y1 < 0) then b.y1 := 0;
 
-        result := findBitmapMaskTolerance(s, x, y, b.x1, b.y1, b.x2, b.y2, 30, 30);
+        result := findBitmapMaskTolerance(s, p.x, p.y, b.x1, b.y1, b.x2, b.y2, 30, 30);
         freeBitmap(s);
 
         if (result) then
           break(3);
       end;
 
-  subDebug('findText('+toStr(txt)+'): '+toStr(result));
+  until(getSystemTime > t);
+
+  if (result) then
+    subDebug('findText('+toStr(txt)+'): True, at point '+toStr(p))
+  else
+    subDebug('findText('+toStr(txt)+'): '+toStr(result));
+end;
+
+(*
+findTextByColor
+~~~~~~~~~~~~~~~
+
+.. code-block:: pascal
+
+    function findTextByColor(var p: TPoint; col, tol: integer; txt, fonts: TStringArray; lookIn: TBox; waitTime: integer = 0): boolean; overload;
+
+Uses TPointArrays to find text on the screen.  Searches for the color (col) with
+tolerance (tol) on the screen, then looks for the text (txt) in a TPA created
+from the fonts (fonts).  Looks in the box (lookIn) and returns the point found
+(p). Returns true if the text is found. If the optional parameter (waitTime) is
+set, will wait specified amount of time for the text to be found before returning
+false.
+
+
+.. note::
+
+    by Raymond and Coh3n
+    Last Updated: Feb. 20, 2013 by Coh3n
+
+Example:
+
+.. code-block:: pascal
+
+    var
+      p: TPoint;
+    begin
+      if (findTextByColor(p, clWhite, 10, ['Lobby'], [upCharsEx], MI_BOX)) then
+        writeln('Found "Exit to Lobby" text');
+      .
+      .
+      .
+    end;
+*)
+function findTextByColor(var p: TPoint; col, tol: integer; txt, fonts: TStringArray; lookIn: TBox; waitTime: integer = 0): boolean; overload;
+var
+  b: TBox;
+  i, j, w, h, t: integer;
+  tpaColors, tpaText, matches: TPointArray;
+begin
+  t := (getSystemTime + waitTime);
+  p := point(-1, -1);
+
+  if (not findColorsTolerance(tpaColors, col, lookIn, tol)) then
+  begin
+    subDebug('findTextByColor: failed to find text color');
+    exit(false);
+  end;
+
+  repeat
+    // loop through the fonts and texts to look for
+    for i := 0 to high(txt) do
+      for j := 0 to high(fonts) do
+      begin
+        tpaText := TPAFromText(txt[i], fonts[i], w, h);
+
+        if (tpaColors.findTextIn(h - 1, tpaText, matches)) then
+        begin
+          // sort the tpa matches and return the top left of the text
+          b := tpaText.getBounds();
+          matches.sortFromPoint(point(b.x1, b.y1));
+          p.x := matches[0].x;
+          p.y := matches[0].y;
+
+          result := true;
+          break(3);
+        end;
+      end;
+
+  until(getSystemTime() > t);
+
+  if (result) then
+    subDebug('findTextByColor('+toStr(txt)+'): True, at point '+toStr(p))
+  else
+    subDebug('findTextByColor('+toStr(txt)+'): '+toStr(result));
 end;
 
 (*
@@ -134,4 +221,50 @@ begin
 
   if (pressEnter) then
     TypeByte(VK_ENTER);
+end;
+
+(*
+isUptext
+~~~~~~~~
+
+.. code-block:: pascal
+
+    function isUptext(txt: TStringArray; waitTime: integer = 50; tol: extended = 0.6): boolean;
+
+Returns true if 'txt' is found in the RS uptext string. Optional parameter
+'waitTime' to wait for the text to appear (default 50ms). Optional tolerance
+parameter (default 0.6).
+
+.. note::
+
+    by Narcle
+    Last Updated: Feb. 21, 2013 by Coh3n
+
+Example:
+
+.. code-block:: pascal
+
+    if (isUptext(['Mine', 'rock'])) then
+      writeln('Found uptext!');
+*)
+function isUptext(txt: TStringArray; waitTime: integer = 0; tol: extended = 0.6): boolean;
+var
+  i, t: integer;
+  s: string;
+begin
+  t := (getSystemTime() + waitTime);
+
+  repeat
+    s := rs_GetUpText;
+    debug('isUptext current uptext: '+s);
+
+    for i := 0 to high(txt) do
+      if (stringMatch(txt[i], s, tol)) then
+      begin
+        subDebug('Found '+txt[i]+' in uptext string: '+s);
+        exit(true);
+      end;
+
+    wait(10);
+  until (getSystemTime() > t);
 end;

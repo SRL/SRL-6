@@ -20,6 +20,8 @@ EVERYTHING should be recorded here: new features, function name changes, user-de
 
 - text.simba
   - TypeSendEx removed and an optional pressEnter parameter added to typeSend
+  - All IsUpText functions replaced with one function, isUptext() with optional waitTime and tolerance parameters.
+  - FindTextTPA/Ex replaced with findTextyColor()
 
 - players.simba merged with login.simba
   - TUser renamed to TPlayer

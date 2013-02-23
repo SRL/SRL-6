@@ -933,7 +933,8 @@ Example:
 *}
 function __logout(): boolean;
 var
-  x, y, t: integer;
+  t: integer;
+  p: TPoint;
 begin
   if (not isLoggedIn()) then
   begin
@@ -954,9 +955,9 @@ begin
 
   wait(100 + random(200));
 
-  if (findText(x, y, ['Login'], [UpCharsEx], MI_BOX, 1000)) then
+  if (findText(p, ['Login'], [UpCharsEx], MI_BOX, 1000)) then
   begin
-    mouse(point(x, y).rand(3, 10), MOUSE_LEFT);
+    mouse(p.rand(3, 10), MOUSE_LEFT);
     t := (getSystemTime + (15000));
 
     while (not result) and (getSystemTime < t) do
