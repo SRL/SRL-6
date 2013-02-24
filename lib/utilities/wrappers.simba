@@ -7,11 +7,8 @@ The Wrappers include contains wrapper functions used throughout SRL.  These func
 
 *)
 
-var
-  maxInt := $FFFFFFF*8+7;
-
 (*
-FindColors: overload;
+findColors: overload;
 ~~~~~~~~~~~~~~~~~~~~~
 
 .. code-block:: pascal
@@ -31,13 +28,13 @@ Example:
     FindColors(TPA, cl_White, MSBox);
 
 *)
-function FindColors(var points : TPointArray; const color : Integer; const box : TBox): Boolean; overload;
+function findColors(var points : TPointArray; const color : Integer; const box : TBox): Boolean; overload;
 begin
   Result := FindColors(points, color, box.X1, box.Y1, box.X2, box.Y2);
 end;
 
 (*
-FindColorsTolerance: overload;
+findColorsTolerance: overload;
 ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
 
 .. code-block:: pascal
@@ -57,13 +54,13 @@ Example:
     FindColorsTolerance(TPA, cl_White, MSBox, 10);
 
 *)
-function FindColorsTolerance(var points : TPointArray; const color : Integer; const box : TBox; const tolerance : Integer): Boolean; overload;
+function findColorsTolerance(var points : TPointArray; const color : Integer; const box : TBox; const tolerance : Integer): Boolean; overload;
 begin
   Result := FindColorsTolerance(points, color, box.X1, box.Y1, box.X2, box.Y2, tolerance);
 end;
 
 (*
-CountColor: overload;
+countColor: overload;
 ~~~~~~~~~~~~~~~~~~~~~
 
 .. code-block:: pascal
@@ -83,7 +80,7 @@ Example:
     CountColor(clWhite, MSBOX);
 
 *)
-function CountColor(Color: integer; box: TBox): Boolean; overload;
+function countColor(Color: integer; box: TBox): Boolean; overload;
 begin
   Result := CountColor(color, box.X1, box.Y1, box.X2, box.Y2);
 end;

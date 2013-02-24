@@ -7,6 +7,8 @@ recognition.
 
 *)
 
+{$include_once ../tmp.simba}
+
 (*
 findText
 ~~~~~~~~
@@ -247,7 +249,7 @@ Example:
     if (isUptext(['Mine', 'rock'])) then
       writeln('Found uptext!');
 *)
-function isUptext(txt: TStringArray; waitTime: integer = 0; tol: extended = 0.6): boolean;
+{function isUptext(txt: TStringArray; waitTime: integer = 0; tol: extended = 0.6): boolean;
 var
   i, t: integer;
   s: string;
@@ -267,4 +269,121 @@ begin
 
     wait(10);
   until (getSystemTime() > t);
+end;}
+
+{
+  type TOptions
+  Description: Used to store an RS right click menu.
+}
+Type
+  _TOptions = record
+    str: string;
+    bounds, bigBox: TBox;
+  end;
+
+{*
+__getChooseOptions
+~~~~~~~~~~~~~~~~~~
+
+.. code-block:: pascal
+
+    function __getChooseOptions(): array of _TOptions;
+
+Gets the text from the options menu.
+
+.. note::
+
+    by Wizzup? & Narcle
+
+Example:
+
+.. code-block:: pascal
+
+*}
+function __getChooseOptions(): array of _TOptions;
+var
+   b, bb: TBox;
+   TPA, TPA1, TPA2, tpaText, tpaNotText, tpaShadow: TPointArray;
+   ATPA, tmpATPA: T2DPointArray;
+   i, l, w, h, bmp, oldTarget, oldCTS: integer;
+   menuColors: TIntegerArray;
+begin
+  oldTarget := getImageTarget();
+
+  // the entire RS client
+  getClientDimensions(b.x2, b.y2);
+  b := intToBox(0, 0, b.x2 - 1, b.y2 - 1);
+
+  oldCTS := getToleranceSpeed();
+  setColorToleranceSpeed(1);
+
+  menuColors := [131843 {black}, 3682593 {top blue}, 3552822 {grey}];
+  setLength(ATPA, length(menuColors));
+
+  // find how many of each menu color is found; store in ATPA
+  for i := 0 to high(menuColors) do
+    findColors(ATPA[i], menuColors[i], b);
+
+  TPA := ATPA.merge();
+  ATPA := TPA.split(4);
+
+  // gets the right box of colors on the MS by checking the size of each color's area
+  for i := 0 to high(ATPA) do
+  begin
+    b := ATPA[i].getBounds();
+
+    if ((b.x2 - b.x1) > 90) and ((b.y2 - b.y1) > 18) then
+      break;
+  end;
+
+  setColorToleranceSpeed(3);
+
+  // get TPAs of the text, around text, and shadow
+  findColorsTolerance(tpaText, 4996381, b, 18);
+  tpaNotText := tpaText.returnNotInTPA(tpaText.getBounds());
+  findColorsTolerance(tpaShadow, 460291, b, 6);
+
+  setColorToleranceSpeed(oldCTS);
+
+  // create a bitmap of size b (the size of the menu)
+  bmp := createBitmap(b.x2 - b.x1 + 2, b.y2 - b.y1 + 2);
+
+  // "reset" not text/shadow TPAs so they can be drawn on bmp
+  tpaNotText.offset(point(-b.x1, -b.y1));
+  tpaShadow.offset(point(-b.x1, -b.y1));
+
+  fastDrawClear(bmp, 0);
+  drawTPABitmap(bmp, tpaNotText, clRed);
+  drawTPABitmap(bmp, tpaShadow, clPurple);
+
+  ocr_FilterUpTextByCharacteristics(getMufasaBitmap(bmp));
+  getBitmapSize(bmp, w, h);
+
+  setTargetBitmap(bmp); // new target for findColors
+  setLength(ATPA, h div 16);
+
+  // look for the outlined text on the bitmap
+  for i := 0 to high(ATPA) do
+    findColors(ATPA[i], clRed, 0, (2 + i * 16), w - 1, (18 + i * 16)); // +2 to y to line it up
+
+  l := high(ATPA);
+  sortATPAFromFirstPointY(ATPA, point(w div 2, 0));
+
+  setLength(result, length(ATPA));
+
+  for i := 0 to high(ATPA) do
+  begin
+    tmpATPA := ATPA[i].split(1, 10); // split one into characters
+    sortATPAFromFirstPointX(tmpATPA, point(0, 0));
+
+    result[i].str := tmpATPA.getTextInATPA(5, 'UpCharsEx');
+    //writeln(result[i].str);
+
+    bb := ATPA[i].getBounds();
+    result[i].bounds := intToBox((bb.x1 + b.x1), (bb.y1 + b.y1), (bb.x2 + b.x1), (bb.y2 + b.Y1));
+  end;
+
+  setColorToleranceSpeed(oldCTS);
+  setImageTarget(oldTarget);
+  freeBitmap(bmp);
 end;

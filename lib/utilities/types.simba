@@ -2169,6 +2169,58 @@ begin
 end;
 
 (*
+TPointArray.returnNotInTPA
+~~~~~~~~~~~~~~~~~~~~~~~~~~
+
+.. code-block:: pascal
+
+    function TPointArray.returnNotInTPA(b: TBox): TPointArray;
+
+Returns the points in the given box (b) that are not in the TPointArray.
+
+.. note::
+
+    by Coh3n
+
+Example:
+
+..code-block:: pascal
+
+    if (TPA.returnNotInTPA(b)) then
+
+*)
+function TPointArray.returnNotInTPA(b: TBox): TPointArray;
+begin
+  result := returnPointsNotInTPA(self, b);
+end;
+
+(*
+TPointArray.offset
+~~~~~~~~~~~~~~~~~~
+
+.. code-block:: pascal
+
+    procedure TPointArray.offset(p: TPoint);
+
+Offsets each point in the TPointArray by the point p.
+
+.. note::
+
+    by Coh3n
+
+Example:
+
+..code-block:: pascal
+
+    TPA.offset(point(5, 5));
+
+*)
+procedure TPointArray.offset(p: TPoint);
+begin
+  offsetTPA(self, p);
+end;
+
+(*
 TPointArray.sortQuick
 ~~~~~~~~~~~~~~~~~~~~~
 
@@ -2431,4 +2483,108 @@ Example:
 function TPointArray.findTextIn(const height : Integer; const searchTPA : TPointArray; var matches : TPointArray): Boolean;
 begin
   Result := FindTextTPAInTPA(height, searchTPA, self, matches);
+end;
+
+(*
+TPointArray.split
+~~~~~~~~~~~~~~~~~
+
+.. code-block:: pascal
+
+    function TPointArray.split(w, h: integer): T2DPointArray;
+
+Splits the TPointArray into a 2D array of boxes w by h.
+
+.. note::
+
+    by Coh3n
+
+Example:
+
+.. code-block:: pascal
+
+    ATPA := TPA.split(5, 3);
+
+*)
+function TPointArray.split(w, h: integer): T2DPointArray;
+begin
+  result := splitTPAEx(self, w, h);
+end;
+
+(*
+TPointArray.split overload
+~~~~~~~~~~~~~~~~~~~~~~~~~~
+
+.. code-block:: pascal
+
+    function TPointArray.split(const dist: integer): T2DPointArray;
+
+Splits the TPointArray into a 2D array of boxes dist by dist.
+
+.. note::
+
+    by Coh3n
+
+Example:
+
+.. code-block:: pascal
+
+    ATPA := TPA.split(4);
+
+*)
+function TPointArray.split(const dist: integer): T2DPointArray; overload;
+begin
+  result := splitTPA(self, dist);
+end;
+
+(*
+T2DPointArray.merge
+~~~~~~~~~~~~~~~~~~~
+
+.. code-block:: pascal
+
+    function T2DPointArray.merge(): TPointArray;
+
+Merges the T2DPointArray into a TPointArray.
+
+.. note::
+
+    by Coh3n
+
+Example:
+
+.. code-block:: pascal
+
+    TPA := ATPA.merge();
+
+*)
+function T2DPointArray.merge(): TPointArray;
+begin
+  result := mergeATPA(self);
+end;
+
+(*
+T2DPointArray.merge
+~~~~~~~~~~~~~~~~~~~
+
+.. code-block:: pascal
+
+    function T2DPointArray.getTextATPA(const maxSpacing: integer; const font: string): string;
+
+Returns the string of font found inthe T2DPointArray.
+
+.. note::
+
+    by Coh3n
+
+Example:
+
+.. code-block:: pascal
+
+    txt := ATPA.getTextATPA();
+
+*)
+function T2DPointArray.getTextInATPA(const maxSpacing: integer; const font: string): string;
+begin
+  result := getTextATPA(self, maxSpacing, font);
 end;
