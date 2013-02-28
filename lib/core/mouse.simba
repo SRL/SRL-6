@@ -354,13 +354,18 @@ var
   randSpeed: extended;
   x,y,ms: integer;
 begin
+  if (button = MOUSE_NONE) then
+    exit;
+
   ms := mouseSpeed;
   randSpeed := (random(mouseSpeed) / 2.0 + mouseSpeed) / 10.0;
   getMousePos(x,y);
+
   if mmType = MOUSE_HUMAN then
     humanWindMouse(x, y, pnt.x, pnt.y, MOUSE_HUMAN, 5, 10.0/randSpeed, 15.0/randSpeed, 10.0*randSpeed)
   else
     brakeWindMouse(x, y, pnt.x, pnt.y, mmType, 3, 10.0/randSpeed, 15.0/randSpeed, 10.0*randSpeed, false);
+
   mouseSpeed := ms;
   fastClick(button);
 end;
@@ -441,7 +446,7 @@ dragMouse
 
     procedure dragMouse(dest: TPoint);
 
-Clicks mouse_Left at current position and drags to dest(ination).
+Clicks MOUSE_LEFT at current position and drags to dest(ination).
 
 .. note::
 
@@ -459,14 +464,36 @@ var
   x, y: integer;
 begin
   getMousePos(x, y);
-  holdMouse(x, y, mouse_Left);
+  holdMouse(x, y, MOUSE_LEFT);
   wait(random(100));
   mouse(dest);
   getMousePos(x, y);
   wait(random(100));
-  releaseMouse(x, y, mouse_Left);
+  releaseMouse(x, y, MOUSE_LEFT);
 end;
 
+{*
+mouseBox
+~~~~~~~~
+
+.. code-block:: pascal
+
+    procedure mouseBox(b: TBox; button: integer = MOUSE_MOVE);
+
+Moves the mouse somewhere inside the box b. Will just move my default. Click
+depends on what button is set to.
+
+.. note::
+
+    by Coh3n
+    Last Updated: Feb. 24, 2013 by Coh3n
+
+Example:
+
+.. code-block:: pascal
+
+    mouseBox(b, MOUSE_LEFT);
+*}
 procedure mouseBox(b: TBox; button: integer = MOUSE_MOVE);
 var
   p: TPoint;
