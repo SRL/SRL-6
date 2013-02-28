@@ -1512,6 +1512,35 @@ begin
 end;
 
 (*
+TBox.rand
+~~~~~~~~~
+
+.. code-block:: pascal
+
+    procedure TBox.rand(x1, y1, x2, y2: integer);
+
+Adds random values to the TBox.
+
+.. note::
+
+    by Coh3n
+
+Example:
+
+.. code-block:: pascal
+
+    b.rand(5, 5, 5, 5);
+
+*)
+procedure TBox.rand(rx1, ry1, rx2, ry2: integer);
+begin
+  self.x1 := self.x1 + random(rx1);
+  self.y1 := self.y1 + random(ry1);
+  self.x2 := self.x2 + random(rx2);
+  self.y2 := self.y2 + random(ry2);
+end;
+
+(*
 TPoint.create
 ~~~~~~~~~~~~~
 
@@ -2535,6 +2564,31 @@ Example:
 function TPointArray.split(const dist: integer): T2DPointArray; overload;
 begin
   result := splitTPA(self, dist);
+end;
+
+(*
+TPointArray.clearTPAFrom
+~~~~~~~~~~~~~~~~~~~~~~~~
+
+.. code-block:: pascal
+
+    function TPointArray.clearTPAFrom(const tpa: TPointArray): TPointArray;
+
+Removes the points in 'tpa' that are in the TPointArray.
+
+.. note::
+
+    by Coh3n
+
+Example:
+
+.. code-block:: pascal
+
+    filteredTPA := TPA.clearTPAFrom(clearTPA);
+*)
+function TPointArray.clearTPAFrom(const tpa: TPointArray): TPointArray;
+begin
+  result := clearTPAFromTPA(self, tpa);
 end;
 
 (*
