@@ -1,0 +1,76 @@
+(*
+Interfaces
+==========
+
+The interfaces file stores any global interface functions, including TRSInterface
+and all its functions.  All interface files should import this file.
+
+*)
+
+{$include_once ../../utilities/types.simba}
+
+// ID constants for all our global interfaces
+const
+  ID_INTERFACE_TAB_INVENTORY = 0; // feel free to suggest a shorter/better naming scheme
+
+// global interface constants
+const
+  MIX1 = 0; // not sure if we want to rename these since they won't just be used for the inventory
+  MIX2 = 0;
+  MIY1 = 0;
+  MIY2 = 0;
+
+type
+  TRSInterface = record
+    name: string;
+    ID, parentID: integer;
+    static: boolean;
+    x, y, w, h: integer;
+  end;
+
+function TRSInterface.getBounds(): TBox;
+begin
+  result := intToBox(x, y, (x + w), (y + h));
+end;
+
+function TRSInterface.getColors(): TIntegerArray;
+begin
+  getColorsWrap(TPAFromBox(self.getBounds()), result);
+  result.clearEquals();
+end;
+
+function TRSInterface.findColor(col, tol: integer): TPointArray;
+begin
+  findColorsTolerance(result, col, self.getBounds(), tol);
+end;
+
+function TRSInterface.drag(dest: TPoint): boolean;
+var
+  mouseDownPoint, currMousePos, diff, dragTo: TPoint;
+begin
+  if (self.static = true) then
+  begin
+    debug('Interface '+self.name+' is static; cannot be dragged');
+    exit(false);
+  end;
+
+  // point to start the drag
+  mouseDownPoint := point(self.x + random(self.w), self.y + random(self.y)); // point to start the drag
+  mouse(mouseDownPoint);
+
+  // calculate where to drag to and from
+  getMousePos(currMousePos.x, currMousePos.y);
+  diff.x := (self.x - dest.x);
+  diff.y := (self.y - dest.y);
+  dragTo.x := (currMousePos.x - diff.x);
+  dragTo.y := (currMousePos.y - diff.y);
+
+  // drag the mouse
+  dragMouse(dragTo);
+  self.x := dest.x;
+  self.y := dest.y;
+  result = true;
+end;
+
+
+
