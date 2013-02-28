@@ -703,6 +703,7 @@ begin
      777: result := ['Login limit exceeded',       20000,     10, '',       'Waiting for login.'   ];
      850: result := ['Skill level 1000+ required', 0,         9,  'true',   '1000 skill club'      ];
     1028: result := ['Player in member-only area', 0,         1,  'false',  'In member-only area'  ];
+     812: result := ['Cannot connect to world',    2000,      5,  'true',   'Error connect world'  ];
 
     else
       if ((getSystemTime() > timer) and (timer > 0)) then
