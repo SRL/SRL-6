@@ -1541,6 +1541,36 @@ begin
 end;
 
 (*
+TBox.getColors
+~~~~~~~~~~~~~~
+
+.. code-block:: pascal
+
+    function TBox.getColors(clearSame: boolean = true): TIntegerArray;
+
+Returns an array of the colors found inside the TBox. Will clear the same
+colors if clearSame is set to true.
+
+.. note::
+
+    by Coh3n
+
+Example:
+
+.. code-block:: pascal
+
+    cols := b.getColors();
+
+*)
+function TBox.getColors(clearSame: boolean = true): TIntegerArray;
+begin
+  getColorsWrap(TPAFromBox(intToBox(self.x1, self.y1, self.x2, self.y2)), result);
+
+  if (clearSame) then
+    result.clearEquals();
+end;
+
+(*
 TPoint.create
 ~~~~~~~~~~~~~
 

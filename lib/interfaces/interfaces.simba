@@ -7,19 +7,37 @@ and all its functions.  All interface files should import this file.
 
 *)
 
-{$include_once ../../utilities/types.simba}
+{$include_once ../utilities/types.simba}
+{$include_once ../core/debug.simba}
+{$include_once ../core/mouse.simba}
 
-// ID constants for all our global interfaces
-const
-  ID_INTERFACE_TAB_INVENTORY = 0; // feel free to suggest a shorter/better naming scheme
+{*
+Constant: IDs
+~~~~~~~~~~~~~
 
-// global interface constants
+Integer constants that represent the ID's of each global interface.
+*}
 const
-  MIX1 = 0; // not sure if we want to rename these since they won't just be used for the inventory
+  ID_INTERFACE_TAB_INVENTORY = 0;
+
+{*
+Constant: Interface
+~~~~~~~~~~~~~~~~~~~
+
+Constants that are consistent over several interfaces.
+*}
+const
+  MIX1 = 0;
   MIX2 = 0;
   MIY1 = 0;
   MIY2 = 0;
 
+{*
+Type: TRSInterface
+~~~~~~~~~~~~~~~~~~
+
+A record that stores useful information about RS interfaces.
+*}
 type
   TRSInterface = record
     name: string;
@@ -28,22 +46,110 @@ type
     x, y, w, h: integer;
   end;
 
+(*
+TRSInterface.getBounds
+~~~~~~~~~~~~~~~~~~~~~~
+
+.. code-block:: pascal
+
+    function TRSInterface.getBounds(): TBox;
+
+Returns a TBox of the TRSInterface.
+
+.. note::
+
+    by Coh3n
+
+Example:
+
+.. code-block:: pascal
+
+    b := mainscreen.getBounds();
+*)
 function TRSInterface.getBounds(): TBox;
 begin
   result := intToBox(x, y, (x + w), (y + h));
 end;
 
-function TRSInterface.getColors(): TIntegerArray;
+(*
+TRSInterface.getColors
+~~~~~~~~~~~~~~~~~~~~~~
+
+.. code-block:: pascal
+
+    function TRSInterface.getColors(clearSame: boolean = true): TIntegerArray;
+
+Returns an array of all the colors found in the TRSInterface. Clears duplicate
+colors if clearSame is set to true.
+
+.. note::
+
+    by Coh3n
+
+Example:
+
+.. code-block:: pascal
+
+    cols := mainscreen.getColors();
+*)
+function TRSInterface.getColors(clearSame: boolean = true): TIntegerArray;
+var
+  b: TBox;
 begin
-  getColorsWrap(TPAFromBox(self.getBounds()), result);
-  result.clearEquals();
+  b := self.getBounds();
+  result := b.getColors(clearSame);
 end;
 
-function TRSInterface.findColor(col, tol: integer): TPointArray;
+(*
+TRSInterface.findColor
+~~~~~~~~~~~~~~~~~~~~~~
+
+.. code-block:: pascal
+
+    function TRSInterface.findColors(var tpa: TPointArray; col, tol: integer): boolean;
+
+Returns true if a color with a given tolerance is found in the TRSInterface.
+    * tpa: The points where the color was found.
+    * col: The color to look for.
+    * tol: The tolerance on col.
+
+.. note::
+
+    by Coh3n
+
+Example:
+
+.. code-block:: pascal
+
+    if (mainscreen.findColor(tpa, clRed, 10)) then
+      debug('Found the color red');
+*)
+function TRSInterface.findColor(var tpa: TPointArray; col, tol: integer): boolean;
 begin
-  findColorsTolerance(result, col, self.getBounds(), tol);
+  result := findColorsTolerance(tpa, col, self.getBounds(), tol);
 end;
 
+(*
+TRSInterface.drag
+~~~~~~~~~~~~~~~~~
+
+.. code-block:: pascal
+
+    function TRSInterface.drag(dest: TPoint): boolean;
+
+Drags the TRSInterface to a destination point (dest) if the interface's static
+attribute is set to false.
+
+.. note::
+
+    by Coh3n
+
+Example:
+
+.. code-block:: pascal
+
+    squealOfFortune.drag(point(0, 0));
+*)
 function TRSInterface.drag(dest: TPoint): boolean;
 var
   mouseDownPoint, currMousePos, diff, dragTo: TPoint;
