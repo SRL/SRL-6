@@ -7,6 +7,11 @@ Runescape lobby mainscreen.
 
 *)
 
+{$include_once ../core/debug.simba}
+{$include_once ../core/mouse.simba}
+{$include_once ../utilities/types.simba}
+{$include_once ../tmp.simba}
+
 (*
 closeWindow
 ~~~~~~~~~~~
@@ -32,4 +37,343 @@ Example:
 function closeWindow(): boolean;
 begin
   result := true;
+end;
+
+(*
+isUptext
+~~~~~~~~
+
+.. code-block:: pascal
+
+    function isUptext(txt: TStringArray; waitTime: integer = 50; tol: extended = 0.6): boolean;
+
+Returns true if 'txt' is found in the RS uptext string. Optional parameter
+'waitTime' to wait for the text to appear (default 50ms). Optional tolerance
+parameter (default 0.6).
+
+.. note::
+
+    by Narcle
+    Last Updated: Feb. 21, 2013 by Coh3n
+
+Example:
+
+.. code-block:: pascal
+
+    if (isUptext(['Mine', 'rock'])) then
+      writeln('Found uptext!');
+*)
+function isUptext(txt: TStringArray; waitTime: integer = 100; tol: extended = 0.6): boolean;
+var
+  i, t: integer;
+  s: string;
+begin
+  t := (getSystemTime() + waitTime);
+
+  repeat
+    s := rs_GetUpTextAt(7, 57); // Simba's rs_GetUptext get's text at (7, 7) which is in the navigation bar
+    debug('isUptext current uptext: '+s);
+
+    for i := 0 to high(txt) do
+      if (stringMatch(txt[i], s, tol)) then
+      begin
+        subDebug('Found '+txt[i]+' in uptext string: '+s);
+        exit(true);
+      end;
+
+    wait(10);
+  until (getSystemTime() > t);
+end;
+
+{
+  type __TOptions
+  Description: Used to store an RS right click menu.
+}
+Type
+  __TOptions = record
+    str: string;
+    bounds, bigBox: TBox;
+  end;
+
+{*
+__debugOptions
+~~~~~~~~~~~~~~
+
+.. code-block:: pascal
+
+    procedure __debugOptions(options: array of __TOptions);
+
+Prints the options' .str attribute to the debug box.
+
+.. note::
+
+    by Coh3n
+    Last Updated: Feb. 27, 2013 by Coh3n
+
+Example:
+
+.. code-block:: pascal
+
+    __debugOptions(options);
+*}
+procedure __debugOptions(options: array of __TOptions);
+var
+  i: integer;
+begin
+  debug('Options found: ');
+
+  for i := 0 to high(options) do
+    subDebug(options[i].str);
+end;
+
+{*
+__getChooseOptions
+~~~~~~~~~~~~~~~~~~
+
+.. code-block:: pascal
+
+    function __getChooseOptions(excludeBox: TBox; tabbed: boolean = false): array of __TOptions;
+
+Gets the text from the options menu. Searches for the menu in the entire client.
+    * excludeBox: The box to exclude of colors are found. Only used when searching a tabbed menu.
+    * tabbed: Optional. Default false. Set to true if looking for tabbed options.
+
+.. note::
+
+    by Wizzup?, Narcle, Coh3n & Flight
+    Last Updated: Feb. 24, 2013 by Coh3n
+
+Example:
+
+.. code-block:: pascal
+
+    tabbedOptions := __getChooseOptions(MS_BOX, true);
+*}
+function __getChooseOptions(excludeBox: TBox; tabbed: boolean = false): array of __TOptions;
+var
+  b, bb, bigBox: TBox;
+  TPA, TPA1, TPA2, tpaText, tpaNotText, tpaShadow, tpaFilter: TPointArray;
+  ATPA, tmpATPA: T2DPointArray;
+  i, l, w, h, bmp, oldTarget, oldCTS: integer;
+  menuColors: TIntegerArray;
+begin
+  oldTarget := getImageTarget();
+
+  // the entire RS client
+  getClientDimensions(b.x2, b.y2);
+  b := intToBox(0, 0, b.x2 - 1, b.y2 - 1);
+
+  oldCTS := getToleranceSpeed();
+  setColorToleranceSpeed(1);
+
+  menuColors := [131843 {black}, 3682593 {top blue}, 3552822 {grey}];
+  setLength(ATPA, length(menuColors));
+
+  // find how many of each menu color is found; store in ATPA
+  for i := 0 to high(menuColors) do
+    findColors(ATPA[i], menuColors[i], b);
+
+  TPA := ATPA.merge();
+
+  if (tabbed) then
+  begin
+    tpaFilter := TPA.clearTPAFrom(TPAFromBox(excludeBox));
+    ATPA := tpaFilter.split(4);
+  end else
+    ATPA := TPA.split(4);
+
+  // gets the right box of colors on the MS by checking the size of each color's area
+  for i := 0 to high(ATPA) do
+  begin
+    b := ATPA[i].getBounds();
+
+    if ((b.x2 - b.x1) > 90) and ((b.y2 - b.y1) > 18) then
+      break;
+  end;
+
+  bigBox := b; // used in chooseOption to move the mouse away if the options don't exist
+  setColorToleranceSpeed(3);
+
+  // get TPAs of the text, around text, and shadow
+  findColorsTolerance(tpaText, 4996381, b, 18);
+  tpaNotText := tpaText.returnNotInTPA(tpaText.getBounds());
+  findColorsTolerance(tpaShadow, 460291, b, 6);
+
+  setColorToleranceSpeed(oldCTS);
+
+  // create a bitmap of size b (the size of the menu)
+  bmp := createBitmap(b.x2 - b.x1 + 2, b.y2 - b.y1 + 2);
+
+  // "reset" not text/shadow TPAs so they can be drawn on bmp
+  tpaNotText.offset(point(-b.x1, -b.y1));
+  tpaShadow.offset(point(-b.x1, -b.y1));
+
+  fastDrawClear(bmp, 0);
+  drawTPABitmap(bmp, tpaNotText, clRed);
+  drawTPABitmap(bmp, tpaShadow, clPurple);
+
+  ocr_FilterUpTextByCharacteristics(getMufasaBitmap(bmp));
+  getBitmapSize(bmp, w, h);
+
+  setTargetBitmap(bmp); // new target for findColors
+  setLength(ATPA, h div 16);
+
+  // look for the outlined text on the bitmap
+  for i := 0 to high(ATPA) do
+    findColors(ATPA[i], clRed, 0, (2 + i * 16), w - 1, (18 + i * 16)); // +2 to y to line it up
+
+  l := high(ATPA);
+  sortATPAFromFirstPointY(ATPA, point(w div 2, 0));
+
+  setLength(result, length(ATPA));
+  result[0].bigBox := bigBox;
+
+  for i := 0 to high(ATPA) do
+  begin
+    tmpATPA := ATPA[i].split(1, 10); // split one into characters
+    sortATPAFromFirstPointX(tmpATPA, point(0, 0));
+
+    result[i].str := tmpATPA.getTextInATPA(5, 'UpCharsEx');
+    //writeln(result[i].str);
+
+    bb := ATPA[i].getBounds();
+    result[i].bounds := intToBox((bb.x1 + b.x1), (bb.y1 + b.y1), (bb.x2 + b.x1), (bb.y2 + b.Y1));
+  end;
+
+  setColorToleranceSpeed(oldCTS);
+  setImageTarget(oldTarget);
+  freeBitmap(bmp);
+  __debugOptions(result);
+end;
+
+(*
+chooseOption
+~~~~~~~~~~~~
+
+.. code-block:: pascal
+
+    function chooseOption(txt, txtTab: TStringArray; mouseAction: integer; close: boolean = true; waitTime: integer = 100): boolean;
+
+Works for RS tabbed menus.
+    * txtTab: The final option you want to choose. The function looks for this option first.
+    * txt: The text that the mouse hovers to activate the tabbed menu.
+    * mouseAction: What you want the mouse to do.  Mouse constants are in mouse.simba.
+    * close: Optional; default true. Will move the mouse away from the menu if the option isn't found.
+    * waitTime: Optional; default 100ms. The time you want the function to wait for the options to be found.
+
+.. note::
+
+    by Wizzup?, Nava2 & N1ke!
+    Last Modified: Feb. 27, 2013 by Coh3n
+
+Example:
+
+.. code-block:: pascal
+
+    if (chooseOption(['Bank'], ['Use'], MOUSE_LEFT)) then
+      writeln('Using bank');
+*)
+function chooseOption(txt, txtTab: TStringArray; mouseAction: integer; close: boolean = true; waitTime: integer = 100): boolean;
+var
+  b: TBox;
+  p: TPoint;
+  textFound: boolean;
+  i, x, t: integer;
+  options: array of __TOptions;
+begin
+  result := false;
+  wait(waitTime + random(50)); // an initial wait after mouse is clicked
+  t := (getSystemTime() + waitTime);
+
+  repeat
+    options := __getChooseOptions(b);
+
+    if (length(txtTab) > 0) then
+    begin
+      if (chooseOption(txtTab, [], MOUSE_LEFT, false, 0)) then // choose the final option if it exists
+        exit(true)
+      else
+        if (not chooseOption(txt, [], MOUSE_MOVE, false, 0)) then // move the mouse to the first option
+        begin
+          debug('chooseOption (tabbed): txt not found');
+          exit(false);
+        end;
+
+      wait(100 + random(100));
+      options := __getChooseOptions(options[0].bigBox, true);
+    end;
+
+    if (length(options) <= 0) then
+    begin
+      debug('chooseOption: no options available');
+      exit(false);
+    end;
+
+    for i := 0 to high(options) do
+    begin
+      if (length(txtTab) > 0) then
+        textFound := strArrInStr(txtTab, options[i].str)
+      else
+        textFound := strArrInStr(txt, options[i].str);
+
+      if (textFound) then
+      begin
+        // carefully move the mouse to the tabbed menu
+        if (length(txtTab) > 0) then
+        begin
+          getMousePos(p.x, p.y);
+          mouse(point(randomRange(options[0].bigBox.x1, options[0].bigBox.x2), p.y), MOUSE_MOVE, MOUSE_ACCURATE);
+        end;
+
+        mouseBox(options[i].bounds, mouseAction);
+        debug('Found option: '+options[i].str);
+        result := true;
+        exit(true);
+      end;
+    end;
+
+    wait(25 + random(25));
+  until(getSystemTime() > t);
+
+  // to move the mouse away from the menu box if the option isn't found
+  b := options[0].bigBox;
+  if (mouseAction <> MOUSE_NONE) and (close = true) then
+  begin
+    x := max(b.x1 - 52, 0);
+
+    if (x = 0) then
+      x := (b.x2 + 10);
+
+    mouse(point(x, max(b.y1 - 50, 0)).rand(40, b.y2 - b.y1));
+    wait(200 + random(100));
+  end;
+end;
+
+(*
+chooseOption; overload;
+~~~~~~~~~~~~~~~~~~~~~~~
+
+.. code-block:: pascal
+
+    function chooseOption(txt: TStringArray; mouseAction: integer; waitTime: integer = 100): boolean; overload;
+
+Chooses the first option in txt that's found in the RS right click menu.  Mouse
+behaviour depends on mouseAction.  Will wait (waitTime) for the options to
+exist.  Default waitTime is 100ms.
+
+.. note::
+
+    by Coh3n
+    Last Modified: Feb. 27, 2013 by Coh3n
+
+Example:
+
+.. code-block:: pascal
+
+    if (chooseOption(['Examine'], MOUSE_LEFT)) then
+      writeln('Examining something...');
+*)
+function chooseOption(txt: TStringArray; mouseAction: integer; waitTime: integer = 100): boolean; overload;
+begin
+  result := chooseOption(txt, TStringArray([]), mouseAction, waitTime);
 end;

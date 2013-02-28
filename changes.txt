@@ -20,8 +20,9 @@ EVERYTHING should be recorded here: new features, function name changes, user-de
 
 - text.simba
   - TypeSendEx removed and an optional pressEnter parameter added to typeSend
-  - All IsUpText functions replaced with one function, isUptext() with optional waitTime and tolerance parameters.
   - FindTextTPA/Ex replaced with findTextyColor()
+  - All uptext functions replaced with isUptext, and moved to mainscreen.simba
+  - All option functions replaced with chooseOption, and moved to mainscreen.simba
 
 - players.simba merged with login.simba
   - TUser renamed to TPlayer
@@ -92,3 +93,6 @@ EVERYTHING should be recorded here: new features, function name changes, user-de
   - new function overload FindColorsTolerance. Can now enter a TBox instead of x1, y1, x2, y2
   - new function overload replicate. Can now enter a string instead of only one char.
   - new functions overloads for lowercase, uppercase and capitalize. Can now enter a TStringArray instead of only one string.  
+
+- new file, mainscreen.simba
+  - Uptext and option functions moved here
