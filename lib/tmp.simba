@@ -157,3 +157,77 @@ begin
       Exit;
   Result := False;
 end;
+
+(*
+GridBox
+~~~~~~~
+
+.. code-block:: pascal
+
+    function GridBox(slot, columns, rows, w, h, diffX, diffY: integer; starTPoint: TPoint): TBox;
+
+Returns a TBox of the slot 'slot' in a grid created by the other parameters.
+Slots start with 0 being the top left of the grid, and counting accross.
+    * columns: number of columns in the grid
+    * rows: number of rows in the grid
+    * w: the width of each box in the grid
+    * h: the height of each box in the grid
+    * diffX: pixels from center to center (x)
+    * diffY: pixels from center to center (y)
+    * starTPoint: the center point of the top left box in the grid
+
+.. note::
+
+    | Author: Coh3n
+    | Last Modified: Jan. 25th, 2012 by Coh3n
+
+Example:
+
+.. code-block:: pascal
+
+    result := GridBox(Slot, 4, 2, 95, 80, 0, 150, point(110, 100));
+*)
+function GridBox(slot, columns, rows, w, h, diffX, diffY: integer; startPoint: TPoint): TBox;
+begin
+  if (slot > (columns * rows)) then
+  begin
+    writeln('GridBox: Invalid slot: '+toStr(slot));
+    exit;
+  end;
+
+  result.x1 := (startPoint.x + ((slot mod columns) * diffX) - (w div 2));
+  result.y1 := (startPoint.y + ((slot div columns) * diffY) - (h div 2));
+  result.x2 := (result.x1 + w);
+  result.y2 := (result.y1 + h);
+end;
+
+(*
+Grid
+~~~~
+
+.. code-block:: pascal
+
+    function Grid(columns, rows, w, h, diffX, diffY: integer; starTPoint: TPoint): TBoxArray;
+
+Returns a grid of TBoxes (see GridBox for parameters).
+
+.. note::
+
+    | Author: Coh3n
+    | Last Modified: Jan. 25th, 2012 by Coh3n
+
+Example:
+
+.. code-block:: pascal
+
+    SMART_DrawBoxes(false, Grid(5, 10, 20, 20, 25, 25, point(30, 30)), clYellow);
+*)
+function Grid(columns, rows, w, h, diffX, diffY: integer; starTPoint: TPoint): TBoxArray;
+var
+  i: integer;
+begin
+  setLength(result, (columns * rows));
+
+  for i := 0 to high(result) do
+    result[i] := GridBox(i, columns, rows, w, h, diffX, diffY, starTPoint);
+end;
