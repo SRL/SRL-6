@@ -6,8 +6,11 @@ The debug file holds any files used for SRL debugging and logging.
 
 *)
 
+{$include_once globals.simba}
 {$include_once ../utilities/time.simba}
 {$include_once ../utilities/wrappers.simba}
+{$include_once ../utilities/types.simba}
+{$include_once ../tmp.simba}
 
 var
   debugLevel = 1; // used for the nice debug formatting
