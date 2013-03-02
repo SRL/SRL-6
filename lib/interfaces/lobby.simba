@@ -7,7 +7,7 @@ lobby.
 
 *)
 
-{$include_once gametabs/gametab.simba}
+{$include_once gametabs/logout.simba}
 
 (*
 Constant: Lobby
@@ -31,6 +31,33 @@ const
     LOBBY_CHAT = 3;
     LOBBY_CLAN = 4;
     LOBBY_OPTIONS = 5;
+
+{*
+__validateEmailScreen()
+~~~~~~~~~~~~~~~~~~~~~~~
+
+.. code-block:: pascal
+
+    procedure __validateEmailScreen();
+
+Handles the validate email screen that comes up when you enter to lobby.
+
+.. note::
+
+    by NCDS
+    Last updated: Mar. 1, 2013 by Coh3n
+
+Example:
+
+.. code-block:: pascal
+
+    __validateEmailScreen();
+*}
+procedure __validateEmailScreen();
+begin
+  if (getColor(473, 468) = 1001495) then // gold border around the "confirm" button
+    mouseBox(intToBox(502, 474, 548, 485), MOUSE_LEFT); // the "skip" button
+end;
 
 (*
 getLobbyTab
@@ -87,18 +114,21 @@ Example:
 *)
 function isLobbyScreenOpen(): boolean;
 begin
+  __validateEmailScreen();
+  wait(200 + random(200));
   result := inRange(getLobbyTab, LOBBY_PLAYER, LOBBY_OPTIONS);
 end;
 
-(*
-exitToLobby
-~~~~~~~~~~~
+{*
+_exitToLobby
+~~~~~~~~~~~~
 
 .. code-block:: pascal
 
-    function exitToLobby(): boolean;
+    function _exitToLobby(): boolean;
 
-Exits to the lobby screen.
+Exits to the lobby screen. Should call players[currentPlayer].exitToLobby()
+instead of this function.
 
 .. note::
 
@@ -109,41 +139,31 @@ Example:
 
 .. code-block:: pascal
 
-    if (exitToLobby()) then
+    if (_exitToLobby()) then
       writeln('We''ve exited to the lobby!');
-*)
-function exitToLobby(): boolean;
+*}
+function _exitToLobby(): boolean;
 var
-  p: TPoint;
   t := (getSystemTime + (15000));
 begin
-  addHeader('exitToLobby(): logging out to lobby');
-
   if (isLobbyScreenOpen()) then
   begin
-    closeHeader('exitToLobby(): lobby screen already open');
     result := true;
     exit;
   end;
 
-  if (not gameTab(TAB_LOGOUT)) then
+  if (not tabLogout.open()) then
     exit;
 
   wait(100 + random(200));
 
-  if (findText(p, ['Lobby'], [UpCharsEx], MI_BOX, 1000)) then
-  begin
-    mouse(p.rand(3, 10), MOUSE_LEFT);
-
+  if (tabLogout.clickText(['Lobby'])) then
     while (not result) and (getSystemTime < t) do
     begin
       debug('Waiting for lobby screen...');
       result := isLobbyScreenOpen();
       wait(700 + random(500));
     end;
-  end;
-
-  closeHeader('exitToLobby(): ' + toStr(result));
 end;
 
 (*

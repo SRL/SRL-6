@@ -9,8 +9,6 @@ Runescape lobby mainscreen.
 
 {$include_once ../core/debug.simba}
 {$include_once ../core/mouse.simba}
-{$include_once ../utilities/types.simba}
-{$include_once ../tmp.simba}
 
 (*
 closeWindow
@@ -72,7 +70,7 @@ begin
 
   repeat
     s := rs_GetUpTextAt(7, 57); // Simba's rs_GetUptext get's text at (7, 7) which is in the navigation bar
-    debug('isUptext current uptext: '+s);
+    debug('isUptext: current uptext: '+s);
 
     for i := 0 to high(txt) do
       if (stringMatch(txt[i], s, tol)) then
@@ -376,4 +374,31 @@ Example:
 function chooseOption(txt: TStringArray; mouseAction: integer; waitTime: integer = 100): boolean; overload;
 begin
   result := chooseOption(txt, TStringArray([]), mouseAction, waitTime);
+end;
+
+(*
+optionsExist
+~~~~~~~~~~~~
+
+.. code-block:: pascal
+
+    function optionsExist(txt: TStringArray): boolean;
+
+Returns true if one of the strings in txt exists in the options menu.
+
+.. note::
+
+    by Coh3n
+    Last Modified: Mar. 2, 2013 by Coh3n
+
+Example:
+
+.. code-block:: pascal
+
+    if (optionsExist(['Examine'])) then
+      writeln('Option exists');
+*)
+function optionsExist(txt: TStringArray): boolean;
+begin
+  result := chooseOption(txt, MOUSE_NONE, 0);
 end;

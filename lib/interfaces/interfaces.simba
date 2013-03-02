@@ -7,7 +7,6 @@ and all its functions.  All interface files should import this file.
 
 *)
 
-{$include_once ../utilities/types.simba}
 {$include_once ../core/debug.simba}
 {$include_once ../core/mouse.simba}
 
@@ -19,6 +18,7 @@ Integer constants that represent the ID's of each global interface.
 *}
 const
   ID_INTERFACE_TAB_INVENTORY = 0;
+  ID_INTERFACE_TAB_LOGOUT    = 1;
 
 {*
 Constant: Interface
@@ -44,6 +44,7 @@ type
     ID, parentID: integer;
     static: boolean;
     x, y, w, h: integer;
+    bounds: TBox;
   end;
 
 (*
@@ -177,6 +178,3 @@ begin
   self.y := dest.y;
   result = true;
 end;
-
-
-

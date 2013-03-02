@@ -7,7 +7,8 @@ recognition.
 
 *)
 
-{$include_once ../tmp.simba}
+{$include_once debug.simba}
+{$include_once mouse.simba}
 
 (*
 findText
@@ -15,13 +16,13 @@ findText
 
 .. code-block:: pascal
 
-    function findText(var p: TPoint; txt, fonts: TStringArray; b: TBox; waitTime: integer = 0): boolean;
+    function findText(var p: TPoint; txt, fonts: TStringArray; searchBox: TBox): boolean;
 
-Uses bitmap masks to find text on the screen. Returns true if the text (txt) of
-given fonts (fonts) are found in the specified box (b).  If found, set's the
-point (p) to where the top right of the text that is found. Optional parameter
-(waitTime, default 0) will wait said ms for text to appear.
-
+Uses a bitmap mask to find text on the screen.  Returns true if the text is found.
+    * p: The point the text is found.
+    * txt: The text to look for.
+    * fonts: The font(s) of the text.
+    * searchBox: The box to look for the text.
 
 .. note::
 
@@ -35,37 +36,34 @@ Example:
     var
       p: TPoint;
     begin
-      if (findText(p, ['Lobby'], [upCharsEx], MI_BOX)) then
+      if (findText(p, ['Lobby'], [upCharsEx], tabLogout.bounds)) then
         writeln('Found "Exit to Lobby" text');
       .
       .
       .
     end;
 *)
-function findText(var p: TPoint; txt, fonts: TStringArray; b: TBox; waitTime: integer = 0): boolean;
+function findText(var p: TPoint; txt, fonts: TStringArray; searchBox: TBox): boolean;
 var
-  s, i, j, t: integer;
+  s, i, j: integer;
 begin
-  t := (getSystemTime + waitTime);
   p := point(-1, -1);
 
-  repeat
-    for i := 0 to high(txt) do
-      for j := 0 to high(fonts) do
-      begin
-        s := bitmapFromText(toStr(txt[i]), toStr(fonts[j]));
+  for i := 0 to high(txt) do
+    for j := 0 to high(fonts) do
+    begin
+      s := bitmapFromText(toStr(txt[i]), toStr(fonts[j]));
 
-        if (b.x1 < 0) then b.x1 := 0;
-        if (b.y1 < 0) then b.y1 := 0;
+      // to prevent looking outside the client
+      if (searchBox.x1 < 0) then searchBox.x1 := 0;
+      if (searchBox.y1 < 0) then searchBox.y1 := 0;
 
-        result := findBitmapMaskTolerance(s, p.x, p.y, b.x1, b.y1, b.x2, b.y2, 30, 30);
-        freeBitmap(s);
+      result := findBitmapMaskTolerance(s, p, searchBox, 30, 30);
+      freeBitmap(s);
 
-        if (result) then
-          break(3);
-      end;
-
-  until(getSystemTime > t);
+      if (result) then
+        break(2);
+    end;
 
   if (result) then
     subDebug('findText('+toStr(txt)+'): True, at point '+toStr(p))
@@ -101,7 +99,7 @@ Example:
     var
       p: TPoint;
     begin
-      if (findTextByColor(p, clWhite, 10, ['Lobby'], [upCharsEx], MI_BOX)) then
+      if (findTextByColor(p, clWhite, 10, ['Lobby'], [upCharsEx], gameTabArea)) then
         writeln('Found "Exit to Lobby" text');
       .
       .
@@ -149,6 +147,42 @@ begin
     subDebug('findTextByColor('+toStr(txt)+'): True, at point '+toStr(p))
   else
     subDebug('findTextByColor('+toStr(txt)+'): '+toStr(result));
+end;
+
+(*
+mouseText
+~~~~~~~~~
+
+.. code-block:: pascal
+
+    function mouseText(txt, fonts: TStringArray; searchBox: TBox; mouseAction: integer): boolean;
+
+Returns true if the mouse action is performed on the text.
+    * txt: The text to look for.
+    * fonts: The font(s) of the text.
+    * searchBox: The box to look for the text.
+    * mouseAction: The action of the mouse.
+
+.. note::
+
+    by Coh3n
+    Last Updated: Mar. 1, 2013 by Coh3n
+
+Example:
+
+.. code-block:: pascal
+
+    mouseText(['Lobby'], [upCharsEx], tabLogout.bounds, MOUSE_LEFT);
+*)
+function mouseText(txt, fonts: TStringArray; searchBox: TBox; mouseAction: integer): boolean;
+var
+  p: TPoint;
+begin
+  if (findText(p, txt, fonts, searchBox)) then
+  begin
+    mouse(p.rand(3, 10), mouseAction);
+    exit(true);
+  end;
 end;
 
 (*

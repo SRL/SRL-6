@@ -2,27 +2,320 @@
 Gametab
 =======
 
-This Include contains all Gametab Routines.
+The gametab file holds any global gametab data.
 
 *)
 
-{$include_once inventory.simba}
+{$include_once ../interfaces.simba}
+{$include_once ../mainscreen.simba}
+{$include_once ../../core/text.simba}
 
-const
-  TAB_LOGOUT = 37;
+// just here temporarily to test and compile
+// remove TTemp, bankScreen, and TTemp.isOpen when bankscreen.simba is added
+type
+  TTemp = record
+    name: string;
+  end;
 
-// just temporary to test logout functions
-function gameTab(tab: integer): boolean;
 var
-  x, y: integer;
+  bankScreen: TTemp;
+
+function TTemp.isOpen(): boolean;
 begin
-  if (tab = TAB_LOGOUT) and (not result) then
-    if (getColor(754, 61) = 3629683) then // color in the middle of the X
+  result := false;
+end;
+
+{*
+Constant: Tabs
+~~~~~~~~~~~~~~
+
+Integer constants that represent each gametab. Are internal constants and
+shouldn't be used outside of SRL.
+
+Example:
+
+.. code-block:: pascal
+
+    _openGameTab(_TAB_LOGOUT);
+*}
+const
+  _TAB_COMBAT       = 0;
+  _TAB_NOTICE       = 1;
+  _TAB_STATS        = 2;
+  _TAB_ACADEMY      = 3;
+  _TAB_INVENTORY    = 4;
+  _TAB_EQUIPMENT    = 5;
+  _TAB_PRAYER       = 6;
+  _TAB_ABILITY      = 7;
+  _TAB_EXTRAS       = 8;
+  _TAB_FRIENDS_LIST = 9;
+  _TAB_FRIENDS_CHAT = 10;
+  _TAB_CLAN_CHAT    = 11;
+  _TAB_OPTIONS      = 12;
+  _TAB_EMOTES       = 13;
+  _TAB_MUSIC        = 14;
+  _TAB_NOTES        = 15;
+  _TAB_LOGOUT       = 16;
+
+// used so a TBoxArray calculation isn't required every time a gametab function is called
+// set at the bottom of this file
+var
+  _gameTabGrid: TBoxArray;
+
+// the coords of each gameTab area (i.e. the old MIX1, MIY1, etc.)
+// set at the bottom of this file
+var
+  _gameTabArea: TBox;
+
+{*
+__isTabValid
+~~~~~~~~~~~~
+
+.. code-block:: pascal
+
+    function __isTabValid(tab: integer): boolean;
+
+Returns true if the tab is valid.  Used to avoid repeated code.
+
+.. note::
+
+    by Coh3n
+    Last Updated: Feb. 28, 2013 by Coh3n
+
+Example:
+
+.. code-block:: pascal
+
+    tab := getCurrentTab();
+*}
+function __isTabValid(tab: integer): boolean;
+begin
+  if (not inRange(tab, _TAB_COMBAT, _TAB_LOGOUT)) then
+  begin
+    subDebug('__isTabValid: invalid gametab '+toStr(tab));
+    exit(false);
+  end;
+
+  result := true;
+end;
+
+(*
+getCurrentTab
+~~~~~~~~~~~~~
+
+.. code-block:: pascal
+
+    function getCurrentTab(): integer;
+
+Returns the current gametab that is open.
+
+.. note::
+
+    by Zephyrsfury & Coh3n
+    Last Updated: Feb. 28, 2013 by Coh3n
+
+Example:
+
+.. code-block:: pascal
+
+    tab := getCurrentTab();
+*)
+function getCurrentTab(): integer;
+var
+  p: TPoint;
+  i: integer;
+begin
+  result := -1;
+
+  if (bankScreen.isOpen()) then
+    exit(_TAB_INVENTORY);
+
+  if (getColor(553, 305) = 2070783) then // orange color at the W
+    exit(_TAB_LOGOUT);
+
+  for i := 0 to (high(_gameTabGrid) - 1) do // -1 to skip TAB_LOGOUT
+    // "- 8" is to get the top border of the tab
+    if (getColor(_gameTabGrid[i].x1, _gameTabGrid[i].y1 - 8) = 6476542) then // goldish outline color
+      exit(i);
+end;
+
+(*
+doesTabExist
+~~~~~~~~~~~~
+
+.. code-block:: pascal
+
+    function doesTabExist(tab: integer): boolean;
+
+Returns true if the tab exists.
+
+.. note::
+
+    by Zephyrsfury & Icefire908
+    Last Modified: Feb. 28, 2013 by Coh3n
+
+Example:
+
+.. code-block:: pascal
+
+    if (not doesTabExist(TAB_ABILITY)) then
+      writeln('Ability tab doesn't exist');
+*)
+function doesTabExist(tab: integer): boolean;
+var
+  tmpCTS, x, y: integer;
+begin
+  if (not __isTabValid(tab)) then
+    exit(false);
+
+  // requires CTS 1, may result in false negatives if CTS 2
+  tmpCTS := getToleranceSpeed();
+  setColorToleranceSpeed(1);
+
+  // if the bank is open, no tabs exist, but inventory is available
+  if (tab = _TAB_INVENTORY) and (bankScreen.isOpen())then
+  begin
+    setColorToleranceSpeed(tmpCTS);
+    exit(true);
+  end;
+
+  if (tab = _TAB_LOGOUT) then
+  begin
+    result := findColor(x, y, 3629683, _gameTabGrid[_TAB_LOGOUT]); // color in logout X
+    setColorToleranceSpeed(tmpCTS);
+    exit(true);
+  end;
+
+  // the color of the tab background
+  result := (countColorTolerance(5005422, _gameTabGrid[tab], 55) < 250); // actual count should be 266
+
+  setColorToleranceSpeed(tmpCTS);
+end;
+
+{*
+_openGameTab
+~~~~~~~~~~~~
+
+.. code-block:: pascal
+
+    function _openGameTab(tab: integer): boolean;
+
+Opens the gametab 'tab'.  Is an internal SRL function and should only be called
+in the TTabWhatever.open type functions.
+
+.. note::
+
+    by Zephyrsfury & Coh3n
+    Last Modified: Feb. 28, 2013 by Coh3n
+
+Example:
+
+.. code-block:: pascal
+
+    result := _openGameTab(TAB_INVENTORY);
+*}
+function _openGameTab(tab: integer): boolean;
+var
+  tries, t: integer;
+begin
+  if (not __isTabValid(tab)) then
+    exit(false);
+
+  // check to see if the tab is already open
+  if (getCurrentTab() = tab) then
+    exit(true);
+
+  // incase the bank or another interface is open
+  if (not doesTabExist(tab)) then
+  begin
+    closeWindow();
+    wait(200 + random(200));
+  end;
+
+  if (not result) and (doesTabExist(tab)) then
+    while (tries < 3) do
     begin
-      mouse(point(754, 61).rand(5), MOUSE_LEFT);
-      result := true;
+      mouseBox(_gameTabGrid[tab], MOUSE_LEFT);
+
+      t := (getSystemTime() + 2000);
+      while (getSystemTime < t) do
+      begin
+        if (getCurrentTab = tab) then
+        begin
+          debug('_openGameTab: opened tab '+toStr(tab));
+          exit(true);
+        end;
+
+        wait(100 + random(100));
+      end;
+
+      inc(tries);
     end;
 
-  subDebug('gameTab(' + toStr(tab) + '): ' + toStr(result));
+  debug('_openGameTab: failed to open tab '+toStr(tab));
+end;
+
+(*
+_openGameTabFKey
+~~~~~~~~~~~~~~~~
+
+.. code-block:: pascal
+
+    function _openGameTabFKey(tab: integer): boolean;
+
+Instead of clicking the tab this uses the F keys to instantly switch to the tab.
+Only works with inventory, equipment, prayer, magic and combat tabs (F1-F5).
+Returns true if switch was successful.
+
+.. note::
+
+    by Narcle
+    Last Modified: Mar. 2, 2013 by Coh3n
+
+Example:
+
+.. code-block:: pascal
+
+    if (_openGameTabFKey(TAB_INVENTORY)) then
+      writeln('Opened inventory via F key');
+*)
+function _openGameTabFKey(tab: integer): boolean;
+var
+  t, F: integer;
+begin
+  if (getCurrentTab = tab) then
+    exit(true);
+
+  case tab of
+    _TAB_INVENTORY: F := 1;
+    _TAB_EQUIPMENT: F := 2;
+    _TAB_PRAYER:    F := 3;
+    _TAB_ABILITY:   F := 4;
+    _TAB_COMBAT:    F := 5;
+
+    else
+      subDebug('_openGameTabFKey: '+toStr(tab)+' isn''t a valid option');
+  end;
+
+  t := (getSystemTime() + 618);
+  repeat
+    typeByte(111 + F);
+    wait(150 + random(100));
+    result := (getCurrentTab() = tab);
+  until(result or (getSystemTime() > t));
+
+  // failsafe
+  if (not result) then
+    result:= _openGameTab(tab);
+end;
+
+begin
+  // set globals
+  _gameTabGrid := grid(8, 2, 13, 18, 30, 298, point(536, 236));
+
+  setLength(_gameTabGrid, length(_gameTabGrid) + 1);
+  _gameTabGrid[_TAB_LOGOUT] := intToBox(750, 55, 760, 65);
+
+  _gameTabArea := intToBox(547, 252, 737, 506);
 end;
 

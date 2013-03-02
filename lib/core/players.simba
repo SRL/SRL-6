@@ -22,7 +22,6 @@ Example:
 .. code-block:: pascal
 
     players[currentPlayer].skillLevel[SKILL_ATTACK] := 50;
-
 *)
 const
   SKILL_COUNT = 25;
@@ -778,6 +777,7 @@ TPlayer.loginToLobby
 
 Logs the TPlayer into to the lobby. Returns true when the lobby screen is
 visible.
+
 .. note::
 
     by The SRL Developers Team
@@ -827,13 +827,8 @@ begin
       if (not self.__loginResponse(tries, t)) then
         break;
 
-      // to handle the validate email screen
-      if (getColor(473, 468) = 1001495) then // gold border around the "confirm" button
-        mouseBox(intToBox(502, 474, 548, 485), MOUSE_LEFT); // the "skip" button
-
       wait(100 + random(100));
       result := (isLobbyScreenOpen());
-
     until(result);
   until(result);
 
@@ -910,66 +905,6 @@ begin
   wait(300 + random(500));
 end;
 
-{*
-__logout()
-~~~~~~~~~~
-
-.. code-block:: pascal
-
-    function __logout(): boolean;
-
-Returns true if the current player is successfully logged out.
-
-.. note::
-
-    by Starblaster100, Raymond, IceFire908, Tarajunky & NCDS
-    Last updated: 30/09/2012 by Coh3n
-
-Example:
-
-.. code-block:: pascal
-
-    if (players[currentPlayer].logout()) then
-      writeln('We are logged out!');
-*}
-function __logout(): boolean;
-var
-  t: integer;
-  p: TPoint;
-begin
-  if (not isLoggedIn()) then
-  begin
-    result := true;
-    exit;
-  end;
-
-  if (@SRL_Events[EVENT_LOGOUT] <> nil) then
-    SRL_Events[EVENT_LOGOUT]();
-
-  if (not gameTab(TAB_LOGOUT)) then
-  begin
-    closeWindow(); // incase the bank or another interface is open
-
-    if (not gameTab(TAB_LOGOUT)) then
-      exit;
-  end;
-
-  wait(100 + random(200));
-
-  if (findText(p, ['Login'], [UpCharsEx], MI_BOX, 1000)) then
-  begin
-    mouse(p.rand(3, 10), MOUSE_LEFT);
-    t := (getSystemTime + (15000));
-
-    while (not result) and (getSystemTime < t) do
-    begin
-      subDebug('Waiting for login screen...');
-      result := (not isLoggedIn());
-      wait(700 + random(500));
-    end;
-  end;
-end;
-
 (*
 TPlayer.logout
 ~~~~~~~~~~~~~~
@@ -989,16 +924,61 @@ Example:
 
 .. code-block:: pascal
 
-    players[currentPlayer].loginToLobby();
+    players[currentPlayer].logout();
 
 *)
 function TPlayer.logout(): boolean;
+var
+  t: integer;
 begin
-  if (__logout()) then
+  if (not isLoggedIn()) then
   begin
     result := true;
+    exit;
+  end;
+
+  if (@SRL_Events[EVENT_LOGOUT] <> nil) then
+    SRL_Events[EVENT_LOGOUT]();
+
+  if (tabLogout.clickText(['Login'])) then
+  begin
+    t := (getSystemTime + (15000));
+
+    while (not result) and (getSystemTime < t) do
+    begin
+      subDebug('Waiting for login screen...');
+      result := (not isLoggedIn());
+      wait(700 + random(500));
+    end;
+
     self.worked.pause();
   end;
+end;
+
+(*
+TPlayer.exitToLobby
+~~~~~~~~~~~~~~~~~~~
+
+.. code-block:: pascal
+
+    function TPlayer.exitToLobby(): boolean;
+
+Logs the player out to the lobby.
+
+.. note::
+
+    by Coh3n
+    Last updated: Mar. 1, 2013 by Coh3n
+
+Example:
+
+.. code-block:: pascal
+
+    players[currentPlayer].exitToLobby();
+*)
+function TPlayer.exitToLobby(): boolean;
+begin
+  result := _exitToLobby();
 end;
 
 begin

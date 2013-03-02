@@ -18,8 +18,8 @@ SRL library isn't available to you.
 {$include_once lib/core/players.simba}
 {$include_once lib/core/client.simba}
 
-{$include_once lib/interfaces/gametabs/inventory.simba}
 {$include_once lib/interfaces/gametabs/gametab.simba}
+{$include_once lib/interfaces/gametabs/logout.simba}
 {$include_once lib/interfaces/lobby.simba}
 {$include_once lib/interfaces/mainscreen.simba}
 
