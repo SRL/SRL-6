@@ -60,6 +60,32 @@ begin
 end;
 
 (*
+findColorTolerance: overload;
+~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+
+.. code-block:: pascal
+
+    function findColorTolerance(var x, y: integer; color: integer; box: tbox; tolerance: integer): boolean; overload;
+
+Takes a TBox variable instead of x1, y1, x2 and y2 variables.
+
+.. note::
+
+    by Ollybest
+
+Example:
+
+.. code-block:: pascal
+
+    findColorTolerance(x, y, 255, b, 10);
+
+*)
+function findColorTolerance(var x, y: integer; color: integer; box: tbox; tolerance: integer): boolean; overload;
+begin
+  result := FindColorTolerance(x, y, color, box.X1, box.Y1, box.X2, box.Y2, tolerance);
+end; 
+
+(*
 findColorsTolerance: overload;
 ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
 
