@@ -8,6 +8,32 @@ The Wrappers include contains wrapper functions used throughout SRL.  These func
 *)
 
 (*
+findColor: overload;
+~~~~~~~~~~~~~~~~~~~~
+
+.. code-block:: pascal
+
+    function findColor(var x, y: integer; col: integer b: TBox): boolean; overload;
+
+Takes a TBox variable instead of x1, y1, x2 and y2 variables.
+
+.. note::
+
+    by Coh3n
+
+Example:
+
+.. code-block:: pascal
+
+    FindColor(x, y, cl_White, mainScreen.getBounds());
+
+*)
+function findColor(var x, y: integer; col: integer; b: TBox): boolean; overload;
+begin
+  result := findColor(x, y, col, b.x1, b.y1, b.x2, b.y2);
+end;
+
+(*
 findColors: overload;
 ~~~~~~~~~~~~~~~~~~~~~
 
@@ -80,9 +106,60 @@ Example:
     CountColor(clWhite, MSBOX);
 
 *)
-function countColor(Color: integer; box: TBox): Boolean; overload;
+function countColor(Color: integer; box: TBox): integer; overload;
 begin
   Result := CountColor(color, box.X1, box.Y1, box.X2, box.Y2);
+end;
+
+(*
+CountColorTolerance: overload;
+~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+
+.. code-block:: pascal
+
+    function countColorTolerance(Color: integer; box: TBox; tol: integer): Boolean; overload;
+
+Takes a TBox variable instead of x1, y1, x2 and y2 variables.
+
+.. note::
+
+    by Coh3n
+
+Example:
+
+.. code-block:: pascal
+
+    CountColorTolerance(clWhite, 10, MSBOX);
+
+*)
+function countColorTolerance(Color: integer; box: TBox; tol: integer): Boolean; overload;
+begin
+  Result := CountColorTolerance(color, box.X1, box.Y1, box.X2, box.Y2, tol);
+end;
+
+(*
+findBitmapMaskTolerance: overload;
+~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+
+.. code-block:: pascal
+
+    function findBitmapMaskTolerance(mask: integer; var p: TPoint, b: TBox; tol, contourTol: integer): boolean; overload;
+
+Takes a TBox variable instead of x1, y1, x2 and y2 variables.
+
+.. note::
+
+    by Coh3n
+
+Example:
+
+.. code-block:: pascal
+
+    result := findBitmapMaskTolerance(s, p, mainscreen.bounds, 30, 30);
+*)
+function findBitmapMaskTolerance(mask: integer; var p: TPoint; b: TBox; tol, contourTol: integer): boolean; overload;
+begin
+  result := findBitmapMaskTolerance(mask, p.x, p.y, b.x1, b.y1, b.x2, b.y2, tol, contourTol);
 end;
 
 (*
