@@ -1571,6 +1571,35 @@ begin
 end;
 
 (*
+TBox.colorExists
+~~~~~~~~~~~~~~~~
+
+.. code-block:: pascal
+
+    function TBox.colorExists(color: integer; tolerance: integer = 0): Boolean;
+
+Returns true if the color is found within the tbox. Also includes a optional
+tolerance parameter.
+
+.. note::
+
+    by Ollybest
+
+Example:
+
+.. code-block:: pascal
+
+    result := b.colorExists(OUTLINE_BLACK);
+
+*)
+function TBox.colorExists(color: integer; tolerance: integer = 0): Boolean;
+var
+  x, y: integer;
+begin
+  result := findColorTolerance(x, y, color, self, tolerance);
+end;
+
+(*
 TPoint.create
 ~~~~~~~~~~~~~
 
