@@ -981,6 +981,32 @@ begin
   result := _exitToLobby();
 end;
 
+(*
+TPlayer.leaveLobby
+~~~~~~~~~~~~~~~~~~
+
+.. code-block:: pascal
+
+    function TPlayer.leaveLobby(): boolean;
+
+Leaves the lobby; goes to the login screen.
+
+.. note::
+
+    by Coh3n
+    Last updated: Mar. 3, 2013 by Coh3n
+
+Example:
+
+.. code-block:: pascal
+
+    players[currentPlayer].leaveLobby();
+*)
+function TPlayer.leaveLobby(): boolean;
+begin
+  result := _leaveLobby();
+end;
+
 begin
   _boxUsername := intToBox(279, 205, 486, 215);
   _boxPassword := intToBox(279, 250, 486, 265);

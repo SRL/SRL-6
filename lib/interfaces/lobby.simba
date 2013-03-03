@@ -33,30 +33,33 @@ const
     LOBBY_OPTIONS = 5;
 
 {*
-__validateEmailScreen()
-~~~~~~~~~~~~~~~~~~~~~~~
+__skipEmailScreen()
+~~~~~~~~~~~~~~~~~~~
 
 .. code-block:: pascal
 
-    procedure __validateEmailScreen();
+    procedure __skipEmailScreen();
 
 Handles the validate email screen that comes up when you enter to lobby.
 
 .. note::
 
     by NCDS
-    Last updated: Mar. 1, 2013 by Coh3n
+    Last updated: Mar. 3, 2013 by Coh3n
 
 Example:
 
 .. code-block:: pascal
 
-    __validateEmailScreen();
+    __skipEmailScreen();
 *}
-procedure __validateEmailScreen();
+procedure __skipEmailScreen();
 begin
   if (getColor(473, 468) = 1001495) then // gold border around the "confirm" button
+  begin
     mouseBox(intToBox(502, 474, 548, 485), MOUSE_LEFT); // the "skip" button
+    wait(200 + random(200));
+  end;
 end;
 
 (*
@@ -114,8 +117,7 @@ Example:
 *)
 function isLobbyScreenOpen(): boolean;
 begin
-  __validateEmailScreen();
-  wait(200 + random(200));
+  __skipEmailScreen();
   result := inRange(getLobbyTab, LOBBY_PLAYER, LOBBY_OPTIONS);
 end;
 
@@ -166,35 +168,35 @@ begin
     end;
 end;
 
-(*
-leaveLobby
-~~~~~~~~~~
+{*
+_leaveLobby
+~~~~~~~~~~~
 
 .. code-block:: pascal
 
-    function leaveLobby(): boolean;
+    function _leaveLobby(): boolean;
 
 Leaves the lobby screen.
 
 .. note::
 
     by IceFire908
-    Last Updated: Jan. 7th, 2013 by Coh3n
+    Last Updated: Mar. 3, 2013 by Coh3n
 
 Example:
 
 .. code-block:: pascal
 
     if (isLobbyScreenOpen()) then
-      if (not leaveLobby()) then
+      if (not players[currentPlayer].leaveLobby()) then
         writeln('Oh no, we didn''t make it out of the Lobby Screen.');
-*)
-function leaveLobby(): boolean;
+*}
+function _leaveLobby(): boolean;
 var
   t := (getSystemTime() + 30000);
   exitButton := point(690, 85).rand(3);
 begin
-  addHeader('leaveLobby(): leaving lobby');
+  addHeader('_leaveLobby(): leaving lobby');
 
   result := (not isLobbyScreenOpen());
 
@@ -206,5 +208,5 @@ begin
     result := (not isLobbyScreenOpen());
   end;
 
-  closeHeader('leaveLobby(): ' + toStr(result));
+  closeHeader('_leaveLobby(): ' + toStr(result));
 end;
