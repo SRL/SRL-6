@@ -17,3 +17,4 @@ VARIABLES:
 	currentPlayer: integer; 		- the current active player
 	SMART_SixHourFix: boolean; 		- restart SMART after 6 hours. Default true.
 	SMART_ForceNew: boolean; 		- force a new SMART client when a script is started. Default false.
+	tabLogout: TTabLogout;			- called to interact with the logout gametab
