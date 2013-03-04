@@ -46,4 +46,19 @@ Example:
 var
   SRL_Events: array[0..(EVENT_COUNT - 1)] of procedure;
 
+(*
+Constant: Outlines
+~~~~~~~~~~~~~~~~~~
 
+Integer constants that represents item outline color.
+
+Example:
+
+.. code-block:: pascal
+
+    FindColors(tpa, OUTLINE_BLACK, Box, 0);
+
+*)
+const
+  OUTLINE_BLACK = 131072;
+  OUTLINE_WHITE = 16777215; 
