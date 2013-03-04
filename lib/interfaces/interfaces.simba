@@ -11,30 +11,19 @@ and all its functions.  All interface files should import this file.
 {$include_once ../core/mouse.simba}
 
 {*
-Constant: IDs
-~~~~~~~~~~~~~
+const IDs
+~~~~~~~~~
 
 Integer constants that represent the ID's of each global interface.
 *}
 const
   ID_INTERFACE_TAB_INVENTORY = 0;
   ID_INTERFACE_TAB_LOGOUT    = 1;
+  ID_INTERFACE_LOBBY         = 2;
 
 {*
-Constant: Interface
-~~~~~~~~~~~~~~~~~~~
-
-Constants that are consistent over several interfaces.
-*}
-const
-  MIX1 = 0;
-  MIX2 = 0;
-  MIY1 = 0;
-  MIY2 = 0;
-
-{*
-Type: TRSInterface
-~~~~~~~~~~~~~~~~~~
+type TRSInterface
+~~~~~~~~~~~~~~~~~
 
 A record that stores useful information about RS interfaces.
 *}

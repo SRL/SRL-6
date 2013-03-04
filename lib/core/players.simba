@@ -795,7 +795,7 @@ var
   arr: TVariantArray;
   c, t, tries: integer;
 begin
-  if (isLoggedIn() or isLobbyScreenOpen()) then
+  if (isLoggedIn() or lobby.isOpen()) then
     exit(true);
 
   // check player activity
@@ -828,7 +828,7 @@ begin
         break;
 
       wait(100 + random(100));
-      result := (isLobbyScreenOpen());
+      result := (lobby.isOpen());
     until(result);
   until(result);
 
@@ -978,7 +978,7 @@ Example:
 *)
 function TPlayer.exitToLobby(): boolean;
 begin
-  result := _exitToLobby();
+  result := lobby._open();
 end;
 
 (*
@@ -1004,7 +1004,7 @@ Example:
 *)
 function TPlayer.leaveLobby(): boolean;
 begin
-  result := _leaveLobby();
+  result := lobby._leaveLobby();
 end;
 
 begin

@@ -35,7 +35,7 @@ Example:
 *)
 function isClientReady(): boolean;
 begin
-  Result := (isLoggedIn() or isLobbyScreenOpen());
+  Result := (isLoggedIn() or lobby.isOpen());
 
   if (not Result) then
   begin

@@ -7,11 +7,32 @@ lobby.
 
 *)
 
+{$include_once interfaces.simba}
 {$include_once gametabs/logout.simba}
 
 (*
-Constant: Lobby
-~~~~~~~~~~~~~~~
+type TRSLobby
+~~~~~~~~~~~~~
+
+A type that stores functions and properties of the Runescape lobby.
+*)
+type
+  TRSLobby = record(TRSInterface)
+    __placeholder: byte;
+  end;
+
+(*
+var lobby
+~~~~~~~~~
+
+Variable that stores functions and properties of the Runescape lobby.
+*)
+var
+  lobby: TRSLobby;
+
+(*
+const Lobby Tabs
+~~~~~~~~~~~~~~~~
 
 Integer constants that representing the different lobby tabs.
 
@@ -19,7 +40,7 @@ Example:
 
 .. code-block:: pascal
 
-  if (GetlobbyScreen() = LOBBY_CLAN) then
+  if (lobby.getTab() = LOBBY_CLAN) then
     writeln('The clan chat tab is open!');
 
 *)
@@ -33,12 +54,48 @@ const
     LOBBY_OPTIONS = 5;
 
 {*
-__skipEmailScreen()
-~~~~~~~~~~~~~~~~~~~
+TRSLobby.__init()
+~~~~~~~~~~~~~~~~~
 
 .. code-block:: pascal
 
-    procedure __skipEmailScreen();
+    procedure TRSLobby.__init();
+
+Initiates the lobby variable. Called at the end of this file.
+
+.. note::
+
+    by Coh3n
+    Last updated: Mar. 3, 2013 by Coh3n
+
+Example:
+
+.. code-block:: pascal
+
+    lobby.__init();
+*}
+procedure TRSLobby.__init();
+begin
+  with self do
+  begin
+    name := 'RS Lobby';
+    ID := ID_INTERFACE_LOBBY;
+    parentID := -1;
+    static := true;
+    x := 0;
+    y := 50;
+    getClientDimensions(w, h);
+    bounds := self.getBounds();
+  end;
+end;
+
+{*
+TRSLobby.__skipEmailScreen()
+~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+
+.. code-block:: pascal
+
+    procedure TRSLobby.__skipEmailScreen();
 
 Handles the validate email screen that comes up when you enter to lobby.
 
@@ -51,9 +108,9 @@ Example:
 
 .. code-block:: pascal
 
-    __skipEmailScreen();
+    lobby.__skipEmailScreen();
 *}
-procedure __skipEmailScreen();
+procedure TRSLobby.__skipEmailScreen();
 begin
   if (getColor(473, 468) = 1001495) then // gold border around the "confirm" button
   begin
@@ -63,12 +120,12 @@ begin
 end;
 
 (*
-getLobbyTab
-~~~~~~~~~~~
+TRSLobby.getCurrentTab()
+~~~~~~~~~~~~~~~~~~~~~~~~
 
 .. code-block:: pascal
 
-    function getLobbyTab: integer;
+    function TRSLobby.getCurrentTab: integer;
 
 Gets current lobby tab.
 
@@ -80,11 +137,11 @@ Example:
 
 .. code-block:: pascal
 
-    if (getLobbyTab = LOBBY_WORLD) then
+    if (lobby.getCurrentTab() = LOBBY_WORLD) then
       writeln('The world list is open!');
 
 *)
-function getLobbyTab: integer;
+function TRSLobby.getCurrentTab(): integer;
 begin
   for result := 0 to (LOBBY_COUNT - 1) do
     if (GetColor(63 + result * 102, 82) = 11582147) then
@@ -94,12 +151,12 @@ begin
 end;
 
 (*
-isLobbyScreenOpen
+TRSLobby.isOpen()
 ~~~~~~~~~~~~~~~~~
 
 .. code-block:: pascal
 
-    function isLobbyScreenOpen: boolean;
+    function TRSLobby.isOpen(): boolean;
 
 Returns true if we are at the lobby screen is loaded.
 
@@ -111,23 +168,23 @@ Example:
 
 .. code-block:: pascal
 
-    while (not isLobbyScreenOpen) do
+    while (not lobby.isOpen()) do
       wait(100 + Random(400));
 
 *)
-function isLobbyScreenOpen(): boolean;
+function TRSLobby.isOpen(): boolean;
 begin
-  __skipEmailScreen();
-  result := inRange(getLobbyTab, LOBBY_PLAYER, LOBBY_OPTIONS);
+  self.__skipEmailScreen();
+  result := inRange(self.getCurrentTab(), LOBBY_PLAYER, LOBBY_OPTIONS);
 end;
 
 {*
-_exitToLobby
-~~~~~~~~~~~~
+TRSLobby._open()
+~~~~~~~~~~~~~~~~
 
 .. code-block:: pascal
 
-    function _exitToLobby(): boolean;
+    function TRSLobby._open(): boolean;
 
 Exits to the lobby screen. Should call players[currentPlayer].exitToLobby()
 instead of this function.
@@ -135,20 +192,20 @@ instead of this function.
 .. note::
 
     by Starblaster100, Raymond, IceFire908, Tarajunky, & Coh3n
-    Last Updated: Jan. 10th, by Co3n
+    Last Updated: Mar. 3, 2013 by Co3n
 
 Example:
 
 .. code-block:: pascal
 
-    if (_exitToLobby()) then
+    if (players[currentPlayer].exitToLobby()) then
       writeln('We''ve exited to the lobby!');
 *}
-function _exitToLobby(): boolean;
+function TRSLobby._open(): boolean;
 var
-  t := (getSystemTime + (15000));
+  t: integer;
 begin
-  if (isLobbyScreenOpen()) then
+  if (lobby.isOpen()) then
   begin
     result := true;
     exit;
@@ -160,21 +217,25 @@ begin
   wait(100 + random(200));
 
   if (tabLogout.clickText(['Lobby'])) then
+  begin
+    t := (getSystemTime + (15000));
+
     while (not result) and (getSystemTime < t) do
     begin
       debug('Waiting for lobby screen...');
-      result := isLobbyScreenOpen();
+      result := lobby.isOpen();
       wait(700 + random(500));
     end;
+  end;
 end;
 
 {*
-_leaveLobby
-~~~~~~~~~~~
+TRSLobby._leaveLobby
+~~~~~~~~~~~~~~~~~~~~
 
 .. code-block:: pascal
 
-    function _leaveLobby(): boolean;
+    function TRSLobby._leaveLobby(): boolean;
 
 Leaves the lobby screen.
 
@@ -187,26 +248,33 @@ Example:
 
 .. code-block:: pascal
 
-    if (isLobbyScreenOpen()) then
+    if (lobby.isOpen()) then
       if (not players[currentPlayer].leaveLobby()) then
         writeln('Oh no, we didn''t make it out of the Lobby Screen.');
 *}
-function _leaveLobby(): boolean;
+function TRSLobby._leaveLobby(): boolean;
 var
-  t := (getSystemTime() + 30000);
-  exitButton := point(690, 85).rand(3);
+  t: integer;
+  exitButton: TPoint;
 begin
   addHeader('_leaveLobby(): leaving lobby');
 
-  result := (not isLobbyScreenOpen());
+  result := (not lobby.isOpen());
+
+  t := (getSystemTime() + 30000);
+  exitButton := point(690, 85).rand(3);
 
   while (not result) and (getSystemTime() < t) do
   begin
     debug('Waiting for login screen...');
     mouse(exitButton, MOUSE_LEFT);
     wait(randomRange(1000, 2000));
-    result := (not isLobbyScreenOpen());
+    result := (not lobby.isOpen());
   end;
 
   closeHeader('_leaveLobby(): ' + toStr(result));
+end;
+
+begin
+  lobby.__init();
 end;

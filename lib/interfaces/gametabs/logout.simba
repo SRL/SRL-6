@@ -9,14 +9,47 @@ gametab.
 
 {$include_once gametab.simba}
 
+(*
+type TTabLogout
+~~~~~~~~~~~~~~~
+
+A type that stores functions and properties of the Runescape logout tab.
+*)
 type
   TTabLogout = record(TRSInterface)
     tabIndex: integer;
   end;
 
+(*
+var tabLogout
+~~~~~~~~~~~~~
+
+Variable that stores functions and properties of the Runescape logout tab.
+*)
 var
   tabLogout: TTabLogout;
 
+{*
+TTabLogout.__init()
+~~~~~~~~~~~~~~~~~~~
+
+.. code-block:: pascal
+
+    procedure TTabLogout.__init();
+
+Initiates the tabLogout variable. Called at the end of this file.
+
+.. note::
+
+    by Coh3n
+    Last updated: Mar. 3, 2013 by Coh3n
+
+Example:
+
+.. code-block:: pascal
+
+    tabLogout.__init();
+*}
 procedure TTabLogout.__init();
 begin
   with self do
