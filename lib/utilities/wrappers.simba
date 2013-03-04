@@ -164,6 +164,33 @@ begin
 end;
 
 (*
+findDTM: overload;
+~~~~~~~~~~~~~~~~~~
+
+.. code-block:: pascal
+
+    function findDTM(dtm: integer; var x, y: integer; box: tbox): Boolean; overload;
+
+Takes a TBox variable instead of x1, y1, x2 and y2 variables.
+
+.. note::
+
+    by Ollybest
+
+Example:
+
+.. code-block:: pascal
+
+    if findDTM(theDTM, x, y, msBox) then
+      writeln('we found the dtm!');
+
+*)
+function findDTM(dtm: integer; var x, y: integer; box: tbox): Boolean; overload;
+begin
+  result := findDTM(dtm, x, y, box.X1, box.Y1, box.X2, box.Y2);
+end;
+
+(*
 findBitmapMaskTolerance: overload;
 ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
 
