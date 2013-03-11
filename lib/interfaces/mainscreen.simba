@@ -371,7 +371,7 @@ Example:
     if (chooseOption(['Examine'], MOUSE_LEFT)) then
       writeln('Examining something...');
 *)
-function chooseOption(txt: TStringArray; mouseAction: integer; waitTime: integer = 100): boolean; overload;
+function chooseOption(txt: TStringArray; mouseAction: integer = MOUSE_LEFT; waitTime: integer = 100): boolean; overload;           
 begin
   result := chooseOption(txt, TStringArray([]), mouseAction, waitTime);
 end;
