@@ -20,6 +20,7 @@ const
   ID_INTERFACE_TAB_INVENTORY = 0;
   ID_INTERFACE_TAB_LOGOUT    = 1;
   ID_INTERFACE_LOBBY         = 2;
+  ID_INTERFACE_MAINSCREEN    = 3;
 
 {*
 type TRSInterface
@@ -59,64 +60,6 @@ Example:
 function TRSInterface.getBounds(): TBox;
 begin
   result := intToBox(x, y, (x + w), (y + h));
-end;
-
-(*
-TRSInterface.getColors
-~~~~~~~~~~~~~~~~~~~~~~
-
-.. code-block:: pascal
-
-    function TRSInterface.getColors(clearSame: boolean = true): TIntegerArray;
-
-Returns an array of all the colors found in the TRSInterface. Clears duplicate
-colors if clearSame is set to true.
-
-.. note::
-
-    by Coh3n
-
-Example:
-
-.. code-block:: pascal
-
-    cols := mainscreen.getColors();
-*)
-function TRSInterface.getColors(clearSame: boolean = true): TIntegerArray;
-var
-  b: TBox;
-begin
-  b := self.getBounds();
-  result := b.getColors(clearSame);
-end;
-
-(*
-TRSInterface.findColor
-~~~~~~~~~~~~~~~~~~~~~~
-
-.. code-block:: pascal
-
-    function TRSInterface.findColors(var tpa: TPointArray; col, tol: integer): boolean;
-
-Returns true if a color with a given tolerance is found in the TRSInterface.
-    * tpa: The points where the color was found.
-    * col: The color to look for.
-    * tol: The tolerance on col.
-
-.. note::
-
-    by Coh3n
-
-Example:
-
-.. code-block:: pascal
-
-    if (mainscreen.findColor(tpa, clRed, 10)) then
-      debug('Found the color red');
-*)
-function TRSInterface.findColor(var tpa: TPointArray; col, tol: integer): boolean;
-begin
-  result := findColorsTolerance(tpa, col, self.getBounds(), tol);
 end;
 
 (*

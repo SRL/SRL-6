@@ -10,13 +10,13 @@ gametab.
 {$include_once gametab.simba}
 
 (*
-type TTabLogout
-~~~~~~~~~~~~~~~
+type TRSTabLogout
+~~~~~~~~~~~~~~~~~
 
 A type that stores functions and properties of the Runescape logout tab.
 *)
 type
-  TTabLogout = record(TRSInterface)
+  TRSTabLogout = record(TRSInterface)
     tabIndex: integer;
   end;
 
@@ -27,15 +27,15 @@ var tabLogout
 Variable that stores functions and properties of the Runescape logout tab.
 *)
 var
-  tabLogout: TTabLogout;
+  tabLogout: TRSTabLogout;
 
 {*
-TTabLogout.__init()
-~~~~~~~~~~~~~~~~~~~
+TRSTabLogout.__init()
+~~~~~~~~~~~~~~~~~~~~~
 
 .. code-block:: pascal
 
-    procedure TTabLogout.__init();
+    procedure TRSTabLogout.__init();
 
 Initiates the tabLogout variable. Called at the end of this file.
 
@@ -50,7 +50,7 @@ Example:
 
     tabLogout.__init();
 *}
-procedure TTabLogout.__init();
+procedure TRSTabLogout.__init();
 begin
   with self do
   begin
@@ -68,12 +68,12 @@ begin
 end;
 
 (*
-TTabLogout.isOpen()
-~~~~~~~~~~~~~~~~~~~
+TRSTabLogout.isOpen()
+~~~~~~~~~~~~~~~~~~~~~
 
 .. code-block:: pascal
 
-    function TTabLogout.isOpen(): boolean;
+    function TRSTabLogout.isOpen(): boolean;
 
 Returns true if the logout tab is opened.
 
@@ -89,18 +89,18 @@ Example:
     if (tabLogout.isOpen()) then
       writeln('Logout tab is open');
 *)
-function TTabLogout.isOpen(): boolean;
+function TRSTabLogout.isOpen(): boolean;
 begin
   result := (getCurrentTab = self.tabIndex);
 end;
 
 (*
-TTabLogout.open()
-~~~~~~~~~~~~~~~~~
+TRSTabLogout.open()
+~~~~~~~~~~~~~~~~~~~
 
 .. code-block:: pascal
 
-    function TTabLogout.open(): boolean;
+    function TRSTabLogout.open(): boolean;
 
 Returns true if the logout tab is opened.
 
@@ -116,18 +116,18 @@ Example:
     if (tabLogout.open()) then
       writeln('Opened logout tab');
 *)
-function TTabLogout.open(): boolean;
+function TRSTabLogout.open(): boolean;
 begin
   result := _openGameTab(self.tabIndex);
 end;
 
 {*
-TTabLogout.mouseText()
-~~~~~~~~~~~~~~~~~~~~~~
+TRSTabLogout.mouseText()
+~~~~~~~~~~~~~~~~~~~~~~~~
 
 .. code-block:: pascal
 
-    function TTabLogout.mouseText(txt: TStringArray; mouseAction: integer = MOUSE_LEFT): boolean;
+    function TRSTabLogout.mouseText(txt: TStringArray; mouseAction: integer = MOUSE_LEFT): boolean;
 
 Returns true if the logout text is clicked.
 
@@ -143,7 +143,7 @@ Example:
     if (tabLogout.mouseText(['Login'])) then
       writeln('We are logging out');
 *}
-function TTabLogout.clickText(txt: TStringArray; mouseAction: integer = MOUSE_LEFT): boolean;
+function TRSTabLogout.clickText(txt: TStringArray; mouseAction: integer = MOUSE_LEFT): boolean;
 var
   p: TPoint;
 begin
