@@ -1600,6 +1600,34 @@ begin
 end;
 
 (*
+TBox.dtmExists
+~~~~~~~~~~~~~~~~
+
+.. code-block:: pascal
+
+    function TBox.dtmExists(dtm: integer): boolean;
+
+Returns true if the dtm is found within the tbox.
+
+.. note::
+
+    by Ollybest
+
+Example:
+
+.. code-block:: pascal
+
+    result := b.dtmExists(thedtm);
+
+*)
+function TBox.dtmExists(dtm: integer): boolean;
+var
+  p: tpoint;
+begin
+  result := findDTM(dtm, p.x, p.y, self);
+end;
+
+(*
 TPoint.create
 ~~~~~~~~~~~~~
 

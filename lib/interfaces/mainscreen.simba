@@ -435,7 +435,7 @@ TRSMainscreen.chooseOption; overload;
 
 .. code-block:: pascal
 
-    function TRSMainscreen.chooseOption(txt: TStringArray; mouseAction: integer; waitTime: integer = 100): boolean; overload;
+    function TRSMainscreen.chooseOption(txt: TStringArray; mouseAction: integer = MOUSE_LEFT; waitTime: integer = 100): boolean; overload;
 
 Chooses the first option in txt that's found in the RS right click menu.  Mouse
 behaviour depends on mouseAction.  Will wait (waitTime) for the options to
@@ -453,7 +453,7 @@ Example:
     if (mainscreen.chooseOption(['Examine'], MOUSE_LEFT)) then
       writeln('Examining something...');
 *)
-function TRSMainscreen.chooseOption(txt: TStringArray; mouseAction: integer; waitTime: integer = 100): boolean; overload;
+function TRSMainscreen.chooseOption(txt: TStringArray; mouseAction: integer = MOUSE_LEFT; waitTime: integer = 100): boolean; overload;
 begin
   result := self.chooseOption(txt, TStringArray([]), mouseAction, waitTime);
 end;
