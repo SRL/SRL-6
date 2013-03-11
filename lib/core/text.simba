@@ -77,7 +77,7 @@ findTextByColor
 
 .. code-block:: pascal
 
-    function findTextByColor(var p: TPoint; col, tol: integer; txt, fonts: TStringArray; lookIn: TBox; waitTime: integer = 0): boolean; overload;
+    function findTextByColor(var p: TPoint; col, tol: integer; txt, fonts: TStringArray; lookIn: TBox; waitTime: integer = 0): boolean;
 
 Uses TPointArrays to find text on the screen.  Searches for the color (col) with
 tolerance (tol) on the screen, then looks for the text (txt) in a TPA created
@@ -106,7 +106,7 @@ Example:
       .
     end;
 *)
-function findTextByColor(var p: TPoint; col, tol: integer; txt, fonts: TStringArray; lookIn: TBox; waitTime: integer = 0): boolean; overload;
+function findTextByColor(var p: TPoint; col, tol: integer; txt, fonts: TStringArray; lookIn: TBox; waitTime: integer = 0): boolean;
 var
   b: TBox;
   i, j, w, h, t: integer;
