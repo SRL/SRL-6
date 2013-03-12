@@ -2705,8 +2705,8 @@ begin
 end;
 
 (*
-T2DPointArray.merge
-~~~~~~~~~~~~~~~~~~~
+T2DPointArray.getTextATPA
+~~~~~~~~~~~~~~~~~~~~~~~~~
 
 .. code-block:: pascal
 
@@ -2729,3 +2729,39 @@ function T2DPointArray.getTextInATPA(const maxSpacing: integer; const font: stri
 begin
   result := getTextATPA(self, maxSpacing, font);
 end;
+
+(*
+T2DPointArray.removeTPAsUnder
+~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+
+.. code-block:: pascal
+
+    procedure T2DPointArray.removeTPAsUnder(minLength: integer);
+
+Removes all tpa's under minLength in the atpa.
+
+.. note::
+
+    by Ollybest
+
+Example:
+
+.. code-block:: pascal
+
+    atpa.removeTPAsUnder(50);
+
+*)
+procedure T2DPointArray.removeTPAsUnder(minLength: integer);
+var
+  len: integer := length(self);
+  i: integer := 0;
+begin
+  sortATPASize(self, true);
+
+  for i to (len - 1) do
+    if (length(self[i]) < minLength) then
+    begin
+      setLength(self, i);
+      break;
+    end;
+end;                            
