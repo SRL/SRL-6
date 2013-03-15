@@ -85,7 +85,6 @@ begin
     x := 0;
     y := 50;
     getClientDimensions(w, h);
-    bounds := self.getBounds();
   end;
 end;
 

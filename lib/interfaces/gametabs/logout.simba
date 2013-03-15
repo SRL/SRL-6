@@ -63,7 +63,6 @@ begin
     y := _gameTabArea.y1;
     w := (_gameTabArea.x2 - x);
     h := (_gameTabArea.y2 - y);
-    bounds := self.getBounds();
   end;
 end;
 
@@ -151,7 +150,7 @@ begin
     exit(false);
 
   wait(100 + random(200));
-  result := mouseText(txt, [upCharsEx], self.bounds, mouseAction);
+  result := mouseText(txt, [upCharsEx], self.getBounds(), mouseAction);
 end;
 
 begin

@@ -34,7 +34,6 @@ type
     ID, parentID: integer;
     static: boolean;
     x, y, w, h: integer;
-    bounds: TBox;
   end;
 
 (*
