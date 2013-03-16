@@ -9,25 +9,25 @@ Runescape inventory gametab.
 
 {$include_once gametab.simba}
 
-{*
-const
-~~~~~
+(*
+const Inventory low/high
+~~~~~~~~~~~~~~~~~~~~~~~~
 
 Integer constants that represent the highest and lowest inventory slots.
 
-*}
+*)
 const
   INV_SLOT_LOW = 1;
   INV_SLOT_HIGH = 28;
 
 
-{*
-const
-~~~~~
+(*
+const Drop Patterns
+~~~~~~~~~~~~~~~~~~~
 
 TIntegerArray constants that represent drop patterns.
 
-*}
+*)
 const
   DROP_PATTERN_REGULAR := TIntegerArray([1..28]);
   DROP_PATTERN_BACKWARDS := TIntegerArray([28..1]);
@@ -36,13 +36,13 @@ const
   DROP_PATTERN_UP_DOWN := [1, 5, 9, 13, 17, 21, 25, 26, 22, 18, 14, 10, 6, 2,
                            3, 7, 11, 15, 19, 23, 27, 28, 24, 20, 16, 12, 8, 4];
 
-{*
+(*
 type TRSTabInventory
 ~~~~~~~~~~~~~~~~~~~~
 
 A type that stores functions and properties of the Runescape inventory tab.
 
-*}
+*)
 type
   TRSTabInventory = record(TRSInterface)
     tabIndex: integer;
@@ -50,19 +50,20 @@ type
 end;
 
 
-{*
+(*
 var tabInventory
 ~~~~~~~~~~~~~~~~
 
 Variable that stores functions and properties of the Runescape inventory tab.
-*}
+
+*)
 var
   tabInventory: TRSTabInventory;
 
 
-(*
- TRSTabInventory.__init
-~~~~~~~~~~~~~~~~~~~~~~~
+{*
+TRSTabInventory.__init
+~~~~~~~~~~~~~~~~~~~~~~
 
 .. code-block:: pascal
 
@@ -81,7 +82,7 @@ Example:
 
     tabInventory.__init();
 
-*)
+*}
 procedure TRSTabInventory.__init();
 begin
   with self do
@@ -95,7 +96,6 @@ begin
     y := _gameTabArea.y1;
     w := (_gameTabArea.x2 - x);
     h := (_gameTabArea.y2 - y);
-    bounds := self.getBounds();
     __inventoryGrid := Grid(4, 7, 31, 31, 42, 36, point(578, 278));
   end;
 end;
@@ -289,7 +289,7 @@ Example:
      p: tpoint;
      i: integer;
    begin
-     if finddtm(p.x, p.y, dtm, tabInventory.bounds) then
+     if finddtm(p.x, p.y, dtm, tabInventory.getBounds()) then
        i := tabInventory.pointToSlot(p);
 
      writeln('our dtm is in slot ' + intToStr(i));
@@ -303,7 +303,7 @@ var
   hi: integer := INV_SLOT_HIGH;
   i: integer := INV_SLOT_LOW;
 begin
-  if (not (pointInBox(p, self.bounds))) then
+  if (not (pointInBox(p, self.getBounds()))) then
     exit;
 
   for i to hi do
@@ -458,7 +458,7 @@ begin
   if (not self.open()) then
     exit(false);
 
-  result := (not (self.bounds.colorExists(OUTLINE_BLACK)));
+  result := (not (self.getBounds().colorExists(OUTLINE_BLACK)));
 end;
 
 
@@ -571,7 +571,7 @@ var
   i: integer := INV_SLOT_LOW;
   hi: integer := INV_SLOT_HIGH;
 begin
-  if (not self.open()) or (not (self.bounds.colorExists(OUTLINE_WHITE))) then
+  if (not self.open()) or (not (self.getBounds().colorExists(OUTLINE_WHITE))) then
     exit(- 1);
 
   for i to hi do
@@ -593,13 +593,9 @@ TRSTabInventory.dropItems
 Drops items in the TIntegerArray, the parameter slots its optional if untouched
 the procedure will drop all items in slots 1 to 28. Can also be used with
 drop patterns.
-
- tabInventory.dropItems(); - would drop items in slots 1..28
-
- tabInventory.dropItems([1, 2, 25, 6]); - would drop items in slots 1, 2, 25 and 6
-
- tabInventory.dropItems(DROP_PATTERN_SNAKE);  - would use the drop pattern "snake"
-
+    * tabInventory.dropItems(); - would drop items in slots 1..28
+    * tabInventory.dropItems([1, 2, 25, 6]); - would drop items in slots 1, 2, 25 and 6
+    * tabInventory.dropItems(DROP_PATTERN_SNAKE);  - would use the drop pattern "snake"
 
 .. note::
 
@@ -658,7 +654,7 @@ end;
 
 (*
 TRSTabInventory.countItemsDTM
-~~~~~~~~~~~~~~~~~~~~~~~~~~~
+~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
 
 .. code-block:: pascal
 
@@ -707,26 +703,22 @@ end;
 
 (*
 TRSTabInventory.clickItemsDTM
-~~~~~~~~~~~~~~~~~~~~~~~~~~~
+~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
 
 .. code-block:: pascal
 
-    function TRSTabInventory.clickItemsDTM(dtms: tintegerarray; clicktype: integer; option: string; waitFor: integer = 300): integer;
+    function TRSTabInventory.clickItemsDTM(dtms: TIntegerArray; clicktype: integer; option: string; waitFor: integer = 300): integer;
 
 Searches for the dtm(s) and if found will perform what action is it set to do
 accepts multiple dtms. Will return how many items were clicked.
-
-DTMs - enter the dtm(s) (accept multiple dtms) to search for.
-
-clicktype - what will the mouse do?
-  MOUSE_MOVE
-  MOUSE_LEFT
-  MOUSE_RIGHT
-
-option - what option to choose. If not using MOUSE_RIGHT just leave it blank.
-
-waitFor - this is optional and on defualt is set to 300, if burying a bone you
-          may need a longer wait time than something else.
+    * DTMs - enter the dtm(s) (accept multiple dtms) to search for.
+    * clicktype - what will the mouse do?
+        MOUSE_MOVE
+        MOUSE_LEFT
+        MOUSE_RIGHT
+    * option - what option to choose. If not using MOUSE_RIGHT just leave it blank.
+    * waitFor - this is optional and on defualt is set to 300, if burying a bone you
+                may need a longer wait time than something else.
 
 .. note::
 
@@ -744,7 +736,7 @@ Example:
     tabInventory.clickItemsDTM([dtm1, dtm2], MOUSE_RIGHT, 'bury', 1000);
 
 *)
-function TRSTabInventory.clickItemsDTM(dtms: tintegerarray; clicktype: integer; option: string; waitFor: integer = 300): integer;
+function TRSTabInventory.clickItemsDTM(dtms: TIntegerArray; clicktype: integer; option: string; waitFor: integer = 300): integer;
 var
   l: integer := length(dtms);
   hi: integer := INV_SLOT_HIGH;
