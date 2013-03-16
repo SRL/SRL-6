@@ -10,24 +10,24 @@ and all its functions.  All interface files should import this file.
 {$include_once ../core/debug.simba}
 {$include_once ../core/mouse.simba}
 
-{*
+(*
 const IDs
 ~~~~~~~~~
 
 Integer constants that represent the ID's of each global interface.
-*}
+*)
 const
   ID_INTERFACE_TAB_INVENTORY = 0;
   ID_INTERFACE_TAB_LOGOUT    = 1;
   ID_INTERFACE_LOBBY         = 2;
   ID_INTERFACE_MAINSCREEN    = 3;
 
-{*
+(*
 type TRSInterface
 ~~~~~~~~~~~~~~~~~
 
 A record that stores useful information about RS interfaces.
-*}
+*)
 type
   TRSInterface = record
     name: string;
