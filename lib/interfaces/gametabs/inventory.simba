@@ -2,516 +2,779 @@
 Inventory
 =========
 
-The Inventory include contains all inventory-related functions.
+The Inventory file holds functions and procedures that are used in the
+Runescape inventory gametab.
 
 *)
 
-(*
-Constant: Outline
-~~~~~~~~~~~~~~~~~
+{$include_once gametab.simba}
 
-Integer constants that represents item outline color.
-
-Example:
-
-.. code-block:: pascal
-
-    FindColorsTolerance(P, OUTLINE_BLACK, Box.X1, Box.Y1, Box.X2, Box.Y2, 0);
-
-*)
+{*
 const
-  OUTLINE_BLACK = 131072;
-  OUTLINE_WHITE = 16777215;
+~~~~~
 
-(*
-Constant: Inventory TBox Coordinates
-~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+Integer constants that represent the highest and lowest inventory slots.
 
-TBox constants that represents the TBox coordinates for the inventory border.
-
-Example:
-
-.. code-block:: pascal
-
-    Result := (not FindColor(X, Y, OUTLINE_BLACK, MI_BOX.X1, MI_BOX.Y1, MI_BOX.X2, MI_BOX.Y2));
-
-*)
+*}
 const
-  MI_BOX := IntToBox(547, 252, 737, 506);
+  INV_SLOT_LOW = 1;
+  INV_SLOT_HIGH = 28;
 
-(*
-Constant: Center Inventory Coordinates
-~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
 
-TPoint constant that represents the center point of the inventory
-
-Example:
-
-.. code-block:: pascal
-
-    SortTPAFrom(TPA, Point(MI_CP.X, MI_CP.Y));
-
-*)
+{*
 const
-  MI_CP := point(642, 384);
+~~~~~
 
-(*
-Type: TItem
-~~~~~~~~~~~
+TIntegerArray constants that represent drop patterns.
 
-A record that stores useful information about inventory Items.  It is up to
-the scripter to use these attributes in their scripts.
+*}
+const
+  DROP_PATTERN_REGULAR := TIntegerArray([1..28]);
+  DROP_PATTERN_BACKWARDS := TIntegerArray([28..1]);
+  DROP_PATTERN_SNAKE := [28, 27, 26, 25, 21, 22, 23, 24, 20, 19, 18, 17, 13,
+                         14, 15, 16, 12, 11, 10, 9, 5, 6, 7, 8, 4, 3, 2, 1];
+  DROP_PATTERN_UP_DOWN := [1, 5, 9, 13, 17, 21, 25, 26, 22, 18, 14, 10, 6, 2,
+                           3, 7, 11, 15, 19, 23, 27, 28, 24, 20, 16, 12, 8, 4];
 
-Example:
+{*
+type TRSTabInventory
+~~~~~~~~~~~~~~~~~~~~
 
-.. code-block:: pascal
+A type that stores functions and properties of the Runescape inventory tab.
 
-    with TItem do
-    begin
-      Name := 'Log';
-      Slot := 1;
-      Stack := False;
-    end;
-
-*)
+*}
 type
-  TItem  = record
-    width, height : Integer; // the width and height of the item
-    count : Integer;         // the count of the item
-    itemBox : TBox;          // the exact box around the item
-    centerPoint : TPoint;    // the center point inside the item
-    itemExists : Boolean;     // to define the item Exists
-    name : String;           // to define name of an item.
-    colorArr : TIntegerArray;// to define an array of colors
-    checkSum : Integer;      // to define the checksum used in Item scanning
-    TPACount : Integer;      // the length of the Items TPA
-    slot : Integer;          // the Slot the item is in.
-    stack : Boolean;         // to define if the item stacks
-  end;
-  TItemArray = array of TItem;
-
-(*
-invBox
-~~~~~~
-
-.. code-block:: pascal
-
-    Function invBox(Slot :Integer): TBox;
-
-Returns TBox of surrounding Inventory SlotBox
-1-2-3-4
-5-6-7-8
-etc.
-
-.. note::
-
-    by Boreas
-    Modified: by Ogre July 15th 2009.
-    Last Modified: by BraK October 1st 2012.
-
-Example:
-
-.. code-block:: pascal
-
-    iBox := invBox;
-    MMouse(randomRange(iBox.x1, iBox.x2), randomRange(iBox.y1, iBox.y2), 0, 0);
-
-*)
-function invBox(Slot :Integer): TBox;
-var
-  Slot1, Slot6: TBox;
-begin
-  if not InRange(Slot, 1, 28) then
-  begin
-    Result := IntToBox(-1,-1,-1,-1);
-    Exit;
-  end;
-  Slot1 := IntToBox(563, 263, 594, 294);
-  Slot6 := IntToBox(605, 299, 636, 330);
-  Result.x1 := Slot1.X1 + (((Slot + 3) mod 4) * (Slot6.X1 - Slot1.X1));
-  Result.y1 := Slot1.Y1 + (((Slot - 1) div 4) * (Slot6.Y1 - Slot1.Y1));
-  Result.x2 := Result.x1 + (Slot1.X2 - Slot1.X1);
-  Result.y2 := Result.y1 + (Slot1.Y2 - Slot1.Y1);
+  TRSTabInventory = record(TRSInterface)
+    tabIndex: integer;
+    __inventoryGrid: TBoxArray;
 end;
 
-(*
-getItem
-~~~~~~~
 
-.. code-block:: pascal
-
-    function getItem(Slot: Integer) : TItem;
-
-Returns The Width, Height, Count, ItemBox and CenterPoint of the given Item Slot.
-
-.. note::
-
-    by SKy Scripter and BraK
-
-Example:
-
-.. code-block:: pascal
-
-    TItem := getItem(InvSlot);
-    MMouse(TItem.centerPoint.x, TItem.centerPoint.y, 2, 2);
-
-*)
-function getItem(Slot: Integer) : TItem;
-var
-  I, Cx, Cy : Integer;
-  P : TPointArray;
-  MinP, MaxP : TPoint;
-  Box : TBox;
-begin
-//  GameTab(tab_Inv);
-  Box := invBox(Slot);
-  FindColorsTolerance(P, OUTLINE_BLACK, Box.X1, Box.Y1, Box.X2, Box.Y2, 0);
-  Result.Count := Length(P);
-  if (Result.Count = 0) then Exit;
-  Result.ItemExists := True;
-  MinP := P[0];
-  MaxP := P[Result.Count-1];
-  Cx := P[0].x + P[Result.Count-1].x;
-  Cy := P[0].y + P[Result.Count-1].y;
-  for I := 1 to Result.Count - 2 do
-  begin
-    if (P[i].x < MinP.x) then MinP.x := P[i].x;
-    if (P[i].y < MinP.y) then MinP.y := P[i].y;
-    if (P[i].x > MaxP.x) then MaxP.x := P[i].x;
-    if (P[i].y > MaxP.y) then MaxP.y := P[i].y;
-    Cx := Cx + P[i].x;
-    Cy := Cy + P[i].y;
-  end;
-  Cx := Cx div Result.Count;
-  Cy := Cy div Result.Count;
-  Result.CenterPoint := Point(Cx, Cy);
-  Result.Width  := MaxP.x - MinP.x;
-  Result.Height := MaxP.y - MinP.y;
-  Result.ItemBox := PointToBox(MinP, MaxP);
-  result.Slot := Slot;
-end;
-
-(*
-getInventoryArray
-~~~~~~~~~~~~~~~~~
-
-.. code-block:: pascal
-
-    function GetInventoryArray : TItems;
-
-Returns The Width, Height, Count, ItemBox and CenterPoint in array [0..27] of
-all Items in the inventory.
-
-.. note::
-
-    by SKy Scripter
-
-Example:
-
-.. code-block:: pascal
-
-    invItems := getInventoryArray);
-    for i := 3 to 7 do
-      MMouse(invItems[i].centerPoint.x, invItems[i].centerPoint.y, 2, 2);
-
-*)
-function getInventoryArray : TItemArray;
-var
-  I: Byte;
-begin
-  SetLength(Result, 28);
-  for I := 0 to 27 do
-   Result[I] := GetItem(i + 1);
-end;
-
-(*
-slotCoords
-~~~~~~~~~~
-
-.. code-block:: pascal
-
-    function slotCoords(i: Integer): TPoint;
-
-Returns X and Y of Specified Inventory Slot
-
-.. note::
-
-    by RsN
-
-Example:
-
-.. code-block:: pascal
-
-    Coords := slotCoords(3);
-    MMouse(Coords.x, Coords.y, 2, 2);
-
-*)
-function slotCoords(Slot: Integer): TPoint;
-var
-  Box: TBox;
-begin
-  Box := InvBox(Slot);
-  Result.X := (Box.X1 + Box.X2) Shr 1;
-  Result.Y := (Box.Y1 + Box.Y2) Shr 1;
-end;
-
-(*
-coordsToSlot
-~~~~~~~~~~~~
-
-.. code-block:: pascal
-
-    function coordsToSlot(X, Y: Integer): Integer;
-
-Returns which Inventory slot the X and Y coords are in. If the
-coords are between slots (or not in the inventory area at all) it will return 0.
-
-.. note::
-
-    by Boreas and BraK
-
-Example:
-
-.. code-block:: pascal
-
-    Writeln('Item found in slot '+IntToStr(coordsToSlot(point.x, point.y)));
-
-*)
-function coordsToSlot(X, Y: Integer): Integer;
-begin
-  if not PointInBox(Point(X, Y), IntToBox(MI_BOX.X1, MI_BOX.Y1, MI_BOX.X2, MI_BOX.Y2)) then
-    exit;
-  for Result := 1 to 28 do
-    if PointInBox(Point(X, Y), InvBox(result)) then
-      exit;
-  Result := 0;
-end;
-
-(*
-getInvItemBounds
+{*
+var tabInventory
 ~~~~~~~~~~~~~~~~
 
+Variable that stores functions and properties of the Runescape inventory tab.
+*}
+var
+  tabInventory: TRSTabInventory;
+
+
+(*
+ TRSTabInventory.__init
+~~~~~~~~~~~~~~~~~~~~~~~
+
 .. code-block:: pascal
 
-    function getInvItemBounds(InvSpot: Integer; var T: TBox): Boolean;
+    procedure TRSTabInventory.__init();
 
-If item exists, returns TBox of the item, else returns the normal InvBox.
+Initiates the tabInventory variable. Called at the end of this file.
 
 .. note::
 
-    by Wizzup?
+    by Ollybest
+    Last updated: Mar. 15, 2013 by Ollybest
 
 Example:
 
 .. code-block:: pascal
 
-    for i := 1 to 7 do
-      if getInvItemBounds(i, iBox) then
-        Writeln('Item found in slot '+IntToStr(i));
+    tabInventory.__init();
 
 *)
-function getInvItemBounds(Slot: Integer; var T: TBox): Boolean;
-var
-  TPA: TPointArray;
+procedure TRSTabInventory.__init();
 begin
-//  GameTab(tab_inv);                                                           //Off until Gametab is done
-  if (not FindColors(TPA, OUTLINE_BLACK, T.x1, T.y1, T.x2, T.y2)) then          //No shortcut elevation
+  with self do
   begin
-    Result := False;
-    T := invBox(Slot);
-    Exit;
+    name := 'RS Inventory tab';
+    ID := ID_INTERFACE_TAB_INVENTORY;
+    tabIndex := _TAB_INVENTORY;
+    parentID := -1;
+    static := true;
+    x := _gameTabArea.x1;
+    y := _gameTabArea.y1;
+    w := (_gameTabArea.x2 - x);
+    h := (_gameTabArea.y2 - y);
+    bounds := self.getBounds();
+    __inventoryGrid := Grid(4, 7, 31, 31, 42, 36, point(578, 278));
   end;
-  Result := True;
-  T := GetTPABounds(TPA);
 end;
 
+
 (*
-itemExists
-~~~~~~~~~
+TRSTabInventory.isOpen()
+~~~~~~~~~~~~~~~~~~~~~~~~
 
 .. code-block:: pascal
 
-    function itemExists(Slot: Integer): Boolean;
+    function TRSTabInventory.open(): boolean;
 
-Checks if item in inventory at specified position exists
+Returns true if our current tab is the inventory tab.
 
 .. note::
 
-    by WT-Fakawi and BraK
+    by Ollybest
+    Last Updated: March. 11, 2013
 
 Example:
 
 .. code-block:: pascal
 
-    for i := 1 to 28 do
-      if itemExists(i) then
-        Inc(Count);
-
+    if (tabInventory.isOpen()) then
+      writeln('the inventory tab is open');
 *)
-function itemExists(Slot: Integer): Boolean;
+function TRSTabInventory.isOpen(): boolean;
 begin
-//  GameTab(tab_Inv);                                                            //Off until Gametab is done
-  result := getItem(Slot).itemExists;
+  result := (getCurrentTab = self.tabIndex);
 end;
 
+
 (*
-invCount
-~~~~~~~~
+TRSTabInventory.open()
+~~~~~~~~~~~~~~~~~~~~~~
 
 .. code-block:: pascal
 
-    function invCount: Integer;
+    function TRSTabInventory.open(): boolean;
 
-Returns amount of items in your inventory
+Opens the inventory tab if we're currently not on it.
 
 .. note::
 
-    by RsN
+    by Ollybest
+    Last Updated: March. 11, 2013
 
 Example:
 
 .. code-block:: pascal
 
-    totalCount := invCount;
-
+    if (tabInventory.open()) then
+      writeln('We opened the inventory tab');
 *)
-function invCount: Integer;
-var
-  I: Integer;
+function TRSTabInventory.open(): boolean;
 begin
-  Result := 0;
-  //GameTab(tab_inv);                                                           //Off until Gametab is done
-  for I := 1 to 28 do
-    if (itemExists(I)) then
-      Inc(Result);
+  result := true;
+
+  if (not (self.isOpen)) then
+    result := _openGameTab(self.tabIndex);
 end;
 
+
 (*
-invEmpty
-~~~~~~~~
+TRSTabInventory.invaildSlot
+~~~~~~~~~~~~~~~~~~~~~~~~~~~
 
 .. code-block:: pascal
 
-    function invEmpty: Boolean;
+    function TRSTabInventory.invaildSlot(slot: integer): boolean;
 
-Returns True if inventory is empty
+Returns if the desired slot is not vaild.
 
 .. note::
 
-    by WT-Fakawi
+    by Ollybest
+    Last Updated: March. 11, 2013
 
 Example:
 
 .. code-block:: pascal
 
-    if invEmpty then
-      CloseBank;
-
+    if (tabInventory.invaildSlot(35)) then
+      writeln('WARNING: slot 35 is invaild');
 *)
-function invEmpty: Boolean;
-var
-  X, Y: Integer;
+function TRSTabInventory.invaildSlot(slot: integer): boolean;
 begin
-  //GameTab(tab_Inv);                                                           //Off until Gametab is done
-  Result := (not FindColor(X, Y, OUTLINE_BLACK, MI_BOX.X1, MI_BOX.Y1, MI_BOX.X2, MI_BOX.Y2));
+  result := (not (inRange(slot, INV_SLOT_LOW, INV_SLOT_HIGH)));
+
+  if (result) then
+    subDebug('The slot "' + intToStr(slot) + '" is an incorrect slot!');
 end;
 
+
 (*
-invFull
-~~~~~~~
+TRSTabInventory.getSlotBox
+~~~~~~~~~~~~~~~~~~~~~~~~~~
 
 .. code-block:: pascal
 
-    function invFull: Boolean;
+    function TRSTabInventory.getSlotBox(slot: integer): tbox;
 
-Returns True if inventory is full
+Returns the tbox of the desired inventory slot.
 
 .. note::
 
-    by n3ss3s
+    by Ollybest
+    Last Updated: March. 11, 2013
 
 Example:
 
 .. code-block:: pascal
 
-    if invFull then
-      walkToBank;
+   var
+     b: tbox;
+   begin
+     b := tabInventory.getSlotBox(1);
+   ...
+   ..
+   .
 
 *)
-function invFull: Boolean;
-var
-  i : integer;
+function TRSTabInventory.getSlotBox(slot: integer): tbox;
 begin
-  //GameTab(Tab_Inv);                                                           //Off until Gametab is done
-  Result := True;
+  if (self.invaildSlot(slot)) then
+    exit(intToBox(-1, -1, -1, -1));
 
-  for i := 1 to 28 do
-    if (not itemExists(i)) then
-    begin
-      Result := False;
-      exit;
-    end;
+  // - 1 because the grid (array) starts at 0.
+  result := __inventoryGrid[slot - 1];
 end;
 
+
 (*
-itemActivated
-~~~~~~~~~~~~~~
+TRSTabInventory.isItemInSlot
+~~~~~~~~~~~~~~~~~~~~~~~~~~~~
 
 .. code-block:: pascal
 
-    function itemActivated(Slot: Integer): Boolean;
+    function TRSTabInventory.isItemInSlot(slot: integer): boolean;
 
-Checks if item in specified inventory slot has a white outline.
-Returns True if the item has a white outline, otherwise returns false.
+Returns true if an item is in the desired inventory slot.
 
 .. note::
 
-    by marpis
+    by Ollybest
+    Last Updated: March. 11, 2013
 
 Example:
 
 .. code-block:: pascal
 
-    Result := itemActivated(4);
+   if (tabInventory.isItemInSlot(1)) then
+     writeln('We have an item in slot number 1');
 
 *)
-function itemActivated(Slot: Integer): Boolean;
+function TRSTabInventory.isItemInSlot(slot: integer): boolean;
 var
-  X, Y: Integer;
-  TB: TBox;
+  b: tbox := getSlotBox(slot);
+begin
+  if (not self.open()) then
+    exit(false);
+
+  if (self.invaildSlot(slot)) then
+    exit(false);
+
+  result := b.colorExists(OUTLINE_BLACK);
+end;
+
+
+(*
+TRSTabInventory.pointToSlot
+~~~~~~~~~~~~~~~~~~~~~~~~~~~
+
+.. code-block:: pascal
+
+    function TRSTabInventory.pointToSlot(p: tpoint): integer;
+
+Returns the inventory slot number in which the tpoint falls within.
+
+.. note::
+
+    by Ollybest
+    Last Updated: March. 11, 2013
+
+Example:
+
+.. code-block:: pascal
+
+   var
+     p: tpoint;
+     i: integer;
+   begin
+     if finddtm(p.x, p.y, dtm, tabInventory.bounds) then
+       i := tabInventory.pointToSlot(p);
+
+     writeln('our dtm is in slot ' + intToStr(i));
+   ...
+   ..
+   .
+
+*)
+function TRSTabInventory.pointToSlot(p: tpoint): integer;
+var
+  hi: integer := INV_SLOT_HIGH;
+  i: integer := INV_SLOT_LOW;
+begin
+  if (not (pointInBox(p, self.bounds))) then
+    exit;
+
+  for i to hi do
+    if pointInBox(p, self.getSlotBox(i)) then
+      exit(i);
+
+  result := 0;
+end;
+
+(*
+TRSTabInventory.getInvCount
+~~~~~~~~~~~~~~~~~~~~~~~~~~~
+
+.. code-block:: pascal
+
+    function TRSTabInventory.getInvCount: integer;
+
+Returns how many items are in our inventory.
+
+.. note::
+
+    by Ollybest
+    Last Updated: March. 11, 2013
+
+Example:
+
+.. code-block:: pascal
+
+   writeln(tabInventory.getInvCount);
+
+*)
+function TRSTabInventory.getInvCount: integer;
+var
+  i: integer := INV_SLOT_LOW;
+  hi: integer := INV_SLOT_HIGH;
+begin
+  result := 0;
+
+  if (not self.open()) then
+    exit;
+
+  for i to hi do
+    if (self.isItemInSlot(i)) then
+      inc(result);
+end;
+
+
+(*
+TRSTabInventory.isInvCount
+~~~~~~~~~~~~~~~~~~~~~~~~~~
+
+.. code-block:: pascal
+
+    function TRSTabInventory.isInvCount(count: integer; waitTime: integer = 0): boolean;
+
+Returns true if our inventory count is "count", also includes an optional waitTime
+parameter useful for waiting for a set inventory count.
+
+.. note::
+
+    by Ollybest
+    Last Updated: March. 11, 2013
+
+Example:
+
+.. code-block:: pascal
+
+   if tabInventory.isInvCount(10) then
+     writeln('we have 10 items in our inventory.');
+
+*)
+function TRSTabInventory.isInvCount(count: integer; waitTime: integer = 0): boolean;
+var
+  t := getSystemTime + waitTime;
 begin
   result := false;
-//  if not GameTab(tab_Inv) then
-//    exit;
-  TB := invBox(Slot);
-  Result := FindColor(x, y, OUTLINE_WHITE, TB.x1, TB.y1, TB.x2, TB.y2);
+
+  if (self.invaildSlot(count)) then
+    exit;
+
+  repeat
+    if (self.GetInvCount = count) then
+      exit(true);
+  until (getSystemTime > t);
 end;
 
+
 (*
-getActivatedItem
-~~~~~~~~~~~~~~~~
+TRSTabInventory.isInvFull
+~~~~~~~~~~~~~~~~~~~~~~~~~
 
 .. code-block:: pascal
 
-    function getActivatedItem : integer;
+    function TRSTabInventory.isInvFull: boolean;
 
-Returns the selected item in invetory (if any), else returns -1.
+Returns true if our inventory is full.
 
 .. note::
 
-    by mastaraymond and BraK
+    by Ollybest
+    Last Updated: March. 11, 2013
 
 Example:
 
 .. code-block:: pascal
 
-    Slot := getActivatedItem;
+   if tabInventory.isInvFull then
+     writeln('our inventory is full!');
 
 *)
-function getActivatedItem: integer;
+function TRSTabInventory.isInvFull: boolean;
+var
+  i: integer := INV_SLOT_LOW;
+  hi: integer := INV_SLOT_HIGH;
 begin
-  for result := 1 to 28 do
-    if itemActivated(result) then
-      exit;
+  if (not self.open()) then
+    exit(false);
+
+  result := true;
+
+  for i to hi do
+    if (not (self.isItemInSlot(i))) then
+      exit(false);
+end;
+
+
+(*
+TRSTabInventory.isInvEmpty
+~~~~~~~~~~~~~~~~~~~~~~~~~~
+
+.. code-block:: pascal
+
+    function TRSTabInventory.isInvEmpty: boolean;
+
+Returns true if our inventory is empty.
+
+.. note::
+
+    by Ollybest
+    Last Updated: March. 11, 2013
+
+Example:
+
+.. code-block:: pascal
+
+   if tabInventory.isInvEmpty then
+     writeln('our inventory is empty!');
+
+*)
+function TRSTabInventory.isInvEmpty: boolean;
+begin
+  if (not self.open()) then
+    exit(false);
+
+  result := (not (self.bounds.colorExists(OUTLINE_BLACK)));
+end;
+
+
+(*
+TRSTabInventory.mouseSlot
+~~~~~~~~~~~~~~~~~~~~~~~~~
+
+.. code-block:: pascal
+
+    function TRSTabInventory.mouseInvSlot(slot, button: integer): boolean;
+
+Moves and performs the desired mouse action at the selected inventory slot.
+
+.. note::
+
+    by Ollybest
+    Last Updated: March. 11, 2013
+
+Example:
+
+.. code-block:: pascal
+
+   if tabInventory.mouseSlot(1, MOUSE_MOVE) then
+     writeln('We moved the mouse to inventory slot 1');
+
+*)
+function TRSTabInventory.mouseSlot(slot, mouseAction: integer): boolean;
+var
+  b: tbox := self.getSlotBox(slot);
+  p: TPoint;
+begin
+  if (not self.open()) or (self.invaildSlot(slot)) then
+    exit(false);
+
+  if (not (inRange(mouseAction, 0, 3))) then
+  begin
+    subDebug('mouseSlot: invalid mouse button');
+    exit(false);
+  end;
+
+  result := true;
+  mouseBox(b, mouseAction);
+end;
+
+
+(*
+TRSTabInventory.isSlotActivated
+~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+
+.. code-block:: pascal
+
+    function TRSTabInventory.isSlotActivated(slot: integer): boolean;
+
+Will return true if a desired slot is activated.
+
+.. note::
+
+    by Ollybest
+    Last Updated: March. 12, 2013
+
+Example:
+
+.. code-block:: pascal
+
+   if tabInventory.isSlotActivated(28) then
+     writeln('Slot 28 is activated.');
+
+*)
+function TRSTabInventory.isSlotActivated(slot: integer): boolean;
+var
+  b: tbox := self.getSlotBox(slot);
+begin
+  if (not self.open()) or (self.invaildSlot(slot)) then
+    exit(false);
+
+  result := b.colorExists(OUTLINE_WHITE);
+end;
+
+
+(*
+TRSTabInventory.getActivatedSlot
+~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+
+.. code-block:: pascal
+
+    function TRSTabInventory.getActivatedSlot: integer;
+
+Returns what slot is activated, if none are it will return - 1.
+
+.. note::
+
+    by Ollybest
+    Last Updated: March. 12, 2013
+
+Example:
+
+.. code-block:: pascal
+
+   var
+     i: integer;
+   begin
+     i := getActivatedSlot;
+   ...
+   ..
+   .
+
+*)
+function TRSTabInventory.getActivatedSlot: integer;
+var
+  i: integer := INV_SLOT_LOW;
+  hi: integer := INV_SLOT_HIGH;
+begin
+  if (not self.open()) or (not (self.bounds.colorExists(OUTLINE_WHITE))) then
+    exit(- 1);
+
+  for i to hi do
+    if self.isSlotActivated(i) then
+      exit(i);
+
   result := - 1;
+end;
+
+
+(*
+TRSTabInventory.dropItems
+~~~~~~~~~~~~~~~~~~~~~~~~~
+
+.. code-block:: pascal
+
+    procedure TRSTabInventory.dropItems(slots: TIntegerArray = [1..28]);
+
+Drops items in the TIntegerArray, the parameter slots its optional if untouched
+the procedure will drop all items in slots 1 to 28. Can also be used with
+drop patterns.
+
+ tabInventory.dropItems(); - would drop items in slots 1..28
+
+ tabInventory.dropItems([1, 2, 25, 6]); - would drop items in slots 1, 2, 25 and 6
+
+ tabInventory.dropItems(DROP_PATTERN_SNAKE);  - would use the drop pattern "snake"
+
+
+.. note::
+
+    by Ollybest
+    Last Updated: March. 12, 2013
+
+Example:
+
+.. code-block:: pascal
+
+    tabInventory.dropItems();
+
+*)
+procedure TRSTabInventory.dropItems(slots: TIntegerArray = DROP_PATTERN_REGULAR);
+var
+  l: integer := length(slots);
+  i: integer := 0;
+  r: integer := 1;
+  tia: TIntegerArray;
+begin
+  if (not self.open()) then
+    exit;
+
+  if (l < 1) then
+  begin
+    subDebug('dropItems: you didnt enter any slots to drop.');
+    exit;
+  end;
+
+  // small chance of mixing some slots up
+  if (random(12) = 5) then
+    if (l = 28) then
+      for r to (l - 4) do
+        swap(slots[randomRange(r - 1, r + 4)], slots[randomRange(r - 1, r + 4)]);
+
+  for i to l - 1 do
+    if (not (self.invaildSlot(slots[i]))) then
+      if self.isItemInSlot(slots[i]) then
+      begin
+        self.mouseSlot(slots[i], MOUSE_RIGHT);
+        if chooseOption(['Drop', 'drop', 'rop']) then
+        begin
+          insert(slots[i], tia);
+          wait(120 + random(305));
+        end;
+      end;
+
+  if (length(tia) > 0) then
+  begin
+    tia.sortQuick;
+    debug('dropItems: Dropped items in slots ' + toStr(tia));
+  end else
+    debug('dropItems: Failed finding any items to drop');
+end;
+
+
+(*
+TRSTabInventory.countItemsDTM
+~~~~~~~~~~~~~~~~~~~~~~~~~~~
+
+.. code-block:: pascal
+
+    function TRSTabInventory.countItemsDTM(dtm: integer): integer;
+
+Searches for the dtm in each inventory slot and will return how many matches it finds.
+
+.. note::
+
+    by Ollybest
+    Last Updated: March. 12, 2013
+
+Example:
+
+.. code-block:: pascal
+
+    var
+      dtm: integer;
+      i: integer;
+    begin
+      dtm := dtmFromString('lotsofstuffhere');
+      i := tabInventory.countItemsDTM(dtm);
+      writeln('We counted ' + intToStr(i) + ' items in our inventory.');
+    ...
+    ..
+    .
+
+*)
+function TRSTabInventory.countItemsDTM(dtm: integer): integer;
+var
+  i : integer := INV_SLOT_LOW;
+  hi: integer := INV_SLOT_HIGH;
+begin
+  result := 0;
+
+  if (not self.open()) then
+    exit;
+
+  for i to hi do
+    if self.getSlotBox(i).dtmExists(dtm) then
+      inc(result);
+
+  debug('countItemsDTM: counted ' + intToStr(result) + ' items.');
+end;
+
+
+(*
+TRSTabInventory.clickItemsDTM
+~~~~~~~~~~~~~~~~~~~~~~~~~~~
+
+.. code-block:: pascal
+
+    function TRSTabInventory.clickItemsDTM(dtms: tintegerarray; clicktype: integer; option: string; waitFor: integer = 300): integer;
+
+Searches for the dtm(s) and if found will perform what action is it set to do
+accepts multiple dtms. Will return how many items were clicked.
+
+DTMs - enter the dtm(s) (accept multiple dtms) to search for.
+
+clicktype - what will the mouse do?
+  MOUSE_MOVE
+  MOUSE_LEFT
+  MOUSE_RIGHT
+
+option - what option to choose. If not using MOUSE_RIGHT just leave it blank.
+
+waitFor - this is optional and on defualt is set to 300, if burying a bone you
+          may need a longer wait time than something else.
+
+.. note::
+
+    by Ollybest
+    Last Updated: March. 12, 2013
+
+Example:
+
+.. code-block:: pascal
+
+    //  would search for one dtm and click the item.
+    tabInventory.clickitemsDTM([dtm], MOUSE_MOVE, '');
+
+    //  would search for multiple dtms and a 1000ms wait after burying the item.
+    tabInventory.clickItemsDTM([dtm1, dtm2], MOUSE_RIGHT, 'bury', 1000);
+
+*)
+function TRSTabInventory.clickItemsDTM(dtms: tintegerarray; clicktype: integer; option: string; waitFor: integer = 300): integer;
+var
+  l: integer := length(dtms);
+  hi: integer := INV_SLOT_HIGH;
+  i: integer := INV_SLOT_LOW;
+  ii: integer;
+begin
+  if (l < 1) then
+  begin
+    subDebug('clickItemsDTM: You didnt enter any dtms.');
+    exit(- 1);
+  end;
+
+  if (not self.open()) then
+    exit(- 1);
+
+  for i to hi do
+    for ii := 0 to (l - 1) do
+      if self.getSlotBox(i).dtmExists(dtms[ii]) then
+      begin
+        self.mouseSlot(i, clickType);
+        if (clickType = MOUSE_RIGHT) and (option <> '') then
+          chooseOption([option], MOUSE_LEFT, 200);
+
+        inc(result);
+        wait(waitFor + random(100));
+      end;
+
+  debug('clickItemsDTM: clicked ' + intToStr(result) + ' items.');
+end;
+
+begin
+  tabInventory.__init();
 end;
