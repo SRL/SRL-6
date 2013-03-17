@@ -566,10 +566,10 @@ didClick
 
 .. code-block:: pascal
 
-    function didClick(P: TPoint; Red: Boolean; Time: Integer = 1000): boolean;
+    function didClick(Red: Boolean; Time: Integer = 1000): boolean;
 
-Clicks the point P and looks for the colored X. Times out after Time.  Time default
-set to 1000.
+Clicks the current mouse position and looks for the colored X. Times out after
+Time.  Time default set to 1000.
 
 .. note::
 
@@ -583,7 +583,7 @@ Example:
     if (didClick(true)) then
       writeln('Clicked object!');
 *)
-function didClick(P: TPoint; Red: Boolean; Time: Integer = 1000): boolean;
+function didClick(Red: Boolean; Time: Integer = 1000): boolean;
 var
   TimeOut, x, y, w, h, R, G: integer;
   B: TBox;
