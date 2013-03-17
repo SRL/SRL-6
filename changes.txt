@@ -65,10 +65,14 @@ EVERYTHING should be recorded here: new features, function name changes, user-de
   - Added Placeholder.
 
 - mouse.simba
-  - windMouse -> humanWindMouse() & brakeWindMouse()
-  - mouse_move const set to -1 rather than 3 which would interfere with simba internal constants
-  - MMouse() & Mouse() -> mouse() overload;
-  - ClickMouse2() -> fastClick()
+  - windMouse split and renamed to humanWindMouse() & brakeWindMouse()
+  - MMouse() & Mouse() converted to mouse() overload;
+  - ClickMouse2() renamed fastClick()
+  - didClick left clicks the mouse and return true if the colored X is found.
+  - Added function multiMouse from MSI.
+  - SleepAndMoveMouse moved to anitban.simba
+  - mouseBox now takes a TBox parameter.
+  - Removed IdleTime, MouseTBox, DidRedClick, DidYelloClick, MouseBoxEx, and DragMouseTBox.
 
 - timing.simba renamed to time.simba
   - MarkTime/TimeFromMark replaced with TTimeMarker and TTimeMarker functions
