@@ -165,6 +165,80 @@ begin
   until (getSystemTime() > t);
 end;
 
+(*
+TRSMainscreen.spiralUptext
+~~~~~~~~~~~~~~~~~~~~~~~~~~
+
+.. code-block:: pascal
+
+    function TRSMainscreen.spiralUptext(var p: TPoint; spiralBox: Tbox; upText: TStringArray; PpC, aInc: Integer): boolean;
+
+Spirals the mouse in a circle from the center of the defined box. It will continue
+to spiral until it finds a spiral completely outside the box, always skipping
+points outside. Returns the occurance of the first occurance of UpText into p.
+    * p: The first point that the uptext is found.  Set to (-1, -1) if not found.
+    * spiralBox: The box to spiral in.
+    * PpC: The number of pixels to increase per spiral.
+    * aInc: The number of stops to make around each spiral.
+Takes some testing to get the right combination of PpC and aInc.
+
+.. note::
+
+    by Nava2
+    Last Updates: Mar. 16, 2013 by Coh3n
+
+Example:
+
+.. code-block:: pascal
+
+    if (mainscreen.spiralUptext(p, depoisitAllBox, ['All'], 4, 4)) then
+      mouse(p, MOUSE_LEFT);
+*)
+function TRSMainscreen.spiralUptext(var p: TPoint; spiralBox: Tbox; upText: TStringArray; PpC, aInc: Integer): boolean;
+var
+  aStep, a, rStep, rV, oB: extended;
+  pX, pY, ms: integer;
+  sP: TPoint;
+  L2R: boolean;
+begin
+  result := false;
+
+  ms := mouseSpeed;
+  mouseSpeed := (25 + randomRange(-3, 3));
+  sP := middleTPA([point(spiralBox.x1, spiralBox.y1), point(spiralBox.x2, spiralBox.y2)]);
+  aStep := (pi / (aInc / 2));
+  a := 0;
+  rStep := (PpC / aInc);
+  L2R := (random(2) = 0);
+
+  repeat
+    rV := rV + rStep;
+    pX := round(rV * cos(a)) + sP.x;
+    pY := round(rV * sin(a)) + sP.y;
+
+    if (L2R) then
+      a := (a + aStep)
+    else
+      a := (a - aStep);
+
+    if (pointInBox(point(pX, pY), spiralBox)) then
+    begin
+      oB := 0;
+      mouse(point(pX - 2, pY - 2).rand(5), MOUSE_MOVE);
+
+      if (mainscreen.isUptext(upText, 300)) then
+      begin
+        getMousePos(p.x, p.y);
+        result := true;
+      end;
+    end else
+      oB := (oB + aStep);
+
+  until(result or (oB > (2 * Pi)));
+
+  mouseSpeed := ms;
+end;
+
 begin
   mainscreen.__init();
 end;

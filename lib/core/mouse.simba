@@ -2,7 +2,7 @@
 Mouse
 =====
 
-The Mouse include contains all Mouse movement and clicking functions
+The Mouse include contains all Mouse movement and clicking functions.
 
 *)
 
@@ -498,5 +498,165 @@ begin
     mouse(p, button);
   end else
     mouse(point(x, y), button);
+end;
+
+(*
+didClick
+~~~~~~~~
+
+.. code-block:: pascal
+
+    function didClick(Red: Boolean; Time: Integer = 1000): boolean;
+
+Checks for the X after a click, times out after Time.  Time default set to 1000.
+
+.. note::
+
+    by Rasta Magician & Narcle
+    Last Updated: Mar. 16, 2013 by Coh3n
+
+Example:
+
+.. code-block:: pascal
+
+    if (didClick(true)) then
+      writeln('Clicked object!');
+*)
+function didClick(Red: Boolean; Time: Integer = 1000): boolean;
+var
+  TimeOut, x, y, w, h, R, G: integer;
+  B: TBox;
+begin
+  GetMousePos(x, y);
+  GetClientDimensions(w, h);
+  B := IntToBox(x - 15, y - 15, x + 15, y + 15);
+
+  if (B.x1 < 0) then B.x1 := 0;
+  if (B.y1 < 0) then B.y1 := 0;
+  if (B.x2 > w) then B.x2 := w;
+  if (B.y2 > h) then B.y2 := h;
+
+  TimeOut := GetSystemTime + Time;
+
+  while (GetSystemTime < TimeOut) and (not Result) do
+  begin
+    R := CountColorTolerance(395675, B.x1, B.y1, B.x2, B.y2, 15);
+    G := CountColorTolerance(1695663, B.x1, B.y1, B.x2, B.y2, 15);
+
+    if Red then
+    begin
+      if (G > 8) then
+        Exit(false);
+
+      Result := (R > 20);
+    end else
+    begin
+      if (R > 5) then
+        Exit(false);
+
+      Result := (G > 35);
+    end;
+  end;
+end;
+
+(*
+mouseOval
+~~~~~~~~~
+
+.. code-block:: pascal
+
+    procedure mouseOval(cx, cy, rx, ry, mouseAction: Integer = MOUSE_MOVE);
+
+Clicks a random point within an oval shape.
+    * cx, cy: The center point of the oval.
+    * rx, ry: X and Y radius of the oval.
+    * mouseAction: the action of the mouse. Default set to MOUSE_MOVE;
+
+.. note::
+
+    by mixster
+    Last Updated: Mar. 16, 2013 by Coh3n
+
+Example:
+
+.. code-block:: pascal
+
+    mouseOval(100, 100, 50, 30);
+*)
+procedure mouseOval(cx, cy, rx, ry, mouseAction: Integer = MOUSE_MOVE);
+var
+  o: TPoint;
+begin
+  o.y := random(ry) * ((random(2) * 2) - 1);
+  o.x := random(round(sqrt(sqr(ry) - sqr(o.y)) * rx / ry)) * ((random(2) * 2) - 1);
+
+  mouse(point(cx + o.x, cy + o.y), mouseAction);
+end;
+
+(*
+mouseCircle
+~~~~~~~~~~~
+
+.. code-block:: pascal
+
+    procedure mouseCircle(MidX, MidY, Radius, mouseAction: Integer = MOUSE_MOVE);
+
+Same as mouseOval, but mouses within a circle instead.
+
+.. note::
+
+    by mixster
+    Last Updated: Mar. 21st, 2012 by Coh3n
+
+Example:
+
+.. code-block:: pascal
+
+    mouseCircle(50, 50, 25);
+*)
+procedure mouseCircle(MidX, MidY, Radius, mouseAction: Integer = MOUSE_MOVE);
+begin
+  mouseOval(MidX, MidY, Radius, Radius, mouseAction);
+end;
+
+(*
+multiClick
+~~~~~~~~~~~~~~
+
+.. code-block:: pascal
+
+  function multiClick(p: TPoint; chance, maxClicks: integer): boolean;
+
+Will simulate "spam" clicking on the point, p.  Will do it a random amount
+between 1 and 'maxClicks'.  Will always click once, then has a percent
+'chance' of clicking again.  Will not exceed 'maxClicks'.
+
+.. note::
+
+  | Author: Coh3n
+  | Last Updated: 16 March 2013 by Coh3n
+
+Example:
+
+.. code-block:: pascal
+
+  if (mainscreen.isUptext('Tree')) then
+    multiClick(p, 35, 5, true);
+*)
+function multiClick(p: TPoint; chance, maxClicks: integer): boolean;
+var
+  clicks: integer;
+begin
+  result := true;
+
+  repeat
+    inc(clicks);
+    mouse(p, MOUSE_LEFT);
+
+    if (random(100) > chance) or (not result) then
+      break;
+
+    wait(50 + random(50));
+  until(clicks >= maxClicks);
 end;
 
