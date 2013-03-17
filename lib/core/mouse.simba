@@ -6,46 +6,38 @@ The Mouse include contains all Mouse movement and clicking functions
 
 *)
 
+{$include_once ../tmp.simba}
+
 (*
-Constants and Vars
-~~~~~~~~~~~~~~~~~~
+var mouseSpeed
+~~~~~~~~~~~~~~
 
-Constants and Variables used locally within mouse.simba
-
-Example:
-
-.. code-block:: pascal
-
-    mouseSpeed := 10;
-
+Adjustable mouse speed variable. Default set to 20.
 *)
 var
   mouseSpeed: Integer = 20;
 
-{
- Used in place of other mouse button constants to move the mouse
- without actually clicking.
-}
-const
-  MOUSE_NONE = -1;
-  MOUSE_MOVE = 3;
+(*
+const Mouse Styles
+~~~~~~~~~~~~~~~~~~
 
-{
- Used to determine the 'style' in which the mouse moves
- Values are used as modifiers in mouse()
-}
+Different ways of moving the mouse:
+    * MOUSE_BREAK: moves slower when reaching destination.
+    * MOUSE_ACCURATE: a slower, more accurate movement.
+    * MOUSE_HUMAN: the most human-like movement of the mouse styles.
+*)
 const
   MOUSE_BREAK    = 8;
   MOUSE_ACCURATE = 14;
   MOUSE_HUMAN    = 7;
 
 {*
-brakeWindMouse
-~~~~~~~~~~~~~~
+_brakeWindMouse
+~~~~~~~~~~~~~~~
 
 .. code-block:: pascal
 
-    procedure brakeWindMouse(xs, ys, xe, ye, gravity, wind, minWait,
+    procedure _brakeWindMouse(xs, ys, xe, ye, gravity, wind, minWait,
       maxWait, targetArea: extended; reverse: boolean);
 
 Mouse movement based on distance to determine speed. Default slowed
@@ -60,10 +52,10 @@ Example:
 
 .. code-block:: pascal
 
-    Emaple here
+    See mouse().
 
 *}
-procedure brakeWindMouse(xs, ys, xe, ye, gravity, wind, minWait, maxWait,
+procedure _brakeWindMouse(xs, ys, xe, ye, gravity, wind, minWait, maxWait,
           targetArea: extended; double: boolean);
 var
   veloX,veloY,windX,windY,veloMag,dist,randomDist,lastDist,D: extended;
@@ -190,12 +182,12 @@ begin
 end;
 
 {*
-humanWindMouse
-~~~~~~~~~~~~~~
+_humanWindMouse
+~~~~~~~~~~~~~~~
 
 .. code-block:: pascal
 
-    procedure humanWindMouse(xs, ys, xe, ye, gravity, wind, minWait,
+    procedure _humanWindMouse(xs, ys, xe, ye, gravity, wind, minWait,
       maxWait, targetArea: extended);
 
 Description: FLIGHT YOU NEED TO GIVE ME SOMETHING FOR THIS! ;)
@@ -208,10 +200,9 @@ Example:
 
 .. code-block:: pascal
 
-    Example here
-
+    See mouse().
 *}
-procedure humanWindMouse(xs, ys, xe, ye, gravity, wind, minWait, maxWait, targetArea: extended);
+procedure _humanWindMouse(xs, ys, xe, ye, gravity, wind, minWait, maxWait, targetArea: extended);
 var
   veloX,veloY,windX,windY,veloMag,dist,randomDist,lastDist,D: extended;
   lastX,lastY,MSP,W,T,TDist: integer;
@@ -293,7 +284,7 @@ begin
   mouseSpeed := MSP;
 end;
 
-{*
+(*
 fastClick
 ~~~~~~~~~
 
@@ -311,9 +302,9 @@ Example:
 
 .. code-block:: pascal
 
-    fastClick(mouse_left);
+    fastClick(MOUSE_LEFT);
 
-*}
+*)
 procedure fastClick(button: integer);
 var
   x, y: integer;
@@ -328,7 +319,7 @@ begin
   releaseMouse(x, y, button);
 end;
 
-{*
+(*
 mouse
 ~~~~~
 
@@ -348,7 +339,7 @@ Example:
 
     mouse(point, mouse_Left, MOUSE_ACCURATE);
 
-*}
+*)
 procedure mouse(pnt: TPoint; button: integer; mmType: integer = MOUSE_HUMAN); overload;
 var
   randSpeed: extended;
@@ -362,17 +353,17 @@ begin
   getMousePos(x,y);
 
   if mmType = MOUSE_HUMAN then
-    humanWindMouse(x, y, pnt.x, pnt.y, MOUSE_HUMAN, 5, 10.0/randSpeed, 15.0/randSpeed, 10.0*randSpeed)
+    _humanWindMouse(x, y, pnt.x, pnt.y, MOUSE_HUMAN, 5, 10.0/randSpeed, 15.0/randSpeed, 10.0*randSpeed)
   else
-    brakeWindMouse(x, y, pnt.x, pnt.y, mmType, 3, 10.0/randSpeed, 15.0/randSpeed, 10.0*randSpeed, false);
+    _brakeWindMouse(x, y, pnt.x, pnt.y, mmType, 3, 10.0/randSpeed, 15.0/randSpeed, 10.0*randSpeed, false);
 
   mouseSpeed := ms;
   fastClick(button);
 end;
 
-{*
-mouse: overload;
-~~~~~~~~~~~~~~~~
+(*
+mouse() overload;
+~~~~~~~~~~~~~~~~~
 
 .. code-block:: pascal
 
@@ -389,14 +380,13 @@ Example:
 .. code-block:: pascal
 
     mouse(point);
-
-*}
+*)
 procedure mouse(pnt: TPoint); overload;
 begin
   mouse(pnt, MOUSE_MOVE);
 end;
 
-{*
+(*
 missMouse
 ~~~~~~~~~
 
@@ -416,7 +406,7 @@ Example:
 
     missMouse(point);
 
-*}
+*)
 procedure missMouse(pnt: TPoint);
 var
   randSpeed: extended;
@@ -432,13 +422,13 @@ begin
   randSpeed := (random(mouseSpeed) / 2.0 + mouseSpeed) / 10.0;
   x2 := randomRange(Pnt.x-(a*mp), Pnt.x+(a*mp));
   y2 := randomRange(Pnt.y-(a*mp), Pnt.y+(a*mp));
-  humanWindMouse(x, y, x2, y2, MOUSE_HUMAN, 5, 10.0/randSpeed, 15.0/randSpeed, 10.0*randSpeed);
+  _humanWindMouse(x, y, x2, y2, MOUSE_HUMAN, 5, 10.0/randSpeed, 15.0/randSpeed, 10.0*randSpeed);
   getMousePos(x, y);
   mouse(pnt);
   mouseSpeed := a;
 end;
 
-{*
+(*
 dragMouse
 ~~~~~~~~~
 
@@ -458,7 +448,7 @@ Example:
 
     dragMouse(point);
 
-*}
+*)
 procedure dragMouse(dest: TPoint);
 var
   x, y: integer;
@@ -472,7 +462,7 @@ begin
   releaseMouse(x, y, MOUSE_LEFT);
 end;
 
-{*
+(*
 mouseBox
 ~~~~~~~~
 
@@ -481,19 +471,20 @@ mouseBox
     procedure mouseBox(b: TBox; button: integer = MOUSE_MOVE);
 
 Moves the mouse somewhere inside the box b. Will just move my default. Click
-depends on what button is set to.
+depends on what button is set to.  It is more likely to click around the middle
+of the box.
 
 .. note::
 
     by Coh3n
-    Last Updated: Feb. 24, 2013 by Coh3n
+    Last Updated: Mar. 17, 2013 by Coh3n
 
 Example:
 
 .. code-block:: pascal
 
     mouseBox(b, MOUSE_LEFT);
-*}
+*)
 procedure mouseBox(b: TBox; button: integer = MOUSE_MOVE);
 var
   p: TPoint;
@@ -501,11 +492,9 @@ var
 begin
   getMousePos(x, y);
 
-  if (not pointInBox(point(x, y), b)) then
+  if (not pointInBox(point(x, y), b)) then // if the mouse is already in the box
   begin
-    // should be replaced with gaussBox when it's available in Simba
-    p.x := b.x1 + random(b.x2 - b.x1);
-    p.y := b.y1 + random(b.y2 - b.y1);
+    gaussBox(p, b);
     mouse(p, button);
   end else
     mouse(point(x, y), button);
