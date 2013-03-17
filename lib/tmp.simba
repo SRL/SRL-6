@@ -1,4 +1,11 @@
+(*
+Temporary Functions
+===================
 
+This file stores data utilized by SRL that will eventually be a part of Simba
+and/or Lape.
+
+*)
 
 var
   clWhite = 16777215;
