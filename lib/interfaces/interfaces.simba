@@ -62,6 +62,33 @@ begin
 end;
 
 (*
+TRSInterface.getCenterPoint
+~~~~~~~~~~~~~~~~~~~~~~~~~~~
+
+.. code-block:: pascal
+
+    function TRSInterface.getCenterPoint(): TPoint;
+
+Returns the center point of the TRSInterface.
+
+.. note::
+
+    by Coh3n
+    Last Updated: Mar. 21, 2013 by Coh3n
+
+Example:
+
+.. code-block:: pascal
+
+    mP := tabInventory.getCenterPoint();
+*)
+function TRSInterface.getCenterPoint(): TPoint;
+begin
+  result.x := (self.x + (self.w div 2));
+  result.y := (self.y + (self.h div 2));
+end;
+
+(*
 TRSInterface.drag
 ~~~~~~~~~~~~~~~~~
 
