@@ -624,7 +624,7 @@ end;
 
 (*
 multiClick
-~~~~~~~~~~~~~~
+~~~~~~~~~~
 
 .. code-block:: pascal
 
