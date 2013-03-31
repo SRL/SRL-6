@@ -7,6 +7,7 @@ The Type include contains type editing functions used throughout SRL.
 *)
 
 {$include_once ../utilities/wrappers.simba}
+{$include_once ../core/mouse.simba}
 
 (*
 TStringArray.addIndex
@@ -1512,6 +1513,65 @@ begin
 end;
 
 (*
+TBox.isPointInside
+~~~~~~~~~~~~~~~~~~
+
+.. code-block:: pascal
+
+    function TBox.isPointInside(const point: TPoint): boolean;
+
+Returns true if the point is in the TBox.
+
+.. note::
+
+    by Ollybest
+
+Example:
+
+.. code-block:: pascal
+
+    result := box.isPointInside(point(250, 100));
+
+*)
+function TBox.isPointInside(const point: TPoint): boolean;
+begin
+  result := pointInBox(point, self);
+end;
+
+(*
+TBox.getDimensions
+~~~~~~~~~~~~~~~~~~
+
+.. code-block:: pascal
+
+    procedure TBox.getDimensions(var w, h: integer);
+
+Returns the width and the height of the box in vars. W and H.
+
+.. note::
+
+    by Ollybest
+
+Example:
+
+.. code-block:: pascal
+
+    var
+      w, h: integer;
+    begin
+      box.getDimensions(w, h);
+    ..
+    .
+
+*)
+procedure TBox.getDimensions(var w, h: integer);
+begin
+  w := self.x2 - self.x1;
+  h := self.y2 - self.y1;
+end;
+
+
+(*
 TBox.rand
 ~~~~~~~~~
 
@@ -1578,7 +1638,7 @@ TBox.colorExists
 
     function TBox.colorExists(color: integer; tolerance: integer = 0): Boolean;
 
-Returns true if the color is found within the tbox. Also includes a optional
+Returns true if the color is found within the TBox. Also includes a optional
 tolerance parameter.
 
 .. note::
@@ -1594,20 +1654,20 @@ Example:
 *)
 function TBox.colorExists(color: integer; tolerance: integer = 0): Boolean;
 var
-  x, y: integer;
+  p: TPoint;
 begin
-  result := findColorTolerance(x, y, color, self, tolerance);
+  result := findColorTolerance(p.x, p.y, color, self, tolerance);
 end;
 
 (*
 TBox.dtmExists
-~~~~~~~~~~~~~~~~
+~~~~~~~~~~~~~~
 
 .. code-block:: pascal
 
-    function TBox.dtmExists(dtm: integer): boolean;
+    function TBox.dtmExists(const dtm: integer): boolean;
 
-Returns true if the dtm is found within the tbox.
+Returns true if the dtm is found within the TBox.
 
 .. note::
 
@@ -1620,11 +1680,91 @@ Example:
     result := b.dtmExists(thedtm);
 
 *)
-function TBox.dtmExists(dtm: integer): boolean;
+function TBox.dtmExists(const dtm: integer): boolean;
 var
-  p: tpoint;
+  p: TPoint;
 begin
   result := findDTM(dtm, p.x, p.y, self);
+end;
+
+(*
+TBox.bitmapExists
+~~~~~~~~~~~~~~~~~
+
+.. code-block:: pascal
+
+    function TBox.bitmapExists(const bitmap, tolerance: integer): boolean;
+
+Returns true if the bitmap is found within the TBox.
+
+.. note::
+
+    by Ollybest
+
+Example:
+
+.. code-block:: pascal
+
+    result := b.bitmapExists(aBitmap, 25);
+
+*)
+function TBox.bitmapExists(const bitmap, tolerance: integer): boolean;
+var
+  p: TPoint;
+begin
+  result := findBitmapToleranceIn(bitmap, p.x, p.y, self, tolerance);
+end;
+
+(*
+TBox.createTPA
+~~~~~~~~~~~~~~
+
+.. code-block:: pascal
+
+    function TBox.createTPA: TPointArray;
+
+Creates and returns a TPointArray of the TBox.
+
+.. note::
+
+    by Ollybest
+
+Example:
+
+.. code-block:: pascal
+
+    TPA := box.createTPA;
+
+*)
+function TBox.createTPA: TPointArray;
+begin
+  result := tpaFromBox(self);
+end;
+
+(*
+TBox.mouse
+~~~~~~~~~~
+
+.. code-block:: pascal
+
+    procedure TBox.mouse(const mouseAction: integer = MOUSE_MOVE);
+
+Peforms the desired mouse action on the box (uses mouseBox).
+
+.. note::
+
+    by Ollybest
+
+Example:
+
+.. code-block:: pascal
+
+    box.mouse();
+
+*)
+procedure TBox.mouse(const mouseAction: integer = MOUSE_MOVE);
+begin
+  mouseBox(self, mouseAction);
 end;
 
 (*
@@ -1740,6 +1880,59 @@ Example:
 function TPoint.equals(const P : TPoint) : Boolean;
 begin
   result := (self.X = P.X) and (self.Y = P.Y);
+end;
+
+(*
+TPoint.isInvaild
+~~~~~~~~~~~~~~~~
+
+.. code-block:: pascal
+
+    function TPoint.isInvaild: boolean;
+
+Returns true if the TPoint is invaild, an invaild TPoint is point(-1, -1);
+
+.. note::
+
+    by Ollybest
+
+Example:
+
+.. code-block:: pascal
+
+    if (p.isInvaild) then
+      exit;
+
+*)
+function TPoint.isInvaild: boolean;
+begin
+  result := self.equals(Point(-1, -1));
+end;
+
+(*
+TPoint.rotate
+~~~~~~~~~~~~~
+
+.. code-block:: pascal
+
+    procedure TPoint.rotate(const angle, cx, cy: extended);
+
+Rotates the TPoint.
+
+.. note::
+
+    by Ollybest
+
+Example:
+
+.. code-block:: pascal
+
+    tp.rotate(54.00, p.x, p.y);
+
+*)
+procedure TPoint.rotate(const angle, cx, cy: extended);
+begin
+  self := rotatePoint(self, angle, cx, cy);
 end;
 
 (*
@@ -2015,6 +2208,32 @@ begin
   for I := 0 to high(arr) do
     if not isInArray(arr[I]) then
       result.append(arr[I]);
+end;
+
+(*
+TPointArray.rotate
+~~~~~~~~~~~~~~~~~~
+
+.. code-block:: pascal
+
+    procedure TPointArray.rotate(const angle, cx, cy: extended);
+
+Rotates the points in the TPointArray.
+
+.. note::
+
+    by Ollybest
+
+Example:
+
+.. code-block:: pascal
+
+    tpa.rotate(40.00, p.x, p.y);
+
+*)
+procedure TPointArray.rotate(const angle, cx, cy: extended);
+begin
+  self := rotatePoints(self, angle, cx, cy);
 end;
 
 (*
@@ -2728,4 +2947,136 @@ Example:
 function T2DPointArray.getTextInATPA(const maxSpacing: integer; const font: string): string;
 begin
   result := getTextATPA(self, maxSpacing, font);
+end;
+
+(*
+T2DPointArray.sortFromFirstPoint
+~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+
+.. code-block:: pascal
+
+    procedure T2DPointArray.sortFromFirstPoint(const sortFrom: TPoint);
+
+Sorts the atpa from the desired TPoint.
+
+.. note::
+
+    by Ollybest
+
+Example:
+
+.. code-block:: pascal
+
+    atpa.sortFromFirstPoint(point(250, 250));
+
+*)
+procedure T2DPointArray.sortFromFirstPoint(const sortFrom: TPoint);
+begin
+  sortATPAFromFirstPoint(self, sortFrom);
+end;
+
+(*
+T2DPointArray.sortSize
+~~~~~~~~~~~~~~~~~~~~~~
+
+.. code-block:: pascal
+
+    procedure T2DPointArray.sortSize(const bigFirst: boolean = true);
+
+Sorts the atpa from largest to smallest if bigFirst is true or smallest to
+largest if BigFirst is false, if sorting from bigFirst the parameter is optional.
+
+.. note::
+
+    by Ollybest
+
+Example:
+
+.. code-block:: pascal
+
+    atpa.sortSize; // sort the atpa from highest to lowest
+    atpa.sortSize(false) // sort the atpa from lowest to highest
+
+*)
+procedure T2DPointArray.sortSize(const bigFirst: boolean = true);
+begin
+  sortATPASize(self, bigFirst);
+end;
+
+(*
+T2DPointArray.sortFromSize
+~~~~~~~~~~~~~~~~~~~~~~~~~~
+
+.. code-block:: pascal
+
+    procedure T2DPointArray.sortFromSize(const fromSize: integer; const closestFirst: boolean);
+
+Sorts the T2DPointArray from Size by the closest first if CloseFirst is true.
+
+.. note::
+
+    by Ollybest
+
+Example:
+
+.. code-block:: pascal
+
+    atpa.sortFromSize(400, true);
+
+*)
+procedure T2DPointArray.sortFromSize(const fromSize: integer; const closestFirst: boolean);
+begin
+  sortATPAFromSize(self, fromSize, closestFirst);
+end;
+
+(*
+T2DPointArray.getLength
+~~~~~~~~~~~~~~~~~~~~~~~
+
+.. code-block:: pascal
+
+    function T2DPointArray.getLength: integer;
+
+Returns the length of the T2DPointArray.
+
+.. note::
+
+    by Ollybest
+
+Example:
+
+.. code-block:: pascal
+
+    l := atpa.getLength;
+
+*)
+function T2DPointArray.getLength: integer;
+begin
+  result := length(self);
+end;
+
+(*
+TPointArray.getLength
+~~~~~~~~~~~~~~~~~~~~~
+
+.. code-block:: pascal
+
+    function TPointArray.getLength: integer;
+
+Returns the length of the TPointArray.
+
+.. note::
+
+    by Ollybest
+
+Example:
+
+.. code-block:: pascal
+
+    l := tpa.getLength;
+
+*)
+function TPointArray.getLength: integer;
+begin
+  result := length(self);
 end;
