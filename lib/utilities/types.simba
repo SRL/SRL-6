@@ -17,7 +17,7 @@ TStringArray.addIndex
 
     procedure TStringArray.addIndex(const str : String; const index : Integer);
 
-Used to add a value to a TStringArray at a chosen index.
+Used to add a value to a TStringArray at a chosen index larger than the array's lowest index.
 
 .. note::
 
@@ -34,7 +34,7 @@ procedure TStringArray.addIndex(const str : String; const index : Integer);
 var
   I : Integer;
 begin
-  if index > length(self) then
+  if not inRange(index, low(self), length(self)) then
   begin
     WriteLn('ERROR: addIndex: index larger than array length.');
     Exit;
@@ -54,7 +54,7 @@ TStringArray.deleteIndex
 
     procedure TStringArray.deleteIndex(const index : Integer);
 
-Used to delete a value of a TStringArray at a chosen index.
+Used to delete a value of a TStringArray at a chosen index larger than the array's lowest index.
 
 .. note::
 
@@ -71,7 +71,7 @@ procedure TStringArray.deleteIndex(const index : Integer);
 var
   I : Integer;
 begin
-  if index > length(self) then
+  if not inRange(index, low(self), length(self)) then
   begin
     WriteLn('ERROR: deleteIndex: index larger than array length.');
     Exit;
@@ -105,7 +105,7 @@ Example:
 *)
 procedure TStringArray.append(const str : String);
 begin
-  addIndex(str, length(self));
+  self.addIndex(str, length(self));
 end;
 
 (*
@@ -134,7 +134,7 @@ var
   I : Integer;
 begin
   for I := 0 to high(arr) do
-    append(arr[I]);
+    self.append(arr[I]);
 end;
 
 (*
@@ -194,7 +194,7 @@ Example:
 *)
 function TStringArray.isInArray(const str : String) : Boolean;
 begin
-  result := returnInArray(str) > -1;
+  result := self.returnInArray(str) > -1;
 end;
 
 (*
@@ -223,7 +223,7 @@ var
   I : Integer;
 begin
   for I := 0 to high(arr) do
-    if isInArray(arr[I]) then
+    if self.isInArray(arr[I]) then
       result.append(arr[I]);
 end;
 
@@ -253,7 +253,7 @@ var
   I : Integer;
 begin
   for I := 0 to high(arr) do
-    if not isInArray(arr[I]) then
+    if not self.isInArray(arr[I]) then
       result.append(arr[I]);
 end;
 
@@ -348,6 +348,105 @@ begin
   for I := high(self) downto 0 do
     arr.append(self[I]);
   self := arr;
+end;
+
+(*
+TStringArray.explodeArr
+~~~~~~~~~~~~~~~~~~~~~~~
+
+.. code-block:: pascal
+
+    function TStringArray.explodeArr(const delArr : TStringArray): T2DStringArray;
+
+Used to explode the TStringArray using different del strings.
+  Requires the length of delArr to be the same as the length of the string array.
+
+.. note::
+
+    by Zyt3x
+    Rename this to "TStringArray.explode" once lape requires "self" for internal things.
+
+Example:
+
+.. code-block:: pascal
+
+    s2DArr := sArr.explodeArr(['divider1', ...]);
+
+*)
+function TStringArray.explodeArr(const delArr : TStringArray): T2DStringArray;
+var
+  I : Integer;
+begin
+  if not length(delArr) <> length(self) then
+  begin
+    WriteLn('ERROR: explodeArr: delArr length not equal to array length.');
+    Exit;
+  end;
+
+  setLength(result, length(self));
+  for I := 0 to high(self) do
+    result[I] := explode(delArr[I], self[I]);
+end;
+
+(*
+TStringArray.explodeArr: overload;
+~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+
+.. code-block:: pascal
+
+    function TStringArray.explodeArr(const del : String): T2DStringArray; overload;
+
+Used to explode the TStringArray.  Uses a string instead of an array of strings.
+
+.. note::
+
+    by Zyt3x
+    Rename this to "TStringArray.explode" once lape requires "self" for internal things.
+
+Example:
+
+.. code-block:: pascal
+
+    s2DArr := sArr.explodeArr('divider');
+
+*)
+function TStringArray.explodeArr(const del : String): T2DStringArray; overload;
+var
+  delArr : TStringArray;
+  I : Integer;
+begin
+  setLength(delArr, length(self));
+  for I := 0 to high(delArr) do
+    delArr[I] := del;
+
+  result := self.explodeArr(delArr);
+end;
+
+(*
+TStringArray.implodeArr
+~~~~~~~~~~~~~~~~~~~~~~~
+
+.. code-block:: pascal
+
+    function TStringArray.implodeArr(const glue : String): String;
+
+Used to implode the TStringArray.
+
+.. note::
+
+    by Zyt3x
+    Rename this to "TStringArray.implode" once lape requires "self" for internal things.
+
+Example:
+
+.. code-block:: pascal
+
+    S := sArr.implodeArr('glue');
+
+*)
+function TStringArray.implodeArr(const glue : String): String;
+begin
+  result := implode(glue, self);
 end;
 
 (*
@@ -459,11 +558,80 @@ Example:
 
 *)
 function TStringArray.toString() : String;
+begin
+  result := self.implodeArr('');
+end;
+
+(*
+TStringArray.implodeArr
+~~~~~~~~~~~~~~~~~~~~~~~
+
+.. code-block:: pascal
+
+    function T2DStringArray.implodeArr(const glueArr : TStringArray): TStringArray;
+
+Used to implode the T2DStringArray.
+  Requires the length of glueArr to be the same as the length of the string array.
+
+.. note::
+
+    by Zyt3x
+    Rename this to "T2DStringArray.implode" once lape requires "self" for internal things.
+
+Example:
+
+.. code-block:: pascal
+
+    sArr := s2DArr.implodeArr(['glue1', ...]);
+
+*)
+function T2DStringArray.implodeArr(const glueArr : TStringArray): TStringArray;
 var
   I : Integer;
 begin
+  if not length(glueArr) <> length(self) then
+  begin
+    WriteLn('ERROR: implodeArr: glueArr length not equal to array length.');
+    Exit;
+  end;
+
+  setLength(result, length(self));
   for I := 0 to high(self) do
-    result := result + self[I];
+    result[I] := self[I].implodeArr(glueArr[I]);
+end;
+
+(*
+TStringArray.implodeArr: overload;
+~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+
+.. code-block:: pascal
+
+    function T2DStringArray.implodeArr(const glue : String): TStringArray; overload;
+
+Used to implode the T2DStringArray using glue strings.  Uses a string instead of an array of strings.
+
+.. note::
+
+    by Zyt3x
+    Rename this to "T2DStringArray.implode" once lape requires "self" for internal things.
+
+Example:
+
+.. code-block:: pascal
+
+    sArr := s2DArr.implodeArr('glue']);
+
+*)
+function T2DStringArray.implodeArr(const glue : String): TStringArray; overload;
+var
+  glueArr : TStringArray;
+  I : Integer;
+begin
+  setLength(glueArr, length(self));
+  for I := 0 to high(glueArr) do
+    glueArr[I] := glue;
+
+  result := self.implodeArr(glueArr);
 end;
 
 (*
@@ -474,7 +642,7 @@ TIntegerArray.addIndex
 
     procedure TIntegerArray.addIndex(const int : Integer; const index : Integer);
 
-Used to add a value to a TIntegerArray at a chosen index.
+Used to add a value to a TIntegerArray at a chosen index larger than the array's lowest index.
 
 .. note::
 
@@ -491,7 +659,7 @@ procedure TIntegerArray.addIndex(const int : Integer; const index : Integer);
 var
   I : Integer;
 begin
-  if index > length(self) then
+  if not inRange(index, low(self), length(self)) then
   begin
     WriteLn('ERROR: addIndex: index larger than array length.');
     Exit;
@@ -511,7 +679,7 @@ TIntegerArray.deleteIndex
 
     procedure TIntegerArray.deleteIndex(const index : Integer);
 
-Used to delete a value of a TIntegerArray at a chosen index.
+Used to delete a value of a TIntegerArray at a chosen index larger than the array's lowest index.
 
 .. note::
 
@@ -528,7 +696,7 @@ procedure TIntegerArray.deleteIndex(const index : Integer);
 var
   I : Integer;
 begin
-  if index > length(self) then
+  if not inRange(index, low(self), length(self)) then
   begin
     WriteLn('ERROR: deleteIndex: index larger than array length.');
     Exit;
@@ -562,7 +730,7 @@ Example:
 *)
 procedure TIntegerArray.append(const int : Integer);
 begin
-  addIndex(int, length(self));
+  self.addIndex(int, length(self));
 end;
 
 (*
@@ -671,7 +839,7 @@ var
   I : Integer;
 begin
   for I := 0 to high(arr) do
-    if isInArray(arr[I]) then
+    if self.isInArray(arr[I]) then
       result.append(arr[I]);
 end;
 
@@ -701,7 +869,7 @@ var
   I : Integer;
 begin
   for I := 0 to high(arr) do
-    if not isInArray(arr[I]) then
+    if not self.isInArray(arr[I]) then
       result.append(arr[I]);
 end;
 
@@ -832,6 +1000,7 @@ Returns the sum of all values in a TIntegerArray.  Returns the value in a Int64 
 .. note::
 
     by Zyt3x
+    Used for large numbers.
 
 Example:
 
@@ -935,7 +1104,7 @@ TExtendedArray.addIndex
 
     procedure TExtendedArray.addIndex(const ext : Extended; const index : Integer);
 
-Used to add a value to a TExtendedArray at a chosen index.
+Used to add a value to a TExtendedArray at a chosen index larger than the array's lowest index.
 
 .. note::
 
@@ -952,7 +1121,7 @@ procedure TExtendedArray.addIndex(const ext : Extended; const index : Integer);
 var
   I : Integer;
 begin
-  if index > length(self) then
+  if not inRange(index, low(self), length(self)) then
   begin
     WriteLn('ERROR: addIndex: index larger than array length.');
     Exit;
@@ -972,7 +1141,7 @@ TExtendedArray.deleteIndex
 
     procedure TExtendedArray.deleteIndex(const index : Integer);
 
-Used to delete a value of a TExtendedArray at a chosen index.
+Used to delete a value of a TExtendedArray at a chosen index larger than the array's lowest index.
 
 .. note::
 
@@ -989,7 +1158,7 @@ procedure TExtendedArray.deleteIndex(const index : Integer);
 var
   I : Integer;
 begin
-  if index > length(self) then
+  if not inRange(index, low(self), length(self)) then
   begin
     WriteLn('ERROR: deleteIndex: index larger than array length.');
     Exit;
@@ -1023,7 +1192,7 @@ Example:
 *)
 procedure TExtendedArray.append(const ext : Extended);
 begin
-  addIndex(ext, length(self));
+  self.addIndex(ext, length(self));
 end;
 
 (*
@@ -1052,7 +1221,7 @@ var
   I : Integer;
 begin
   for I := 0 to high(arr) do
-    append(arr[I]);
+    self.append(arr[I]);
 end;
 
 (*
@@ -1141,7 +1310,7 @@ var
   I : Integer;
 begin
   for I := 0 to high(arr) do
-    if isInArray(arr[I]) then
+    if self.isInArray(arr[I]) then
       result.append(arr[I]);
 end;
 
@@ -1171,7 +1340,7 @@ var
   I : Integer;
 begin
   for I := 0 to high(arr) do
-    if not isInArray(arr[I]) then
+    if not self.isInArray(arr[I]) then
       result.append(arr[I]);
 end;
 
@@ -1331,7 +1500,7 @@ TBoolArray.addIndex
 
     procedure TBoolArray.addIndex(const bool : Boolean; const index : Integer);
 
-Used to add a value to a TBoolArray at a chosen index.
+Used to add a value to a TBoolArray at a chosen index larger than the array's lowest index.
 
 .. note::
 
@@ -1348,7 +1517,7 @@ procedure TBoolArray.addIndex(const bool : Boolean; const index : Integer);
 var
   I : Integer;
 begin
-  if index > length(self) then
+  if not inRange(index, low(self), length(self)) then
   begin
     WriteLn('ERROR: addIndex: index larger than array length.');
     Exit;
@@ -1368,7 +1537,7 @@ TBoolArray.deleteIndex
 
     procedure TBoolArray.deleteIndex(const index : Integer);
 
-Used to delete a value of a TBoolArray at a chosen index.
+Used to delete a value of a TBoolArray at a chosen index larger than the array's lowest index.
 
 .. note::
 
@@ -1385,7 +1554,7 @@ procedure TBoolArray.deleteIndex(const index : Integer);
 var
   I : Integer;
 begin
-  if index > length(self) then
+  if not inRange(index, low(self), length(self)) then
   begin
     WriteLn('ERROR: deleteIndex: index larger than array length.');
     Exit;
@@ -1419,7 +1588,7 @@ Example:
 *)
 procedure TBoolArray.append(const bool : Boolean);
 begin
-  addIndex(bool, length(self));
+  self.addIndex(bool, length(self));
 end;
 
 (*
@@ -1448,7 +1617,7 @@ var
   I : Integer;
 begin
   for I := 0 to high(arr) do
-    append(arr[I]);
+    self.append(arr[I]);
 end;
 
 (*
@@ -1973,7 +2142,7 @@ TPointArray.addIndex
 
     procedure TPointArray.addIndex(const p : TPoint; const index : Integer);
 
-Used to add a point to a TPointArray at a chosen index.
+Used to add a point to a TPointArray at a chosen index larger than the array's lowest index.
 
 .. note::
 
@@ -1990,7 +2159,7 @@ procedure TPointArray.addIndex(const p : TPoint; const index : Integer);
 var
   I : Integer;
 begin
-  if index > length(self) then
+  if not inRange(index, low(self), length(self)) then
   begin
     WriteLn('ERROR: addIndex: index larger than array length.');
     Exit;
@@ -2010,7 +2179,7 @@ TPointArray.deleteIndex
 
     procedure TPointArray.deleteIndex(const index : Integer);
 
-Used to delete a point of a TPointArray at a chosen index.
+Used to delete a point of a TPointArray at a chosen index larger than the array's lowest index.
 
 .. note::
 
@@ -2027,7 +2196,7 @@ procedure TPointArray.deleteIndex(const index : Integer);
 var
   I : Integer;
 begin
-  if index > length(self) then
+  if not inRange(index, low(self), length(self)) then
   begin
     WriteLn('ERROR: deleteIndex: index larger than array length.');
     Exit;
@@ -2061,7 +2230,7 @@ Example:
 *)
 procedure TPointArray.append(const p : TPoint);
 begin
-  addIndex(p, length(self));
+  self.addIndex(p, length(self));
 end;
 
 (*
@@ -2176,7 +2345,7 @@ var
   I : Integer;
 begin
   for I := 0 to high(arr) do
-    if isInArray(arr[I]) then
+    if self.isInArray(arr[I]) then
       result.append(arr[I]);
 end;
 
@@ -2206,7 +2375,7 @@ var
   I : Integer;
 begin
   for I := 0 to high(arr) do
-    if not isInArray(arr[I]) then
+    if not self.isInArray(arr[I]) then
       result.append(arr[I]);
 end;
 

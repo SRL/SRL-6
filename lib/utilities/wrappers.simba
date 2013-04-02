@@ -616,10 +616,10 @@ Example:
 *)
 procedure freeDTM(dtms: TIntegerArray); overload;
 var
-  i: integer := 0;
+  I : integer;
 begin
-  for i to high(dtms) do
-    freeDTM(dtms[i]);
+  for I to high(dtms) do
+    freeDTM(dtms[I]);
 end;
 
 (*
@@ -648,8 +648,47 @@ Example:
 *)
 procedure freeBitmap(bmps: TIntegerArray); overload;
 var
-  i: integer := 0;
+  I : integer;
 begin
-  for i to high(bmps) do
-    freeBitmap(bmps[i]);
+  for I to high(bmps) do
+    freeBitmap(bmps[I]);
+end;
+
+(*
+explode: overload;
+~~~~~~~~~~~~~~~~~~
+
+.. code-block:: pascal
+
+     function explode(const del : TStringArray; str : String): TStringArray; overload;
+
+Explodes a string into a TStringArray, takes an array of delimiters instead of one.
+
+.. note::
+
+    by Zyt3x
+
+Example:
+
+.. code-block:: pascal
+
+   S := '1 2,3.4,5--6,7.8,9 0';
+   sArr := explode([' ', ',', '.', '--'], S);
+   // sArr = [1, 2, 3, 4, 5, 6, 7, 8, 9, 0]
+
+*)
+function explode(const del : TStringArray; str : String): TStringArray; overload;
+var
+  I : Integer;
+  delSTR : String;
+begin
+  delSTR := '/*DEL*/';
+  while pos(delSTR, str) > 0 do
+    delSTR := delSTR + toStr(random(10));
+  delSTR := delSTR + '/';
+
+  for I := 0 to high(del) do
+    str := replace(str, del[I], delSTR, [rfReplaceAll]);
+
+  result := explode(delSTR, str);
 end;
