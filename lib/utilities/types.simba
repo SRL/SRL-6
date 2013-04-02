@@ -563,8 +563,8 @@ begin
 end;
 
 (*
-TStringArray.implodeArr
-~~~~~~~~~~~~~~~~~~~~~~~
+T2DStringArray.implodeArr
+~~~~~~~~~~~~~~~~~~~~~~~~~
 
 .. code-block:: pascal
 
@@ -601,8 +601,8 @@ begin
 end;
 
 (*
-TStringArray.implodeArr: overload;
-~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+T2DStringArray.implodeArr: overload;
+~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
 
 .. code-block:: pascal
 
