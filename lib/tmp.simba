@@ -170,6 +170,96 @@ begin
 end;
 
 (*
+filterTPAsBetween
+~~~~~~~~~~~~~~~~~
+
+.. code-block:: pascal
+
+    procedure filterTPAsBetween(var atpa: T2DPointArray; len1, len2: integer);
+
+Filters (removes) the TPointArrays in the T2DPointArray if the length is between
+len1, or len2.
+
+Note: This will re-order your array.
+
+.. note::
+
+    by Ollybest
+
+Example:
+
+.. code-block:: pascal
+
+     filterTPAsBetween(atpa, 150, 300);
+
+*)
+procedure filterTPAsBetween(var atpa: T2DPointArray; len1, len2: integer);
+var
+  h, l, i: integer;
+  c: T2DPointArray;
+begin
+  h := high(atpa);
+
+  for i := 0 to h do
+  begin
+    l := length(atpa[i]);
+
+    if (not (inRange(l, len1, len2))) then
+      insert(atpa[i], c);
+  end;
+
+  atpa := c;
+end;
+
+(*
+mostCommonNumber
+~~~~~~~~~~~~~~~~
+
+.. code-block:: pascal
+
+    function mostCommonNumber(Arr: TIntegerArray): LongInt;
+
+Returns the most common number in the array, useful for finding the most common
+color in a TPointArray.
+
+.. note::
+
+    by Dgby714
+
+Example:
+
+.. code-block:: pascal
+
+     mostCol := mostCommonNumber(getColors(tpa));
+
+*)
+function mostCommonNumber(Arr: TIntegerArray): LongInt;
+var
+  H, I, Cur, Count, HighCount: LongInt;
+begin
+  Count := 0;
+  HighCount := 0;
+  QuickSort(Arr);
+  H := High(Arr);
+  for I := 0 to H do
+  begin
+    if (Cur <> Arr[I]) then
+    begin
+      if (Count > HighCount) then
+      begin
+        HighCount := Count;
+        Result := Cur;
+      end;
+
+      Count := 0;
+      Cur := Arr[I];
+    end;
+
+    Inc(Count);
+  end;
+end;
+
+(*
 GridBox
 ~~~~~~~
 
