@@ -2,15 +2,15 @@
 Debug
 =====
 
-The printToDebug file holds any files used for SRL printToDebugging and logging. printToDebug usage
+The debug file holds any files used for SRL debugging and logging. Debug usage
 guidelines are as follows:
-    * Use printprintToDebug() for error messages.
-    * Use printprintToDebug() for warnings.  If a lot of warnings are expected in a
-      row, use printprintToDebug() once, followed by printLog().
-    * Use printprintToDebug() for informational messages (i.e. "Checking if..." or
+    * Use printToDebug() for error messages.
+    * Use printToDebug() for warnings.  If a lot of warnings are expected in a
+      row, use printToDebug() once, followed by printLog().
+    * Use printToDebug() for informational messages (i.e. "Checking if..." or
       "Found...").
     * Use printLog() for specific information the user won't want to see, but
-      will be useful for scripters to printToDebug (i.e. "Found 20 pixels of the color
+      will be useful for scripters to debug (i.e. "Found 20 pixels of the color
       12345678 with tolerance 15").
 *)
 
@@ -124,7 +124,7 @@ printToDebug
 
     procedure printToDebug(txt: string);
 
-Prints 'txt' to the printToDebug box in the SRL printToDebug format.
+Prints 'txt' to the printToDebug box in the SRL debug format.
 
 .. note::
 
@@ -161,7 +161,7 @@ onFuncEnter()
 
     procedure onFuncEnter();
 
-Increments the printToDebug level when entering a function.
+Increments the debug level when entering a function.
 
 .. note::
 
@@ -188,7 +188,7 @@ onFuncExit
 
     procedure onFuncExit();
 
-Decrements the printToDebug level when exiting a function.
+Decrements the debug level when exiting a function.
 
 .. note::
 
