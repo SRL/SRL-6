@@ -1,9 +1,17 @@
 (*
-Debug
+printToDebug
 =====
 
-The debug file holds any files used for SRL debugging and logging.
-
+The printToDebug file holds any files used for SRL printToDebugging and logging. printToDebug usage
+guidelines are as follows:
+    * Use printprintToDebug() for error messages.
+    * Use printprintToDebug() for warnings.  If a lot of warnings are expected in a
+      row, use printprintToDebug() once, followed by printLog().
+    * Use printprintToDebug() for informational messages (i.e. "Checking if..." or
+      "Found...").
+    * Use printLog() for specific information the user won't want to see, but
+      will be useful for scripters to printToDebug (i.e. "Found 20 pixels of the color
+      12345678 with tolerance 15").
 *)
 
 {$include_once globals.simba}
@@ -13,11 +21,11 @@ The debug file holds any files used for SRL debugging and logging.
 {$include_once ../tmp.simba}
 
 var
-  debugLevel = 1; // used for the nice debug formatting
+  debugLevel = 1; // used for the nice printToDebug formatting
   logPath = includePath + 'SRL-6/logs/';
   scriptStartTime = '0:0:0';
   disableSRLLog = false;
-  disableSRLDebug = false;
+  disableSRLprintToDebug = false;
 
 (*
 openLogFile
@@ -68,12 +76,12 @@ begin
 end;
 
 (*
-addToLog
-~~~~~~~~
+printToLog
+~~~~~~~~~~
 
 .. code-block:: pascal
 
-    procedure addToLog(s : string);
+    procedure printToLog(s : string);
 
 Writes the string 's' to the SRL log file.
 
@@ -86,10 +94,10 @@ Example:
 
 .. code-block:: pascal
 
-    addToLog('Adding to SRL log file!');
+    printToLog('Adding to SRL log file!');
 
 *)
-procedure addToLog(s: string);
+procedure printToLog(s: string);
 var
   tmpFile: integer;
 begin
@@ -109,14 +117,14 @@ begin
 end;
 
 (*
-debug
-~~~~~
+printToDebug
+~~~~~~~~~~~~
 
 .. code-block:: pascal
 
-    procedure debug(txt: string);
+    procedure printToDebug(txt: string);
 
-Prints 'txt' to the debug box in the SRL debug format.
+Prints 'txt' to the printToDebug box in the SRL printToDebug format.
 
 .. note::
 
@@ -127,105 +135,75 @@ Example:
 
 .. code-block:: pascal
 
-    debug(TheDate);
+    printToDebug(TheDate);
 
 *)
-procedure debug(txt: string);
+procedure printToDebug(txt: string);
 var
-  debugMSG := replicate('--', debugLevel) + ' ' + txt;
+  printToDebugMSG: string;
 begin
-  if (not disableSRLLog) then
-    addToLog(debugMSG);
+  printToDebugMSG := replicate('--', debugLevel) + ' ' + txt;
 
-  if (disableSRLdebug) then
+  if (not disableSRLLog) then
+    printToLog(printToDebugMSG);
+
+  if (disableSRLprintToDebug) then
     exit;
 
-  writeln(debugMSG);
+  writeln(printToDebugMSG);
 end;
 
 (*
-addHeader
-~~~~~~~~~
+onFuncEnter()
+~~~~~~~~~~~~~
 
 .. code-block:: pascal
 
-    procedure addHeader(header: string);
+    procedure onFuncEnter();
 
-Creates a new header in the debug box. Means that all following debugs will be
-indented 2 spaces with respect to the header. Should be called at the beginning
-of a procedure or function.
+Increments the printToDebug level when entering a function.
 
 .. note::
 
-    by Sir R. Magician
+    by Coh3n
+    Last Updated: 06 April 2013
 
 Example:
 
 .. code-block:: pascal
 
-  addHeader('OpenBank()');
+    Lape_OnFunctionEnter := @onFuncEnter;
 
 *)
-procedure addHeader(header: string);
-begin
-  debug(header);
-  inc(debugLevel);
-end;
-
-(*
-closeHeader
-~~~~~~~~~~~
-
-.. code-block:: pascal
-
-    procedure closeHeader(closer: string);
-
-Closes the current proceudre or function. Will print "closer" to the debug box.
-This should be called at the end of a function or procedure.
-
-.. note::
-
-    by Sir R. Magician
-
-Example:
-
-.. code-block:: pascal
-
-    closeHeader('OpenBank(): '+result);
-
-*)
-procedure closeHeader(closer: string);
-begin
-  Dec(debugLevel);
-  debug(closer);
-end;
-
-(*
-subDebug
-~~~~~~~~
-
-.. code-block:: pascal
-
-    procedure subDebug(txt: string);
-
-Allows a one-time-only indented debug.  Used in smaller procedures that don't
-call Add/closeHeader
-
-.. note::
-
-    by Sir R. Magician
-
-Example:
-
-.. code-block:: pascal
-
-    subDebug('BankScreen: screen not open');
-
-*)
-procedure subDebug(txt: string);
+procedure onFuncEnter();
 begin
   inc(debugLevel);
-  debug(txt);
+end;
+
+(*
+onFuncExit
+~~~~~~~~~~
+
+.. code-block:: pascal
+
+    procedure onFuncExit();
+
+Decrements the printToDebug level when exiting a function.
+
+.. note::
+
+    by Coh3n
+    Last Updated: 06 April 2013 by Coh3n
+
+Example:
+
+.. code-block:: pascal
+
+    Lape_OnFunctionExit := @onFuncExit;
+
+*)
+procedure onFuncExit();
+begin
   dec(debugLevel);
 end;
 
@@ -253,5 +231,10 @@ Example:
 procedure takeScreenshot(fileName: string);
 begin
   saveScreenshot(logPath + timeRunning + '_' + fileName);
+end;
+
+begin
+  //Lape_OnFunctionEnter := @onFuncEnter;
+  //Lape_OnFunctionExit := @onFuncExit;
 end;
 

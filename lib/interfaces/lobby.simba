@@ -221,7 +221,7 @@ begin
 
     while (not result) and (getSystemTime < t) do
     begin
-      debug('Waiting for lobby screen...');
+      printToDebug('Waiting for lobby screen...');
       result := lobby.isOpen();
       wait(700 + random(500));
     end;
@@ -256,8 +256,6 @@ var
   t: integer;
   exitButton: TPoint;
 begin
-  addHeader('_leaveLobby(): leaving lobby');
-
   result := (not lobby.isOpen());
 
   t := (getSystemTime() + 30000);
@@ -265,13 +263,11 @@ begin
 
   while (not result) and (getSystemTime() < t) do
   begin
-    debug('Waiting for login screen...');
+    printToDebug('Waiting for login screen...');
     mouse(exitButton, MOUSE_LEFT);
     wait(randomRange(1000, 2000));
     result := (not lobby.isOpen());
   end;
-
-  closeHeader('_leaveLobby(): ' + toStr(result));
 end;
 
 begin

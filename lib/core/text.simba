@@ -66,9 +66,9 @@ begin
     end;
 
   if (result) then
-    subDebug('findText('+toStr(txt)+'): True, at point '+toStr(p))
+    printToDebug('findText('+toStr(txt)+'): True, at point '+toStr(p))
   else
-    subDebug('findText('+toStr(txt)+'): '+toStr(result));
+    printToDebug('findText('+toStr(txt)+'): '+toStr(result));
 end;
 
 (*
@@ -117,7 +117,7 @@ begin
 
   if (not findColorsTolerance(tpaColors, col, lookIn, tol)) then
   begin
-    subDebug('findTextByColor: failed to find text color');
+    printToDebug('findTextByColor: failed to find text color');
     exit(false);
   end;
 
@@ -144,9 +144,9 @@ begin
   until(getSystemTime() > t);
 
   if (result) then
-    subDebug('findTextByColor('+toStr(txt)+'): True, at point '+toStr(p))
+    printToDebug('findTextByColor('+toStr(txt)+'): True, at point '+toStr(p))
   else
-    subDebug('findTextByColor('+toStr(txt)+'): '+toStr(result));
+    printToDebug('findTextByColor('+toStr(txt)+'): '+toStr(result));
 end;
 
 (*
@@ -279,7 +279,7 @@ __debugOptions
 
     procedure __debugOptions(options: array of __TOptions);
 
-Prints the options' .str attribute to the debug box.
+Prints the options' .str attribute to the printToDebug box.
 
 .. note::
 
@@ -296,10 +296,10 @@ procedure __debugOptions(options: array of __TOptions);
 var
   i: integer;
 begin
-  debug('Options found: ');
+  printToDebug('Options found: ');
 
   for i := 0 to high(options) do
-    subDebug(options[i].str);
+    printToDebug(options[i].str);
 end;
 
 {*
@@ -471,7 +471,7 @@ begin
       else
         if (not chooseOption(txt, TStringArray([]), MOUSE_MOVE, false, 0)) then // move the mouse to the first option
         begin
-          debug('chooseOption (tabbed): txt not found');
+          printToDebug('chooseOption (tabbed): txt not found');
           exit(false);
         end;
 
@@ -481,7 +481,7 @@ begin
 
     if (length(options) <= 0) then
     begin
-      debug('chooseOption: no options available');
+      printToDebug('chooseOption: no options available');
       exit(false);
     end;
 
@@ -502,7 +502,7 @@ begin
         end;
 
         mouseBox(options[i].bounds, mouseAction);
-        debug('Found option: '+options[i].str);
+        printToDebug('Found option: '+options[i].str);
         result := true;
         exit(true);
       end;

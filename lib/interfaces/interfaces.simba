@@ -115,7 +115,7 @@ var
 begin
   if (self.static = true) then
   begin
-    debug('Interface '+self.name+' is static; cannot be dragged');
+    printToDebug('Interface '+self.name+' is static; cannot be dragged');
     exit(false);
   end;
 

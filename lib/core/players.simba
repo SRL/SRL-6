@@ -241,7 +241,7 @@ begin
       end;
 
       if (j = high(tmp)) then
-        debug('Invalid player name: '+names[i]);
+        printToDebug('Invalid player name: '+names[i]);
     end;
 end;
 
@@ -277,11 +277,11 @@ begin
 
   if (self.getActive() <= 0) then
   begin
-    debug('All players inactive...');
+    printToDebug('All players inactive...');
     exit(false);
   end;
 
-  debug('Switching to player '+toStr(player)+' ('+self[player].nickname+')');
+  printToDebug('Switching to player '+toStr(player)+' ('+self[player].nickname+')');
   currentPlayer := player;
 
   if (@SRL_Events[EVENT_PLAYER_NEXT] <> nil) then
@@ -379,7 +379,7 @@ TPlayer.write
 
     procedure TPlayer.write();
 
-Writes the standard information about the player to the Simba debug box.
+Writes the standard information about the player to the Simba printToDebug box.
 
 .. note::
 
@@ -395,13 +395,13 @@ Example:
 *)
 procedure TPlayer.write();
 begin
-  debug('Login Name: ' + loginName);
-  debug('Display Name: ' + displayName);
-  debug('Nickname: ' + nickname);
-  debug('Member: ' + toStr(isMember));
-  debug('Active: ' + toStr(isActive));
-  debug('Worked: ' + toStr(worked.getTime()));
-  debug('Total Worked: ' + toStr(worked.getTotalTime()));
+  printToDebug('Login Name: ' + loginName);
+  printToDebug('Display Name: ' + displayName);
+  printToDebug('Nickname: ' + nickname);
+  printToDebug('Member: ' + toStr(isMember));
+  printToDebug('Active: ' + toStr(isActive));
+  printToDebug('Worked: ' + toStr(worked.getTime()));
+  printToDebug('Total Worked: ' + toStr(worked.getTotalTime()));
 end;
 
 (*
@@ -647,7 +647,7 @@ begin
       begin
         if (@SRL_Events[EVENT_RS_UPDATE] <> nil) then
         begin
-          debug('Waiting 5 minutes before calling update procedure');
+          printToDebug('Waiting 5 minutes before calling update procedure');
           wait(5 * 60000);
           SRL_Events[EVENT_RS_UPDATE];
           exit(false);
@@ -688,7 +688,7 @@ const
 function __getLoginResponse(colorCount, timer: integer): TVariantArray;
 begin
   case (colorCount) of
-    //               debug message      |      wait time | tries | action | player[].location
+    //               printToDebug message      |      wait time | tries | action | player[].location
     763, 2348, 2299:
           result := ['Invalid username/password',  0,         2,  'false',  'Wrong User/Pass'      ];
     1088: result := ['Account has been disabled',  0,         0,  'false',  'Acc Disabled'         ];
@@ -708,7 +708,7 @@ begin
       if ((getSystemTime() > timer) and (timer > 0)) then
       begin
         result :=   ['One minute as passed...',    0,         5,  'false',  'Login failed'         ];
-        debug('Unknown color count: '+toStr(colorCount));
+        printToDebug('Unknown color count: '+toStr(colorCount));
         takeScreenshot(logPath + 'unknown_login_count.png');
       end;
   end;
@@ -748,7 +748,7 @@ begin
 
   if (length(arr) > 0) then // if there was an error logging in
   begin
-    debug('Login response: '+arr[__RES_DEBUG]);
+    printToDebug('Login response: '+arr[__RES_DEBUG]);
     wait(2000 + arr[__RES_WAIT] + randomRange(-200, 200));
     typeByte(VK_ESCAPE); // exit response window
 
@@ -801,7 +801,7 @@ begin
   // check player activity
   if (not self.isActive) then
   begin
-    debug('Player '+self.nickname+' is not active...');
+    printToDebug('Player '+self.nickname+' is not active...');
     exit(false);
   end;
 
@@ -811,7 +811,7 @@ begin
   repeat
     inc(tries);
 
-    debug(capitalize(self.loginName)+' ('+capitalize(self.displayName)+')');
+    printToDebug(capitalize(self.loginName)+' ('+capitalize(self.displayName)+')');
 
     if (not self.secureLogin) then
     begin
@@ -894,7 +894,7 @@ begin
 
   if (result) then
   begin
-    debug('Logged in: '+self.nickname);
+    printToDebug('Logged in: '+self.nickname);
     self.worked.start();
     //__exitedSquealOfFortune := false;
 
@@ -946,7 +946,7 @@ begin
 
     while (not result) and (getSystemTime < t) do
     begin
-      subDebug('Waiting for login screen...');
+      printToDebug('Waiting for login screen...');
       result := (not isLoggedIn());
       wait(700 + random(500));
     end;

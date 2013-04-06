@@ -187,7 +187,7 @@ begin
   result := (not (inRange(slot, INV_SLOT_LOW, INV_SLOT_HIGH)));
 
   if (result) then
-    subDebug('The slot "' + intToStr(slot) + '" is an incorrect slot!');
+    printToDebug('The slot "' + intToStr(slot) + '" is an incorrect slot!');
 end;
 
 
@@ -495,7 +495,7 @@ begin
 
   if (not (inRange(mouseAction, 0, 3))) then
   begin
-    subDebug('mouseSlot: invalid mouse button');
+    printToDebug('mouseSlot: invalid mouse button');
     exit(false);
   end;
 
@@ -621,7 +621,7 @@ begin
 
   if (l < 1) then
   begin
-    subDebug('dropItems: you didnt enter any slots to drop.');
+    printToDebug('dropItems: you didnt enter any slots to drop.');
     exit;
   end;
 
@@ -646,9 +646,9 @@ begin
   if (length(tia) > 0) then
   begin
     tia.sortQuick;
-    debug('dropItems: Dropped items in slots ' + toStr(tia));
+    printToDebug('dropItems: Dropped items in slots ' + toStr(tia));
   end else
-    debug('dropItems: Failed finding any items to drop');
+    printToDebug('dropItems: Failed finding any items to drop');
 end;
 
 
@@ -697,7 +697,7 @@ begin
     if self.getSlotBox(i).dtmExists(dtm) then
       inc(result);
 
-  debug('countItemsDTM: counted ' + intToStr(result) + ' items.');
+  printToDebug('countItemsDTM: counted ' + intToStr(result) + ' items.');
 end;
 
 
@@ -745,7 +745,7 @@ var
 begin
   if (l < 1) then
   begin
-    subDebug('clickItemsDTM: You didnt enter any dtms.');
+    printToDebug('clickItemsDTM: You didnt enter any dtms.');
     exit(- 1);
   end;
 
@@ -764,7 +764,7 @@ begin
         wait(waitFor + random(100));
       end;
 
-  debug('clickItemsDTM: clicked ' + intToStr(result) + ' items.');
+  printToDebug('clickItemsDTM: clicked ' + intToStr(result) + ' items.');
 end;
 
 begin

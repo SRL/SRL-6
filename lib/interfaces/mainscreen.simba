@@ -85,7 +85,7 @@ Example:
 .. code-block:: pascal
 
     if (closeWindow()) then
-      debug('Window is closed');
+      printToDebug('Window is closed');
 *)
 function closeWindow(): boolean;
 begin
@@ -152,12 +152,12 @@ begin
 
   repeat
     s := self.getUptext();
-    debug('isUptext: current uptext: '+s);
+    printToDebug('isUptext: current uptext: '+s);
 
     for i := 0 to high(txt) do
       if (stringMatch(txt[i], s, tol)) then
       begin
-        subDebug('Found '+txt[i]+' in uptext string: '+s);
+        printToDebug('Found '+txt[i]+' in uptext string: '+s);
         exit(true);
       end;
 
