@@ -57,13 +57,25 @@ const
   _TAB_NOTES        = 15;
   _TAB_LOGOUT       = 16;
 
-// used so a TBoxArray calculation isn't required every time a gametab function is called
-// set at the bottom of this file
+{*
+var _gameTabGrid
+~~~~~~~~~~~~~~~~
+
+Used so a TBoxArray calculation isn't required every time a gametab function is
+called.  Set at the bottom of this file.
+
+*}
 var
   _gameTabGrid: TBoxArray;
 
-// the coords of each gameTab area (i.e. the old MIX1, MIY1, etc.)
-// set at the bottom of this file
+{*
+var _gameTabArea
+~~~~~~~~~~~~~~~~
+
+The coords of each gametab area (i.e. the replacement of MIX1, MIY1, MIX2, MIY2).
+Set at the botom of this file.
+
+*}
 var
   _gameTabArea: TBox;
 
@@ -92,7 +104,7 @@ function __isTabValid(tab: integer): boolean;
 begin
   if (not inRange(tab, _TAB_COMBAT, _TAB_LOGOUT)) then
   begin
-    printToDebug('__isTabValid: invalid gametab '+toStr(tab));
+    printToDebug('Invalid gametab '+toStr(tab));
     exit(false);
   end;
 
@@ -133,7 +145,7 @@ begin
   if (getColor(553, 305) = 2070783) then // orange color at the W
     exit(_TAB_LOGOUT);
 
-  for i := 0 to (high(_gameTabGrid) - 1) do // -1 to skip TAB_LOGOUT
+  for i := 0 to (high(_gameTabGrid) - 1) do // - 1 to skip TAB_LOGOUT
     // "- 8" is to get the top border of the tab
     if (getColor(_gameTabGrid[i].x1, _gameTabGrid[i].y1 - 8) = 6476542) then // goldish outline color
       exit(i);
@@ -242,7 +254,7 @@ begin
       begin
         if (getCurrentTab = tab) then
         begin
-          printToDebug('_openGameTab: opened tab '+toStr(tab));
+          printToDebug('Opened tab '+toStr(tab));
           exit(true);
         end;
 
@@ -252,7 +264,7 @@ begin
       inc(tries);
     end;
 
-  printToDebug('_openGameTab: failed to open tab '+toStr(tab));
+  printToDebug('Failed to open tab '+toStr(tab));
 end;
 
 (*
@@ -294,7 +306,7 @@ begin
     _TAB_COMBAT:    F := 5;
 
     else
-      printToDebug('_openGameTabFKey: '+toStr(tab)+' isn''t a valid option');
+      printToDebug('Invalid FKey '+toStr(tab));
   end;
 
   t := (getSystemTime() + 618);
@@ -318,4 +330,3 @@ begin
 
   _gameTabArea := intToBox(547, 252, 737, 506);
 end;
-
