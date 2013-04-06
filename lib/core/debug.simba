@@ -1,5 +1,5 @@
 (*
-printToDebug
+Debug
 =====
 
 The printToDebug file holds any files used for SRL printToDebugging and logging. printToDebug usage
