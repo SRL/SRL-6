@@ -377,7 +377,7 @@ Example:
 *)
 function TRSTabInventory.isInvCount(count: integer; waitTime: integer = 0): boolean;
 var
-  t := getSystemTime + waitTime;
+  t := getSystemTime() + waitTime;
 begin
   result := false;
 
@@ -387,7 +387,7 @@ begin
   repeat
     if (self.GetInvCount = count) then
       exit(true);
-  until (getSystemTime > t);
+  until (getSystemTime() > t);
 end;
 
 
