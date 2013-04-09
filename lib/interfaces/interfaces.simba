@@ -10,6 +10,8 @@ and all its functions.  All interface files should import this file.
 {$include_once ../core/debug.simba}
 {$include_once ../core/mouse.simba}
 
+{$f-}
+
 (*
 const IDs
 ~~~~~~~~~

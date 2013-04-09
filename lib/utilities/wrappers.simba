@@ -7,6 +7,8 @@ The Wrappers include contains wrapper functions used throughout SRL.  These func
 
 *)
 
+{$f-}
+
 (*
 getColor: overload;
 ~~~~~~~~~~~~~~~~~~~

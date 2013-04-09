@@ -11,6 +11,8 @@ stores properties of the TPlayer type.
 {$include_once ../interfaces/mainscreen.simba}
 {$include_once ../core/mouse.simba}
 
+{$f-}
+
 (*
 Constant: Skills
 ~~~~~~~~~~~~~~~~
@@ -462,7 +464,7 @@ var
   p: TPoint;
   c, t: integer;
 begin
-  t := (getSystemTime + (60000 * 2));
+  t := (getSystemTime() + (60000 * 2));
 
   repeat
     // check to see if there is already text in the input box
@@ -496,7 +498,7 @@ begin
       wait(50+random(50));
     end;
 
-  until(not findColors(tpa, LOGIN_COLOR_TEXT, inputBox) or (getSystemTime > t));
+  until(not findColors(tpa, LOGIN_COLOR_TEXT, inputBox) or (getSystemTime() > t));
 
   wait(100 + random(200));
   typeSend(info, pressEnter);
@@ -806,7 +808,7 @@ begin
   end;
 
   typeByte(VK_ESCAPE); // exit any existing windows
-  t := (getSystemTime + 60000);
+  t := (getSystemTime() + 60000);
 
   repeat
     inc(tries);
@@ -942,9 +944,9 @@ begin
 
   if (tabLogout.clickText(['Login'])) then
   begin
-    t := (getSystemTime + (15000));
+    t := (getSystemTime() + (15000));
 
-    while (not result) and (getSystemTime < t) do
+    while (not result) and (getSystemTime() < t) do
     begin
       printToDebug('Waiting for login screen...');
       result := (not isLoggedIn());

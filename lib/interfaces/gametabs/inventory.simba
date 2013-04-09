@@ -9,6 +9,8 @@ Runescape inventory gametab.
 
 {$include_once gametab.simba}
 
+{$f-}
+
 (*
 const Inventory low/high
 ~~~~~~~~~~~~~~~~~~~~~~~~
@@ -125,7 +127,7 @@ Example:
 *)
 function TRSTabInventory.isOpen(): boolean;
 begin
-  result := (getCurrentTab = self.tabIndex);
+  result := (getCurrentTab() = self.tabIndex);
 end;
 
 
@@ -155,7 +157,7 @@ function TRSTabInventory.open(): boolean;
 begin
   result := true;
 
-  if (not (self.isOpen)) then
+  if (not (self.isOpen())) then
     result := _openGameTab(self.tabIndex);
 end;
 
@@ -385,7 +387,7 @@ begin
     exit;
 
   repeat
-    if (self.GetInvCount = count) then
+    if (self.GetInvCount() = count) then
       exit(true);
   until (getSystemTime() > t);
 end;

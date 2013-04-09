@@ -9,6 +9,8 @@ functions for SRL.
 
 *)
 
+{$f-}
+
 {$loadlib libsmartremote}
 
 (*
@@ -83,10 +85,10 @@ procedure fixSmartSpeed;
 var
   T: Integer;
 begin
-  T:= GetSystemTime + 2000;
-  while (not SmartEnabled) do
+  T:= GetSystemTime() + 2000;
+  while (not SmartEnabled()) do
   begin
-    if (GetSystemTime >= T) Then
+    if (GetSystemTime() >= T) Then
       Break;
     Wait(500);
   end;
@@ -95,10 +97,10 @@ begin
   begin
     if isClientReady() then
       Break;
-    SmartSetRefresh(SmartGetRefresh + 1);
+    SmartSetRefresh(SmartGetRefresh() + 1);
     mouse(point(4, 4));
-    SmartSetRefresh(SmartGetRefresh - 1);
-    if (GetSystemTime >= T) Then
+    SmartSetRefresh(SmartGetRefresh() - 1);
+    if (GetSystemTime() >= T) Then
       Break;
     Wait(500);
   end;
@@ -158,7 +160,7 @@ var
   IDs: TIntegerArray;
   I: Integer;
 begin
-  IDs := smartGetClientIDs;
+  IDs := smartGetClientIDs();
   for I := High(IDs) DownTo 0 do
     if SmartKillClient(IDs[I]) Then
       Writeln('Killed Client: ' + ToStr(IDs[I]))
@@ -190,13 +192,13 @@ var
   Trash: TVariantArray;
   Refresh: Integer;
 begin
-  Refresh := SmartGetRefresh;
-  SmartKillClient(SmartCurrentClient);
+  Refresh := SmartGetRefresh();
+  SmartKillClient(SmartCurrentClient());
   try
     VariantInvoke('DeclarePlayers', Trash);
   except
     Writeln('Could not DeclarePlayers');
-    TerminateScript;
+    TerminateScript();
   end;
 
   try
@@ -210,7 +212,7 @@ begin
   if (not players[currentPlayer].login()) then
   begin
     Writeln('~sixHourFix~ Could not Login Player');
-    TerminateScript;
+    TerminateScript();
   end;
 end;
 
@@ -238,7 +240,7 @@ var
   I, Count: Integer;
   IDs: TIntegerArray;
 begin
-  IDs := smartGetClientIDs;
+  IDs := smartGetClientIDs();
   Count := Length(IDs);
   if (Count > 0) then
     for I:= 0 To (Count - 1) do
@@ -281,7 +283,7 @@ var
 begin
   if (not ForceNew) then
   begin
-    Ids := smartGetClientIDs;
+    Ids := smartGetClientIDs();
     Count := Length(IDs);
     if (Count > 0) then
       for I:= 0 To (Count - 1) do
@@ -296,11 +298,11 @@ begin
       end;
   end;
 
-  Params := getSmartParams;
+  Params := getSmartParams();
   if (Length(Params) > 2) then
   begin
     Writeln('** Failed To Grab Smart Parameters **');
-    TerminateScript;
+    TerminateScript();
     Exit;
   end;
 
@@ -313,12 +315,12 @@ begin
     except
       WriteLn('** Fatal Error: Pairing Clients; Terminating Script **');
       Writeln('** Try setting your folder permissions to Allow **');
-      TerminateScript;
+      TerminateScript();
     end;
   end else
     begin
       Writeln('** Smart Cannot Spawn Clients **');
-      TerminateScript;
+      TerminateScript();
     end;
 end;
 
@@ -347,13 +349,13 @@ procedure setupSmart(ForceNewClient: Boolean);
 var
   T: Integer;
 begin
-  T := GetSystemTime + 120000;
+  T := GetSystemTime() + 120000;
   Smart_CurrentClient:= initSmart(ForceNewClient);
 
   if (Smart_CurrentClient <= 0) then
   begin
     writeln('*** Smart failed to load ***');
-    terminateScript;
+    terminateScript();
   end;
 end;
 
@@ -381,7 +383,7 @@ var
   T : TSysProcArr;
   I : Integer;
 begin
-  T := GetProcesses;
+  T := GetProcesses();
   for I := High(T) downto 0 do
     if Pos(TitlePrefix, T[I].Title) <> 0 then
     begin
@@ -395,5 +397,5 @@ begin
   setupSmart(Smart_ForceNew);
 
   if (SMART_SixHourFix) then
-    SRL_Events[EVENT_RS_UPDATE] := @sixHourFix;
+    SRL_Events[EVENT_RS_UPDATE] := sixHourFix;
 end;
