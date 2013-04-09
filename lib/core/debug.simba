@@ -20,6 +20,8 @@ guidelines are as follows:
 {$include_once ../utilities/types.simba}
 {$include_once ../tmp.simba}
 
+{$f-}
+
 var
   debugLevel = 1; // used for the nice printToDebug formatting
   logPath = includePath + 'SRL-6/logs/';
@@ -230,7 +232,7 @@ Example:
 *)
 procedure takeScreenshot(fileName: string);
 begin
-  saveScreenshot(logPath + timeRunning + '_' + fileName);
+  saveScreenshot(logPath + timeRunning() + '_' + fileName);
 end;
 
 begin

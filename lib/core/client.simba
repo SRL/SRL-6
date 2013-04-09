@@ -9,6 +9,8 @@ client settings.
 
 {$include_once ../interfaces/lobby.simba}
 
+{$f-}
+
 (*
 isClientReady
 ~~~~~~~~~~~~~
@@ -78,7 +80,7 @@ begin
           ' to select the RS client.');
   writeln('Waiting up to 5 minutes for RS to load...');
 
-  while ((getTickCount - t) < (5 * 60000)) do // 5 minutes
+  while ((getTickCount() - t) < (5 * 60000)) do // 5 minutes
   begin
     if (isClientReady()) then
     begin

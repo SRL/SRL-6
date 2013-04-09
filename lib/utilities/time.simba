@@ -7,6 +7,8 @@ the time of day, conversions, etc.
 
 *)
 
+{$f-}
+
 const
   TIME_FORMAL = 0;
   TIME_SHORT  = 1;
@@ -94,7 +96,7 @@ Example:
 *)
 function timeRunning: string;
 begin
-  Result := msToTime(GetTimeRunning, TIME_FORMAL);
+  Result := msToTime(GetTimeRunning(), TIME_FORMAL);
 end;
 
 (*
@@ -123,7 +125,7 @@ var
   Hour, Mins, Sec, MSec: Word;
   PAM: string;
 begin
-  DecodeTime(Now, Hour, Mins, Sec, MSec);
+  DecodeTime(Now(), Hour, Mins, Sec, MSec);
   PAM := 'AM';
   if (Hour > 12) then
   begin
@@ -167,7 +169,7 @@ var
   D: string;
   Mnths, sfx: TStringArray;
 begin
-  DecodeDate(Date, Year, Month, Day);
+  DecodeDate(Date(), Year, Month, Day);
   Mnths := ['January', 'February', 'March', 'April', 'May', 'June', 'July',
             'August', 'September', 'October', 'November', 'December'];
   sfx := ['st', 'nd', 'rd'];
@@ -235,12 +237,12 @@ Example:
 *)
 procedure TTimeMarker.start();
 begin
-  Self.__prevMark := GetSystemTime; // used for adding time after a pause
+  Self.__prevMark := GetSystemTime(); // used for adding time after a pause
 
   // if it hasn't been started yet
   if not Self.paused then
   begin
-    Self.startTime := GetSystemTime;
+    Self.startTime := GetSystemTime();
     Self.time := 0;
   end;
 
@@ -298,7 +300,7 @@ Example:
 *)
 procedure TTimeMarker.pause();
 begin
-  Self.time := Self.time + (GetSystemTime - Self.__prevMark);
+  Self.time := Self.time + (GetSystemTime() - Self.__prevMark);
   Self.paused := True;
 end;
 
@@ -329,7 +331,7 @@ Example:
 function TTimeMarker.getTime(): LongWord;
 begin
   if not Self.paused then
-    Result := Self.time + (GetSystemTime - Self.__prevMark)
+    Result := Self.time + (GetSystemTime() - Self.__prevMark)
   else
     Result := Self.time;
 end; 
@@ -358,5 +360,5 @@ Example:
 *)
 function TTimeMarker.getTotalTime(): LongWord;
 begin
-  Result := GetSystemTime - Self.startTime;
+  Result := GetSystemTime() - Self.startTime;
 end; 

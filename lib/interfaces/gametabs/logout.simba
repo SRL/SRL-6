@@ -9,6 +9,8 @@ gametab.
 
 {$include_once gametab.simba}
 
+{$f-}
+
 (*
 type TRSTabLogout
 ~~~~~~~~~~~~~~~~~
@@ -90,7 +92,7 @@ Example:
 *)
 function TRSTabLogout.isOpen(): boolean;
 begin
-  result := (getCurrentTab = self.tabIndex);
+  result := (getCurrentTab() = self.tabIndex);
 end;
 
 (*

@@ -10,6 +10,8 @@ lobby.
 {$include_once interfaces.simba}
 {$include_once gametabs/logout.simba}
 
+{$f-}
+
 (*
 type TRSLobby
 ~~~~~~~~~~~~~
@@ -217,9 +219,9 @@ begin
 
   if (tabLogout.clickText(['Lobby'])) then
   begin
-    t := (getSystemTime + (15000));
+    t := (getSystemTime() + (15000));
 
-    while (not result) and (getSystemTime < t) do
+    while (not result) and (getSystemTime() < t) do
     begin
       printToDebug('Waiting for lobby screen...');
       result := lobby.isOpen();
