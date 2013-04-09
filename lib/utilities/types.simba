@@ -1770,6 +1770,33 @@ begin
 end;
 
 (*
+TBox.getMidPoint
+~~~~~~~~~~~~~~~~
+
+.. code-block:: pascal
+
+    function TBox.getMidPoint(): tPoint;
+
+returns tPoint of the TBox's middle.
+
+.. note::
+
+    by Dgby714
+
+Example:
+
+.. code-block:: pascal
+
+    pt := b.getMidPoint();
+
+*)
+function TBox.getMidPoint(): TPoint;
+begin
+
+  result := Point((self.x2 + self.x1) div 2, (self.y2 + self.y1) div 2);
+end;
+
+(*
 TBox.getColors
 ~~~~~~~~~~~~~~
 
