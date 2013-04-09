@@ -10,19 +10,178 @@ and/or Lape.
 var
   clWhite = 16777215;
   clBlack = 0;
-
   clRed   = 255;
   clGreen = 32768;
   clBlue  = 16711680;
-
   clPurple = 8388736;
   clYellow = 65535;
+  clAqua = 16776960;
+  clOrange = 26367;
+  clFuchsia = 16711935;
+  clTeal = 8421376;
+  clNavy =  8388608;
+  clGray = 8421504;
+  clLime =  65280;
+  clMaroon =  128;
+  clSilver = 12632256;
 
+var
   maxInt = high(integer);
 
 const
   MOUSE_NONE = -1;
   MOUSE_MOVE = 3;
+
+(*
+freeDTMs
+~~~~~~~~
+
+.. code-block:: pascal
+
+    procedure freeDTMs(DTMs: TIntegerArray);
+
+Free's an array of DTMs.
+
+.. note::
+
+    by Ollybest
+
+Example:
+
+.. code-block:: pascal
+
+     freeDTMs([dtm1, dtm2]);
+
+*)
+procedure freeDTMs(DTMs: TIntegerArray);
+var
+  i: integer;
+begin
+  for i := 0 to high(dtms) do
+    freeDTM(dtms[i]);
+end;
+
+(*
+freeBitmaps
+~~~~~~~~~~~
+
+.. code-block:: pascal
+
+    procedure freeBitmaps(bitmaps: TIntegerArray);
+
+Free's an array of bitmaps.
+
+.. note::
+
+    by Ollybest
+
+Example:
+
+.. code-block:: pascal
+
+     freeBitmaps([bmp1, bmp2]);
+
+*)
+procedure freeBitmaps(bitmaps: TIntegerArray);
+var
+  i: integer;
+begin
+  for i := 0 to high(bitmaps) do
+    freeBitmap(bitmaps[i]);
+end;
+
+(*
+filterTPAsBetween
+~~~~~~~~~~~~~~~~~
+
+.. code-block:: pascal
+
+    procedure filterTPAsBetween(var atpa: T2DPointArray; len1, len2: integer);
+
+Filters (removes) the TPointArrays in the T2DPointArray if the length is between
+len1, or len2.
+
+Note: This will re-order your array.
+
+.. note::
+
+    by Ollybest
+
+Example:
+
+.. code-block:: pascal
+
+     filterTPAsBetween(atpa, 150, 300);
+
+*)
+procedure filterTPAsBetween(var atpa: T2DPointArray; len1, len2: integer);
+var
+  h, l, i: integer;
+  c: T2DPointArray;
+begin
+  h := high(atpa);
+
+  for i := 0 to h do
+  begin
+    l := length(atpa[i]);
+
+    if (not (inRange(l, len1, len2))) then
+      insert(atpa[i], c);
+  end;
+
+  atpa := c;
+end;
+
+(*
+getMostCommonNumber
+~~~~~~~~~~~~~~~~~~~
+
+.. code-block:: pascal
+
+    function getMostCommonNumber(Arr: TIntegerArray): LongInt;
+
+Returns the most common number in the array, useful for finding the most common
+color in a TPointArray.
+
+.. note::
+
+    by Dgby714
+
+Example:
+
+.. code-block:: pascal
+
+     mostCol := getMostCommonNumber(getColors(tpa));
+
+*)
+function getMostCommonNumber(Arr: TIntegerArray): LongInt;
+var
+  H, I, Cur, Count, HighCount: LongInt;
+begin
+  QuickSort(Arr);
+
+  Cur := Arr[0] - 1;
+  Count := 0;
+  HighCount := 0;
+
+  H := High(Arr);
+  for I := 0 to H do
+  begin
+    if (Cur <> Arr[I]) then
+    begin
+      if (Count > HighCount) then
+      begin
+        HighCount := Count;
+        Result := Cur;
+      end;
+
+      Count := 0;
+      Cur := Arr[I];
+    end;
+
+    Inc(Count);
+  end;
+end;
 
 procedure SortATPAFromFirstPointY(var a: T2DPointArray; const From: TPoint);
 var
@@ -245,7 +404,7 @@ end;
 
 (*
 __gaussRand
-~~~~~~~~~~~~~
+~~~~~~~~~~~
 
 This is a functional pointer. It behaves transparently as a regular function
 would. This function will behave as so: it will return a random Extended
@@ -295,9 +454,8 @@ begin
 end;
 
 (*
-
 Gauss
-~~~~~~~~
+~~~~~
 
 .. code-block:: pascal
 
@@ -326,9 +484,8 @@ begin
 end;
 
 (*
-
 __gaussMarsPolar
-~~~~~~~~~~~~~~
+~~~~~~~~~~~~~~~~
 
 .. code-block:: pascal
 
@@ -353,7 +510,6 @@ begin
 end;
 
 (*
-
 GaussRand
 ~~~~~~~~~
 
@@ -385,7 +541,6 @@ end;
 
 
 (*
-
 GaussPoint
 ~~~~~~~~~~~
 
@@ -439,7 +594,7 @@ end;
 
 (*
 GaussRangeExt
-~~~~~~~~~~
+~~~~~~~~~~~~~
 
 .. code-block:: pascal
 
@@ -481,9 +636,8 @@ begin
 end;
 
 (*
-
 GaussRangeInt
-~~~~~~~~~~~
+~~~~~~~~~~~~~
 
 .. code-block:: pascal
 
@@ -502,7 +656,6 @@ begin
 end;
 
 (*
-
 GaussRandom
 ~~~~~~~~~~~
 
@@ -530,7 +683,6 @@ begin
 end;
 
 (*
-
 GaussBox
 ~~~~~~~~
 
@@ -557,7 +709,6 @@ Example:
     WriteLn(Format("gX, gY -> %d, %d", gX, gY);
 
 *)
-
 procedure GaussBox(out p: TPoint; box: TBox);
 begin
   p.x := GaussRangeInt(box.x1, box.x2);
