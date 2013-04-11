@@ -10,6 +10,8 @@ The gametab file holds any global gametab data.
 {$include_once ../mainscreen.simba}
 {$include_once ../../core/text.simba}
 
+{$f-}
+
 // just here temporarily to test and compile
 // remove TTemp, bankScreen, and TTemp.isOpen when bankscreen.simba is added
 type
@@ -250,9 +252,9 @@ begin
       mouseBox(_gameTabGrid[tab], MOUSE_LEFT);
 
       t := (getSystemTime() + 2000);
-      while (getSystemTime < t) do
+      while (getSystemTime() < t) do
       begin
-        if (getCurrentTab = tab) then
+        if (getCurrentTab() = tab) then
         begin
           printToDebug('Opened tab '+toStr(tab));
           exit(true);
@@ -295,7 +297,7 @@ function _openGameTabFKey(tab: integer): boolean;
 var
   t, F: integer;
 begin
-  if (getCurrentTab = tab) then
+  if (getCurrentTab() = tab) then
     exit(true);
 
   case tab of

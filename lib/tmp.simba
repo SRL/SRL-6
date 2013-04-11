@@ -7,6 +7,9 @@ and/or Lape.
 
 *)
 
+{$f-}
+
+
 var
   clWhite = 16777215;
   clBlack = 0;
@@ -721,5 +724,5 @@ end;
 begin
   __gaussPoint := 0.4;
   __gaussRange := 0.3;
-  __gaussRand := @__gaussMarsPolar;
+  __gaussRand := __gaussMarsPolar;
 end;

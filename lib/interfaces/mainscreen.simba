@@ -9,6 +9,8 @@ Runescape lobby mainscreen.
 
 {$include_once interfaces.simba}
 
+{$f-}
+
 (*
 type TRSMainscreen
 ~~~~~~~~~~~~~~~~~~

@@ -6,6 +6,8 @@ The Mouse include contains all Mouse movement and clicking functions.
 
 *)
 
+{$f-}
+
 {$include_once ../tmp.simba}
 
 (*
@@ -84,9 +86,9 @@ begin
     nModB := 0.10;
   end;
 
-  t := getSystemTime + 5000;
+  t := getSystemTime() + 5000;
   repeat
-    if (getSystemTime > t) then
+    if (getSystemTime() > t) then
       break;
 
     dist:= hypot(xs - xe, ys - ye);
@@ -214,9 +216,9 @@ begin
   sqrt5:= sqrt(5);
 
   TDist := distance(round(xs), round(ys), round(xe), round(ye));
-  t := getSystemTime + 10000;
+  t := getSystemTime() + 10000;
   repeat
-    if (getSystemTime > t) then
+    if (getSystemTime() > t) then
       break;
 
     dist:= hypot(xs - xe, ys - ye);
@@ -599,9 +601,9 @@ begin
   if (B.x2 > w) then B.x2 := w;
   if (B.y2 > h) then B.y2 := h;
 
-  TimeOut := GetSystemTime + Time;
+  TimeOut := GetSystemTime() + Time;
 
-  while (GetSystemTime < TimeOut) and (not Result) do
+  while (GetSystemTime() < TimeOut) and (not Result) do
   begin
     R := CountColorTolerance(395675, B.x1, B.y1, B.x2, B.y2, 15);
     G := CountColorTolerance(1695663, B.x1, B.y1, B.x2, B.y2, 15);

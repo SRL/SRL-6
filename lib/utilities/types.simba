@@ -9,6 +9,8 @@ The Type include contains type editing functions used throughout SRL.
 {$include_once ../utilities/wrappers.simba}
 {$include_once ../core/mouse.simba}
 
+{$f-}
+
 (*
 TStringArray.addIndex
 ~~~~~~~~~~~~~~~~~~~~~
