@@ -94,9 +94,28 @@ EVERYTHING should be recorded here: new features, function name changes, user-de
   - new function TPoint.coords that will assign the x and y values of a TPoint
 
 - new file, wrappers.simba
-  - new function overload FindColorsTolerance. Can now enter a TBox instead of x1, y1, x2, y2
-  - new function overload replicate. Can now enter a string instead of only one char.
-  - new functions overloads for lowercase, uppercase and capitalize. Can now enter a TStringArray instead of only one string.  
+ - getColor now takes a TPoint rather than x, y variables.
+ - tpaFromText can be called without the w and h variables.
+ - replicate can be used to replicate any string, as opposed to the former replicate() that replicates chars.
+ - explode now accepts a TStringArray.
+
+ - list of functions that take TBox variables instead of x1, y1, x2 and y2 variables:
+  - findColors
+  - findColorsTolerance
+  - findColorSpiral
+  - findColorsSpiralTolerance
+  - countColor
+  - countColorTolerance
+  - findBitmapIn
+  - findBitmapToleranceIn
+  - findBitmapMaskTolerance
+  - findDeformedBitmapToleranceIn
+  - findDTMRotatedSE
+  - findDTMRotatedAlternating
+  - findDTMRotated
+  - findDTMs
+  - findDTM
+  - getTextAtEx  
 
 - new file, mainscreen.simba
   - Uptext and option functions moved here
