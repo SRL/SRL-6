@@ -183,6 +183,91 @@ begin
   end;
 end;
 
+(*
+sendKeyWait
+~~~~~~~~~~~
+
+.. code-block:: pascal
+
+    procedure sendKeyWait(key: Byte; waitTime: Integer);
+
+Presses and holds down the desired key for the set waitTime.
+
+.. note::
+
+    by Ollybest
+
+Example:
+
+.. code-block:: pascal
+
+     sendKeyWait(vk_up, 800 + random(200));
+
+*)
+procedure sendKeyWait(key: Byte; waitTime: Integer);
+begin
+  if (not (isKeyDown(key))) then
+    keyDown(key);
+
+  wait(waitTime);
+
+  if isKeyDown(key) then
+    keyUp(key);
+end;
+
+(*
+intToPoint
+~~~~~~~~~~
+
+.. code-block:: pascal
+
+    function intToPoint(x, y: integer): TPoint;
+
+Converts 2 integers into a TPoint.
+
+.. note::
+
+    by Ollybest
+
+Example:
+
+.. code-block:: pascal
+
+     point := intToPoint(i,ii);
+
+*)
+function intToPoint(x, y: integer): TPoint;
+begin
+  result := point(x, y);
+end;
+
+(*
+isInCircle
+~~~~~~~~~~
+
+.. code-block:: pascal
+
+    function isInCircle(x, y, mx, my, radius: integer): boolean;
+
+Returns true if x and y are inside the circle.
+
+.. note::
+
+    by Ollybest
+
+Example:
+
+.. code-block:: pascal
+
+     if isInCircle(x, y, 200, 200, 50) then
+       writeln('x and y are in the circle');
+
+*)
+function isInCircle(x, y, mx, my, radius: integer): boolean;
+begin
+  result := (Sqrt(sqr(x-mx) + sqr(y-my)) <= radius);
+end;   
+
 procedure SortATPAFromFirstPointY(var a: T2DPointArray; const From: TPoint);
 var
    i, l: Integer;
