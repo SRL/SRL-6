@@ -19,8 +19,9 @@ Integer constants that represent the ID's of each global interface.
 const
   ID_INTERFACE_TAB_INVENTORY = 0;
   ID_INTERFACE_TAB_LOGOUT    = 1;
-  ID_INTERFACE_LOBBY         = 2;
-  ID_INTERFACE_MAINSCREEN    = 3;
+  ID_INTERFACE_TAB_STATS     = 2;
+  ID_INTERFACE_LOBBY         = 3;
+  ID_INTERFACE_MAINSCREEN    = 4;  
 
 (*
 type TRSInterface
