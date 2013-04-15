@@ -60,8 +60,8 @@ var
   _boxUsername, _boxPassword: TBox; // set at the end of this file
 
 (*
-Type: TPlayer
-~~~~~~~~~~~~~
+type TPlayer
+~~~~~~~~~~~~
 
 A record that stores useful information about the current players.  It is up to
 the scripter to set most these attributes in their scripts.
