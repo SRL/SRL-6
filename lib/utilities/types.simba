@@ -3122,6 +3122,83 @@ begin
 end;
 
 (*
+T2DPointArray.getBounds
+~~~~~~~~~~~~~~~~~~~~~~~
+
+.. code-block:: pascal
+
+    function T2DPointArray.getBounds(): TBox;
+
+Returns the box boundaries of the TPA.
+
+.. note::
+
+    by Coh3n
+
+Example:
+
+.. code-block:: pascal
+
+    b := TPA.getBounds();
+
+*)
+function T2DPointArray.getBounds(): TBox;
+begin
+  result := getATPABounds(self);
+end;
+
+(*
+T2DPointArray.offset
+~~~~~~~~~~~~~~~~~~~~
+
+.. code-block:: pascal
+
+    procedure T2DPointArray.offset(p: TPoint);
+
+Offsets a T2DPointArray by p.
+
+.. note::
+
+    by Coh3n
+
+Example:
+
+.. code-block:: pascal
+
+    atpa.offset(point(1, 1));
+
+*)
+procedure T2DPointArray.offset(p: TPoint);
+begin
+  offsetATPA(self, p);
+end;
+
+(*
+T2DPointArray.copy
+~~~~~~~~~~~~~~~~~~
+
+.. code-block:: pascal
+
+    function T2DPointArray.copy(): T2DPointArray;
+
+Copies a T2DPointArray.
+
+.. note::
+
+    by Coh3n
+
+Example:
+
+.. code-block:: pascal
+
+    newATPA := ATPA.copy();
+*)
+function T2DPointArray.copy(): T2DPointArray;
+begin
+  result := copyATPA(self);
+end;
+
+(*
 T2DPointArray.merge
 ~~~~~~~~~~~~~~~~~~~
 
@@ -3277,4 +3354,29 @@ Example:
 function TPointArray.getLength: integer;
 begin
   result := length(self);
+end;
+
+(*
+TPointArray.copy
+~~~~~~~~~~~~~~~
+
+.. code-block:: pascal
+
+    function TPointArray.copy(): TPointArray;
+
+Copies a TPointArray.
+
+.. note::
+
+    by Coh3n
+
+Example:
+
+.. code-block:: pascal
+
+    newTPA := TPA.copy();
+*)
+function TPointArray.copy(): TPointArray;
+begin
+  result := copyTPA(self);
 end;

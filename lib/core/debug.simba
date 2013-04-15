@@ -22,20 +22,27 @@ guidelines are as follows:
 
 {$f-}
 
+{$s+}
+type
+  TDebug = (DEBUG, LOG, HINT, WARNING, ERROR);
+{$s-}
+
 var
+  __logFile: integer;
   debugLevel = 1; // used for the nice printToDebug formatting
   logPath = includePath + 'SRL-6/logs/';
   scriptStartTime = '0:0:0';
   disableSRLLog = false;
-  disableSRLprintToDebug = false;
+  disableSRLDebug = false;
 
-(*
-openLogFile
-~~~~~~~~~~~
+
+{*
+__openLogFile
+~~~~~~~~~~~~~
 
 .. code-block:: pascal
 
-    function openLogFile(): integer;
+    function __openLogFile(): boolean;
 
 Creates the SRL log file.
 
@@ -48,10 +55,10 @@ Example:
 
 .. code-block:: pascal
 
-    openLogFile();
+    __openLogFile();
 
-*)
-function openLogFile(): integer;
+*}
+function __openLogFile(): boolean;
 var
   fileName: string;
 begin
@@ -69,17 +76,17 @@ begin
 
   try
     if (fileExists(fileName)) then
-      result := appendFile(fileName)
+      __logFile := openFile(fileName, true)
     else
-      result := createFile(fileName);
+      __logFile := createFile(fileName);
   except
-    writeln('Could not open log file');
+    writeln('Could not open/create log file');
   end;
 end;
 
-(*
-printToLog
-~~~~~~~~~~
+{*
+__printToLog
+~~~~~~~~~~~~
 
 .. code-block:: pascal
 
@@ -98,61 +105,108 @@ Example:
 
     printToLog('Adding to SRL log file!');
 
-*)
-procedure printToLog(s: string);
-var
-  tmpFile: integer;
+*}
+procedure __printToLog(s: string);
 begin
   if (disableSRLLog) then
     exit;
 
-  tmpFile := openLogFile();
-
-  if (tmpFile >= 0) then
+  if (__logFile >= 0) then
     try
-      writeFileString(tmpFile, '['+msToTime(getTimeRunning(), TIME_BARE)+']: '+s+#13+#10);
+      writeFileString(__logFile, '['+msToTime(getTimeRunning(), TIME_BARE)+']: '+s+#13+#10);
     except
       writeln('Could not write to log file');
-    finally
-      closeFile(tmpFile);
     end;
 end;
 
-(*
-printToDebug
-~~~~~~~~~~~~
+{*
+__closeLogFile
+~~~~~~~~~~~~~~
 
 .. code-block:: pascal
 
-    procedure printToDebug(txt: string);
+    procedure __closeLogFile();
 
-Prints 'txt' to the printToDebug box in the SRL debug format.
+Closes the log file.
 
 .. note::
 
     by Coh3n
-    Last Modified: Jan. 03th, 2013 by Zyt3x
+    Last Modified: 13 April 2013 by Coh3n
 
 Example:
 
 .. code-block:: pascal
 
-    printToDebug(TheDate);
+    __closeLogFile();
 
-*)
-procedure printToDebug(txt: string);
-var
-  printToDebugMSG: string;
+*}
+procedure __closeLogFile();
 begin
-  printToDebugMSG := replicate('--', debugLevel) + ' ' + txt;
-
-  if (not disableSRLLog) then
-    printToLog(printToDebugMSG);
-
-  if (disableSRLprintToDebug) then
+  if (disableSRLLog) then
     exit;
 
-  writeln(printToDebugMSG);
+  try
+    closeFile(__logFile);
+  except
+    writeln('Error closing log file');
+  end;
+end;
+
+(*
+print
+~~~~~
+
+.. code-block:: pascal
+
+    procedure print(txt: string; debugType: TDebug = TDebug.DEBUG);
+
+Prints txt to the debug box if debugType doesn't equal TDebug.LOG.  Will always
+print to the log file unless disableSRLLog is set to true.  Valid arguements
+for debugType:
+    * DEBUG (default)
+    * LOG
+    * HINT
+    * WARNING
+    * ERROR
+
+.. note::
+
+    by Coh3n & masterBB
+    Last Modified: 04 April 2013 by Coh3n
+
+Example:
+
+.. code-block:: pascal
+
+    print(TheDate);
+
+*)
+procedure print(txt: string; debugType: TDebug = TDebug.DEBUG);
+var
+  debugMSG: string;
+begin
+  case debugType of
+    TDebug.HINT:
+      txt := 'HINT: ' + txt;
+
+    TDebug.WARNING:
+      txt := 'WARNING: ' + txt;
+
+    TDebug.ERROR:
+      txt := 'ERROR: ' + txt;
+  end;
+
+  debugMSG := replicate('--', debugLevel) + ' ' + txt;
+
+  if (not disableSRLLog) then
+    __printToLog(debugMSG);
+
+  if (disableSRLDebug) then
+    exit;
+
+  if (debugType <> TDebug.LOG) then
+    writeln(debugMSG);
 end;
 
 (*
@@ -210,6 +264,212 @@ begin
 end;
 
 (*
+debugBitmap
+~~~~~~~~~~~
+
+.. code-block:: pascal
+
+    procedure debugBitmap(Bmp: Integer);
+
+Shows a bitmap in the debug image window.
+
+.. note::
+
+    by Cazax
+    Last Updated: 12 April 2013 by Coh3n
+
+Example:
+
+.. code-block:: pascal
+
+    debugBitmap(bmp);
+*)
+procedure debugBitmap(Bmp: Integer);
+var
+  W, H: Integer;
+begin
+  try
+    GetBitmapSize(Bmp, W, H);
+    DisplayDebugImgWindow(W, H);
+    DrawBitmapDebugImg(Bmp);
+  except
+    print('Error in DebugBitmap', TDebug.error);
+  end;
+end;
+
+(*
+debugTPA
+~~~~~~~~
+
+.. code-block:: pascal
+
+    procedure debugTPA(tpa: TPointArray; bmpName: string);
+
+Shows a TPointArray on the debug image window. Has the option to save the
+window to a file.
+    * tpa: The TPointArray to be displayed.
+    * bmpName: The name of the file to be saved.  If bmpName = '' nothing is saved.
+
+.. note::
+
+    by Wizzup?
+    Last Updated: 12 April 2013 by Coh3n
+
+Example:
+
+.. code-block:: pascal
+
+    debugTPA(tpa, 'Example');
+*)
+procedure debugTPA(tpa: TPointArray; bmpName: string);
+var
+  bmp: integer;
+  bds: TBox;
+  tpaTemp : TPointArray;
+begin
+  bds := tpa.getBounds();
+  bmp := bitmapFromClient(bds.x1, bds.y1, bds.x2, bds.y2);
+
+  tpaTemp := tpa.copy();
+  tpaTemp.offset(point(-bds.x1, -bds.y1));
+
+  drawTPABitmap(bmp, tpaTemp, clRed);
+  drawBitmapDebugImg(bmp);
+  displayDebugImgWindow(bds.x2 - bds.x1 + 1, bds.y2 - bds.y1 + 1);
+
+  if (bmpName <> '') then
+    saveBitmap(bmp, scriptPath + bmpName + '.png');
+
+  freeBitmap(bmp);
+end;
+
+(*
+debugATPA
+~~~~~~~~~
+
+.. code-block:: pascal
+
+    procedure debugATPA(atpa: T2DPointArray; bmpName: string);
+
+Plots the points of a T2DPointArray to the debug image window.  Will plot each
+element of the array in a different color.  Has the option to save the window
+to a file.
+    * atpa: The T2DPointArray to be drawn.
+    * bmpName: The name of the file to be saved.  If bmpName = '', no file is saved.
+
+.. note::
+
+    by Wizzup?
+    Last Updated: 12 April 2013 by Coh3n
+
+Example:
+
+.. code-block:: pascal
+
+    debugATPA(atpa, 'Example');
+*)
+procedure debugATPA(atpa: T2DPointArray; bmpName: string);
+var
+  bmp: integer;
+  atpaTemp: T2DPointArray;
+  bds: TBox;
+begin
+  if (length(atpa) <= 0) then
+    exit;
+
+  bds := atpa.getBounds();
+  bmp := bitmapFromClient(bds.x1, bds.y1, bds.x2, bds.y2);
+
+  atpaTemp := atpa.copy();
+  atpaTemp.offset(point(-bds.x1, -bds.y1));
+
+  drawATPABitmap(bmp, atpaTemp);
+  drawBitmapDebugImg(bmp);
+  displayDebugImgWindow(bds.x2 - bds.x1 + 1, bds.y2 - bds.y1 + 1);
+
+  if (bmpName <> '') then
+    saveBitmap(bmp, scriptPath + bmpName + '.png');
+
+  freeBitmap(bmp);
+end;
+
+(*
+debugATPABounds
+~~~~~~~~~~~~~~~
+
+.. code-block:: pascal
+
+    procedure debugATPABounds(ATPA: T2DPointArray; bmpName: string);
+
+Plots the founds of each element of a T2DPointArray to the debug image window.
+Has the option to save the window's display to a file.
+    * ATPA: The T2DPointArray to be drawn.
+    * bmpName: The name of the file to be saved.  If bmpName = '', no file is saved.
+
+.. note::
+
+    by Wizzup?
+    Last Updated: 12 April 2013 by Coh3n
+
+Example:
+
+.. code-block:: pascal
+
+    debugATPABounds(atpa, 'Example');
+*)
+procedure debugATPABounds(ATPA: T2DPointArray; bmpName: string);
+var
+  Width, Height, ClientBMP, I: Integer;
+  B, Box: TBox;
+  BoxColors: TIntegerArray;
+  SelColor: Integer;
+  x, y: Integer;
+  BMP: Integer;
+begin
+  ATPA.getBounds();
+  Width := Box.X2 + 5;
+  Height := Box.Y2 + 5;
+
+  DisplayDebugImgWindow(Width, Height);
+  BoxColors := [clRed, clBlue, clBlack, clGreen, clYellow];
+
+  ClientBMP := BitmapFromClient(0, 0, Width - 1, Height - 1);
+
+  for i:= 0 to High(ATPA) do
+  begin
+    SelColor := BoxColors[Random(Length(BoxColors))];
+    B := ATPA[i].getBounds();
+
+    for x := B.x1 to B.x2 do
+    begin
+      FastSetPixel(ClientBMP, x, b.y1, selColor);
+      FastSetPixel(ClientBMP, x, B.y2, selColor);
+    end;
+
+    for y := B.y1 to B.y2 do
+    begin
+      FastSetPixel(ClientBMP, B.x1, y, selColor);
+      FastSetPixel(ClientBMP, B.x2, y, selColor);
+    end;
+
+    BMP := BitmapFromText(IntToStr(i), StatChars);
+    FastReplaceColor(bmp, clBlack, clYellow);
+    FastReplaceColor(bmp, clWhite, clBlack);
+
+    SetTransparentColor(bmp,clYellow);
+    FastDrawTransparent(B.x1 + 2, b.y1 + 2, BMP, ClientBMP);
+
+    FreeBitmap(BMP);
+  end;
+
+  if (bmpName <> '') then
+    SaveBitmap(ClientBMP, bmpName + '.png');
+
+  DrawBitmapDebugImg(ClientBMP);
+  FreeBitmap(ClientBmp);
+end;
+
+(*
 takeScreenshot
 ~~~~~~~~~~~~~~
 
@@ -236,6 +496,8 @@ begin
 end;
 
 begin
+  __openLogFile();
+  //addOnTerminate(@__closeLogFile());
   //Lape_OnFunctionEnter := @onFuncEnter;
   //Lape_OnFunctionExit := @onFuncExit;
 end;
