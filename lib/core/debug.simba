@@ -22,19 +22,50 @@ guidelines are as follows:
 
 {$f-}
 
+(*
+type TDebug
+~~~~~~~~~~~
+
+A set of enums used to distinguish between the types of SRL debugging.
+
+Example:
+
+.. code-block:: pascal
+
+    print('Failed to open bank', TDebug.ERROR);
+*)
 {$s+}
 type
   TDebug = (DEBUG, LOG, HINT, WARNING, ERROR);
 {$s-}
 
+{*
+var Internal Debug
+~~~~~~~~~~~~~~~~~~
+
+Internal SRL debug variables:
+    * __logFile: The handle of the SRL log file.
+    * __scriptStartTime: The time the script starts. Used for the name of the log file.
+    * __debugLevel: Used for debug indenting. Makes it easier to read & follow.
+*}
 var
   __logFile: integer;
-  debugLevel = 1; // used for the nice printToDebug formatting
+  __scriptStartTime = '0:0:0';
+  __debugLevel = 1;
+
+(*
+var External Debug
+~~~~~~~~~~~~~~~~~~
+
+External SRL debug variables that can be set scripts:
+    * logPath: string; The path the save the SRL log file. Default path is SRL-6/logs/.
+    * disableSRLLog: boolean; Disables saving debug to a log file.  Default false.
+    * disableSRLDebug: boolean; Disables SRL functions from printing to the debug box.  Default false.
+*)
+var
   logPath = includePath + 'SRL-6/logs/';
-  scriptStartTime = '0:0:0';
   disableSRLLog = false;
   disableSRLDebug = false;
-
 
 {*
 __openLogFile
@@ -69,7 +100,7 @@ begin
     forceDirectories(logPath);
 
   // make sure it's a valid file name (Windows)
-  fileName := 'SRL log ('+scriptStartTime+').txt';
+  fileName := 'SRL log ('+__scriptStartTime+').txt';
   fileName := replace(fileName, '/', '-', [rfReplaceAll]);
   fileName := replace(fileName, ':', '-', [rfReplaceAll]);
   fileName := logPath + fileName;
@@ -197,7 +228,7 @@ begin
       txt := 'ERROR: ' + txt;
   end;
 
-  debugMSG := replicate('--', debugLevel) + ' ' + txt;
+  debugMSG := replicate('--', __debugLevel) + ' ' + txt;
 
   if (not disableSRLLog) then
     __printToLog(debugMSG);
@@ -233,7 +264,7 @@ Example:
 *)
 procedure onFuncEnter();
 begin
-  inc(debugLevel);
+  inc(__debugLevel);
 end;
 
 (*
@@ -260,7 +291,7 @@ Example:
 *)
 procedure onFuncExit();
 begin
-  dec(debugLevel);
+  dec(__debugLevel);
 end;
 
 (*
@@ -496,7 +527,7 @@ begin
 end;
 
 begin
-  __openLogFile();
+  //__openLogFile();
   //addOnTerminate(@__closeLogFile());
   //Lape_OnFunctionEnter := @onFuncEnter;
   //Lape_OnFunctionExit := @onFuncExit;
