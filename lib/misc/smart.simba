@@ -14,8 +14,8 @@ functions for SRL.
 {$loadlib libsmartremote}
 
 (*
-Variables
-~~~~~~~~~
+var SMART Globals
+~~~~~~~~~~~~~~~~~
 
 All the variables associated with smart.simba.
 
