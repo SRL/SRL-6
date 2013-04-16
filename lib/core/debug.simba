@@ -4,14 +4,15 @@ Debug
 
 The debug file holds any files used for SRL debugging and logging. Debug usage
 guidelines are as follows:
-    * Use printToDebug() for error messages.
-    * Use printToDebug() for warnings.  If a lot of warnings are expected in a
-      row, use printToDebug() once, followed by printLog().
-    * Use printToDebug() for informational messages (i.e. "Checking if..." or
+    * Use print('Message', TDebug.ERROR) for error messages.
+    * Use print('Message', TDebug.WARNING) for warnings.  If a lot of warnings are expected in a
+      row, use print() once, followed by print('Message' TDebug.LOG).
+    * Use print('Message') for informational messages (i.e. "Checking if..." or
       "Found...").
-    * Use printLog() for specific information the user won't want to see, but
+    * Use print('Message', TDebug.LOG) for specific information the user won't want to see, but
       will be useful for scripters to debug (i.e. "Found 20 pixels of the color
       12345678 with tolerance 15").
+    * Use print('Message', TDebug.HINT) for scripting hints.
 *)
 
 {$include_once globals.simba}
