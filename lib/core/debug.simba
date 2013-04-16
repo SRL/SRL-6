@@ -13,6 +13,7 @@ guidelines are as follows:
       will be useful for scripters to debug (i.e. "Found 20 pixels of the color
       12345678 with tolerance 15").
     * Use print('Message', TDebug.HINT) for scripting hints.
+    * Use print('Message', TDebug.FATAL) to terminate the script.
 *)
 
 {$include_once globals.simba}
@@ -37,7 +38,7 @@ Example:
 *)
 {$s+}
 type
-  TDebug = (DEBUG, LOG, HINT, WARNING, ERROR);
+  TDebug = (DEBUG, LOG, HINT, WARNING, ERROR, FATAL);
 {$s-}
 
 {*
@@ -46,12 +47,10 @@ var Internal Debug
 
 Internal SRL debug variables:
     * __logFile: The handle of the SRL log file.
-    * __scriptStartTime: The time the script starts. Used for the name of the log file.
     * __debugLevel: Used for debug indenting. Makes it easier to read & follow.
 *}
 var
   __logFile: integer;
-  __scriptStartTime = '0:0:0';
   __debugLevel = 1;
 
 (*
@@ -92,7 +91,7 @@ Example:
 *}
 function __openLogFile(): boolean;
 var
-  fileName: string;
+  fileName, start: string;
 begin
   if (disableSRLLog) then
     exit;
@@ -100,8 +99,10 @@ begin
   if (not directoryExists(logPath)) then
     forceDirectories(logPath);
 
+  start := replace(theDate(DATE_DAY)+' at '+theTime(), ':', '.', [rfReplaceAll]);
+
   // make sure it's a valid file name (Windows)
-  fileName := 'SRL log ('+__scriptStartTime+').txt';
+  fileName := 'SRL log ('+start+').txt';
   fileName := replace(fileName, '/', '-', [rfReplaceAll]);
   fileName := replace(fileName, ':', '-', [rfReplaceAll]);
   fileName := logPath + fileName;
@@ -227,6 +228,9 @@ begin
 
     TDebug.ERROR:
       txt := 'ERROR: ' + txt;
+
+    TDebug.FATAL:
+      txt := 'FATAL ERROR: ' + txt;
   end;
 
   debugMSG := replicate('--', __debugLevel) + ' ' + txt;
@@ -239,6 +243,9 @@ begin
 
   if (debugType <> TDebug.LOG) then
     writeln(debugMSG);
+
+  if (debugType = TDebug.FATAL) then
+    halt();
 end;
 
 (*
@@ -528,7 +535,7 @@ begin
 end;
 
 begin
-  //__openLogFile();
+  __openLogFile();
   //addOnTerminate(@__closeLogFile());
   //Lape_OnFunctionEnter := @onFuncEnter;
   //Lape_OnFunctionExit := @onFuncExit;
