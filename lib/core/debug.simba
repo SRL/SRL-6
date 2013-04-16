@@ -50,7 +50,7 @@ Internal SRL debug variables:
     * __debugLevel: Used for debug indenting. Makes it easier to read & follow.
 *}
 var
-  __logFile: integer;
+  __logFile = -1;
   __debugLevel = 1;
 
 (*
@@ -236,7 +236,12 @@ begin
   debugMSG := replicate('--', __debugLevel) + ' ' + txt;
 
   if (not disableSRLLog) then
+  begin
+    if (__logFile = -1) then // if it hasn't yet been created
+      __openLogFile();
+
     __printToLog(debugMSG);
+  end;
 
   if (disableSRLDebug) then
     exit;
@@ -535,7 +540,6 @@ begin
 end;
 
 begin
-  __openLogFile();
   //addOnTerminate(@__closeLogFile());
   //Lape_OnFunctionEnter := @onFuncEnter;
   //Lape_OnFunctionExit := @onFuncExit;
