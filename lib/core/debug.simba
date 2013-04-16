@@ -206,7 +206,7 @@ for debugType:
 .. note::
 
     by Coh3n & masterBB
-    Last Modified: 04 April 2013 by Coh3n
+    Last Modified: 16 April 2013 by Coh3n
 
 Example:
 
@@ -243,14 +243,18 @@ begin
     __printToLog(debugMSG);
   end;
 
+  // print the fatal error and terminate the script
+  if (debugType = TDebug.FATAL) then
+  begin
+    writeln(debugMSG);
+    halt();
+  end;
+
   if (disableSRLDebug) then
     exit;
 
   if (debugType <> TDebug.LOG) then
     writeln(debugMSG);
-
-  if (debugType = TDebug.FATAL) then
-    halt();
 end;
 
 (*
