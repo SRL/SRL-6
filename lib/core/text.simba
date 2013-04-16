@@ -68,9 +68,9 @@ begin
     end;
 
   if (result) then
-    printToDebug('findText('+toStr(txt)+'): True, at point '+toStr(p))
+    print('findText('+toStr(txt)+'): True, at point '+toStr(p))
   else
-    printToDebug('findText('+toStr(txt)+'): '+toStr(result));
+    print('findText('+toStr(txt)+'): '+toStr(result));
 end;
 
 (*
@@ -119,7 +119,7 @@ begin
 
   if (not findColorsTolerance(tpaColors, col, lookIn, tol)) then
   begin
-    printToDebug('findTextByColor: failed to find text color');
+    print('findTextByColor: failed to find text color');
     exit(false);
   end;
 
@@ -146,9 +146,9 @@ begin
   until(getSystemTime() > t);
 
   if (result) then
-    printToDebug('findTextByColor('+toStr(txt)+'): True, at point '+toStr(p))
+    print('findTextByColor('+toStr(txt)+'): True, at point '+toStr(p))
   else
-    printToDebug('findTextByColor('+toStr(txt)+'): '+toStr(result));
+    print('findTextByColor('+toStr(txt)+'): '+toStr(result));
 end;
 
 (*
@@ -298,10 +298,10 @@ procedure __debugOptions(options: array of __TOptions);
 var
   i: integer;
 begin
-  printToDebug('Options found: ');
+  print('Options found: ');
 
   for i := 0 to high(options) do
-    printToDebug(options[i].str);
+    print(options[i].str);
 end;
 
 {*
@@ -473,7 +473,7 @@ begin
       else
         if (not chooseOption(txt, TStringArray([]), MOUSE_MOVE, false, 0)) then // move the mouse to the first option
         begin
-          printToDebug('chooseOption (tabbed): txt not found');
+          print('chooseOption (tabbed): txt not found');
           exit(false);
         end;
 
@@ -483,7 +483,7 @@ begin
 
     if (length(options) <= 0) then
     begin
-      printToDebug('chooseOption: no options available');
+      print('chooseOption: no options available');
       exit(false);
     end;
 
@@ -504,7 +504,7 @@ begin
         end;
 
         mouseBox(options[i].bounds, mouseAction);
-        printToDebug('Found option: '+options[i].str);
+        print('Found option: '+options[i].str);
         result := true;
         exit(true);
       end;

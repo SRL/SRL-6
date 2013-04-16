@@ -6,9 +6,16 @@ EVERYTHING should be recorded here: new features, function name changes, user-de
 - no longer need to call SetupSRL since Lape has initialization (see the end of srl.simba for details)
 
 - debug.simba (merged with SRLLog.simba)
-  - Added variable disableSRLDebug, disableSRLLog, disableIPScreenshots
+  - Added variables disableSRLDebug, disableSRLLog, disableIPScreenshots
   - Logs are automatically saved to srl/logs/
   - Function TakeIPScreen replaced with takeScreenshot()
+  - Functions moved from SRL/SRL/misc/debug.simba:
+    - debugBitmap
+    - debugTPA
+    - debugATPA
+    - debugATPABounds
+  - Debug levels are expressed by the enum TDebug
+  - SRL's debug procedure is now print('Message', debugType: TDebug = TDebug.DEBUG)
 
 - globals.simba
   - renamed variable SRL_Proc to events
