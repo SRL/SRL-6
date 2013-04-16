@@ -243,7 +243,7 @@ begin
       end;
 
       if (j = high(tmp)) then
-        printToDebug('Invalid player name: '+names[i]);
+        print('Invalid player name: '+names[i]);
     end;
 end;
 
@@ -279,11 +279,11 @@ begin
 
   if (self.getActive() <= 0) then
   begin
-    printToDebug('All players inactive...');
+    print('All players inactive...');
     exit(false);
   end;
 
-  printToDebug('Switching to player '+toStr(player)+' ('+self[player].nickname+')');
+  print('Switching to player '+toStr(player)+' ('+self[player].nickname+')');
   currentPlayer := player;
 
   if (@SRL_Events[EVENT_PLAYER_NEXT] <> nil) then
@@ -397,13 +397,13 @@ Example:
 *)
 procedure TPlayer.write();
 begin
-  printToDebug('Login Name: ' + loginName);
-  printToDebug('Display Name: ' + displayName);
-  printToDebug('Nickname: ' + nickname);
-  printToDebug('Member: ' + toStr(isMember));
-  printToDebug('Active: ' + toStr(isActive));
-  printToDebug('Worked: ' + toStr(worked.getTime()));
-  printToDebug('Total Worked: ' + toStr(worked.getTotalTime()));
+  print('Login Name: ' + loginName);
+  print('Display Name: ' + displayName);
+  print('Nickname: ' + nickname);
+  print('Member: ' + toStr(isMember));
+  print('Active: ' + toStr(isActive));
+  print('Worked: ' + toStr(worked.getTime()));
+  print('Total Worked: ' + toStr(worked.getTotalTime()));
 end;
 
 (*
@@ -649,7 +649,7 @@ begin
       begin
         if (@SRL_Events[EVENT_RS_UPDATE] <> nil) then
         begin
-          printToDebug('Waiting 5 minutes before calling update procedure');
+          print('Waiting 5 minutes before calling update procedure');
           wait(5 * 60000);
           SRL_Events[EVENT_RS_UPDATE];
           exit(false);
@@ -710,7 +710,7 @@ begin
       if ((getSystemTime() > timer) and (timer > 0)) then
       begin
         result :=   ['One minute as passed...',    0,         5,  'false',  'Login failed'         ];
-        printToDebug('Unknown color count: '+toStr(colorCount));
+        print('Unknown color count: '+toStr(colorCount));
         takeScreenshot(logPath + 'unknown_login_count.png');
       end;
   end;
@@ -750,7 +750,7 @@ begin
 
   if (length(arr) > 0) then // if there was an error logging in
   begin
-    printToDebug('Login response: '+arr[__RES_DEBUG]);
+    print('Login response: '+arr[__RES_DEBUG]);
     wait(2000 + arr[__RES_WAIT] + randomRange(-200, 200));
     typeByte(VK_ESCAPE); // exit response window
 
@@ -803,7 +803,7 @@ begin
   // check player activity
   if (not self.isActive) then
   begin
-    printToDebug('Player '+self.nickname+' is not active...');
+    print('Player '+self.nickname+' is not active...');
     exit(false);
   end;
 
@@ -813,7 +813,7 @@ begin
   repeat
     inc(tries);
 
-    printToDebug(capitalize(self.loginName)+' ('+capitalize(self.displayName)+')');
+    print(capitalize(self.loginName)+' ('+capitalize(self.displayName)+')');
 
     if (not self.secureLogin) then
     begin
@@ -896,7 +896,7 @@ begin
 
   if (result) then
   begin
-    printToDebug('Logged in: '+self.nickname);
+    print('Logged in: '+self.nickname);
     self.worked.start();
     //__exitedSquealOfFortune := false;
 
@@ -948,7 +948,7 @@ begin
 
     while (not result) and (getSystemTime() < t) do
     begin
-      printToDebug('Waiting for login screen...');
+      print('Waiting for login screen...');
       result := (not isLoggedIn());
       wait(700 + random(500));
     end;

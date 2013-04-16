@@ -106,7 +106,7 @@ function __isTabValid(tab: integer): boolean;
 begin
   if (not inRange(tab, _TAB_COMBAT, _TAB_LOGOUT)) then
   begin
-    printToDebug('Invalid gametab '+toStr(tab));
+    print('Invalid gametab '+toStr(tab));
     exit(false);
   end;
 
@@ -256,7 +256,7 @@ begin
       begin
         if (getCurrentTab() = tab) then
         begin
-          printToDebug('Opened tab '+toStr(tab));
+          print('Opened tab '+toStr(tab));
           exit(true);
         end;
 
@@ -266,7 +266,7 @@ begin
       inc(tries);
     end;
 
-  printToDebug('Failed to open tab '+toStr(tab));
+  print('Failed to open tab '+toStr(tab));
 end;
 
 (*
@@ -308,7 +308,7 @@ begin
     _TAB_COMBAT:    F := 5;
 
     else
-      printToDebug('Invalid FKey '+toStr(tab));
+      print('Invalid FKey '+toStr(tab));
   end;
 
   t := (getSystemTime() + 618);

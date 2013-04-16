@@ -40,7 +40,7 @@ var
   t := getTickCount();
 begin
   clearDebug();
-  scriptStartTime := replace(theDate(DATE_DAY)+' at '+theTime(), ':', '.', [rfReplaceAll]);
+  __scriptStartTime := replace(theDate(DATE_DAY)+' at '+theTime(), ':', '.', [rfReplaceAll]);
   writeln('Set up SRL in ', (getTickCount() - t), 'ms.');
 
   {$IFNDEF SMART}
