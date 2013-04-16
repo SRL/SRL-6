@@ -14,6 +14,8 @@ EVERYTHING should be recorded here: new features, function name changes, user-de
     - debugTPA
     - debugATPA
     - debugATPABounds
+  - Debug levels are expressed by the enum TDebug
+  - SRL's debug procedure is now print('Message', debugType: TDebug = TDebug.DEBUG)
 
 - globals.simba
   - renamed variable SRL_Proc to events
