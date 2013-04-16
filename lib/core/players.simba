@@ -243,7 +243,7 @@ begin
       end;
 
       if (j = high(tmp)) then
-        print('Invalid player name: '+names[i]);
+        print('Invalid player name: '+names[i], TDebug.WARNING);
     end;
 end;
 
@@ -381,7 +381,7 @@ TPlayer.write
 
     procedure TPlayer.write();
 
-Writes the standard information about the player to the Simba printToDebug box.
+Writes the standard information about the player to the Simba debug box.
 
 .. note::
 
@@ -649,7 +649,7 @@ begin
       begin
         if (@SRL_Events[EVENT_RS_UPDATE] <> nil) then
         begin
-          print('Waiting 5 minutes before calling update procedure');
+          print('Waiting 5 minutes before calling update procedure', TDebug.WARNING);
           wait(5 * 60000);
           SRL_Events[EVENT_RS_UPDATE];
           exit(false);
@@ -690,7 +690,7 @@ const
 function __getLoginResponse(colorCount, timer: integer): TVariantArray;
 begin
   case (colorCount) of
-    //               printToDebug message      |      wait time | tries | action | player[].location
+    //               debug message      |      wait time | tries | action | player[].location
     763, 2348, 2299:
           result := ['Invalid username/password',  0,         2,  'false',  'Wrong User/Pass'      ];
     1088: result := ['Account has been disabled',  0,         0,  'false',  'Acc Disabled'         ];
@@ -710,7 +710,7 @@ begin
       if ((getSystemTime() > timer) and (timer > 0)) then
       begin
         result :=   ['One minute as passed...',    0,         5,  'false',  'Login failed'         ];
-        print('Unknown color count: '+toStr(colorCount));
+        print('Unknown color count: '+toStr(colorCount), TDebug.WARNING);
         takeScreenshot(logPath + 'unknown_login_count.png');
       end;
   end;
