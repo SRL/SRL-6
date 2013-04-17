@@ -94,6 +94,76 @@ begin
 end;
 
 (*
+TMufasaBitmap.createFromClient
+~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+
+.. code-block:: pascal
+
+    procedure TMufasaBitmap.createFromClient(const xs, ys, xe, ye: integer) overload;
+
+Creates a TMufasaBitmap from the CURRENT client.
+
+- make around for TClient not being supported in lape currently.
+
+.. note::
+
+    by Ollybest
+
+Example:
+
+.. code-block:: pascal
+
+     tmb.createFromClient(100, 100, 500, 500);
+
+*)
+procedure TMufasaBitmap.createFromClient(const xs, ys, xe, ye: integer) overload;
+var
+  tmp: integer;
+  tpa: TPointArray;
+  tia: TIntegerArray;
+begin
+  tmp := BitmapFromClient(xs, ys, xe, ye);
+
+  tpa := TPAFromBox(intToBox(xs, ys, xe-1, ye-1));
+  tia := FastGetPixels(tmp, tpa);
+
+  self.init;
+  self.setSize(xe, ye);
+  self.setPixels(tpa, tia);
+
+  freeBitmap(tmp);
+end;
+
+(*
+TMufasaBitmap.drawBoxEdge
+~~~~~~~~~~~~~~~~~~~~~~~~~
+
+.. code-block:: pascal
+
+    procedure TMufasaBitmap.drawBoxEdge(const box: TBox; color: TColor);
+
+Draws a box onto the TMufsasBitmap.
+
+.. note::
+
+    by Ollybest
+
+Example:
+
+.. code-block:: pascal
+
+     tmb.drawBoxEdge(box, clRed);
+
+*)
+procedure TMufasaBitmap.drawBoxEdge(const box: TBox; color: TColor);
+var
+  tpa: TPointArray;
+begin
+  tpa := EdgeFromBox(box);
+  self.DrawTPA(tpa, color);
+end;         
+
+(*
 filterTPAsBetween
 ~~~~~~~~~~~~~~~~~
 
