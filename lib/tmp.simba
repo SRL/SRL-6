@@ -125,6 +125,7 @@ begin
   tmp := BitmapFromClient(xs, ys, xe, ye);
 
   tpa := TPAFromBox(intToBox(xs, ys, xe-1, ye-1));
+  offsetTPA(tpa, point(0-xs, 0-ys)); 
   tia := FastGetPixels(tmp, tpa);
 
   self.init;
