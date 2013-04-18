@@ -94,14 +94,14 @@ begin
 end;
 
 (*
-TMufasaBitmap.createFromClient
-~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+TMufasaBitmap.FromClient
+~~~~~~~~~~~~~~~~~~~~~~~~
 
 .. code-block:: pascal
 
-    procedure TMufasaBitmap.createFromClient(const xs, ys, xe, ye: integer) overload;
+    procedure TMufasaBitmap.FromClient(const xs, ys, xe, ye: integer) overload;
 
-Creates a TMufasaBitmap from the CURRENT client.
+Copys the current client to the TMufasaBitmap.
 
 - make around for TClient not being supported in lape currently.
 
@@ -113,10 +113,10 @@ Example:
 
 .. code-block:: pascal
 
-     tmb.createFromClient(100, 100, 500, 500);
+     tmb.fromClient(100, 100, 500, 500);
 
 *)
-procedure TMufasaBitmap.createFromClient(const xs, ys, xe, ye: integer) overload;
+procedure TMufasaBitmap.fromClient(const xs, ys, xe, ye: integer) overload;
 var
   tmp: integer;
   tpa: TPointArray;
@@ -124,15 +124,15 @@ var
 begin
   tmp := BitmapFromClient(xs, ys, xe, ye);
 
-  tpa := TPAFromBox(intToBox(xs, ys, xe-1, ye-1));
+  tpa := TPAFromBox(intToBox(xs, ys, xe, ye));
+  offsetTPA(tpa, point(0-xs, 0-ys));
   tia := FastGetPixels(tmp, tpa);
 
-  self.init;
   self.setSize(xe, ye);
   self.setPixels(tpa, tia);
 
   freeBitmap(tmp);
-end;
+end;  
 
 (*
 TMufasaBitmap.Rectangle: overload;
