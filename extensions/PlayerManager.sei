@@ -264,7 +264,7 @@ end;
 *}
 procedure CreateCustomButton(w, h, x, y: Integer; images: TStringArray; parent: TWinControl);
 var
-  Hi, Hii, I, Bmp_Temp: Integer;
+  Hi, Hii, I: Integer;
   img: TImage;
 begin
   Hi := Length(CButtons);
@@ -407,10 +407,9 @@ end;
 
 function HandleData(var data: String; const path: String): Boolean;
 var
-  pass, name, ext: String;
+  pass, ext: String;
   pathParts, ArmiesTSA, PlayersTSA: TStringArray;
   I: Integer;
-  tsl: TStringList;
 begin
   Result := false;
 
@@ -471,7 +470,6 @@ end;
 
 procedure LoadArmy(path: String);
 var
-  flHandle, flSize: Integer;
   data: String;
   fileTSL: TStringList;
 begin
@@ -495,7 +493,7 @@ end;
 
 procedure OpenArmy(Sender: TObject);
 var
-  path, ext: String;
+  path: String;
 begin
   with TOpenDialog.Create(mainForm) do
   begin
@@ -519,7 +517,6 @@ end;
 procedure SaveArmy(Sender: TObject);
 var
   fileString, extension, path: String;
-  fileHandle: Integer;
   fileTSL: TStringList;
   encryption: Boolean;
 begin
@@ -566,8 +563,7 @@ end;
 
 procedure FormClosed(Sender: TObject; var CloseAction:TCloseAction);
 begin
-  if(MessageBox('Do you want to save all changes to '+ArmyNameField.text+' before closing?', 'Player Manager', 4) = mrYes) then
-    SaveArmy(nil);
+  SaveArmy(nil);
 end;
 
 procedure InitForm;
