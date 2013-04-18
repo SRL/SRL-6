@@ -60,7 +60,7 @@ isn't set to fixed size.
 .. note::
 
     by Coh3n
-    Last updated: 13/12/2012 by Coh3n
+    Last updated: 18/04/2012 by Ollybest
 
 Example:
 
@@ -71,24 +71,34 @@ Example:
 
 *)
 function waitClientReady(): boolean;
-const
-  t := getTickCount();
+var
+  t, i: integer;
 begin
-  writeln('NOTE: if RS is loaded and nothing is happening, set your RS client'+
-          ' to "Fixed Size".');
-  writeln('NOTE: if you''re not using SMART, be sure to use Simba''s crosshairs'+
-          ' to select the RS client.');
-  writeln('Waiting up to 5 minutes for RS to load...');
+  t := getSystemTime();
+  i := 1;
 
-  while ((getTickCount() - t) < (5 * 60000)) do // 5 minutes
+  print('If RS is loaded and nothing is happening, make sure the RS client'+
+        ' to "Fixed Size" and check there are no pop-ups open', TDebug.HINT);
+
+ {$IFNDEF SMART}
+   print('You are not using SMART, be sure to use Simba''s crosshairs'+
+        ' to select the RS client.', TDebug.HINT);
+ {$ENDIF}
+
+  print('Waiting up to 5 minutes for RS to load...');
+
+  while ((getSystemTime() - t) < (5 * 60000)) do // 5 minutes
   begin
     if (isClientReady()) then
+      exit(true);
+
+    if ((getSystemTime() - t) > (i * 60000)) then // each minute
     begin
-      result := true;
-      break;
+      print(intToStr(i) + ' minute(s) have passed, client is not ready yet');
+      inc(i);
     end;
 
     wait(250);
   end;
-end;
+end;   
 
