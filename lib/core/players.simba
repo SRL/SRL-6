@@ -14,8 +14,8 @@ stores properties of the TPlayer type.
 {$f-}
 
 (*
-Constant: Skills
-~~~~~~~~~~~~~~~~
+const Skills
+~~~~~~~~~~~~
 
 Integer constants that represent each skill.
 
@@ -53,9 +53,28 @@ const
     SKILL_SUMMONING     = 23;
     SKILL_DUNGEONEERING = 24;
 
-const
-  LOGIN_COLOR_TEXT = 12378347;
+{*
+const Internal
+~~~~~~~~~~~~~~
 
+File's internal constants.
+    * __PATH_PLAYER: The file army files are saved to.
+    * __LOGIN_COLOR_TEXT: The color of the login screen text.
+
+*}
+const
+  __PATH_PLAYER = IncludePath + 'Players/';
+  __LOGIN_COLOR_TEXT = 12378347;
+
+{*
+var Internal
+~~~~~~~~~~~~
+
+File's internal variables.
+    * _boxUsername: TBox of the username edit box.
+    * _boxPassword: TBox of the password edit box.
+
+*}
 var
   _boxUsername, _boxPassword: TBox; // set at the end of this file
 
@@ -120,9 +139,6 @@ var
   players: TPlayerArray;
   currentPlayer: integer;
   disableIPScreenshots: boolean;
-
-// from player_info.simba; can't be avoided :'(
-function getPlayers(): TPlayerArray; forward;
 
 (*
 TPlayerArray.getActive
@@ -201,6 +217,7 @@ begin
   self[h] := info;
   self[h].isActive := true;
   self[h].findMod := true;
+  self[h].worked.paused := true;
 end;
 
 (*
@@ -209,29 +226,134 @@ TPlayerArray.setup
 
 .. code-block:: pascal
 
-    procedure TPlayerArray.setup(names: TStringArray);
+    procedure TPlayerArray.setup(names: TStringArray; const army: string = 'default');
 
 Sets up the players with login name, display name, or nickname that match
-elements of 'names'.  Should only be called only in DeclarePlayers().
+elements of 'names'.  Should only be called in DeclarePlayers().  Will load
+army file 'army'. Loads 'default' by default.
 
 .. note::
 
-    by Zyt3x & Coh3n
-    Last updated: Dec. 22nd, 2012 by Coh3n
+    by Bart (masterBB)
+    Last updated: Apr. 4th, 2013 by Bart
 
 Example:
 
 .. code-block:: pascal
 
-   players.setup(['woodcutter5', 'miner3', 'fisher6']);
+   players.setup(['woodcutter5', 'miner3', 'fisher6'], 'BartsArmy');
 
 *)
-procedure TPlayerArray.setup(names: TStringArray);
+procedure TPlayerArray.setup(names: TStringArray; const army: string = 'default');
 var
+  fileHandle, fileSz: integer;
+  pass, ext, data: string;
+  ArmiesTSA, PlayersTSA: TStringArray;
   i, j: integer;
   tmp: TPlayerArray;
+  mesh: string;
+  dataParts: TStringArray;
 begin
-  tmp := getPlayers();
+  ext := '.raf';
+
+  if (not FileExists(__PATH_PLAYER + army + ext)) then
+  begin
+    ext := '.xml';
+
+    if not(FileExists(__PATH_PLAYER + army + ext)) then
+    begin
+      print('Couldn''t find army file(' + army + ')', TDebug.ERROR);
+
+      if (army = 'default') then
+        print('Make sure you create an army with the player manager (SRL > Open Player Manager)', TDebug.HINT);
+
+      halt();
+    end;
+  end;
+
+  fileHandle := OpenFile(__PATH_PLAYER + army + ext, true);
+
+  if (not fileHandle >= 0) then // fileHandle = -1 if shit went wrong
+  begin
+    print('Couldn''t open file: ' + __PATH_PLAYER + army + ext, TDebug.ERROR);
+    print('Make sure your folder permissions are set properly', TDebug.HINT);
+    halt();
+  end;
+
+  fileSz := FileSize(fileHandle); // the size of the file in characters
+
+  if (fileSz) = 0 then
+  begin
+    print('File is empty: ' + __PATH_PLAYER + army + ext, TDebug.ERROR);
+    print('Make sure you create an army with the player manager (SRL > Open Player Manager)', TDebug.HINT);
+    halt();
+  end;
+
+  if (not ReadFileString(fileHandle, data, fileSz)) then
+  begin
+    print('Couldn''t read file: ' + __PATH_PLAYER + army + ext, TDebug.ERROR);
+    print('Make sure your folder permissions are set properly', TDebug.HINT);
+    halt();
+  end;
+
+  CloseFile(fileHandle);
+
+  if (ext = '.raf') then
+  begin
+    repeat
+      if (InputQuery('Player Manager', 'Please enter your army password for decryption', pass)) then
+      begin
+        // decrypting the data
+        dataParts := MultiBetween(data, '<block_128_chars>', '</block_128_chars>');
+
+        data := '';
+
+        for i := 0 to High(dataParts) do
+        begin
+          mesh := dataParts[i];
+          rc2_decrypt(pass, htSHA256, mesh);
+          data := data + mesh;
+        end;
+
+        pass := ''; //no longer needed
+
+        if ExecRegExpr('<army>', data) then
+        begin
+          print('Password accepted!');
+          break;
+        end else begin
+          print('Couldn''t decrypt file. Re-enter password.'); // wrong password
+          halt();
+        end;
+      end else
+        exit; // cancel button is pressed
+
+    until(false);
+  end else
+    if (not ExecRegExpr('<army>', data)) then
+    begin
+      print('File doesn''t contain a valid army', TDebug.FATAL);
+      print('Make sure you create an army with the player manager (SRL > Open Player Manager)', TDebug.HINT);
+      halt();
+    end;
+
+  // finally parse the data
+  ArmiesTSA := MultiBetween(data, '<army>', '</army>');
+
+  if (Length(ArmiesTSA) = 0) then
+    exit;
+
+  PlayersTSA := multiBetween(ArmiesTSA[0], '<player>', '</player>');
+
+  setLength(tmp, Length(PlayersTSA));
+  for I := 0 to High(PlayersTSA) do
+  begin
+    tmp[I].DisplayName := between('<diplayName>', '</diplayName>', PlayersTSA[I]);
+    tmp[I].LoginName := between('<loginName>', '</loginName>', PlayersTSA[I]);
+    tmp[I].NickName := between('<nickName>', '</nickName>', PlayersTSA[I]);
+    tmp[I].Password := between('<password>', '</password>', PlayersTSA[I]);
+    tmp[I].BankPin := between('<bankPin>', '</bankPin>', PlayersTSA[I]);
+  end;
 
   for i := 0 to high(names) do
     for j := 0 to high(tmp) do
@@ -286,7 +408,7 @@ begin
   print('Switching to player '+toStr(player)+' ('+self[player].nickname+')');
   currentPlayer := player;
 
-  if (@SRL_Events[EVENT_PLAYER_NEXT] <> nil) then
+  if (SRL_Events[EVENT_PLAYER_NEXT] <> nil) then
     SRL_Events[EVENT_PLAYER_NEXT]();
 
   result := self[currentPlayer].login();
@@ -397,13 +519,13 @@ Example:
 *)
 procedure TPlayer.write();
 begin
-  print('Login Name: ' + loginName);
-  print('Display Name: ' + displayName);
-  print('Nickname: ' + nickname);
-  print('Member: ' + toStr(isMember));
-  print('Active: ' + toStr(isActive));
-  print('Worked: ' + toStr(worked.getTime()));
-  print('Total Worked: ' + toStr(worked.getTotalTime()));
+  print('Login Name: ' + self.loginName);
+  print('Display Name: ' + self.displayName);
+  print('Nickname: ' + self.nickname);
+  print('Member: ' + toStr(self.isMember));
+  print('Active: ' + toStr(self.isActive));
+  print('Worked: ' + toStr(self.worked.getTime()));
+  print('Total Worked: ' + toStr(self.worked.getTotalTime()));
 end;
 
 (*
@@ -468,7 +590,7 @@ begin
 
   repeat
     // check to see if there is already text in the input box
-    findColors(tpa, LOGIN_COLOR_TEXT, inputBox);
+    findColors(tpa, __LOGIN_COLOR_TEXT, inputBox);
 
     // click input box; clicks to the right of existing text
     if (length(tpa) > 0) then // if there's text in the box
@@ -491,14 +613,14 @@ begin
 
     // delete any existing text
     c := 0;
-    while (countColor(LOGIN_COLOR_TEXT, inputBox) > 0) and (c < 25) do
+    while (countColor(__LOGIN_COLOR_TEXT, inputBox) > 0) and (c < 25) do
     begin
       inc(c);
       typeByte(VK_BACK);
       wait(50+random(50));
     end;
 
-  until(not findColors(tpa, LOGIN_COLOR_TEXT, inputBox) or (getSystemTime() > t));
+  until(not findColors(tpa, __LOGIN_COLOR_TEXT, inputBox) or (getSystemTime() > t));
 
   wait(100 + random(200));
   typeSend(info, pressEnter);
@@ -539,8 +661,8 @@ begin
   mouseSpeed := 13;
 
   // remove existing text from the input boxes
-  uTextExists := findColors(uTPA, LOGIN_COLOR_TEXT, _boxUsername);
-  pTextExists := findColors(pTPA, LOGIN_COLOR_TEXT, _boxPassword);
+  uTextExists := findColors(uTPA, __LOGIN_COLOR_TEXT, _boxUsername);
+  pTextExists := findColors(pTPA, __LOGIN_COLOR_TEXT, _boxPassword);
 
   if (uTextExists) then
     __enterLoginInfo(_boxUsername, '', true, pTextExists);
@@ -745,7 +867,7 @@ begin
   result := true;
 
   // counts the colors in the lobby pop up screen
-  c := countColor(LOGIN_COLOR_TEXT, 260, 190, 510, 450);
+  c := countColor(__LOGIN_COLOR_TEXT, 260, 190, 510, 450);
   arr := __getLoginResponse(c, timer);
 
   if (length(arr) > 0) then // if there was an error logging in
@@ -900,7 +1022,7 @@ begin
     self.worked.start();
     //__exitedSquealOfFortune := false;
 
-    if (@SRL_Events[EVENT_LOGIN] <> nil) then
+    if (SRL_Events[EVENT_LOGIN] <> nil) then
       SRL_Events[EVENT_LOGIN]();
   end;
 
@@ -939,7 +1061,7 @@ begin
     exit;
   end;
 
-  if (@SRL_Events[EVENT_LOGOUT] <> nil) then
+  if (SRL_Events[EVENT_LOGOUT] <> nil) then
     SRL_Events[EVENT_LOGOUT]();
 
   if (tabLogout.clickText(['Login'])) then

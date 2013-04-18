@@ -360,5 +360,6 @@ Example:
 *)
 function TTimeMarker.getTotalTime(): LongWord;
 begin
-  Result := GetSystemTime() - Self.startTime;
+  if (Self.startTime > 0) then
+    Result := GetSystemTime() - Self.startTime;
 end; 
