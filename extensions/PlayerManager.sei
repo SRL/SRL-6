@@ -418,20 +418,20 @@ begin
 
   if ext = '.raf' then
   begin
-    if InputQuery('Rafiki', 'Please enter your army password for decryption.', pass) then
+    if InputQuery('Player Manager', 'Please enter your army password for decryption.', pass) then
     begin
       if DecryptArmy(data, pass) then
       begin
-        writeln('Rafiki: password accepted!');
+        writeln('Player Manager: Password accepted!');
         Result := true;
       end else
-        writeln('Rafiki: couldn''t decrypt file. Possible wrong password?'); //wrong password?
+        writeln('Player Manager: Couldn''t decrypt file. Possible wrong password?'); //wrong password?
     end;
   end else
     if ExecRegExpr('<army>', data) then
       Result := true
     else
-      writeln('Rafiki: file doesn''t contain a valid army');
+      writeln('Player Manager: File doesn''t contain a valid army');
 
   //Finally parse the data
   if Result then
@@ -534,12 +534,12 @@ begin
   else
     extension := '.xml';
 
-  if not(ForceDirectories(IncludePath + 'Rafiki/')) then
+  if not(ForceDirectories(IncludePath + 'Players/')) then
   begin
-    writeln('Rafiki: oh no!, couldn''t create or open the directory: ' + IncludePath + 'Rafiki/');
+    writeln('Player Manager: oh no!, couldn''t create or open the directory: ' + IncludePath + 'Rafiki/');
     Exit;
   end;
-  path := IncludePath + 'Rafiki/' + ArmyName + extension;
+  path := IncludePath + 'Players/' + ArmyName + extension;
 
   fileTSL := TStringList.Create;
   writeln(FileExists(path));
@@ -550,7 +550,7 @@ begin
   begin
     if not(PassField.TEXT = Pass2Field.TEXT) or (PassField.TEXT = '') then
     begin
-      writeln('Rafiki: oh no!, something is wrong with encryption passwords!');
+      writeln('Player Manager: Oh no!, something is wrong with encryption passwords!');
       fileTSL.Free;
       Exit;
     end;
@@ -566,7 +566,7 @@ end;
 
 procedure FormClosed(Sender: TObject; var CloseAction:TCloseAction);
 begin
-  //if(MessageBox('Do you want to save all changes to '+ArmyNameField.text+' before closing?', 'Rafiki', 4) = mrYes) then
+  if(MessageBox('Do you want to save all changes to '+ArmyNameField.text+' before closing?', 'Player Manager', 4) = mrYes) then
     SaveArmy(nil);
 end;
 
@@ -601,15 +601,15 @@ begin
   Mm_MainMenu.Items.Add(Mi_Army);
 
   Mi_ArmyNew := TMenuItem.Create(Mi_Army);
-  Mi_ArmyNew.Caption := 'New army';
+  Mi_ArmyNew.Caption := 'New';
   Mi_ArmyNew.ONCLICK := @NewArmy;
 
   Mi_ArmyOpen := TMenuItem.Create(Mi_Army);
-  Mi_ArmyOpen.Caption := 'Open army';
+  Mi_ArmyOpen.Caption := 'Open';
   Mi_ArmyOpen.ONCLICK := @OpenArmy;
 
   Mi_ArmySave := TMenuItem.Create(Mi_Army);
-  Mi_ArmySave.Caption := 'Save army';
+  Mi_ArmySave.Caption := 'Save';
   Mi_ArmySave.ONCLICK := @SaveArmy;
 
   Mi_Army.Add(Mi_ArmyNew);
