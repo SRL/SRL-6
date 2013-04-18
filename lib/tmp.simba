@@ -94,6 +94,81 @@ begin
 end;
 
 (*
+TMufasaBitmap.createFromClient
+~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+
+.. code-block:: pascal
+
+    procedure TMufasaBitmap.createFromClient(const xs, ys, xe, ye: integer) overload;
+
+Creates a TMufasaBitmap from the CURRENT client.
+
+- make around for TClient not being supported in lape currently.
+
+.. note::
+
+    by Ollybest
+
+Example:
+
+.. code-block:: pascal
+
+     tmb.createFromClient(100, 100, 500, 500);
+
+*)
+procedure TMufasaBitmap.createFromClient(const xs, ys, xe, ye: integer) overload;
+var
+  tmp: integer;
+  tpa: TPointArray;
+  tia: TIntegerArray;
+begin
+  tmp := BitmapFromClient(xs, ys, xe, ye);
+
+  tpa := TPAFromBox(intToBox(xs, ys, xe-1, ye-1));
+  tia := FastGetPixels(tmp, tpa);
+
+  self.init;
+  self.setSize(xe, ye);
+  self.setPixels(tpa, tia);
+
+  freeBitmap(tmp);
+end;
+
+(*
+TMufasaBitmap.Rectangle: overload;
+~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+
+.. code-block:: pascal
+
+    procedure TMufasaBitmap.Rectangle(const box: TBox; fill: boolean; color: TColor); overload;
+
+Accepts a fill parameter.
+
+.. note::
+
+    by Ollybest
+
+Example:
+
+.. code-block:: pascal
+
+     tmb.rectangle(box, false, clRed);
+
+*)
+procedure TMufasaBitmap.Rectangle(const box: TBox; fill: boolean; color: TColor); overload;
+var
+  tpa: TPointArray;
+begin
+  if (fill) then
+    self.Rectangle(box, color)
+  else
+  begin
+    tpa := EdgeFromBox(box);
+    self.DrawTPA(tpa, color)
+  end;
+end;
+
+(*
 filterTPAsBetween
 ~~~~~~~~~~~~~~~~~
 
