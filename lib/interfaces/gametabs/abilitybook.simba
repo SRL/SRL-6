@@ -1,0 +1,745 @@
+(*
+AbilityBook
+===========
+
+The abilitybook file holds functions and procedures that are used in the
+Runescape Ability Book tab.
+
+*)
+
+{$include_once gametab.simba}
+
+{$f-}
+
+(*
+type TRSAbilityBook
+~~~~~~~~~~~~~~~~~~
+
+A type that stores functions and properties of the Runescape Ability Book tab.
+*)
+type
+  TRSTabAbilityBook = record(TRSInterface)
+
+    tabIndex: integer;
+    __abilityGrid: TBoxArray;
+end;
+
+(*
+var tabAbilityBook
+~~~~~~~~~~~~~~~~~~
+
+Variable that stores functions and properties of the Runescape Ability Book tab.
+*)
+var
+  tabAbilityBook: TRSTabAbilityBook;
+
+{$S+}
+
+(*
+type TAbilityTab
+~~~~~~~~~~~~~~~~
+
+A enum type for the tabs of the Ability Book.
+*)
+type
+  TAbilityTab = (
+
+    ATTACK,
+    STRENGTH,
+    RANGED,
+    ABILITIES,
+    COMBAT_SPELLS,
+    TELEPORT_SPELLS,
+    SKILLING_SPELLS,
+    DEFENCE,
+    CONSTITUTION);
+
+(*
+type TAbility
+~~~~~~~~~~~~~
+
+A enum type for the Abilities of the Ability Book.
+*)
+  TAbility = (
+
+    //Attack
+    SLICE,
+    SLAUGHTER,
+    OVERPOWER,
+    HAVOC,
+    BACKHAND,
+    SMASH,
+    BARGE,
+    FLURRY,
+    SEVER,
+    HURRICANE,
+    MASSACRE,
+    METEOR_STRIKE,
+
+    //Strength
+    KICK,
+    PUNISH,
+    DISMEMBER,
+    FURY,
+    DESTROY,
+    QUAKE,
+    BERSERK,
+    CLEAVE,
+    ASSAULT,
+    DECIMATE,
+    PULVERISE,
+    FRENZY,
+
+    //Ranged
+    PIERCING_SHOT,
+    SNAP_SHOT,
+    DEADSHOT,
+    SNIPE,
+    DAZING_SHOT,
+    NEEDLE_STRIKE,
+    BINDING_SHOT,
+    FRAGMENTATION_SHOT,
+    ESCAPE,
+    RAPID_FIRE,
+    RICOCHET,
+    BOMBARDMENT,
+    INCENDIARY_SHOT,
+    UNLOAD,
+
+    //Magic
+    WRACK,
+    ASPHYXIATE,
+    OMNIPOWER,
+    DRAGON_BREATH,
+    SONIC_WAVE,
+    CONCENTRATED_BLAST,
+    IMPACT,
+    COMBUST,
+    SURGE,
+    DETONATE,
+    CHAIN,
+    WILD_MAGIC,
+    METAMORPHOSIS,
+    TSUNAMI,
+
+    //Defence
+    ANTICIPATION,
+    BASH,
+    REVENGE,
+    PROVOKE,
+    IMMORTALITY,
+    FREEDOM,
+    REFLECT,
+    RESONANCE,
+    REJUVENATE,
+    DEBILITATE,
+    PREPARATION,
+    BARRICADE,
+
+    //Constitution
+    REGENERATE,
+    MOMENTUM,
+    INCITE,
+    SINGLE_WAY_WILDERNESS);
+
+{$S-}
+
+  const
+    AB_ABILITY_SET_ATTACK       = [TAbility.SLICE .. TAbility.METEOR_STRIKE];
+    AB_ABILITY_SET_STRENGTH     = [TAbility.KICK .. TAbility.FRENZY];
+    AB_ABILITY_SET_RANGED       = [TAbility.PIERCING_SHOT .. TAbility.UNLOAD];
+    AB_ABILITY_SET_ABILITIES    = [TAbility.WRACK .. TAbility.TSUNAMI];
+    AB_ABILITY_SET_DEFENSE      = [TAbility.ANTICIPATION .. TAbility.BARRICADE];
+    AB_ABILITY_SET_CONSTITUTION = [TAbility.REGENERATE .. TAbility.SINGLE_WAY_WILDERNESS];
+
+    AB_ABILITY_SETS = [AB_ABILITY_SET_ATTACK,
+     AB_ABILITY_SET_STRENGTH,
+      AB_ABILITY_SET_RANGED,
+       AB_ABILITY_SET_ABILITIES,
+        AB_ABILITY_SET_DEFENSE,
+         AB_ABILITY_SET_CONSTITUTION];
+
+    AB_TAB_ATTACK                   = [TAbilityTab.ATTACK .. TAbilityTab.STRENGTH];
+    AB_TAB_RANGED                   = [TAbilityTab.RANGED];
+    AB_TAB_MAGIC                    = [TAbilityTab.ABILITIES .. TAbilityTab.SKILLING_SPELLS];
+    AB_TAB_DEFENCE_AND_CONSTITUTION = [TAbilityTab.DEFENCE .. TAbilityTab.CONSTITUTION];
+
+    AB_TABS = [AB_TAB_ATTACK, AB_TAB_RANGED, AB_TAB_MAGIC, AB_TAB_DEFENCE_AND_CONSTITUTION];
+
+{*
+TRSTabAbilityBook.__init()
+~~~~~~~~~~~~~~~~~~~~~~~~~~
+
+.. code-block:: pascal
+
+    procedure TRSAbilityBook.__init();
+
+Initiates the tabAbilityBook variable. Called at the end of this file.
+
+.. note::
+
+    by euphemism
+    Last updated: 18 April 2013 by euphemism
+
+Example:
+
+.. code-block:: pascal
+
+    tabAbilityBook.__init();
+*}
+procedure TRSTabAbilityBook.__init();
+begin
+
+  with (self) do
+  begin
+
+    name := 'RS Ability Book Tab';
+
+    ID := ID_INTERFACE_TAB_ABILITY_BOOK;
+    parentID := -1;
+
+    tabIndex := _TAB_ABILITY;
+    static := true;
+
+    x := _gameTabArea.x1;
+    y := _gameTabArea.y1;
+    w := (_gameTabArea.x2 - x);
+    h := (_gameTabArea.y2 - y);
+
+    __abilityGrid := grid(4, 5, 29, 29, 44, 36, Point(575, 354));
+  end;
+end;
+
+(*
+TRSTabAbilityBook.isOpen
+~~~~~~~~~~~~~~~~~~~~~~~~
+
+.. code-block:: pascal
+
+    function TRSTabAbilityBook.isOpen(): boolean;
+
+Returns true if the Ability Book gametab is open.
+
+.. note::
+
+    by euphemism
+    Last Updated: 18 April 2013 by euphemism
+
+Example:
+
+.. code-block:: pascal
+
+    if (tabAbilityBook.isOpen()) then
+      writeln('Ability Book gametab is open!');
+*)
+function TRSTabAbilityBook.isOpen(): boolean;
+begin
+
+  result := (getCurrentTab() = self.tabIndex);
+end;
+
+(*
+TRSTabAbilityBook.open
+~~~~~~~~~~~~~~~~~~~~~~
+
+.. code-block:: pascal
+
+    function TRSTabAbilityBook.open(): boolean;
+
+Opens the Ability Book gametab.  Returns true if successful.
+
+.. note::
+
+    by euphemism
+    Last Updated: 18 April 2013 by euphemism
+
+Example:
+
+.. code-block:: pascal
+
+    if (tabAbilityBook.open()) then
+      tabAbilityBook.setTab(TAbilityTab.RANGED);
+*)
+function TRSTabAbilityBook.open(): boolean;
+begin
+
+  result := true;
+
+  if (not (self.isOpen())) then
+    result := _openGameTab(self.tabIndex);
+end;
+
+{*
+__getActiveAbilityTab
+~~~~~~~~~~~~~~~~~~~~~
+
+.. code-block:: pascal
+
+    function __getActiveAbilityTab(subTab: boolean = false): integer;
+
+Internal function used to find what the active main tab and sub tab are.
+
+.. note::
+
+    by euphemism
+    Last Updated: 18 April 2013 by euphemism
+
+Example:
+
+.. code-block:: pascal
+
+    if (__getActiveAbilityTab() = 0) then
+      writeln('The Attack main tab is open.');
+*}
+function __getActiveAbilityTab(subTab: boolean = false): integer;
+var
+
+  yCoord: integer;
+  hue, sat, lum: extended;
+  xCoords: tintegerArray;
+begin
+
+  setlength(xCoords, 4);
+
+  if (not (subTab)) then
+  begin
+
+    xCoords := [570, 618, 666, 714];
+    yCoord := 292;
+
+    for result := 0 to 3 do
+    begin
+
+      colorToHSL(getColor(xCoords[result], yCoord), hue, sat, lum);
+
+      if (lum < 15) then
+        exit;
+    end;
+  end else
+  begin
+
+    xCoords := [555, 602, 648, 695];
+
+    case (__getActiveAbilityTab()) of
+
+      2: xCoords[1] := 601;
+      3: xCoords[1] := 601;
+    end;
+
+    yCoord := 312;
+  end;
+
+  for result := 0 to 3 do
+  begin
+
+    colorToHSL(getColor(xCoords[result], yCoord), hue, sat, lum);
+
+    if (lum > 10) then
+      exit;
+  end;
+end;
+
+(*
+TRSTabAbilityBook.setTab
+~~~~~~~~~~~~~~~~~~~~~~~~
+
+.. code-block:: pascal
+
+    function TRSTabAbilityBook.setTab(tabToSwitchTo: TAbilityTab): boolean;
+
+Sets the Ability Book to the specified sub tab.
+
+.. note::
+
+    by euphemism
+    Last Updated: 18 April 2013 by euphemism
+
+Example:
+
+.. code-block:: pascal
+
+    if (tabAbilityBook.setTab(TAbilityTab.COMBAT_SPELLS)) then
+      writeln('ready to cast a combat spell');
+*)
+function TRSTabAbilityBook.setTab(tabToSwitchTo: TAbilityTab): boolean;
+var
+
+  activeMain, i, main, sub, tabCompare, timeOut: integer;
+  boxCoords, tabLocations, tabLoop: t2DintegerArray;
+  firstSubTabInEachTab: array of TAbilityTab;
+begin
+
+  if (not (getCurrentTab() = self.tabIndex)) then
+    if (not self.open()) then
+      exit(false);
+
+  firstSubTabInEachTab := [
+
+  {attack tab}                   TAbilityTab.ATTACK,
+  {ranged tab}                   TAbilityTab.RANGED,
+  {magic tab}                    TAbilityTab.ABILITIES,
+  {defence and constitution tab} TAbilityTab.DEFENCE];
+
+  for main := 0 to high(AB_TABS) do
+    if tabToSwitchTo in AB_TABS[main] then
+      break;
+
+  sub := ord(tabToSwitchTo) - ord(firstSubTabInEachTab[main]);
+
+  Setlength(boxCoords, 2);
+  boxCoords[0] := [548, 255, 594, 287, 47]; //Main tab size and spacing
+  boxCoords[1] := [557, 298, 586, 327, 46]; //Sub tab size and spacing
+
+  activeMain := __getActiveAbilityTab(); //Stores the current active main tab to reduce redundancy.
+
+  Setlength(tabLoop, 2);
+  tabLoop[0] := [activeMain, main]; //Holds the active main tab, and the target main tab.
+  tabLoop[1] := [__getActiveAbilityTab(true), sub]; //Holds the active sub tab to 0, and the target sub tab.
+
+  if ((tabLoop[0][0] = tabLoop[0][1]) and (tabLoop[1][0] = tabLoop[1][1])) then
+    exit(true);
+
+  wait(random(300));
+
+  for i := 0 to 1 do //This loop sets the main tab and sub tab to to the target tab.
+  begin
+
+    if (i = 1) then
+      tabLoop[i][0] := __getActiveAbilityTab(true); //Updates the stored active sub tab to account for switching the main tab.
+
+    if (tabLoop[i][0] <> tabLoop[i][1]) then
+    begin
+
+      intToBox((boxCoords[i][0] + (boxCoords[i][4] * tabLoop[i][1])), boxCoords[i][1], (boxCoords[i][2] + (boxCoords[i][4] * tabLoop[i][1])), boxCoords[i][3]).mouse(MOUSE_LEFT); //Clicks the target tab.
+
+      timeOut := (getSystemTime() + randomRange(800, 1200)); //Sets timeout fail-safe.
+
+      if (i = 0) then
+        while ((getSystemTime() < timeOut) and (__getActiveAbilityTab() <> tabLoop[i][1])) do //Fail-safe and state check for the tab.
+          wait(16)
+      else
+        while ((getSystemTime() < timeOut) and (__getActiveAbilityTab(true) <> tabLoop[i][1])) do //Fail-safe and state check for the tab.
+
+          wait(16);
+    end;
+
+    if (i = 0) then //Sets the tabCompare variable to either the active main tab or active sub tab based on the value of the looping variable.
+      tabCompare := __getActiveAbilityTab()
+    else
+      tabCompare := __getActiveAbilityTab(true);
+
+    if (tabCompare <> tabLoop[i][1]) then //If the tab failed to change to the target tab, function returns false and exit.
+      exit(true);
+
+    if (i = 0) then //Determines whether to wait between setting the main tab and sub tab, or to check the final result.
+      Wait(400 + random(300))
+    else
+      result := ((__getActiveAbilityTab() = tabLoop[0][1]) and (__getActiveAbilityTab(true) = tabLoop[1][1]));
+  end;
+end;
+
+{*
+TRSTabAbilityBook.__getAbilityLocation
+~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+
+.. code-block:: pascal
+
+    procedure TRSTabAbilityBook.__getAbilityLocation(abilityConstant: TAbility; out subTab: TAbilityTab; out gridPosition: integer);
+
+Internal function that says what sub tab an ability is located under, and the ability's position under that tab.
+
+.. note::
+
+    by euphemism
+    Last Updated: 18 April 2013 by euphemism
+
+Example:
+
+.. code-block:: pascal
+
+    tabAbilityBook.__getAbilityLocation(TAbility.SURGE, subTab, gridPosition);
+
+    tabAbilityBook.setTab(subTab);
+*}
+procedure TRSTabAbilityBook.__getAbilityLocation(abilityConstant: TAbility; out subTab: TAbilityTab; out gridPosition: integer);
+var
+
+  subTabIndex: integer;
+  abilityTabs: array of TAbilityTab;
+  firstAbilityInEachTab: array of TAbility;
+begin
+
+  firstAbilityInEachTab := [
+
+  {attack tab}       TAbility.SLICE,
+  {strength tab}     TAbility.KICK,
+  {ranged tab}       TAbility.PIERCING_SHOT,
+  {abilities tab}    TAbility.WRACK,
+  {defense tab}      TAbility.ANTICIPATION,
+  {constitution tab} TAbility.REGENERATE];
+
+  abilityTabs := [
+
+    TAbilityTab.ATTACK,
+     TAbilityTab.STRENGTH,
+      TAbilityTab.RANGED,
+       TAbilityTab.ABILITIES,
+        TAbilityTab.DEFENCE,
+         TAbilityTab.CONSTITUTION];
+
+  for subTabIndex := 0 to high(AB_ABILITY_SETS) do
+    if abilityConstant in AB_ABILITY_SETS[subTabIndex] then
+      break;
+
+  gridPosition := ord(abilityConstant) - ord(firstAbilityInEachTab[subTabIndex]) + 1;
+  subTab := abilityTabs[subTabIndex];
+end;
+
+{*
+TRSTabAbilityBook.__getAbilityCooldown
+~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+
+.. code-block:: pascal
+
+    function TRSTabAbilityBook.__getAbilityCooldown(boxToCheck: TBox; inActionBar: boolean = false): integer;
+
+Internal function called by the Ability Book and Action Bar interfaces to get the cooldown
+ percentage of the specified ability in the box, boxToCheck.
+
+.. note::
+
+    by euphemism
+    Last Updated: 18 April 2013 by euphemism
+
+Example:
+
+.. code-block:: pascal
+
+    writeln(tabAbilityBook.__getAbilityCooldown(tabAbilityBook.__abilityGrid[0]));
+*}
+function TRSTabAbilityBook.__getAbilityCooldown(boxToCheck: TBox; inActionBar: boolean = false): integer;
+var
+
+  colorFix, clientBitmap, i, len, sumTotal, tempBitmap: integer;
+  x1, y1, x2, y2, width, height: integer;
+  midPoint: TPoint;
+  pointCircle, line, tpa: TPointArray;
+begin
+
+  result := - 1;
+
+  try
+
+    clientBitmap := BitmapFromClient(boxToCheck.x1, boxToCheck.y1, boxToCheck.x2, boxToCheck.y2);
+    SetBitmapName(clientBitmap, 'Cooldown Bitmap');
+
+    x1 := 0;
+    y1 := 0;
+    x2 := boxToCheck.x2 - boxToCheck.x1;
+    y2 := boxToCheck.y2 - boxToCheck.y1;
+
+    width  := x2 + 1;
+    height := y2 + 1;
+
+    if (inActionBar) then
+    begin
+
+      FindColors(tpa, 3111603, boxToCheck.x1 + 2, boxToCheck.Y1 + 19, boxToCheck.x1 + 8, boxToCheck.y1 + 26);
+      tpa.offset(Point( - boxToCheck.x1, - boxToCheck.y1));
+
+      for i := 0 to High(tpa) do
+        FastSetPixel(clientBitmap, tpa[i].x, tpa[i].y, 0);
+    end;
+
+    tempBitmap := BrightnessBitmap(clientBitmap, 100);
+    FreeBitmap(clientBitmap);
+
+    clientBitmap := PosterizeBitmap(tempBitmap, 60);
+    FreeBitmap(tempBitmap);
+
+    tempBitmap := ContrastBitmap(clientBitmap, 30);
+    FreeBitmap(clientBitmap);
+
+    clientBitmap := Desaturate(tempBitmap);
+    FreeBitmap(tempBitmap);
+
+    midPoint := Point(15, 14);
+
+    TPAFromCircleWrap(midPoint.x, midPoint.y, 14, pointCircle);
+    SortCircleWise(pointCircle, midPoint.x, midPoint.y, 359, false, true);
+
+    len := length(pointCircle);
+
+    for i := 0 to (len - 1) do
+    begin
+
+      if (InRange(i, 0, 38)) then
+        midPoint := Point(14, 15)
+      else
+        midPoint := Point(15, 14);
+
+      TPAFromLineWrap(midPoint.x, midPoint.y, pointCircle[i].x, pointCircle[i].y, Line);
+      line.sortFromPoint(midPoint);
+      line.invert();
+
+      if (i = 0) then
+        Setlength(line, 7)
+      else
+        Setlength(line, length(Line) - 4);
+
+      sumTotal := 0;
+      sumTotal := sumintegerArray(FastGetPixels(clientBitmap, line));
+
+      if (sumTotal <> 0) then
+      begin
+
+        result := Ceil((Round(FixD(Degrees(ArcTan2(pointCircle[i].x - midPoint.x - 1, - (pointCircle[i].y - midPoint.y))))) / 360.0) * 100) + 1;
+
+        if (result = 99) then
+        begin
+
+          colorFix := GetColor(boxToCheck.x1 + 14, boxToCheck.y1 + 2);
+
+          if ((colorFix = 6706) or (colorFix = 1710617)) then
+            result := 100;
+        end;
+
+        break;
+      end else
+        if (i = (len - 1)) then
+          result := 0;
+    end;
+  finally
+
+    FreeBitmap(clientBitmap);
+  end;
+end;
+
+(*
+TRSTabAbilityBook.getAbilityCooldown
+~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+
+.. code-block:: pascal
+
+    function TRSTabAbilityBook.getAbilityCooldown(abilityConstant: TAbility): integer;
+
+Returns the cooldown percentage of the specified ability in the Ability Book.
+
+.. note::
+
+    by euphemism
+    Last Updated: 18 April 2013 by euphemism
+
+Example:
+
+.. code-block:: pascal
+
+    if (tabAbilityBook.getAbilityCooldown(TAbility.SURGE) = 100) then
+    begin
+
+      writeln('The Surge ability is ready to be used!');
+      tabAbilityBook.useAbility(TAbility.SURGE);
+    end;
+*)
+function TRSTabAbilityBook.getAbilityCooldown(abilityConstant: TAbility): integer;
+var
+
+  gridPosition: integer;
+  subTab: TAbilityTab;
+begin
+
+  self.__getAbilityLocation(abilityConstant, subTab, gridPosition);
+  self.setTab(subTab);
+
+  self.__getAbilityCooldown(self.__abilityGrid[gridPosition - 1]);
+end;
+
+{*
+TRSTabAbilityBook.__useAbility
+~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+
+.. code-block:: pascal
+
+    function TRSTabAbilityBook.__useAbility(locationOfAbility: TBox; inActionBar: boolean = false): boolean;
+
+Internal function called by the Ability Book and Action Bar interfaces to use the ability in
+ the specified box, locationOfAbility.
+
+.. note::
+
+    by euphemism
+    Last Updated: 18 April 2013 by euphemism
+
+Example:
+
+.. code-block:: pascal
+
+    tabAbilityBook.__useAbility(tabAbilityBook.__abilityGrid[0]);
+*}
+function TRSTabAbilityBook.__useAbility(locationOfAbility: TBox; inActionBar: boolean = false): boolean;
+var
+
+  cooldown, timeMarker: integer;
+begin
+
+  if (inActionBar) then
+    cooldown := tabAbilityBook.__getAbilityCooldown(locationOfAbility, inActionBar)
+  else
+    cooldown := tabAbilityBook.__getAbilityCooldown(locationOfAbility);
+
+  if (not (cooldown = 100)) then
+    exit(false);
+
+  locationOfAbility.mouse(MOUSE_LEFT);
+
+  timeMarker := getSystemTime() + randomRange(800, 1204);
+
+  repeat
+
+    if (inActionBar) then
+      result := (tabAbilityBook.__getAbilityCooldown(locationOfAbility, inActionBar) <> 100)
+    else
+      result := (tabAbilityBook.__getAbilityCooldown(locationOfAbility) <> 100);
+  until ((result) or (getSystemTime() > timeMarker));
+end;
+
+(*
+TRSTabAbilityBook.useAbility
+~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+
+.. code-block:: pascal
+
+    function TRSTabAbilityBook.useAbility(abilityConstant: TAbility): boolean;
+
+Uses the specified ability, and returns true if successful.
+
+.. note::
+
+    by euphemism
+    Last Updated: 18 April 2013 by euphemism
+
+Example:
+
+.. code-block:: pascal
+
+    if (tabAbilityBook.useAbility(TAbility.SURGE)) then
+      writeln('Successfully used the Surge ability.');
+*)
+function TRSTabAbilityBook.useAbility(abilityConstant: TAbility): boolean;
+var
+
+  gridPosition: integer;
+  subTab: TAbilityTab;
+begin
+
+  self.__getAbilityLocation(abilityConstant, subTab, gridPosition);
+  self.setTab(subTab);
+
+  self.__useAbility(self.__abilityGrid[gridPosition - 1]);
+end;
+
+begin
+
+  tabAbilityBook.__init();
+end;
+
