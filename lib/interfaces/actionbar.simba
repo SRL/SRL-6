@@ -815,7 +815,7 @@ Example:
 function TRSActionBar.addItem(invSlot, actionBarSlot: integer): boolean;
 var
 
-  bmp, i, len, timeMarker, xCoord, yCoord: integer;
+  bmp, cts, i, len, timeMarker, xCoord, yCoord: integer;
   acc: extended;
   inventoryBox: TBox;
   tpa: TPointArray;
@@ -843,8 +843,10 @@ begin
     for i := 0 to (len - 1) do
       fastSetPixel(bmp, tpa[i].x, tpa[i].y, 0);
 
+    cts := getToleranceSpeed();
     setColorToleranceSpeed(0);
     findColorsTolerance(tpa, 3292227, inventoryBox.x1, inventoryBox.y1, inventoryBox.x2, inventoryBox.y2, 8); //Color is an average of the browns that make up inventory background.  Used to filter background out of bitmap.
+    setColorToleranceSpeed(cts);
 
     tpa.offset(point(- inventoryBox.x1, - inventoryBox.y1));
     len := length(tpa);
@@ -856,7 +858,7 @@ begin
      self.__slots[actionBarSlot - 1].y1 - 1,
       self.__slots[actionBarSlot - 1].x2,
        self.__slots[actionBarSlot - 1].y2, 35, 0, false, acc);
-                                writeln(acc);
+
     if (acc > 0.8) then
       exit(true);
 
