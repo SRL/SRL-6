@@ -1,3 +1,4 @@
+{$f-}
 
 (*
 type TColorSettings
@@ -274,7 +275,7 @@ function FindColorsTolerance(var points: TPointArray; color, XS, YS, XE, YE, tol
 var
   cs: TColorSettings;
 begin
-  cs.Retrieve;
+  cs.Retrieve();
   settings.Apply();
   Result := FindColorsTolerance(points, color, XS, YS, XE, YE, tol);
   cs.Apply();
@@ -306,7 +307,7 @@ function FindColorSpiralTolerance(var x, y: Integer; color, XS, YS, XE, YE, tol:
 var
   cs: TColorSettings;
 begin
-  cs.Retrieve;
+  cs.Retrieve();
   settings.Apply();
   Result := FindColorSpiralTolerance(x, y, color, XS, YS, XE, YE, tol);
   cs.Apply();
@@ -338,7 +339,7 @@ function FindColorsSpiralTolerance(x, y: Integer; var points: TPointArray; color
 var
   cs: TColorSettings;
 begin
-  cs.Retrieve;
+  cs.Retrieve();
   settings.Apply();
   Result := FindColorsSpiralTolerance(x, y, points, color, XS, YS, XE, YE, tol);
   cs.Apply();
@@ -370,7 +371,7 @@ function FindColoredAreaTolerance(var x, y: Integer; color, XS, YS, XE, YE, minA
 var
   cs: TColorSettings;
 begin
-  cs.Retrieve;
+  cs.Retrieve();
   settings.Apply();
   Result := FindColoredAreaTolerance(x, y, color, XS, YS, XE, YE, minArea, tol);
   cs.Apply();
@@ -401,7 +402,7 @@ function SimilarColors(col1, col2, tol: Integer; settings: TColorSettings): Bool
 var
   cs: TColorSettings;
 begin
-  cs.Retrieve;
+  cs.Retrieve();
   settings.Apply();
   Result := SimilarColors(col1, col2, tol);
   cs.Apply();
@@ -432,7 +433,7 @@ function CountColorTolerance(color, XS, YS, XE, YE, tol: Integer; settings: TCol
 var
   cs: TColorSettings;
 begin
-  cs.Retrieve;
+  cs.Retrieve();
   settings.Apply();
   Result := CountColorTolerance(color, XS, YS, XE, YE, tol);
   cs.Apply();
@@ -463,7 +464,7 @@ function FindBitmapToleranceIn(bitmap: Integer; var x, y: Integer; XS, YS, XE, Y
 var
   cs: TColorSettings;
 begin
-  cs.Retrieve;
+  cs.Retrieve();
   settings.Apply();
   Result := FindBitmapToleranceIn(bitmap, x, y, XS, YS, XE, YE, tol);
   cs.Apply();
@@ -494,7 +495,7 @@ function FindBitmapSpiralTolerance(bitmap: Integer; var x, y: Integer; XS, YS, X
 var
   cs: TColorSettings;
 begin
-   cs.Retrieve;
+   cs.Retrieve();
   settings.Apply();
   Result := FindBitmapSpiralTolerance(bitmap, x, y, XS, YS, XE, YE, tol);
   cs.Apply();
@@ -525,7 +526,7 @@ function FindBitmapsSpiralTolerance(bitmap: Integer; x, y: Integer; var points: 
 var
   cs: TColorSettings;
 begin
-  cs.Retrieve;
+  cs.Retrieve();
   settings.Apply();
   Result := FindBitmapsSpiralTolerance(bitmap, x, y, points, XS, YS, XE, YE, tol);
   cs.Apply();
@@ -556,7 +557,7 @@ function FindBitmapMaskTolerance(mask: Integer; var x, y: Integer; XS, YS, XE, Y
 var
   cs: TColorSettings;
 begin
-  cs.Retrieve;
+  cs.Retrieve();
   settings.Apply();
   Result := FindBitmapMaskTolerance(mask, x, y, XS, YS, XE, YE, tol, contourTol);
   cs.Apply();
@@ -587,7 +588,7 @@ function FindDeformedBitmapToleranceIn(bitmap: Integer; var x, y: Integer; XS, Y
 var
   cs: TColorSettings;
 begin
-  cs.Retrieve;
+  cs.Retrieve();
   settings.Apply();
   Result := FindDeformedBitmapToleranceIn(bitmap, x, y, XS, YS, XE, YE, tol, range, allowPartialAccuracy, accuracy);
   cs.Apply();
