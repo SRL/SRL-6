@@ -1,3 +1,12 @@
+(*
+Color
+=====
+
+The color type holds all the functions and types that can be used for easy color
+finding, comparing or manupilation.
+
+*)
+
 {$f-}
 
 (*
