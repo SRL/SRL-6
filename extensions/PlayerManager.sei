@@ -566,7 +566,7 @@ var
 begin
   case Sender of
     Mi_Forum: addr := 'http://villavu.com/forum/showthread.php?t=47714';
-    Mi_ForumTut: addr := 'http://docs.villavu.com/srl-6/';
+    Mi_ForumTut: addr := 'http://villavu.com/forum/showthread.php?p=851555';
     Mi_FeedBack: addr := 'http://villavu.com/forum/project.php?projectid=6';
   end;
 
@@ -630,15 +630,15 @@ begin
   Mm_MainMenu.Items.Add(Mi_Help);
 
   Mi_Forum := TMenuItem.Create(Mi_Help);
-  Mi_Forum.Caption := 'How to use?';
+  Mi_Forum.Caption := 'How to use/setup';
   Mi_Forum.ONCLICK := @Help;
 
   Mi_ForumTut := TMenuItem.Create(Mi_Help);
-  Mi_ForumTut.Caption := 'How to implement?';
+  Mi_ForumTut.Caption := 'How to fix common errors';
   Mi_ForumTut.ONCLICK := @Help;
 
   Mi_FeedBack := TMenuItem.Create(Mi_Help);
-  Mi_FeedBack.Caption := 'Feedback';
+  Mi_FeedBack.Caption := 'Bugs and suggestions';
   Mi_FeedBack.ONCLICK := @Help;
 
   Mi_Help.Add(Mi_Forum);
