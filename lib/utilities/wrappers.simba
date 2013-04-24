@@ -630,3 +630,83 @@ begin
 
   result := explode(delSTR, str);
 end;
+
+(*
+TMufasaBitmap.create();
+~~~~~~~~~~~~~~~~~~~~~~~
+
+.. code-block:: pascal
+
+    procedure TMufasaBitmap.create();
+
+A more user friendly procedure that creates a TMufasaBitmap.
+
+.. note::
+
+    by Ollybest
+
+Example:
+
+.. code-block:: pascal
+
+    mufasaBitmap.create();
+
+*)
+procedure TMufasaBitmap.create();
+begin
+  self.init();
+  client.getMBitmaps().addBMP(self);
+end;
+
+(*
+TMufasaBitmap.destory()
+~~~~~~~~~~~~~~~~~~~~~~~
+
+.. code-block:: pascal
+
+    procedure TMufasaBitmap.destory();
+
+A more user friendly procedure that destorys (free's) a TMufasaBitmap.
+
+.. note::
+
+    by Ollybest
+
+Example:
+
+.. code-block:: pascal
+
+    mufasaBitmap.destory();
+
+*)
+procedure TMufasaBitmap.destory();
+begin
+  client.getMBitmaps().freeBMP(self.getIndex());
+end;
+
+(*
+inRange: overload;
+~~~~~~~~~~~~~~~~~~
+
+.. code-block:: pascal
+
+    function inRange(const value, min, max: extended): boolean; overload;
+
+Takes a extended variable instead of an integer variable.
+
+.. note::
+
+    by Ollybest
+
+Example:
+
+.. code-block:: pascal
+
+    if inRange(33.90, 30.0, 35.0) then
+      writeln('it''s in range');
+
+*)
+function inRange(const value, min, max: extended): boolean; overload;
+begin
+  result := (value >= min) and (value <= max);
+end;        
