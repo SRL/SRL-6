@@ -27,7 +27,7 @@ EVERYTHING should be recorded here: new features, function name changes, user-de
 
 - text.simba
   - TypeSendEx removed and an optional pressEnter parameter added to typeSend
-  - FindTextTPA/Ex replaced with findTextyColor()
+  - FindTextTPA/Ex replaced with findTextByColor()
   - All uptext functions replaced with isUptext, and moved to mainscreen.simba
   - All option functions replaced with chooseOption, and moved to mainscreen.simba
 
@@ -67,6 +67,37 @@ EVERYTHING should be recorded here: new features, function name changes, user-de
   - modified getItem, coordsToSlot, itemExists, getActivatedItem
   - renamed itemExists, getItem, coordsToSlot, getActivatedItem
   - removed InvMouse, MMouseItem, MouseItem, DragItem, ClickAllItemsExcept, ClickAllItems, DropItem, DropArray, DropPattern, DropAll, DropAllExcept, DropItemsByIdent, ArrangeInv, CountItemsBlackList, ClickItemsBlackList, ExistItemDTM
+
+- new file, abilitybook.simba
+  - This file contains all methods and variables related to the operation of the Ability Book gametab.
+  - All ability constants have been moved into this file and are expressed through the enum TAbility
+  - Ability Book tabs now expressed through the enum TAbilityTab
+  - renamed SetAbilityBook() to actionBar.setTab()
+  - removed AbilitySlotToBox(), slots are now a property of the tabAbilityBook variable
+  - GetAbilityCooldown() for Abiility Book accessible through tabAbilityBook.getAbilityCooldown()
+  - UseAbility() for Ability Book accessible through tabAbilityBook.useAbility()
+
+- new file, actionbar.simba
+  - This file contains all methods and variables related to the operation of the Action Bar.
+  - IsActionBarOpen() renamed to isOpen(), accessible through actionBar.isOpen()
+  - ToggleActionBar broken up into two functions, actionBar.open() and actionBar.close()
+  - ActionBarSlotToBox() removed, slots are now a property of the actionBar variable
+  - ActionBarSlotEmpty() renamed to actionBar.isSlotEmpty()
+  - GetAbilityCooldown() for Action Bar accessible through actionBar.getAbilityCooldown()
+  - UseAbility() for Action Bar accessible through actionBar.useAbility()
+  - AbilityInSlot renamed to actionBar.isAbilityInSlot()
+  - GetAdrenalinePercent() renamed to actionBar.getAdrenalinePercent()
+  - IsActionBarLocked() renamed to actionBar.isLocked()
+  - ToggleActionBarLock() broken up into two functions, actionBar.lock() and actionBar.unlock()
+  - ActionBarEmpty() renamed to actionBar.isEmpty()
+  - ClearActionBarSlot() renamed to actionBar.clearSlot()
+  - ClearActionBar() renamed to actionBar.clear()
+  - CurrentActionBar() renamed to actionBar.getCurrentBar()
+  - SwitchActionBar() renamed to actionBar.switchToBar()
+  - ClickActionBarSlot() renamed to actionBar.clickSlot()
+  - AddAbilityToActionBar() renamed to actionBar.addAbility()
+  - AddItemToActionBar() renamed to actionBar.addItem()
+  - GetKeyBind() renamed to actionBar.getKeyBind()
 
 - gametab.simba
   - Added Placeholder.
@@ -123,7 +154,7 @@ EVERYTHING should be recorded here: new features, function name changes, user-de
    - findDTMRotated
    - findDTMs
    - findDTM
-   - getTextAtEx 
+   - getTextAtEx
 
 - new file, mainscreen.simba
   - Uptext and option functions moved here
