@@ -46,11 +46,10 @@ var
   Mi_Army: TMenuItem;
   Mi_ArmyNew, Mi_ArmyOpen, Mi_ArmySave: TMenuItem;
 
-  Mi_Player: TMenuItem;
-  Mi_NewPlayer: TMenuItem;
-
   Mi_Help: TMenuItem;
   Mi_Forum: TMenuItem;
+  Mi_ForumTut: TMenuItem;
+  Mi_FeedBack: TMenuItem;
 
   CButtons: Array of TCustomButton;
   EditID: Integer; //the index of the player in the playerlist we are currently editing (-1 otherwise)    TODO: -1 is magic, something else!
@@ -561,6 +560,19 @@ begin
   fileTSL.Free;
 end;
 
+procedure Help(Sender: TObject);
+var
+  addr: String;
+begin
+  case Sender of
+    Mi_Forum: addr := 'http://villavu.com/forum/showthread.php?t=47714';
+    Mi_ForumTut: addr := 'http://docs.villavu.com/srl-6/';
+    Mi_FeedBack: addr := 'http://villavu.com/forum/project.php?projectid=6';
+  end;
+
+  OpenWebPage(addr);
+end;
+
 procedure FormClosed(Sender: TObject; var CloseAction:TCloseAction);
 begin
   SaveArmy(nil);
@@ -612,17 +624,26 @@ begin
   Mi_Army.Add(Mi_ArmyOpen);
   Mi_Army.Add(Mi_ArmySave);
 
-  Mi_Player := TMenuItem.Create(Mm_MainMenu);
-  Mi_Player.Caption := 'Player';
-
-  Mi_NewPlayer := TMenuItem.Create(Mi_Player);
-  Mi_NewPlayer.Caption := 'New Player';
-
   Mi_Help := TMenuItem.Create(Mm_MainMenu);
-  Mi_Help.Caption := 'Player';
+  Mi_Help.Caption := 'Help';
+
+  Mm_MainMenu.Items.Add(Mi_Help);
 
   Mi_Forum := TMenuItem.Create(Mi_Help);
-  Mi_Forum.Caption := 'New Player';
+  Mi_Forum.Caption := 'How to use?';
+  Mi_Forum.ONCLICK := @Help;
+
+  Mi_ForumTut := TMenuItem.Create(Mi_Help);
+  Mi_ForumTut.Caption := 'How to implement?';
+  Mi_ForumTut.ONCLICK := @Help;
+
+  Mi_FeedBack := TMenuItem.Create(Mi_Help);
+  Mi_FeedBack.Caption := 'Feedback';
+  Mi_FeedBack.ONCLICK := @Help;
+
+  Mi_Help.Add(Mi_Forum);
+  Mi_Help.Add(Mi_ForumTut);
+  Mi_Help.Add(Mi_FeedBack);
 
   {*
   *     Formatting the main components
