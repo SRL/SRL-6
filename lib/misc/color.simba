@@ -602,3 +602,189 @@ begin
   Result := FindDeformedBitmapToleranceIn(bitmap, x, y, XS, YS, XE, YE, tol, range, allowPartialAccuracy, accuracy);
   cs.Apply();
 end;
+
+(*
+FindDTM
+~~~~~~~
+
+.. code-block:: pascal
+
+    function FindDTM(DTM: Integer; var x, y: Integer; XS, YS, XE, YE: Integer; settings: TColorSettings): Boolean;
+
+Calls the simba find function with an additional color settings parameter. Sets and restores the CTS settings.
+
+.. note::
+
+    by Janilabo
+    Last Updated: Apr. 24, 2013 by Janilabo
+
+Example:
+
+.. code-block:: pascal
+
+    if(FindDTM(bonesDtm, x, y, XS, YS, XE, YE, invCS)) then
+*)
+function FindDTM(DTM: Integer; var x, y: Integer; XS, YS, XE, YE: Integer; settings: TColorSettings): Boolean; overload;
+var
+  cs: TColorSettings;
+begin
+  cs.Retrieve();
+  settings.Apply();
+  Result := FindDTM(DTM, x, y, XS, YS, XE, YE);
+  cs.Apply();
+end;
+
+(*
+FindDTMs
+~~~~~~~~
+
+.. code-block:: pascal
+
+    function FindDTMs(DTM: Integer; var points: TPointArray; XS, YS, XE, YE: Integer; settings: TColorSettings): Boolean;
+
+Calls the simba find function with an additional color settings parameter. Sets and restores the CTS settings.
+
+.. note::
+
+    by Janilabo
+    Last Updated: Apr. 24, 2013 by Janilabo
+
+Example:
+
+.. code-block:: pascal
+
+    if(FindDTMs(bonesDtm, points, XS, YS, XE, YE, invCS)) then
+*)
+function FindDTMs(DTM: Integer; var points: TPointArray; XS, YS, XE, YE: Integer; settings: TColorSettings): Boolean; overload;
+var
+  cs: TColorSettings;
+begin
+  cs.Retrieve();
+  settings.Apply();
+  Result := FindDTMs(DTM, points, XS, YS, XE, YE);
+  cs.Apply();
+end;
+
+(*
+FindDTMRotatedSE
+~~~~~~~~~~~~~~~~
+
+.. code-block:: pascal
+
+    function FindDTMRotatedSE(DTM: Integer; var x, y: Integer; XS, YS, XE, YE: Integer; sAngle, eAngle, aStep: Extended; var aFound: Extended; settings: TColorSettings): Boolean;
+
+Calls the simba find function with an additional color settings parameter. Sets and restores the CTS settings.
+
+.. note::
+
+    by Janilabo
+    Last Updated: Apr. 24, 2013 by Janilabo
+
+Example:
+
+.. code-block:: pascal
+
+    if(FindDTMRotatedSE(bankersDtm, points, XS, YS, XE, YE, 0, 360, 2, angle, CreateCS(2, 0.80, 0.20))) then
+*)
+function FindDTMRotatedSE(DTM: Integer; var x, y: Integer; XS, YS, XE, YE: Integer; sAngle, eAngle, aStep: Extended; var aFound: Extended; settings: TColorSettings): Boolean; overload;
+var
+  cs: TColorSettings;
+begin
+  cs.Retrieve();
+  settings.Apply();
+  Result := FindDTMRotatedSE(DTM, x, y, XS, YS, XE, YE, sAngle, eAngle, aStep, aFound);
+  cs.Apply();
+end;
+
+(*
+FindDTMRotatedAlternating
+~~~~~~~~~~~~~~~~~~~~~~~~~
+
+.. code-block:: pascal
+
+    function FindDTMRotatedAlternating(DTM: Integer; var x, y: Integer; XS, YS, XE, YE: Integer; sAngle, eAngle, aStep: Extended; var aFound: Extended; settings: TColorSettings): Boolean;
+
+Calls the simba find function with an additional color settings parameter. Sets and restores the CTS settings.
+
+.. note::
+
+    by Janilabo
+    Last Updated: Apr. 24, 2013 by Janilabo
+
+Example:
+
+.. code-block:: pascal
+
+    if(FindDTMRotatedAlternating(bankersDtm, x, y, XS, YS, XE, YE, 0, 360, 2, angle, CreateCS(2, 0.80, 0.20))) then
+*)
+function FindDTMRotatedAlternating(DTM: Integer; var x, y: Integer; XS, YS, XE, YE: Integer; sAngle, eAngle, aStep: Extended; var aFound: Extended; settings: TColorSettings): Boolean; overload;
+var
+  cs: TColorSettings;
+begin
+  cs.Retrieve();
+  settings.Apply();
+  Result := FindDTMRotatedAlternating(DTM, x, y, XS, YS, XE, YE, sAngle, eAngle, aStep, aFound);
+  cs.Apply();
+end;
+
+(*
+FindDTMsRotatedSE
+~~~~~~~~~~~~~~~~~
+
+.. code-block:: pascal
+
+    function FindDTMsRotatedSE(DTM: Integer; var points: TPointArray; XS, YS, XE, YE: Integer; sAngle, eAngle, aStep: Extended; var aFound: T2DExtendedArray; settings: TColorSettings): Boolean;
+
+Calls the simba find function with an additional color settings parameter. Sets and restores the CTS settings.
+
+.. note::
+
+    by Janilabo
+    Last Updated: Apr. 24, 2013 by Janilabo
+
+Example:
+
+.. code-block:: pascal
+
+    if(FindDTMsRotatedSE(bankersDtm, points, XS, YS, XE, YE, 0, 360, 2, angles, CreateCS(2, 0.80, 0.20))) then
+*)
+function FindDTMsRotatedSE(DTM: Integer; var points: TPointArray; XS, YS, XE, YE: Integer; sAngle, eAngle, aStep: Extended; var aFound: T2DExtendedArray; settings: TColorSettings): Boolean; overload;
+var
+  cs: TColorSettings;
+begin
+  cs.Retrieve();
+  settings.Apply();
+  Result := FindDTMsRotatedSE(DTM, points, XS, YS, XE, YE, sAngle, eAngle, aStep, aFound);
+  cs.Apply();
+end;
+
+(*
+FindDTMsRotatedAlternating
+~~~~~~~~~~~~~~~~~~~~~~~~~~
+
+.. code-block:: pascal
+
+    function FindDTMsRotatedAlternating(DTM: Integer; var points: TPointArray; XS, YS, XE, YE: Integer; sAngle, eAngle, aStep: Extended; var aFound: T2DExtendedArray; settings: TColorSettings): Boolean;
+
+Calls the simba find function with an additional color settings parameter. Sets and restores the CTS settings.
+
+.. note::
+
+    by Janilabo
+    Last Updated: Apr. 24, 2013 by Janilabo
+
+Example:
+
+.. code-block:: pascal
+
+    if(FindDTMsRotatedAlternating(bankersDtm, points, XS, YS, XE, YE, 0, 360, 2, angles, CreateCS(2, 0.80, 0.20))) then
+*)
+function FindDTMsRotatedAlternating(DTM: Integer; var points: TPointArray; XS, YS, XE, YE: Integer; sAngle, eAngle, aStep: Extended; var aFound: T2DExtendedArray; settings: TColorSettings): Boolean; overload;
+var
+  cs: TColorSettings;
+begin
+  cs.Retrieve();
+  settings.Apply();
+  Result := FindDTMsRotatedAlternating(DTM, points, XS, YS, XE, YE, sAngle, eAngle, aStep, aFound);
+  cs.Apply();
+end;
