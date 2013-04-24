@@ -565,8 +565,8 @@ var
   addr: String;
 begin
   case Sender of
-    Mi_Forum: addr := 'http://villavu.com/forum/showthread.php?t=101005';
-    Mi_ForumTut: addr := 'http://villavu.com/forum/showthread.php?t=101005';
+    Mi_Forum: addr := 'http://villavu.com/forum/showthread.php?t=47714';
+    Mi_ForumTut: addr := 'http://docs.villavu.com/srl-6/';
     Mi_FeedBack: addr := 'http://villavu.com/forum/project.php?projectid=6';
   end;
 
