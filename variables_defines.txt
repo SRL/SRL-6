@@ -8,15 +8,23 @@ DEFINES:
 
 VARIABLES:
 	mouseSpeed: integer; 			- the speed at which the mouse moves. Default 20.
+
 	disableSRLDebug: boolean; 		- disables SRL debugging. Default false.
 	disableSRLLog: boolean; 		- disables the SRL logging system. Default false.
-	disableIPScreenshots: boolean;  	- disables screenshots taken of the users IP address
+	disableIPScreenshots: boolean;  	- disables screenshots taken of the users IP address.
 	logPath: string; 			- the path where SRL log files are saved. Default SRL/logs/.
+
 	SRL_Events: array of procedure 		- procedures called throughout SRL (i.e. on RS update, on login etc.). Full list in globals.simba.
+	
 	players: array of TPlayer 		- the default TPlayerArray.
-	currentPlayer: integer; 		- the current active player
+	currentPlayer: integer; 		- the current active player.
+
 	SMART_SixHourFix: boolean; 		- restart SMART after 6 hours. Default true.
 	SMART_ForceNew: boolean; 		- force a new SMART client when a script is started. Default false.
-	mainscreen: TRSMainscreen; 		- used to call mainscreen functions/procedures (i.e. mainscreen.isUptext, mainscreen.chooseOption).
-	lobby: TRSLobby;			- used to call lobby functions/procedures
-	tabLogout: TRSTabLogout;		- called to interact with the logout gametab
+
+	Interfaces/gametabs:
+		mainscreen: TRSMainscreen; 		- used to call mainscreen functions/procedures (i.e. mainscreen.isUptext, mainscreen.chooseOption).
+		lobby: TRSLobby;			- used to call lobby functions/procedures.
+		tabLogout: TRSTabLogout;		- called to interact with the logout gametab.
+		tabInventory: TRSTabInventory;		- called to interact with the inventory gametab.
+		tabAbilityBook: TRSTabAbilityBook;	- called to interact with the ability book gametab.

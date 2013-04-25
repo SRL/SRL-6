@@ -4,6 +4,8 @@ Changes from SRL5
 EVERYTHING should be recorded here: new features, function name changes, user-defined variables... everything! Everything here will be explained in the SRL6 release thread.
 
 - no longer need to call SetupSRL since Lape has initialization (see the end of srl.simba for details)
+- Lape's auto-invoke has been turned off.  This means when you call a function/procedure you NEED to include () at the end.
+  - i.e. WRONG: walkToTrees; RIGHT: walkToTrees();
 
 - debug.simba (merged with SRLLog.simba)
   - Added variables disableSRLDebug, disableSRLLog, disableIPScreenshots
@@ -55,6 +57,7 @@ EVERYTHING should be recorded here: new features, function name changes, user-de
   - Logout renamed to TPlayer.logout()
 
 - inventory.simba
+  - functions are used like tabInventory.functionNameHere()
   
   added consts
   - INV_SLOT_HIGH
@@ -65,7 +68,7 @@ EVERYTHING should be recorded here: new features, function name changes, user-de
   - DROP_PATTERN_SNAKE
   - DROP_PATTERN_UP_DOWN 
 
- renamed(from > to):
+  renamed(from > to):
   - InvBox > getSlotBox
   - CordsToItem > pointToSlot
   - ExistsItem > isItemInSlot
@@ -85,7 +88,7 @@ EVERYTHING should be recorded here: new features, function name changes, user-de
   - dropItems
   - countItemsDTM
 
- removed: 
+  removed: 
   - GetInven
   - GetInventoryArray  
   - ItemCoords
@@ -138,11 +141,11 @@ EVERYTHING should be recorded here: new features, function name changes, user-de
   - Added Placeholder.
 
 - mouse.simba
-  - windMouse split and renamed to humanWindMouse() & brakeWindMouse()
+  - WindMouse split and renamed to _humanWindMouse() & _brakeWindMouse() & made internal functions.
   - MMouse() & Mouse() converted to mouse() overload;
   - ClickMouse2() renamed fastClick()
   - didClick left clicks the mouse and return true if the colored X is found.
-  - Added function multiMouse from MSI.
+  - Added function multiMouse from MSI, and renamed multiClick().
   - SleepAndMoveMouse moved to anitban.simba
   - mouseBox now takes a TBox parameter.
   - Removed IdleTime, MouseTBox, DidRedClick, DidYelloClick, MouseBoxEx, and DragMouseTBox.
@@ -155,9 +158,6 @@ EVERYTHING should be recorded here: new features, function name changes, user-de
   - removed function isRealMouseInBox
   - removed function getReadMousePos because TClient isn't yet supported in Lape
 
-- new file, login_info.simba
-  - This file is to replace the traditional DeclarePlayers.  Users will enter in their player information only one time and can choose which players to use in scripts.  Any other attributes (i.e. integers, booleans, etc.) will be edited in the script's DeclarePlayers like always.
-
 - new file, client.simba
   - added function isClientReady (replaces RSReady)
   - added function waitClientReady, which is called in setupSRL
@@ -165,7 +165,6 @@ EVERYTHING should be recorded here: new features, function name changes, user-de
 - new file, types.simba
   - new function TPoint.rand that will add a random integer to a TPoint
   - new function TPoint.coords that will assign the x and y values of a TPoint
-
 
 - new file, wrappers.simba
   - getColor may a take a TPoint instead of x and y variables.
