@@ -32,6 +32,10 @@ Variable that stores functions and properties of the Runescape Action Bar.
 var
   actionBar: TRSActionBar;
 
+const
+  ACTION_BAR_SLOT_LOW = 1;
+  ACTION_BAR_SLOT_HIGH = 12;
+
 {*
 TRSActionBar.__init
 ~~~~~~~~~~~~~~~~~~~
@@ -75,6 +79,25 @@ begin
   end;
 end;
 
+function TRSActionBar.__isSlotValid(var slot: integer): boolean;
+begin
+
+  if (inRange(slot, ACTION_BAR_SLOT_LOW, ACTION_BAR_SLOT_HIGH)) then
+    exit(true);
+
+  print('Specified Action Bar slot not in the range of 1 - ' + toStr(length(self.__slots)) + '.', TDebug.ERROR);
+
+  slot := 1;
+  result := false;
+end;
+
+function TRSActionBar.__printWarning(methodName, resultValue: variant): variant;
+begin
+
+  print(methodName + ' will now exit, returning ' + toStr(result) + '.', TDebug.WARNING);
+  exit(resultValue);
+end;
+
 (*
 TRSActionBar.isOpen
 ~~~~~~~~~~~~~~~~~~~
@@ -98,9 +121,14 @@ Example:
       writeln('Action Bar open and ready to use!');
 *)
 function TRSActionBar.isOpen(): boolean;
+var
+
+  color: integer;
 begin
 
-  result := (getColor(self.x + 1, self.y + 1) = 13224393); //Color is the silver border of the action bar.  In this case, checks the top-left corner of the action bar.
+  color := getColor(self.x + 1, self.y + 1);
+  result := (color = 13224393); //Color is the silver border of the action bar.  In this case, checks the top-left corner of the action bar.
+  print('actionBar.isOpen() returned ' + toStr(result) + ' and found the color ' + toStr(color) + '. We were looking for 13224393 if the Action Bar was open.', TDebug.LOG);
 end;
 
 {*
@@ -233,6 +261,7 @@ function TRSActionBar.getCurrentBar(): Integer;
 begin
 
   result := strToIntDef(getTextAtEx(intToBox(495, 354, 501, 363), 0, 0, 0, 3111603, 0, 'UpChars'), -1); //Color is of the number at the rightmost end of the action bar showing which bar is active.
+  print('actionBar.getCurrentBar() returned ' + toStr(result), TDebug.LOG);
 end;
 
 
@@ -373,6 +402,9 @@ Example:
 function TRSActionBar.isSlotEmpty(slot: integer): boolean;
 begin
 
+  if (not (self.__isSlotValid(slot))) then
+    exit(self.__printWarning('actionBar.isSlotEmpty()', false));
+
   result := (GetColor(self.__slots[slot - 1].getMidPoint()) = 59); //Color is of the dark red X present in the center of an empty slot.
 end;
 
@@ -406,7 +438,7 @@ begin
 
   result := false;
 
-  for i := 1 to 12 do
+  for i := ACTION_BAR_SLOT_LOW to ACTION_BAR_SLOT_HIGH do
     if (not self.isSlotEmpty(i)) then
       exit;
 
@@ -438,6 +470,9 @@ Example:
 *)
 function TRSActionBar.clickSlot(slot: integer): boolean;
 begin
+
+  if (not (self.__isSlotValid(slot))) then
+    exit(self.__printWarning('actionBar.clickSlot()', false));
 
   if (self.isSlotEmpty(slot)) then
     exit(false);
@@ -471,19 +506,25 @@ Example:
 
     writeln('The key bind for slot 1 is: ', slotOneKeyBind);
 *)
-function TRSActionBar.getKeyBind(slot: integer): string;
+function TRSActionBar.getKeyBind(slot: integer): char;
+var
+
+  tempResult: string;
 begin
 
-  if (not inRange(slot, 1, 12)) then
-    exit();
+  if (not (self.__isSlotValid(slot))) then
+    exit(self.__printWarning('actionBar.getKeyBind()', ' '));
 
   if (not self.open()) then
-    exit();
+    exit(self.__printWarning('actionBar.getKeyBind()', ' '));
 
-  result:= getTextAtEx(intToBox(12 + 36 * slot, 365, 17 + 36 * slot, 372), 0, 0, 0, 3111603, 0, 'UpChars'); //Color is key bind character in bottom-left of slot.
-  if (result = '__') then //Simba's OCR detects an equals sign as two underscores.
-    result := '=';
+  tempResult := getTextAtEx(intToBox(12 + 36 * slot, 365, 17 + 36 * slot, 372), 0, 0, 0, 3111603, 0, 'UpChars'); //Color is key bind character in bottom-left of slot.
 
+  if (tempResult = '__') then //Simba's OCR detects an equals sign as two underscores.
+    tempResult := '=';
+
+  print('actionBar.getKeyBind() checked slot ' + toStr(slot) + ' and found the key bind to be ' + tempResult, TDebug.LOG);
+  result := tempResult[1];
 end;
 
 (*
@@ -513,6 +554,9 @@ var
 
   sloTBox: TBox;
 begin
+
+  if (not (self.__isSlotValid(slot))) then
+    exit(self.__printWarning('actionBar.clearSlot()', false));
 
   if (self.isSlotEmpty(slot)) then
     exit(true);
@@ -611,10 +655,15 @@ Example:
 function TRSActionBar.getAbilityCooldown(slot: integer): integer;
 begin
 
+  if (not (self.__isSlotValid(slot))) then
+    exit(self.__printWarning('actionBar.getAbilityCooldown()', -1));
+
   if (self.isSlotEmpty(slot)) then
     exit(-1);
 
   result := tabAbilityBook.__getAbilityCooldown(self.__slots[slot - 1], true);
+
+  print('actionBar.getAbilityCooldown() checked slot ' + toStr(slot) + 'and got ' + toStr(result), TDebug.LOG);
 end;
 
 (*
@@ -644,6 +693,9 @@ var
 
   timeMarker: integer;
 begin
+
+  if (not (self.__isSlotValid(slot))) then
+    exit(self.__printWarning('actionBar.useAbility()', false));
 
   if (not (useKeyBind)) then
     result := tabAbilityBook.__useAbility(self.__slots[slot - 1], true)
@@ -696,6 +748,9 @@ var
   colors: tIntegerArray;
   tpa: TPointArray;
 begin
+
+  if (not (self.__isSlotValid(slot))) then
+    exit(self.__printWarning('actionBar.isAbilityInSlot()', false));
 
   tabAbilityBook.__getAbilityLocation(abilityConstant, SubTab, gridPosition);
 
@@ -762,6 +817,9 @@ var
   subTab: TAbilityTab;
 begin
 
+  if (not (self.__isSlotValid(slot))) then
+    exit(self.__printWarning('actionBar.addAbility()', false));
+
   if (self.isAbilityInSlot(abilityConstant, slot)) then
     exit(true);
 
@@ -821,6 +879,8 @@ var
   tpa: TPointArray;
 begin
 
+  if (not (self.__isSlotValid(actionBarSlot))) then
+    exit(self.__printWarning('actionBar.addItem()', false));
 
   if ((not tabInventory.isOpen()) or (not self.open())) then
     exit(false);
@@ -933,6 +993,8 @@ begin
        (adrenalineBox.X2 - adrenalineBox.X1) * 1.0) * 100);
     end;
   end;
+
+  print('actionBar.getAdrenalinePercent() returned ' + toStr(result), TDebug.LOG);
 end;
 
 (*
@@ -964,6 +1026,7 @@ var
 begin
 
   color := getColor(19, 346);
+  print('actionBar.isLocked() grabbed the color ' + toStr(color) + ' and we were looking for 5145251 or 8846590', TDebug.LOG);
   result := ((color = 5145251) or (color = 8846590)); //Gold on the lock symbol.
 end;
 
