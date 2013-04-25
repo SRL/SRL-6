@@ -55,18 +55,53 @@ EVERYTHING should be recorded here: new features, function name changes, user-de
   - Logout renamed to TPlayer.logout()
 
 - inventory.simba
-  - TIventItem renamed TItem
-  - attributes added: ColorArr, Name, TPACount, CheckSum, Slot, Stack
-  - attributes renamed: ItemExists
-  - TInvenItemArr renamed TItemArray
-  - Change function Parameter I to Slot
-  - added CONST
-    - BLACK_OUTLINE, WHITE_OUTLINE
-    - MI_BOX, MI_CP
-  - invBox moved
-  - modified getItem, coordsToSlot, itemExists, getActivatedItem
-  - renamed itemExists, getItem, coordsToSlot, getActivatedItem
-  - removed InvMouse, MMouseItem, MouseItem, DragItem, ClickAllItemsExcept, ClickAllItems, DropItem, DropArray, DropPattern, DropAll, DropAllExcept, DropItemsByIdent, ArrangeInv, CountItemsBlackList, ClickItemsBlackList, ExistItemDTM
+  
+  added consts
+  - INV_SLOT_HIGH
+  - INV_SLOT_LOW
+ 
+  - DROP_PATTERN_REGULAR
+  - DROP_PATTERN_BACKWARDS
+  - DROP_PATTERN_SNAKE
+  - DROP_PATTERN_UP_DOWN 
+
+ renamed(from > to):
+  - InvBox > getSlotBox
+  - CordsToItem > pointToSlot
+  - ExistsItem > isItemInSlot
+  - InvMouse > mouseSlot
+  - DragItem > dragSlot
+  - InvCount > getInvCount
+  - InvEmpty > isInvEmpty
+  - InvFull > isInvFull
+  - CountItems > countItemsDTM
+  - ActivatedItem > getActivatedSlot
+  - ItemActivated > isSlotActivated
+  - dropItem > dropItemInSlot
+
+  added: 
+  - clickItemsDTM
+  - isInvCount
+  - dropItems
+  - countItemsDTM
+
+ removed: 
+  - GetInven
+  - GetInventoryArray  
+  - ItemCoords
+  - GetInvItemBounds
+  - ExistItemDTM
+  - MMouseItem
+  - MouseItem
+  - ClickAllItemsExcept
+  - ClickAllItems
+  - DropPattern (now constants)
+  - DropAllExcept
+  - DropItemsByIdentifer
+  - ArrangeInv
+  - CountItemBlackLine
+  - ClickAllItemsBlackLine
+  - CountItems
 
 - new file, abilitybook.simba
   - This file contains all methods and variables related to the operation of the Ability Book gametab.
