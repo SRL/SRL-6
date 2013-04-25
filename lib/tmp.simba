@@ -9,6 +9,8 @@ and/or Lape.
 
 {$f-}
 
+var
+  __onTerminateProcs: TVariantArray;
 
 var
   clWhite = 16777215;
@@ -34,6 +36,85 @@ var
 const
   MOUSE_NONE = -1;
   MOUSE_MOVE = 3;
+
+(*
+TerminateScript(); override;
+~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+
+.. code-block:: pascal
+
+     procedure TerminateScript(); override;
+
+Overrides the current TerminateScript to allow procedures to be called.
+
+note: will ONLY be triggered when terminateScript() is called, if a script
+      ends "naturally" this will not be called.
+
+.. note::
+
+    by core
+
+Example:
+
+.. code-block:: pascal
+
+     begin
+       mainLoop;
+       terminateScript();
+     end.
+
+*)
+procedure TerminateScript(); override;
+var
+  i, l: Integer;
+begin
+  l := length(__onTerminateProcs);
+
+  if (l > 0) then
+  begin
+    writeln('-- TerminateScript: calling procedures ' + toStr(__onTerminateProcs));
+    for i := 0 to (l - 1) do
+      variantInvoke(__onTerminateProcs[i]);
+  end;
+
+  inherited();
+end;
+
+(*
+addOnTerminate
+~~~~~~~~~~~~~~
+
+.. code-block:: pascal
+
+     function addOnTerminate(const proc: string): boolean;
+
+Adds a procedure to be called when TerminateScript is called.
+
+.. note::
+
+    by core
+
+Example:
+
+.. code-block:: pascal
+
+     addOnTerminate('procedure name here');
+
+*)
+function addOnTerminate(const proc: string): boolean;
+var
+  i, h: integer;
+begin
+  h := high(__onTerminateProcs);
+  for i := 0 to h do
+    if (__onTerminateProcs[i] = proc) then
+      exit;
+
+  setLength(__onTerminateProcs, h + 2);
+  __onTerminateProcs[h + 1] := proc;
+
+  result := True;
+end;
 
 (*
 freeDTMs
