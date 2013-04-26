@@ -166,6 +166,10 @@ A enum type for the Abilities of the Ability Book.
 
     AB_TABS = [AB_TAB_ATTACK, AB_TAB_RANGED, AB_TAB_MAGIC, AB_TAB_DEFENCE_AND_CONSTITUTION];
 
+    const
+      ABILITY_BOOK_LOW  = 0;
+      ABILITY_BOOK_HIGH = ord(TAbility.SINGLE_WAY_WILDERNESS);
+
 {*
 TRSTabAbilityBook.__init()
 ~~~~~~~~~~~~~~~~~~~~~~~~~~
@@ -312,6 +316,8 @@ begin
 
       colorToHSL(getColor(xCoords[result], yCoord), hue, sat, lum);
 
+      print('tabAbilityBook.__getActiveAbilityTab() found a luminance of ' + toStr(lum) + ' at main tab ' + toStr(result), TDebug.LOG);
+
       if (lum < 15) then
         exit;
     end;
@@ -333,6 +339,8 @@ begin
   begin
 
     colorToHSL(getColor(xCoords[result], yCoord), hue, sat, lum);
+
+    print('tabAbilityBook.__getActiveAbilityTab() found a luminance of ' + toStr(lum) + ' at sub tab ' + toStr(result) + '.', TDebug.LOG);
 
     if (lum > 10) then
       exit;
@@ -364,7 +372,7 @@ Example:
 function TRSTabAbilityBook.setTab(tabToSwitchTo: TAbilityTab): boolean;
 var
 
-  activeMain, i, main, sub, tabCompare, timeOut: integer;
+  i, main, sub, tabCompare, timeOut: integer;
   boxCoords, tabLocations, tabLoop: t2DintegerArray;
   firstSubTabInEachTab: array of TAbilityTab;
 begin
@@ -390,10 +398,8 @@ begin
   boxCoords[0] := [548, 255, 594, 287, 47]; //Main tab size and spacing
   boxCoords[1] := [557, 298, 586, 327, 46]; //Sub tab size and spacing
 
-  activeMain := __getActiveAbilityTab(); //Stores the current active main tab to reduce redundancy.
-
   Setlength(tabLoop, 2);
-  tabLoop[0] := [activeMain, main]; //Holds the active main tab, and the target main tab.
+  tabLoop[0] := [__getActiveAbilityTab(), main]; //Holds the active main tab, and the target main tab.
   tabLoop[1] := [__getActiveAbilityTab(true), sub]; //Holds the active sub tab to 0, and the target sub tab.
 
   if ((tabLoop[0][0] = tabLoop[0][1]) and (tabLoop[1][0] = tabLoop[1][1])) then
@@ -530,8 +536,8 @@ begin
 
   try
 
-    clientBitmap := BitmapFromClient(boxToCheck.x1, boxToCheck.y1, boxToCheck.x2, boxToCheck.y2);
-    SetBitmapName(clientBitmap, 'Cooldown Bitmap');
+    clientBitmap := bitmapFromClient(boxToCheck.x1, boxToCheck.y1, boxToCheck.x2, boxToCheck.y2);
+    setBitmapName(clientBitmap, 'Cooldown Bitmap');
 
     x1 := 0;
     y1 := 0;
@@ -544,64 +550,70 @@ begin
     if (inActionBar) then
     begin
 
-      FindColors(tpa, 3111603, boxToCheck.x1 + 2, boxToCheck.Y1 + 19, boxToCheck.x1 + 8, boxToCheck.y1 + 26);
+      findColors(tpa, 3111603, boxToCheck.x1 + 2, boxToCheck.Y1 + 19, boxToCheck.x1 + 8, boxToCheck.y1 + 26);
       tpa.offset(Point( - boxToCheck.x1, - boxToCheck.y1));
 
+      print('tabAbilityBook.__getAbilityCooldown() checking ActionBar slot, found ' + toStr(length(tpa)) + ' pixels of key bind color.', TDebug.LOG);
+
       for i := 0 to High(tpa) do
-        FastSetPixel(clientBitmap, tpa[i].x, tpa[i].y, 0);
+        fastSetPixel(clientBitmap, tpa[i].x, tpa[i].y, 0);
     end;
 
-    tempBitmap := BrightnessBitmap(clientBitmap, 100);
-    FreeBitmap(clientBitmap);
+    tempBitmap := brightnessBitmap(clientBitmap, 100);
+    freeBitmap(clientBitmap);
 
-    clientBitmap := PosterizeBitmap(tempBitmap, 60);
-    FreeBitmap(tempBitmap);
+    clientBitmap := posterizeBitmap(tempBitmap, 60);
+    freeBitmap(tempBitmap);
 
-    tempBitmap := ContrastBitmap(clientBitmap, 30);
-    FreeBitmap(clientBitmap);
+    tempBitmap := contrastBitmap(clientBitmap, 30);
+    freeBitmap(clientBitmap);
 
-    clientBitmap := Desaturate(tempBitmap);
-    FreeBitmap(tempBitmap);
+    clientBitmap := desaturate(tempBitmap);
+    freeBitmap(tempBitmap);
 
-    midPoint := Point(15, 14);
+    midPoint := point(15, 14);
 
-    TPAFromCircleWrap(midPoint.x, midPoint.y, 14, pointCircle);
-    SortCircleWise(pointCircle, midPoint.x, midPoint.y, 359, false, true);
+    tpaFromCircleWrap(midPoint.x, midPoint.y, 14, pointCircle);
+    sortCircleWise(pointCircle, midPoint.x, midPoint.y, 359, false, true);
 
     len := length(pointCircle);
 
     for i := 0 to (len - 1) do
     begin
 
-      if (InRange(i, 0, 38)) then
-        midPoint := Point(14, 15)
+      if (inRange(i, 0, 38)) then
+        midPoint := point(14, 15)
       else
-        midPoint := Point(15, 14);
+        midPoint := point(15, 14);
 
-      TPAFromLineWrap(midPoint.x, midPoint.y, pointCircle[i].x, pointCircle[i].y, Line);
+      tpaFromLineWrap(midPoint.x, midPoint.y, pointCircle[i].x, pointCircle[i].y, line);
       line.sortFromPoint(midPoint);
       line.invert();
 
       if (i = 0) then
-        Setlength(line, 7)
+        setlength(line, 7)
       else
-        Setlength(line, length(Line) - 4);
+        setlength(line, length(line) - 4);
 
       sumTotal := 0;
-      sumTotal := sumintegerArray(FastGetPixels(clientBitmap, line));
+      sumTotal := sumintegerArray(fastGetPixels(clientBitmap, line));
 
       if (sumTotal <> 0) then
       begin
 
-        result := Ceil((Round(FixD(Degrees(ArcTan2(pointCircle[i].x - midPoint.x - 1, - (pointCircle[i].y - midPoint.y))))) / 360.0) * 100) + 1;
+        result := ceil((round(fixD(degrees(arcTan2(pointCircle[i].x - midPoint.x - 1, - (pointCircle[i].y - midPoint.y))))) / 360.0) * 100) + 1;
 
         if (result = 99) then
         begin
 
-          colorFix := GetColor(boxToCheck.x1 + 14, boxToCheck.y1 + 2);
+          colorFix := getColor(boxToCheck.x1 + 14, boxToCheck.y1 + 2);
 
           if ((colorFix = 6706) or (colorFix = 1710617)) then
+          begin
+
+            print('tabAbilityBook.__getAbilityCooldown() used the colorFix check.', TDebug.LOG);
             result := 100;
+          end;
         end;
 
         break;
@@ -611,7 +623,7 @@ begin
     end;
   finally
 
-    FreeBitmap(clientBitmap);
+    freeBitmap(clientBitmap);
   end;
 end;
 
@@ -647,6 +659,17 @@ var
   gridPosition: integer;
   subTab: TAbilityTab;
 begin
+
+  if (not (inRange(ord(abilityConstant), ABILITY_BOOK_LOW, ABILITY_BOOK_HIGH))) then
+  begin
+
+    print('tabAbilityBook.getAbilityCooldown() ability is not a valid ability enum.', TDebug.ERROR);
+    print('tabAbilityBook.getAbilityCooldown() will now exit, returning -1', TDebug.WARNING);
+
+    exit(-1);
+  end;
+
+  print('tabAbilityBook.getAbilityCooldown() getting cooldown for ' + toStr(abilityConstant) + '.', TDebug.LOG);
 
   self.__getAbilityLocation(abilityConstant, subTab, gridPosition);
   self.setTab(subTab);
@@ -732,6 +755,15 @@ var
   subTab: TAbilityTab;
 begin
 
+  if (not (inRange(ord(abilityConstant), ABILITY_BOOK_LOW, ABILITY_BOOK_HIGH))) then
+  begin
+
+    print('tabAbilityBook.useAbility() ability is not a valid ability enum.', TDebug.ERROR);
+    print('tabAbilityBook.useAbility() will now exit, returning -1', TDebug.WARNING);
+
+    exit(-1);
+  end;
+
   self.__getAbilityLocation(abilityConstant, subTab, gridPosition);
   self.setTab(subTab);
 
@@ -742,4 +774,3 @@ begin
 
   tabAbilityBook.__init();
 end;
-
