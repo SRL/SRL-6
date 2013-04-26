@@ -127,8 +127,8 @@ var
 begin
 
   color := getColor(self.x + 1, self.y + 1);
-  result := (color = 13224393); //Color is the silver border of the action bar.  In this case, checks the top-left corner of the action bar.
-  print('actionBar.isOpen() returned ' + toStr(result) + ' and found the color ' + toStr(color) + '. We were looking for 13224393 if the Action Bar was open.', TDebug.LOG);
+  result := (color = 13224393); //Top-left corner of the action bar.
+  print('actionBar.isOpen() returned ' + toStr(result) + ' and found the color ' + toStr(color) + '. We were looking for the silver border of the Action Bar, if it was open.', TDebug.LOG);
 end;
 
 {*
@@ -1026,7 +1026,7 @@ var
 begin
 
   color := getColor(19, 346);
-  print('actionBar.isLocked() grabbed the color ' + toStr(color) + ' and we were looking for 5145251 or 8846590', TDebug.LOG);
+  print('actionBar.isLocked() grabbed the color ' + toStr(color) + ' and we were looking at the point where the shackle/shank meets the body of the lock symbol', TDebug.LOG);
   result := ((color = 5145251) or (color = 8846590)); //Gold on the lock symbol.
 end;
 
