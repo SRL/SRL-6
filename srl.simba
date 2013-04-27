@@ -8,7 +8,7 @@ SRL library isn't available to you.
 
 *)
 
-{$include_once lib/utilities/types.simba}
+{$include_once lib/utilities/types/types.simba}
 {$include_once lib/utilities/time.simba}
 
 {$include_once lib/core/globals.simba}
@@ -25,8 +25,6 @@ SRL library isn't available to you.
 {$include_once lib/interfaces/lobby.simba}
 {$include_once lib/interfaces/mainscreen.simba}
 {$include_once lib/interfaces/actionbar.simba}
-
-{$include_once player_info.simba}
 
 {$IFDEF SMART}
   {$include_once lib/misc/smart.simba}
