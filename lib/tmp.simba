@@ -283,68 +283,6 @@ begin
   result := point(x, y);
 end;
 
-(*
-createTPAFromLine
-~~~~~~~~~~~~~~~~~
-
-.. code-block:: pascal
-
-    function createTPAFromLine(const x1, y1, x2, y2: integer): TPointArray;
-
-Creates a TPointArray from a line between x1, y1 and x2, and y2.
-
-.. note::
-
-    by masterBB
-
-Example:
-
-.. code-block:: pascal
-
-     tpa := createTPAFromLine(100, 100, 200, 200);
-
-*)
-function createTPAFromLine(const x1, y1, x2, y2: integer): TPointArray;
-var
-  inc, shortLength, longLength, i: integer;
-  isYLonger: boolean;
-  multiDiff: extended;
-begin
-  shortLength := y2 - y1;
-  longLength := x2 - x1;
-
-  isYLonger := false;
-
-  if ((shortLength xor (shortLength shr 31)) - (shortLength shr 31) > (longLength xor (longLength shr 31)) - (longLength shr 31)) then
-  begin
-    shortLength := shortLength xor longLength;
-    longLength := longLength xor shortLength;
-    shortLength := shortLength xor longLength;
-
-    isYLonger := true;
-  end;
-
-  if (longLength < 0) then
-    inc := -1
-  else
-    inc := 1;
-
-  if (longLength = 0) then
-    multiDiff := shortLength
-  else
-    multiDiff := shortLength / longLength;
-
-  setLength(result, longLength + 1);
-
-  if (isYLonger) then
-  begin
-    for i := 0 to longLength do
-      result[i] := point(floor(x1 + i*multiDiff), (y1+i));
-  end else
-    for i := 0 to longLength do
-      result[i] := point((x1 + i), floor(y1+i*multiDiff))
-end; 
-
 procedure SortATPAFromFirstPointY(var a: T2DPointArray; const From: TPoint);
 var
    i, l: Integer;
