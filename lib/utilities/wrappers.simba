@@ -630,3 +630,30 @@ begin
 
   result := explode(delSTR, str);
 end;
+
+(*
+inRange: overload;
+~~~~~~~~~~~~~~~~~~
+
+.. code-block:: pascal
+
+    function inRange(const value, min, max: extended): boolean; overload;
+
+Takes a extended variable instead of an integer variable.
+
+.. note::
+
+    by Ollybest
+
+Example:
+
+.. code-block:: pascal
+
+    if inRange(33.90, 30.0, 35.0) then
+      writeln('it''s in range');
+
+*)
+function inRange(const value, min, max: extended): boolean; overload;
+begin
+  result := (value >= min) and (value <= max);
+end;
