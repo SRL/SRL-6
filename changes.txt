@@ -56,6 +56,23 @@ EVERYTHING should be recorded here: new features, function name changes, user-de
   - RandomPlayerIndex and RandomNextPlayer merged to TPlayerArray.randomNext()
   - Logout renamed to TPlayer.logout()
 
+- New file, minimap.simba. Combination of mapwalk.simba, flag.simba, and symbol.simba.
+  - Added minimap dot and direction constants.
+  - Removed VariantToDirection() as it is now obsolete.
+  - "SRL_" prefix removed from angle constants.
+  - SetAngle moved to mainscreen.simba and renamed to TRSMainscreen.setAngle().
+  - MakeCompass renamed to TRSMinimap.setCompassAngle().
+  - Removed RunAway as it was used for old randoms.
+  - All RadialWalk functions combined into TRSMinimap.radialWalk.
+   	 NOTE: Setting the start and end radial values equal will execute the same as linearWalk in SRL5.
+  - GetMinimapDotsIn renamed to TRSMinimap.getDots().
+  - rs_OnMinimap renamed to TRSMinimap.isPointOn().
+  - FindFlag and FindFlag2 renamed to _findFlagBitmap and _findFlagColor.
+  - FlagPresent renamed to TRSMinimap.isFlagPresent.
+  - roadColorChecker and all components have been comepletely removed from SRL6
+  - Flag functions combined to waitFlag(flagDist: integer = 0).
+  - MouseFlagEx, MFF, MFNF, MouseFlag merged into mouseFlag().
+
 - inventory.simba
   - functions are used like tabInventory.functionNameHere()
   
