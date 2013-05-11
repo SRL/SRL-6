@@ -32,9 +32,6 @@ SRL library isn't available to you.
 
 {$f+}
 
-
-
-
 function setupSRL(): boolean;
 var
   t := getTickCount();
