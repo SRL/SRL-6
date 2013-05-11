@@ -13,7 +13,7 @@ finding, comparing or manupilation.
 type TColorSettings
 ~~~~~~~~~~~~~~~~~~~
 
-A record that provides easy access to the simba CTS settings
+A record that provides easy access to the Simba CTS settings.
 *)
 type
   TColorSettings = record
