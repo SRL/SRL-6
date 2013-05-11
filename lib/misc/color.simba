@@ -24,14 +24,14 @@ type
   end;
 
 (*
-ColorSetting
+colorSetting
 ~~~~~~~~~~~~
 
 .. code-block:: pascal
 
-    function ColorSetting(_CTS:Integer): TColorSettings;
+    function colorSetting(_CTS:Integer): TColorSettings;
 
-Creates and returns a ColorSetting record with the given CTS method.
+Creates and returns a colorSetting record with the given CTS method.
 
 .. note::
 
@@ -42,9 +42,9 @@ Example:
 
 .. code-block:: pascal
 
-    if(FindColorTolerance(x, y, $FF0000, MSX1, MSY1, MSX2, MSY2, 10, ColorSetting(0))) then
+    if(findColorTolerance(x, y, $FF0000, MSX1, MSY1, MSX2, MSY2, 10, colorSetting(0))) then
 *)
-function ColorSetting(_CTS:Integer): TColorSettings;
+function colorSetting(_CTS:Integer): TColorSettings;
 var
   cs: TColorSettings;
 begin
@@ -53,14 +53,14 @@ begin
 end;
 
 (*
-ColorSetting
+colorSetting
 ~~~~~~~~~~~~
 
 .. code-block:: pascal
 
-    function ColorSetting(_CTS:Integer): TColorSettings;
+    function colorSetting(_CTS:Integer): TColorSettings;
 
-Creates and returns a ColorSetting record with the given CTS method and the CTS 2 modifiers.
+Creates and returns a colorSetting record with the given CTS method and the CTS 2 modifiers.
 
 .. note::
 
@@ -71,25 +71,25 @@ Example:
 
 .. code-block:: pascal
 
-    if(FindColorTolerance(x, y, $DACE11, MSX1, MSY1, MSX2, MSY2, 10, ColorSetting(2, 0.20, 0.80))) then
+    if(findColorTolerance(x, y, $DACE11, MSX1, MSY1, MSX2, MSY2, 10, colorSetting(2, 0.20, 0.80))) then
 *)
-function ColorSetting(_CTS:Integer;  _hueModifier, _saturationModifier: Extended): TColorSettings; overload;
+function colorSetting(_CTS:Integer;  _hueModifier, _saturationModifier: Extended): TColorSettings; overload;
 var
   cs: TColorSettings;
 begin
-  cs.ToColorSettings(_CTS, _hueModifier, _saturationModifier);
+  cs.toColorSettings(_CTS, _hueModifier, _saturationModifier);
   Result := cs;
 end;
 
 (*
-ColorSetting
+colorSetting
 ~~~~~~~~~~~~
 
 .. code-block:: pascal
 
-    function ColorSetting(_CTS:Integer): TColorSettings;
+    function colorSetting(_CTS:Integer): TColorSettings;
 
-Creates and returns a ColorSetting record with the given CTS method and the CTS 3 modifier.
+Creates and returns a colorSetting record with the given CTS method and the CTS 3 modifier.
 
 .. note::
 
@@ -100,25 +100,25 @@ Example:
 
 .. code-block:: pascal
 
-    if(FindColorTolerance(x, y, $DACE11, MSX1, MSY1, MSX2, MSY2, 10, ColorSetting(2, 10))) then
+    if(findColorTolerance(x, y, $DACE11, MSX1, MSY1, MSX2, MSY2, 10, colorSetting(2, 10))) then
 *)
-function ColorSetting(_CTS:Integer; _sensitivityModifier: Extended): TColorSettings; overload;
+function colorSetting(_CTS:Integer; _sensitivityModifier: Extended): TColorSettings; overload;
 var
   cs: TColorSettings;
 begin
-  cs.ToColorSettings(_CTS, _sensitivityModifier);
+  cs.toColorSettings(_CTS, _sensitivityModifier);
   Result := cs;
 end;
 
 (*
-TColorSettings.ToColorSettings
+TColorSettings.toColorSettings
 ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
 
 .. code-block:: pascal
 
-    procedure TColorSettings.ToColorSettings(_CTS: Integer; _hueModifier, _saturationModifier: Extended);
+    procedure TColorSettings.toColorSettings(_CTS: Integer; _hueModifier, _saturationModifier: Extended);
 
-Creates and ColorSetting record with the given CTS method and the CTS 2 modifiers.
+Creates and colorSetting record with the given CTS method and the CTS 2 modifiers.
 
 .. note::
 
@@ -129,10 +129,10 @@ Example:
 
 .. code-block:: pascal
 
-    goblinCS.ToColorSettings(2, 0.45. 0.90);
-    if(FindColorTolerance(x, y, $DACE11, MSX1, MSY1, MSX2, MSY2, 10, goblinCS)) then
+    goblinCS.toColorSettings(2, 0.45. 0.90);
+    if(findColorTolerance(x, y, $DACE11, MSX1, MSY1, MSX2, MSY2, 10, goblinCS)) then
 *)
-procedure TColorSettings.ToColorSettings(_CTS: Integer; _hueModifier, _saturationModifier: Extended);
+procedure TColorSettings.toColorSettings(_CTS: Integer; _hueModifier, _saturationModifier: Extended);
 begin
   Self.CTS := _CTS;
   Self.modifier.hue := _hueModifier;
@@ -140,12 +140,12 @@ begin
 end;
 
 (*
-TColorSettings.ToColorSettings
+TColorSettings.toColorSettings
 ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
 
 .. code-block:: pascal
 
-    procedure TColorSettings.ToColorSettings(_CTS: Integer; _sensitivityModifier: Extended);
+    procedure TColorSettings.toColorSettings(_CTS: Integer; _sensitivityModifier: Extended);
 
 Creates and ColorSetting record with the given CTS method and the CTS 3 modifier.
 
@@ -158,22 +158,22 @@ Example:
 
 .. code-block:: pascal
 
-    chickenCS.ToColorSettings(3, 20);
-    if(FindColorTolerance(x, y, $FFFFFF, MSX1, MSY1, MSX2, MSY2, 15, chickenCS)) then
+    chickenCS.toColorSettings(3, 20);
+    if(findColorTolerance(x, y, $FFFFFF, MSX1, MSY1, MSX2, MSY2, 15, chickenCS)) then
 *)
-procedure TColorSettings.ToColorSettings(_CTS: Integer; _sensitivityModifier: Extended); overload;
+procedure TColorSettings.toColorSettings(_CTS: Integer; _sensitivityModifier: Extended); overload;
 begin
   Self.CTS := _CTS;
   Self.modifier.sensitivity := _sensitivityModifier;
 end;
 
 (*
-TColorSettings.Retrieve
+TColorSettings.retrieve
 ~~~~~~~~~~~~~~~~~~~~~~~
 
 .. code-block:: pascal
 
-    procedure TColorSettings.Retrieve();
+    procedure TColorSettings.retrieve();
 
 Gets the current CTS settings used by simba, and stores them into the record.
 
@@ -186,25 +186,25 @@ Example:
 
 .. code-block:: pascal
 
-    restoreCS.Retrieve();
+    restoreCS.retrieve();
     SetColorToleranceSpeed(5);
-    a := FindColorTolerance(x, y, 5811341, MSX1, MSY1, MSX2, MSY2, 10);
-    restoreCS.Apply();
+    a := findColorTolerance(x, y, 5811341, MSX1, MSY1, MSX2, MSY2, 10);
+    restoreCS.apply();
 *)
-procedure TColorSettings.Retrieve();
+procedure TColorSettings.retrieve();
 begin
-  Self.CTS := GetToleranceSpeed;
-  Self.modifier.sensitivity := GetToleranceSpeed3Modifier;
+  Self.CTS := GetToleranceSpeed();
+  Self.modifier.sensitivity := GetToleranceSpeed3Modifier();
   GetToleranceSpeed2Modifiers(Self.modifier.hue, Self.modifier.saturation);
 end;
 
 (*
-TColorSettings.Retrieve
+TColorSettings.retrieve
 ~~~~~~~~~~~~~~~~~~~~~~~
 
 .. code-block:: pascal
 
-    procedure TColorSettings.Apply();
+    procedure TColorSettings.apply();
 
 Applies the CTS settings from the record to the simba client.
 
@@ -217,10 +217,10 @@ Example:
 
 .. code-block:: pascal
 
-    goblinCS.Apply();
-    if(FindColorTolerance(x, y, 5811341, MSX1, MSY1, MSX2, MSY2, 10))then
+    goblinCS.apply();
+    if(findColorTolerance(x, y, 5811341, MSX1, MSY1, MSX2, MSY2, 10))then
 *)
-procedure TColorSettings.Apply();
+procedure TColorSettings.apply();
 begin
   SetColorToleranceSpeed(Self.CTS);
   SetToleranceSpeed2Modifiers(Self.modifier.hue, Self.modifier.saturation);
@@ -228,12 +228,12 @@ begin
 end;
 
 (*
-FindColorTolerance
+findColorTolerance
 ~~~~~~~~~~~~~~~~~~
 
 .. code-block:: pascal
 
-    function FindColorTolerance(var x, y: Integer; color, XS, YS, XE, YE, tol: Integer; settings: TColorSettings): Boolean;
+    function findColorTolerance(var x, y: Integer; color, XS, YS, XE, YE, tol: Integer; settings: TColorSettings): Boolean;
 
 Calls the simba find function with an additional color settings parameter. Sets and restores the CTS settings.
 
@@ -246,26 +246,26 @@ Example:
 
 .. code-block:: pascal
 
-    goblinCS.Apply();
-    if(FindColorTolerance(x, y, 5811341, MSX1, MSY1, MSX2, MSY2, 10))then
+    goblinCS.apply();
+    if(findColorTolerance(x, y, 5811341, MSX1, MSY1, MSX2, MSY2, 10))then
 *)
-function FindColorTolerance(var x, y: Integer; color, XS, YS, XE, YE, tol: Integer; settings: TColorSettings): Boolean; overload;
+function findColorTolerance(var x, y: Integer; color, XS, YS, XE, YE, tol: Integer; settings: TColorSettings): Boolean; overload;
 var
   cs: TColorSettings;
 begin
-  cs.Retrieve;
-  settings.Apply();
-  Result := FindColorTolerance(x, y, color, XS, YS, XE, YE, tol);
-  cs.Apply();
+  cs.retrieve;
+  settings.apply();
+  Result := findColorTolerance(x, y, color, XS, YS, XE, YE, tol);
+  cs.apply();
 end;
 
 (*
-FindColorsTolerance
+findColorsTolerance
 ~~~~~~~~~~~~~~~~~~~
 
 .. code-block:: pascal
 
-    function FindColorsTolerance(var points: TPointArray; color, XS, YS, XE, YE, tol: Integer; settings: TColorSettings): Boolean;
+    function findColorsTolerance(var points: TPointArray; color, XS, YS, XE, YE, tol: Integer; settings: TColorSettings): Boolean;
 Calls the simba find function with an additional color settings parameter. Sets and restores the CTS settings.
 
 .. note::
@@ -277,26 +277,26 @@ Example:
 
 .. code-block:: pascal
 
-    goblinCS.Apply();
-    if(FindColorsTolerance(tpa, 5811341, MSX1, MSY1, MSX2, MSY2, 10))then
+    goblinCS.apply();
+    if(findColorsTolerance(tpa, 5811341, MSX1, MSY1, MSX2, MSY2, 10))then
 *)
-function FindColorsTolerance(var points: TPointArray; color, XS, YS, XE, YE, tol: Integer; settings: TColorSettings): Boolean; overload;
+function findColorsTolerance(var points: TPointArray; color, XS, YS, XE, YE, tol: Integer; settings: TColorSettings): Boolean; overload;
 var
   cs: TColorSettings;
 begin
-  cs.Retrieve();
-  settings.Apply();
-  Result := FindColorsTolerance(points, color, XS, YS, XE, YE, tol);
-  cs.Apply();
+  cs.retrieve();
+  settings.apply();
+  Result := findColorsTolerance(points, color, XS, YS, XE, YE, tol);
+  cs.apply();
 end;
 
 (*
-FindColorSpiralTolerance
+findColorSpiralTolerance
 ~~~~~~~~~~~~~~~~~~~~~~~~
 
 .. code-block:: pascal
 
-    function FindColorSpiralTolerance(var x, y: Integer; color, XS, YS, XE, YE, tol: Integer; settings: TColorSettings): Boolean;
+    function findColorSpiralTolerance(var x, y: Integer; color, XS, YS, XE, YE, tol: Integer; settings: TColorSettings): Boolean;
 
 Calls the simba find function with an additional color settings parameter. Sets and restores the CTS settings.
 
@@ -309,26 +309,26 @@ Example:
 
 .. code-block:: pascal
 
-    goblinCS.Apply();
-    if(FindColorSpiralTolerance(x, y, 5811341, MSX1, MSY1, MSX2, MSY2, 10))then
+    goblinCS.apply();
+    if(findColorSpiralTolerance(x, y, 5811341, MSX1, MSY1, MSX2, MSY2, 10))then
 *)
-function FindColorSpiralTolerance(var x, y: Integer; color, XS, YS, XE, YE, tol: Integer; settings: TColorSettings): Boolean; overload;
+function findColorSpiralTolerance(var x, y: Integer; color, XS, YS, XE, YE, tol: Integer; settings: TColorSettings): Boolean; overload;
 var
   cs: TColorSettings;
 begin
-  cs.Retrieve();
-  settings.Apply();
-  Result := FindColorSpiralTolerance(x, y, color, XS, YS, XE, YE, tol);
-  cs.Apply();
+  cs.retrieve();
+  settings.apply();
+  Result := findColorSpiralTolerance(x, y, color, XS, YS, XE, YE, tol);
+  cs.apply();
 end;
 
 (*
-FindColorsSpiralTolerance
+findColorsSpiralTolerance
 ~~~~~~~~~~~~~~~~~~~~~~~~~
 
 .. code-block:: pascal
 
-    function FindColorsSpiralTolerance(x, y: Integer; var points: TPointArray; color, XS, YS, XE, YE, tol: Integer; settings: TColorSettings): Boolean;
+    function findColorsSpiralTolerance(x, y: Integer; var points: TPointArray; color, XS, YS, XE, YE, tol: Integer; settings: TColorSettings): Boolean;
 
 Calls the simba find function with an additional color settings parameter. Sets and restores the CTS settings.
 
@@ -341,26 +341,26 @@ Example:
 
 .. code-block:: pascal
 
-    goblinCS.Apply();
-    if(FindColorsSpiralTolerance(x, y, tpa, 5811341, MSX1, MSY1, MSX2, MSY2, 10)) then
+    goblinCS.apply();
+    if(findColorsSpiralTolerance(x, y, tpa, 5811341, MSX1, MSY1, MSX2, MSY2, 10)) then
 *)
-function FindColorsSpiralTolerance(x, y: Integer; var points: TPointArray; color, XS, YS, XE, YE, tol: Integer; settings: TColorSettings): Boolean; overload;
+function findColorsSpiralTolerance(x, y: Integer; var points: TPointArray; color, XS, YS, XE, YE, tol: Integer; settings: TColorSettings): Boolean; overload;
 var
   cs: TColorSettings;
 begin
-  cs.Retrieve();
-  settings.Apply();
-  Result := FindColorsSpiralTolerance(x, y, points, color, XS, YS, XE, YE, tol);
-  cs.Apply();
+  cs.retrieve();
+  settings.apply();
+  Result := findColorsSpiralTolerance(x, y, points, color, XS, YS, XE, YE, tol);
+  cs.apply();
 end;
 
 (*
-FindColoredAreaTolerance
+findColoredAreaTolerance
 ~~~~~~~~~~~~~~~~~~~~~~~~
 
 .. code-block:: pascal
 
-    function FindColoredAreaTolerance(var x, y: Integer; color, XS, YS, XE, YE, minArea, tol: Integer; settings: TColorSettings): Boolean;
+    function findColoredAreaTolerance(var x, y: Integer; color, XS, YS, XE, YE, minArea, tol: Integer; settings: TColorSettings): Boolean;
 
 Calls the simba find function with an additional color settings parameter. Sets and restores the CTS settings.
 
@@ -373,26 +373,26 @@ Example:
 
 .. code-block:: pascal
 
-    goblinCS.Apply();
-    if(FindColoredAreaTolerance(x, y, 5811341, MSX1, MSY1, MSX2, MSY2, 22, 10)) then
+    goblinCS.apply();
+    if(findColoredAreaTolerance(x, y, 5811341, MSX1, MSY1, MSX2, MSY2, 22, 10)) then
 *)
-function FindColoredAreaTolerance(var x, y: Integer; color, XS, YS, XE, YE, minArea, tol: Integer; settings: TColorSettings): Boolean; overload;
+function findColoredAreaTolerance(var x, y: Integer; color, XS, YS, XE, YE, minArea, tol: Integer; settings: TColorSettings): Boolean; overload;
 var
   cs: TColorSettings;
 begin
-  cs.Retrieve();
-  settings.Apply();
-  Result := FindColoredAreaTolerance(x, y, color, XS, YS, XE, YE, minArea, tol);
-  cs.Apply();
+  cs.retrieve();
+  settings.apply();
+  Result := findColoredAreaTolerance(x, y, color, XS, YS, XE, YE, minArea, tol);
+  cs.apply();
 end;
 
 (*
-FindColoredAreaTolerance
+findColoredAreaTolerance
 ~~~~~~~~~~~~~~~~~~~~~~~~
 
 .. code-block:: pascal
 
-    function FindColoredAreaTolerance(var x, y: Integer; color, XS, YS, XE, YE, minArea, tol: Integer; settings: TColorSettings): Boolean;
+    function findColoredAreaTolerance(var x, y: Integer; color, XS, YS, XE, YE, minArea, tol: Integer; settings: TColorSettings): Boolean;
 
 Calls the simba compare function with an additional color settings parameter. Sets and restores the CTS settings.
 
@@ -405,25 +405,25 @@ Example:
 
 .. code-block:: pascal
 
-    if(SimilarColors($CECECE, $CFCFCF, 2, CreateCS(1))) then
+    if(similarColors($CECECE, $CFCFCF, 2, CreateCS(1))) then
 *)
-function SimilarColors(col1, col2, tol: Integer; settings: TColorSettings): Boolean; overload;
+function similarColors(col1, col2, tol: Integer; settings: TColorSettings): Boolean; overload;
 var
   cs: TColorSettings;
 begin
-  cs.Retrieve();
-  settings.Apply();
-  Result := SimilarColors(col1, col2, tol);
-  cs.Apply();
+  cs.retrieve();
+  settings.apply();
+  Result := similarColors(col1, col2, tol);
+  cs.apply();
 end;
 
 (*
-CountColorTolerance
+countColorTolerance
 ~~~~~~~~~~~~~~~~~~~
 
 .. code-block:: pascal
 
-    function CountColorTolerance(color, XS, YS, XE, YE, tol: Integer; settings: TColorSettings): Integer;
+    function countColorTolerance(color, XS, YS, XE, YE, tol: Integer; settings: TColorSettings): Integer;
 
 Calls the simba count function with an additional color settings parameter. Sets and restores the CTS settings.
 
@@ -436,25 +436,25 @@ Example:
 
 .. code-block:: pascal
 
-    if(CountColorTolerance(color, XS, YS, XE, YE, minArea, tol, demonCS) > 20) then
+    if(countColorTolerance(color, XS, YS, XE, YE, minArea, tol, demonCS) > 20) then
 *)
-function CountColorTolerance(color, XS, YS, XE, YE, tol: Integer; settings: TColorSettings): Integer; overload;
+function countColorTolerance(color, XS, YS, XE, YE, tol: Integer; settings: TColorSettings): Integer; overload;
 var
   cs: TColorSettings;
 begin
-  cs.Retrieve();
-  settings.Apply();
-  Result := CountColorTolerance(color, XS, YS, XE, YE, tol);
-  cs.Apply();
+  cs.retrieve();
+  settings.apply();
+  Result := countColorTolerance(color, XS, YS, XE, YE, tol);
+  cs.apply();
 end;
 
 (*
-FindBitmapToleranceIn
+findBitmapToleranceIn
 ~~~~~~~~~~~~~~~~~~~~~
 
 .. code-block:: pascal
 
-    function FindBitmapToleranceIn(bitmap: Integer; var x, y: Integer; XS, YS, XE, YE, tol: Integer; settings: TColorSettings): Boolean;
+    function findBitmapToleranceIn(bitmap: Integer; var x, y: Integer; XS, YS, XE, YE, tol: Integer; settings: TColorSettings): Boolean;
 
 Calls the simba find function with an additional color settings parameter. Sets and restores the CTS settings.
 
@@ -467,25 +467,25 @@ Example:
 
 .. code-block:: pascal
 
-    if(CountColorTolerance(AttackPotionBmp, x, y, XS, YS, XE, YE, tol, invCS)) then
+    if(countColorTolerance(AttackPotionBmp, x, y, XS, YS, XE, YE, tol, invCS)) then
 *)
-function FindBitmapToleranceIn(bitmap: Integer; var x, y: Integer; XS, YS, XE, YE, tol: Integer; settings: TColorSettings): Boolean; overload;
+function findBitmapToleranceIn(bitmap: Integer; var x, y: Integer; XS, YS, XE, YE, tol: Integer; settings: TColorSettings): Boolean; overload;
 var
   cs: TColorSettings;
 begin
-  cs.Retrieve();
-  settings.Apply();
-  Result := FindBitmapToleranceIn(bitmap, x, y, XS, YS, XE, YE, tol);
-  cs.Apply();
+  cs.retrieve();
+  settings.apply();
+  Result := findBitmapToleranceIn(bitmap, x, y, XS, YS, XE, YE, tol);
+  cs.apply();
 end;
 
 (*
-FindBitmapSpiralTolerance
+findBitmapSpiralTolerance
 ~~~~~~~~~~~~~~~~~~~~~~~~~
 
 .. code-block:: pascal
 
-    function FindBitmapSpiralTolerance(bitmap: Integer; var x, y: Integer; XS, YS, XE, YE, tol: Integer; settings: TColorSettings): Boolean;
+    function findBitmapSpiralTolerance(bitmap: Integer; var x, y: Integer; XS, YS, XE, YE, tol: Integer; settings: TColorSettings): Boolean;
 
 Calls the simba find function with an additional color settings parameter. Sets and restores the CTS settings.
 
@@ -498,25 +498,25 @@ Example:
 
 .. code-block:: pascal
 
-    if(FindBitmapSpiralTolerance(AttackPotionBmp, x, y, XS, YS, XE, YE, 15, invCS)) then
+    if(findBitmapSpiralTolerance(AttackPotionBmp, x, y, XS, YS, XE, YE, 15, invCS)) then
 *)
-function FindBitmapSpiralTolerance(bitmap: Integer; var x, y: Integer; XS, YS, XE, YE, tol: Integer; settings: TColorSettings): Boolean; overload;
+function findBitmapSpiralTolerance(bitmap: Integer; var x, y: Integer; XS, YS, XE, YE, tol: Integer; settings: TColorSettings): Boolean; overload;
 var
   cs: TColorSettings;
 begin
-   cs.Retrieve();
-  settings.Apply();
-  Result := FindBitmapSpiralTolerance(bitmap, x, y, XS, YS, XE, YE, tol);
-  cs.Apply();
+   cs.retrieve();
+  settings.apply();
+  Result := findBitmapSpiralTolerance(bitmap, x, y, XS, YS, XE, YE, tol);
+  cs.apply();
 end;
 
 (*
-FindBitmapsSpiralTolerance
+findBitmapsSpiralTolerance
 ~~~~~~~~~~~~~~~~~~~~~~~~~~
 
 .. code-block:: pascal
 
-    function FindBitmapsSpiralTolerance(bitmap: Integer; x, y: Integer; var points: TPointArray; XS, YS, XE, YE, tol: Integer; settings: TColorSettings): Boolean;
+    function findBitmapsSpiralTolerance(bitmap: Integer; x, y: Integer; var points: TPointArray; XS, YS, XE, YE, tol: Integer; settings: TColorSettings): Boolean;
 
 Calls the simba find function with an additional color settings parameter. Sets and restores the CTS settings.
 
@@ -529,25 +529,25 @@ Example:
 
 .. code-block:: pascal
 
-    if(FindBitmapsSpiralTolerance(AttackPotionBmp, x, y, tpa, XS, YS, XE, YE, 15, invCS)) then
+    if(findBitmapsSpiralTolerance(AttackPotionBmp, x, y, tpa, XS, YS, XE, YE, 15, invCS)) then
 *)
-function FindBitmapsSpiralTolerance(bitmap: Integer; x, y: Integer; var points: TPointArray; XS, YS, XE, YE, tol: Integer; settings: TColorSettings): Boolean; overload;
+function findBitmapsSpiralTolerance(bitmap: Integer; x, y: Integer; var points: TPointArray; XS, YS, XE, YE, tol: Integer; settings: TColorSettings): Boolean; overload;
 var
   cs: TColorSettings;
 begin
-  cs.Retrieve();
-  settings.Apply();
-  Result := FindBitmapsSpiralTolerance(bitmap, x, y, points, XS, YS, XE, YE, tol);
-  cs.Apply();
+  cs.retrieve();
+  settings.apply();
+  Result := findBitmapsSpiralTolerance(bitmap, x, y, points, XS, YS, XE, YE, tol);
+  cs.apply();
 end;
 
 (*
-FindBitmapMaskTolerance
+findBitmapMaskTolerance
 ~~~~~~~~~~~~~~~~~~~~~~~
 
 .. code-block:: pascal
 
-    function FindBitmapMaskTolerance(mask: Integer; var x, y: Integer; XS, YS, XE, YE, tol, contourTol: Integer; settings: TColorSettings): Boolean;
+    function findBitmapMaskTolerance(mask: Integer; var x, y: Integer; XS, YS, XE, YE, tol, contourTol: Integer; settings: TColorSettings): Boolean;
 
 Calls the simba find function with an additional color settings parameter. Sets and restores the CTS settings.
 
@@ -560,25 +560,25 @@ Example:
 
 .. code-block:: pascal
 
-    if(FindBitmapMaskTolerance(mazeMask, x, y, tpa, XS, YS, XE, YE, 15, 20, mmCS)) then
+    if(findBitmapMaskTolerance(mazeMask, x, y, tpa, XS, YS, XE, YE, 15, 20, mmCS)) then
 *)
-function FindBitmapMaskTolerance(mask: Integer; var x, y: Integer; XS, YS, XE, YE, tol, contourTol: Integer; settings: TColorSettings): Boolean; overload;
+function findBitmapMaskTolerance(mask: Integer; var x, y: Integer; XS, YS, XE, YE, tol, contourTol: Integer; settings: TColorSettings): Boolean; overload;
 var
   cs: TColorSettings;
 begin
-  cs.Retrieve();
-  settings.Apply();
-  Result := FindBitmapMaskTolerance(mask, x, y, XS, YS, XE, YE, tol, contourTol);
-  cs.Apply();
+  cs.retrieve();
+  settings.apply();
+  Result := findBitmapMaskTolerance(mask, x, y, XS, YS, XE, YE, tol, contourTol);
+  cs.apply();
 end;
 
 (*
-FindDeformedBitmapToleranceIn
+findDeformedBitmapToleranceIn
 ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
 
 .. code-block:: pascal
 
-    function FindDeformedBitmapToleranceIn(bitmap: Integer; var x, y: Integer; XS, YS, XE, YE, tol, range: Integer; allowPartialAccuracy: Boolean; var accuracy: Extended; settings: TColorSettings): Boolean;
+    function findDeformedBitmapToleranceIn(bitmap: Integer; var x, y: Integer; XS, YS, XE, YE, tol, range: Integer; allowPartialAccuracy: Boolean; var accuracy: Extended; settings: TColorSettings): Boolean;
 
 Calls the simba find function with an additional color settings parameter. Sets and restores the CTS settings.
 
@@ -591,25 +591,25 @@ Example:
 
 .. code-block:: pascal
 
-    if(FindDeformedBitmapToleranceIn(mazeMask, x, y, tpa, XS, YS, XE, YE, 15, 20, True, 0.40, mmCS)) then
+    if(findDeformedBitmapToleranceIn(mazeMask, x, y, tpa, XS, YS, XE, YE, 15, 20, True, 0.40, mmCS)) then
 *)
-function FindDeformedBitmapToleranceIn(bitmap: Integer; var x, y: Integer; XS, YS, XE, YE, tol, range: Integer; allowPartialAccuracy: Boolean; var accuracy: Extended; settings: TColorSettings): Boolean; overload;
+function findDeformedBitmapToleranceIn(bitmap: Integer; var x, y: Integer; XS, YS, XE, YE, tol, range: Integer; allowPartialAccuracy: Boolean; var accuracy: Extended; settings: TColorSettings): Boolean; overload;
 var
   cs: TColorSettings;
 begin
-  cs.Retrieve();
-  settings.Apply();
-  Result := FindDeformedBitmapToleranceIn(bitmap, x, y, XS, YS, XE, YE, tol, range, allowPartialAccuracy, accuracy);
-  cs.Apply();
+  cs.retrieve();
+  settings.apply();
+  Result := findDeformedBitmapToleranceIn(bitmap, x, y, XS, YS, XE, YE, tol, range, allowPartialAccuracy, accuracy);
+  cs.apply();
 end;
 
 (*
-FindDTM
+findDTM
 ~~~~~~~
 
 .. code-block:: pascal
 
-    function FindDTM(DTM: Integer; var x, y: Integer; XS, YS, XE, YE: Integer; settings: TColorSettings): Boolean;
+    function findDTM(DTM: Integer; var x, y: Integer; XS, YS, XE, YE: Integer; settings: TColorSettings): Boolean;
 
 Calls the simba find function with an additional color settings parameter. Sets and restores the CTS settings.
 
@@ -622,25 +622,25 @@ Example:
 
 .. code-block:: pascal
 
-    if(FindDTM(bonesDtm, x, y, XS, YS, XE, YE, invCS)) then
+    if(findDTM(bonesDtm, x, y, XS, YS, XE, YE, invCS)) then
 *)
-function FindDTM(DTM: Integer; var x, y: Integer; XS, YS, XE, YE: Integer; settings: TColorSettings): Boolean; overload;
+function findDTM(DTM: Integer; var x, y: Integer; XS, YS, XE, YE: Integer; settings: TColorSettings): Boolean; overload;
 var
   cs: TColorSettings;
 begin
-  cs.Retrieve();
-  settings.Apply();
-  Result := FindDTM(DTM, x, y, XS, YS, XE, YE);
-  cs.Apply();
+  cs.retrieve();
+  settings.apply();
+  Result := findDTM(DTM, x, y, XS, YS, XE, YE);
+  cs.apply();
 end;
 
 (*
-FindDTMs
+findDTMs
 ~~~~~~~~
 
 .. code-block:: pascal
 
-    function FindDTMs(DTM: Integer; var points: TPointArray; XS, YS, XE, YE: Integer; settings: TColorSettings): Boolean;
+    function findDTMs(DTM: Integer; var points: TPointArray; XS, YS, XE, YE: Integer; settings: TColorSettings): Boolean;
 
 Calls the simba find function with an additional color settings parameter. Sets and restores the CTS settings.
 
@@ -653,25 +653,25 @@ Example:
 
 .. code-block:: pascal
 
-    if(FindDTMs(bonesDtm, points, XS, YS, XE, YE, invCS)) then
+    if(findDTMs(bonesDtm, points, XS, YS, XE, YE, invCS)) then
 *)
-function FindDTMs(DTM: Integer; var points: TPointArray; XS, YS, XE, YE: Integer; settings: TColorSettings): Boolean; overload;
+function findDTMs(DTM: Integer; var points: TPointArray; XS, YS, XE, YE: Integer; settings: TColorSettings): Boolean; overload;
 var
   cs: TColorSettings;
 begin
-  cs.Retrieve();
-  settings.Apply();
-  Result := FindDTMs(DTM, points, XS, YS, XE, YE);
-  cs.Apply();
+  cs.retrieve();
+  settings.apply();
+  Result := findDTMs(DTM, points, XS, YS, XE, YE);
+  cs.apply();
 end;
 
 (*
-FindDTMRotatedSE
+findDTMRotatedSE
 ~~~~~~~~~~~~~~~~
 
 .. code-block:: pascal
 
-    function FindDTMRotatedSE(DTM: Integer; var x, y: Integer; XS, YS, XE, YE: Integer; sAngle, eAngle, aStep: Extended; var aFound: Extended; settings: TColorSettings): Boolean;
+    function findDTMRotatedSE(DTM: Integer; var x, y: Integer; XS, YS, XE, YE: Integer; sAngle, eAngle, aStep: Extended; var aFound: Extended; settings: TColorSettings): Boolean;
 
 Calls the simba find function with an additional color settings parameter. Sets and restores the CTS settings.
 
@@ -684,25 +684,25 @@ Example:
 
 .. code-block:: pascal
 
-    if(FindDTMRotatedSE(bankersDtm, points, XS, YS, XE, YE, 0, 360, 2, angle, CreateCS(2, 0.80, 0.20))) then
+    if(findDTMRotatedSE(bankersDtm, points, XS, YS, XE, YE, 0, 360, 2, angle, CreateCS(2, 0.80, 0.20))) then
 *)
-function FindDTMRotatedSE(DTM: Integer; var x, y: Integer; XS, YS, XE, YE: Integer; sAngle, eAngle, aStep: Extended; var aFound: Extended; settings: TColorSettings): Boolean; overload;
+function findDTMRotatedSE(DTM: Integer; var x, y: Integer; XS, YS, XE, YE: Integer; sAngle, eAngle, aStep: Extended; var aFound: Extended; settings: TColorSettings): Boolean; overload;
 var
   cs: TColorSettings;
 begin
-  cs.Retrieve();
-  settings.Apply();
-  Result := FindDTMRotatedSE(DTM, x, y, XS, YS, XE, YE, sAngle, eAngle, aStep, aFound);
-  cs.Apply();
+  cs.retrieve();
+  settings.apply();
+  Result := findDTMRotatedSE(DTM, x, y, XS, YS, XE, YE, sAngle, eAngle, aStep, aFound);
+  cs.apply();
 end;
 
 (*
-FindDTMRotatedAlternating
+findDTMRotatedAlternating
 ~~~~~~~~~~~~~~~~~~~~~~~~~
 
 .. code-block:: pascal
 
-    function FindDTMRotatedAlternating(DTM: Integer; var x, y: Integer; XS, YS, XE, YE: Integer; sAngle, eAngle, aStep: Extended; var aFound: Extended; settings: TColorSettings): Boolean;
+    function findDTMRotatedAlternating(DTM: Integer; var x, y: Integer; XS, YS, XE, YE: Integer; sAngle, eAngle, aStep: Extended; var aFound: Extended; settings: TColorSettings): Boolean;
 
 Calls the simba find function with an additional color settings parameter. Sets and restores the CTS settings.
 
@@ -715,25 +715,25 @@ Example:
 
 .. code-block:: pascal
 
-    if(FindDTMRotatedAlternating(bankersDtm, x, y, XS, YS, XE, YE, 0, 360, 2, angle, CreateCS(2, 0.80, 0.20))) then
+    if(findDTMRotatedAlternating(bankersDtm, x, y, XS, YS, XE, YE, 0, 360, 2, angle, CreateCS(2, 0.80, 0.20))) then
 *)
-function FindDTMRotatedAlternating(DTM: Integer; var x, y: Integer; XS, YS, XE, YE: Integer; sAngle, eAngle, aStep: Extended; var aFound: Extended; settings: TColorSettings): Boolean; overload;
+function findDTMRotatedAlternating(DTM: Integer; var x, y: Integer; XS, YS, XE, YE: Integer; sAngle, eAngle, aStep: Extended; var aFound: Extended; settings: TColorSettings): Boolean; overload;
 var
   cs: TColorSettings;
 begin
-  cs.Retrieve();
-  settings.Apply();
-  Result := FindDTMRotatedAlternating(DTM, x, y, XS, YS, XE, YE, sAngle, eAngle, aStep, aFound);
-  cs.Apply();
+  cs.retrieve();
+  settings.apply();
+  Result := findDTMRotatedAlternating(DTM, x, y, XS, YS, XE, YE, sAngle, eAngle, aStep, aFound);
+  cs.apply();
 end;
 
 (*
-FindDTMsRotatedSE
+findDTMsRotatedSE
 ~~~~~~~~~~~~~~~~~
 
 .. code-block:: pascal
 
-    function FindDTMsRotatedSE(DTM: Integer; var points: TPointArray; XS, YS, XE, YE: Integer; sAngle, eAngle, aStep: Extended; var aFound: T2DExtendedArray; settings: TColorSettings): Boolean;
+    function findDTMsRotatedSE(DTM: Integer; var points: TPointArray; XS, YS, XE, YE: Integer; sAngle, eAngle, aStep: Extended; var aFound: T2DExtendedArray; settings: TColorSettings): Boolean;
 
 Calls the simba find function with an additional color settings parameter. Sets and restores the CTS settings.
 
@@ -746,25 +746,25 @@ Example:
 
 .. code-block:: pascal
 
-    if(FindDTMsRotatedSE(bankersDtm, points, XS, YS, XE, YE, 0, 360, 2, angles, CreateCS(2, 0.80, 0.20))) then
+    if(findDTMsRotatedSE(bankersDtm, points, XS, YS, XE, YE, 0, 360, 2, angles, CreateCS(2, 0.80, 0.20))) then
 *)
-function FindDTMsRotatedSE(DTM: Integer; var points: TPointArray; XS, YS, XE, YE: Integer; sAngle, eAngle, aStep: Extended; var aFound: T2DExtendedArray; settings: TColorSettings): Boolean; overload;
+function findDTMsRotatedSE(DTM: Integer; var points: TPointArray; XS, YS, XE, YE: Integer; sAngle, eAngle, aStep: Extended; var aFound: T2DExtendedArray; settings: TColorSettings): Boolean; overload;
 var
   cs: TColorSettings;
 begin
-  cs.Retrieve();
-  settings.Apply();
-  Result := FindDTMsRotatedSE(DTM, points, XS, YS, XE, YE, sAngle, eAngle, aStep, aFound);
-  cs.Apply();
+  cs.retrieve();
+  settings.apply();
+  Result := findDTMsRotatedSE(DTM, points, XS, YS, XE, YE, sAngle, eAngle, aStep, aFound);
+  cs.apply();
 end;
 
 (*
-FindDTMsRotatedAlternating
+findDTMsRotatedAlternating
 ~~~~~~~~~~~~~~~~~~~~~~~~~~
 
 .. code-block:: pascal
 
-    function FindDTMsRotatedAlternating(DTM: Integer; var points: TPointArray; XS, YS, XE, YE: Integer; sAngle, eAngle, aStep: Extended; var aFound: T2DExtendedArray; settings: TColorSettings): Boolean;
+    function findDTMsRotatedAlternating(DTM: Integer; var points: TPointArray; XS, YS, XE, YE: Integer; sAngle, eAngle, aStep: Extended; var aFound: T2DExtendedArray; settings: TColorSettings): Boolean;
 
 Calls the simba find function with an additional color settings parameter. Sets and restores the CTS settings.
 
@@ -777,14 +777,14 @@ Example:
 
 .. code-block:: pascal
 
-    if(FindDTMsRotatedAlternating(bankersDtm, points, XS, YS, XE, YE, 0, 360, 2, angles, CreateCS(2, 0.80, 0.20))) then
+    if(findDTMsRotatedAlternating(bankersDtm, points, XS, YS, XE, YE, 0, 360, 2, angles, CreateCS(2, 0.80, 0.20))) then
 *)
-function FindDTMsRotatedAlternating(DTM: Integer; var points: TPointArray; XS, YS, XE, YE: Integer; sAngle, eAngle, aStep: Extended; var aFound: T2DExtendedArray; settings: TColorSettings): Boolean; overload;
+function findDTMsRotatedAlternating(DTM: Integer; var points: TPointArray; XS, YS, XE, YE: Integer; sAngle, eAngle, aStep: Extended; var aFound: T2DExtendedArray; settings: TColorSettings): Boolean; overload;
 var
   cs: TColorSettings;
 begin
-  cs.Retrieve();
-  settings.Apply();
-  Result := FindDTMsRotatedAlternating(DTM, points, XS, YS, XE, YE, sAngle, eAngle, aStep, aFound);
-  cs.Apply();
+  cs.retrieve();
+  settings.apply();
+  Result := findDTMsRotatedAlternating(DTM, points, XS, YS, XE, YE, sAngle, eAngle, aStep, aFound);
+  cs.apply();
 end;
