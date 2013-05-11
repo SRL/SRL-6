@@ -544,7 +544,7 @@ begin
 end;
 
 begin
-  //addOnTerminate(@__closeLogFile());
+  addOnTerminate('__closeLogFile');
   //Lape_OnFunctionEnter := @onFuncEnter;
   //Lape_OnFunctionExit := @onFuncExit;
 end;
