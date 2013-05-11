@@ -241,6 +241,44 @@ begin
   mouseSpeed := ms;
 end;
 
+(*
+TRSMainscreen.setAngle
+~~~~~~~~~~~~~~~~~~~~~~
+
+.. code-block:: pascal
+
+    procedure TRSMainscreen.setAngle(angle: integer);
+
+Sets the mainscreen at highest\lowest angle, dependant on constant passed.
+
+.. note::
+
+    by Raymond, edit by Naum
+    Last Updated: 10 May 2013 by Coh3n
+
+Example:
+
+.. code-block:: pascal
+
+    // make the camera the highest
+    setAngle(ANGLE_HIGH);
+*)
+const
+  ANGLE_HIGH  = 0;
+  ANGLE_LOW   = 1;
+  ANGLE_NONE  = 2;
+
+procedure TRSMainscreen.setAngle(angle: integer);
+begin
+  if (angle = ANGLE_NONE) then
+    exit;
+
+  keyDown((angle * 2) + 38);
+  sleep(1000 + random(300));
+  keyUp((angle * 2) + 38);
+  wait(500 + random(100));
+end;
+
 begin
   mainscreen.__init();
 end;

@@ -1,0 +1,471 @@
+{$include_once ../interfaces.simba}
+{$f-}
+
+const
+  DIRECTION_NORTH = 0;
+  DIRECTION_EAST  = 90;
+  DIRECTION_SOUTH = 180;
+  DIRECTION_WEST  = 270;
+
+const
+  MM_NPC    = 4369;
+  MM_ITEM   = 23;
+  MM_PLAYER = 1907997;
+  MM_FRIEND = 5376;
+  MM_TEAM   = 2171941;
+
+const
+  MM_RADIUS = 75;
+
+type
+  TRSMinimap = record(TRSInterface)
+    __placeholder: byte;
+  end;
+
+var
+  minimap: TRSMinimap;
+
+procedure TRSMinimap.__init();
+begin
+  with self do
+  begin
+    name := 'RS Minimap';
+    ID := ID_INTERFACE_MINIMAP;
+    parentID := -1;
+    static := true;
+    x := 550;
+    y := 58;
+    w := 153;
+    h := 153;
+  end;
+end;
+
+function TRSMinimap.getAngleRadians(): extended;
+var
+  tpa: TPointArray;
+  t: TPoint;
+  b: TBox;
+begin
+  b := intToBox(524, 5, 562, 43);
+  findColorsSpiralTolerance(t.x, t.y, tpa, 65536, b.x1, b.y1, b.x2, b.y2, 0);
+
+  if (length(tpa) < 1) then
+   exit;
+
+  t := middleTPA(tpa);
+
+  result := arcTan2(-(t.y - 24), t.x - 543) + radians(90);
+  result := fixRad(result - pi);
+end;
+
+function TRSMinimap.getAngleDegrees(): extended;
+begin
+  result := degrees(self.getAngleRadians());
+end;
+
+function TRSMinimap.setAngle(angleDegrees: integer): boolean;
+  // Helper function for setCompassAngle to clean up code
+  // Compares Angle and directionDeg to see how far away it is
+  function __setCompassAngle_minCheck(angle, directionDeg: extended): extended;
+  begin
+    result := minE(abs(angle - (directionDeg + 360)), abs((angle + 360) - directionDeg));
+    result := minE(abs(angle - directionDeg), result);
+  end;
+var
+  startAngle, angle, directionDeg, i: extended;
+  left: boolean;
+  mark: Integer;
+begin
+  result := false;
+  startAngle := (self.getAngleDegrees());
+
+  if (startAngle < 0) then
+    exit;
+
+  directionDeg := (angleDegrees * 1.0);
+
+  if (__setCompassAngle_minCheck(startAngle, directionDeg) <= 8.0) then
+    exit(true);
+
+  left := (round((360 - startAngle) + directionDeg) mod 360 <= round((startAngle + 360) - directionDeg) mod 360);
+  keyDown((ord(not left) * 2) + 37);
+  wait(10);
+  mark := getSystemTime()();
+  i := 0.0;
+
+  repeat
+    wait(16);
+    angle := self.getAngleDegrees();
+    if (((getSystemTime()() - mark > 6000)  and (i < 1.0)) or
+        ((getSystemTime()() - mark > 10000) and (i < 2.0)) or
+        ((getSystemTime()() - mark > 14000) and (i < 3.0))) then
+    begin
+      i := i + 1.0;
+    end;
+  until ((angle < 0) or
+         (getSystemTime() - mark > 14000) or
+         (__setCompassAngle_minCheck(angle, directionDeg) <= (7.0 + i)));
+
+  if (left) then
+    keyUp(VK_LEFT)
+  else
+    keyUp(VK_RIGHT);
+
+  wait(10);
+
+  result := (__setCompassAngle_minCheck(angle, directionDeg) <= (7.0 + i));
+end;
+
+procedure TRSMinimap.clickCompass();
+var
+  p: TPoint;
+begin
+  if (random(4) = 1) then
+  begin
+    p := point(542, 24);
+    mouse(p.Rand(15), mouse_Right);
+    chooseOption(['ace', 'orth'], MOUSE_LEFT, 1200);
+  end else
+    mouse(p.Rand(15), mouse_Left);
+end;
+
+function TRSMinimap.getDots(dotType: integer; searchBox: TBox): TPointArray;
+var
+  i, dif, radius, hi, c: integer;
+  tpa: TPointArray;
+begin
+  // confirm valid dot type
+  if (not inIntArray([MM_NPC, MM_ITEM, MM_PLAYER, MM_FRIEND, MM_TEAM], dotType)) then
+  begin
+    print('TRSMinimap.getDots: Invalid dot type '+toStr(dotType), TDebug.ERROR);
+    exit;
+  end;
+
+  freeze();
+  radius := min((searchBox.x2 - searchBox.x1) div 2, (searchBox.y2 - searchBox.y1) div 2);
+
+  findColors(tpa, dotType, searchBox);
+  if (length(tpa) > 0) then
+    filterPointsPie(tpa, 0, 360, 0, radius, self.getCenterPoint().x, self.getCenterPoint().y);
+
+  hi := high(tpa);
+  setLength(result, hi + 1);
+
+  if (hi < 0) then
+  begin
+    unfreeze();
+    exit;
+  end;
+
+  c := 0;
+
+  for i := 0 to hi do
+  if (getColor(tpa[i].x - 1, tpa[i].y - 1) - getColor(tpa[i].x, tpa[i].y - 1) = dif) then
+  begin
+    result[c] := point(tpa[i].x, tpa[i].y - 2);
+    inc(c);
+  end;
+
+  unFreeze();
+  setLength(result, c);
+end;
+
+function TRSMinimap.getDotsMainscreen(dotType: integer): TPointArray;
+var
+  i, l, c: integer;
+  dots: TPointArray;
+  b: TBox;
+  cen: TPoint;
+begin
+  cen := self.getCenterPoint();
+  b := intToBox(32, 23, 24, 17);
+  dots := self.getDots(dotType, intToBox(cen.x - round(b.x1 * 1.3), cen.y - round(b.y1 * 1.3),
+                                         cen.x + round(b.x2 * 1.3), cen.y + round(b.y2 * 1.3)));
+  l := length(dots);
+
+  if (l > 0) then
+  begin
+    setLength(result, l);
+
+    for i := 0 to (l - 1) do
+      if (inAbstractBox(cen.x - b.x1, cen.y - b.y1, cen.x + b.x1, cen.y - b.y1, cen.x + b.x2, cen.y + b.y2, cen.x - b.x2, cen.y + b.y2, dots[i].x, dots[i].y)) then
+      begin
+        result[c] := dots[i];
+        inc(c);
+      end;
+
+    setLength(result, c);
+    sortTPAFrom(result, cen);
+  end;
+end;
+
+function TRSMinimap.getColorPercent(color, tol, startRadial, endRadial, startRadius, endRadius: integer): integer;
+var
+  TPA: TPointArray;
+begin
+  findColorsTolerance(TPA, color, self.getBounds(), tol);
+  filterPointsPie(TPA, startRadial, endRadial, startRadius, endRadius, self.getCenterPoint().x, self.getCenterPoint().y);
+  result := ceil((length(TPA) * 100) / ((Pi * (endRadius * endRadius)) * ((endRadial - startRadial) / 360.0)-((Pi * (startRadius * startRadius)) * ((endRadial - startRadial) / 360.0))));
+end;
+
+function TRSMinimap.isPointOn(p: TPoint): boolean;
+begin
+  result := (MM_RADIUS >= distance(p.x, p.y, self.getCenterPoint().x, self.getCenterPoint().y));
+end;
+
+function TRSMinimap.isPlayerMoving(): boolean;
+var
+  c: TPoint;
+  shiftBox: TBox;
+begin
+  c := self.getCenterPoint();
+  shiftBox := intToBox(c.x - 30, c.y - 30, c.x + 30, c.y + 30);
+  //result := (pixelShift(shiftBox, 500) > 200);
+end;
+
+function TRSMinimap._findFlagBitmap(var p: TPoint): boolean;
+var
+  bmpFlag: integer;
+begin
+  result := false;
+
+  bmpFlag := bitmapFromString(8, 15, 'meJxjYEAHIpr/F8yYgSkozPfE3ty' +
+            'cGHGgIKY4RBBNHC6ILI4sAkYngOIwNhQJ8bUBBYEIyEBGQO37tm3D' +
+            'dCcdxIGBhlUcCBgZGAA27Tt3');
+
+  if (findBitmapToleranceIn(bmpFlag, p.x, p.y, self.getBounds(), MM_RADIUS)) then
+  begin
+    result := true;
+    p.x := (p.x + 7);
+    p.y := (p.y + 14);
+  end;
+
+  freeBitmap(bmpFlag);
+end;
+
+function TRSMinimap._findFlagColor(var p: TPoint): boolean;
+var
+  kmTarget, iTarget, i, map, wid, hei, t: integer;
+  tpa: TPointArray;
+begin
+  result := false;
+  map := bitmapFromString(self.w, self.h, '');
+  copyClientToBitmap(map, self.x, self.y, (self.x + self.w), (self.y + self.h));
+
+  kmTarget := getKeyMouseTarget();
+  iTarget := getImageTarget();
+
+  setTargetBitmap(map);
+  getBitmapSize(map, wid, hei);
+
+  findColors(tpa, 65536, 0, 0, wid - 1, hei -1);
+  filterPointsDist(tpa, 0, MM_RADIUS, wid div 2, hei div 2);
+
+  for i := 0 to high(tpa) do
+    if ((fastGetPixel(map, tpa[i].x - 1, tpa[i].y - 1) - fastGetPixel(map, tpa[i].x, tpa[i].y - 1)) = 6381921) then
+    begin
+      result := true;
+      p.x := tpa[I].x + self.x;
+      p.y := tpa[I].y + self.y;
+      break;
+    end;
+
+  t := getImageTarget();
+
+  setKeyMouseTarget(kmTarget);
+  setImageTarget(iTarget);
+
+  freeTarget(t);
+  freeBitmap(map);
+end;
+
+function TRSMinimap.isFlagPresent(var p: TPoint): boolean;
+begin
+  result := (self._findFlagBitmap(p) or self._findFlagColor(p));
+end;
+
+function TRSMinimap.isFlagPresent(): boolean; overload;
+var
+  p: TPoint;
+begin
+  result := (self.isFlagPresent(p));
+end;
+
+function TRSMinimap.getFlagDistance(): integer;
+var
+  p: TPoint;
+begin
+  result := -1;
+
+  if (self.isFlagPresent(p)) then
+    result := distance(self.getCenterPoint().x, self.getCenterPoint().y, p.x, p.y);
+end;
+
+function TRSMinimap.waitFlag(dist: integer = 0): boolean;
+var
+  m, d1, d2: integer;
+  p: TPoint;
+begin
+  result := false;
+  m := getSystemTime();
+
+  repeat
+    if (not self.isFlagPresent(p)) then
+      exit(true);
+
+    d1 := distance(p.x, p.y, self.getCenterPoint().x, self.getCenterPoint().y);
+
+    if (d1 <= dist) then
+      exit(true);
+
+    if (d1 > (dist + 12)) then
+      wait(450 + random(70))
+    else
+      wait(50 + random(50));
+
+    if (getColor(6, 6) <> 13092807) then // border of the loading message
+      if (getSystemTime() - m > 5000) then
+      begin
+        if (d1 = d2) then
+          exit;
+
+        d2 := d1;
+        m := getSystemTime();
+      end;
+
+    if (SRL_Events[EVENT_ANTIBAN] <> nil) then
+      SRL_Events[EVENT_ANTIBAN]();
+
+  until(false);
+end;
+
+function TRSMinimap.mouseFlag(pt: TPoint; xMod, yMod, flagDist: integer; checkForFlag: boolean): boolean;
+var
+  i, t: integer;
+  p: TPoint;
+begin
+  result := false;
+
+  if (self.isFlagPresent()) then
+    if (checkForflag) or (self.getFlagDistance() <= flagDist) then
+      exit;
+
+  p := point(pt.x - xMod, pt.y - yMod);
+  xMod := max(xMod, 3);
+  yMod := max(yMod, 3);
+
+  for i := 0 to 4 do
+  begin
+    incEx(p.x, random(3));
+    incEx(p.y, random(3));
+
+    if (not self.isPointOn(p)) then
+      continue;
+
+    mouse(p, MOUSE_LEFT);
+
+    t := (getSystemTime() + 3000);
+    while (getSystemTime() < t) do
+    begin
+      if (self.isFlagPresent()) then
+      begin
+        result := true;
+        break;
+      end;
+
+      wait(50);
+    end;
+  end;
+
+  if (flagDist > -1) then
+    self.waitFlag(flagDist);
+end;
+
+function TRSMinimap.radialWalk(var tpa: TPointArray; cx, cy, theColor, tol, radius, startRadial, endRadial: integer; xMod, yMod: integer = 0): boolean;
+var
+  sd, ed, direction: integer;
+  linear: boolean;
+  i: integer;
+begin
+  result := false;
+
+  sd := startRadial;
+  ed := endRadial;
+
+  if (sd = ed) then
+  begin
+    linear := true;
+    direction := sd;
+
+    if (direction < 50) then
+      sd := ((direction + 360) - 50)
+    else
+      sd := (direction - 50);
+
+    ed := (direction + 50);
+    sd := trunc(FixD(sd + 0.0));
+    ed := trunc(FixD(ed + 0.0));
+  end else
+    if (sd > ed) then
+      swap(sd, ed);
+
+  findColorsTolerance(tpa, theColor, self.getBounds(), tol);
+  filterPointsPie(tpa, sd, ed, 10, radius, cx, cy);
+
+  if (linear) then
+    linearSort(tpa, cx, cy, direction, false)
+  else
+    sortCircleWise(tpa, cx, cy, startRadial, false, startRadial > endRadial);
+
+  result := (length(tpa) > 0);
+
+  if (result) then
+    for i := 0 to high(tpa) do
+      if (self.mouseFlag(tpa[i], xMod, yMod, -1, false)) then
+      begin
+        self.waitFlag(10);
+        exit(true);
+      end;
+end;
+
+function TRSMinimap.tpaWalk(color, tol, offsetX, offsetY: integer = 0; sortFrom: TPoint): boolean;
+var
+  i, t: integer;
+  tpa: TPointArray;
+  p: TPoint;
+begin
+  result := false;
+
+  if (findColorsTolerance(tpa, color, self.getBounds(), tol)) then
+  begin
+    sortTPAFrom(tpa, sortFrom);
+
+    for i := 0 to high(tpa) do
+    begin
+      p := tpa[i];
+      incEx(p.x, offsetX);
+      incEx(p.y, offsetY);
+
+      if (not self.isPointOn(p)) then
+        continue;
+
+      mouse(p.Rand(3), MOUSE_LEFT);
+
+      t := (getSystemTime() + 3000);
+      while (getSystemTime() < t) do
+      begin
+        if (self.waitFlag()) then
+        begin
+          result := true;
+          break;
+        end;
+
+        wait(50);
+      end;
+    end;
+  end;
+end;
+
+begin
+  minimap.__init();
+end;
