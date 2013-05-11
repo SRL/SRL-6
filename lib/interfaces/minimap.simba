@@ -213,14 +213,14 @@ begin
   result := (MM_RADIUS >= distance(p.x, p.y, self.getCenterPoint().x, self.getCenterPoint().y));
 end;
 
-function TRSMinimap.isPlayerMoving(): boolean;
+function TRSMinimap.isPlayerMoving(shiftInterval: integer = 500): boolean;
 var
   c: TPoint;
   shiftBox: TBox;
 begin
   c := self.getCenterPoint();
   shiftBox := intToBox(c.x - 30, c.y - 30, c.x + 30, c.y + 30);
-  //result := (pixelShift(shiftBox, 500) > 200);
+  //result := (pixelShift(shiftBox, shiftInterval) > 200);
 end;
 
 function TRSMinimap._findFlagBitmap(var p: TPoint): boolean;
