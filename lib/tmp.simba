@@ -94,47 +94,6 @@ begin
 end;
 
 (*
-TMufasaBitmap.createFromClient
-~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
-
-.. code-block:: pascal
-
-    procedure TMufasaBitmap.createFromClient(const xs, ys, xe, ye: integer) overload;
-
-Creates a TMufasaBitmap from the CURRENT client.
-
-- make around for TClient not being supported in lape currently.
-
-.. note::
-
-    by Ollybest
-
-Example:
-
-.. code-block:: pascal
-
-     tmb.createFromClient(100, 100, 500, 500);
-
-*)
-procedure TMufasaBitmap.createFromClient(const xs, ys, xe, ye: integer) overload;
-var
-  tmp: integer;
-  tpa: TPointArray;
-  tia: TIntegerArray;
-begin
-  tmp := BitmapFromClient(xs, ys, xe, ye);
-
-  tpa := TPAFromBox(intToBox(xs, ys, xe-1, ye-1));
-  tia := FastGetPixels(tmp, tpa);
-
-  self.init;
-  self.setSize(xe, ye);
-  self.setPixels(tpa, tia);
-
-  freeBitmap(tmp);
-end;
-
-(*
 TMufasaBitmap.Rectangle: overload;
 ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
 
@@ -155,16 +114,21 @@ Example:
      tmb.rectangle(box, false, clRed);
 
 *)
-procedure TMufasaBitmap.Rectangle(const box: TBox; fill: boolean; color: TColor); overload;
+procedure TMufasaBitmap.rectangle(const box: TBox; const fill: boolean; const color: TColor); overload;
 var
   tpa: TPointArray;
 begin
   if (fill) then
-    self.Rectangle(box, color)
+    self.rectangle(box, color)
   else
   begin
-    tpa := EdgeFromBox(box);
-    self.DrawTPA(tpa, color)
+    try
+      tpa := EdgeFromBox(box);
+    except
+      tpa := [point(box.x1, box.y1)];
+    finally
+      self.drawTPA(tpa, color)
+    end;
   end;
 end;
 
@@ -318,68 +282,6 @@ function intToPoint(x, y: integer): TPoint;
 begin
   result := point(x, y);
 end;
-
-(*
-createTPAFromLine
-~~~~~~~~~~~~~~~~~
-
-.. code-block:: pascal
-
-    function createTPAFromLine(const x1, y1, x2, y2: integer): TPointArray;
-
-Creates a TPointArray from a line between x1, y1 and x2, and y2.
-
-.. note::
-
-    by masterBB
-
-Example:
-
-.. code-block:: pascal
-
-     tpa := createTPAFromLine(100, 100, 200, 200);
-
-*)
-function createTPAFromLine(const x1, y1, x2, y2: integer): TPointArray;
-var
-  inc, shortLength, longLength, i: integer;
-  isYLonger: boolean;
-  multiDiff: extended;
-begin
-  shortLength := y2 - y1;
-  longLength := x2 - x1;
-
-  isYLonger := false;
-
-  if ((shortLength xor (shortLength shr 31)) - (shortLength shr 31) > (longLength xor (longLength shr 31)) - (longLength shr 31)) then
-  begin
-    shortLength := shortLength xor longLength;
-    longLength := longLength xor shortLength;
-    shortLength := shortLength xor longLength;
-
-    isYLonger := true;
-  end;
-
-  if (longLength < 0) then
-    inc := -1
-  else
-    inc := 1;
-
-  if (longLength = 0) then
-    multiDiff := shortLength
-  else
-    multiDiff := shortLength / longLength;
-
-  setLength(result, longLength + 1);
-
-  if (isYLonger) then
-  begin
-    for i := 0 to longLength do
-      result[i] := point(floor(x1 + i*multiDiff), (y1+i));
-  end else
-    for i := 0 to longLength do
-      result[i] := point((x1 + i), floor(y1+i*multiDiff))
-end; 
 
 procedure SortATPAFromFirstPointY(var a: T2DPointArray; const From: TPoint);
 var
