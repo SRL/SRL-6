@@ -54,6 +54,3 @@ begin
   result := true;
 end;
 
-begin
-  setupSRL();
-end;

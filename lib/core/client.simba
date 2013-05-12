@@ -79,18 +79,15 @@ begin
   t := getSystemTime();
   i := 1;
 
-  // function uses writeln() instead of print() so a log file isn't created
-  // the user may have disableSRLLog set to true AFTER setupSRL is called
-
-  writeln('HINT: If RS is loaded and nothing is happening, make sure the RS client is set'+
-          ' to "Fixed Size" and check there are no pop-ups open.');
+  print('If RS is loaded and nothing is happening, make sure the RS client is set'+
+        ' to "Fixed Size" and check there are no pop-ups open', TDebug.HINT); 
 
  {$IFNDEF SMART}
-   writeln('You are not using SMART, be sure to use Simba''s crosshairs'+
-           ' to select the RS client.');
+   print('You are not using SMART, be sure to use Simba''s crosshairs'+
+        ' to select the RS client.', TDebug.HINT);
  {$ENDIF}
 
-  writeln('Waiting up to 5 minutes for RS to load...');
+  print('Waiting up to 5 minutes for RS to load...');
 
   while ((getSystemTime() - t) < (5 * 60000)) do // 5 minutes
   begin
@@ -99,7 +96,7 @@ begin
 
     if ((getSystemTime() - t) > (i * 60000)) then // each minute
     begin
-      writeln(intToStr(i) + ' minute(s) have passed, client is not ready yet.');
+      print(intToStr(i) + ' minute(s) have passed, client is not ready yet');
       inc(i);
     end;
 
