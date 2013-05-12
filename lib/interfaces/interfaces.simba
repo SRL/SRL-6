@@ -110,8 +110,7 @@ Example:
 *)
 function TRSInterface.getCenterPoint(): TPoint;
 begin
-  result.x := (self.x + (self.w div 2));
-  result.y := (self.y + (self.h div 2));
+  result := self.getBounds().getMidPoint();
 end;
 
 (*

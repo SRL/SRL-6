@@ -46,7 +46,7 @@ var
   t: TPoint;
   b: TBox;
 begin
-  b := intToBox(524, 5, 562, 43);
+  b := intToBox(524, 5, 562, 43); // coordinates of the compass
   findColorsSpiralTolerance(t.x, t.y, tpa, 65536, b.x1, b.y1, b.x2, b.y2, 0);
 
   if (length(tpa) < 1) then
@@ -64,8 +64,8 @@ begin
 end;
 
 function TRSMinimap.setAngle(angleDegrees: integer): boolean;
-  // Helper function for setCompassAngle to clean up code
-  // Compares Angle and directionDeg to see how far away it is
+  // helper function for setCompassAngle to clean up code
+  // compares angle and directionDeg to see how far away it is
   function __setCompassAngle_minCheck(angle, directionDeg: extended): extended;
   begin
     result := minE(abs(angle - (directionDeg + 360)), abs((angle + 360) - directionDeg));
@@ -451,6 +451,7 @@ begin
 
       mouse(p.Rand(3), MOUSE_LEFT);
 
+      // wait for the flag to disappear
       t := (getSystemTime() + 3000);
       while (getSystemTime() < t) do
       begin
