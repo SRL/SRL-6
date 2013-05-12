@@ -46,15 +46,15 @@ var
   t: TPoint;
   b: TBox;
 begin
-  b := intToBox(524, 5, 562, 43); // coordinates of the compass
-  findColorsSpiralTolerance(t.x, t.y, tpa, 65536, b.x1, b.y1, b.x2, b.y2, 0);
+  b := intToBox(524, 55, 562, 93); // coordinates of the compass
+  findColorsSpiralTolerance(t.x, t.y, tpa, 65536, b.x1, b.y1, b.x2, b.y2, 0); // the black of the N on the compass
 
   if (length(tpa) < 1) then
-   exit;
+    exit;
 
   t := middleTPA(tpa);
 
-  result := arcTan2(-(t.y - 24), t.x - 543) + radians(90);
+  result := arcTan2(-(t.y - 74), t.x - 543) + radians(90);
   result := fixRad(result - pi);
 end;
 
@@ -120,13 +120,17 @@ procedure TRSMinimap.clickCompass();
 var
   p: TPoint;
 begin
+  p := point(542, 74);
+
   if (random(4) = 1) then
   begin
-    p := point(542, 24);
-    mouse(p.Rand(15), mouse_Right);
+    mouse(p.Rand(15), MOUSE_RIGHT);
     chooseOption(['ace', 'orth'], MOUSE_LEFT, 1200);
   end else
-    mouse(p.Rand(15), mouse_Left);
+    mouse(p.Rand(15), MOUSE_LEFT);
+
+  print('Clicked compass');
+  print('Call mainscreen.setAngle(ANGLE_HIGH) to convert to overhead view', TDebug.HINT);
 end;
 
 function TRSMinimap.getDots(dotType: integer; searchBox: TBox): TPointArray;
@@ -205,7 +209,7 @@ var
 begin
   findColorsTolerance(TPA, color, self.getBounds(), tol);
   filterPointsPie(TPA, startRadial, endRadial, startRadius, endRadius, self.getMidPoint().x, self.getMidPoint().y);
-  result := ceil((length(TPA) * 100) / ((Pi * (endRadius * endRadius)) * ((endRadial - startRadial) / 360.0)-((Pi * (startRadius * startRadius)) * ((endRadial - startRadial) / 360.0))));
+  result := ceil((length(TPA) * 100) / ((Pi * (endRadius * endRadius)) * ((endRadial - startRadial) / 360.0) - ((Pi * (startRadius * startRadius)) * ((endRadial - startRadial) / 360.0))));
 end;
 
 function TRSMinimap.isPointOn(p: TPoint): boolean;
@@ -236,7 +240,7 @@ begin
   if (findBitmapToleranceIn(bmpFlag, p.x, p.y, self.getBounds(), MM_RADIUS)) then
   begin
     result := true;
-    p.x := (p.x + 7);
+    p.x := (p.x + 7);  // offset the point to the bottom of the flag
     p.y := (p.y + 14);
   end;
 
