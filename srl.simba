@@ -25,6 +25,7 @@ SRL library isn't available to you.
 {$include_once lib/interfaces/lobby.simba}
 {$include_once lib/interfaces/mainscreen.simba}
 {$include_once lib/interfaces/actionbar.simba}
+{$include_once lib/interfaces/minimap.simba}
 
 {$IFDEF SMART}
   {$include_once lib/misc/smart.simba}

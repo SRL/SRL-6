@@ -88,12 +88,12 @@ begin
 end;
 
 (*
-TRSInterface.getCenterPoint
-~~~~~~~~~~~~~~~~~~~~~~~~~~~
+TRSInterface.getMidPoint
+~~~~~~~~~~~~~~~~~~~~~~~~
 
 .. code-block:: pascal
 
-    function TRSInterface.getCenterPoint(): TPoint;
+    function TRSInterface.getMidPoint(): TPoint;
 
 Returns the center point of the TRSInterface.
 
@@ -106,9 +106,9 @@ Example:
 
 .. code-block:: pascal
 
-    mP := tabInventory.getCenterPoint();
+    mP := tabInventory.getMidPoint();
 *)
-function TRSInterface.getCenterPoint(): TPoint;
+function TRSInterface.getMidPoint(): TPoint;
 begin
   result := self.getBounds().getMidPoint();
 end;
