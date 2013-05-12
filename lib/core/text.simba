@@ -301,7 +301,7 @@ begin
   print('Options found: ');
 
   for i := 0 to high(options) do
-    print(options[i].str);
+    print('-> '+options[i].str);
 end;
 
 {*
