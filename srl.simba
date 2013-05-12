@@ -38,16 +38,16 @@ var
   t := getTickCount();
 begin
   clearDebug();
-  writeln('Set up SRL in ', (getTickCount() - t), 'ms.');
+  print('Set up SRL in ' + toStr(getTickCount() - t) + 'ms.');
 
   {$IFNDEF SMART}
   activateClient();
   {$ENDIF}
 
   if (waitClientReady()) then
-    writeln('Client is ready.')
+    print('Client is ready.')
   else begin
-    writeln('Client is taking too long to load, terminating...');
+    print('Client is taking too long to load, terminating...');
     halt();
   end;
 
