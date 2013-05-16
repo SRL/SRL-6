@@ -10,6 +10,7 @@ SRL library isn't available to you.
 
 {$include_once lib/utilities/types/types.simba}
 {$include_once lib/utilities/time.simba}
+{$include_once lib/utilities/drawing.simba}
 
 {$include_once lib/core/globals.simba}
 {$include_once lib/core/mouse.simba}
@@ -32,25 +33,22 @@ SRL library isn't available to you.
 
 {$f+}
 
-
-
-
 function setupSRL(): boolean;
 var
-  t := getTickCount();
+  t := getSystemTime();
 begin
-  clearDebug();
-  writeln('Set up SRL in ', (getTickCount() - t), 'ms.');
+  writeln('Set up SRL in ', (getSystemTime() - t), 'ms.');
 
   {$IFNDEF SMART}
-  activateClient();
+    clearDebug();
+    activateClient();
   {$ENDIF}
 
   if (waitClientReady()) then
     writeln('Client is ready.')
   else begin
     writeln('Client is taking too long to load, terminating...');
-    halt();
+    terminateScript();
   end;
 
   result := true;

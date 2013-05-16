@@ -1,0 +1,567 @@
+(*
+tbox
+====
+
+This file holds all types related to TBox.
+
+*)
+
+{$include_once ../../tmp.simba}
+{$include_once ../../core/mouse.simba}
+
+{$f-}
+
+(*
+TBox.isPointInside
+~~~~~~~~~~~~~~~~~~
+
+.. code-block:: pascal
+
+    function TBox.isPointInside(const point: TPoint): boolean;
+
+Returns true if the point is in the TBox.
+
+.. note::
+
+    by Ollybest
+
+Example:
+
+.. code-block:: pascal
+
+    result := box.isPointInside(point(250, 100));
+
+*)
+function TBox.isPointInside(const point: TPoint): boolean;
+begin
+  result := pointInBox(point, self);
+end;
+
+(*
+TBox.getDimensions
+~~~~~~~~~~~~~~~~~~
+
+.. code-block:: pascal
+
+    procedure TBox.getDimensions(var w, h: integer);
+
+Returns the width and the height of the box in vars. W and H.
+
+.. note::
+
+    by Ollybest
+
+Example:
+
+.. code-block:: pascal
+
+    var
+      w, h: integer;
+    begin
+      box.getDimensions(w, h);
+
+*)
+procedure TBox.getDimensions(var w, h: integer);
+begin
+  w := self.x2 - self.x1;
+  h := self.y2 - self.y1;
+end;
+
+(*
+TBox.getMidPoint
+~~~~~~~~~~~~~~~~
+
+.. code-block:: pascal
+
+    function TBox.getMidPoint(): tPoint;
+
+returns tPoint of the TBox's middle.
+
+.. note::
+
+    by Dgby714
+
+Example:
+
+.. code-block:: pascal
+
+    pt := b.getMidPoint();
+
+*)
+function TBox.getMidPoint(): TPoint;
+begin
+  result := Point((self.x2 + self.x1) div 2, (self.y2 + self.y1) div 2);
+end;
+
+(*
+TBox.getColors
+~~~~~~~~~~~~~~
+
+.. code-block:: pascal
+
+    function TBox.getColors(clearSame: boolean = true): TIntegerArray;
+
+Returns an array of the colors found inside the TBox. Will clear the same
+colors if clearSame is set to true.
+
+.. note::
+
+    by Coh3n
+
+Example:
+
+.. code-block:: pascal
+
+    cols := b.getColors();
+
+*)
+function TBox.getColors(clearSame: boolean = true): TIntegerArray;
+begin
+  getColorsWrap(TPAFromBox(intToBox(self.x1, self.y1, self.x2, self.y2)), result);
+
+  if (clearSame) then
+    clearSameIntegers(result);
+end;
+
+(*
+TBox.colorExists
+~~~~~~~~~~~~~~~~
+
+.. code-block:: pascal
+
+    function TBox.colorExists(color: integer; tolerance: integer = 0): Boolean;
+
+Returns true if the color is found within the TBox. Also includes a optional
+tolerance parameter.
+
+.. note::
+
+    by Ollybest
+
+Example:
+
+.. code-block:: pascal
+
+    result := b.colorExists(OUTLINE_BLACK);
+
+*)
+function TBox.colorExists(color: integer; tolerance: integer = 0): Boolean;
+var
+  p: TPoint;
+begin
+  result := findColorTolerance(p.x, p.y, color, self.x1, self.y1, self.x2, self.y2, tolerance);
+end;
+
+(*
+TBox.dtmExists
+~~~~~~~~~~~~~~
+
+.. code-block:: pascal
+
+    function TBox.dtmExists(const dtm: integer): boolean;
+
+Returns true if the dtm is found within the TBox.
+
+.. note::
+
+    by Ollybest
+
+Example:
+
+.. code-block:: pascal
+
+    result := b.dtmExists(thedtm);
+
+*)
+function TBox.dtmExists(const dtm: integer): boolean;
+var
+  p: TPoint;
+begin
+  result := findDTM(dtm, p.x, p.y, self.x1, self.y1, self.x2, self.y2);
+end;
+
+(*
+TBox.bitmapExists
+~~~~~~~~~~~~~~~~~
+
+.. code-block:: pascal
+
+    function TBox.bitmapExists(const bitmap, tolerance: integer): boolean;
+
+Returns true if the bitmap is found within the TBox.
+
+.. note::
+
+    by Ollybest
+
+Example:
+
+.. code-block:: pascal
+
+    result := b.bitmapExists(aBitmap, 25);
+
+*)
+function TBox.bitmapExists(const bitmap, tolerance: integer): boolean;
+var
+  p: TPoint;
+begin
+  result := findBitmapToleranceIn(bitmap, p.x, p.y, self.x1, self.y1, self.x2, self.y2, tolerance);
+end;
+
+(*
+TBox.createTPA
+~~~~~~~~~~~~~~
+
+.. code-block:: pascal
+
+    function TBox.createTPA: TPointArray;
+
+Creates and returns a TPointArray of the TBox.
+
+.. note::
+
+    by Ollybest
+
+Example:
+
+.. code-block:: pascal
+
+    TPA := box.createTPA;
+
+*)
+function TBox.createTPA: TPointArray;
+begin
+  result := tpaFromBox(self);
+end;
+
+(*
+TBox.createTPAEdge
+~~~~~~~~~~~~~~~~~~
+
+.. code-block:: pascal
+
+    function TBox.createTPAEdge: TPointArray;
+
+Creates and returns a TPointArray of the edge of the TBox.
+
+.. note::
+
+    by Ollybest
+
+Example:
+
+.. code-block:: pascal
+
+    tpa := myBox.createTPAEdge;
+
+*)
+function TBox.createTPAEdge: TPointArray;
+begin
+  result := edgeFromBox(self);
+end;
+
+(*
+TBox.mouse
+~~~~~~~~~~
+
+.. code-block:: pascal
+
+    procedure TBox.mouse(const mouseAction: integer = MOUSE_MOVE);
+
+Peforms the desired mouse action on the box (uses mouseBox).
+
+.. note::
+
+    by Ollybest
+
+Example:
+
+.. code-block:: pascal
+
+    box.mouse();
+
+*)
+procedure TBox.mouse(const mouseAction: integer = MOUSE_MOVE);
+begin
+  mouseBox(self, mouseAction);
+end;
+
+(*
+TBox.isVaild
+~~~~~~~~~~~~
+
+.. code-block:: pascal
+
+    function TBox.isVaild(invaildBox: Tbox = intToBox(-1, -1, -1, -1)): boolean;
+
+Returns true if the TBox is vaild or not, an invaild box is considered by default
+(-1, -1, -1, -1), but can be changed (invaildBox).
+
+.. note::
+
+    by Ollybest
+
+Example:
+
+.. code-block:: pascal
+
+    if b.isVaild() then
+      writeln('box is vaild.);
+
+*)
+function TBox.isVaild(invaildBox: Tbox = intToBox(-1, -1, -1, -1)): boolean;
+begin
+  result := (self.x1 <> invaildBox.x1) and (self.x2 <> invaildBox.x2) and
+            (self.y1 <> invaildBox.y1) and (self.y2 <> invaildBox.y2);
+end;
+
+(*
+TBox.setBounds
+~~~~~~~~~~~~~~
+
+.. code-block:: pascal
+
+    procedure TBox.setBounds(const xs, ys, xe, ye: integer);
+
+Sets the bounds of the TBox.
+
+.. note::
+
+    by Ollybest
+
+Example:
+
+.. code-block:: pascal
+
+    b.setBounds(50, 50, 250, 250);
+
+*)
+procedure TBox.setBounds(const xs, ys, xe, ye: integer);
+begin
+  self := intToBox(xs, ys, xe, ye);
+end;
+
+(*
+TBox.setLimit
+~~~~~~~~~~~~~~
+
+.. code-block:: pascal
+
+    procedure TBox.setLimit(b: TBox);
+
+Limits the TBox to another TBox (b).
+
+.. note::
+
+    by Ollybest
+
+Example:
+
+.. code-block:: pascal
+
+    b.limit(intToBox(50, 50, 100, 100));
+
+*)
+procedure TBox.setLimit(b: TBox);
+begin
+  if (self.x1 < b.x1) then self.x1 := b.x1;
+  if (self.x2 > b.x2) then self.x2 := b.x2;
+  if (self.y1 < b.y1) then self.y1 := b.y1;
+  if (self.y2 > b.y2) then self.y2 := b.y2;
+end;
+
+(*
+TBox.copy()
+~~~~~~~~~~~
+
+.. code-block:: pascal
+
+    function TBox.copy(): TBox;
+
+Results a copy of the TBox.
+
+.. note::
+
+    by Ollybest
+
+Example:
+
+.. code-block:: pascal
+
+    b := myBox.copy();
+
+*)
+function TBox.copy(): TBox;
+begin
+  result := intToBox(self.x1, self.y1, self.x2, self.y2);
+end;
+
+(*
+TBox.shift
+~~~~~~~~~~
+
+.. code-block:: pascal
+
+    procedure TBox.shift(const x, y: integer);
+
+Shifts the TBox by x and y values.
+
+.. note::
+
+    by Ollybest
+
+Example:
+
+.. code-block:: pascal
+
+    myBox.shift(10, 10);
+
+*)
+procedure TBox.shift(const x, y: integer);
+begin
+  self.X1 := self.X1 + x;
+  self.X2 := self.X2 + x;
+  self.Y1 := self.Y1 + y;
+  self.Y2 := self.Y2 + y;
+end;
+
+(*
+TBox.edit
+~~~~~~~~~
+
+.. code-block:: pascal
+
+    procedure TBox.edit(const x1_, y1_, x2_, y2_: integer);
+
+Edits the TBox values.
+
+.. note::
+
+    by Ollybest
+
+Example:
+
+.. code-block:: pascal
+
+    myBox.edit(-10, -10, + 10, + 10);
+
+*)
+procedure TBox.edit(const x1_, y1_, x2_, y2_: integer);
+begin
+  self.x1 := self.x1 + x1_;
+  self.y1 := self.y1 + y1_;
+  self.x2 := self.x2 + x2_;
+  self.y2 := self.y2 + y2_;
+end;
+
+(*
+TBox.toArray
+~~~~~~~~~~~~
+
+.. code-block:: pascal
+
+    function TBox.toArray(const width, height: integer): TBoxArray;
+
+Results the TBox split into an array of boxes with the width and height.
+
+.. note::
+
+    by Home
+
+Example:
+
+.. code-block:: pascal
+
+    tba := myBox.toArray(25, 25);
+
+*)
+function TBox.toArray(const width, height: integer): TBoxArray;
+var
+  AreaW, AreaH: Integer;
+  BoxX, BoxY: Integer;
+  x, y, i: Integer;
+begin
+  // Calculate the area dimensions
+  AreaW := self.X2 - self.X1 + 1;
+  AreaH := self.Y2 - self.Y1 + 1;
+
+  // Calculate the number of boxes in each dimension
+  BoxX := AreaW div Width;
+  if AreaW mod Width <> 0 then Inc(BoxX);
+  BoxY := AreaH div Height;
+  if AreaH mod Height <> 0 then Inc(BoxY);
+
+  // Set the number of boxes
+  SetLength(Result, BoxX * BoxY);
+
+  // Calculate the boxes
+  i := 0;
+  for y := 0 to (BoxY - 1) do
+    for x := 0 to (BoxX - 1) do
+    begin
+      Result[i] := IntToBox(self.X1 + x * Width,
+      self.Y1 + y * Height,
+      Min(self.X2, self.X1 + (x + 1) * Width - 1),
+      Min(self.Y2, self.Y1 + (y + 1) * Height - 1));
+      Inc(i);
+    end;
+end;
+
+(*
+TBox.getGaussPoint
+~~~~~~~~~~~~~~~~~~
+
+.. code-block:: pascal
+
+    function TBox.getGaussPoint: TPoint;
+
+Returns a gauss point in the TBox. See gaussBox (tmp.simba) for more.
+
+.. note::
+
+    by Ollybest
+
+Example:
+
+.. code-block:: pascal
+
+    p := myBox.getGaussPoint();
+
+*)
+function TBox.getGaussPoint: TPoint;
+begin
+  gaussBox(result, self);
+end;
+
+(*
+TBox.getRandomPoint
+~~~~~~~~~~~~~~~~~~~
+
+.. code-block:: pascal
+
+    function TBox.getRandomPoint: TPoint;
+
+Returns a 100% random point in the TBox.
+
+.. note::
+
+    by Ollybest
+
+Example:
+
+.. code-block:: pascal
+
+    p := myBox.getRandomPoint();
+
+*)
+function TBox.getRandomPoint: TPoint;
+begin
+  result.x := randomRange(self.x1, self.x2);
+  result.y := randomRange(self.y1, self.y2);
+end;
+
+
+
+
+
+

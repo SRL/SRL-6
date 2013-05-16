@@ -247,7 +247,7 @@ begin
   if (debugType = TDebug.FATAL) then
   begin
     writeln(debugMSG);
-    halt();
+    terminateScript();
   end;
 
   if (disableSRLDebug) then
@@ -544,7 +544,7 @@ begin
 end;
 
 begin
-  //addOnTerminate(@__closeLogFile());
+  addOnTerminate('__closeLogFile');
   //Lape_OnFunctionEnter := @onFuncEnter;
   //Lape_OnFunctionExit := @onFuncExit;
 end;
