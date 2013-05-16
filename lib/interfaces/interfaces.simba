@@ -57,7 +57,9 @@ type
     name: string;
     ID, parentID: integer;
     static: boolean;
-    x, y, w, h: integer;
+    x1, y1, x2, y2: integer;
+    cx, cy: integer;
+    w, h: integer;
   end;
 
 (*
@@ -82,7 +84,42 @@ Example:
 *)
 function TRSInterface.getBounds(): TBox;
 begin
-  result := intToBox(x, y, (x + w), (y + h));
+  result := intToBox(self.x1, self.y1, self.x2, self.y2);
+end;
+
+(*
+TRSInterface.setBounds
+~~~~~~~~~~~~~~~~~~~~~~
+
+.. code-block:: pascal
+
+    procedure TRSInterface.getBounds(newBounds: TBox);
+
+Sets the bounds, width, height, and center point of the TRSInterface.
+
+.. note::
+
+    by Coh3n
+    Last Updated: 16 May 2013 by Coh3n
+
+Example:
+
+.. code-block:: pascal
+
+    mainscreen.setBounds(newBox);
+*)
+procedure TRSInterface.setBounds(newBounds: TBox);
+begin
+  self.x1 := newBounds.x1;
+  self.y1 := newBounds.y1;
+  self.x2 := newBounds.x2;
+  self.y2 := newBounds.y2;
+
+  self.w := (newBounds.x2 - newBounds.x1);
+  self.h := (newBounds.y2 - newBounds.y1);
+
+  self.cx := self.getCenterPoint().x;
+  self.cy := self.getCenterPoint().y;
 end;
 
 (*
@@ -98,7 +135,7 @@ Returns the center point of the TRSInterface.
 .. note::
 
     by Coh3n
-    Last Updated: Mar. 21, 2013 by Coh3n
+    Last Updated: 16 May 2013 by Coh3n
 
 Example:
 
@@ -108,8 +145,7 @@ Example:
 *)
 function TRSInterface.getCenterPoint(): TPoint;
 begin
-  result.x := (self.x + (self.w div 2));
-  result.y := (self.y + (self.h div 2));
+  result := self.getBounds().getMidPoint();
 end;
 
 (*
@@ -144,19 +180,18 @@ begin
   end;
 
   // point to start the drag
-  mouseDownPoint := point(self.x + random(self.w), self.y + random(self.y)); // point to start the drag
+  mouseDownPoint := point(self.x1 + random(self.w), self.y1 + random(self.h)); // point to start the drag
   mouse(mouseDownPoint);
 
   // calculate where to drag to and from
   getMousePos(currMousePos.x, currMousePos.y);
-  diff.x := (self.x - dest.x);
-  diff.y := (self.y - dest.y);
+  diff.x := (self.x1 - dest.x);
+  diff.y := (self.y1 - dest.y);
   dragTo.x := (currMousePos.x - diff.x);
   dragTo.y := (currMousePos.y - diff.y);
 
-  // drag the mouse
+  // drag the mouse & reset attributes
   dragMouse(dragTo);
-  self.x := dest.x;
-  self.y := dest.y;
+  self.setBounds(intToBox(dest.x, dest.y, (self.x1 + self.w), (self.y1 + self.h)));
   result = true;
 end;
