@@ -247,7 +247,7 @@ begin
   if (debugType = TDebug.FATAL) then
   begin
     writeln(debugMSG);
-    halt();
+    terminateScript();
   end;
 
   if (disableSRLDebug) then
