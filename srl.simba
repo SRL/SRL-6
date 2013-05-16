@@ -37,7 +37,6 @@ function setupSRL(): boolean;
 var
   t := getSystemTime();
 begin
-  clearDebug();
   writeln('Set up SRL in ', (getSystemTime() - t), 'ms.');
 
   {$IFNDEF SMART}

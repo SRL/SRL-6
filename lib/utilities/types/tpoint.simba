@@ -1,0 +1,303 @@
+{$f-}
+
+(*
+TPoint.create
+~~~~~~~~~~~~~
+
+.. code-block:: pascal
+
+    procedure TPoint.create(const pX, pY : Integer);
+
+Used to assign values to both the 'x' and 'y' coordinates of a TPoint.
+
+.. note::
+
+    by Zyt3x
+
+Example:
+
+.. code-block:: pascal
+
+    point.create(x,y);
+    mouse(point.rand(5));
+
+*)
+procedure TPoint.create(const pX, pY : Integer);
+begin
+  X := pX;
+  Y := pY;
+end;
+
+(*
+TPoint.rand
+~~~~~~~~~~~
+
+.. code-block:: pascal
+
+    function TPoint.rand(xx,yy: integer): TPoint;
+
+Used to apply separate randomness to both the 'x' and 'y' coordinates of a TPoint.
+
+.. note::
+
+    by NCDS
+
+Example:
+
+.. code-block:: pascal
+
+    mouse(point.rand(5,5));
+
+*)
+function TPoint.rand(xx, yy : Integer): TPoint;
+var
+  nx, ny, rx, ry: integer;
+begin
+  nx := xx div abs(xx);   //div by self to determine positive or negative
+  ny := yy div abs(yy);
+
+  rx := random(xx) * nx;
+  ry := random(yy) * ny;
+
+  result.x := x + rx;
+  result.y := y + ry;
+end;
+
+(*
+TPoint.rand: overload;
+~~~~~~~~~~~~~~~~~~~~~~
+
+.. code-block:: pascal
+
+    function TPoint.rand(ran: integer) : TPoint; overload;
+
+Used to apply THE SAME randomness to both the 'x' and 'y' coordinates of a TPoint.
+
+.. note::
+
+    by NCDS
+
+Example:
+
+.. code-block:: pascal
+
+    mouse(point.rand(5));
+
+*)
+function TPoint.rand(ran : Integer) : TPoint; overload;
+begin
+  result := rand(ran, ran);
+end;
+
+(*
+TPoint.equals
+~~~~~~~~~~~~~
+
+.. code-block:: pascal
+
+    function TPoint.equals(const P : TPoint) : Boolean;
+
+Returns True if both TPoint variables are equal.
+
+.. note::
+
+    by Zyt3x
+
+Example:
+
+.. code-block:: pascal
+
+    writeLn(P.equals(P2));
+
+*)
+function TPoint.equals(const P : TPoint) : Boolean;
+begin
+  result := (self.X = P.X) and (self.Y = P.Y);
+end;
+
+(*
+TPoint.isInvaild
+~~~~~~~~~~~~~~~~
+
+.. code-block:: pascal
+
+    function TPoint.isInvaild: boolean;
+
+Returns true if the TPoint is invaild, an invaild TPoint by default is (-1, -1)
+but can be changed(invaildPoint).
+
+.. note::
+
+    by Ollybest
+
+Example:
+
+.. code-block:: pascal
+
+    if (p.isInvaild) then
+      exit();
+
+*)
+function TPoint.isInvaild(invaildPoint: TPoint = point(-1, -1)): boolean;
+begin
+  result := self.equals(invaildPoint);
+end;
+
+(*
+TPoint.rotate
+~~~~~~~~~~~~~
+
+.. code-block:: pascal
+
+    procedure TPoint.rotate(const angle, cx, cy: extended);
+
+Rotates the TPoint by angle around cx and cy.
+
+.. note::
+
+    by Ollybest
+
+Example:
+
+.. code-block:: pascal
+
+    p.rotate(54.00, p.x, p.y);
+
+*)
+procedure TPoint.rotate(const angle, cx, cy: extended);
+begin
+  self := rotatePoint(self, angle, cx, cy);
+end;
+
+(*
+TPoint.swap
+~~~~~~~~~~~
+
+.. code-block:: pascal
+
+    procedure TPoint.swap(var p : TPoint);
+
+Used to swap two TPoint variables.
+
+.. note::
+
+    by Zyt3x
+
+Example:
+
+.. code-block:: pascal
+
+    P.swap(P);
+
+*)
+procedure TPoint.swap(var p : TPoint);
+begin
+  tSwap(self, p);
+end;
+
+(*
+TPoint.randPosNeg
+~~~~~~~~~~~~~~~~~
+
+.. code-block:: pascal
+
+    function TPoint.randPosNeg(ran: integer): TPoint;
+
+Randomly adds OR subtracts "ran" from both values of the TPoint.
+
+.. note::
+
+    by Ollybest
+
+Example:
+
+.. code-block:: pascal
+
+    mouse(point.randPosNeg(5));
+
+*)
+function TPoint.randPosNeg(ran: integer): TPoint;
+begin
+  result.x := randomRange(self.x - ran, self.x + ran);
+  result.y := randomRange(self.y - ran, self.y + ran);
+end;
+
+(*
+TPoint.offset
+~~~~~~~~~~~~~
+
+.. code-block:: pascal
+
+    procedure TPoint.offSet(p: TPoint);
+
+Offsets the TPoint by p.
+
+.. note::
+
+    by Ollybest
+
+Example:
+
+.. code-block:: pascal
+
+    p.offset(point(50, 50));
+
+*)
+procedure TPoint.offSet(p: TPoint);
+begin
+  self.x := self.x + p.x;
+  self.y := self.y + p.y;
+end;
+
+(*
+TPoint.copy
+~~~~~~~~~~~
+
+.. code-block:: pascal
+
+    function TPoint.copy(): TPoint;
+
+Result a copy of the TPoint.
+
+.. note::
+
+    by Ollybest
+
+Example:
+
+.. code-block:: pascal
+
+    tp := p.copy();
+
+*)
+function TPoint.copy(): TPoint;
+begin
+  result := point(self.x, self.y);
+end;
+
+(*
+TPoint.isInBox
+~~~~~~~~~~~~~~
+
+.. code-block:: pascal
+
+    function TPoint.isInBox(const box: TBox): boolean;
+
+Returns if the TPoint is in the box.
+
+.. note::
+
+    by Ollybest
+
+Example:
+
+.. code-block:: pascal
+
+    if p.isInBox(box) then
+      writeln('point P is in the box!');
+
+*)
+function TPoint.isInBox(const box: TBox): boolean;
+begin
+  result := pointInBox(self, box);
+end;
