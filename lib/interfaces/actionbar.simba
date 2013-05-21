@@ -8,6 +8,9 @@ Runescape Action Bar.
 *)
 
 {$include_once interfaces.simba}
+{$include_once ../core/text.simba}
+{$include_once gametabs/abilitybook.simba}
+{$include_once gametabs/inventory.simba}
 
 {$f-}
 
@@ -59,23 +62,21 @@ Example:
 *}
 procedure TRSActionBar.__init();
 begin
-
   with (self) do
   begin
-
     name := 'RS Action Bar';
-
     ID := ID_INTERFACE_ACTION_BAR;
     parentID := ID_INTERFACE_MAINSCREEN;
-
     static := true;
-
-    x := 0;
-    y := 312;
-    w := 517;
-    h := 75;
-
-    __slots := Grid(12, 1, 29, 29, 36, 0, Point(x + 61, y + 49));
+    x1 := 0;
+    y1 := 312;
+    x2 := 517;
+    y2 := 387;
+    w := (x2 - x1);
+    h := (y2 - y1);
+    cx := self.getCenterPoint().x;
+    cy := self.getCenterPoint().y;
+    __slots := Grid(12, 1, 29, 29, 36, 0, Point(x1 + 61, y1 + 49));
   end;
 end;
 
@@ -126,7 +127,7 @@ var
   color: integer;
 begin
 
-  color := getColor(self.x + 1, self.y + 1);
+  color := getColor(self.x1 + 1, self.y1 + 1);
   result := (color = 13224393); //Top-left corner of the action bar.
   print('actionBar.isOpen() returned ' + toStr(result) + ' and found the color ' + toStr(color) + '. We were looking for the silver border of the Action Bar, if it was open.', TDebug.LOG);
 end;
@@ -163,9 +164,9 @@ begin
   begin
 
     if (open) then
-      intToBox(self.x + 500, y + 65, self.x + 515, self.y + 75).mouse(MOUSE_LEFT)
+      intToBox(self.x1 + 500, self.y1 + 65, self.x1 + 515, self.y1 + 75).mouse(MOUSE_LEFT)
     else
-      intToBox(self.x + 500, y + 3, self.x + 515, self.y + 13).mouse(MOUSE_LEFT);
+      intToBox(self.x1 + 500, self.y1 + 3, self.x1 + 515, self.y1 + 13).mouse(MOUSE_LEFT);
 
     t := getSystemTime() + 950 + random(100);
 
@@ -982,7 +983,7 @@ begin
   begin
 
     result := 0;
-    adrenalineBox := IntToBox(self.x + 49, self.y + 22, self.x + 469, self.y + 25);
+    adrenalineBox := IntToBox(self.x1 + 49, self.y1 + 22, self.x1 + 469, self.y1 + 25);
 
     if FindColorsTolerance(tpa, 1776411, adrenalineBox, 15) then //Average of shades of gold in adrenaline meter.
     begin

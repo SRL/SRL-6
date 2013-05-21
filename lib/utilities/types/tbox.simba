@@ -9,6 +9,8 @@ This file holds all types related to TBox.
 {$include_once ../../tmp.simba}
 {$include_once ../../core/mouse.simba}
 
+{$f-}
+
 (*
 TBox.isPointInside
 ~~~~~~~~~~~~~~~~~~

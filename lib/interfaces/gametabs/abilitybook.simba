@@ -205,10 +205,14 @@ begin
     tabIndex := _TAB_ABILITY;
     static := true;
 
-    x := _gameTabArea.x1;
-    y := _gameTabArea.y1;
-    w := (_gameTabArea.x2 - x);
-    h := (_gameTabArea.y2 - y);
+    x1 := _gameTabArea.x1;
+    y1 := _gameTabArea.y1;
+    x2 := _gameTabArea.x2;
+    y2 := _gameTabArea.y2;
+    w := (x2 - x1);
+    h := (y2 - y1);
+    cx := self.getCenterPoint().x;
+    cy := self.getCenterPoint().y;
 
     __abilityGrid := grid(4, 5, 29, 29, 44, 36, Point(575, 354));
   end;
@@ -527,7 +531,6 @@ function TRSTabAbilityBook.__getAbilityCooldown(boxToCheck: TBox; inActionBar: b
 var
 
   colorFix, clientBitmap, i, len, sumTotal, tempBitmap: integer;
-  x1, y1, x2, y2, width, height: integer;
   midPoint: TPoint;
   pointCircle, line, tpa: TPointArray;
 begin
@@ -538,14 +541,6 @@ begin
 
     clientBitmap := bitmapFromClient(boxToCheck.x1, boxToCheck.y1, boxToCheck.x2, boxToCheck.y2);
     setBitmapName(clientBitmap, 'Cooldown Bitmap');
-
-    x1 := 0;
-    y1 := 0;
-    x2 := boxToCheck.x2 - boxToCheck.x1;
-    y2 := boxToCheck.y2 - boxToCheck.y1;
-
-    width  := x2 + 1;
-    height := y2 + 1;
 
     if (inActionBar) then
     begin

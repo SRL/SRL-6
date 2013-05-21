@@ -61,10 +61,14 @@ begin
     tabIndex := _TAB_LOGOUT;
     parentID := -1;
     static := true;
-    x := _gameTabArea.x1;
-    y := _gameTabArea.y1;
-    w := (_gameTabArea.x2 - x);
-    h := (_gameTabArea.y2 - y);
+    x1 := _gameTabArea.x1;
+    y1 := _gameTabArea.y1;
+    x2 := _gameTabArea.x2;
+    y2 := _gameTabArea.y2;
+    w := (x2 - x1);
+    h := (y2 - y1);
+    cx := self.getCenterPoint().x;
+    cy := self.getCenterPoint().y;
   end;
 end;
 
