@@ -8,11 +8,11 @@ const
   DIRECTION_WEST  = 270;
 
 const
-  MM_NPC    = 4369;
-  MM_ITEM   = 23;
-  MM_PLAYER = 1907997;
-  MM_FRIEND = 5376;
-  MM_TEAM   = 2171941;
+  MM_DOT_NPC    = 4369;
+  MM_DOT_ITEM   = 23;
+  MM_DOT_PLAYER = 1907997;
+  MM_DOT_FRIEND = 5376;
+  MM_DOT_TEAM   = 2171941;
 
 const
   MM_RADIUS = 75;
@@ -139,7 +139,7 @@ var
   tpa: TPointArray;
 begin
   // confirm valid dot type
-  if (not inIntArray([MM_NPC, MM_ITEM, MM_PLAYER, MM_FRIEND, MM_TEAM], dotType)) then
+  if (not inIntArray([MM_DOT_NPC, MM_DOT_ITEM, MM_DOT_PLAYER, MM_DOT_FRIEND, MM_DOT_TEAM], dotType)) then
   begin
     print('TRSMinimap.getDots: Invalid dot type '+toStr(dotType), TDebug.ERROR);
     exit;
