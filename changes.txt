@@ -77,6 +77,7 @@ EVERYTHING should be recorded here: new features, function name changes, user-de
   - FindSymbol and FindSymbolIn combined into one.
   - FindSymbols and FindSymbolsIn combined into one.
   - getColorPercent and getBlackBackground moved from SRL-5's color.simba.
+  - PlayerMoving and WaitPlayerMoving moved from animation.simba.
 
 - inventory.simba
   - functions are used like tabInventory.functionNameHere()
