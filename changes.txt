@@ -72,6 +72,10 @@ EVERYTHING should be recorded here: new features, function name changes, user-de
   - roadColorChecker and all components have been comepletely removed from SRL6
   - Flag functions combined to waitFlag(flagDist: integer = 0).
   - MouseFlagEx, MFF, MFNF, MouseFlag merged into mouseFlag().
+  - LoadSymbolBitmapColor renamed to __loadSymbol which returns a _TRSSymbol.
+  - GetSymbolColorIn and GetSymbolColor combined into one and made internal.
+  - FindSymbol and FindSymbolIn combined into one.
+  - FindSymbols and FindSymbolsIn combined into one.
 
 - inventory.simba
   - functions are used like tabInventory.functionNameHere()
