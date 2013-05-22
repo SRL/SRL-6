@@ -291,7 +291,7 @@ begin
       end;
 
     setLength(result, c);
-    sortTPAFrom(result, point(cx. cy));
+    sortTPAFrom(result, point(cx, cy));
   end;
 end;
 
@@ -300,7 +300,7 @@ var
   TPA: TPointArray;
 begin
   findColorsTolerance(TPA, color, self.getBounds(), tol);
-  filterPointsPie(TPA, startRadial, endRadial, startRadius, endRadius, self.getMidPoint().x, self.getMidPoint().y);
+  filterPointsPie(TPA, startRadial, endRadial, startRadius, endRadius, self.cx, self.cy);
   result := ceil((length(TPA) * 100) / ((Pi * (endRadius * endRadius)) * ((endRadial - startRadial) / 360.0) - ((Pi * (startRadius * startRadius)) * ((endRadial - startRadial) / 360.0))));
 end;
 
@@ -333,7 +333,7 @@ end;
 
 function TRSMinimap.isPointOn(p: TPoint): boolean;
 begin
-  result := (MM_RADIUS >= distance(p.x, p.y, self.cs, self.cy));
+  result := (MM_RADIUS >= distance(p.x, p.y, self.cx, self.cy));
 end;
 
 function TRSMinimap.isPlayerMoving(shiftInterval: integer = 500): boolean;
@@ -371,7 +371,7 @@ var
 begin
   result := false;
   map := bitmapFromString(self.w, self.h, '');
-  copyClientToBitmap(map, self.x, self.y, (self.x + self.w), (self.y + self.h));
+  copyClientToBitmap(map, self.x1, self.y1, (self.x1 + self.w), (self.y1 + self.h));
 
   kmTarget := getKeyMouseTarget();
   iTarget := getImageTarget();
@@ -386,8 +386,8 @@ begin
     if ((fastGetPixel(map, tpa[i].x - 1, tpa[i].y - 1) - fastGetPixel(map, tpa[i].x, tpa[i].y - 1)) = 6381921) then
     begin
       result := true;
-      p.x := tpa[I].x + self.x;
-      p.y := tpa[I].y + self.y;
+      p.x := tpa[I].x + self.x1;
+      p.y := tpa[I].y + self.y1;
       break;
     end;
 
@@ -786,7 +786,7 @@ begin
         color := 13345416;
       end;
 
-    MM_SYMBOL_STORE, 'store':
+    MM_SYMBOL_STORE:
       with result do
       begin
         name := 'General Store';
@@ -1357,22 +1357,22 @@ begin
       with result do
       begin
         name := 'Pet Shop';
-       bmp := BitmapFromString(15, 5, 'beNpj42Nm4zt87GxnbWFhUkh' +
-         'skCsQ7dm7CYIgXKB4dUkYUA1QJVwxULyypllFSQMoBUEQLlAcyF68' +
-         'bA1ccV1hBlAQKAXkQoxdOL0LyMalGCgLUQYRhOsCOgOI0BQfWt0JQ' +
-         'TomBhAEVAnkAo0FGg5SDADYtlua');
-        result:= 11713980;
+        bmp := BitmapFromString(15, 5, 'beNpj42Nm4zt87GxnbWFhUkh' +
+          'skCsQ7dm7CYIgXKB4dUkYUA1QJVwxULyypllFSQMoBUEQLlAcyF68' +
+          'bA1ccV1hBlAQKAXkQoxdOL0LyMalGCgLUQYRhOsCOgOI0BQfWt0JQ' +
+          'TomBhAEVAnkAo0FGg5SDADYtlua');
+        color := 11713980;
       end;
 
     MM_SYMBOL_OBELISK:
       with result do
       begin
         name := 'Summoning Obelisk';
-       bmp := BitmapFromString(15, 5, 'beNpj42Nm4zt87CwE2SVP1' +
-         'XaoKeidC0SeUTWfHj4AiixetgYoCCSBKuGKgSKVNc1AZXMO3AOpWf' +
-         '8EqBiiEaIFrhioEigCRJPnrAAqBqJjl98BEVAlxFigGmSTIVqAtgM' +
-         'VAI0FqgeSEBMwFQNVAo0FigPVgxjrnwB1Obj4IBQDAImMdLM=');
-        result:= 10325360;
+        bmp := BitmapFromString(15, 5, 'beNpj42Nm4zt87CwE2SVP1' +
+          'XaoKeidC0SeUTWfHj4AiixetgYoCCSBKuGKgSKVNc1AZXMO3AOpWf' +
+          '8EqBiiEaIFrhioEigCRJPnrAAqBqJjl98BEVAlxFigGmSTIVqAtgM' +
+          'VAI0FqgeSEBMwFQNVAo0FigPVgxjrnwB1Obj4IBQDAImMdLM=');
+        color := 10325360;
       end;
 
     MM_SYMBOL_SHOP_SUMMONING:
@@ -1382,7 +1382,7 @@ begin
         bmp := BitmapFromString(15, 5, 'meJyzicq0QUKMDAzIyAZVFk3ZAVS' +
           'AVQtQJGrCfCA6gA0gqweyFyxY8OjFi5MPvwLVb9uyEVM9muLJ377C' +
           '1WNqgRgOABDhZzk=');
-        result:= 9697013;
+        color := 9697013;
       end;
 
     MM_SYMBOL_SPOT_REST:
@@ -1460,7 +1460,7 @@ end;
 
 function TRSMinimap.findSymbol(var x, y: integer; symbol: integer; searchBox: TBox): boolean;
 begin
-  result := (self._getSymbolColor(x, y, symbol) > 0);
+  result := (self._getSymbolColor(x, y, symbol, searchBox) > 0);
 end;
 
 function TRSMinimap.findSymbols(var tpa: TPointArray; symbol: integer; searchBox: TBox): boolean;
@@ -1481,7 +1481,7 @@ begin
     findColorsTolerance(tmpTPA, newColor, searchBox, 0);
     tmpATPA := tmpTPA.toATPA(10);
 
-    setLength(length(tmpATPA));
+    setLength(tpa, length(tmpATPA));
 
     for i := 0 to length(tmpATPA) do
     begin
@@ -1505,7 +1505,7 @@ begin
     setLength(tpa, l);
 
     if (result) then
-      print('Found '+sym.name+' symbol '+toStr(length(result))+' times');
+      print('Found '+sym.name+' symbol '+toStr(length(tpa))+' times');
   end;
 end;
 
@@ -1524,7 +1524,7 @@ begin
   end;
 
   if (result) then
-    print('Found a total of '+toStr(length(result))+' symbols');
+    print('Found a total of '+toStr(length(tpa))+' symbols');
 end;
 
 begin
