@@ -336,14 +336,6 @@ begin
   result := (MM_RADIUS >= distance(p.x, p.y, self.cx, self.cy));
 end;
 
-function TRSMinimap.isPlayerMoving(shiftInterval: integer = 500): boolean;
-var
-  shiftBox: TBox;
-begin
-  shiftBox.setBounds(self.cx - 30, self.cy - 30, self.cx + 30, self.cy + 30);
-  //result := (pixelShift(shiftBox, shiftInterval) > 200);
-end;
-
 function TRSMinimap._findFlagBitmap(var p: TPoint): boolean;
 var
   bmpFlag: integer;
@@ -500,6 +492,33 @@ begin
 
   if (flagDist > -1) then
     self.waitFlag(flagDist);
+end;
+
+function TRSMinimap.isPlayerMoving(shiftInterval: integer = 500): boolean;
+var
+  shiftBox: TBox;
+begin
+  shiftBox.setBounds(self.cx - 30, self.cy - 30, self.cx + 30, self.cy + 30);
+  //result := (pixelShift(shiftBox, shiftInterval) > 200);
+end;
+
+function TRSMinimap.waitPlayerMoving(waitFlagGone: boolean): boolean;
+var
+  t: integer;
+begin
+  result := false;
+  t := (getSystemTime() + 20000);
+
+  if (waitFlagGone) then
+    self.waitFlag();
+
+  while (getSystemTime() < t) do
+  begin
+    wait(randomRange(50, 100));
+
+    if (not self.isPlayerMoving()) then
+      exit(true);
+  end;
 end;
 
 function TRSMinimap.radialWalk(var tpa: TPointArray; cx, cy, theColor, tol, radius, startRadial, endRadial: integer; xMod, yMod: integer = 0): boolean;
