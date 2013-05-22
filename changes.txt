@@ -76,6 +76,7 @@ EVERYTHING should be recorded here: new features, function name changes, user-de
   - GetSymbolColorIn and GetSymbolColor combined into one and made internal.
   - FindSymbol and FindSymbolIn combined into one.
   - FindSymbols and FindSymbolsIn combined into one.
+  - getColorPercent and getBlackBackground moved from SRL-5's color.simba.
 
 - inventory.simba
   - functions are used like tabInventory.functionNameHere()
