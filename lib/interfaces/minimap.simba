@@ -1509,7 +1509,7 @@ begin
   end;
 end;
 
-function TRSMinimap.findSymbolsMulti(var tpa: TPointArray; symbols: TIntegerArray; searchBox: TBox): boolean;
+function TRSMinimap.findSymbols(var tpa: TPointArray; symbols: TIntegerArray; searchBox: TBox): boolean; overload;
 var
   gTPA: TPointArray;
   i: integer;
