@@ -8,6 +8,7 @@ Runescape lobby mainscreen.
 *)
 
 {$include_once interfaces.simba}
+{$include_once ../utilities/pixelshift.simba}
 
 {$f-}
 
@@ -281,6 +282,37 @@ begin
   sleep(1000 + random(300));
   keyUp((angle * 2) + 38);
   wait(500 + random(100));
+end;
+
+(*
+TRSMainscreen.isPlayerAnimating
+~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+
+.. code-block:: pascal
+
+    function TRSMainscreen.isPlayerAnimating(): boolean;
+
+Uses an average pixel shift in a box around the middle of the mainscreen to check
+if the player in animating.
+
+.. note::
+
+    by Coh3n
+    Last Updated: 23 May 2013 by Coh3n
+
+Example:
+
+.. code-block:: pascal
+
+    while (mainscreen.isPlayerAnimating()) do
+    begin
+      writeln('Waiting for the player to stop animating');
+      wait(2000 + random(500));
+    end;
+*)
+function TRSMainscreen.isPlayerAnimating(): boolean;
+begin
+  result := (getPixelShiftAverage(intToBox(self.cx - 10, self.cy - 25, self.cx + 15, self.cy + 15), 30, 180) > 75);
 end;
 
 begin

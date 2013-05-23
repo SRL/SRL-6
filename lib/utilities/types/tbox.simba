@@ -316,6 +316,34 @@ begin
 end;
 
 (*
+TBox.equals
+~~~~~~~~~~~
+
+.. code-block:: pascal
+
+    function TBox.isVaild(compareBox: TBox): boolean;
+
+Returns true if the TBox is equal to compareBox.
+
+.. note::
+
+    by Coh3n
+
+Example:
+
+.. code-block:: pascal
+
+    if b.equals(b2) then
+      writeln('boxes are equal.);
+
+*)
+function TBox.equals(compareBox: TBox): boolean;
+begin
+  result := (self.x1 = compareBox.x1) and (self.x2 = compareBox.x2) and
+            (self.y1 = compareBox.y1) and (self.y2 = compareBox.y2);
+end;
+
+(*
 TBox.setBounds
 ~~~~~~~~~~~~~~
 

@@ -1,0 +1,150 @@
+{$include_once ../core/debug.simba}
+
+function getPixelShift(b: TBoxArray; time: integer): TIntegerArray;
+var
+  l, i: integer;
+  bmpBefore, bmpAfter: TIntegerArray;
+begin
+  l := length(b);
+  setLength(bmpBefore, l);
+  setLength(bmpAfter, l);
+  setLength(result, l);
+
+  // get the initial pixels
+  for i := 0 to (l - 1) do
+    bmpBefore[i] := bitmapFromClient(b[i].x1, b[i].y1, b[i].x2, b[i].y2);
+
+  wait(time);
+
+  // get pixels after the wait
+  for i := 0 to (l - 1) do
+    bmpAfter[i] := bitmapFromClient(b[i].x1, b[i].y1, b[i].x2, b[i].y2);
+
+  // calculate the pixels that changed
+  for i := 0 to (l - 1) do
+    result[i] := calculatePixelShift(bmpBefore[i], bmpAfter[i], intToBox(0, 0, (b[i].x2 - b[i].x1), (b[i].y2 - b[i].y1)));
+
+  // free all the bitmaps
+  for i := 0 to (l - 1) do
+  begin
+    freeBitmap(bmpBefore[i]);
+    freeBitmap(bmpAfter[i]);
+  end;
+end;
+
+function getPixelShift(b: TBox; time: integer): integer; overload;
+var
+  arr: TIntegerArray;
+begin
+  arr := getPixelShift([b], time);
+  result := arr[0];
+end;
+
+function getPixelShift(atpa: T2DPointArray; t: integer): TIntegerArray; overload;
+var
+  b: TBox;
+  l, i: integer;
+  bmpBefore, bmpAfter: TIntegerArray;
+begin
+  l := length(atpa);
+  setLength(bmpBefore, l);
+  setLength(bmpAfter, l);
+  setLength(result, l);
+
+  // get the initial pixels
+  for i := 0 to (l - 1) do
+  begin
+    b := atpa[i].getBounds();
+    bmpBefore[i] := bitmapFromClient(b.x1, b.y1, b.x2, b.y2);
+  end;
+
+  wait(t);
+
+  // get pixels after the wait
+  for i := 0 to (l - 1) do
+  begin
+    b := atpa[i].getBounds();
+    bmpAfter[i] := bitmapFromClient(b.x1, b.y1, b.x2, b.y2);
+  end;
+
+  // calculate the pixels that changed
+  for i := 0 to (l - 1) do
+  begin
+    b := atpa[i].getBounds();
+    atpa[i].offset(point(-b.x1, -b.y1));
+    result[i] := calculatePixelShiftTPA(bmpBefore[i], bmpAfter[i], atpa[i]);
+  end;
+
+  // free all the bitmaps
+  for i := 0 to (l - 1) do
+  begin
+    freeBitmap(bmpBefore[i]);
+    freeBitmap(bmpAfter[i]);
+  end;
+end;
+
+function getPixelShift(tpa: TPointArray; t: integer): integer; overload;
+var
+  arr: TIntegerArray;
+begin
+  arr := getPixelShift([tpa], t);
+  result := arr[0];
+end;
+
+function getPixelShiftAverage(b: TBoxArray; waitPerLoop, maxTime: integer): TIntegerArray;
+var
+  t, l, i: integer;
+  shifts: array of TIntegerArray;
+begin
+  l := length(b);
+  setLength(result, l);
+
+  t := (getSystemTime() + maxTime);
+
+  while (getSystemTime() < t) do
+    for i := 0 to (l - 1) do
+    begin
+      setLength(shifts, length(shifts) + 1);
+      shifts[high(shifts)] := getPixelShift(b, waitPerLoop);
+    end;
+
+  for i := 0 to (l - 1) do
+    result[i] := averageTIA(shifts[i]);
+end;
+
+function getPixelShiftAverage(b: TBox; waitPerLoop, maxTime: integer): integer; overload;
+var
+  arr: TIntegerArray;
+begin
+  arr := getPixelShiftAverage([b], waitPerLoop, maxTime);
+  result := arr[0];
+end;
+
+function getPixelShiftAverage(b: T2DPointArray; waitPerLoop, maxTime: integer): TIntegerArray; overload;
+var
+  t, l, i: integer;
+  shifts: array of TIntegerArray;
+begin
+  l := length(b);
+  setLength(result, l);
+
+  t := (getSystemTime() + maxTime);
+
+  while (getSystemTime() < t) do
+    for i := 0 to (l - 1) do
+    begin
+      setLength(shifts, length(shifts) + 1);
+      shifts[high(shifts)] := getPixelShift(b, waitPerLoop);
+    end;
+
+  for i := 0 to (l - 1) do
+    result[i] := averageTIA(shifts[i]);
+end;
+
+function getPixelShiftAverage(b: TPointArray; waitPerLoop, maxTime: integer): integer; overload;
+var
+  arr: TIntegerArray;
+begin
+  arr := getPixelShiftAverage([b], waitPerLoop, maxTime);
+  result := arr[0];
+end;
