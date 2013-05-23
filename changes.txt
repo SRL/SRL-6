@@ -71,13 +71,18 @@ EVERYTHING should be recorded here: new features, function name changes, user-de
   - FlagPresent renamed to TRSMinimap.isFlagPresent.
   - roadColorChecker and all components have been comepletely removed from SRL6
   - Flag functions combined to waitFlag(flagDist: integer = 0).
-  - MouseFlagEx, MFF, MFNF, MouseFlag merged into mouseFlag().
+  - Removed MouseFlagEx, MFF, MFNF, MouseFlag removed because they're trivial clicking and waitFlag functions.
   - LoadSymbolBitmapColor renamed to __loadSymbol which returns a _TRSSymbol.
   - GetSymbolColorIn and GetSymbolColor combined into one and made internal.
   - FindSymbol and FindSymbolIn combined into one.
   - FindSymbols and FindSymbolsIn combined into one.
   - getColorPercent and getBlackBackground moved from SRL-5's color.simba.
   - PlayerMoving and WaitPlayerMoving moved from animation.simba.
+  - GridCoords16Ex ranamed to minimap.pointToMainscreen + made more accurate.
+
+- animation.simba renamed to pixelshift.simba
+  - PlayerMoving and WaitPlayerMoving moved to minimap.simba.
+  - Removed ReturnGridColorsInBox, ValidatePixels, InitBoolArr, CountBools, and PixelShiftOT (not used often, and regular pixel shift functions work well).
 
 - inventory.simba
   - functions are used like tabInventory.functionNameHere()

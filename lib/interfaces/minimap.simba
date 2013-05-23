@@ -1,5 +1,7 @@
 {$include_once interfaces.simba}
+{$include_once mainscreen.simba}
 {$include_once ../misc/color.simba}
+{$include_once ../utilities/pixelshift.simba}
 {$f-}
 
 const
@@ -224,45 +226,61 @@ begin
   print('Call mainscreen.setAngle(ANGLE_HIGH) to convert to overhead view', TDebug.HINT);
 end;
 
+function TRSMinimap._isValidDot(dotType: integer): boolean;
+var
+  arr: TIntegerArray;
+begin
+  arr := [ MM_DOT_NPC, MM_DOT_ITEM, MM_DOT_PLAYER,
+           MM_DOT_FRIEND, MM_DOT_TEAM ];
+
+  result := inIntArray(arr, dotType);
+end;
+
 function TRSMinimap.getDots(dotType: integer; searchBox: TBox): TPointArray;
 var
-  i, dif, radius, hi, c: integer;
+  i, c: integer;
   tpa: TPointArray;
 begin
   // confirm valid dot type
-  if (not inIntArray([MM_DOT_NPC, MM_DOT_ITEM, MM_DOT_PLAYER, MM_DOT_FRIEND, MM_DOT_TEAM], dotType)) then
+  if (not self._isValidDot(dotType)) then
   begin
-    print('TRSMinimap.getDots: Invalid dot type '+toStr(dotType), TDebug.ERROR);
+    print('Invalid dot type '+toStr(dotType), TDebug.ERROR);
     exit;
   end;
 
   freeze();
-  radius := min((searchBox.x2 - searchBox.x1) div 2, (searchBox.y2 - searchBox.y1) div 2);
+  findColors(tpa, 65536, searchBox); // the black shadow color of the minimap dots
+  print('Found '+toStr(length(tpa) div 4)+' total dots on the minimap', TDebug.LOG);
 
-  findColors(tpa, dotType, searchBox);
+  // filter out the corners if searching the whole minimap so we only have colors that are actually on the minimap
   if (length(tpa) > 0) then
-    filterPointsPie(tpa, 0, 360, 0, radius, self.cx, self.cy);
+    if (searchBox.equals(self.getBounds())) then
+    begin
+      filterPointsPie(tpa, 0, 360, 0, MM_RADIUS, self.cx, self.cy);
+      print('Found '+toStr(length(tpa) div 4)+' dots after filtering the minimap corners', TDebug.LOG);
+    end;
 
-  hi := high(tpa);
-  setLength(result, hi + 1);
-
-  if (hi < 0) then
+  if (length(tpa) <= 0) then
   begin
     unfreeze();
     exit;
   end;
 
+  setLength(result, length(tpa));
   c := 0;
 
-  for i := 0 to hi do
-  if (getColor(tpa[i].x - 1, tpa[i].y - 1) - getColor(tpa[i].x, tpa[i].y - 1) = dif) then
-  begin
-    result[c] := point(tpa[i].x, tpa[i].y - 2);
-    inc(c);
-  end;
+  // gets the difference between the bottom two colors of a dot
+  for i := 0 to high(tpa) do
+    if (getColor(tpa[i].x - 1, tpa[i].y - 1) - getColor(tpa[i].x, tpa[i].y - 1) = dotType) then
+    begin
+      result[c] := point(tpa[i].x, tpa[i].y - 2);
+      inc(c);
+    end;
 
-  unFreeze();
+  unfreeze();
   setLength(result, c);
+
+  print('Found '+toStr(length(result))+' minimap dots (ID: '+toStr(dotType)+')');
 end;
 
 function TRSMinimap.getDotsMainscreen(dotType: integer): TPointArray;
@@ -271,9 +289,20 @@ var
   dots: TPointArray;
   b: TBox;
 begin
-  b := intToBox(32, 23, 24, 17);
+  // confirm valid dot type
+  if (not self._isValidDot(dotType)) then
+  begin
+    print('Invalid dot type '+toStr(dotType), TDebug.ERROR);
+    exit;
+  end;
+
+  // used for calculating the abstract box (see below)
+  b := intToBox(28, 23, 28, 17);
+
+  // dev HINT: use a TDrawing to draw the below box to see where it's looking for dots
   dots := self.getDots(dotType, intToBox(self.cx - round(b.x1 * 1.3), self.cy - round(b.y1 * 1.3),
                                          self.cx + round(b.x2 * 1.3), self.cy + round(b.y2 * 1.3)));
+
   l := length(dots);
 
   if (l > 0) then
@@ -281,6 +310,8 @@ begin
     setLength(result, l);
 
     for i := 0 to (l - 1) do
+      // this call is needed because the mainscreen camera isn't directly overhead, it's on a slight angle
+      // meaning you can see futher in the top corners of the mainscreen than the bottom corners
       if (inAbstractBox(self.cx - b.x1, self.cy - b.y1,
                         self.cx + b.x1, self.cy - b.y1,
                         self.cx + b.x2, self.cy + b.y2,
@@ -293,6 +324,40 @@ begin
     setLength(result, c);
     sortTPAFrom(result, point(cx, cy));
   end;
+
+  print('Found '+toStr(length(result))+' minimap dots likely to be on the mainscreen');
+  print('Use minimap.getDotsMainscreen() in combination with minimap.pointToMainscreen() to find a dot''s mainscreen location', TDebug.HINT);
+end;
+
+function TRSMinimap.pointToMainscreen(p: TPoint; pMod: TPoint = point(0, 0)): TPoint;
+var
+  yH, yM, x, y: Extended;
+begin
+  p.x := (p.x - self.cx);
+  p.y := (p.y - self.cy);
+
+  x := (p.x + 0.0);
+  y := (p.y + 0.0);
+
+  yM := 36.0;
+  yH := abs(y + yM);
+
+  result.x := round((mainscreen.cx + pMod.x) + (x * 9.75 / (12.8 - (yH / yM * 3.15))) * 9.75);
+  result.y := round((mainscreen.cy + pMod.y) + y * (6.3 + ((yH / yM) * 2.4)));
+
+  // offsets used to improve accuracy
+  if (result.x > mainscreen.cx) then
+    result.x := (result.x - 40);
+
+  if (result.x < mainscreen.cx) then
+    result.x := (result.x + 30);
+
+  if (not pointInBox(result, mainscreen.getBounds())) then
+  begin
+    print('Point calculated '+toStr(result)+' was not in the mainscreen, returning (-1, -1)', TDebug.ERROR);
+    result := point(-1, -1);
+  end else
+    print('Point calculated to be on mainscreen at '+toStr(result));
 end;
 
 function TRSMinimap.getColorPercent(color, tol, startRadial, endRadial, startRadius, endRadius: integer): integer;
@@ -416,15 +481,21 @@ end;
 
 function TRSMinimap.waitFlag(dist: integer = 0): boolean;
 var
-  m, d1, d2: integer;
+  m, t, d1, d2: integer;
   p: TPoint;
 begin
   result := false;
   m := getSystemTime();
+  t := (m + 20000);
+
+  print('Waiting until flag distance equals '+toStr(dist)+'...');
 
   repeat
     if (not self.isFlagPresent(p)) then
+    begin
+      print('Flag distance is less than or equal to '+toStr(dist));
       exit(true);
+    end;
 
     d1 := distance(p.x, p.y, self.cx, self.cy);
 
@@ -436,7 +507,7 @@ begin
     else
       wait(50 + random(50));
 
-    if (getColor(6, 6) <> 13092807) then // border of the loading message
+    if (getColor(6, 56) <> 13092807) then // border of the loading message
       if (getSystemTime() - m > 5000) then
       begin
         if (d1 = d2) then
@@ -449,49 +520,7 @@ begin
     if (SRL_Events[EVENT_ANTIBAN] <> nil) then
       SRL_Events[EVENT_ANTIBAN]();
 
-  until(false);
-end;
-
-function TRSMinimap.mouseFlag(pt: TPoint; xMod, yMod, flagDist: integer; checkForFlag: boolean): boolean;
-var
-  i, t: integer;
-  p: TPoint;
-begin
-  result := false;
-
-  if (self.isFlagPresent()) then
-    if (checkForflag) or (self.getFlagDistance() <= flagDist) then
-      exit;
-
-  p := point(pt.x - xMod, pt.y - yMod);
-  xMod := max(xMod, 3);
-  yMod := max(yMod, 3);
-
-  for i := 0 to 4 do
-  begin
-    incEx(p.x, random(3));
-    incEx(p.y, random(3));
-
-    if (not self.isPointOn(p)) then
-      continue;
-
-    mouse(p, MOUSE_LEFT);
-
-    t := (getSystemTime() + 3000);
-    while (getSystemTime() < t) do
-    begin
-      if (self.isFlagPresent()) then
-      begin
-        result := true;
-        break;
-      end;
-
-      wait(50);
-    end;
-  end;
-
-  if (flagDist > -1) then
-    self.waitFlag(flagDist);
+  until(getSystemTime() > t);
 end;
 
 function TRSMinimap.isPlayerMoving(shiftInterval: integer = 500): boolean;
@@ -499,7 +528,7 @@ var
   shiftBox: TBox;
 begin
   shiftBox.setBounds(self.cx - 30, self.cy - 30, self.cx + 30, self.cy + 30);
-  //result := (pixelShift(shiftBox, shiftInterval) > 200);
+  result := (getPixelShift(shiftBox, shiftInterval) > 200);
 end;
 
 function TRSMinimap.waitPlayerMoving(waitFlagGone: boolean): boolean;
@@ -512,20 +541,25 @@ begin
   if (waitFlagGone) then
     self.waitFlag();
 
+  print('Waiting while the player is moving...');
+
   while (getSystemTime() < t) do
   begin
     wait(randomRange(50, 100));
 
     if (not self.isPlayerMoving()) then
       exit(true);
+
+    if (SRL_Events[EVENT_ANTIBAN] <> nil) then
+      SRL_Events[EVENT_ANTIBAN]();
   end;
 end;
 
-function TRSMinimap.radialWalk(var tpa: TPointArray; cx, cy, theColor, tol, radius, startRadial, endRadial: integer; xMod, yMod: integer = 0): boolean;
+function TRSMinimap.radialWalk(theColor, tol, radius, startRadial, endRadial: integer; flagDist: integer = 0): boolean;
 var
-  sd, ed, direction: integer;
+  sd, ed, direction, i: integer;
   linear: boolean;
-  i: integer;
+  tpa: TPointArray;
 begin
   result := false;
 
@@ -550,25 +584,28 @@ begin
       swap(sd, ed);
 
   findColorsTolerance(tpa, theColor, self.getBounds(), tol);
-  filterPointsPie(tpa, sd, ed, 10, radius, cx, cy);
+  filterPointsPie(tpa, sd, ed, 10, radius, self.cx, self.cy);
 
   if (linear) then
-    linearSort(tpa, cx, cy, direction, false)
+    linearSort(tpa, self.cx, self.cy, direction, false)
   else
-    sortCircleWise(tpa, cx, cy, startRadial, false, startRadial > endRadial);
+    sortCircleWise(tpa, self.cx, self.cy, startRadial, false, startRadial > endRadial);
 
-  result := (length(tpa) > 0);
-
-  if (result) then
+  if (length(tpa) > 0) then
+  begin
     for i := 0 to high(tpa) do
-      if (self.mouseFlag(tpa[i], xMod, yMod, -1, false)) then
-      begin
-        self.waitFlag(10);
+    begin
+      mouse(tpa[i], MOUSE_LEFT);
+      wait(200 + random(100)); // wait for the flag to appear
+
+      if (self.waitFlag(flagDist)) then
         exit(true);
-      end;
+    end;
+  end else
+    print('Failed to find color '+toStr(theColor)+' with tolerance '+toStr(tol), TDebug.ERROR);
 end;
 
-function TRSMinimap.tpaWalk(color, tol, offsetX, offsetY: integer = 0; sortFrom: TPoint): boolean;
+function TRSMinimap.tpaWalk(color, tol: integer; sortFrom: TPoint; flagDist: integer; offset: TPoint = point(0, 0)): boolean;
 var
   i, t: integer;
   tpa: TPointArray;
@@ -583,28 +620,27 @@ begin
     for i := 0 to high(tpa) do
     begin
       p := tpa[i];
-      incEx(p.x, offsetX);
-      incEx(p.y, offsetY);
+      incEx(p.x, offset.x);
+      incEx(p.y, offset.y);
 
       if (not self.isPointOn(p)) then
         continue;
 
       mouse(p.Rand(3), MOUSE_LEFT);
 
-      // wait for the flag to disappear
+      // wait for the flag to appear
       t := (getSystemTime() + 3000);
       while (getSystemTime() < t) do
       begin
-        if (self.waitFlag()) then
-        begin
-          result := true;
-          break;
-        end;
+        if (self.waitFlag(flagDist)) then
+          exit(true);
 
         wait(50);
       end;
     end;
-  end;
+
+  end else
+    print('Failed to find color '+toStr(color)+' with tolerance '+toStr(tol)+' on the minimap', TDebug.ERROR);
 end;
 
 function _getSymbol(sym: integer): _TRSSymbol;
@@ -1440,7 +1476,7 @@ begin
   end;
 end;
 
-function TRSMinimap._getSymbolColor(var x, y: integer; symbol: integer; searchBox: TBox): integer;
+function TRSMinimap._getSymbolColor(var p: TPoint; symbol: integer; searchBox: TBox): integer;
 var
   sym: _TRSSymbol;
   c: integer;
@@ -1452,7 +1488,7 @@ begin
   if (sym.name <> '') then
   begin
     print('Loaded symbol: '+sym.name);
-    findDeformedBitmapToleranceIn(sym.bmp, x, y, searchBox, 70, 0, true, acc);
+    findDeformedBitmapToleranceIn(sym.bmp, p.x, p.y, searchBox, 70, 0, true, acc);
     freeBitmap(sym.bmp);
 
     if (acc > self.symbolAccuracy) then
@@ -1460,13 +1496,13 @@ begin
         c := c + 5;
 
         // look for the symbol's color in a small box around where the bitmap was found
-        if (findColorTolerance(x, y, sym.color, x, y, x + 15, y + 5, c)) then
+        if (findColorTolerance(p.x, p.y, sym.color, p.x, p.y, p.x + 15, p.y + 5, c)) then
         begin
-          result := getColor(x, y);
+          result := getColor(p.x, p.y);
 
           if (result > 0) then
           begin
-            print('Found '+sym.name+' symbol at '+toStr(point(x, y)));
+            print('Found '+sym.name+' symbol at '+toStr(p));
             exit();
           end;
         end;
@@ -1475,24 +1511,25 @@ begin
 
   print('Failed to find '+sym.name+' symbol', TDebug.ERROR);
   print('Report this bug here: http://villavu.com/forum/project.php?projectid=6', TDebug.HINT);
+  p := point(-1, -1);
 end;
 
-function TRSMinimap.findSymbol(var x, y: integer; symbol: integer; searchBox: TBox): boolean;
+function TRSMinimap.findSymbol(var p: TPoint; symbol: integer; searchBox: TBox): boolean;
 begin
-  result := (self._getSymbolColor(x, y, symbol, searchBox) > 0);
+  result := (self._getSymbolColor(p, symbol, searchBox) > 0);
 end;
 
 function TRSMinimap.findSymbols(var tpa: TPointArray; symbol: integer; searchBox: TBox): boolean;
 var
   sym: _TRSSymbol;
-  newColor, i, x, y, _x, _y, l: integer;
+  newColor, i, _x, _y, l: integer;
   tmpATPA: T2DPointArray;
   tmpTPA: TPointArray;
-  p: TPoint;
+  p, _p: TPoint;
   acc: Extended;
 begin
   sym := _getSymbol(symbol);
-  newColor := _getSymbolColor(x, y, symbol, searchBox); // autocolor's the symbol's stored color
+  newColor := _getSymbolColor(_p, symbol, searchBox); // autocolor's the symbol's stored color
 
   if (sym.color > 0) then
   begin
@@ -1502,12 +1539,12 @@ begin
 
     setLength(tpa, length(tmpATPA));
 
-    for i := 0 to length(tmpATPA) do
+    for i := 0 to high(tmpATPA) do
     begin
-      p := tmpATPA[i].getMiddle();
+      p := middleTPA(tmpATPA[i]);
 
       // if the original found symbol is in the array (skips a findBitmal call)
-      if (tmpATPA[i].isInArray(point(x, y))) then
+      if (tmpATPA[i].isInArray(point(_p.x, _p.y))) then
         acc := 1
       else
         // checks for the bitmap in a small box around where the newColor was found
@@ -1539,7 +1576,7 @@ begin
     if (self.findSymbols(gTPA, symbols[i], searchBox)) then
       result := true;
 
-    tpa := CombineTPA(gTPA, tpa);
+    tpa := combineTPA(gTPA, tpa);
   end;
 
   if (result) then
