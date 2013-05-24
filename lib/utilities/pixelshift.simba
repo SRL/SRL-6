@@ -1,5 +1,34 @@
+(*
+Pixel Shift
+~~~~~~~~~~~
+
+A file that stores all functions that have anything to do with pixel shifting.
+*)
+
 {$include_once ../core/debug.simba}
 
+(*
+getPixelShift
+~~~~~~~~~~~~~
+
+.. code-block:: pascal
+
+    function getPixelShift(b: TBoxArray; time: integer): TIntegerArray;
+
+Calculates how many pixels change in each box in "b" over the "time" (in milliseconds).
+Returns the shifts in a TIntegerArray.
+
+.. note::
+
+    by marpis
+    Last Updated: 23 May 2013 by Coh3n
+
+Example:
+
+.. code-block:: pascal
+
+    s := getPixelShift([intToBox(100, 100, 200, 200)], 500);
+*)
 function getPixelShift(b: TBoxArray; time: integer): TIntegerArray;
 var
   l, i: integer;
@@ -24,14 +53,31 @@ begin
   for i := 0 to (l - 1) do
     result[i] := calculatePixelShift(bmpBefore[i], bmpAfter[i], intToBox(0, 0, (b[i].x2 - b[i].x1), (b[i].y2 - b[i].y1)));
 
-  // free all the bitmaps
-  for i := 0 to (l - 1) do
-  begin
-    freeBitmap(bmpBefore[i]);
-    freeBitmap(bmpAfter[i]);
-  end;
+  freeBitmaps(bmpBefore);
+  freeBitmaps(bmpAfter);
 end;
 
+(*
+getPixelShift; overload;
+~~~~~~~~~~~~~~~~~~~~~~~~
+
+.. code-block:: pascal
+
+    function getPixelShift(b: TBox; time: integer): integer; overload;
+
+Overload function. Takes a TBox parameter rather than a TBoxArray.
+
+.. note::
+
+    by Coh3n
+    Last Updated: 23 May 2013 by Coh3n
+
+Example:
+
+.. code-block:: pascal
+
+    s := getPixelShift(minimap.getBounds(), 500);
+*)
 function getPixelShift(b: TBox; time: integer): integer; overload;
 var
   arr: TIntegerArray;
@@ -40,7 +86,29 @@ begin
   result := arr[0];
 end;
 
-function getPixelShift(atpa: T2DPointArray; t: integer): TIntegerArray; overload;
+(*
+getPixelShift; overload;
+~~~~~~~~~~~~~~~~~~~~~~~~
+
+.. code-block:: pascal
+
+    function getPixelShift(atpa: T2DPointArray; time: integer): TIntegerArray; overload;
+
+Overload function. Returns the number of pixels shifted in each TPointArray in
+"atpa" over the "time". Returns the shifts in a TIntegerArray.
+
+.. note::
+
+    by Coh3n
+    Last Updated: 23 May 2013 by Coh3n
+
+Example:
+
+.. code-block:: pascal
+
+    s := getPixelShift(atpa, 500);
+*)
+function getPixelShift(atpa: T2DPointArray; time: integer): TIntegerArray; overload;
 var
   b: TBox;
   l, i: integer;
@@ -58,7 +126,7 @@ begin
     bmpBefore[i] := bitmapFromClient(b.x1, b.y1, b.x2, b.y2);
   end;
 
-  wait(t);
+  wait(time);
 
   // get pixels after the wait
   for i := 0 to (l - 1) do
@@ -75,14 +143,31 @@ begin
     result[i] := calculatePixelShiftTPA(bmpBefore[i], bmpAfter[i], atpa[i]);
   end;
 
-  // free all the bitmaps
-  for i := 0 to (l - 1) do
-  begin
-    freeBitmap(bmpBefore[i]);
-    freeBitmap(bmpAfter[i]);
-  end;
+  freeBitmaps(bmpBefore);
+  freeBitmaps(bmpAfter);
 end;
 
+(*
+getPixelShift; overload;
+~~~~~~~~~~~~~~~~~~~~~~~~
+
+.. code-block:: pascal
+
+    function getPixelShift(tpa: TPointArray; t: integer): integer; overload;
+
+Overload function. Takes a TPointArray parameter rather than a T2DPointArray.
+
+.. note::
+
+    by Coh3n
+    Last Updated: 23 May 2013 by Coh3n
+
+Example:
+
+.. code-block:: pascal
+
+    s := getPixelShift(TPAFromBox(minimap.getBounds()), 500);
+*)
 function getPixelShift(tpa: TPointArray; t: integer): integer; overload;
 var
   arr: TIntegerArray;
@@ -91,6 +176,28 @@ begin
   result := arr[0];
 end;
 
+(*
+getPixelShiftAverage
+~~~~~~~~~~~~~~~~~~~~
+
+.. code-block:: pascal
+
+    function getPixelShiftAverage(b: TBoxArray; waitPerLoop, maxTime: integer): TIntegerArray;
+
+Returns the average pixel shifts in each box in "b" over "maxTime", waiting
+"waitPerLoop" milliseconds between pixel shift checks.
+
+.. note::
+
+    by Coh3n
+    Last Updated: 23 May 2013 by Coh3n
+
+Example:
+
+.. code-block:: pascal
+
+    s := getPixelShift([intToBox(100, 100, 200, 200)], 50, 500);
+*)
 function getPixelShiftAverage(b: TBoxArray; waitPerLoop, maxTime: integer): TIntegerArray;
 var
   t, l, i: integer;
@@ -112,6 +219,28 @@ begin
     result[i] := averageTIA(shifts[i]);
 end;
 
+(*
+getPixelShiftAverage; overload;
+~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+
+.. code-block:: pascal
+
+    function getPixelShiftAverage(b: TBox; waitPerLoop, maxTime: integer): integer; overload;
+
+Returns the average pixel shift in box "b" over "maxTime", waiting "waitPerLoop"
+between getPixelShift calls.
+
+.. note::
+
+    by Coh3n
+    Last Updated: 23 May 2013 by Coh3n
+
+Example:
+
+.. code-block:: pascal
+
+    s := getPixelShift(minimap.getBounds(), 50, 500);
+*)
 function getPixelShiftAverage(b: TBox; waitPerLoop, maxTime: integer): integer; overload;
 var
   arr: TIntegerArray;
@@ -120,12 +249,34 @@ begin
   result := arr[0];
 end;
 
-function getPixelShiftAverage(b: T2DPointArray; waitPerLoop, maxTime: integer): TIntegerArray; overload;
+(*
+getPixelShiftAverage; overload;
+~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+
+.. code-block:: pascal
+
+    function getPixelShiftAverage(atpa: T2DPointArray; waitPerLoop, maxTime: integer): TIntegerArray; overload;
+
+Returns the average pixel shifts in each TPointArray in "atpa" over "maxTime", waiting
+"waitPerLoop" milliseconds between pixel shift checks.
+
+.. note::
+
+    by Coh3n
+    Last Updated: 23 May 2013 by Coh3n
+
+Example:
+
+.. code-block:: pascal
+
+    s := getPixelShift(atpa, 50, 500);
+*)
+function getPixelShiftAverage(atpa: T2DPointArray; waitPerLoop, maxTime: integer): TIntegerArray; overload;
 var
   t, l, i: integer;
   shifts: array of TIntegerArray;
 begin
-  l := length(b);
+  l := length(atpa);
   setLength(result, l);
 
   t := (getSystemTime() + maxTime);
@@ -134,13 +285,34 @@ begin
     for i := 0 to (l - 1) do
     begin
       setLength(shifts, length(shifts) + 1);
-      shifts[high(shifts)] := getPixelShift(b, waitPerLoop);
+      shifts[high(shifts)] := getPixelShift(atpa, waitPerLoop);
     end;
 
   for i := 0 to (l - 1) do
     result[i] := averageTIA(shifts[i]);
 end;
 
+(*
+getPixelShiftAverage; overload;
+~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+
+.. code-block:: pascal
+
+    function getPixelShiftAverage(b: TPointArray; waitPerLoop, maxTime: integer): integer; overload;
+
+Description of the function here.
+
+.. note::
+
+    by Coh3n
+    Last Updated: 23 May 2013 by Coh3n
+
+Example:
+
+.. code-block:: pascal
+
+    s := getPixelShift(tpa, 50, 500);
+*)
 function getPixelShiftAverage(b: TPointArray; waitPerLoop, maxTime: integer): integer; overload;
 var
   arr: TIntegerArray;

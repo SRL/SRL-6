@@ -3,7 +3,7 @@ Changes from SRL5
 
 EVERYTHING should be recorded here: new features, function name changes, user-defined variables... everything! Everything here will be explained in the SRL6 release thread.
 
-- no longer need to call SetupSRL since Lape has initialization (see the end of srl.simba for details)
+- The interface constants (MS, MM, MC, etc.) have been removed. Instead use minimap.x1, minimap.getBounds(), etc. See each interface file for a list of all possible attributes.
 - Lape's auto-invoke has been turned off.  This means when you call a function/procedure you NEED to include () at the end.
   - i.e. WRONG: walkToTrees; RIGHT: walkToTrees();
 
