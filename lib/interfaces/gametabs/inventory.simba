@@ -766,7 +766,7 @@ begin
     begin
       self.mouseSlot(i, clickType);
       if (clickType = MOUSE_RIGHT) and (option <> '') then
-        chooseOption([option], MOUSE_LEFT, 200);
+        chooseOption([option], 200);
 
       inc(result);
       wait(waitFor + random(100));
