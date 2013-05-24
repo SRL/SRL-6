@@ -4,6 +4,11 @@ Debug
 
 The debug file holds any files used for SRL debugging and logging. Debug usage
 guidelines are as follows:
+    * Use print('TRSMinimap.getDots()', TDebug.HEADER) to initilize a function header.
+    * Use print('TRSMinimap.getDots(): '+toStr(result), TDebug.FOOTER) to signal the end of the function.
+    * WARNING: If TDebug.HEADER is used, a TDebug.FOOTER MUST be called once before exiting the function.
+    * Use print('Function/procedure name here', TDebug.SUB) for short functions that don't need a header/footer.
+    * HINT: Always include the function's name in a TDebug.SUB to make it easier for developers.
     * Use print('Message', TDebug.ERROR) for error messages.
     * Use print('Message', TDebug.WARNING) for warnings.  If a lot of warnings are expected in a
       row, use print() once, followed by print('Message' TDebug.LOG).
@@ -38,7 +43,7 @@ Example:
 *)
 {$s+}
 type
-  TDebug = (DEBUG, LOG, HINT, WARNING, ERROR, FATAL);
+  TDebug = (DEBUG, HEADER, SUB, FOOTER, LOG, HINT, WARNING, ERROR, FATAL);
 {$s-}
 
 {*
@@ -202,11 +207,14 @@ for debugType:
     * HINT
     * WARNING
     * ERROR
+    * HEADER
+    * FOOTER
+    * SUB
 
 .. note::
 
     by Coh3n & masterBB
-    Last Modified: 16 April 2013 by Coh3n
+    Last Modified: 24 May 2013 by Coh3n
 
 Example:
 
@@ -231,9 +239,24 @@ begin
 
     TDebug.FATAL:
       txt := 'FATAL ERROR: ' + txt;
+
+    TDebug.FOOTER:
+      dec(__debugLevel);
+
+    TDebug.SUB:
+      inc(__debugLevel);
   end;
 
   debugMSG := replicate('--', __debugLevel) + ' ' + txt;
+
+  // check for header after the case because the debugMSG needs to
+  // be calculated BEFORE __debugLevel is changed
+  if (debugType = TDebug.HEADER) then
+    inc(__debugLevel);
+
+  // reset the debug level
+  if (debugType = TDebug.SUB) then
+    dec(__debugLevel);
 
   if (not disableSRLLog) then
   begin
@@ -255,60 +278,6 @@ begin
 
   if (debugType <> TDebug.LOG) then
     writeln(debugMSG);
-end;
-
-(*
-onFuncEnter()
-~~~~~~~~~~~~~
-
-.. code-block:: pascal
-
-    procedure onFuncEnter();
-
-Increments the debug level when entering a function.
-
-.. note::
-
-    by Coh3n
-    Last Updated: 06 April 2013
-
-Example:
-
-.. code-block:: pascal
-
-    Lape_OnFunctionEnter := @onFuncEnter;
-
-*)
-procedure onFuncEnter();
-begin
-  inc(__debugLevel);
-end;
-
-(*
-onFuncExit
-~~~~~~~~~~
-
-.. code-block:: pascal
-
-    procedure onFuncExit();
-
-Decrements the debug level when exiting a function.
-
-.. note::
-
-    by Coh3n
-    Last Updated: 06 April 2013 by Coh3n
-
-Example:
-
-.. code-block:: pascal
-
-    Lape_OnFunctionExit := @onFuncExit;
-
-*)
-procedure onFuncExit();
-begin
-  dec(__debugLevel);
 end;
 
 (*
@@ -545,7 +514,5 @@ end;
 
 begin
   addOnTerminate('__closeLogFile');
-  //Lape_OnFunctionEnter := @onFuncEnter;
-  //Lape_OnFunctionExit := @onFuncExit;
 end;
 
