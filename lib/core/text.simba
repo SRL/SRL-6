@@ -135,8 +135,7 @@ begin
           // sort the tpa matches and return the top left of the text
           b := tpaText.getBounds();
           matches.sortFromPoint(point(b.x1, b.y1));
-          p.x := matches[0].x;
-          p.y := matches[0].y;
+          p := matches[0];
 
           result := true;
           break(3);
@@ -149,6 +148,43 @@ begin
     print('findTextByColor('+toStr(txt)+'): True, at point '+toStr(p))
   else
     print('findTextByColor('+toStr(txt)+'): '+toStr(result));
+end;
+
+(*
+findTextNumbers
+~~~~~~~~~~~~~~~
+
+.. code-block:: pascal
+
+    function findTextNumbers(col, tol: integer; area: TBox; font: string; spacing: array [0..2] of integer): integer;
+
+Uses getTextAtEx to find text and extracts the numbers from it.
+    * spacing[0] = minvspacing.
+    * spacing[0] = maxvspacing.
+    * spacing[0] = hspacing.
+
+.. note::
+
+    by Ollybest
+    Last Updated: May. 24, 2013 by Ollybest
+
+Example:
+
+.. code-block:: pascal
+
+    writeln(findTextNumbers(clBlack, 10, b, 'statChars', [1, 1, 0]);
+*)
+function findTextNumbers(col, tol: integer; area: TBox; font: string; spacing: array [0..2] of integer): integer;
+var
+  s: string;
+begin
+  s := getTextAtEx(area, spacing[0], spacing[1], spacing[2], col, tol, font);
+  result := strToIntDef(extractFromStr(s, numbers) , -1);
+
+  if (result = -1) then
+    print('findTextNumbers(): Failed to find any numbers in the text('+ s +')')
+  else
+    print('findTextNumbers(): result = ' + intToStr(result));
 end;
 
 (*
@@ -301,7 +337,7 @@ begin
   print('Options found: ');
 
   for i := 0 to high(options) do
-    print('-> '+options[i].str);
+    print(options[i].str);
 end;
 
 {*
@@ -332,7 +368,7 @@ var
   b, bb, bigBox: TBox;
   TPA, TPA1, TPA2, tpaText, tpaNotText, tpaShadow, tpaFilter: TPointArray;
   ATPA, tmpATPA: T2DPointArray;
-  i, l, bW, bH, bmp, oldTarget, oldCTS: integer;
+  i, l, bW, bH, bmp, oldTarget, oldCTS, t: integer;
   menuColors: TIntegerArray;
 begin
   oldTarget := getImageTarget();
@@ -344,6 +380,8 @@ begin
   oldCTS := getToleranceSpeed();
   setColorToleranceSpeed(1);
 
+  setLength(menuColors, 3);
+
   menuColors := [131843 {black}, 3682593 {top blue}, 3552822 {grey}];
   setLength(ATPA, length(menuColors));
 
@@ -352,6 +390,13 @@ begin
     findColors(ATPA[i], menuColors[i], b);
 
   TPA := ATPA.merge();
+
+  if (length(tpa) < 1) then
+  begin
+    print('__getChooseOptions(): Failed to find any choose option box color');
+    setColorToleranceSpeed(oldCTS);
+    exit();
+  end;
 
   if (tabbed) then
   begin
@@ -406,7 +451,7 @@ begin
   setLength(result, length(ATPA));
   result[0].bigBox := bigBox;
 
-  for i := 0 to high(ATPA) do
+  for i := 0 to l do
   begin
     tmpATPA := ATPA[i].split(1, 10); // split one into characters
     sortATPAFromFirstPointX(tmpATPA, point(0, 0));
@@ -419,9 +464,12 @@ begin
   end;
 
   setColorToleranceSpeed(oldCTS);
+  t := getImageTarget();
+
   setImageTarget(oldTarget);
+
+  freeTarget(t);
   freeBitmap(bmp);
-  __debugOptions(result);
 end;
 
 (*
@@ -483,7 +531,7 @@ begin
 
     if (length(options) <= 0) then
     begin
-      print('chooseOption: no options available');
+      print('chooseOption(): No options available');
       exit(false);
     end;
 
@@ -504,8 +552,7 @@ begin
         end;
 
         mouseBox(options[i].bounds, mouseAction);
-        print('Found option: '+options[i].str);
-        result := true;
+        print('Found option: '+ options[i].str);
         exit(true);
       end;
     end;
@@ -513,10 +560,16 @@ begin
     wait(25 + random(25));
   until(getSystemTime() > t);
 
+  // lets debug the options if we didnt find any match
+  print('chooseOption(): Didn''t find any matches');
+  __debugOptions(options);
+
   // to move the mouse away from the menu box if the option isn't found
   b := options[0].bigBox;
-  if (mouseAction <> MOUSE_NONE) and (close = true) then
+  if (mouseAction <> MOUSE_NONE) and (close) then
   begin
+    print('chooseOption(): Closing the menu');
+
     j := max(b.x1 - 52, 0);
 
     if (j = 0) then
@@ -533,27 +586,27 @@ chooseOption; overload;
 
 .. code-block:: pascal
 
-    function chooseOption(txt: TStringArray; mouseAction: integer = MOUSE_LEFT; waitTime: integer = 100): boolean; overload;
+    function chooseOption(txt: TStringArray; waitTime: integer = 100): boolean; overload;
 
-Chooses the first option in txt that's found in the RS right click menu.  Mouse
-behaviour depends on mouseAction.  Will wait (waitTime) for the options to
-exist.  Default waitTime is 100ms.
+Chooses the first option in txt that's found in the RS right click menu. Will
+left click the option if found. Will wait (waitTime) for the options to
+exist. Default waitTime is 100ms.
 
 .. note::
 
     by Coh3n
-    Last Modified: Mar. 10, 2013 by Coh3n
+    Last Updated: May. 24, 2013 by Ollybest
 
 Example:
 
 .. code-block:: pascal
 
-    if (chooseOption(['Examine'], MOUSE_LEFT)) then
+    if (chooseOption(['Examine'])) then
       writeln('Examining something...');
 *)
-function chooseOption(txt: TStringArray; mouseAction: integer = MOUSE_LEFT; waitTime: integer = 100): boolean; overload;
+function chooseOption(txt: TStringArray; waitTime: integer = 100): boolean; overload;
 begin
-  result := chooseOption(txt, TStringArray([]), mouseAction, waitTime);
+  result := chooseOption(txt, TStringArray([]), MOUSE_LEFT, waitTime);
 end;
 
 (*
@@ -580,5 +633,6 @@ Example:
 *)
 function optionsExist(txt: TStringArray): boolean;
 begin
-  result := chooseOption(txt, MOUSE_NONE, 0);
+  result := chooseOption(txt, TStringArray([]), MOUSE_NONE, 0);
 end;
+
