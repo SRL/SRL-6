@@ -74,12 +74,12 @@ begin
 end;
 
 (*
-findTextByColor
-~~~~~~~~~~~~~~~
+findText; overload;
+~~~~~~~~~~~~~~~~~~~
 
 .. code-block:: pascal
 
-    function findTextByColor(var p: TPoint; col, tol: integer; txt, fonts: TStringArray; lookIn: TBox; waitTime: integer = 0): boolean;
+    function findText(var p: TPoint; col, tol: integer; txt, fonts: TStringArray; lookIn: TBox; waitTime: integer = 0): boolean; overload;
 
 Uses TPointArrays to find text on the screen.  Searches for the color (col) with
 tolerance (tol) on the screen, then looks for the text (txt) in a TPA created
@@ -101,14 +101,14 @@ Example:
     var
       p: TPoint;
     begin
-      if (findTextByColor(p, clWhite, 10, ['Lobby'], [upCharsEx], gameTabArea)) then
+      if (findText(p, clWhite, 10, ['Lobby'], [upCharsEx], gameTabArea)) then
         writeln('Found "Exit to Lobby" text');
       .
       .
       .
     end;
 *)
-function findTextByColor(var p: TPoint; col, tol: integer; txt, fonts: TStringArray; lookIn: TBox; waitTime: integer = 0): boolean;
+function findText(var p: TPoint; col, tol: integer; txt, fonts: TStringArray; lookIn: TBox; waitTime: integer = 0): boolean; overload;
 var
   b: TBox;
   i, j, w, h, t: integer;
@@ -160,8 +160,8 @@ findTextNumbers
 
 Uses getTextAtEx to find text and extracts the numbers from it.
     * spacing[0] = minvspacing.
-    * spacing[0] = maxvspacing.
-    * spacing[0] = hspacing.
+    * spacing[1] = maxvspacing.
+    * spacing[2] = hspacing.
 
 .. note::
 
