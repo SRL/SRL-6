@@ -18,6 +18,8 @@ EVERYTHING should be recorded here: new features, function name changes, user-de
     - debugATPABounds
   - Debug levels are expressed by the enum TDebug
   - SRL's debug procedure is now print('Message', debugType: TDebug = TDebug.DEBUG)
+  - Valid debugTypes and debug guidlines can be found at the top of debug.simba.
+  - We HIGHLY recommend adopting this system for your scripts (it's displays the same as MSI's debug if anyone has seen that system).
 
 - globals.simba
   - renamed variable SRL_Proc to events
@@ -32,6 +34,8 @@ EVERYTHING should be recorded here: new features, function name changes, user-de
   - FindTextTPA/Ex replaced with findTextByColor()
   - All uptext functions replaced with isUptext, and moved to mainscreen.simba
   - All option functions replaced with chooseOption, and moved to mainscreen.simba
+  - Added function findTextNumbers().
+  - Two findText functions, one that uses bitmaps, one that uses color.
 
 - players.simba merged with login.simba
   - TUser renamed to TPlayer
@@ -79,6 +83,12 @@ EVERYTHING should be recorded here: new features, function name changes, user-de
   - getColorPercent and getBlackBackground moved from SRL-5's color.simba.
   - PlayerMoving and WaitPlayerMoving moved from animation.simba.
   - GridCoords16Ex ranamed to minimap.pointToMainscreen + made more accurate.
+
+- new file, mainscreen.simba
+  - Uptext and option functions moved here.
+  - setAngle moved here and renamed TRSMainscreen.setAngle. 
+  - Angle constants renamed with a MS_ prefix.
+  - Animating moved here and renamed TRSMainscreen.isPlayerAnimating.
 
 - animation.simba renamed to pixelshift.simba
   - PlayerMoving and WaitPlayerMoving moved to minimap.simba.
@@ -166,7 +176,8 @@ EVERYTHING should be recorded here: new features, function name changes, user-de
   - GetKeyBind() renamed to actionBar.getKeyBind()
 
 - gametab.simba
-  - Added Placeholder.
+  - Split into a separate file for each gametab.  All gametab files are found in lib/interfaces/gametabs.
+  - gametab.simba holds the TRSGametab type as well as general gametab functions.
 
 - mouse.simba
   - WindMouse split and renamed to _humanWindMouse() & _brakeWindMouse() & made internal functions.
@@ -186,13 +197,17 @@ EVERYTHING should be recorded here: new features, function name changes, user-de
   - removed function isRealMouseInBox
   - removed function getReadMousePos because TClient isn't yet supported in Lape
 
+- smartgraphics.simba converted to drawing.simba
+  - Using drawing.simba, one can create several different drawings and display them how they wish.
+  - smart.simba has a global variable, SMART_Image: TDrawing, that can be drawn to using any of the TDrawing functions.
+
 - new file, client.simba
   - added function isClientReady (replaces RSReady)
   - added function waitClientReady, which is called in setupSRL
 
-- new file, types.simba
-  - new function TPoint.rand that will add a random integer to a TPoint
-  - new function TPoint.coords that will assign the x and y values of a TPoint
+- Type functions:
+  - In the lib/utilities/types/ folder there are several different type files that hold different type functions, some that are in Simba and some that aren't.
+  - Example: TBox.equals can be used like if (box1.equals(box2)) then ...
 
 - new file, wrappers.simba
   - getColor may a take a TPoint instead of x and y variables.
@@ -217,6 +232,3 @@ EVERYTHING should be recorded here: new features, function name changes, user-de
    - findDTMs
    - findDTM
    - getTextAtEx
-
-- new file, mainscreen.simba
-  - Uptext and option functions moved here
