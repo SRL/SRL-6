@@ -337,7 +337,7 @@ begin
   print('Options found: ');
 
   for i := 0 to high(options) do
-    print(options[i].str);
+    print(options[i].str, TDebug.SUB);
 end;
 
 {*
@@ -393,7 +393,7 @@ begin
 
   if (length(tpa) < 1) then
   begin
-    print('__getChooseOptions(): Failed to find any choose option box color');
+    print('__getChooseOptions(): Failed to find any choose option box color', TDebug.SUB);
     setColorToleranceSpeed(oldCTS);
     exit();
   end;
@@ -490,7 +490,7 @@ Works for RS tabbed menus.
 .. note::
 
     by Wizzup?, Nava2 & N1ke!
-    Last Modified: Mar. 10, 2013 by Coh3n
+    Last Modified: 30 May 2013 by Coh3n
 
 Example:
 
@@ -500,13 +500,33 @@ Example:
       writeln('Using bank');
 *)
 function chooseOption(txt, txtTab: TStringArray; mouseAction: integer; close: boolean = true; waitTime: integer = 100): boolean;
+  // used to move the mouse away from the options menu if the option isn't found
+  procedure __mouseAway(bigBox: TBox; mouseAction: integer; close: boolean);
+  var
+    j: integer;
+  begin
+    if (mouseAction <> MOUSE_NONE) and (close) then
+    begin
+      print('Closing the menu');
+
+      j := max(bigBox.x1 - 52, 0);
+
+      if (j = 0) then
+        j := (bigBox.x2 + 10);
+
+      mouse(point(j, max(bigBox.y1 - 50, 0)).rand(40, bigBox.y2 - bigBox.y1));
+      wait(200 + random(100));
+    end;
+  end;
 var
   b: TBox;
   p: TPoint;
   textFound: boolean;
-  i, j, t: integer;
+  i, t: integer;
   options: array of __TOptions;
 begin
+  print('chooseOption()', TDebug.HEADER);
+
   result := false;
   wait(waitTime + random(50)); // an initial wait after mouse is clicked
   t := (getSystemTime() + waitTime);
@@ -514,14 +534,19 @@ begin
   repeat
     options := __getChooseOptions(b);
 
+    // if using the tabbed option
     if (length(txtTab) > 0) then
     begin
       if (chooseOption(txtTab, TStringArray([]), MOUSE_LEFT, false, 0)) then // choose the final option if it exists
-        exit(true)
-      else
+      begin
+        print('chooseOption(): True', TDebug.FOOTER);
+        exit(true);
+      end else
         if (not chooseOption(txt, TStringArray([]), MOUSE_MOVE, false, 0)) then // move the mouse to the first option
         begin
-          print('chooseOption (tabbed): txt not found');
+          __mouseAway(options[0].bigBox, mouseAction, close);
+          print('Text '+toStr(txt)+' not found');
+          print('chooseOption(): False', TDebug.FOOTER);
           exit(false);
         end;
 
@@ -531,7 +556,8 @@ begin
 
     if (length(options) <= 0) then
     begin
-      print('chooseOption(): No options available');
+      print('No options available');
+      print('chooseOption(): False', TDebug.FOOTER);
       exit(false);
     end;
 
@@ -553,6 +579,7 @@ begin
 
         mouseBox(options[i].bounds, mouseAction);
         print('Found option: '+ options[i].str);
+        print('chooseOption(): True', TDebug.FOOTER);
         exit(true);
       end;
     end;
@@ -561,23 +588,11 @@ begin
   until(getSystemTime() > t);
 
   // lets debug the options if we didnt find any match
-  print('chooseOption(): Didn''t find any matches');
+  print('Didn''t find any matches');
   __debugOptions(options);
+  __mouseAway(options[0].bigBox, mouseAction, close);
 
-  // to move the mouse away from the menu box if the option isn't found
-  b := options[0].bigBox;
-  if (mouseAction <> MOUSE_NONE) and (close) then
-  begin
-    print('chooseOption(): Closing the menu');
-
-    j := max(b.x1 - 52, 0);
-
-    if (j = 0) then
-      j := (b.x2 + 10);
-
-    mouse(point(j, max(b.y1 - 50, 0)).rand(40, b.y2 - b.y1));
-    wait(200 + random(100));
-  end;
+  print('chooseOption(): '+toStr(result), TDebug.FOOTER);
 end;
 
 (*
