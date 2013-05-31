@@ -544,7 +544,9 @@ begin
       end else
         if (not chooseOption(txt, TStringArray([]), MOUSE_MOVE, false, 0)) then // move the mouse to the first option
         begin
-          __mouseAway(options[0].bigBox, mouseAction, close);
+          if (length(options) > 0) then
+            __mouseAway(options[0].bigBox, mouseAction, close);
+
           print('Text '+toStr(txt)+' not found');
           print('chooseOption(): False', TDebug.FOOTER);
           exit(false);
@@ -590,7 +592,9 @@ begin
   // lets debug the options if we didnt find any match
   print('Didn''t find any matches');
   __debugOptions(options);
-  __mouseAway(options[0].bigBox, mouseAction, close);
+
+  if (length(options) > 0) then
+    __mouseAway(options[0].bigBox, mouseAction, close);
 
   print('chooseOption(): '+toStr(result), TDebug.FOOTER);
 end;
