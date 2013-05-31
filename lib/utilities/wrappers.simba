@@ -37,6 +37,35 @@ begin
 end;
 
 (*
+getColors: overload;
+~~~~~~~~~~~~~~~~~~~~
+
+.. code-block:: pascal
+
+    function getColors(tpa: TPointArray; clearSame: boolean): TIntegerArray; overload;
+
+Takes an extra parameter, clearSame if true will clear the same integers in the result.
+
+.. note::
+
+    by Ollybest
+
+Example:
+
+.. code-block:: pascal
+
+     intArr := getColors(myTPA, true);
+
+*)
+function getColors(tpa: TPointArray; clearSame: boolean): TIntegerArray; overload;
+begin
+  result := getColors(tpa);
+
+  if (clearSame) then
+    clearSameIntegers(result);
+end;
+
+(*
 findColor: overload;
 ~~~~~~~~~~~~~~~~~~~~
 
@@ -268,6 +297,32 @@ Example:
 function countColorTolerance(Color: integer; searchBox: TBox; tol: integer): integer; overload;
 begin
   Result := CountColorTolerance(color, searchBox.x1, searchBox.y1, searchBox.x2, searchBox.y2, tol);
+end;
+
+(*
+bitmapFromClient: overload;
+~~~~~~~~~~~~~~~~~~~~~~~~~~~
+
+.. code-block:: pascal
+
+    function bitmapFromClient(searchBox: TBox): integer; overload;
+
+Takes a TBox variable instead of x1, y1, x2 and y2 variables.
+
+.. note::
+
+    by Ollybest
+
+Example:
+
+.. code-block:: pascal
+
+    bmp := bitmapFromClient(box);
+
+*)
+function bitmapFromClient(searchBox: TBox): integer; overload;
+begin
+  result := bitmapFromClient(searchBox.x1, searchBox.y1, searchBox.x2, searchBox.y2);
 end;
 
 (*
