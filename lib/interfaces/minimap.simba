@@ -168,6 +168,17 @@ var
   minimap: TRSMinimap;
 
 {*
+var flag
+~~~~~~~~
+
+Internal variables that store the minimap flag staus.  The flag bitmap is only
+loaded if it's used, and it's only loaded once.
+*}
+var
+  __bmpFlag: integer;
+  __bmpFlagLoaded: boolean;
+
+{*
 TRSMinimap.__init
 ~~~~~~~~~~~~~~~~~
 
@@ -750,23 +761,55 @@ Example:
     flagFound := minimap._findFlagBitmap(p);
 *}
 function TRSMinimap._findFlagBitmap(var p: TPoint): boolean;
-var
-  bmpFlag: integer;
 begin
   result := false;
 
-  bmpFlag := bitmapFromString(8, 15, 'meJxjYEAHIpr/F8yYgSkozPfE3ty' +
-            'cGHGgIKY4RBBNHC6ILI4sAkYngOIwNhQJ8bUBBYEIyEBGQO37tm3D' +
-            'dCcdxIGBhlUcCBgZGAA27Tt3');
+  // load bitmap if it hasn't already been loaded
+  if (not __bmpFlagLoaded) then
+  begin
+    print('Loading flag bitmap...', TDebug.SUB);
 
-  if (findBitmapToleranceIn(bmpFlag, p.x, p.y, self.getBounds(), MM_RADIUS)) then
+    __bmpFlag := bitmapFromString(8, 15, 'meJxjYEAHIpr/F8yYgSkozPfE3ty' +
+                  'cGHGgIKY4RBBNHC6ILI4sAkYngOIwNhQJ8bUBBYEIyEBGQO37tm3D' +
+                  'dCcdxIGBhlUcCBgZGAA27Tt3');
+
+    __bmpFlagLoaded := true;
+    setBitmapName(__bmpFlag, 'minimap_flag');
+  end;
+
+  if (findBitmapToleranceIn(__bmpFlag, p.x, p.y, self.getBounds(), 75)) then
   begin
     result := true;
     p.x := (p.x + 7);  // offset the point to the bottom of the flag
     p.y := (p.y + 14);
   end;
+end;
 
-  freeBitmap(bmpFlag);
+{*
+_freeFlagBitmap
+~~~~~~~~~~~~~~~
+
+.. code-block:: pascal
+
+    procedure _freeFlagBitmap();
+
+Frees the flag bitmap.
+
+.. note::
+
+    by Coh3n
+    Last Updated: 31 May 2013 by Coh3n
+
+Example:
+
+.. code-block:: pascal
+
+    addOnTerminate('_freeFlagBitmap');
+*}
+procedure _freeFlagBitmap();
+begin
+  if (__bmpFlagLoaded) then
+    freeBitmap(__bmpFlag);
 end;
 
 {*
@@ -2252,4 +2295,9 @@ begin
 
   if (result) then
     print('Found a total of '+toStr(length(tpa))+' symbols');
+end;
+
+begin
+  minimap.__init();
+  addOnTerminate('_freeFlagBitmap');
 end;
