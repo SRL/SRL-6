@@ -89,6 +89,7 @@ EVERYTHING should be recorded here: new features, function name changes, user-de
   - setAngle moved here and renamed TRSMainscreen.setAngle. 
   - Angle constants renamed with a MS_ prefix.
   - Animating moved here and renamed TRSMainscreen.isPlayerAnimating.
+  - FindObjTPA and FindObjTPAMulti moved from object.simba.
 
 - animation.simba renamed to pixelshift.simba
   - PlayerMoving and WaitPlayerMoving moved to minimap.simba.
