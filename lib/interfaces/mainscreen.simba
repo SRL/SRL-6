@@ -8,6 +8,7 @@ Runescape lobby mainscreen.
 *)
 
 {$include_once interfaces.simba}
+{$include_once actionbar.simba}
 {$include_once ../utilities/pixelshift.simba}
 {$include_once ../utilities/color.simba}
 
@@ -82,6 +83,40 @@ begin
     cx := self.getCenterPoint().x;
     cy := self.getCenterPoint().y;
   end;
+end;
+
+(*
+TRSMainscreen.getBounds; override;
+~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+
+.. code-block:: pascal
+
+    function TRSMainscreen.getBounds(): TBox; override;
+
+Returns the coordinates of the mainscree.  Takes into consideration whether or
+not the action bar is open.
+
+.. note::
+
+    by Coh3n
+    Last Updated: 31 May 2013
+
+Example:
+
+.. code-block:: pascal
+
+    b := mainscreen.getBounds();
+*)
+function TRSMainscreen.getBounds(): TBox; override;
+begin
+  if (actionbar.isOpen()) then
+  begin
+    if (self.y2 > actionbar.y1) then
+      self.y2 := (self.y2 - actionbar.h);
+  end else
+    self.y2 := actionbar.y2;
+
+  result := intToBox(self.x1, self.y1, self.x2, self.y2);
 end;
 
 (*
