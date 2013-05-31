@@ -8,7 +8,7 @@ minimap.
 
 {$include_once interfaces.simba}
 {$include_once mainscreen.simba}
-{$include_once ../misc/color.simba}
+{$include_once ../utilities/color.simba}
 {$include_once ../utilities/pixelshift.simba}
 {$f-}
 
@@ -681,7 +681,7 @@ var
 begin
   result := -1;
 
-  findColorsTolerance(TPA, clBlack, self.x1, self.y1, self.x2, self.y2, 3, colorSetting(2, 100, 100));
+  findColorsTolerance(TPA, clBlack, self.getBounds(), 3, colorSetting(2, 100, 100));
   if (length(TPA) < 1) then
     exit();
 

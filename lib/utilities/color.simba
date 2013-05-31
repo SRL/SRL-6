@@ -1,0 +1,389 @@
+(*
+Color
+=====
+
+The color type holds all the functions and types that can be used for easy color
+finding, comparing or manupilation.
+
+*)
+
+{$include_once wrappers.simba}
+{$f-}
+
+(*
+type TColorSettings
+~~~~~~~~~~~~~~~~~~~
+
+A record that provides easy access to the Simba CTS settings.
+*)
+type
+  TColorSettings = record
+    CTS: Integer;
+    modifier: record
+      hue, saturation, sensitivity: Extended;
+    end;
+  end;
+
+(*
+colorSetting
+~~~~~~~~~~~~
+
+.. code-block:: pascal
+
+    function colorSetting(_CTS:Integer): TColorSettings;
+
+Creates and returns a colorSetting record with the given CTS method.
+
+.. note::
+
+    by Janilabo
+    Last Updated: Apr. 20, 2013 by Janilabo
+
+Example:
+
+.. code-block:: pascal
+
+    if(findColorTolerance(x, y, $FF0000, MSX1, MSY1, MSX2, MSY2, 10, colorSetting(0))) then
+*)
+function colorSetting(_CTS:Integer): TColorSettings;
+var
+  cs: TColorSettings;
+begin
+  cs.CTS := _CTS;
+  Result := cs;
+end;
+
+(*
+colorSetting
+~~~~~~~~~~~~
+
+.. code-block:: pascal
+
+    function colorSetting(_CTS:Integer): TColorSettings;
+
+Creates and returns a colorSetting record with the given CTS method and the CTS 2 modifiers.
+
+.. note::
+
+    by Janilabo
+    Last Updated: Apr. 20, 2013 by Janilabo
+
+Example:
+
+.. code-block:: pascal
+
+    if(findColorTolerance(x, y, $DACE11, MSX1, MSY1, MSX2, MSY2, 10, colorSetting(2, 0.20, 0.80))) then
+*)
+function colorSetting(_CTS:Integer;  _hueModifier, _saturationModifier: Extended): TColorSettings; overload;
+var
+  cs: TColorSettings;
+begin
+  cs.create(_CTS, _hueModifier, _saturationModifier);
+  Result := cs;
+end;
+
+(*
+colorSetting
+~~~~~~~~~~~~
+
+.. code-block:: pascal
+
+    function colorSetting(_CTS:Integer): TColorSettings;
+
+Creates and returns a colorSetting record with the given CTS method and the CTS 3 modifier.
+
+.. note::
+
+    by Janilabo
+    Last Updated: Apr. 20, 2013 by Janilabo
+
+Example:
+
+.. code-block:: pascal
+
+    if(findColorTolerance(x, y, $DACE11, MSX1, MSY1, MSX2, MSY2, 10, colorSetting(2, 10))) then
+*)
+function colorSetting(_CTS:Integer; _sensitivityModifier: Extended): TColorSettings; overload;
+var
+  cs: TColorSettings;
+begin
+  cs.create(_CTS, _sensitivityModifier);
+  Result := cs;
+end;
+
+(*
+TColorSettings.create
+~~~~~~~~~~~~~~~~~~~~~
+
+.. code-block:: pascal
+
+    procedure TColorSettings.create(_CTS: Integer; _hueModifier, _saturationModifier: Extended);
+
+Creates and colorSetting record with the given CTS method and the CTS 2 modifiers.
+
+.. note::
+
+    by Janilabo
+    Last Updated: Apr. 20, 2013 by Janilabo
+
+Example:
+
+.. code-block:: pascal
+
+    goblinCS.create(2, 0.45. 0.90);
+    if(findColorTolerance(x, y, $DACE11, MSX1, MSY1, MSX2, MSY2, 10, goblinCS)) then
+*)
+procedure TColorSettings.create(_CTS: Integer; _hueModifier, _saturationModifier: Extended);
+begin
+  Self.CTS := _CTS;
+  Self.modifier.hue := _hueModifier;
+  Self.modifier.saturation := _saturationModifier;
+end;
+
+(*
+TColorSettings.create
+~~~~~~~~~~~~~~~~~~~~~
+
+.. code-block:: pascal
+
+    procedure TColorSettings.create(_CTS: Integer; _sensitivityModifier: Extended);
+
+Creates and ColorSetting record with the given CTS method and the CTS 3 modifier.
+
+.. note::
+
+    by Janilabo
+    Last Updated: Apr. 20, 2013 by Janilabo
+
+Example:
+
+.. code-block:: pascal
+
+    chickenCS.create(3, 20);
+    if(findColorTolerance(x, y, $FFFFFF, MSX1, MSY1, MSX2, MSY2, 15, chickenCS)) then
+*)
+procedure TColorSettings.create(_CTS: Integer; _sensitivityModifier: Extended); overload;
+begin
+  Self.CTS := _CTS;
+  Self.modifier.sensitivity := _sensitivityModifier;
+end;
+
+(*
+TColorSettings.retrieve
+~~~~~~~~~~~~~~~~~~~~~~~
+
+.. code-block:: pascal
+
+    procedure TColorSettings.retrieve();
+
+Gets the current CTS settings used by simba, and stores them into the record.
+
+.. note::
+
+    by Janilabo
+    Last Updated: Apr. 20, 2013 by Janilabo
+
+Example:
+
+.. code-block:: pascal
+
+    restoreCS.retrieve();
+    SetColorToleranceSpeed(5);
+    a := findColorTolerance(x, y, 5811341, MSX1, MSY1, MSX2, MSY2, 10);
+    restoreCS.apply();
+*)
+procedure TColorSettings.retrieve();
+begin
+  Self.CTS := GetToleranceSpeed();
+  Self.modifier.sensitivity := GetToleranceSpeed3Modifier();
+  GetToleranceSpeed2Modifiers(Self.modifier.hue, Self.modifier.saturation);
+end;
+
+(*
+TColorSettings.retrieve
+~~~~~~~~~~~~~~~~~~~~~~~
+
+.. code-block:: pascal
+
+    procedure TColorSettings.apply();
+
+Applies the CTS settings from the record to the simba client.
+
+.. note::
+
+    by Janilabo
+    Last Updated: Apr. 20, 2013 by Janilabo
+
+Example:
+
+.. code-block:: pascal
+
+    goblinCS.apply();
+    if (findColorTolerance(x, y, 5811341, MSX1, MSY1, MSX2, MSY2, 10)) then
+*)
+procedure TColorSettings.apply();
+begin
+  SetColorToleranceSpeed(Self.CTS);
+  SetToleranceSpeed2Modifiers(Self.modifier.hue, Self.modifier.saturation);
+  SetToleranceSpeed3Modifier(Self.modifier.sensitivity);
+end;
+
+(*
+findColorTolerance; overload;
+~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+
+.. code-block:: pascal
+
+    function findColorTolerance(var x, y: Integer; color: integer; searchBox: TBox; tol: Integer; settings: TColorSettings): Boolean; overload;
+
+Calls the simba find function with an additional color settings parameter. Sets and restores the CTS settings.
+
+.. note::
+
+    by Janilabo
+    Last Updated: Apr. 20, 2013 by Janilabo
+
+Example:
+
+.. code-block:: pascal
+
+    goblinCS.apply();
+    if (findColorTolerance(x, y, 5811341, MSX1, MSY1, MSX2, MSY2, 10)) then
+*)
+function findColorTolerance(var x, y: Integer; color: integer; searchBox: TBox; tol: Integer; settings: TColorSettings): Boolean; overload;
+var
+  cs: TColorSettings;
+begin
+  cs.retrieve;
+  settings.apply();
+  Result := findColorTolerance(x, y, color, searchBox, tol);
+  cs.apply();
+end;
+
+(*
+findColorsTolerance; overload;
+~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+
+.. code-block:: pascal
+
+    function findColorsTolerance(var points: TPointArray; color: integer; searchBox: TBox; tol: Integer; settings: TColorSettings): Boolean; overload;
+
+Calls the simba find function with an additional color settings parameter. Sets and restores the CTS settings.
+
+.. note::
+
+    by Janilabo
+    Last Updated: Apr. 20, 2013 by Janilabo
+
+Example:
+
+.. code-block:: pascal
+
+    goblinCS.apply();
+    if (findColorsTolerance(tpa, 5811341, MSX1, MSY1, MSX2, MSY2, 10)) then
+*)
+function findColorsTolerance(var points: TPointArray; color: integer; searchBox: TBox; tol: Integer; settings: TColorSettings): Boolean; overload;
+var
+  cs: TColorSettings;
+begin
+  cs.retrieve();
+  settings.apply();
+  Result := findColorsTolerance(points, color, searchBox, tol);
+  cs.apply();
+end;
+
+(*
+findColorSpiralTolerance; overload;
+~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+
+.. code-block:: pascal
+
+    function findColorSpiralTolerance(var x, y: Integer; color: integer; searchBox: TBox; tol: Integer; settings: TColorSettings): Boolean; overload;
+
+Calls the simba find function with an additional color settings parameter. Sets and restores the CTS settings.
+
+.. note::
+
+    by Janilabo
+    Last Updated: Apr. 20, 2013 by Janilabo
+
+Example:
+
+.. code-block:: pascal
+
+    goblinCS.apply();
+    if (findColorSpiralTolerance(x, y, 5811341, MSX1, MSY1, MSX2, MSY2, 10)) then
+*)
+function findColorSpiralTolerance(var x, y: Integer; color: integer; searchBox: TBox; tol: Integer; settings: TColorSettings): Boolean; overload;
+var
+  cs: TColorSettings;
+begin
+  cs.retrieve();
+  settings.apply();
+  Result := findColorSpiralTolerance(x, y, color, searchBox, tol);
+  cs.apply();
+end;
+
+(*
+findColorsSpiralTolerance; overload;
+~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+
+.. code-block:: pascal
+
+    function findColorsSpiralTolerance(x, y: Integer; var points: TPointArray; color: integer; searchBox: TBox; tol: Integer; settings: TColorSettings): Boolean; overload;
+
+Calls the simba find function with an additional color settings parameter. Sets and restores the CTS settings.
+
+.. note::
+
+    by Janilabo
+    Last Updated: Apr. 20, 2013 by Janilabo
+
+Example:
+
+.. code-block:: pascal
+
+    goblinCS.apply();
+    if (findColorsSpiralTolerance(x, y, tpa, 5811341, MSX1, MSY1, MSX2, MSY2, 10)) then
+*)
+function findColorsSpiralTolerance(x, y: Integer; var points: TPointArray; color: integer; searchBox: TBox; tol: Integer; settings: TColorSettings): Boolean; overload;
+var
+  cs: TColorSettings;
+begin
+  cs.retrieve();
+  settings.apply();
+  Result := findColorsSpiralTolerance(x, y, points, color, searchBox, tol);
+  cs.apply();
+end;
+
+
+(*
+countColorTolerance; overload;
+~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+
+.. code-block:: pascal
+
+    function countColorTolerance(color: integer; searchBox: TBox; tol: Integer; settings: TColorSettings): integer; overload;
+
+Calls Simba's countColorTolerance with an additional color settings parameter.
+
+.. note::
+
+    by Janilabo
+    Last Updated: 30 May 2013 by Coh3n
+
+Example:
+
+.. code-block:: pascal
+
+    if (countColorTolerance(color, mainscreen.getBounds(), tol, demonCS) > 20) then
+*)
+function countColorTolerance(color: integer; searchBox: TBox; tol: Integer; settings: TColorSettings): integer; overload;
+var
+  cs: TColorSettings;
+begin
+  cs.retrieve();
+  settings.apply();
+  Result := countColorTolerance(color, searchBox, tol);
+  cs.apply();
+end;
