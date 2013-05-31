@@ -4,8 +4,11 @@ Changes from SRL5
 EVERYTHING should be recorded here: new features, function name changes, user-defined variables... everything! Everything here will be explained in the SRL6 release thread.
 
 - The interface constants (MS, MM, MC, etc.) have been removed. Instead use minimap.x1, minimap.getBounds(), etc. See each interface file for a list of all possible attributes.
-- Lape's auto-invoke has been turned off.  This means when you call a function/procedure you NEED to include () at the end.
+- Lape's auto-invoke has been turned off. This means when you call a function/procedure you NEED to include () at the end.
   - i.e. WRONG: walkToTrees; RIGHT: walkToTrees();
+  - NOTE: This is only when writing code INSIDE SRL. You do not need to include () in your scripts if you don't want.
+- Since Lape doesn't yet have addOnTerminate, we have added it to SRL; however, the only way it works properly is if you call terminateScript() at the end of your script. So, be sure to add terminateScript before the last "end." of your script.
+
 
 - debug.simba (merged with SRLLog.simba)
   - Added variables disableSRLDebug, disableSRLLog, disableIPScreenshots

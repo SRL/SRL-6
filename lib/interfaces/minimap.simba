@@ -168,6 +168,17 @@ var
   minimap: TRSMinimap;
 
 {*
+var flag
+~~~~~~~~
+
+Internal variables that store the minimap flag staus.  The flag bitmap is only
+loaded if it's used, and it's only loaded once.
+*}
+var
+  __bmpFlag: integer;
+  __bmpFlagLoaded: boolean;
+
+{*
 TRSMinimap.__init
 ~~~~~~~~~~~~~~~~~
 
@@ -386,8 +397,8 @@ begin
   end else
     fastClick(MOUSE_LEFT);
 
-  print('Clicked compass');
-  print('Call mainscreen.setAngle(MS_ANGLE_HIGH) to convert to overhead view', TDebug.HINT);
+  print('Clicked compass', TDebug.SUB);
+  print('HINT: Call mainscreen.setAngle(MS_ANGLE_HIGH) to convert to overhead view', TDebug.SUB);
 end;
 
 {*
@@ -448,16 +459,19 @@ var
   i, c: integer;
   tpa: TPointArray;
 begin
+  print('TRSMinimap.getDots()', TDebug.HEADER);
+
   // confirm valid dot type
   if (not self._isValidDot(dotType)) then
   begin
     print('Invalid dot type '+toStr(dotType), TDebug.ERROR);
+    print('TRSMinimap.getDots(): '+toStr(result), TDebug.FOOTER);
     exit;
   end;
 
   freeze();
   findColors(tpa, 65536, searchBox); // the black shadow color of the minimap dots
-  print('Found '+toStr(length(tpa) div 4)+' total dots on the minimap', TDebug.LOG);
+  print('Found '+toStr(length(tpa) div 4)+' total dots on the minimap');
 
   // filter out the corners if searching the whole minimap so we only have colors that are actually on the minimap
   if (length(tpa) > 0) then
@@ -470,11 +484,15 @@ begin
   if (length(tpa) <= 0) then
   begin
     unfreeze();
+    print('No minimap dots found', TDebug.ERROR);
+    print('TRSMinimap.getDots(): '+toStr(result), TDebug.FOOTER);
     exit;
   end;
 
   setLength(result, length(tpa));
   c := 0;
+
+  print('Filtering out the invalid dots...');
 
   // gets the difference between the bottom two colors of a dot
   for i := 0 to high(tpa) do
@@ -488,6 +506,7 @@ begin
   setLength(result, c);
 
   print('Found '+toStr(length(result))+' minimap dots (ID: '+toStr(dotType)+')');
+  print('TRSMinimap.getDots(): '+toStr(result), TDebug.FOOTER);
 end;
 
 (*
@@ -519,10 +538,13 @@ var
   dots: TPointArray;
   b: TBox;
 begin
+  print('TRSMinimap.getDotsMainscreen()', TDebug.HEADER);
+
   // confirm valid dot type
   if (not self._isValidDot(dotType)) then
   begin
     print('Invalid dot type '+toStr(dotType), TDebug.ERROR);
+    print('TRSMinimap.getDotsMainscreen(): '+toStr(result), TDebug.FOOTER);
     exit;
   end;
 
@@ -557,6 +579,7 @@ begin
 
   print('Found '+toStr(length(result))+' minimap dots likely to be on the mainscreen');
   print('Use minimap.getDotsMainscreen() in combination with minimap.pointToMainscreen() to find a dot''s mainscreen location', TDebug.HINT);
+  print('TRSMinimap.getDotsMainscreen(): '+toStr(result), TDebug.FOOTER);
 end;
 
 (*
@@ -607,10 +630,10 @@ begin
 
   if (not pointInBox(result, mainscreen.getBounds())) then
   begin
-    print('Point calculated '+toStr(result)+' was not in the mainscreen, returning (-1, -1)', TDebug.ERROR);
+    print('TRSMinimap.pointToMainscreen(): Point calculated '+toStr(result)+' was not in the mainscreen, returning (-1, -1)', TDebug.SUB);
     result := point(-1, -1);
   end else
-    print('Point calculated to be on mainscreen at '+toStr(result));
+    print('TRSMinimap.pointToMainscreen(): Point calculated to be on mainscreen at '+toStr(result), TDebug.SUB);
 end;
 
 (*
@@ -681,12 +704,20 @@ var
 begin
   result := -1;
 
+  print('TRSMinimap.getBlackBackground()', TDebug.HEADER);
+
   findColorsTolerance(TPA, clBlack, self.getBounds(), 3, colorSetting(2, 100, 100));
   if (length(TPA) < 1) then
+  begin
+    print('Failed to find clBlack', TDebug.ERROR);
+    print('TRSMinimap.getBlackBackground(): '+toStr(result), TDebug.FOOTER);
     exit();
+  end;
 
   cols := getColors(TPA);
   cols.clearEquals();
+
+  print('Found '+toStr(length(cols))+' shades of black, finding the most common one...');
 
   for i := 0 to high(cols) do
   begin
@@ -698,6 +729,8 @@ begin
       max := currentCount;
     end;
   end;
+
+  print('TRSMinimap.getBlackBackground(): '+toStr(result), TDebug.FOOTER);
 end;
 
 (*
@@ -750,23 +783,55 @@ Example:
     flagFound := minimap._findFlagBitmap(p);
 *}
 function TRSMinimap._findFlagBitmap(var p: TPoint): boolean;
-var
-  bmpFlag: integer;
 begin
   result := false;
 
-  bmpFlag := bitmapFromString(8, 15, 'meJxjYEAHIpr/F8yYgSkozPfE3ty' +
-            'cGHGgIKY4RBBNHC6ILI4sAkYngOIwNhQJ8bUBBYEIyEBGQO37tm3D' +
-            'dCcdxIGBhlUcCBgZGAA27Tt3');
+  // load bitmap if it hasn't already been loaded
+  if (not __bmpFlagLoaded) then
+  begin
+    print('Loading flag bitmap...', TDebug.SUB);
 
-  if (findBitmapToleranceIn(bmpFlag, p.x, p.y, self.getBounds(), MM_RADIUS)) then
+    __bmpFlag := bitmapFromString(8, 15, 'meJxjYEAHIpr/F8yYgSkozPfE3ty' +
+                  'cGHGgIKY4RBBNHC6ILI4sAkYngOIwNhQJ8bUBBYEIyEBGQO37tm3D' +
+                  'dCcdxIGBhlUcCBgZGAA27Tt3');
+
+    __bmpFlagLoaded := true;
+    setBitmapName(__bmpFlag, 'minimap_flag');
+  end;
+
+  if (findBitmapToleranceIn(__bmpFlag, p.x, p.y, self.getBounds(), 75)) then
   begin
     result := true;
     p.x := (p.x + 7);  // offset the point to the bottom of the flag
     p.y := (p.y + 14);
   end;
+end;
 
-  freeBitmap(bmpFlag);
+{*
+_freeFlagBitmap
+~~~~~~~~~~~~~~~
+
+.. code-block:: pascal
+
+    procedure _freeFlagBitmap();
+
+Frees the flag bitmap.
+
+.. note::
+
+    by Coh3n
+    Last Updated: 31 May 2013 by Coh3n
+
+Example:
+
+.. code-block:: pascal
+
+    addOnTerminate('_freeFlagBitmap');
+*}
+procedure _freeFlagBitmap();
+begin
+  if (__bmpFlagLoaded) then
+    freeBitmap(__bmpFlag);
 end;
 
 {*
@@ -946,19 +1011,25 @@ begin
   m := getSystemTime();
   t := (m + 20000);
 
+  print('TRSMinimap.waitFlag()', TDebug.HEADER);
   print('Waiting until flag distance equals '+toStr(dist)+'...');
 
   repeat
     if (not self.isFlagPresent(p)) then
     begin
-      print('Flag distance is less than or equal to '+toStr(dist));
-      exit(true);
+      print('Flag is not present, resulting true');
+      result := true;
+      break;
     end;
 
     d1 := distance(p.x, p.y, self.cx, self.cy);
 
     if (d1 <= dist) then
-      exit(true);
+    begin
+      print('Flag distance is less than or equal to '+toStr(dist));
+      result := true;
+      break;
+    end;
 
     if (d1 > (dist + 12)) then
       wait(450 + random(70))
@@ -969,7 +1040,10 @@ begin
       if (getSystemTime() - m > 5000) then
       begin
         if (d1 = d2) then
-          exit;
+        begin
+          print('RS took too long to load, exiting');
+          break;
+        end;
 
         d2 := d1;
         m := getSystemTime();
@@ -979,6 +1053,8 @@ begin
       SRL_Events[EVENT_ANTIBAN]();
 
   until(getSystemTime() > t);
+
+  print('TRSMinimap.waitFlag(): '+toStr(result), TDebug.FOOTER);
 end;
 
 (*
@@ -1043,7 +1119,7 @@ begin
   result := false;
   t := (getSystemTime() + 20000);
 
-  print('Waiting while the player is moving...');
+  print('Waiting while the player is moving...', TDebug.SUB);
 
   while (getSystemTime() < t) do
   begin
@@ -1091,12 +1167,14 @@ var
   tpa: TPointArray;
 begin
   result := false;
+  print('TRSMinimap.radialWalk()', TDebug.HEADER);
 
   sd := startRadial;
   ed := endRadial;
 
   if (sd = ed) then
   begin
+    print('Start and end raidal are equal, using linear walk algorithm');
     linear := true;
     direction := sd;
 
@@ -1122,16 +1200,24 @@ begin
 
   if (length(tpa) > 0) then
   begin
+    print('Found '+toStr(length(tpa))+' instances of color '+toStr(theColor));
+
     for i := 0 to high(tpa) do
     begin
       mouse(tpa[i], MOUSE_LEFT);
       wait(200 + random(100)); // wait for the flag to appear
 
       if (self.waitFlag(flagDist)) then
-        exit(true);
+      begin
+        result := true;
+        break;
+      end;
     end;
+
   end else
     print('Failed to find color '+toStr(theColor)+' with tolerance '+toStr(tol), TDebug.ERROR);
+
+  print('TRSMinimap.radialWalk(): '+toStr(result), TDebug.FOOTER);
 end;
 
 (*
@@ -1168,9 +1254,11 @@ var
   p: TPoint;
 begin
   result := false;
+  print('TRSMinimap.tpaWalk()', TDebug.HEADER);
 
   if (findColorsTolerance(tpa, color, self.getBounds(), tol)) then
   begin
+    print('Found color '+toStr(color)+' on minimap');
     sortTPAFrom(tpa, sortFrom);
 
     for i := 0 to high(tpa) do
@@ -1189,7 +1277,10 @@ begin
       while (getSystemTime() < t) do
       begin
         if (self.waitFlag(flagDist)) then
-          exit(true);
+        begin
+          result := true;
+          break(2);
+        end;
 
         wait(50);
       end;
@@ -1197,6 +1288,8 @@ begin
 
   end else
     print('Failed to find color '+toStr(color)+' with tolerance '+toStr(tol)+' on the minimap', TDebug.ERROR);
+
+  print('TRSMinimap.tpaWalk(): '+toStr(result), TDebug.FOOTER);
 end;
 
 {*
@@ -2083,33 +2176,43 @@ var
 begin
   result := -1;
   sym := _getSymbol(symbol);
+  print('TRSMinimap._getSymbolColor()', TDebug.HEADER);
 
   if (sym.name <> '') then
   begin
     print('Loaded symbol: '+sym.name);
-    findDeformedBitmapToleranceIn(sym.bmp, p.x, p.y, searchBox, 70, 0, true, acc);
-    freeBitmap(sym.bmp);
 
-    if (acc > self.symbolAccuracy) then
-      repeat
-        c := c + 5;
+    if (findDeformedBitmapToleranceIn(sym.bmp, p.x, p.y, searchBox, 70, 0, true, acc)) then
+    begin
+      print('Found symbol bitmap '+toStr(symbol));
+      freeBitmap(sym.bmp);
 
-        // look for the symbol's color in a small box around where the bitmap was found
-        if (findColorTolerance(p.x, p.y, sym.color, p.x, p.y, p.x + 15, p.y + 5, c)) then
-        begin
-          result := getColor(p.x, p.y);
+      if (acc > self.symbolAccuracy) then
+        repeat
+          c := c + 5;
 
-          if (result > 0) then
+          // look for the symbol's color in a small box around where the bitmap was found
+          if (findColorTolerance(p.x, p.y, sym.color, p.x, p.y, p.x + 15, p.y + 5, c)) then
           begin
-            print('Found '+sym.name+' symbol at '+toStr(p));
-            exit();
+            result := getColor(p.x, p.y);
+
+            if (result > 0) then
+            begin
+              print('Found '+sym.name+' symbol at '+toStr(p));
+              print('TRSMinimap._getSymbolColor(): '+toStr(result), TDebug.FOOTER);
+              exit();
+            end;
           end;
-        end;
-      until(c > 70); // max tolerance
+        until(c > 70); // max tolerance
+
+      end else
+        print('Failed to find bitmap symbol '+toStr(symbol), TDebug.ERROR);
   end;
 
   print('Failed to find '+sym.name+' symbol', TDebug.ERROR);
   print('Report this bug here: http://villavu.com/forum/project.php?projectid=6', TDebug.HINT);
+  print('TRSMinimap._getSymbolColor(): '+toStr(result), TDebug.FOOTER);
+
   p := point(-1, -1);
 end;
 
@@ -2192,7 +2295,7 @@ begin
     begin
       p := middleTPA(tmpATPA[i]);
 
-      // if the original found symbol is in the array (skips a findBitmal call)
+      // if the original found symbol is in the array (skips a findBitmap call)
       if (tmpATPA[i].isInArray(point(_p.x, _p.y))) then
         acc := 1
       else
@@ -2210,7 +2313,7 @@ begin
     setLength(tpa, l);
 
     if (result) then
-      print('Found '+sym.name+' symbol '+toStr(length(tpa))+' times');
+      print('TRSMinimap.findSymbols(): Found '+sym.name+' symbol '+toStr(length(tpa))+' times', TDebug.SUB);
   end;
 end;
 
@@ -2251,5 +2354,10 @@ begin
   end;
 
   if (result) then
-    print('Found a total of '+toStr(length(tpa))+' symbols');
+    print('TRSMinimap.findSymbols(): Found a total of '+toStr(length(tpa))+' symbols', TDebug.SUB);
+end;
+
+begin
+  minimap.__init();
+  addOnTerminate('_freeFlagBitmap');
 end;

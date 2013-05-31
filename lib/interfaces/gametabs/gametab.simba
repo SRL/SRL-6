@@ -7,7 +7,6 @@ The gametab file holds any global gametab data.
 *)
 
 {$include_once ../interfaces.simba}
-{$include_once ../mainscreen.simba}
 {$include_once ../../core/text.simba}
 
 {$f-}
@@ -106,7 +105,7 @@ function __isTabValid(tab: integer): boolean;
 begin
   if (not inRange(tab, _TAB_COMBAT, _TAB_LOGOUT)) then
   begin
-    print('Invalid gametab '+toStr(tab));
+    print('__isValidTab(): Invalid gametab '+toStr(tab), TDebug.SUB);
     exit(false);
   end;
 
@@ -242,8 +241,8 @@ begin
   // incase the bank or another interface is open
   if (not doesTabExist(tab)) then
   begin
-    closeWindow();
-    wait(200 + random(200));
+    print('_openGametab(): Tab '+toStr(tab)+' doesn''t exist', TDebug.SUB);
+    print('HINT: Maybe an RS interface (such as the bank) is open', TDebug.SUB);
   end;
 
   if (not result) and (doesTabExist(tab)) then
@@ -256,7 +255,7 @@ begin
       begin
         if (getCurrentTab() = tab) then
         begin
-          print('Opened tab '+toStr(tab));
+          print('Opened tab '+toStr(tab), TDebug.SUB);
           exit(true);
         end;
 
@@ -266,7 +265,7 @@ begin
       inc(tries);
     end;
 
-  print('Failed to open tab '+toStr(tab));
+  print('Failed to open tab '+toStr(tab), TDebug.SUB);
 end;
 
 (*
