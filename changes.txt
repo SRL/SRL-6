@@ -203,7 +203,7 @@ EVERYTHING should be recorded here: new features, function name changes, user-de
 
 - smartgraphics.simba converted to drawing.simba
   - Using drawing.simba, one can create several different drawings and display them how they wish.
-  - smart.simba has a global variable, SMART_Image: TDrawing, that can be drawn to using any of the TDrawing functions.
+  - smart.simba has a global variable, smartImage: TDrawing, that can be drawn to using any of the TDrawing functions.
 
 - new file, client.simba
   - added function isClientReady (replaces RSReady)
@@ -215,6 +215,7 @@ EVERYTHING should be recorded here: new features, function name changes, user-de
 
 - new file, wrappers.simba
   - getColor may a take a TPoint instead of x and y variables.
+  - getColors takes an extra paramter, "clearSame" if true will clear same integers in the result.
   - tpaFromText can be called without the need for w and h variables.
   - replicate Can now enter a string instead of only one char.
   - explode now accepts a TStringArray intead of a string.
@@ -236,3 +237,4 @@ EVERYTHING should be recorded here: new features, function name changes, user-de
    - findDTMs
    - findDTM
    - getTextAtEx
+   - bitmapFromClient

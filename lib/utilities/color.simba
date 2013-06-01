@@ -8,6 +8,7 @@ finding, comparing or manupilation.
 *)
 
 {$include_once wrappers.simba}
+{$include_once ../tmp.simba}
 {$f-}
 
 (*
@@ -385,5 +386,85 @@ begin
   cs.retrieve();
   settings.apply();
   Result := countColorTolerance(color, searchBox, tol);
+  cs.apply();
+end;
+
+(*
+waitColorCountRange
+~~~~~~~~~~~~~~~~~~~
+
+.. code-block:: pascal
+
+    function waitColorCountRange(color, tol: integer; area: TBox; waitTime, minCount: integer; maxCount: integer = maxInt): boolean;
+
+Counts the color until waitTime is reached, if the color count is within range of
+minCount and maxCount will exit and result true, by default maxCount is set to
+maxInt, but can be changed.
+
+.. note::
+
+    by Ollybest
+    Last Updated: 31 May 2013 by Ollybest
+
+Example:
+
+.. code-block:: pascal
+
+     // would wait until the color count is between 50..150 or until 2000ms has passed.
+     waitColorRange(clBlack, 5, mainScreen.getBounds(), 2000, 50, 150);
+
+     // would wait until the color count is over 50, or until 5000ms has passed.
+     waitColorRange(clBlack, 5, mainScreen.getBounds(), 5000, 50);
+
+*)
+function waitColorCountRange(color, tol: integer; area: TBox; waitTime, minCount: integer; maxCount: integer = maxInt): boolean;
+var
+  timeOut, c: integer;
+begin
+  timeOut := getSystemTime() + waitTime;
+  result := false;
+
+  while (timeOut > getSystemTime()) do
+  begin
+    c := countColorTolerance(color, area, tol);
+
+    if inRange(c, minCount, maxCount) then
+      exit(true);
+
+    wait(15 + random(40));
+  end;
+end;
+
+(*
+waitColorCountRange: overload;
+~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+
+.. code-block:: pascal
+
+    function waitColorCountRange(color, tol: integer; area: TBox; waitTime, minCount: integer; maxCount: integer = maxInt): boolean;
+
+Same as waitColorCountRange but with an additional color settings parameter.
+
+.. note::
+
+    by Ollybest
+    Last Updated: 31 May 2013 by Ollybest
+
+Example:
+
+.. code-block:: pascal
+
+     waitColorRange(clBlack, 5, myCSSettings, mainScreen.getBounds(), 2000, 50, 150);
+
+*)
+function waitColorCountRange(color, tol: integer; settings: TColorSettings; area: TBox; waitTime, minCount: integer; maxCount: integer = maxInt): boolean; overload;
+var
+  cs: TColorSettings;
+begin
+  cs.retrieve();
+  settings.apply();
+
+  result := waitColorCountRange(color, tol, area, waitTime, minCount, maxCount);
+
   cs.apply();
 end;

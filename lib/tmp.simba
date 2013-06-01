@@ -16,19 +16,19 @@ const
 var
   clWhite = 16777215;
   clBlack = 0;
-  clRed   = 255;
+  clRed = 255;
   clGreen = 32768;
-  clBlue  = 16711680;
+  clBlue = 16711680;
   clPurple = 8388736;
   clYellow = 65535;
   clAqua = 16776960;
   clOrange = 26367;
   clFuchsia = 16711935;
   clTeal = 8421376;
-  clNavy =  8388608;
+  clNavy = 8388608;
   clGray = 8421504;
-  clLime =  65280;
-  clMaroon =  128;
+  clLime = 65280;
+  clMaroon = 128;
   clSilver = 12632256;
 
 var
