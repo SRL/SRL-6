@@ -413,11 +413,11 @@ begin
 
   if (smartEnableDrawing) then
   begin
+    print('Restoring smart debug image');
+
     smartSetupDrawing();
     oldImage.drawTransparent(0, 0, smartImage.bitmap);
     oldImage.free();
-
-    print('Restored smart debug image');
   end;
 
   print('reloadCurrentClient().', TDebug.FOOTER);
