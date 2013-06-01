@@ -451,12 +451,6 @@ begin
 end;
 
 begin
-  clearDebug();
-  initSmart(smartForceNewClient);
-
-  if (smartEnableDrawing) then
-    smartSetupDrawing();
-
   SRL_Events[EVENT_RS_UPDATE] := reloadCurrentClient;
 end;
 

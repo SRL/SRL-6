@@ -510,6 +510,7 @@ Example:
 procedure takeScreenshot(fileName: string);
 begin
   saveScreenshot(logPath + timeRunning() + '_' + fileName);
+  print('Saving screenshot: '+fileName, TDebug.SUB);
 end;
 
 begin
