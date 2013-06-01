@@ -333,7 +333,7 @@ var
 begin
   print('initSmart():', TDebug.HEADER);
 
-  // if we dont pair to a existing client lets spawn a new one
+  // if we dont pair to a existing client lets spawn a new one.
   if (not pairToExistingClient(force)) then
   begin
     print('Attempting to spawn a SMART client');
