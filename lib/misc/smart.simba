@@ -1,109 +1,137 @@
-(*
-SMART
-=====
-
-SMART is what SRL uses so Simba doesn't occupy the users mouse.  It is
-completely optional and can be added to any script by defining SMART
-{$DEFINE SMART} before including SRL.  This file stores all SMART related
-functions for SRL.
-
-*)
-
 {$f-}
 
 {$loadlib libsmartremote}
+{$include_once ../utilities/drawing.simba}
+{$include_once ../core/debug.simba}
+{$include_once ../core/players.simba}
+{$include_once ../core/client.simba}
 
 (*
-var SMART Globals
-~~~~~~~~~~~~~~~~~
+const Client W/H
+~~~~~~~~~~~~~~~~
 
-All the variables associated with smart.simba.
-
-  * SMART_SixHourFix: Restart SMART after the 6 hour login error. Default is true.
-  * SMART_CurrentClient: the SMART client for the current script.
-  * SMART_ForceNew: force a new SMART client to be loaded. Default is false.
-  * SMART_FixSpeed: fixes SMART's refresh rate. Default is true.
+Integer constants that represent the width and height of the client (fixed) needs
+to function correctly.
 
 *)
+
+const
+  FIXED_CLIENT_W = 765;
+  FIXED_CLIENT_H = 553;
+
 var
-  SMART_SixHourFix = true;
-  SMART_CurrentClient = 0;
-  SMART_ForceNew = false;
-  SMART_FixSpeed = true;
+  smartForceNewClient := false;
+  smartEnableDrawing := true;
+
+var
+  __smartCurrentClient: integer;
+  smartImage: TDrawing;
 
 (*
-getSmartParams
-~~~~~~~~~~~~~~
+smartSetupDrawing
+~~~~~~~~~~~~~~~~~
 
 .. code-block:: pascal
 
-    function getSmartParams: TStringArray;
+     procedure smartSetupDrawing();
 
-Grabs The Correct Parameters for passing to the SmartClient.
+Set ups SMART so its ready to be drawn on-to.
 
 .. note::
 
-  By: Brandon.
-  Modified By: Mormanman, Benland100.
+  By: Ollybest
+  Last Updated: June 1, 2013 by Ollybest
 
 Example:
 
 .. code-block:: pascal
 
 *)
-function getSmartParams: TStringArray;
-var
-  Params: TStringArray;
-  Page: String;
+procedure smartSetupDrawing();
 begin
-  Page := Between('<iframe id="game" src="', '"', GetPage('http://www.runescape.com/game.ws?j=1'));
-  Params := Explode(',', Page);
-  Result := Params;
+  if (smartImage.isSetup) then
+    exit();
+
+  smartSetDebug(true);
+
+  if (not smartImage.create('SMART Debug Image', FIXED_CLIENT_W, FIXED_CLIENT_H)) then
+    print('Failed to create the bitmap for smart drawing', TDebug.FATAL);
+
+  smartImage.bitmap.setPersistentMemory(SmartDebugArray(), FIXED_CLIENT_W, FIXED_CLIENT_H);
+  smartImage.clear();
+
+  addOnTerminate('smartFreeDrawing');
 end;
 
 (*
-fixSmartSpeed
-~~~~~~~~~~~~~
+smartFreeDrawing
+~~~~~~~~~~~~~~~~
 
 .. code-block:: pascal
 
-    procedure fixSmartSpeed;
+     procedure smartFreeDrawing();
 
-Fixes Smart's Loading Speed.  Moves the Mouse & Adjusting the Canvas Refresh
-rate.
+Free's and destorys the smart image.
 
 .. note::
 
-  By: Brandon.
+  By: Ollybest
+  Last Updated: June 1, 2013 by Ollybest
 
 Example:
 
 .. code-block:: pascal
 
 *)
-procedure fixSmartSpeed;
-var
-  T: Integer;
+procedure smartFreeDrawing();
 begin
-  T:= GetSystemTime() + 2000;
-  while (not SmartEnabled()) do
+  if (not smartImage.isSetup) then
+    exit();
+
+  smartImage.bitmap.resetPersistentMemory();
+  smartImage.destroy();
+end;
+
+(*
+smartGetParameters
+~~~~~~~~~~~~~~~~~~
+
+.. code-block:: pascal
+
+     function smartGetParameters(out params: array of string): boolean;
+
+Attempts to grab the correct parameters for spawning a SMART client. Results if
+succesfull or not.
+
+.. note::
+
+  By: Brandon, Mormanman, Benland100
+  Last Updated: May. 26, 2013 by Ollybest
+
+Example:
+
+.. code-block:: pascal
+
+*)
+function smartGetParameters(out p: array of string): boolean;
+var
+  page: string;
+  b: boolean;
+const
+  URL = 'http://www.runescape.com/game.ws?j=1';
+begin
+  page := getPage(URL);
+
+  p := explode(',', between('<iframe id="game" src="', '"', page));
+  result := (length(p) = 2);
+
+  if (not result) then
   begin
-    if (GetSystemTime() >= T) Then
-      Break;
-    Wait(500);
+    print('Cannot acess the RS website, make sure you can acces it currently', TDebug.HINT);
+    print('Could not grab parameters needed to spawn a SMART client', TDebug.FATAL);
   end;
 
-  while (GetColor(382, 252) = 0) do
-  begin
-    if isClientReady() then
-      Break;
-    SmartSetRefresh(SmartGetRefresh() + 1);
-    mouse(point(4, 4));
-    SmartSetRefresh(SmartGetRefresh() - 1);
-    if (GetSystemTime() >= T) Then
-      Break;
-    Wait(500);
-  end;
+  print('smartGetParameters(): Succesfully grabbed paramters', TDebug.SUB);
 end;
 
 (*
@@ -112,28 +140,31 @@ smartGetClientIDs
 
 .. code-block:: pascal
 
-    function smartGetClientIDs: TIntegerArray;
+     function smartGetClientIDs(only_unpaired: boolean = true): TIntegerArray;
 
-Grabs All Client ID's of the current remote.
+Returns the id's of all spawned SMART clients, on default will return all unpaired
+clients.
 
 .. note::
 
-  By: Mormanman.
+  By: Mormanman
+  Last Updated: May. 26, 2013 by Ollybest
 
 Example:
 
 .. code-block:: pascal
 
 *)
-function smartGetClientIDs: TIntegerArray;
+function smartGetClientIDs(only_unpaired: boolean = true): TIntegerArray;
 var
-  I, Count: Integer;
+  i, count: Integer;
 begin
-  Count := SmartGetClients(True);
-  SetLength(Result, Count);
-  if (Count > 0) then
-    for I:= 0 to (Count - 1) do
-      Result[I] := SmartClientID(I);
+  count := smartGetClients(only_unpaired);
+  setLength(result, count);
+
+  if (count > 0) then
+    for i := 0 to (count - 1) do
+      result[i] := SmartClientID(i);
 end;
 
 (*
@@ -142,116 +173,136 @@ smartKillClients
 
 .. code-block:: pascal
 
-    procedure smartKillClients;
+     procedure smartKillClients(only_unpaired: boolean);
 
-Kills all SMART clients.
+Attempts to kill SMART clients based on the only_unpaired boolean.
 
 .. note::
 
-  By: Mormanman.
+  By: Mormanman
+  Last Updated: May. 26, 2013 by Ollybest
 
 Example:
 
 .. code-block:: pascal
 
 *)
-procedure smartKillClients;
+procedure smartKillClients(only_unpaired: boolean);
 var
-  IDs: TIntegerArray;
-  I: Integer;
+  ids: TIntegerArray;
+  I: integer;
 begin
-  IDs := smartGetClientIDs();
-  for I := High(IDs) DownTo 0 do
-    if SmartKillClient(IDs[I]) Then
-      Writeln('Killed Client: ' + ToStr(IDs[I]))
+  ids := smartGetClientIDs(only_unpaired);
+  i := high(ids);
+
+  for i downto 0 do
+    if smartKillClient(ids[i]) then
+      print('smartKillClients(): Succesfully killed client: ' + intToStr(ids[i]), TDebug.SUB)
     else
-      Writeln('Failed To Kill Client: ' + ToStr(IDs[I]));
+      print('smartKillClients(): Failed to kill client: ' + intToStr(ids[i]), TDebug.SUB);
 end;
 
 (*
-sixHourFix
-~~~~~~~~~~
+smartKillClients
+~~~~~~~~~~~~~~~~
 
 .. code-block:: pascal
 
-    procedure sixHourFix;
+     procedure smartKillClients(only_unpaired: boolean);
 
-Kills the current SMART and restarts it.  Used to fix the 6 hour client limit.
+Attempts to kill SMART clients based on the only_unpaired boolean.
 
 .. note::
 
-  By: Brandon.
+  By: Mormanman
+  Last Updated: May. 26, 2013 by Ollybest
 
 Example:
 
 .. code-block:: pascal
 
 *)
-procedure sixHourFix;
+function smartSetAsClient(id: integer): boolean;
 var
-  Trash: TVariantArray;
-  Refresh: Integer;
+  id_string: string;
 begin
-  Refresh := SmartGetRefresh();
-  SmartKillClient(SmartCurrentClient());
-  try
-    VariantInvoke('DeclarePlayers', Trash);
-  except
-    Writeln('Could not DeclarePlayers');
-    TerminateScript();
-  end;
+  id_string := intToStr(id);
+  result := false;
 
-  try
-    VariantInvoke('SMART_FreeDebug', Trash);
-    VariantInvoke('SMART_SetupDebug', Trash);
-  except
-  end;
+  print('smartSetAsClient():', TDebug.HEADER);
+  print('Attempting to pair to SMART['+ id_string +']');
 
-  SmartSetRefresh(Refresh);
-
-  if (not players[currentPlayer].login()) then
+  if smartPairClient(id) then
   begin
-    Writeln('~sixHourFix~ Could not Login Player');
-    TerminateScript();
-  end;
+    print('Succesfully paired, attempting to set target');
+
+    try
+      setEIOSTarget('libsmartremote', id_string);
+      print('Set SMART['+ id_string +'] as Simba''s target');
+      __smartcurrentClient := id;
+      result := true;
+    except
+      print('Failed to set SMART['+ id_string +'] as Simba''s target');
+    end;
+  end else
+    print('Failed to pair to SMART['+ id_string +']');
+
+  print('smartSetAsClient(): result = '+ toStr(result) +'.', TDebug.FOOTER);
 end;
 
 (*
-pairSmart
-~~~~~~~~~
+pairToExistingClient
+~~~~~~~~~~~~~~~~~~~~
 
 .. code-block:: pascal
 
-    function pairSmart(ID: Integer): Boolean;
+     function pairToExistingClient(skip: boolean): boolean;
 
-Pairs A Client To The Current Controller.
+Attempts to spawn to a free already spawned client, will return true if done so.
+If skip is set to true it will exit the function without trying.
 
 .. note::
 
-  By: Benland100, Brandon.
+  By: Ollybest
+  Last Updated: June 1, 2013 by Ollybest
 
 Example:
 
 .. code-block:: pascal
 
 *)
-function pairSmart(ID: Integer): Boolean;
+function pairToExistingClient(skip: boolean): boolean;
 var
-  I, Count: Integer;
-  IDs: TIntegerArray;
+  ids: TIntegerArray;
+  i: integer;
 begin
-  IDs := smartGetClientIDs();
-  Count := Length(IDs);
-  if (Count > 0) then
-    for I:= 0 To (Count - 1) do
-      if (IDs[I] = ID) and SmartPairClient(ID) then
-      begin
-        SetEIOSTarget('libsmartremote', ToStr(ID));
-        Writeln('Paired with SMART[' + ToStr(ID) + ']');
-        Result := True;
-        Exit;
-      end;
-  Writeln('** Failed To Pair Client: ' + ToStr(ID) + '; Client Does not exist **');
+  result := false;
+
+  if (skip) then
+    exit();
+
+  print('pairToExistingClient():', TDebug.HEADER);
+
+  ids := smartGetClientIds(true);
+
+  if (length(ids) > 0) then
+  begin
+    for i := 0 to high(ids) do
+    begin
+      print('Found free existing SMART['+ intToStr(ids[i]) +']');
+
+      result := smartSetAsClient(ids[i]);
+
+      if (result) then
+        break();
+    end;
+  end else
+    print('No free clients to pair to');
+
+  if (result) then
+    print('Succesfully paired to a existing client, SMART['+ intToStr(ids[i]) +']');
+
+  print('pairToExistingClient(): result = '+ toStr(result) +'.', TDebug.FOOTER);
 end;
 
 (*
@@ -260,142 +311,127 @@ initSmart
 
 .. code-block:: pascal
 
-    function initSmart(ForceNew: Boolean): Integer;
+     procedure initSmart();
 
-Initializes A Smart Remote Client. Terminates the current script upon failure.
-Terminates all clients of the current remote upon failure. ForceNew Creates a
-new client.
+Initializes us to a SMART client, will attempt to pair to a existing client, if
+that fails we will attempt to spawn a client, will terminate the script if anything
+goes wrong.
 
 .. note::
 
-  By: Benland100, Mormanman, Brandon.
+  By: Benland100, Mormanman, Brandon
+  Last Updated: June 1, 2013 by Ollybest
 
 Example:
 
 .. code-block:: pascal
 
 *)
-function initSmart(ForceNew: Boolean): Integer;
+procedure initSmart(force: boolean);
 var
-  I, Count: Integer;
-  IDs: TIntegerArray;
-  Params: TStringArray;
+  id: integer;
+  params: TStringArray;
 begin
-  if (not ForceNew) then
+  print('initSmart():', TDebug.HEADER);
+
+  // if we dont pair to a existing client lets spawn a new one.
+  if (not pairToExistingClient(force)) then
   begin
-    Ids := smartGetClientIDs();
-    Count := Length(IDs);
-    if (Count > 0) then
-      for I:= 0 To (Count - 1) do
+    print('Attempting to spawn a SMART client');
+
+    if smartGetParameters(params) then
+    begin
+      print('Using paramters ' + toStr(params));
+
+      id := smartSpawnClient(StringReplace(PluginPath, '\', '/', [rfReplaceAll]), Params[0], ',' + Params[1], FIXED_CLIENT_W, FIXED_CLIENT_H, 's', '', '');
+      wait(100);
+
+      if (id <> 0) then
       begin
-        if SmartPairClient(IDs[I]) then
-        begin
-          Result := IDs[I];
-          SetEIOSTarget('libsmartremote', ToStr(Result));
-          Writeln('Paired with SMART[' + ToStr(Result) + ']');
-          Exit;
-        end;
-      end;
+        if (not smartSetAsClient(id)) then
+          print('Failed to set SMART['+ intToStr(id) +'] as Simba''s target.', TDebug.FATAL);
+      end else
+        print('Failed to spawn a SMART client.', TDebug.FATAL);
+    end;
   end;
 
-  Params := getSmartParams();
-  if (Length(Params) > 2) then
-  begin
-    Writeln('** Failed To Grab Smart Parameters **');
-    TerminateScript();
-    Exit;
-  end;
-
-  Result:= SmartSpawnClient(StringReplace(PluginPath, '\', '/', [rfReplaceAll]), Params[0], ',' + Params[1], 765, 553, 's', '', '');
-  if (Result > 0) Then
-  begin
-    try
-      SetEIOSTarget('libsmartremote', ToStr(Result));
-      Writeln('Loading SMART: ' + Params[0] + Params[1]);
-    except
-      WriteLn('** Fatal Error: Pairing Clients; Terminating Script **');
-      Writeln('** Try setting your folder permissions to Allow **');
-      TerminateScript();
-    end;
-  end else
-    begin
-      Writeln('** Smart Cannot Spawn Clients **');
-      TerminateScript();
-    end;
+  print('initSmart()', TDebug.FOOTER);
 end;
 
 (*
-setupSmart
-~~~~~~~~~~
+reloadCurrentClient
+~~~~~~~~~~~~~~~~~~~
 
 .. code-block:: pascal
 
-    procedure setupSmart(ForceNewClient: Boolean);
+     procedure reloadCurrentClient();
 
-Sets up a new Smart Client and waits until it's on screen. Terminates The
-current script upon failure.
+Attempts to reload our current SMART client.
 
 .. note::
 
-  By: Mormanman.
-  Modified By: Brandon.
+  By: Ollybest
+  Last Updated: June 1, 2013 by Ollybest
 
 Example:
 
 .. code-block:: pascal
 
 *)
-procedure setupSmart(ForceNewClient: Boolean);
+procedure reloadCurrentClient();
 var
-  T: Integer;
+  oldRefresh: integer;
+  oldImage: TMufasaBitmap;
 begin
-  T := GetSystemTime() + 120000;
-  Smart_CurrentClient:= initSmart(ForceNewClient);
+  print('reloadCurrentClient():', TDebug.HEADER);
 
-  if (Smart_CurrentClient <= 0) then
+  oldRefresh := smartGetRefresh();
+
+  if (smartEnableDrawing) then
   begin
-    writeln('*** Smart failed to load ***');
-    terminateScript();
+    oldImage.init();
+    oldImage := smartImage.bitmap.copy();
+    smartFreeDrawing();
   end;
-end;
 
-(*
-findAndSetTarget
-~~~~~~~~~~~~~~~~
+  if (not smartKillClient(__smartCurrentClient)) then
+    print('Failed to kill our current client', TDebug.FATAL);
 
-.. code-block:: pascal
+  // lets force a client just to be safe.
+  initSmart(true);
 
-    function findAndSetTarget(TitlePrefix: String; SetAsTarget: Boolean): Boolean;
+  print('Restoring refresh rate back to ' + intToStr(oldRefresh));
+  smartSetRefresh(oldRefresh);
 
-Finds a Windows by partial title and sets it as the target.
+  if (length(players) < 1) then
+    print('No players to login!', TDebug.FATAL);
 
-.. note::
+  if (waitClientReady) then
+    players[currentPlayer].login()
+  else
+    print('Succesfully spawned a client, but RS failed to load', TDebug.FATAL);
 
-  By: Unknown
+  if (smartEnableDrawing) then
+  begin
+    print('Restoring smart debug image');
 
-Example:
+    smartSetupDrawing();
+    oldImage.drawTransparent(0, 0, smartImage.bitmap);
+    oldImage.free();
+  end;
 
-.. code-block:: pascal
-
-*)
-function findAndSetTarget(TitlePrefix: String; SetAsTarget: Boolean): Boolean;
-var
-  T : TSysProcArr;
-  I : Integer;
-begin
-  T := GetProcesses();
-  for I := High(T) downto 0 do
-    if Pos(TitlePrefix, T[I].Title) <> 0 then
-    begin
-      Result := True;
-      if SetAsTarget then SetTarget(T[I]);
-      Exit;
-    end;
+  print('reloadCurrentClient().', TDebug.FOOTER);
 end;
 
 begin
-  setupSmart(Smart_ForceNew);
+  clearDebug();
+  initSmart(smartForceNewClient);
 
-  if (SMART_SixHourFix) then
-    SRL_Events[EVENT_RS_UPDATE] := sixHourFix;
+  if (smartEnableDrawing) then
+    smartSetupDrawing();
+
+  SRL_Events[EVENT_RS_UPDATE] := reloadCurrentClient;
 end;
+
+
+
