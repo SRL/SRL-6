@@ -32,10 +32,11 @@ const
 var User Set
 ~~~~~~~~~~~~
 
-Variables that can be used/set in scripts.
+Variables that can be used in scripts.
     * smartForceNewClient: Opens a new SMART client every time a scrpit is run.
     * smartEnableDrawing: Enables drawing onto the SMART window.
-    * smartImage: The TDrawing used to draw graphics on the SMART window.
+    * smartImage: The TDrawing used to draw graphics on the SMART window. NOTE:
+      smartImage CANNOT be reset. It can only be used for it's drawing procedures.
 *)
 var
   smartForceNewClient = false;
