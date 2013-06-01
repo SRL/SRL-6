@@ -1,3 +1,13 @@
+(*
+Smart
+=====
+
+The Smart file stores all the functions and procedures used to initiate SMART
+in scripts.  To use SMART in a script, simply add {$DEFINE SMART} before SRL is
+included.
+
+*)
+
 {$f-}
 
 {$loadlib libsmartremote}
@@ -14,18 +24,34 @@ Integer constants that represent the width and height of the client (fixed) need
 to function correctly.
 
 *)
-
 const
   FIXED_CLIENT_W = 765;
   FIXED_CLIENT_H = 553;
 
-var
-  smartForceNewClient := false;
-  smartEnableDrawing := true;
+(*
+var User Set
+~~~~~~~~~~~~
 
+Variables that can be used/set in scripts.
+    * smartForceNewClient: Opens a new SMART client every time a scrpit is run.
+    * smartEnableDrawing: Enables drawing onto the SMART window.
+    * smartImage: The TDrawing used to draw graphics on the SMART window.
+*)
+var
+  smartForceNewClient = false;
+  smartEnableDrawing = true;
+  smartImage: TDrawing;
+
+{*
+var Internal
+~~~~~~~~~~~~
+
+Internal SMART variables used only in smart.simba.
+    * __smartCurrentClient: keeps track of the current SMART client.
+*}
 var
   __smartCurrentClient: integer;
-  smartImage: TDrawing;
+
 
 (*
 smartSetupDrawing
@@ -247,7 +273,7 @@ begin
   end else
     print('Failed to pair to SMART['+ id_string +']');
 
-  print('smartSetAsClient(): result = '+ toStr(result) +'.', TDebug.FOOTER);
+  print('smartSetAsClient(): result = '+ toStr(result), TDebug.FOOTER);
 end;
 
 (*
@@ -302,7 +328,7 @@ begin
   if (result) then
     print('Succesfully paired to a existing client, SMART['+ intToStr(ids[i]) +']');
 
-  print('pairToExistingClient(): result = '+ toStr(result) +'.', TDebug.FOOTER);
+  print('pairToExistingClient(): result = '+ toStr(result), TDebug.FOOTER);
 end;
 
 (*
@@ -420,7 +446,7 @@ begin
     oldImage.free();
   end;
 
-  print('reloadCurrentClient().', TDebug.FOOTER);
+  print('reloadCurrentClient()', TDebug.FOOTER);
 end;
 
 begin
