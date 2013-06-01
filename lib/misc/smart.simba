@@ -314,7 +314,8 @@ initSmart
      procedure initSmart();
 
 Initializes us to a SMART client, will attempt to pair to a existing client, if
-that fails we will attempt to spawn a client.
+that fails we will attempt to spawn a client, will terminate the script if anything
+goes wrong.
 
 .. note::
 
