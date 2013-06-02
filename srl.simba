@@ -40,19 +40,28 @@ function setupSRL(): boolean;
 var
   t := getSystemTime();
 begin
-  writeln('Set up SRL in ', (getSystemTime() - t), 'ms.');
+  print('setupSRL()', TDebug.HEADER);
+  print('Setting up SRL...');
 
   {$IFNDEF SMART}
     activateClient();
+  {$ELSE}
+    initSmart(smartForceNewClient);
+
+    if (smartEnableDrawing) then
+      smartSetupDrawing();
   {$ENDIF}
 
   if (waitClientReady()) then
-    writeln('Client is ready.')
+    print('Client is ready.')
   else begin
-    writeln('Client is taking too long to load, terminating...');
+    print('Client is taking too long to load, terminating...');
+    print('setupSRL(): '+toStr(result), TDebug.FOOTER);
     terminateScript();
   end;
 
   result := true;
+  print('Setup SRL in '+toStr(getSystemTime() - t)+'ms.');
+  print('setupSRL(): '+toStr(result), TDebug.FOOTER);
 end;
 

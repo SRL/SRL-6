@@ -112,7 +112,7 @@ type
     findTrade: boolean;
     reincarnate: boolean;
     secureLogin: boolean;
-    worked: TTimeMarker;
+    worked: TTimeMarker; // automatically calculated if SRL's login methods are used
     world: integer;
     skillLevel: array[0..(SKILL_COUNT - 1)] of integer;
     booleans: array[0..99] of boolean;
@@ -254,6 +254,7 @@ var
   mesh: string;
   dataParts: TStringArray;
 begin
+  print('TPlayerArray.setup()', TDebug.HEADER);
   ext := '.raf';
 
   if (not FileExists(__PATH_PLAYER + army + ext)) then
@@ -267,7 +268,8 @@ begin
       if (army = 'default') then
         print('Make sure you create an army with the player manager (SRL > Open Player Manager)', TDebug.HINT);
 
-      halt();
+      print('TPlayerArray.setup(): false', TDebug.FOOTER);
+      terminateScript();
     end;
   end;
 
@@ -277,7 +279,8 @@ begin
   begin
     print('Couldn''t open file: ' + __PATH_PLAYER + army + ext, TDebug.ERROR);
     print('Make sure your folder permissions are set properly', TDebug.HINT);
-    halt();
+    print('TPlayerArray.setup(): false', TDebug.FOOTER);
+    terminateScript();
   end;
 
   fileSz := FileSize(fileHandle); // the size of the file in characters
@@ -286,14 +289,16 @@ begin
   begin
     print('File is empty: ' + __PATH_PLAYER + army + ext, TDebug.ERROR);
     print('Make sure you create an army with the player manager (SRL > Open Player Manager)', TDebug.HINT);
-    halt();
+    print('TPlayerArray.setup(): false', TDebug.FOOTER);
+    terminateScript();
   end;
 
   if (not ReadFileString(fileHandle, data, fileSz)) then
   begin
     print('Couldn''t read file: ' + __PATH_PLAYER + army + ext, TDebug.ERROR);
     print('Make sure your folder permissions are set properly', TDebug.HINT);
-    halt();
+    print('TPlayerArray.setup(): false', TDebug.FOOTER);
+    terminateScript();
   end;
 
   CloseFile(fileHandle);
@@ -323,10 +328,13 @@ begin
           break;
         end else begin
           print('Couldn''t decrypt file. Re-enter password.'); // wrong password
-          halt();
+          print('TPlayerArray.setup(): false', TDebug.FOOTER);
+          terminateScript();
         end;
-      end else
+      end else begin
+        print('TPlayerArray.setup(): User cancel', TDebug.FOOTER);
         exit; // cancel button is pressed
+      end;
 
     until(false);
   end else
@@ -334,14 +342,18 @@ begin
     begin
       print('File doesn''t contain a valid army', TDebug.FATAL);
       print('Make sure you create an army with the player manager (SRL > Open Player Manager)', TDebug.HINT);
-      halt();
+      print('TPlayerArray.setup(): false', TDebug.FOOTER);
+      terminateScript();
     end;
 
   // finally parse the data
   ArmiesTSA := MultiBetween(data, '<army>', '</army>');
 
   if (Length(ArmiesTSA) = 0) then
+  begin
+    print('TPlayerArray.setup(): false', TDebug.FOOTER);
     exit;
+  end;
 
   PlayersTSA := multiBetween(ArmiesTSA[0], '<player>', '</player>');
 
@@ -360,6 +372,7 @@ begin
     begin
       if (names[i] = tmp[j].loginName) or (names[i] = tmp[j].displayName) or (names[i] = tmp[j].nickname) then
       begin
+        print('Loaded player: '+names[i]);
         self._add(tmp[j]);
         break;
       end;
@@ -367,6 +380,8 @@ begin
       if (j = high(tmp)) then
         print('Invalid player name: '+names[i], TDebug.WARNING);
     end;
+
+  print('TPlayerArray.setup(): Success', TDebug.FOOTER);
 end;
 
 (*
@@ -401,11 +416,11 @@ begin
 
   if (self.getActive() <= 0) then
   begin
-    print('All players inactive...');
+    print('All players inactive...', TDebug.SUB);
     exit(false);
   end;
 
-  print('Switching to player '+toStr(player)+' ('+self[player].nickname+')');
+  print('Switching to player '+toStr(player)+' ('+self[player].nickname+')', TDebug.SUB);
   currentPlayer := player;
 
   if (SRL_Events[EVENT_PLAYER_NEXT] <> nil) then
@@ -519,6 +534,8 @@ Example:
 *)
 procedure TPlayer.write();
 begin
+  print('TPlayer.write()', TDebug.HEADER);
+
   print('Login Name: ' + self.loginName);
   print('Display Name: ' + self.displayName);
   print('Nickname: ' + self.nickname);
@@ -526,6 +543,8 @@ begin
   print('Active: ' + toStr(self.isActive));
   print('Worked: ' + toStr(self.worked.getTime()));
   print('Total Worked: ' + toStr(self.worked.getTotalTime()));
+
+  print('TPlayer.write()', TDebug.FOOTER);
 end;
 
 (*
@@ -765,19 +784,19 @@ begin
       result := players.next(true);
 
     'halt':
-      halt();
+      terminateScript();
 
     'update':
       begin
         if (@SRL_Events[EVENT_RS_UPDATE] <> nil) then
         begin
-          print('Waiting 5 minutes before calling update procedure', TDebug.WARNING);
+          print('RS Update: Waiting 5 minutes before calling update procedure', TDebug.WARNING);
           wait(5 * 60000);
           SRL_Events[EVENT_RS_UPDATE];
           exit(false);
         end;
 
-        halt();
+        terminateScript();
       end;
   end;
 end;
@@ -833,6 +852,7 @@ begin
       begin
         result :=   ['One minute as passed...',    0,         5,  'false',  'Login failed'         ];
         print('Unknown color count: '+toStr(colorCount), TDebug.WARNING);
+        print('Please report this issue at http://villavu.com/forum/project.php?projectid=6', TDebug.HINT);
         takeScreenshot(logPath + 'unknown_login_count.png');
       end;
   end;
@@ -922,10 +942,13 @@ begin
   if (isLoggedIn() or lobby.isOpen()) then
     exit(true);
 
+  print('TPlayer.loginToLobby()', TDebug.HEADER);
+
   // check player activity
   if (not self.isActive) then
   begin
     print('Player '+self.nickname+' is not active...');
+    print('TPlayer.loginToLobby(): '+toStr(result), TDebug.FOOTER);
     exit(false);
   end;
 
@@ -939,10 +962,15 @@ begin
 
     if (not self.secureLogin) then
     begin
+      print('Entering username...');
       __enterLoginInfo(_boxUsername, self.loginName);
+
+      print('Entering password...');
       __enterLoginInfo(_boxPassword, self.password, false);
-    end else
+    end else begin
+      print('Entering info. using a secure method...');
       __secureEnterInfo(self.loginName, self.password);
+    end;
 
     wait(800 + random(50));	// fixes the login spam recoveries bug
 
@@ -958,6 +986,11 @@ begin
 
   if (result) and (not disableIPScreenshots) then
     takeScreenshot('IP_address.png');
+
+  if (result) then
+    print('Found lobby screen');
+
+  print('TPlayer.loginToLobby(): '+toStr(result), TDebug.FOOTER);
 end;
 
 (*
@@ -987,9 +1020,12 @@ function TPlayer.login(): boolean;
 var
   tries, t: integer;
 begin
+  print('TPlayer.login()', TDebug.HEADER);
+
   repeat
     if (isLoggedIn()) then
     begin
+      print('Already logged in');
       result := true;
       break;
     end;
@@ -1027,6 +1063,7 @@ begin
   end;
 
   wait(300 + random(500));
+  print('TPlayer.login(): '+toStr(result), TDebug.FOOTER);
 end;
 
 (*
@@ -1061,8 +1098,13 @@ begin
     exit;
   end;
 
+  print('TPlayer.logout()', TDebug.HEADER);
+
   if (SRL_Events[EVENT_LOGOUT] <> nil) then
+  begin
+    print('Calling SRL logout event');
     SRL_Events[EVENT_LOGOUT]();
+  end;
 
   if (tabLogout.clickText(['Login'])) then
   begin
@@ -1076,7 +1118,10 @@ begin
     end;
 
     self.worked.pause();
-  end;
+  end else
+    print('Failed to click logout text', TDebug.ERROR);
+
+  print('TPlayer.logout(): '+toStr(result), TDebug.FOOTER);
 end;
 
 (*

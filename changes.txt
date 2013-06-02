@@ -8,6 +8,7 @@ EVERYTHING should be recorded here: new features, function name changes, user-de
   - i.e. WRONG: walkToTrees; RIGHT: walkToTrees();
   - NOTE: This is only when writing code INSIDE SRL. You do not need to include () in your scripts if you don't want.
 - Since Lape doesn't yet have addOnTerminate, we have added it to SRL; however, the only way it works properly is if you call terminateScript() at the end of your script. So, be sure to add terminateScript before the last "end." of your script.
+- Functions/variables with the prefix "_" or "__" are meant to be internal SRL data.  This means they are not meant to be used in scripts.  If you are unsure what function to use, just ask. 
 
 
 - debug.simba (merged with SRLLog.simba)
@@ -197,7 +198,6 @@ EVERYTHING should be recorded here: new features, function name changes, user-de
   - MarkTime/TimeFromMark replaced with TTimeMarker and TTimeMarker functions
 
 - smart.simba
-  - renamed variable SRL_SixHourFix to useSMARTSixHourFix (default set to true)
   - removed function isRealMouseInBox
   - removed function getReadMousePos because TClient isn't yet supported in Lape
 

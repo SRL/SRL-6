@@ -19,9 +19,10 @@ VARIABLES:
 	players: array of TPlayer 		- the default TPlayerArray.
 	currentPlayer: integer; 		- the current active player.
 
-	SMART_SixHourFix: boolean; 		- restart SMART after 6 hours. Default true.
-	SMART_ForceNew: boolean; 		- force a new SMART client when a script is started. Default false.
-
+	smartForceNewClient: boolean; 		- force a new SMART client when a script is started. Default false.
+	smartEnableDrawing: boolean;		- enables drawing on the SMART window.
+	smartImage: TDrawing;			- used to draw on the SMART window.
+	
 	Interfaces/gametabs:
 		mainscreen: TRSMainscreen; 		- used to call mainscreen functions/procedures (i.e. mainscreen.isUptext, mainscreen.chooseOption).
 		lobby: TRSLobby;			- used to call lobby functions/procedures.
