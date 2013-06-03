@@ -53,7 +53,6 @@ Internal SMART variables used only in smart.simba.
 var
   __smartCurrentClient: integer;
 
-
 (*
 smartSetupDrawing
 ~~~~~~~~~~~~~~~~~
@@ -82,7 +81,7 @@ begin
   smartSetDebug(true);
 
   if (not smartImage.create('SMART Debug Image', FIXED_CLIENT_W, FIXED_CLIENT_H)) then
-    print('Failed to create the bitmap for smart drawing', TDebug.FATAL);
+    print('smartSetupDrawing(): Failed to setup', TDebug.FATAL);
 
   smartImage.bitmap.setPersistentMemory(SmartDebugArray(), FIXED_CLIENT_W, FIXED_CLIENT_H);
   smartImage.clear();
@@ -140,17 +139,16 @@ Example:
 .. code-block:: pascal
 
 *)
-function smartGetParameters(out p: array of string): boolean;
+function smartGetParameters(out params: array of string): boolean;
 var
   page: string;
-  b: boolean;
 const
   URL = 'http://www.runescape.com/game.ws?j=1';
 begin
   page := getPage(URL);
 
-  p := explode(',', between('<iframe id="game" src="', '"', page));
-  result := (length(p) = 2);
+  params := explode(',', between('<iframe id="game" src="', '"', page));
+  result := (length(params) = 2);
 
   if (not result) then
   begin
@@ -230,18 +228,19 @@ begin
 end;
 
 (*
-smartKillClients
+smartSetAsClient
 ~~~~~~~~~~~~~~~~
 
 .. code-block:: pascal
 
-     procedure smartKillClients(only_unpaired: boolean);
+     function smartSetAsClient(id: integer): boolean;
 
-Attempts to kill SMART clients based on the only_unpaired boolean.
+Attempts to pair, and then set as Simba's target returns true if succesfull, if
+succesfull will set our current current client as the ID.
 
 .. note::
 
-  By: Mormanman
+  By: Ollybest
   Last Updated: May. 26, 2013 by Ollybest
 
 Example:
@@ -368,7 +367,7 @@ begin
 
     if smartGetParameters(params) then
     begin
-      print('Using paramters ' + toStr(params));
+      print('Using Parameters: ' + toStr(params));
 
       id := smartSpawnClient(StringReplace(PluginPath, '\', '/', [rfReplaceAll]), Params[0], ',' + Params[1], FIXED_CLIENT_W, FIXED_CLIENT_H, 's', '', '');
       wait(100);
@@ -436,7 +435,7 @@ begin
   if (waitClientReady) then
     players[currentPlayer].login()
   else
-    print('Succesfully spawned a client, but RS failed to load', TDebug.FATAL);
+    print('Succesfully spawned a client, but RS failed to load.', TDebug.FATAL);
 
   if (smartEnableDrawing) then
   begin

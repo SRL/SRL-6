@@ -66,4 +66,14 @@ const
   OUTLINE_BLACK = 131072;
   OUTLINE_WHITE = 16777215;
 
+(*
+Constant: Yellow text color
+~~~~~~~~~~~~~~~~~~~~~~~~~~~
+
+Integer constant that represent the color of the yellow text on items.
+
+*)
+const
+  ITEM_TEXT_YELLOW = 65535;
+
 

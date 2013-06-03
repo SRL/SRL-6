@@ -738,3 +738,29 @@ function inRange(const value, min, max: extended): boolean; overload;
 begin
   result := (value >= min) and (value <= max);
 end;
+
+(*
+distance: overload;
+~~~~~~~~~~~~~~~~~~~
+
+.. code-block:: pascal
+
+    function distance(pnt1, pnt2: TPoint): integer; overload;
+
+Accepts two TPoints instead of x1, y1, x2 and y2 variables.
+
+.. note::
+
+    by Ollybest
+
+Example:
+
+.. code-block:: pascal
+
+    dist := distance(point(100, 100), point(200, 200));
+
+*)
+function distance(pnt1, pnt2: TPoint): integer; overload;
+begin
+  result := distance(pnt1.x, pnt1.y, pnt2.x, pnt2.y);
+end;

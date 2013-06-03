@@ -86,7 +86,7 @@ EVERYTHING should be recorded here: new features, function name changes, user-de
   - FindSymbols and FindSymbolsIn combined into one.
   - getColorPercent and getBlackBackground moved from SRL-5's color.simba.
   - PlayerMoving and WaitPlayerMoving moved from animation.simba.
-  - GridCoords16Ex ranamed to minimap.pointToMainscreen + made more accurate.
+  - GridCoords16Ex renamed to minimap.pointToMainscreen + made more accurate.
 
 - new file, mainscreen.simba
   - Uptext and option functions moved here.
@@ -203,7 +203,29 @@ EVERYTHING should be recorded here: new features, function name changes, user-de
 
 - smartgraphics.simba converted to drawing.simba
   - Using drawing.simba, one can create several different drawings and display them how they wish.
-  - smart.simba has a global variable, smartImage: TDrawing, that can be drawn to using any of the TDrawing functions.
+  - smart.simba has a global variable, smartImage: TDrawing, that can be drawn to using any of the TDrawing procedures (an example being smartImage.drawBox(myBox, false, clLime).
+  - these procedures are:
+   - TDrawing.create()
+   - TDrawing.destory()
+   - TDrawing.createFromClient()
+   - TDrawing.clear()
+   - TDrawing.clearArea()
+   - TDrawing.drawTPA()
+   - TDrawing.drawATPA()
+   - TDrawing.drawBox()
+   - TDrawing.drawRoundBox()
+   - TDrawing.drawBoxes()	
+   - TDrawing.drawLine()
+   - TDrawing.drawCross()
+   - TDrawing.drawEllipse()
+   - TDrawing.drawCircle()
+   - TDrawing.drawPolygon()
+   - TDrawing.drawBitmap()
+   - TDrawing.drawTextAt()
+   - TDrawing.drawMultiText()
+   - TDrawing.drawTextLines()
+   - TDrawing.debugDTM()	
+   - TDrawing.debugATPA()   
 
 - new file, client.simba
   - added function isClientReady (replaces RSReady)
@@ -215,7 +237,7 @@ EVERYTHING should be recorded here: new features, function name changes, user-de
 
 - new file, wrappers.simba
   - getColor may a take a TPoint instead of x and y variables.
-  - getColors takes an extra paramter, "clearSame" if true will clear same integers in the result.
+  - getColors takes an extra parameter, "clearSame" if true will clear same integers in the result.
   - tpaFromText can be called without the need for w and h variables.
   - replicate Can now enter a string instead of only one char.
   - explode now accepts a TStringArray intead of a string.
