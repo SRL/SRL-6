@@ -241,6 +241,7 @@ EVERYTHING should be recorded here: new features, function name changes, user-de
   - tpaFromText can be called without the need for w and h variables.
   - replicate Can now enter a string instead of only one char.
   - explode now accepts a TStringArray intead of a string.
+  - distance will now accept two TPoints rather than x1, y1, x2 and y2 variables.
 
   - Functions that may take a TBox variable instead of x1, y1, x2 and y2 variables:
    - findColors
@@ -260,3 +261,29 @@ EVERYTHING should be recorded here: new features, function name changes, user-de
    - findDTM
    - getTextAtEx
    - bitmapFromClient
+
+- amount.simba
+ 
+- removed:
+  - shopSwitchTab
+  - RuneAmount
+  - CoinAmount
+  - FindCoins
+  - CountItemsArea
+  - CountItemsIn
+  - ItemCoordinates
+  - CheckArea
+  - AreaInfo
+  - FindItem
+  - FindItemEx
+  - shopScreen
+ 
+- added:
+  - findItem
+  - isItemIn
+
+ - merged ItemAmount & GetAmount & GetAmountBox to getAmountIn()
+
+
+
+

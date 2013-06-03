@@ -34,7 +34,7 @@ Example:
     arr := findItem(myDTM, boxArr);
 
 *)
-function findItemIn(dtm: integer; boxArr: TBoxArray; sort: boolean = true): TIntegerArray;
+function findItem(dtm: integer; boxArr: TBoxArray; sort: boolean = true): TIntegerArray;
 var
   i, h: integer;
   pnt: TPoint;
@@ -71,11 +71,11 @@ Example:
      writeln(findItem(myDTM, boxArr));
 
 *)
-function findItemIn(dtm: integer; boxArr: TBoxArray): integer; overload;
+function findItem(dtm: integer; boxArr: TBoxArray): integer; overload;
 var
   arr: TIntegerArray;
 begin
-  arr := findItemIn(dtm, boxArr, false);
+  arr := findItem(dtm, boxArr, false);
   result := length(arr);
 end;
 
@@ -101,7 +101,7 @@ Example:
      writeln(getAmount(area));
 
 *)
-function getAmountIn(area: TBox): integer;
+function getAmount(area: TBox): integer;
 var
   tpa: TPointArray;
   b: TBox;
@@ -121,12 +121,12 @@ begin
 end;
 
 (*
-getAmount
-~~~~~~~~~
+isItemIn
+~~~~~~~~
 
 .. code-block:: pascal
 
-    function getAmount(area: TBox): integer;
+    function isItemIn(area: TBox): boolean;
 
 Uses the black outline of a item to result whether or not a item is in the area.
 
@@ -139,7 +139,7 @@ Example:
 
 .. code-block:: pascal
 
-     writeln(getAmount(box));
+     writeln(boolToStr(isItemIn(box)));
 
 *)
 function isItemIn(area: TBox): boolean;
