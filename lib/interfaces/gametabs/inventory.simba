@@ -8,6 +8,7 @@ Runescape inventory gametab.
 *)
 
 {$include_once gametab.simba}
+{$include_once ../../items/items.simba}
 
 {$f-}
 
@@ -31,12 +32,12 @@ TIntegerArray constants that represent drop patterns.
 
 *)
 const
-  DROP_PATTERN_REGULAR := TIntegerArray([1..28]);
+  DROP_PATTERN_REGULAR   := TIntegerArray([1..28]);
   DROP_PATTERN_BACKWARDS := TIntegerArray([28..1]);
-  DROP_PATTERN_SNAKE := [1, 2, 3, 4, 8, 7, 6, 5, 9, 10, 11, 12, 16, 15, 14,
-                         13, 17, 18, 19, 20, 24, 23, 22, 21, 25, 26, 27, 28];
-  DROP_PATTERN_UP_DOWN := [1, 5, 9, 13, 17, 21, 25, 26, 22, 18, 14, 10, 6, 2,
-                           3, 7, 11, 15, 19, 23, 27, 28, 24, 20, 16, 12, 8, 4];
+  DROP_PATTERN_SNAKE     := [1, 2, 3, 4, 8, 7, 6, 5, 9, 10, 11, 12, 16, 15, 14,
+                             13, 17, 18, 19, 20, 24, 23, 22, 21, 25, 26, 27, 28];
+  DROP_PATTERN_UP_DOWN   := [1, 5, 9, 13, 17, 21, 25, 26, 22, 18, 14, 10, 6, 2,
+                             3, 7, 11, 15, 19, 23, 27, 28, 24, 20, 16, 12, 8, 4];
 
 (*
 type TRSTabInventory
@@ -48,7 +49,7 @@ A type that stores functions and properties of the Runescape inventory tab.
 type
   TRSTabInventory = record(TRSInterface)
     tabIndex: integer;
-    __inventoryGrid: TBoxArray;
+    slots: TBoxArray;
 end;
 
 (*
@@ -100,7 +101,7 @@ begin
     h := (y2 - y1);
     cx := self.getCenterPoint().x;
     cy := self.getCenterPoint().y;
-    __inventoryGrid := Grid(4, 7, 31, 31, 42, 36, point(578, 278));
+    slots := Grid(4, 7, 31, 31, 42, 36, point(578, 278));
   end;
 end;
 
@@ -222,7 +223,7 @@ begin
     exit(intToBox(-1, -1, -1, -1));
 
   // - 1 because the grid (array) starts at 0.
-  result := __inventoryGrid[slot - 1];
+  result := slots[slot - 1];
 end;
 
 (*
@@ -257,7 +258,7 @@ begin
 
   b := self.getSlotBox(slot);
 
-  result := b.colorExists(OUTLINE_BLACK);
+  result := b.colorExists(ITEM_OUTLINE_BLACK);
 end;
 
 (*
@@ -446,7 +447,7 @@ begin
   if (not self.open()) then
     exit(false);
 
-  result := (not (self.getBounds().colorExists(OUTLINE_BLACK)));
+  result := (not (self.getBounds().colorExists(ITEM_OUTLINE_BLACK)));
 end;
 
 (*
@@ -518,7 +519,7 @@ begin
     exit(false);
 
   b := self.getSlotBox(slot);
-  result := b.colorExists(OUTLINE_WHITE);
+  result := b.colorExists(ITEM_OUTLINE_WHITE);
 end;
 
 (*
@@ -529,7 +530,7 @@ TRSTabInventory.getActivatedSlot
 
     function TRSTabInventory.getActivatedSlot: integer;
 
-Returns what slot is activated, if none are it will return - 1.
+Returns what slot is activated, if none are it will return -1.
 
 .. note::
 
@@ -550,7 +551,7 @@ function TRSTabInventory.getActivatedSlot: integer;
 var
   hi, i: integer;
 begin
-  if (not self.open()) or (not (self.getBounds().colorExists(OUTLINE_WHITE))) then
+  if (not self.open()) or (not (self.getBounds().colorExists(ITEM_OUTLINE_WHITE))) then
     exit(- 1);
 
   hi := INV_SLOT_HIGH;
@@ -590,7 +591,7 @@ Example:
     tabInventory.dropItems();
 
 *)
-procedure TRSTabInventory.dropItems(slots: TIntegerArray = DROP_PATTERN_REGULAR);
+procedure TRSTabInventory.dropItems(slotArr: TIntegerArray = DROP_PATTERN_REGULAR);
 var
   l, i, r: integer;
   tia: TIntegerArray;
@@ -612,16 +613,16 @@ begin
   if (random(10) = 5) then
     if (l = 28) then
       for r to (l - 4) do
-        swap(slots[randomRange(r - 1, r + 4)], slots[randomRange(r - 1, r + 4)]);
+        swap(slotArr[randomRange(r - 1, r + 4)], slotArr[randomRange(r - 1, r + 4)]);
 
   for i to (l - 1) do
-    if (not (self.invaildSlot(slots[i]))) then
-      if self.isItemInSlot(slots[i]) then
+    if (not (self.invaildSlot(slotArr[i]))) then
+      if self.isItemInSlot(slotArr[i]) then
       begin
-        self.mouseSlot(slots[i], MOUSE_RIGHT);
+        self.mouseSlot(slotArr[i], MOUSE_RIGHT);
         if chooseOption(['Drop', 'drop', 'rop']) then
         begin
-          insert(slots[i], tia);
+          insert(slotArr[i], tia);
           wait(120 + random(305));
         end;
       end;

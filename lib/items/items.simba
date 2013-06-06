@@ -1,0 +1,170 @@
+(*
+Items
+=====
+
+The items file stores any functions and procedures that have anything to do with
+RS items.  These functions have their own file because items can appear in many
+different RS interfaces such as the inventory, bank, and chat box.
+
+*)
+
+{$include_once ../core/globals.simba}
+{$include_once ../core/text.simba}
+
+(*
+Constant: Item Colors
+~~~~~~~~~~~~~~~~~~~~~
+
+Integer constants that represents static item colors.
+
+Example:
+
+.. code-block:: pascal
+
+    FindColors(tpa, ITEM_OUTLINE_BLACK, Box, 0);
+
+*)
+const
+  ITEM_OUTLINE_BLACK = 131072;
+  ITEM_OUTLINE_WHITE = 16777215;
+  ITEM_TEXT_YELLOW   = 65535;
+
+(*
+findItem
+~~~~~~~~
+
+.. code-block:: pascal
+
+    function findItem(dtm: integer; boxArr: TBoxArray; sort: boolean = true): TIntegerArray;
+
+Loops though each index of the TBoxArray(boxArr) searching for the DTM(dtm), if
+succesfull will add the box index to the result. If sort is true will order
+the result from (low..high).
+
+.. note::
+
+    by Ollybest
+    Last Updated: May. 26, 2013
+
+Example:
+
+.. code-block:: pascal
+
+    arr := findItem(myDTM, boxArr);
+
+*)
+function findItem(dtm: integer; boxArr: TBoxArray; sort: boolean = true): TIntegerArray;
+var
+  i, h: integer;
+  pnt: TPoint;
+begin
+  h := high(boxArr);
+
+  for i := 0 to h do
+    if findDTM(dtm, pnt.x, pnt.y, boxArr[i]) then
+      insert(i, result);
+
+  if (sort) then
+    result.sortQuick();
+end;
+
+(*
+findItem; overload
+~~~~~~~~~~~~~~~~~~
+
+.. code-block:: pascal
+
+    function findItem(dtm: integer; boxArr: TBoxArray): integer; overload;
+
+Same as findItem, but returns the amount of matches.
+
+.. note::
+
+    by Ollybest
+    Last Updated: May. 26, 2013
+
+Example:
+
+.. code-block:: pascal
+
+     writeln(findItem(myDTM, boxArr));
+
+*)
+function findItem(dtm: integer; boxArr: TBoxArray): integer; overload;
+var
+  arr: TIntegerArray;
+begin
+  arr := findItem(dtm, boxArr, false);
+  result := length(arr);
+end;
+
+(*
+getItemAmount
+~~~~~~~~~~~~~
+
+.. code-block:: pascal
+
+    function getItemAmount(area: TBox): integer;
+
+Searches and returns the item amount (top left) in the area.
+
+.. note::
+
+    by Ollybest
+    Last Updated: May. 26, 2013
+
+Example:
+
+.. code-block:: pascal
+
+     writeln(getItemAmount(area));
+
+*)
+function getItemAmount(area: TBox): integer;
+var
+  tpa: TPointArray;
+  b: TBox;
+begin
+  result := 0;
+
+  if findColors(tpa, ITEM_TEXT_YELLOW, area) then
+  begin
+    b := tpa.getBounds();
+    b.edit(-1, -1, +1, +1);
+
+    result := findTextNumbers(ITEM_TEXT_YELLOW, 0, b, 'statChars', [0, 1, 1]);
+
+    print('getItemAmount(): result = ' + intToStr(result), TDebug.SUB);
+  end else
+    print('getItemAmount(): Didn''t find any text color, result = 0', TDebug.SUB);
+end;
+
+(*
+isItemIn
+~~~~~~~~
+
+.. code-block:: pascal
+
+    function isItemIn(area: TBox): boolean;
+
+Uses the black outline of a item to result whether or not a item is in the area.
+
+.. note::
+
+    by Ollybest
+    Last Updated: 06 June by Coh3n
+
+Example:
+
+.. code-block:: pascal
+
+     writeln(boolToStr(isItemIn(box)));
+
+*)
+function isItemIn(area: TBox): boolean;
+var
+  p: TPoint;
+begin
+  result := (findColor(p.x, p.y, ITEM_OUTLINE_BLACK, area) or findColor(p.x, p.y, ITEM_OUTLINE_WHITE, area));
+end;
+
