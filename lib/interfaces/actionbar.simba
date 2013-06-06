@@ -889,7 +889,7 @@ begin
   if (not tabInventory.isItemInSlot(invSlot)) then
     exit(false);
 
-  inventoryBox := tabInventory.__inventoryGrid[invSlot - 1];
+  inventoryBox := tabInventory.slots[invSlot - 1];
   inventoryBox.x2 := inventoryBox.x2 - 2;
   inventoryBox.y2 := inventoryBox.y2 - 2;
 

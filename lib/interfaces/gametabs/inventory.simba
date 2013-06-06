@@ -48,7 +48,7 @@ A type that stores functions and properties of the Runescape inventory tab.
 type
   TRSTabInventory = record(TRSInterface)
     tabIndex: integer;
-    __inventoryGrid: TBoxArray;
+    slots: TBoxArray;
 end;
 
 (*
@@ -100,7 +100,7 @@ begin
     h := (y2 - y1);
     cx := self.getCenterPoint().x;
     cy := self.getCenterPoint().y;
-    __inventoryGrid := Grid(4, 7, 31, 31, 42, 36, point(578, 278));
+    slots := Grid(4, 7, 31, 31, 42, 36, point(578, 278));
   end;
 end;
 
@@ -222,7 +222,7 @@ begin
     exit(intToBox(-1, -1, -1, -1));
 
   // - 1 because the grid (array) starts at 0.
-  result := __inventoryGrid[slot - 1];
+  result := slots[slot - 1];
 end;
 
 (*
@@ -590,7 +590,7 @@ Example:
     tabInventory.dropItems();
 
 *)
-procedure TRSTabInventory.dropItems(slots: TIntegerArray = DROP_PATTERN_REGULAR);
+procedure TRSTabInventory.dropItems(slotArr: TIntegerArray = DROP_PATTERN_REGULAR);
 var
   l, i, r: integer;
   tia: TIntegerArray;
@@ -612,16 +612,16 @@ begin
   if (random(10) = 5) then
     if (l = 28) then
       for r to (l - 4) do
-        swap(slots[randomRange(r - 1, r + 4)], slots[randomRange(r - 1, r + 4)]);
+        swap(slotArr[randomRange(r - 1, r + 4)], slotArr[randomRange(r - 1, r + 4)]);
 
   for i to (l - 1) do
-    if (not (self.invaildSlot(slots[i]))) then
-      if self.isItemInSlot(slots[i]) then
+    if (not (self.invaildSlot(slotArr[i]))) then
+      if self.isItemInSlot(slotArr[i]) then
       begin
-        self.mouseSlot(slots[i], MOUSE_RIGHT);
+        self.mouseSlot(slotArr[i], MOUSE_RIGHT);
         if chooseOption(['Drop', 'drop', 'rop']) then
         begin
-          insert(slots[i], tia);
+          insert(slotArr[i], tia);
           wait(120 + random(305));
         end;
       end;

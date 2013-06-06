@@ -204,28 +204,7 @@ EVERYTHING should be recorded here: new features, function name changes, user-de
 - smartgraphics.simba converted to drawing.simba
   - Using drawing.simba, one can create several different drawings and display them how they wish.
   - smart.simba has a global variable, smartImage: TDrawing, that can be drawn to using any of the TDrawing procedures (an example being smartImage.drawBox(myBox, false, clLime).
-  - these procedures are:
-   - TDrawing.create()
-   - TDrawing.destory()
-   - TDrawing.createFromClient()
-   - TDrawing.clear()
-   - TDrawing.clearArea()
-   - TDrawing.drawTPA()
-   - TDrawing.drawATPA()
-   - TDrawing.drawBox()
-   - TDrawing.drawRoundBox()
-   - TDrawing.drawBoxes()	
-   - TDrawing.drawLine()
-   - TDrawing.drawCross()
-   - TDrawing.drawEllipse()
-   - TDrawing.drawCircle()
-   - TDrawing.drawPolygon()
-   - TDrawing.drawBitmap()
-   - TDrawing.drawTextAt()
-   - TDrawing.drawMultiText()
-   - TDrawing.drawTextLines()
-   - TDrawing.debugDTM()	
-   - TDrawing.debugATPA()   
+  - All procedures can be found in lib/ulities/drawing.simba
 
 - new file, client.simba
   - added function isClientReady (replaces RSReady)
@@ -282,7 +261,7 @@ EVERYTHING should be recorded here: new features, function name changes, user-de
   - findItem
   - isItemIn
 
- - merged ItemAmount & GetAmount & GetAmountBox to getAmountIn()
+- merged ItemAmount & GetAmount & GetAmountBox to getAmountIn()
 
 
 
