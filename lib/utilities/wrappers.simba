@@ -177,7 +177,7 @@ findColorsTolerance: overload;
 
     function findColorsTolerance(pnts: TPointArray; const color, xs, ys, xe, ye, tolerance, bitmap: integer): boolean; overload;
 
-Same as regualr findColorsTolerance but searches the bitmap.
+Same as regular findColorsTolerance but searches the bitmap.
 
 .. note::
 
@@ -215,7 +215,7 @@ findColorsTolerance: overload;
 
     function findColorsTolerance(pnts: TPointArray; const color: integer; const searchArea: TBox; const tolerance, bitmap: integer): boolean; overload;
 
-Same as regualr findColorsTolerance but searches the bitmap and takes a TBox
+Same as regular findColorsTolerance but searches the bitmap and takes a TBox
 variable instead of x1, y1, x2 and y2 variables.
 
 .. note::
@@ -242,7 +242,7 @@ findColorsTolerance: overload;
 
     function findColorsTolerance(pnts: TPointArray; const color: integer; const searchArea: TBox; const tolerance, bitmap: integer): boolean; overload;
 
-Same as regualr findColorsTolerance but searches the entire bitmap.
+Same as regular findColorsTolerance but searches the entire bitmap.
 
 .. note::
 
