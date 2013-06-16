@@ -7,24 +7,10 @@ The gametab file holds any global gametab data.
 *)
 
 {$include_once ../interfaces.simba}
+{$include_once ../bankscreen.simba}
 {$include_once ../../core/text.simba}
 
 {$f-}
-
-// just here temporarily to test and compile
-// remove TTemp, bankScreen, and TTemp.isOpen when bankscreen.simba is added
-type
-  TTemp = record
-    name: string;
-  end;
-
-var
-  bankScreen: TTemp;
-
-function TTemp.isOpen(): boolean;
-begin
-  result := false;
-end;
 
 {*
 Constant: Tabs
