@@ -31,6 +31,7 @@ SRL library isn't available to you.
 {$include_once lib/interfaces/mainscreen.simba}
 {$include_once lib/interfaces/actionbar.simba}
 {$include_once lib/interfaces/minimap.simba}
+{$include_once lib/interfaces/bankscreen.simba}
 
 {$IFDEF SMART}
   {$include_once lib/misc/smart.simba}

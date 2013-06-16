@@ -38,7 +38,7 @@ type
   end;
 
 (*
-var bankscreen
+var bankScreen
 ~~~~~~~~~~~~~~
 
 The variable that holds all bankscreen information. It used when calling any functions
@@ -225,7 +225,7 @@ begin
     exit();
 
   p := tpa.getMiddle();
-  mouse(p.rand(randomRange(-6, 4)));
+  mouse(p.rand(randomRange(-5, 5)));
   dragMouse(point(483, 131).rand(10, 15));
 
   wait(50 + random(50));
