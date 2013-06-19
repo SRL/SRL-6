@@ -1,0 +1,236 @@
+(*
+BankScreen
+==========
+
+The bankscreen file holds functions and procedures that are used in the
+Runescape bank screen.
+
+*)
+
+{$include_once interfaces.simba}
+{$include_once ../core/text.simba}
+
+{$f-}
+
+(*
+const deposit buttons
+~~~~~~~~~~~~~~~~~~~~~
+
+Integer constants that represent the order of the quick deposit buttons.
+
+*)
+const
+  QUICK_DEPOSIT_INVENTORY   = 0;
+  QUICK_DEPOSIT_EQIUPMENT   = 1;
+  QUICK_DEPOSIT_BOB         = 2;
+  QUICK_DEPOSIT_MONEY_POUCH = 3;
+
+(*
+type TRSBankScreen
+~~~~~~~~~~~~~~~~~~
+
+A type that stores all the attributes and functions of the Runescape bankscreen.
+
+*)
+type
+  TRSBankScreen = record(TRSInterface)
+    slots, tabSlots: TBoxArray;
+  end;
+
+(*
+var bankScreen
+~~~~~~~~~~~~~~
+
+The variable that holds all bankscreen information. It used when calling any functions
+in this file.
+
+*)
+var
+  bankScreen: TRSBankScreen;
+
+{*
+TRSBankScreen.__init
+~~~~~~~~~~~~~~~~~~~~
+
+.. code-block:: pascal
+
+    procedure TRSBankScreen.__init();
+
+Initializes the TRSBankScreen.
+
+.. note::
+
+    by Ollybest
+    Last Updated: 15 June 2013 by Ollybest
+
+Example:
+
+.. code-block:: pascal
+
+    minimap.__init();
+
+*}
+procedure TRSBankScreen.__init();
+begin
+  with (self) do
+  begin
+    name := 'RS Bank Screen';
+    ID := ID_INTERFACE_BANKSCREEN;
+    parentID := -1;
+    static := true;
+    x1 := 17;
+    y1 := 74;
+    x2 := 503;
+    y2 := 376;
+    w := (x2 - x1);
+    h := (y2 - y1);
+    cx := self.getCenterPoint().x;
+    cy := self.getCenterPoint().y;
+
+    slots := grid(10, 5, 31, 32, 44, 44, point(53, 157));
+    tabSlots := grid(9, 1, 36, 33, 48, 44, point(43, 115));
+  end;
+end;
+
+(*
+TRSBankScreen.isOpen
+~~~~~~~~~~~~~~~~~~~~
+
+.. code-block:: pascal
+
+    function TRSBankScreen.close(): boolean;
+
+Returns if the bankscreen is open or not.
+
+.. note::
+
+    by Ollybest
+    Last Updated: 15 June 2013 by Ollybest
+
+Example:
+
+.. code-block:: pascal
+
+    if (bankScreen.isOpen()) then
+      writeln('bankscreen is open! lets start depositing items');
+
+*)
+function TRSBankScreen.isOpen(timeOut: integer = 0): boolean;
+var
+  p: TPoint;
+  t: integer;
+begin
+  t := getSystemTime() + timeOut;
+  result := false;
+
+  repeat
+    if (getColor(197, 79) = 4106994) then
+      result := findText(p, 4106994, 0, ['ank of Run'], [upCharsEx], intToBox(196, 76, 289, 95));
+
+    if (result) then
+      break();
+
+    if (timeOut <> 0) then
+      wait(20 + random(40));
+
+  until (getSystemTime() >= t);
+
+  print('bankScreen.isOpen(): result = ' + toStr(result) + ', took: ' + intToStr(getSystemTime() + timeOut - t) + 'ms', TDebug.SUB);
+end;
+
+(*
+TRSBankScreen.close
+~~~~~~~~~~~~~~~~~~~
+
+.. code-block:: pascal
+
+    function TRSBankScreen.close(): boolean;
+
+Closes the bankscreen, will return if succesful or not.
+
+.. note::
+
+    by Ollybest
+    Last Updated: 15 June 2013 by Ollybest
+
+Example:
+
+.. code-block:: pascal
+
+    if (bankScreen.close()) then
+      writeln('closed the bankscreen');
+
+*)
+function TRSBankScreen.close(): boolean;
+var
+  t, timeOut: integer;
+begin
+  timeOut := getSystemTime() + 5000;
+  t := getSystemTime();
+
+  result := (not self.isOpen());
+
+  if (not result) then
+  begin
+    mouseBox(intToBox(481, 77, 496, 92), MOUSE_LEFT);
+    wait(10 + random(20));
+
+    result := (not self.isOpen());
+
+    while (not result) and (timeOut > getSystemTime()) do
+      wait(20 + random(50));
+  end;
+
+  print('depositScreen.close(): result = ' + boolToStr(result), TDebug.SUB);
+end;
+
+(*
+TRSBankScreen._scrollUp
+~~~~~~~~~~~~~~~~~~~~~~~
+
+.. code-block:: pascal
+
+    procedure TRSBankScreen._scrollUp();
+
+Will scroll the bankscreen up to the top if reqiured.
+
+.. note::
+
+    by Ollybest
+    Last Updated: 15 June 2013 by Ollybest
+
+Example:
+
+.. code-block:: pascal
+
+    bankScreen.scrollUp();
+
+*)
+procedure TRSBankScreen._scrollUp();
+var
+  tpa: TPointArray;
+  p: TPoint;
+begin
+  if (not self.isOpen()) then
+    exit();
+
+  // top of scroller = already at top | area where no scroll exists.
+  if (getColor(489, 151) = 1250841) or (getColor(491, 139) = 2896698) then
+    exit();
+
+  print('bankScreen.scrollUp(): Going to scroll the bankscreen up to the top');
+
+  // find the scrollbar.
+  if (not findColorsTolerance(tpa, 4544607, 482, 151, 495, 326, 20)) then
+    exit();
+
+  p := tpa.getMiddle();
+  mouse(p.rand(randomRange(-5, 5)));
+  dragMouse(point(483, 131).rand(10, 15));
+
+  wait(50 + random(50));
+end;
+
+begin
+  bankScreen.__init();
+end;

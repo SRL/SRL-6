@@ -161,12 +161,107 @@ Example:
 
 .. code-block:: pascal
 
-    FindColorsTolerance(TPA, clWhite, mainScreen.GetCounts, 10);
+    FindColorsTolerance(TPA, clWhite, mainScreen.getBounds(), 10);
 
 *)
 function findColorsTolerance(var points : TPointArray; const color : Integer; const searchBox: TBox; const tolerance : Integer): Boolean; overload;
 begin
   result := findColorsTolerance(points, color, searchBox.x1, searchBox.y1, searchBox.x2, searchBox.y2, tolerance);
+end;
+
+(*
+findColorsTolerance: overload;
+~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+
+.. code-block:: pascal
+
+    function findColorsTolerance(pnts: TPointArray; const color, xs, ys, xe, ye, tolerance, bitmap: integer): boolean; overload;
+
+Same as regular findColorsTolerance but searches the bitmap.
+
+.. note::
+
+    by Ollybest
+
+Example:
+
+.. code-block:: pascal
+
+    findColorsTolerance(tpa, clRed, 10, 10, 20, 20, 50, myBitmap);
+
+*)
+function findColorsTolerance(pnts: TPointArray; const color, xs, ys, xe, ye, tolerance, bitmap: integer): boolean; overload;
+var
+  prevTarget, bmpTarget: integer;
+begin
+  if (not bitmapExists(bitmap)) then
+    exit(false);
+
+  prevTarget := getImageTarget();
+  setTargetBitmap(bitmap);
+
+  result := findColorsTolerance(pnts, color, xs, ys, xe, ye, tolerance);
+
+  bmpTarget := getImageTarget();
+  setImageTarget(prevTarget);
+  freeTarget(bmpTarget);
+end;
+
+(*
+findColorsTolerance: overload;
+~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+
+.. code-block:: pascal
+
+    function findColorsTolerance(pnts: TPointArray; const color: integer; const searchArea: TBox; const tolerance, bitmap: integer): boolean; overload;
+
+Same as regular findColorsTolerance but searches the bitmap and takes a TBox
+variable instead of x1, y1, x2 and y2 variables.
+
+.. note::
+
+    by Ollybest
+
+Example:
+
+.. code-block:: pascal
+
+    findColorsTolerance(tpa, clLime, area, 50, myBitmap);
+
+*)
+function findColorsTolerance(pnts: TPointArray; const color: integer; const searchArea: TBox; const tolerance, bitmap: integer): boolean; overload;
+begin
+  result := findColorsTolerance(pnts, color, searchArea.x1, searchArea.y1, searchArea.x2, searchArea.y2, tolerance, bitmap);
+end;
+
+(*
+findColorsTolerance: overload;
+~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+
+.. code-block:: pascal
+
+    function findColorsTolerance(pnts: TPointArray; const color: integer; const searchArea: TBox; const tolerance, bitmap: integer): boolean; overload;
+
+Same as regular findColorsTolerance but searches the entire bitmap.
+
+.. note::
+
+    by Ollybest
+
+Example:
+
+.. code-block:: pascal
+
+    findColorsTolerance(tpa, clLime, 50, myBitmap);
+
+*)
+function findColorsTolerance(pnts: TPointArray; const color, tolerance, bitmap: integer): boolean; overload;
+var
+  w, h: integer;
+begin
+  getBitmapSize(bitmap, w, h);
+
+  result := findColorsTolerance(pnts, color, 0, 0, w-1, h-1, tolerance, bitmap);
 end;
 
 (*
@@ -617,6 +712,7 @@ function getTextAtEx(const searchBox: TBox; minvspacing, maxvspacing, hspacing, 
 begin
   result := GetTextAtEx(searchBox.x1, searchBox.y1, searchBox.x2, searchBox.y2, minvspacing, maxvspacing, hspacing, color, tolerance, font);
 end;
+
 
 (*
 tpaFromText: overload;

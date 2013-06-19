@@ -714,8 +714,7 @@ begin
     exit();
   end;
 
-  cols := getColors(TPA);
-  cols.clearEquals();
+  cols := getColors(TPA, true);
 
   print('Found '+toStr(length(cols))+' shades of black, finding the most common one...');
 
