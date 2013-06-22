@@ -1,0 +1,284 @@
+(*
+World Switcher
+==============
+
+The World Switcher include contains all kinds of functions to control the built-in RS world switcher.
+
+*)
+
+{$include_once lobby.simba}
+
+const
+  WORLD_HIGH = 139; // the highest number world
+  WORLD_PATH = scriptPath + 'worlds.ini';
+  WORLD_FONT = statChars;
+
+const
+  WORLD_COLOR_ARROW         = 1008783;  // arrow color that can order the worlds
+  WORLD_COLOR_F2P           = 16579836; // white text color
+  WORLD_COLOR_P2P           = 6618364;  // yellow text color
+  WORLD_COLOR_SCROLL_LEFT   = 1250841;  // black color on the left side of scroll area
+  WORLD_COLOR_SCROLL_BOTTOM = 592137;   // black color under scroll bar
+
+const
+  WORLD_ORDER_WORLDS   = 0;
+  WORLD_ORDER_PLAYERS  = 1;
+  WORLD_ORDER_ACTIVITY = 2;
+  WORLD_ORDER_LOCATION = WORLD_ORDER_ACTIVITY;
+  WORLD_ORDER_TYPE     = 3;
+  WORLD_ORDER_PING     = 4;
+
+type
+  __TRSWorld = record
+    world: integer;
+    members: boolean;
+  end;
+
+type
+  TRSLobbyWorlds = record(TRSLobby)
+    lobbyID: integer;
+    worlds: array of __TRSWorld;
+  end;
+
+var
+  lobbyWorlds: TRSLobbyWorlds;
+
+var
+  __worldsOrdered: boolean;
+
+procedure TRSLobbyWorlds.__loadFromINI();
+var
+  i, c: integer;
+begin
+  setLength(self.worlds, WORLD_HIGH);
+
+  for i := 0 to high(self.worlds) do
+    if (readINI(toStr(i), 'world', WORLD_PATH) <> '') then // to make sure the world exists
+    begin
+      self.worlds[c].members := strToBool(readINI(toStr(i), 'members', WORLD_PATH));
+      self.worlds[c].world := strToIntDef(readINI(toStr(i), 'world', WORLD_PATH), -1);
+      inc(c);
+    end;
+
+  setLength(self.worlds, c);
+end;
+
+procedure TRSLobbyWorlds.__init();
+begin
+  with self do
+  begin
+    name := 'RS Lobby Tab: Worlds';
+    ID := ID_INTERFACE_LOBBY_WORLDS;
+    parentID := ID_INTERFACE_LOBBY;
+    static := true;
+    x1 := lobby.x1;
+    y1 := lobby.y1;
+    x2 := lobby.x2;
+    y2 := lobby.y2;
+    w := (x2 - x1);
+    h := (y2 - y1);
+    cx := self.getCenterPoint().x;
+    cy := self.getCenterPoint().y;
+
+    lobbyID := LOBBY_WORLDS;
+    self.__loadFromINI();
+  end;
+end;
+
+function TRSLobbyWorlds.isOpen(): boolean;
+begin
+  result := (lobby.getCurrentTab() = self.lobbyID);
+end;
+
+function TRSLobbyWorlds.open(): boolean;
+begin
+  result := lobby._openTab(self.lobbyID);
+end;
+
+function TRSLobbyWorlds.getCurrentWorld(): integer;
+var
+  box: TBox;
+  tpa: TPointArray;
+begin
+  result := -1;
+
+  if (not self.isOpen()) then
+    exit();
+
+  if (findColors(tpa, 12378347, 628, 79, 689, 92)) then
+  begin
+    box := getTPABounds(tpa);
+    result := strToIntDef(extractFromStr(getTextAtEx(box.x1, box.y1, box.x2, box.y2, 0, 3, 4, 12378347, 0, upChars), numbers), -1);
+  end else
+    print('TRSLobbyWorlds.getCurrentWorld(): Failed to find text color', TDebug.ERROR);
+end;
+
+function TRSLobbyWorlds.getCurrentWorld(var world: integer): boolean; overload;
+begin
+  result := false;
+
+  if (not self.isOpen()) then
+    exit();
+
+  result := (self.getCurrentWorld() = world);
+
+  if (result) then
+    exit();
+
+  world := self.getCurrentWorld();
+end;
+
+function TRSLobbyWorlds._isWorldValid(world: integer): boolean;
+begin
+  if (self.worlds[world].world <> -1) then
+    result := true
+  else
+    print('TRSLobbyWorlds._getIndex(): '+toStr(world)+' is an invalid world', TDebug.ERROR);
+end;
+
+function TRSLobbyWorlds.sort(by: integer; descending: boolean): boolean;
+var
+  ATPA: T2DPointArray;
+  TPA: TPointArray;
+  TB: TBox;
+begin
+  print('TRSLobbyWorlds.sort()', TDebug.HEADER);
+
+  if (findColorsTolerance(TPA, WORLD_COLOR_ARROW, 92, 50, 716, 250, 1)) then
+  begin
+    print('Found WORLD_COLOR_ARROW');
+
+    ATPA := splitTPA(TPA, 2);
+    sortATPAFromFirstPoint(ATPA, point(92, 166));
+
+    if (length(ATPA) < (by * 2)) then
+    begin
+      print('Didn''t find enough of WORLD_COLOR_ARROW', TDebug.ERROR);
+      print('TRSLobbyWorlds.sort(): '+toStr(result), TDebug.FOOTER);
+      exit();
+    end;
+
+    TB := getTPABounds(ATPA[(by * 2) + ord(descending)]);
+    mouseBox(intToBox(TB.x1 + 2, TB.y1 + 2, TB.x2, TB.y2), MOUSE_LEFT);
+
+    result := true;
+  end else
+    print('Failed to find WORLD_COLOR_ARROW', TDebug.ERROR);
+
+  print('TRSLobbyWorlds.sort(): '+toStr(result), TDebug.FOOTER);
+end;
+
+function TRSLobbyWorlds._findWorldNumber(var res: TPoint; w: integer): boolean;
+begin
+  result := findText(res, [toStr(w)], [statChars], intToBox(113, 170, 143, 483)); // box is the world number column
+  res.rand(400, 10); // add randomness to the point clicked
+end;
+
+function TRSLobbyWorlds._scrollToWorld(var res: TPoint; w: integer): boolean;
+var
+  wPos, sPos, curPos: integer;
+  barHeight, worldsOnScreen: integer;
+  TPA, TPA2, TPA3: TPointArray;
+  SP, SB: TBox;
+begin
+  result := false;
+
+  // order the worlds in descending order
+  if (not __worldsOrdered) then
+  begin
+    if (not self.sort(WORLD_ORDER_WORLDS, true)) then
+      exit(false);
+
+    __worldsOrdered := true;
+    wait(400 + random(200));
+  end;
+
+  findColorsTolerance(TPA, WORLD_COLOR_SCROLL_LEFT, 680, 50, 705, 550, 0); // these coords determine the scroll bar's general area, it deviates everything
+  SB := getTPABounds(TPA);
+
+  findColorsTolerance(TPA2, WORLD_COLOR_SCROLL_LEFT, SB.X1 + 3, SB.Y1, SB.X1 + 3, SB.Y2, 0);
+  findColorsTolerance(TPA3, WORLD_COLOR_SCROLL_BOTTOM, SB.X1 + 3, SB.Y1, SB.X1 + 3, SB.Y2, 0);
+  TPA2 := combineTPA(TPA2, TPA3);
+  SP := getTPABounds(TPA2);
+
+  barHeight := (SP.Y2 - SP.Y1);
+  worldsOnScreen := (SB.Y2 - SB.Y1 + 32) div 42; // this is HALF of the worlds on screen
+
+  sPos := ((SB.Y1 + barHeight div 2) + wPos) * (SB.Y2 - SB.Y1 - barHeight) div (high(length(self.worlds)) + 1 - worldsOnScreen); // need the 0.0 to make it extended inside ()
+  curPos := (SP.Y1 + barHeight div 2);
+
+  print('TRSLobbyWorlds._scrollToWorld: Scroll bar info: curPos: '+toStr(curPos)+' wPos: '+toStr(wPos)+' sPos: '+toStr(sPos), TDebug.SUB);
+
+  // if its too close the scroll bar won't move to correct position
+  if (inRange(sPos, curPos - barHeight, curPos + barHeight)) then
+    if (curPos < ((SB.Y1 + barHeight / 2)+ (SB.Y2 - SB.Y1 - barHeight) / 2)) then // half point
+      mouse(point((SB.X1 + (SB.X2 - SB.X1) div 2), SB.Y2), MOUSE_LEFT)
+    else
+      mouse(point((SB.X1 + (SB.X2 - SB.X1) div 2), SB.Y1), MOUSE_LEFT);
+
+  result := self._findWorldNumber(res, w);
+end;
+
+function TRSLobbyWorlds.selectWorld(w: integer): boolean;
+var
+  p: TPoint;
+begin
+  result := false;
+
+  // make sure the worlds screen is open
+  if (not self.isOpen()) then
+    exit(false);
+
+  // make sure the world is valid
+  if (not self._isWorldValid(w)) then
+    exit(false);
+
+  print('TRSLobbyWorlds.selectWorld()', TDebug.HEADER);
+
+  // check to see if we're already on the right world
+  if (self.getCurrentWorld(w)) then
+  begin
+    print('Already on world '+toStr(w));
+    result := true;
+  end;
+
+  if (not result) then
+  begin
+    if (self._findWorldNumber(p, w)) then // check to see if the worlds already visible (or if it's favorited)
+      print('Found world '+toStr(w))
+    else
+      if (self._scrollToWorld(p, w)) then
+        print('Scrolled to and found world '+toStr(w));
+
+    if (not p.isInvalid()) then
+    begin
+      print('Selected world '+toStr(w));
+      mouse(p, MOUSE_LEFT);
+      result := true;
+    end;
+  end;
+
+  print('TRSLobbyWorlds.selectWorld(): '+toStr(result), TDebug.FOOTER);
+end;
+
+function TRSLobbyWorlds.selectRandomWorld(members: boolean): boolean;
+var
+  i, l, wo: integer;
+  wArray: TIntegerArray;
+begin
+  for i := 0 to high(self.worlds) do
+    if (self.worlds[i].members) then
+    begin
+      wArray[l] := self.worlds[i].world;
+      inc(l);
+    end;
+
+  wo := random(l);
+  print('TRSLobbyWorlds.selectRandomWorld(): Random world is '+toStr(wo));
+
+  result := self.selectWorld(wArray[wo]);
+end;
+
+begin
+  lobbyWorlds.__init();
+end;

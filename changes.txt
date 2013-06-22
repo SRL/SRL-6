@@ -32,6 +32,23 @@ EVERYTHING should be recorded here: new features, function name changes, user-de
 - lobby.simba
   - renamed constants to LOBBY_PLAYER/WORLD/FRIENDS/CHAT/CLAN/OPTIONS
   - lobbyScreen renamed to isLobbyScreenOpen()
+  - LobbyTab moved from gametab.simba and renamed to TRSLobby.openTab.
+
+- worldswitcher.simba renamed to lobby/worlds.simba
+  - All functions are now functions of the TRSLobbyWorld type to be used with the variable lobbyWorlds.
+  - WorldScreen renamed to TRSLobbyWorlds.isOpen().
+  - OpenWorldScreen renamed to TRSLobbyWorlds.open().
+  - Language constants removed as they're no longer used.
+  - UpdateWorlds removed as there's no longer an RS worlds URL to be parsed.  A worlds.ini file is still present in lib/interfaces/lobby/ that stores the worlds and whether or not they are P2P.
+  - WS_CurrentWorld/Ex renamed TRSLobbyWorlds.getCurrentWorld and made overloads.
+  - OrderWorlds renamed to TRSLobbyWorlds.sort().
+  - Added TRSLobbyWorlds._findWorldNumber() that finds and returns the coords of a given world.
+  - FindWorld renamed to TRSLobbyWorlds._scrollToWorld().
+  - RandomWorld renamed TRSLobbyWorlds.selectRandomWorld() and now returns a boolean rather than an integer.
+  - QuickSelect removed as it's no longer needed.
+  - GetWorldInfo removed.
+  - ChangeWorld moved to players.simba and renamed to TPlayer.switchWorld.
+  - ChooseWorldsBy removed as it isn't needed.
 
 - text.simba
   - TypeSendEx removed and an optional pressEnter parameter added to typeSend
@@ -42,10 +59,11 @@ EVERYTHING should be recorded here: new features, function name changes, user-de
   - Two findText functions, one that uses bitmaps, one that uses color.
 
 - players.simba merged with login.simba
+  - It's important to know that a player's "world" attribute is, by default, set to -1 which means nothing will happen.  If set to 0, it will select a random world upon login, if set to a certain world, SRL will select that world.
   - TUser renamed to TPlayer
   - attributes removed: worldInfo, nick, status, skill, banked, rand, arrays, boxRewards
   - attributes renamed: loginName, bankPin, password, location
-  - attributes added: displayName, findMod, findTrade, reincarnate, secureLoginvariants
+  - attributes added: displayName, findMod, findTrade, reincarnate, world (set to -1 by default)
   - removed variables checkHPFirst, logoutOnMod, reincarnate, playerCurTime
   - TPlayer.worked type changed to TTimeMarker
   - removed functions allPlayersInactive, numberOfPlayers

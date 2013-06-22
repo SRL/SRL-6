@@ -46,7 +46,8 @@ const
   ID_INTERFACE_MINIMAP    = 33;
 
   // client - logged out
-  ID_INTERFACE_LOBBY = 40;
+  ID_INTERFACE_LOBBY        = 40;
+  ID_INTERFACE_LOBBY_WORLDS = 41;
 
 (*
 type TRSInterface

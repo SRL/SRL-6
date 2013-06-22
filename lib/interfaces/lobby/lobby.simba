@@ -7,8 +7,8 @@ lobby.
 
 *)
 
-{$include_once interfaces.simba}
-{$include_once gametabs/logout.simba}
+{$include_once ../interfaces.simba}
+{$include_once ../gametabs/logout.simba}
 
 {$f-}
 
@@ -49,7 +49,7 @@ Example:
 const
   LOBBY_COUNT = 6;
     LOBBY_PLAYER = 0;
-    LOBBY_WORLD = 1;
+    LOBBY_WORLDS = 1;
     LOBBY_FRIENDS = 2;
     LOBBY_CHAT = 3;
     LOBBY_CLAN = 4;
@@ -143,15 +143,18 @@ Example:
 
 .. code-block:: pascal
 
-    if (lobby.getCurrentTab() = LOBBY_WORLD) then
+    if (lobby.getCurrentTab() = LOBBY_WORLDS) then
       writeln('The world list is open!');
 
 *)
 function TRSLobby.getCurrentTab(): integer;
 begin
   for result := 0 to (LOBBY_COUNT - 1) do
-    if (GetColor(63 + result * 102, 82) = 11582147) then
+    if (getColor(63 + result * 102, 82) = 11582147) then
+    begin
+      print('TRSLobby.getCurrentTab(): Current tab: '+toStr(result), TDebug.SUB);
       exit;
+    end;
 
   Result := -1;
 end;
@@ -236,6 +239,52 @@ begin
 end;
 
 {*
+TRSLobby._openTab
+~~~~~~~~~~~~~~~~~
+
+.. code-block:: pascal
+
+    function TRSLobby._openTab(tab: integer): boolean;
+
+Opens the lobby tab specified by 'tab'. Valied arguments for 'tab' are the
+lobby tab constants at the top of the file. Is an internal SRL function, should
+use the lobby file's variables instead.
+
+.. note::
+
+    by Bionicle1800
+    Last Updated: 12 June 2013 by Coh3n
+
+Example:
+
+.. code-block:: pascal
+
+    lobby._openTab(LOBBY_WORLDS);
+
+*}
+function TRSLobby._openTab(tab: integer): boolean;
+  // used to avoid repeated code and possible error
+  function getColorPoint(tab: integer): TPoint;
+  begin
+    result := point(63 + (tab * 102), 82);
+  end;
+var
+  p: TPoint;
+begin
+  if (self.getCurrentTab() = tab) then
+    exit(true);
+
+  p := getColorPoint(tab);
+
+  // midpoint of the left boundary of the tab; this is the color when the tab is active
+  if (getColor(p) = 8095117) then
+  begin
+    mouse(point(p.x + random(80), p.y + random(5)), MOUSE_LEFT);
+    result := true;
+  end;
+end;
+
+{*
 TRSLobby._leaveLobby
 ~~~~~~~~~~~~~~~~~~~~
 
@@ -243,7 +292,8 @@ TRSLobby._leaveLobby
 
     function TRSLobby._leaveLobby(): boolean;
 
-Leaves the lobby screen.
+Leaves the lobby screen. This instance of the function is internal.  Use
+players[currentPlayer].logout();.
 
 .. note::
 

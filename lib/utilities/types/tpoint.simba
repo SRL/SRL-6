@@ -116,14 +116,14 @@ begin
 end;
 
 (*
-TPoint.isInvaild
+TPoint.isInvalid
 ~~~~~~~~~~~~~~~~
 
 .. code-block:: pascal
 
-    function TPoint.isInvaild: boolean;
+    function TPoint.isInvalid: boolean;
 
-Returns true if the TPoint is invaild, an invaild TPoint by default is (-1, -1)
+Returns true if the TPoint is isInvalid, an invaild TPoint by default is (-1, -1)
 but can be changed(invaildPoint).
 
 .. note::
@@ -134,13 +134,13 @@ Example:
 
 .. code-block:: pascal
 
-    if (p.isInvaild) then
+    if (p.isInvalid) then
       exit();
 
 *)
-function TPoint.isInvaild(invaildPoint: TPoint = point(-1, -1)): boolean;
+function TPoint.isInvalid(invalidPoint: TPoint = point(-1, -1)): boolean;
 begin
-  result := self.equals(invaildPoint);
+  result := self.equals(invalidPoint);
 end;
 
 (*

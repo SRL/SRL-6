@@ -7,7 +7,7 @@ client settings.
 
 *)
 
-{$include_once ../interfaces/lobby.simba}
+{$include_once ../interfaces/lobby/lobby.simba}
 
 {$f-}
 
