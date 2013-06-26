@@ -178,7 +178,7 @@ end;
 function TRSLobbyWorlds._findWorldNumber(var res: TPoint; wo: integer): boolean;
 begin
   result := findText(res, [intToStr(wo)], [statChars], intToBox(113, 170, 143, 483)); // box is the world number column
-  res.rand(400, 10); // add randomness to the point clicked
+  res := res.rand(400, 10); // add randomness to the point clicked
 end;
 
 function TRSLobbyWorlds._scrollToWorld(var res: TPoint; wo: integer): boolean;
@@ -227,14 +227,6 @@ begin
   curPos := (SP.Y1 + (barHeight div 2));
 
   print('TRSLobbyWorlds._scrollToWorld: Scroll bar info: curPos: '+toStr(curPos)+' wPos: '+toStr(wPos)+' sPos: '+toStr(sPos), TDebug.SUB);
-
-  // if its too close the scroll bar won't move to correct position
-  if (inRange(sPos, curPos - barHeight, curPos + barHeight)) then
-    if (curPos < ((SB.Y1 + barHeight / 2)+ (SB.Y2 - SB.Y1 - barHeight) / 2)) then // half point
-      mouse(point((SB.X1 + (SB.X2 - SB.X1) div 2), SB.Y2), MOUSE_LEFT)
-    else
-      mouse(point((SB.X1 + (SB.X2 - SB.X1) div 2), SB.Y1), MOUSE_LEFT);
-
   mouse(point((SB.X1 + (SB.x2 - SB.X1) div 2), sPos), MOUSE_LEFT);
   wait(500 + random(200));
 
@@ -289,15 +281,20 @@ var
   i, l, wo: integer;
   wArray: TIntegerArray;
 begin
+  writeln(members);
+  setLength(wArray, length(self.worlds));
+
   for i := 0 to high(self.worlds) do
-    if (self.worlds[i].members) then
+    if (self.worlds[i].members = members) then
     begin
       wArray[l] := self.worlds[i].world;
       inc(l);
     end;
 
+  setLength(wArray, l);
   wo := random(l);
-  print('TRSLobbyWorlds.selectRandomWorld(): Random world is '+toStr(wo));
+
+  print('TRSLobbyWorlds.selectRandomWorld(): Random world is '+toStr(wArray[wo]), TDebug.SUB);
 
   result := self.selectWorld(wArray[wo]);
 end;

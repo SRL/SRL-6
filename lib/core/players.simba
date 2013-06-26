@@ -845,7 +845,7 @@ const
 function __getLoginResponse(colorCount, timer: integer): TVariantArray;
 begin
   case (colorCount) of
-    //               debug message      |      wait time | tries | action | player[].location
+    //               debug message     | wait time | tries | action
     763, 2348, 2299:
           result := [__LOGIN_INVALID_INFO,   0,         2,  'false'  ];
     1088: result := [__LOGIN_DISABLED,       0,         0,  'false'  ];
@@ -881,6 +881,10 @@ TPlayer.__loginResponse
     function TPlayer.__loginResponse(const tries: integer; const timer: integer): boolean;
 
 Handles the login response pop ups that sometimes show when a player logs in.
+Called in loops waiting for the lobby and login screens. Results are as follows:
+    * __RES_NOTHING: Nothing happens; everything is successful.
+    * __RES_POPUP: Popup was found, need to retry.
+    * __RES_TERMINATE: Exceeded maximum number of tries, terminate.
 
 .. note::
 
@@ -893,12 +897,17 @@ Example:
 
     See TPlayer.loginToLobby();
 *}
-function TPlayer.__loginResponse(const tries: integer; const timer: integer): boolean;
+const
+  __RES_NOTHING   = -1;
+  __RES_POPUP     = 0;
+  __RES_TERMINATE = 1;
+
+function TPlayer.__loginResponse(const tries: integer; const timer: integer): integer;
 var
   c: integer;
   arr: TVariantArray;
 begin
-  result := true;
+  result := __RES_NOTHING;
 
   // counts the colors in the lobby pop up screen
   c := countColor(__LOGIN_COLOR_TEXT, 260, 190, 510, 450);
@@ -934,14 +943,15 @@ begin
         end;
     end;
 
-    if (tries <= arr[__RES_TRIES]) then
+    result := __RES_POPUP;
+
+    if (tries > arr[__RES_TRIES]) then
     begin
       wait(500 + random(500));
-      exit(false);
+      self.location := arr[__RES_DEBUG];
+      __loginActions(arr[__RES_ACTION]);
+      exit(__RES_TERMINATE);
     end;
-
-    self.location := arr[__RES_DEBUG];
-    __loginActions(arr[__RES_ACTION]);
   end;
 end;
 
@@ -971,7 +981,7 @@ Example:
 function TPlayer.loginToLobby(): boolean;
 var
   arr: TVariantArray;
-  c, t, tries: integer;
+  c, t, tries, popup: integer;
 begin
   if (isLoggedIn() or lobby.isOpen()) then
     exit(true);
@@ -990,8 +1000,6 @@ begin
   t := (getSystemTime() + 60000);
 
   repeat
-    inc(tries);
-
     print(capitalize(self.loginName)+' ('+capitalize(self.displayName)+')');
 
     if (not self.secureLogin) then
@@ -1009,13 +1017,20 @@ begin
     wait(800 + random(50));	// fixes the login spam recoveries bug
 
     repeat
-      // returns false if exceeded maximum tries (set in __getLoginResponse)
-      if (not self.__loginResponse(tries, t)) then
-        break;
+      popup := self.__loginResponse(tries, -1);
+
+      // if exceeded maximum tries, break, otherwise terminate
+      if (popup = __RES_TERMINATE) then
+        break(2)
+      else
+        if (popup = __RES_POPUP) then
+          break;
 
       wait(100 + random(100));
       result := (lobby.isOpen());
     until(result);
+
+    inc(tries);
   until(result);
 
   if (result) and (not disableIPScreenshots) then
@@ -1052,7 +1067,7 @@ Example:
 *)
 function TPlayer.login(): boolean;
 var
-  tries, t: integer;
+  tries, t, popup: integer;
 begin
   print('TPlayer.login()', TDebug.HEADER);
 
@@ -1063,8 +1078,6 @@ begin
       result := true;
       break;
     end;
-
-    inc(tries);
 
     if (self.loginToLobby()) then
     begin
@@ -1078,16 +1091,23 @@ begin
       mouseBox(_boxPlay, MOUSE_LEFT);
 
       repeat
-        // returns false if exceeded maximum tries (set in __getLoginResponse)
-        if (not self.__loginResponse(tries, -1)) then
-          break(2);
+        popup := self.__loginResponse(tries, -1);
+
+        // if exceeded maximum tries, break, otherwise terminate
+        if (popup = __RES_TERMINATE) then
+          break(2)
+        else
+          if (popup = __RES_POPUP) then
+            break;
 
         wait(100 + random(100));
         result := (isLoggedIn());
 
       until(result);
     end;
-  until((tries >= 0) or (result));
+
+    inc(tries);
+  until(result);
 
   if (result) then
   begin
