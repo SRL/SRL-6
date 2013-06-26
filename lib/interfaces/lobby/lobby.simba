@@ -231,7 +231,7 @@ begin
 
     while (not result) and (getSystemTime() < t) do
     begin
-      print('Waiting for lobby screen...');
+      print('Waiting for lobby screen...', TDebug.SUB);
       result := lobby.isOpen();
       wait(700 + random(500));
     end;
@@ -280,8 +280,12 @@ begin
   if (getColor(p) = 8095117) then
   begin
     mouse(point(p.x + random(80), p.y + random(5)), MOUSE_LEFT);
+    wait(200 + random(200));
     result := true;
   end;
+
+  if (not result) then
+    print('TRSLobby._openTab(): Failed to open tab '+toStr(tab), TDebug.ERROR);
 end;
 
 {*
@@ -320,7 +324,7 @@ begin
 
   while (not result) and (getSystemTime() < t) do
   begin
-    print('Waiting for login screen...');
+    print('Waiting for login screen...', TDebug.SUB);
     mouse(exitButton, MOUSE_LEFT);
     wait(randomRange(1000, 2000));
     result := (not lobby.isOpen());

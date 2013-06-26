@@ -10,7 +10,7 @@ The World Switcher include contains all kinds of functions to control the built-
 
 const
   WORLD_HIGH = 139; // the highest number world
-  WORLD_PATH = scriptPath + 'worlds.ini';
+  WORLD_PATH = includePath + 'SRL-6/lib/interfaces/lobby/worlds.ini';
   WORLD_FONT = statChars;
 
 const
@@ -91,8 +91,25 @@ begin
 end;
 
 function TRSLobbyWorlds.open(): boolean;
+var
+  t: integer;
 begin
   result := lobby._openTab(self.lobbyID);
+
+  if (result) then
+  begin
+    t := (getSystemTime() + 10000);
+
+    while (getSystemTime() < t) do
+    begin
+      if (getColor(78, 196) = 16711422) then
+        exit(true);
+
+      wait(50);
+    end;
+
+    print('TRSLobbyWorlds.open(): Worlds list taking to long to load', TDebug.SUB);
+  end;
 end;
 
 function TRSLobbyWorlds.getCurrentWorld(): integer;
@@ -105,35 +122,25 @@ begin
   if (not self.isOpen()) then
     exit();
 
-  if (findColors(tpa, 12378347, 628, 79, 689, 92)) then
+  if (findColors(tpa, 12378347, 628, 129, 689, 142)) then // box around the current world
   begin
     box := getTPABounds(tpa);
     result := strToIntDef(extractFromStr(getTextAtEx(box.x1, box.y1, box.x2, box.y2, 0, 3, 4, 12378347, 0, upChars), numbers), -1);
   end else
     print('TRSLobbyWorlds.getCurrentWorld(): Failed to find text color', TDebug.ERROR);
+
+  print('TRSLobbyWorlds.getCurrentWorld(): Current world is '+toStr(result), TDebug.SUB);
 end;
 
-function TRSLobbyWorlds.getCurrentWorld(var world: integer): boolean; overload;
+function TRSLobbyWorlds._isWorldValid(wo: integer): boolean;
+var
+  i: integer;
 begin
-  result := false;
+  for i := 0 to high(self.worlds) do
+    if (self.worlds[i].world = wo) then
+      exit(true);
 
-  if (not self.isOpen()) then
-    exit();
-
-  result := (self.getCurrentWorld() = world);
-
-  if (result) then
-    exit();
-
-  world := self.getCurrentWorld();
-end;
-
-function TRSLobbyWorlds._isWorldValid(world: integer): boolean;
-begin
-  if (self.worlds[world].world <> -1) then
-    result := true
-  else
-    print('TRSLobbyWorlds._getIndex(): '+toStr(world)+' is an invalid world', TDebug.ERROR);
+  print('TRSLobbyWorlds._isWorldValid(): '+toStr(wo)+' is an invalid world', TDebug.ERROR);
 end;
 
 function TRSLobbyWorlds.sort(by: integer; descending: boolean): boolean;
@@ -168,15 +175,15 @@ begin
   print('TRSLobbyWorlds.sort(): '+toStr(result), TDebug.FOOTER);
 end;
 
-function TRSLobbyWorlds._findWorldNumber(var res: TPoint; w: integer): boolean;
+function TRSLobbyWorlds._findWorldNumber(var res: TPoint; wo: integer): boolean;
 begin
-  result := findText(res, [toStr(w)], [statChars], intToBox(113, 170, 143, 483)); // box is the world number column
+  result := findText(res, [intToStr(wo)], [statChars], intToBox(113, 170, 143, 483)); // box is the world number column
   res.rand(400, 10); // add randomness to the point clicked
 end;
 
-function TRSLobbyWorlds._scrollToWorld(var res: TPoint; w: integer): boolean;
+function TRSLobbyWorlds._scrollToWorld(var res: TPoint; wo: integer): boolean;
 var
-  wPos, sPos, curPos: integer;
+  wPos, sPos, curPos, i, hi: integer;
   barHeight, worldsOnScreen: integer;
   TPA, TPA2, TPA3: TPointArray;
   SP, SB: TBox;
@@ -193,9 +200,11 @@ begin
     wait(400 + random(200));
   end;
 
+  // the border of the entire scroll bar area
   findColorsTolerance(TPA, WORLD_COLOR_SCROLL_LEFT, 680, 50, 705, 550, 0); // these coords determine the scroll bar's general area, it deviates everything
   SB := getTPABounds(TPA);
 
+  // a line the height of the scroll bar
   findColorsTolerance(TPA2, WORLD_COLOR_SCROLL_LEFT, SB.X1 + 3, SB.Y1, SB.X1 + 3, SB.Y2, 0);
   findColorsTolerance(TPA3, WORLD_COLOR_SCROLL_BOTTOM, SB.X1 + 3, SB.Y1, SB.X1 + 3, SB.Y2, 0);
   TPA2 := combineTPA(TPA2, TPA3);
@@ -204,8 +213,18 @@ begin
   barHeight := (SP.Y2 - SP.Y1);
   worldsOnScreen := (SB.Y2 - SB.Y1 + 32) div 42; // this is HALF of the worlds on screen
 
-  sPos := ((SB.Y1 + barHeight div 2) + wPos) * (SB.Y2 - SB.Y1 - barHeight) div (high(length(self.worlds)) + 1 - worldsOnScreen); // need the 0.0 to make it extended inside ()
-  curPos := (SP.Y1 + barHeight div 2);
+  // get the world's index in the global array to be used in calculating the starting position of the scroll bar
+  hi := high(self.worlds);
+  wPos := -1;
+  for i := 0 to hi do
+    if (self.worlds[i].world = wo) then
+    begin
+      wPos := i;
+      break;
+    end;
+
+  sPos := (SB.Y1 + barHeight div 2) + (wPos * (SB.Y2 - SB.Y1 - barHeight) div (high(self.worlds) + 1 - worldsOnScreen)); // need the 0.0 to make it extended inside ()
+  curPos := (SP.Y1 + (barHeight div 2));
 
   print('TRSLobbyWorlds._scrollToWorld: Scroll bar info: curPos: '+toStr(curPos)+' wPos: '+toStr(wPos)+' sPos: '+toStr(sPos), TDebug.SUB);
 
@@ -216,10 +235,13 @@ begin
     else
       mouse(point((SB.X1 + (SB.X2 - SB.X1) div 2), SB.Y1), MOUSE_LEFT);
 
-  result := self._findWorldNumber(res, w);
+  mouse(point((SB.X1 + (SB.x2 - SB.X1) div 2), sPos), MOUSE_LEFT);
+  wait(500 + random(200));
+
+  result := self._findWorldNumber(res, wo);
 end;
 
-function TRSLobbyWorlds.selectWorld(w: integer): boolean;
+function TRSLobbyWorlds.selectWorld(wo: integer): boolean;
 var
   p: TPoint;
 begin
@@ -227,32 +249,33 @@ begin
 
   // make sure the worlds screen is open
   if (not self.isOpen()) then
-    exit(false);
+    if (not self.open()) then
+      exit(false);
 
   // make sure the world is valid
-  if (not self._isWorldValid(w)) then
+  if (not self._isWorldValid(wo)) then
     exit(false);
 
   print('TRSLobbyWorlds.selectWorld()', TDebug.HEADER);
 
   // check to see if we're already on the right world
-  if (self.getCurrentWorld(w)) then
+  if (self.getCurrentWorld() = wo) then
   begin
-    print('Already on world '+toStr(w));
+    print('Already on world '+toStr(wo));
     result := true;
   end;
 
   if (not result) then
   begin
-    if (self._findWorldNumber(p, w)) then // check to see if the worlds already visible (or if it's favorited)
-      print('Found world '+toStr(w))
+    if (self._findWorldNumber(p, wo)) then // check to see if the worlds already visible (or if it's favorited)
+      print('Found world '+toStr(wo))
     else
-      if (self._scrollToWorld(p, w)) then
-        print('Scrolled to and found world '+toStr(w));
+      if (self._scrollToWorld(p, wo)) then
+        print('Scrolled to and found world '+toStr(wo));
 
     if (not p.isInvalid()) then
     begin
-      print('Selected world '+toStr(w));
+      print('Selected world '+toStr(wo));
       mouse(p, MOUSE_LEFT);
       result := true;
     end;

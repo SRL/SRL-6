@@ -76,7 +76,7 @@ File's internal variables.
 
 *}
 var
-  _boxUsername, _boxPassword: TBox; // set at the end of this file
+  _boxUsername, _boxPassword, _boxPlay: TBox; // set at the end of this file
 
 (*
 type TPlayer
@@ -828,7 +828,6 @@ const
   __RES_WAIT   = 1;
   __RES_TRIES  = 2;
   __RES_ACTION = 3;
-  __RES_LOC    = 4;
   __LOGIN_INVALID_INFO   = 'Invalid username/password';
   __LOGIN_DISABLED       = 'Account has been disabled';
   __LOGIN_LOGGED_IN      = 'Already logged in';
@@ -848,19 +847,19 @@ begin
   case (colorCount) of
     //               debug message      |      wait time | tries | action | player[].location
     763, 2348, 2299:
-          result := [__LOGIN_INVALID_INFO,   0,         2,  'false',  'Wrong User/Pass'      ];
-    1088: result := [__LOGIN_DISABLED,       0,         0,  'false',  'Acc Disabled'         ];
-     951: result := [__LOGIN_LOGGED_IN,      5000,      5,  'true',   'Already logged in'    ];
-    1239: result := [__LOGIN_NOT_MEMBER,     0,         1,  'true',   'Not a member'         ];
-     364: result := [__LOGIN_ERROR_CONNECT,  20000,     9,  'halt',   'Error Connecting'     ];
-    1057: result := [__LOGIN_TOO_MANY,       5 * 60000, 2,  'false',  'Too many logins'      ];
-     732: result := [__LOGIN_UPDATE,         0,         0,  'update', 'RS Updated'           ];
-     591: result := [__LOGIN_TOKEN,          0,         0,  'update', 'Client Token Changed' ];
-    1606: result := [__LOGIN_EXPIRE,         0,         0,  'update', 'Session Expired'      ];
-     777: result := [__LOGIN_EXCEED_LIMIT,   20000,     10, '',       'Waiting for login.'   ];
-     850: result := [__LOGIN_SKILL_LEVEL,    0,         9,  'true',   '1000 skill club'      ];
-    1028: result := [__LOGIN_MEMBER_ONLY,    0,         1,  'false',  'In member-only area'  ];
-     812: result := [__LOGIN_CANNOT_CONNECT, 2000,      5,  'true',   'Error connect world'  ];
+          result := [__LOGIN_INVALID_INFO,   0,         2,  'false'  ];
+    1088: result := [__LOGIN_DISABLED,       0,         0,  'false'  ];
+     951: result := [__LOGIN_LOGGED_IN,      5000,      5,  'true'   ];
+    1239: result := [__LOGIN_NOT_MEMBER,     0,         1,  'true'   ];
+     364: result := [__LOGIN_ERROR_CONNECT,  20000,     9,  'halt'   ];
+    1057: result := [__LOGIN_TOO_MANY,       5 * 60000, 2,  'false'  ];
+     732: result := [__LOGIN_UPDATE,         0,         0,  'update' ];
+     591: result := [__LOGIN_TOKEN,          0,         0,  'update' ];
+    1606: result := [__LOGIN_EXPIRE,         0,         0,  'update' ];
+     777: result := [__LOGIN_EXCEED_LIMIT,   20000,     10, ''       ];
+     850: result := [__LOGIN_SKILL_LEVEL,    0,         9,  'true'   ];
+    1028: result := [__LOGIN_MEMBER_ONLY,    0,         1,  'false'  ];
+     812: result := [__LOGIN_CANNOT_CONNECT, 2000,      5,  'true'   ];
 
     else
       if ((getSystemTime() > timer) and (timer > 0)) then
@@ -941,9 +940,7 @@ begin
       exit(false);
     end;
 
-    if (arr[__RES_LOC] <> '') then
-      self.location := arr[__RES_LOC];
-
+    self.location := arr[__RES_DEBUG];
     __loginActions(arr[__RES_ACTION]);
   end;
 end;
@@ -1078,8 +1075,7 @@ begin
         else
           lobbyWorlds.selectWorld(self.world);
 
-      // the "Play" button
-      mouseBox(intToBox(270, 500, 490, 520), MOUSE_LEFT);
+      mouseBox(_boxPlay, MOUSE_LEFT);
 
       repeat
         // returns false if exceeded maximum tries (set in __getLoginResponse)
@@ -1243,19 +1239,25 @@ function TPlayer.switchToWorld(newWorld: integer = 0): boolean;
 begin
   result := false;
 
+  print('Switching to world '+toStr(newWorld), TDebug.SUB);
+
   if (self.exitToLobby()) then
   begin
+    self.world := -1;
+
     if (newWorld = 0) then
       result := lobbyWorlds.selectRandomWorld(self.isMember);
 
     if (not result) then
       result := lobbyWorlds.selectWorld(newWorld);
 
-    self.login();
+    if (result) then
+      result := self.login();
   end;
 end;
 
 begin
   _boxUsername := intToBox(279, 205, 486, 215);
   _boxPassword := intToBox(279, 250, 486, 265);
+  _boxPlay     := intToBox(270, 500, 490, 520);
 end;

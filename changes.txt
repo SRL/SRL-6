@@ -40,7 +40,7 @@ EVERYTHING should be recorded here: new features, function name changes, user-de
   - OpenWorldScreen renamed to TRSLobbyWorlds.open().
   - Language constants removed as they're no longer used.
   - UpdateWorlds removed as there's no longer an RS worlds URL to be parsed.  A worlds.ini file is still present in lib/interfaces/lobby/ that stores the worlds and whether or not they are P2P.
-  - WS_CurrentWorld/Ex renamed TRSLobbyWorlds.getCurrentWorld and made overloads.
+  - WS_CurrentWorld/Ex combined into one.
   - OrderWorlds renamed to TRSLobbyWorlds.sort().
   - Added TRSLobbyWorlds._findWorldNumber() that finds and returns the coords of a given world.
   - FindWorld renamed to TRSLobbyWorlds._scrollToWorld().
