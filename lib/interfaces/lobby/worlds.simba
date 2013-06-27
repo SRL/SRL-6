@@ -1,25 +1,33 @@
 (*
-World Switcher
-==============
+Worlds
+~~~~~~
 
-The World Switcher include contains all kinds of functions to control the built-in RS world switcher.
-
+The worlds file is used to represent the world tab interface in the RS lobby. It
+stores the functions needed to switch players between servers.
 *)
 
 {$include_once lobby.simba}
 
-const
-  WORLD_HIGH = 139; // the highest number world
-  WORLD_PATH = includePath + 'SRL-6/lib/interfaces/lobby/worlds.ini';
-  WORLD_FONT = statChars;
+{*
+const Internal
+~~~~~~~~~~~~~~
 
+Internal constants used throughout several functions.
+*}
 const
-  WORLD_COLOR_ARROW         = 1008783;  // arrow color that can order the worlds
-  WORLD_COLOR_F2P           = 16579836; // white text color
-  WORLD_COLOR_P2P           = 6618364;  // yellow text color
-  WORLD_COLOR_SCROLL_LEFT   = 1250841;  // black color on the left side of scroll area
-  WORLD_COLOR_SCROLL_BOTTOM = 592137;   // black color under scroll bar
+  _WORLD_HIGH                = 139; // the highest number world
+  _WORLD_PATH                = includePath + 'SRL-6/lib/interfaces/lobby/worlds.ini';
+  _WORLD_FONT                = statChars;
+  _WORLD_COLOR_ARROW         = 1008783;  // arrow color that can order the worlds
+  _WORLD_COLOR_SCROLL_LEFT   = 1250841;  // black color on the left side of scroll area
+  _WORLD_COLOR_SCROLL_BOTTOM = 592137;   // black color under scroll bar
 
+(*
+const Order
+~~~~~~~~~~~
+
+Constants to be used with the TRSLobbyWorlds sorting functions.
+*)
 const
   WORLD_ORDER_WORLDS   = 0;
   WORLD_ORDER_PLAYERS  = 1;
@@ -28,41 +36,107 @@ const
   WORLD_ORDER_TYPE     = 3;
   WORLD_ORDER_PING     = 4;
 
+{*
+type __TRSWorld
+~~~~~~~~~~~~~~~
+
+An internal type used to store individual world information.
+*}
 type
   __TRSWorld = record
     world: integer;
     members: boolean;
   end;
 
+(*
+type TRSLobbyWorlds
+~~~~~~~~~~~~~~~~~~~
+
+The type representing the worlds interface in the RS lobby.
+*)
 type
   TRSLobbyWorlds = record(TRSLobby)
     lobbyID: integer;
     worlds: array of __TRSWorld;
   end;
 
+(*
+var lobbyWorlds
+~~~~~~~~~~~~~~~
+
+The global variable used to call any worlds interface functions/procedures.
+*)
 var
   lobbyWorlds: TRSLobbyWorlds;
 
-var
-  __worldsOrdered: boolean;
+{*
+var Internal
+~~~~~~~~~~~~
 
+Internal worlds interface variables:
+*}
+var
+  __worldsOrdered: boolean; // set to true if the worlds get ordered in the sorting functions
+
+{*
+TRSLobbyWorlds.__loadFromINI
+~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+
+.. code-block:: pascal
+
+    procedure TRSLobbyWorlds.__loadFromINI();
+
+Loads the world information from an INI file.
+
+.. note::
+
+    by Narcle, Nava2, and Coh3n
+    Last Updated: 26 June 2013 by Coh3n
+
+Example:
+
+.. code-block:: pascal
+
+    self.__loadFromINI();
+*}
 procedure TRSLobbyWorlds.__loadFromINI();
 var
   i, c: integer;
 begin
-  setLength(self.worlds, WORLD_HIGH);
+  setLength(self.worlds, _WORLD_HIGH);
 
   for i := 0 to high(self.worlds) do
-    if (readINI(toStr(i), 'world', WORLD_PATH) <> '') then // to make sure the world exists
+    if (readINI(toStr(i), 'world', _WORLD_PATH) <> '') then // to make sure the world exists
     begin
-      self.worlds[c].members := strToBool(readINI(toStr(i), 'members', WORLD_PATH));
-      self.worlds[c].world := strToIntDef(readINI(toStr(i), 'world', WORLD_PATH), -1);
+      self.worlds[c].members := strToBool(readINI(toStr(i), 'members', _WORLD_PATH));
+      self.worlds[c].world := strToIntDef(readINI(toStr(i), 'world', _WORLD_PATH), -1);
       inc(c);
     end;
 
   setLength(self.worlds, c);
 end;
 
+{*
+TRSLobbyWorlds.__init
+~~~~~~~~~~~~~~~~~~~~~
+
+.. code-block:: pascal
+
+    procedure TRSLobbyWorlds.__init();
+
+Initiates the TRSLobbyWorlds variable.  Called at the end of this file.
+
+.. note::
+
+    by Coh3n
+    Last Updated: 26 June 2013 by Coh3n
+
+Example:
+
+.. code-block:: pascal
+
+    lobbyWorlds.__init();
+*}
 procedure TRSLobbyWorlds.__init();
 begin
   with self do
@@ -85,24 +159,70 @@ begin
   end;
 end;
 
+(*
+TRSLobbyWorlds.isOpen
+~~~~~~~~~~~~~~~~~~~~~
+
+.. code-block:: pascal
+
+    function TRSLobbyWorlds.isOpen(): boolean;
+
+Returns true if the worlds interface is open.
+
+.. note::
+
+    by Icefire908
+    Last Updated: 26 June 2013 by Coh3n
+
+Example:
+
+.. code-block:: pascal
+
+    if (lobbyWorlds.isOpen()) then
+      lobbyWorlds.selectWorld(115);
+*)
 function TRSLobbyWorlds.isOpen(): boolean;
 begin
   result := (lobby.getCurrentTab() = self.lobbyID);
 end;
 
+(*
+TRSLobbyWorlds.open
+~~~~~~~~~~~~~~~~~~~
+
+.. code-block:: pascal
+
+    function TRSLobbyWorlds.open(): boolean;
+
+Returns true if the worlds interface is open.  Waits a maximum of 10 seconds
+after the tab is clicked to compensate for lag.
+
+.. note::
+
+    by Bionicle1800 & Coh3n
+    Last Updated: 26 June 2013 by Coh3n
+
+Example:
+
+.. code-block:: pascal
+
+    if (not lobbyWorlds.isOpen()) then
+      lobbyWorlds.open();
+*)
 function TRSLobbyWorlds.open(): boolean;
 var
   t: integer;
 begin
   result := lobby._openTab(self.lobbyID);
 
+  // needed to compensate for lag
   if (result) then
   begin
     t := (getSystemTime() + 10000);
 
     while (getSystemTime() < t) do
     begin
-      if (getColor(78, 196) = 16711422) then
+      if (getColor(78, 196) = 16711422) then // white color of some text in the interface
         exit(true);
 
       wait(50);
@@ -112,6 +232,28 @@ begin
   end;
 end;
 
+(*
+TRSLobbyWorlds.getCurrentWorld
+~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+
+.. code-block:: pascal
+
+    function TRSLobbyWorlds.getCurrentWorld(): integer;
+
+Returns the currently selected world.
+
+.. note::
+
+    by Home
+    Last Updated: 26 June 2013 by Coh3n
+
+Example:
+
+.. code-block:: pascal
+
+    if (not lobbyWorlds.getCurrentWorld(115)) then
+      lobbyWorlds.selectWorld(115);
+*)
 function TRSLobbyWorlds.getCurrentWorld(): integer;
 var
   box: TBox;
@@ -132,6 +274,28 @@ begin
   print('TRSLobbyWorlds.getCurrentWorld(): Current world is '+toStr(result), TDebug.SUB);
 end;
 
+{*
+TRSLobbyWorlds._isWorldValid
+~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+
+.. code-block:: pascal
+
+    function TRSLobbyWorlds._isWorldValid(wo: integer): boolean;
+
+Returns true if the world (wo) is valid.
+
+.. note::
+
+    by Coh3n
+    Last Updated: 26 June 2013 by Coh3n
+
+Example:
+
+.. code-block:: pascal
+
+    if (not lobbyWorlds._isWorldValid(115)) then
+      exit(false);
+*}
 function TRSLobbyWorlds._isWorldValid(wo: integer): boolean;
 var
   i: integer;
@@ -143,6 +307,35 @@ begin
   print('TRSLobbyWorlds._isWorldValid(): '+toStr(wo)+' is an invalid world', TDebug.ERROR);
 end;
 
+(*
+TRSLobbyWorlds.sort
+~~~~~~~~~~~~~~~~~~~
+
+.. code-block:: pascal
+
+    function TRSLobbyWorlds.sort(by: integer; descending: boolean): boolean;
+
+Sorts the worlds list by the order specified by 'by', and 'descending'.  Setting
+'descending' to true will order the worlds with the largest at the top.  Valid
+arguements for 'by' are:
+    * WORLD_ORDER_WORLDS
+    * WORLD_ORDER_PLAYERS
+    * WORLD_ORDER_ACTIVITY
+    * WORLD_ORDER_LOCATION
+    * WORLD_ORDER_TYPE
+    * WORLD_ORDER_PING
+
+.. note::
+
+    by Naum & Coh3n
+    Last Updated: 26 June 2013 by Coh3n
+
+Example:
+
+.. code-block:: pascal
+
+    lobbyWorlds.sort(WORLD_SORT_WORLDS, false); // sorts the worlds starting with 1 at the top
+*)
 function TRSLobbyWorlds.sort(by: integer; descending: boolean): boolean;
 var
   ATPA: T2DPointArray;
@@ -151,16 +344,16 @@ var
 begin
   print('TRSLobbyWorlds.sort()', TDebug.HEADER);
 
-  if (findColorsTolerance(TPA, WORLD_COLOR_ARROW, 92, 50, 716, 250, 1)) then
+  if (findColorsTolerance(TPA, _WORLD_COLOR_ARROW, 92, 50, 716, 250, 1)) then
   begin
-    print('Found WORLD_COLOR_ARROW');
+    print('Found _WORLD_COLOR_ARROW');
 
     ATPA := splitTPA(TPA, 2);
     sortATPAFromFirstPoint(ATPA, point(92, 166));
 
     if (length(ATPA) < (by * 2)) then
     begin
-      print('Didn''t find enough of WORLD_COLOR_ARROW', TDebug.ERROR);
+      print('Didn''t find enough of _WORLD_COLOR_ARROW', TDebug.ERROR);
       print('TRSLobbyWorlds.sort(): '+toStr(result), TDebug.FOOTER);
       exit();
     end;
@@ -170,17 +363,63 @@ begin
 
     result := true;
   end else
-    print('Failed to find WORLD_COLOR_ARROW', TDebug.ERROR);
+    print('Failed to find _WORLD_COLOR_ARROW', TDebug.ERROR);
 
   print('TRSLobbyWorlds.sort(): '+toStr(result), TDebug.FOOTER);
 end;
 
+{*
+TRSLobbyWorlds._findWorldNumber
+~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+
+.. code-block:: pascal
+
+    function TRSLobbyWorlds._findWorldNumber(var res: TPoint; wo: integer): boolean;
+
+Searches for the text of the world 'wo'. Returns true if found. Returns it's
+coordinates in 'res'.
+
+.. note::
+
+    by Coh3n
+    Last Updated: 26 June 2013 by Coh3n
+
+Example:
+
+.. code-block:: pascal
+
+    if (lobbyWorlds._findWorldNumber(p, 115)) then
+      mouse(p.rand(5), MOUSE_LEFT);
+*}
 function TRSLobbyWorlds._findWorldNumber(var res: TPoint; wo: integer): boolean;
 begin
   result := findText(res, [intToStr(wo)], [statChars], intToBox(113, 170, 143, 483)); // box is the world number column
   res := res.rand(400, 10); // add randomness to the point clicked
 end;
 
+{*
+TRSLobbyWorlds._scrollToWorld
+~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+
+.. code-block:: pascal
+
+    function TRSLobbyWorlds._scrollToWorld(var res: TPoint; wo: integer): boolean;
+
+Uses the scroll bar to find the world 'wo'.  Returns it's corrdinates in 'res'.
+Function is internal.  Use TRSLobbyWorlds.selectWorld instead.
+
+.. note::
+
+    by Narcle, Shuttleu, and Coh3n
+    Last Updated: 26 June 2013 by Coh3n
+
+Example:
+
+.. code-block:: pascal
+
+    if (lobbyWorlds._scrollToWorld(p, 115)) then
+      mouse(p, MOUSE_LEFT);
+*}
 function TRSLobbyWorlds._scrollToWorld(var res: TPoint; wo: integer): boolean;
 var
   wPos, sPos, curPos, i, hi: integer;
@@ -201,12 +440,12 @@ begin
   end;
 
   // the border of the entire scroll bar area
-  findColorsTolerance(TPA, WORLD_COLOR_SCROLL_LEFT, 680, 50, 705, 550, 0); // these coords determine the scroll bar's general area, it deviates everything
+  findColorsTolerance(TPA, _WORLD_COLOR_SCROLL_LEFT, 680, 50, 705, 550, 0); // these coords determine the scroll bar's general area, it deviates everything
   SB := getTPABounds(TPA);
 
   // a line the height of the scroll bar
-  findColorsTolerance(TPA2, WORLD_COLOR_SCROLL_LEFT, SB.X1 + 3, SB.Y1, SB.X1 + 3, SB.Y2, 0);
-  findColorsTolerance(TPA3, WORLD_COLOR_SCROLL_BOTTOM, SB.X1 + 3, SB.Y1, SB.X1 + 3, SB.Y2, 0);
+  findColorsTolerance(TPA2, _WORLD_COLOR_SCROLL_LEFT, SB.X1 + 3, SB.Y1, SB.X1 + 3, SB.Y2, 0);
+  findColorsTolerance(TPA3, _WORLD_COLOR_SCROLL_BOTTOM, SB.X1 + 3, SB.Y1, SB.X1 + 3, SB.Y2, 0);
   TPA2 := combineTPA(TPA2, TPA3);
   SP := getTPABounds(TPA2);
 
@@ -233,6 +472,28 @@ begin
   result := self._findWorldNumber(res, wo);
 end;
 
+(*
+TRSLobbyWorlds.selectWorld
+~~~~~~~~~~~~~~~~~~~~~~~~~~
+
+.. code-block:: pascal
+
+    function TRSLobbyWorlds.selectWorld(wo: integer): boolean;
+
+Selects the world 'wo'.  Will open the worlds interface and scroll if needed.
+Does NOT log the player in.  Will just click the world on the list.
+
+.. note::
+
+    by Narcle, ZephyrsFury, Ashaman88, and Coh3n
+    Last Updated: 26 June 2013 by Coh3n
+
+Example:
+
+.. code-block:: pascal
+
+    lobbyWorlds.selectWorld(115);
+*)
 function TRSLobbyWorlds.selectWorld(wo: integer): boolean;
 var
   p: TPoint;
@@ -276,6 +537,27 @@ begin
   print('TRSLobbyWorlds.selectWorld(): '+toStr(result), TDebug.FOOTER);
 end;
 
+(*
+TRSLobbyWorlds.selectRandomWorld
+~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+
+.. code-block:: pascal
+
+    function TRSLobbyWorlds.selectRandomWorld(members: boolean): boolean;
+
+Selects a random world. P2P or F2P depends on the value of 'members'.
+
+.. note::
+
+    by Narcle, Mixter, and Coh3n
+    Last Updated: 26 June 2013 by Coh3n
+
+Example:
+
+.. code-block:: pascal
+
+    lobbyWorlds.selectRandomWorld(players[currentPlayer].isMember);
+*)
 function TRSLobbyWorlds.selectRandomWorld(members: boolean): boolean;
 var
   i, l, wo: integer;
@@ -297,8 +579,4 @@ begin
   print('TRSLobbyWorlds.selectRandomWorld(): Random world is '+toStr(wArray[wo]), TDebug.SUB);
 
   result := self.selectWorld(wArray[wo]);
-end;
-
-begin
-  lobbyWorlds.__init();
 end;
