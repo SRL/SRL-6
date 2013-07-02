@@ -50,7 +50,7 @@ type
   TRSTabInventory = record(TRSInterface)
     tabIndex: integer;
     slots: TBoxArray;
-end;
+  end;
 
 (*
 var tabInventory
@@ -156,9 +156,9 @@ Example:
 *)
 function TRSTabInventory.open(): boolean;
 begin
-  result := true;
+  result := self.isOpen();
 
-  if (not (self.isOpen())) then
+  if (not (result)) then
     result := _openGameTab(self.tabIndex);
 end;
 
@@ -250,15 +250,11 @@ Example:
 
 *)
 function TRSTabInventory.isItemInSlot(slot: integer): boolean;
-var
-  b: TBox;
 begin
   if (not self.open()) or (self.invaildSlot(slot))then
     exit(false);
 
-  b := self.getSlotBox(slot);
-
-  result := b.colorExists(ITEM_OUTLINE_BLACK);
+  result := self.getSlotBox(slot).colorExists(ITEM_OUTLINE_BLACK);
 end;
 
 (*
@@ -285,19 +281,14 @@ Example:
 *)
 function TRSTabInventory.pointToSlot(p: TPoint): integer;
 var
-  hi, i: integer;
+  i: integer;
 begin
   if (not (pointInBox(p, self.getBounds()))) then
-    exit;
+    exit(0);
 
-  hi := INV_SLOT_HIGH;
-  i := INV_SLOT_LOW;
-
-  for i to hi do
+  for i := INV_SLOT_LOW to INV_SLOT_HIGH do
     if pointInBox(p, self.getSlotBox(i)) then
       exit(i);
-
-  result := 0;
 end;
 
 (*
@@ -324,17 +315,12 @@ Example:
 *)
 function TRSTabInventory.getInvCount: integer;
 var
-  i, hi: integer;
+  i: integer;
 begin
-  result := 0;
-
   if (not self.open()) then
-    exit;
+    exit(-1);
 
-  hi := INV_SLOT_HIGH;
-  i := INV_SLOT_LOW;
-
-  for i to hi do
+  for i := INV_SLOT_LOW to INV_SLOT_HIGH do
     if (self.isItemInSlot(i)) then
       inc(result);
 end;
@@ -368,10 +354,9 @@ var
   t: integer;
 begin
   t := getSystemTime() + waitTime;
-  result := false;
 
   if (self.invaildSlot(count)) then
-    exit;
+    exit(false);
 
   repeat
     if (self.GetInvCount() = count) then
@@ -404,15 +389,12 @@ Example:
 *)
 function TRSTabInventory.isInvFull: boolean;
 var
-  hi, i: integer;
+  i: integer;
 begin
   if (not self.open()) then
     exit(false);
 
-  hi := INV_SLOT_HIGH;
-  i := INV_SLOT_LOW;
-
-  for i to hi do
+  for i := INV_SLOT_LOW to INV_SLOT_HIGH do
     if (not (self.isItemInSlot(i))) then
       exit(false);
 
@@ -512,14 +494,11 @@ Example:
 
 *)
 function TRSTabInventory.isSlotActivated(slot: integer): boolean;
-var
-  b: TBox;
 begin
   if (not self.open()) or (self.invaildSlot(slot)) then
     exit(false);
 
-  b := self.getSlotBox(slot);
-  result := b.colorExists(ITEM_OUTLINE_WHITE);
+  result := self.getSlotBox(slot).colorExists(ITEM_OUTLINE_WHITE);
 end;
 
 (*
@@ -549,15 +528,12 @@ Example:
 *)
 function TRSTabInventory.getActivatedSlot: integer;
 var
-  hi, i: integer;
+  i: integer;
 begin
   if (not self.open()) or (not (self.getBounds().colorExists(ITEM_OUTLINE_WHITE))) then
     exit(- 1);
 
-  hi := INV_SLOT_HIGH;
-  i := INV_SLOT_LOW;
-
-  for i to hi do
+  for i := INV_SLOT_LOW to INV_SLOT_HIGH do
     if self.isSlotActivated(i) then
       exit(i);
 
@@ -593,7 +569,8 @@ Example:
 *)
 procedure TRSTabInventory.dropItems(slotArr: TIntegerArray = DROP_PATTERN_REGULAR);
 var
-  l, i, r: integer;
+  l := length(slots);
+  r, I : Integer;
   tia: TIntegerArray;
 begin
   if (not self.open()) then
@@ -605,17 +582,13 @@ begin
     exit;
   end;
 
-  l := length(slots);
-  r := 1;
-  i := 0;
-
   // small chance of mixing some slots up
   if (random(10) = 5) then
-    if (l = 28) then
-      for r to (l - 4) do
+    if (l = INV_SLOT_HIGH) then
+      for r := 0 to (l - 4) do
         swap(slotArr[randomRange(r - 1, r + 4)], slotArr[randomRange(r - 1, r + 4)]);
 
-  for i to (l - 1) do
+  for i := 1 to (l - 1) do
     if (not (self.invaildSlot(slotArr[i]))) then
       if self.isItemInSlot(slotArr[i]) then
       begin
@@ -660,8 +633,6 @@ Example:
 *)
 function TRSTabInventory.dropItemInSlot(slot: integer): boolean;
 begin
-  result := false;
-
   if self.isItemInSlot(slot) then
     if self.mouseSlot(slot, MOUSE_RIGHT) then
       result := chooseOption(['Drop', 'drop', 'rop']);
@@ -704,17 +675,12 @@ Example:
 *)
 function TRSTabInventory.countItemsDTM(dtm: integer): integer;
 var
-  i, hi: integer;
+  i: integer;
 begin
-  result := 0;
-
-  i := INV_SLOT_LOW;
-  hi := INV_SLOT_HIGH;
-
   if (not self.open()) then
-    exit;
+    exit(-1);
 
-  for i to hi do
+  for i := INV_SLOT_LOW to INV_SLOT_HIGH do
     if self.getSlotBox(i).dtmExists(dtm) then
       inc(result);
 
@@ -754,15 +720,12 @@ Example:
 *)
 function TRSTabInventory.clickItemsDTM(dtm: integer; clickType: integer; option: string; waitFor: integer = 300): integer;
 var
-  hi, i: integer;
+  i: integer;
 begin
   if (not self.open()) then
-    exit(- 1);
+    exit(-1);
 
-  hi := INV_SLOT_HIGH;
-  i := INV_SLOT_LOW;
-
-  for i to hi do
+  for i := INV_SLOT_LOW to INV_SLOT_HIGH do
     if self.getSlotBox(i).dtmExists(dtm) then
     begin
       self.mouseSlot(i, clickType);
@@ -800,8 +763,6 @@ function TRSTabInventory.dragSlot(fromSlot, toSlot: integer): boolean;
 var
   p: TPoint;
 begin
-  result := false;
-
   if self.isItemInSlot(fromSlot) then
   begin
     mouseSlot(fromSlot, MOUSE_MOVE);

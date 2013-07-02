@@ -19,10 +19,9 @@ A type that stores functions and properties of the Runescape Ability Book tab.
 *)
 type
   TRSTabAbilityBook = record(TRSInterface)
-
     tabIndex: integer;
     __abilityGrid: TBoxArray;
-end;
+  end;
 
 (*
 var tabAbilityBook
@@ -43,7 +42,6 @@ A enum type for the tabs of the Ability Book.
 *)
 type
   TAbilityTab = (
-
     ATTACK,
     STRENGTH,
     RANGED,
@@ -61,7 +59,6 @@ type TAbility
 A enum type for the Abilities of the Ability Book.
 *)
   TAbility = (
-
     //Attack
     SLICE,
     SLAUGHTER,
@@ -153,11 +150,11 @@ A enum type for the Abilities of the Ability Book.
     AB_ABILITY_SET_CONSTITUTION = [TAbility.REGENERATE .. TAbility.SINGLE_WAY_WILDERNESS];
 
     AB_ABILITY_SETS = [AB_ABILITY_SET_ATTACK,
-     AB_ABILITY_SET_STRENGTH,
-      AB_ABILITY_SET_RANGED,
-       AB_ABILITY_SET_ABILITIES,
-        AB_ABILITY_SET_DEFENSE,
-         AB_ABILITY_SET_CONSTITUTION];
+                       AB_ABILITY_SET_STRENGTH,
+                       AB_ABILITY_SET_RANGED,
+                       AB_ABILITY_SET_ABILITIES,
+                       AB_ABILITY_SET_DEFENSE,
+                       AB_ABILITY_SET_CONSTITUTION];
 
     AB_TAB_ATTACK                   = [TAbilityTab.ATTACK .. TAbilityTab.STRENGTH];
     AB_TAB_RANGED                   = [TAbilityTab.RANGED];
@@ -193,10 +190,8 @@ Example:
 *}
 procedure TRSTabAbilityBook.__init();
 begin
-
   with (self) do
   begin
-
     name := 'RS Ability Book Tab';
 
     ID := ID_INTERFACE_TAB_ABILITY_BOOK;
@@ -242,7 +237,6 @@ Example:
 *)
 function TRSTabAbilityBook.isOpen(): boolean;
 begin
-
   result := (getCurrentTab() = self.tabIndex);
 end;
 
@@ -270,7 +264,6 @@ Example:
 *)
 function TRSTabAbilityBook.open(): boolean;
 begin
-
   result := true;
 
   if (not (self.isOpen())) then
@@ -301,12 +294,10 @@ Example:
 *}
 function __getActiveAbilityTab(subTab: boolean = false): integer;
 var
-
   yCoord: integer;
   hue, sat, lum: extended;
   xCoords: tintegerArray;
 begin
-
   setlength(xCoords, 4);
 
   if (not (subTab)) then
@@ -317,9 +308,7 @@ begin
 
     for result := 0 to 3 do
     begin
-
       colorToHSL(getColor(xCoords[result], yCoord), hue, sat, lum);
-
       print('tabAbilityBook.__getActiveAbilityTab() found a luminance of ' + toStr(lum) + ' at main tab ' + toStr(result), TDebug.LOG);
 
       if (lum < 15) then
@@ -327,11 +316,9 @@ begin
     end;
   end else
   begin
-
     xCoords := [555, 602, 648, 695];
 
     case (__getActiveAbilityTab()) of
-
       2: xCoords[1] := 601;
       3: xCoords[1] := 601;
     end;
@@ -341,9 +328,7 @@ begin
 
   for result := 0 to 3 do
   begin
-
     colorToHSL(getColor(xCoords[result], yCoord), hue, sat, lum);
-
     print('tabAbilityBook.__getActiveAbilityTab() found a luminance of ' + toStr(lum) + ' at sub tab ' + toStr(result) + '.', TDebug.LOG);
 
     if (lum > 10) then
@@ -375,18 +360,15 @@ Example:
 *)
 function TRSTabAbilityBook.setTab(tabToSwitchTo: TAbilityTab): boolean;
 var
-
   i, main, sub, tabCompare, timeOut: integer;
   boxCoords, tabLocations, tabLoop: t2DintegerArray;
   firstSubTabInEachTab: array of TAbilityTab;
 begin
-
   if (not (getCurrentTab() = self.tabIndex)) then
     if (not self.open()) then
       exit(false);
 
   firstSubTabInEachTab := [
-
   {attack tab}                   TAbilityTab.ATTACK,
   {ranged tab}                   TAbilityTab.RANGED,
   {magic tab}                    TAbilityTab.ABILITIES,
@@ -413,7 +395,6 @@ begin
 
   for i := 0 to 1 do //This loop sets the main tab and sub tab to to the target tab.
   begin
-
     if (i = 1) then
       tabLoop[i][0] := __getActiveAbilityTab(true); //Updates the stored active sub tab to account for switching the main tab.
 
@@ -478,7 +459,6 @@ var
   abilityTabs: array of TAbilityTab;
   firstAbilityInEachTab: array of TAbility;
 begin
-
   firstAbilityInEachTab := [
 
   {attack tab}       TAbility.SLICE,
@@ -529,16 +509,13 @@ Example:
 *}
 function TRSTabAbilityBook.__getAbilityCooldown(boxToCheck: TBox; inActionBar: boolean = false): integer;
 var
-
   colorFix, clientBitmap, i, len, sumTotal, tempBitmap: integer;
   midPoint: TPoint;
   pointCircle, line, tpa: TPointArray;
 begin
-
   result := - 1;
 
   try
-
     clientBitmap := bitmapFromClient(boxToCheck.x1, boxToCheck.y1, boxToCheck.x2, boxToCheck.y2);
     setBitmapName(clientBitmap, 'Cooldown Bitmap');
 
@@ -575,7 +552,6 @@ begin
 
     for i := 0 to (len - 1) do
     begin
-
       if (inRange(i, 0, 38)) then
         midPoint := point(14, 15)
       else
@@ -617,7 +593,6 @@ begin
           result := 0;
     end;
   finally
-
     freeBitmap(clientBitmap);
   end;
 end;
@@ -650,11 +625,9 @@ Example:
 *)
 function TRSTabAbilityBook.getAbilityCooldown(abilityConstant: TAbility): integer;
 var
-
   gridPosition: integer;
   subTab: TAbilityTab;
 begin
-
   if (not (inRange(ord(abilityConstant), ABILITY_BOOK_LOW, ABILITY_BOOK_HIGH))) then
   begin
 
@@ -696,10 +669,8 @@ Example:
 *}
 function TRSTabAbilityBook.__useAbility(locationOfAbility: TBox; inActionBar: boolean = false): boolean;
 var
-
   cooldown, timeMarker: integer;
 begin
-
   if (inActionBar) then
     cooldown := tabAbilityBook.__getAbilityCooldown(locationOfAbility, inActionBar)
   else
@@ -713,7 +684,6 @@ begin
   timeMarker := getSystemTime() + randomRange(800, 1204);
 
   repeat
-
     if (inActionBar) then
       result := (tabAbilityBook.__getAbilityCooldown(locationOfAbility, inActionBar) <> 100)
     else
@@ -745,11 +715,9 @@ Example:
 *)
 function TRSTabAbilityBook.useAbility(abilityConstant: TAbility): boolean;
 var
-
   gridPosition: integer;
   subTab: TAbilityTab;
 begin
-
   if (not (inRange(ord(abilityConstant), ABILITY_BOOK_LOW, ABILITY_BOOK_HIGH))) then
   begin
 
@@ -766,6 +734,5 @@ begin
 end;
 
 begin
-
   tabAbilityBook.__init();
 end;
