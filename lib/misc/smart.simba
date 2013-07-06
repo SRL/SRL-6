@@ -25,8 +25,18 @@ to function correctly.
 
 *)
 const
-  FIXED_CLIENT_W = 765;
-  FIXED_CLIENT_H = 553;
+  FIXED_CLIENT_W = 1024;
+  FIXED_CLIENT_H = 768;
+
+(*
+const URL
+~~~~~~~~~
+
+The Runescape web address for SMART to load.
+*)
+const
+  //SMART_URL = 'http://www.runescape.com/game.ws?j=1'; // RS2
+  SMART_URL = 'http://www.runescape.com/c=uYbfa6oEQTg/game.ws?beta=1&j=1'; // RS3 Beta
 
 (*
 var User Set
@@ -142,10 +152,8 @@ Example:
 function smartGetParameters(out params: array of string): boolean;
 var
   page: string;
-const
-  URL = 'http://www.runescape.com/game.ws?j=1';
 begin
-  page := getPage(URL);
+  page := getPage(SMART_URL);
 
   params := explode(',', between('<iframe id="game" src="', '"', page));
   result := (length(params) = 2);
