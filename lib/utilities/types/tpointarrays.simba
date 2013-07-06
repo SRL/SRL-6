@@ -53,7 +53,7 @@ procedure TPointArray.addIndex(const p : TPoint; const index : Integer);
 var
   I : Integer;
 begin
-  if not inRange(index, low(self), high(self)) then
+  if not inRange(index, low(self), length(self)) then
   begin
     WriteLn('ERROR: addIndex: index larger than array length.');
     Exit;
