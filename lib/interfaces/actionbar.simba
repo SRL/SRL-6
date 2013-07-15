@@ -10,7 +10,7 @@ Runescape Action Bar.
 {$include_once interfaces.simba}
 {$include_once ../core/text.simba}
 {$include_once gametabs/abilitybook.simba}
-{$include_once gametabs/inventory.simba}
+{$include_once gametabs/backpack.simba}
 
 {$f-}
 
@@ -883,13 +883,13 @@ begin
   if (not (self.__isSlotValid(actionBarSlot))) then
     exit(self.__printWarning('actionBar.addItem()', false));
 
-  if ((not tabInventory.isOpen()) or (not self.open())) then
+  if ((not tabBackpack.isOpen()) or (not self.open())) then
     exit(false);
 
-  if (not tabInventory.isItemInSlot(invSlot)) then
+  if (not tabBackpack.isItemInSlot(invSlot)) then
     exit(false);
 
-  inventoryBox := tabInventory.slots[invSlot - 1];
+  inventoryBox := tabBackpack.slots[invSlot - 1];
   inventoryBox.x2 := inventoryBox.x2 - 2;
   inventoryBox.y2 := inventoryBox.y2 - 2;
 
@@ -930,7 +930,7 @@ begin
 
     repeat
 
-      if (tabInventory.isItemInSlot(invSlot)) then
+      if (tabBackpack.isItemInSlot(invSlot)) then
       begin
 
         findDeformedBitmapToleranceIn(bmp, xCoord, yCoord,

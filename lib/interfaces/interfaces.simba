@@ -21,7 +21,7 @@ Integer constants that represent the ID's of each global interface.
 *)
 const 
   // gametabs
-  ID_INTERFACE_TAB_INVENTORY    = 0;
+  ID_INTERFACE_TAB_BACKPACK     = 0;
   ID_INTERFACE_TAB_LOGOUT       = 1;
   ID_INTERFACE_TAB_COMBAT       = 2;
   ID_INTERFACE_TAB_NOTICE       = 3;

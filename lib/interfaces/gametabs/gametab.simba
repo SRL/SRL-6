@@ -30,7 +30,7 @@ const
   _TAB_NOTICE       = 1;
   _TAB_STATS        = 2;
   _TAB_ACADEMY      = 3;
-  _TAB_INVENTORY    = 4;
+  _TAB_BACKPACK     = 4;
   _TAB_EQUIPMENT    = 5;
   _TAB_PRAYER       = 6;
   _TAB_ABILITY      = 7;
@@ -127,7 +127,7 @@ begin
   result := -1;
 
   if (bankScreen.isOpen()) then
-    exit(_TAB_INVENTORY);
+    exit(_TAB_BACKPACK);
 
   if (getColor(553, 305) = 2070783) then // orange color at the W
     exit(_TAB_LOGOUT);
@@ -172,7 +172,7 @@ begin
   setColorToleranceSpeed(1);
 
   // if the bank is open, no tabs exist, but inventory is available
-  if (tab = _TAB_INVENTORY) and (bankScreen.isOpen())then
+  if (tab = _TAB_BACKPACK) and (bankScreen.isOpen())then
   begin
     setColorToleranceSpeed(tmpCTS);
     exit(true);
@@ -286,7 +286,7 @@ begin
     exit(true);
 
   case tab of
-    _TAB_INVENTORY: F := 1;
+    _TAB_BACKPACK:  F := 1;
     _TAB_EQUIPMENT: F := 2;
     _TAB_PRAYER:    F := 3;
     _TAB_ABILITY:   F := 4;
