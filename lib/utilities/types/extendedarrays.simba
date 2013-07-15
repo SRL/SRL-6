@@ -25,7 +25,7 @@ procedure TExtendedArray.addIndex(const ext : Extended; const index : Integer);
 var
   I : Integer;
 begin
-  if not inRange(index, low(self), high(self)) then
+  if not inRange(index, low(self), length(self)) then
   begin
     WriteLn('ERROR: addIndex: index larger than array length.');
     Exit;
@@ -62,7 +62,7 @@ procedure TExtendedArray.deleteIndex(const index : Integer);
 var
   I : Integer;
 begin
-  if not inRange(index, low(self), length(self)) then
+  if not inRange(index, low(self), high(self)) then
   begin
     WriteLn('ERROR: deleteIndex: index larger than array length.');
     Exit;
