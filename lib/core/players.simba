@@ -860,6 +860,7 @@ begin
      850: result := [__LOGIN_SKILL_LEVEL,    0,         9,  'true'   ];
     1028: result := [__LOGIN_MEMBER_ONLY,    0,         1,  'false'  ];
      812: result := [__LOGIN_CANNOT_CONNECT, 2000,      5,  'true'   ];
+     662: typeByte(VK_ESCAPE); // the "Your saved game has been updated" popup
 
     else
       if ((getSystemTime() > timer) and (timer > 0)) then
@@ -910,7 +911,7 @@ begin
   result := __RES_NOTHING;
 
   // counts the colors in the lobby pop up screen
-  c := countColor(__LOGIN_COLOR_TEXT, 260, 190, 510, 450);
+  c := countColor(__LOGIN_COLOR_TEXT, 180, 190, 810, 600);
   arr := __getLoginResponse(c, timer);
 
   if (length(arr) > 0) then // if there was an error logging in
@@ -1277,7 +1278,7 @@ begin
 end;
 
 begin
-  _boxUsername := intToBox(279, 205, 486, 215);
-  _boxPassword := intToBox(279, 250, 486, 265);
-  _boxPlay     := intToBox(270, 500, 490, 520);
+  _boxUsername := intToBox(410, 300, 620, 320);
+  _boxPassword := intToBox(410, 345, 620, 365);
+  _boxPlay     := intToBox(400, 585, 630, 610);
 end;

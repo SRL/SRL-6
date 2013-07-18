@@ -119,7 +119,7 @@ begin
 
   if (not findColorsTolerance(tpaColors, col, lookIn, tol)) then
   begin
-    print('findTextByColor: failed to find text color');
+    print('findText: failed to find text color', TDebug.SUB);
     exit(false);
   end;
 
@@ -145,9 +145,9 @@ begin
   until(getSystemTime() > t);
 
   if (result) then
-    print('findTextByColor('+toStr(txt)+'): True, at point '+toStr(p))
+    print('findTextByColor('+toStr(txt)+'): True, at point '+toStr(p), TDebug.SUB)
   else
-    print('findTextByColor('+toStr(txt)+'): '+toStr(result));
+    print('findTextByColor('+toStr(txt)+'): '+toStr(result), TDebug.SUB);
 end;
 
 (*
