@@ -201,6 +201,7 @@ function TRSMainscreen.isUptext(txt: TStringArray; waitTime: integer = 100; tol:
 var
   i, t: integer;
   s: string;
+  acc: extended;
 begin
   t := (getSystemTime() + waitTime);
   print('TRSMainscreen.isUptext()', TDebug.HEADER);
@@ -210,14 +211,18 @@ begin
     print('Current uptext: "'+s+'"');
 
     for i := 0 to high(txt) do
-      if (stringMatch(txt[i], s, tol)) then
+    begin
+      acc := stringMatch(txt[i], s);
+
+      if (acc >= tol) then
       begin
-        print('Found "'+txt[i]+'" in uptext string: "'+s+'"');
+        print('Found "'+txt[i]+'" in uptext string: "'+s+'" @ accuracy ' + floatToStr(acc));
         result := true;
         break(2);
       end;
+    end;
 
-    wait(10);
+    wait(10 + random(20));
   until (getSystemTime() > t);
 
   print('TRSMainscreen.isUptext(): '+toStr(result), TDebug.FOOTER);

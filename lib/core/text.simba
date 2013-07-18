@@ -566,9 +566,9 @@ begin
     for i := 0 to high(options) do
     begin
       if (length(txtTab) > 0) then
-        textFound := strArrInStr(txtTab, options[i].str)
+        textFound := isArrInStr(txtTab, options[i].str)
       else
-        textFound := strArrInStr(txt, options[i].str);
+        textFound := isArrInStr(txt, options[i].str);
 
       if (textFound) then
       begin
