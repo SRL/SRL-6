@@ -13,6 +13,10 @@ Contents:
 
    srlcore
    srlinterfaces
+   srlitems
+   srlmisc
+   srlobjects
+   srlutilities
 
 
 
