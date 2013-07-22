@@ -572,7 +572,7 @@ Example:
 *)
 function isLoggedIn(): boolean;
 begin
-  Result := (GetColor(478, 543) = 16777215); // white text on report abuse button
+  Result := (GetColor(1016, 728) = 4701412); // white text on report abuse button
 end;
 
 {*

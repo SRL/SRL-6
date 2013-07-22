@@ -25,7 +25,7 @@ Useful for waiting until RS has fully loaded.
 .. note::
 
     by ZephyrsFury
-    Last updated: 16 July 2013 by Coh3n
+    Last updated: 22 July 2013 by Coh3n
 
 Example:
 
@@ -33,7 +33,6 @@ Example:
 
     while (not isClientReady) do
       SleepAndMoveMouse(100 + Random(500));
-
 *)
 function isClientReady(): boolean;
 begin
@@ -42,7 +41,7 @@ begin
   if (not Result) then
   begin
     ImageResetClientArea;
-    Result := (GetColor(974, 155) = 16645629); // X button in top right
+    Result := (GetColor(954, 85) = 4371174); // Arrow button in top right
   end;
 end;
 
