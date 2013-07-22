@@ -11,11 +11,11 @@ SRL Utilities Reference
     time
     wrappers
 
-    types/extendedarrays
-    types/string
-    types/tbox
-    types/tpointarrays
-    types/integerarrays
-    types/stringarrays
-    types/tpoint
-    types/types
+    extendedarrays
+    string
+    tbox
+    tpointarrays
+    integerarrays
+    stringarrays
+    tpoint
+    types

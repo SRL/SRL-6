@@ -11,10 +11,10 @@ SRL Interfaces Reference
     mainscreen
     minimap
 
-    gametabs/abilitybook
-    gametabs/backpack
-    gametabs/gametab
-    gametabs/logout
+    abilitybook
+    backpack
+    gametab
+    logout
 
-    lobby/lobby
-    lobby/worlds
+    lobby
+    worlds
