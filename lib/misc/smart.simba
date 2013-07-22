@@ -35,8 +35,7 @@ const URL
 The Runescape web address for SMART to load.
 *)
 const
-  //SMART_URL = 'http://www.runescape.com/game.ws?j=1'; // RS2
-  SMART_URL = 'http://www.runescape.com/c=uYbfa6oEQTg/game.ws?beta=1&j=1'; // RS3 Beta
+  SMART_URL = 'http://www.runescape.com/game.ws?j=1';
 
 (*
 var User Set
@@ -377,7 +376,7 @@ begin
     begin
       print('Using Parameters: ' + toStr(params));
 
-      id := smartSpawnClient(StringReplace(PluginPath, '\', '/', [rfReplaceAll]), Params[0], ',' + Params[1], FIXED_CLIENT_W, FIXED_CLIENT_H, 's', '', '');
+      id := smartSpawnClient(StringReplace(PluginPath, '\', '/', [rfReplaceAll]), Params[0], ',' + Params[1], FIXED_CLIENT_W, FIXED_CLIENT_H, '', '', '');
       wait(100);
 
       if (id <> 0) then
