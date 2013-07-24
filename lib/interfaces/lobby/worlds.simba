@@ -18,9 +18,9 @@ const
   _WORLD_HIGH                = 139; // the highest number world
   _WORLD_PATH                = includePath + 'SRL-6/lib/interfaces/lobby/worlds.ini';
   _WORLD_FONT                = statChars;
-  _WORLD_COLOR_ARROW         = 1008783;  // arrow color that can order the worlds
-  _WORLD_COLOR_SCROLL_LEFT   = 1250841;  // black color on the left side of scroll area
-  _WORLD_COLOR_SCROLL_BOTTOM = 592137;   // black color under scroll bar
+  _WORLD_COLOR_ARROW         = 1074576;  // arrow color that can order the worlds
+  _WORLD_COLOR_SCROLL_LEFT   = 3615246;  // blue color on the left side of scroll area
+  _WORLD_COLOR_SCROLL_BOTTOM = 3753285;   // black color under scroll bar
 
 (*
 const Order
@@ -103,7 +103,7 @@ procedure TRSLobbyWorlds.__loadFromINI();
 var
   i, c: integer;
 begin
-  setLength(self.worlds, _WORLD_HIGH);
+  setLength(self.worlds, _WORLD_HIGH + 1);
 
   for i := 0 to high(self.worlds) do
     if (readINI(toStr(i), 'world', _WORLD_PATH) <> '') then // to make sure the world exists
@@ -145,10 +145,10 @@ begin
     ID := ID_INTERFACE_LOBBY_WORLDS;
     parentID := ID_INTERFACE_LOBBY;
     static := true;
-    x1 := lobby.x1;
-    y1 := lobby.y1;
-    x2 := lobby.x2;
-    y2 := lobby.y2;
+    x1 := -1;
+    y1 := -1;
+    x2 := -1;
+    y2 := -1;
     w := (x2 - x1);
     h := (y2 - y1);
     cx := self.getCenterPoint().x;
@@ -157,6 +157,34 @@ begin
     lobbyID := LOBBY_WORLDS;
     self.__loadFromINI();
   end;
+end;
+
+{*
+TRSLobbyWorlds._getWorldIndex
+~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+
+.. code-block:: pascal
+
+    function TRSLobbyWorlds._getWorldIndex(wo: integer): integer;
+
+Retruns the array index the world 'wo' is in.
+
+.. note::
+
+    by Coh3n
+    Last Updated: 24 July 2013 by Coh3n
+
+Example:
+
+.. code-block:: pascal
+
+    b := lobbyWorlds.worlds[lobbyWorlds._getWorldIndex(12)].member;
+*}
+function TRSLobbyWorlds._getWorldIndex(wo: integer): integer;
+begin
+  for result := 0 to high(self.worlds) do
+    if (self.worlds[result].world = wo) then
+      break;
 end;
 
 (*
@@ -171,8 +199,8 @@ Returns true if the worlds interface is open.
 
 .. note::
 
-    by Icefire908
-    Last Updated: 26 June 2013 by Coh3n
+    by Icefire908 & Coh3n
+    Last Updated: 23 July 2013 by Coh3n
 
 Example:
 
@@ -184,6 +212,19 @@ Example:
 function TRSLobbyWorlds.isOpen(): boolean;
 begin
   result := (lobby.getCurrentTab() = self.lobbyID);
+
+  // set the world's bounds to the same as the lobby's
+  if (result) then
+  begin
+    self.x1 := lobby.x1;
+    self.y1 := lobby.y1;
+    self.x2 := lobby.x2;
+    self.y2 := lobby.y2;
+    self.w := (x2 - x1);
+    self.h := (y2 - y1);
+    self.cx := self.getCenterPoint().x;
+    self.cy := self.getCenterPoint().y;
+  end;
 end;
 
 (*
@@ -200,7 +241,7 @@ after the tab is clicked to compensate for lag.
 .. note::
 
     by Bionicle1800 & Coh3n
-    Last Updated: 26 June 2013 by Coh3n
+    Last Updated: 23 July 2013 by Coh3n
 
 Example:
 
@@ -215,6 +256,9 @@ var
 begin
   result := lobby._openTab(self.lobbyID);
 
+  if (not self.isOpen()) then
+    exit(false);
+
   // needed to compensate for lag
   if (result) then
   begin
@@ -222,7 +266,7 @@ begin
 
     while (getSystemTime() < t) do
     begin
-      if (getColor(78, 196) = 16711422) then // white color of some text in the interface
+      if (getColor(self.x1 + 22, self.y1 + 133) = 16777215) then // white color of some text in the interface
         exit(true);
 
       wait(50);
@@ -245,7 +289,7 @@ Returns the currently selected world.
 .. note::
 
     by Home
-    Last Updated: 26 June 2013 by Coh3n
+    Last Updated: 23 July 2013 by Coh3n
 
 Example:
 
@@ -264,7 +308,7 @@ begin
   if (not self.isOpen()) then
     exit();
 
-  if (findColors(tpa, 12378347, 628, 129, 689, 142)) then // box around the current world
+  if (findColors(tpa, 12378347, self.x1 + 575, self.y1 + 60, self.x2, self.y1 + 75)) then // box around the current world
   begin
     box := getTPABounds(tpa);
     result := strToIntDef(extractFromStr(getTextAtEx(box.x1, box.y1, box.x2, box.y2, 0, 3, 4, 12378347, 0, upChars), numbers), -1);
@@ -328,13 +372,13 @@ arguements for 'by' are:
 .. note::
 
     by Naum & Coh3n
-    Last Updated: 26 June 2013 by Coh3n
+    Last Updated: 23 July 2013 by Coh3n
 
 Example:
 
 .. code-block:: pascal
 
-    lobbyWorlds.sort(WORLD_SORT_WORLDS, false); // sorts the worlds starting with 1 at the top
+    lobbyWorlds.sort(WORLD_ORDER_WORLDS, false); // sorts the worlds starting with 1 at the top
 *)
 function TRSLobbyWorlds.sort(by: integer; descending: boolean): boolean;
 var
@@ -344,12 +388,16 @@ var
 begin
   print('TRSLobbyWorlds.sort()', TDebug.HEADER);
 
-  if (findColorsTolerance(TPA, _WORLD_COLOR_ARROW, 92, 50, 716, 250, 1)) then
+  if (not self.isOpen()) then
+    exit(false);
+
+  // long box around the arrows
+  if (findColorsTolerance(TPA, _WORLD_COLOR_ARROW, self.x1, self.y1 + 115, self.x2, self.y1 + 130, 1)) then
   begin
     print('Found _WORLD_COLOR_ARROW');
 
     ATPA := splitTPA(TPA, 2);
-    sortATPAFromFirstPoint(ATPA, point(92, 166));
+    sortATPAFromFirstPoint(ATPA, point(self.x1, self.y1));
 
     if (length(ATPA) < (by * 2)) then
     begin
@@ -382,7 +430,7 @@ coordinates in 'res'.
 .. note::
 
     by Coh3n
-    Last Updated: 26 June 2013 by Coh3n
+    Last Updated: 24 July 2013 by Coh3n
 
 Example:
 
@@ -392,9 +440,42 @@ Example:
       mouse(p.rand(5), MOUSE_LEFT);
 *}
 function TRSLobbyWorlds._findWorldNumber(var res: TPoint; wo: integer): boolean;
+var
+  i, hi, l, col: integer;
+  worldsArea: TBox;
+  tpa: TPointArray;
+  atpa: T2DPointArray;
+  p: TPoint;
 begin
-  result := findText(res, [intToStr(wo)], [statChars], intToBox(113, 170, 143, 483)); // box is the world number column
-  res := res.rand(400, 10); // add randomness to the point clicked
+  // box is the world number column
+  worldsArea := intToBox(self.x1 + 55, self.y1 + 115, self.x1 + 80, self.y2 - 50);
+
+  if (self.worlds[self._getWorldIndex(wo)].members) then
+    col := 6618364
+  else
+    col := 16579836;
+
+  findColors(tpa, col, worldsArea);
+  atpa := splitTPA(tpa, 10); // separate each row
+
+  l := length(TPAFromText(intToStr(wo), statChars));
+  hi := high(atpa);
+
+  // checks TPA length first, then for the text
+  for i := 0 to hi do
+    if (length(atpa[i]) = l) then
+      if (findTextNumbers(col, 0, atpa[i].getBounds(), statChars, [0, 0, 0]) = wo) then
+      begin
+        res := atpa[i].getMiddle();
+        result := true;
+        break;
+      end;
+
+  if (result) then
+  begin
+    print('TRSLobbyWorlds._findWorldNumber(): Found world '+toStr(wo), TDebug.SUB);
+    res := res.rand(400, 10); // add randomness to the point clicked
+  end;
 end;
 
 {*
@@ -405,13 +486,13 @@ TRSLobbyWorlds._scrollToWorld
 
     function TRSLobbyWorlds._scrollToWorld(var res: TPoint; wo: integer): boolean;
 
-Uses the scroll bar to find the world 'wo'.  Returns it's corrdinates in 'res'.
+Uses mouseScroll to find the world 'wo'.  Returns it's corrdinates in 'res'.
 Function is internal.  Use TRSLobbyWorlds.selectWorld instead.
 
 .. note::
 
-    by Narcle, Shuttleu, and Coh3n
-    Last Updated: 26 June 2013 by Coh3n
+    by Coh3n
+    Last Updated: 24 July 2013 by Coh3n
 
 Example:
 
@@ -422,54 +503,33 @@ Example:
 *}
 function TRSLobbyWorlds._scrollToWorld(var res: TPoint; wo: integer): boolean;
 var
-  wPos, sPos, curPos, i, hi: integer;
-  barHeight, worldsOnScreen: integer;
-  TPA, TPA2, TPA3: TPointArray;
-  SP, SB: TBox;
+  p, tmp: TPoint;
+  t: integer;
+  down: boolean;
 begin
-  result := false;
+  if (not self.isOpen()) then
+    exit(false);
 
-  // order the worlds in descending order
-  if (not __worldsOrdered) then
-  begin
-    if (not self.sort(WORLD_ORDER_WORLDS, true)) then
-      exit(false);
+  p := self.getCenterPoint().rand(randomRange(-200, 200));
+  t := (getSystemTime() + 15000);
 
-    __worldsOrdered := true;
-    wait(400 + random(200));
-  end;
-
-  // the border of the entire scroll bar area
-  findColorsTolerance(TPA, _WORLD_COLOR_SCROLL_LEFT, 680, 50, 705, 550, 0); // these coords determine the scroll bar's general area, it deviates everything
-  SB := getTPABounds(TPA);
-
-  // a line the height of the scroll bar
-  findColorsTolerance(TPA2, _WORLD_COLOR_SCROLL_LEFT, SB.X1 + 3, SB.Y1, SB.X1 + 3, SB.Y2, 0);
-  findColorsTolerance(TPA3, _WORLD_COLOR_SCROLL_BOTTOM, SB.X1 + 3, SB.Y1, SB.X1 + 3, SB.Y2, 0);
-  TPA2 := combineTPA(TPA2, TPA3);
-  SP := getTPABounds(TPA2);
-
-  barHeight := (SP.Y2 - SP.Y1);
-  worldsOnScreen := (SB.Y2 - SB.Y1 + 32) div 42; // this is HALF of the worlds on screen
-
-  // get the world's index in the global array to be used in calculating the starting position of the scroll bar
-  hi := high(self.worlds);
-  wPos := -1;
-  for i := 0 to hi do
-    if (self.worlds[i].world = wo) then
+  repeat
+    if (self._findWorldNumber(res, wo)) then
     begin
-      wPos := i;
+      result := true;
       break;
     end;
 
-  sPos := (SB.Y1 + barHeight div 2) + (wPos * (SB.Y2 - SB.Y1 - barHeight) div (high(self.worlds) + 1 - worldsOnScreen)); // need the 0.0 to make it extended inside ()
-  curPos := (SP.Y1 + (barHeight div 2));
+    if (self._findWorldNumber(tmp, 1)) then
+      down := true;
 
-  print('TRSLobbyWorlds._scrollToWorld: Scroll bar info: curPos: '+toStr(curPos)+' wPos: '+toStr(wPos)+' sPos: '+toStr(sPos), TDebug.SUB);
-  mouse(point((SB.X1 + (SB.x2 - SB.X1) div 2), sPos), MOUSE_LEFT);
-  wait(500 + random(200));
+    if (self._findWorldNumber(tmp, _WORLD_HIGH)) then
+      down := false;
 
-  result := self._findWorldNumber(res, wo);
+    mouseScroll(p, 3 + random(5), down);
+    wait(50 + random(50));
+
+  until(getSystemTime() > t);
 end;
 
 (*
@@ -579,4 +639,8 @@ begin
   print('TRSLobbyWorlds.selectRandomWorld(): Random world is '+toStr(wArray[wo]), TDebug.SUB);
 
   result := self.selectWorld(wArray[wo]);
+end;
+
+begin
+  lobbyWorlds.__init();
 end;

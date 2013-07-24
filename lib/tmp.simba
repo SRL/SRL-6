@@ -233,7 +233,7 @@ begin
     except
       tpa := [point(box.x1, box.y1)];
     finally
-      self.drawTPA(tpa, color)
+      self.drawTPA(tpa, color);
     end;
   end;
 end;

@@ -1,0 +1,188 @@
+(*
+Options
+=======
+
+The options file holds functions and procedures that are used to interact with
+the Runescape options menu.
+
+*)
+
+{$include_once interfaces.simba}
+
+{$f-}
+
+(*
+type TRSOptions
+~~~~~~~~~~~~~~~
+
+A type that stores functions and properties of the Runescape options menu.
+*)
+type
+  TRSOptions = record(TRSInterface)
+    __placeholder: byte;
+  end;
+
+(*
+var options
+~~~~~~~~~~~
+
+Variable that stores functions and properties of the Runescape options menu.
+*)
+var
+  options: TRSOptions;
+
+{*
+TRSOptions.__init()
+~~~~~~~~~~~~~~~~~~~
+
+.. code-block:: pascal
+
+    procedure TRSOptions.__init();
+
+Initiates the options default values. Called at the end of this file.
+
+.. note::
+
+    by Coh3n
+    Last updated: 23 July 2013 by Coh3n
+
+Example:
+
+.. code-block:: pascal
+
+    options.__init();
+*}
+procedure TRSOptions.__init();
+begin
+  with self do
+  begin
+    name := 'RS Options Menu';
+    ID := ID_INTERFACE_OPTIONS;
+    parentID := -1;
+    static := true;
+    x1 := 380;
+    y1 := 132;
+    x2 := 580;
+    y2 := 507;
+    w := (x2 - x1);
+    h := (y2 - y1);
+    cx := self.getCenterPoint().x;
+    cy := self.getCenterPoint().y;
+  end;
+end;
+
+{*
+TRSOptions.__find()
+~~~~~~~~~~~~~~~~~~~~~~~~~
+
+.. code-block:: pascal
+
+    function TRSOptions.__find(): boolean;
+
+Finds and sets the bounds on the options interface. This allows the options menu
+to be interacted with on any screen size.  This function is called whenever
+TRSOptions.isOpen() is called.
+
+.. note::
+
+    by Coh3n
+    Last Updated: 23 July 2013 by Coh3n
+
+Example:
+
+.. code-block:: pascal
+
+    options.__find();
+*}
+function TRSOptions.__find(): boolean;
+var
+  wid, hei: integer;
+  tpa: TPointArray;
+  bds: TBox;
+begin
+  getClientDimensions(wid, hei);
+  result := true;
+
+  self.x1 := round(wid / 2 - 100);
+  self.y1 := round(hei / 2 - 188);
+  self.x2 := round(wid / 2 + 100);
+  self.y2 := round(hei / 2 + 187);
+  self.w := (x2 - x1);
+  self.h := (y2 - y1);
+  self.cx := self.getCenterPoint().x;
+  self.cy := self.getCenterPoint().y;
+end;
+
+(*
+TRSOptions.isOpen()
+~~~~~~~~~~~~~~~~~~~
+
+.. code-block:: pascal
+
+    function TRSOptions.isOpen(): boolean;
+
+Returns true if the options interface is open.
+
+.. note::
+
+    by Coh3n
+    Last Updated: 23 July 2013 by Co3n
+
+Example:
+
+.. code-block:: pascal
+
+    if (options.isOpen()) then
+      writeln('Options menu is open!');
+*)
+function TRSOptions.isOpen(): boolean;
+begin
+  self.__find();
+
+  // gold color of the interface's text
+  result := (countColorTolerance(379903, self.x1, self.y1, self.x2, self.y1 + 30, 10) = 135);
+end;
+
+(*
+TRSOptions.open()
+~~~~~~~~~~~~~~~~~
+
+.. code-block:: pascal
+
+    function TRSOptions.open(): boolean;
+
+Opens the in-game options menu.
+
+.. note::
+
+    by Coh3n
+    Last Updated: 23 July 2013 by Co3n
+
+Example:
+
+.. code-block:: pascal
+
+    if (options.open()) then
+      writeln('We opened the options interface');
+*)
+function TRSOptions.open(): boolean;
+var
+  t: integer;
+begin
+  if (self.isOpen()) then
+    exit(true);
+
+  typeByte(VK_ESCAPE);
+
+  t := (getSystemTime() + (3000));
+
+  while (not result) and (getSystemTime() < t) do
+  begin
+    result := self.isOpen();
+    wait(300 + random(200));
+  end;
+end;
+
+begin
+  options.__init();
+end;

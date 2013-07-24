@@ -36,13 +36,7 @@ Example:
 *)
 function isClientReady(): boolean;
 begin
-  Result := (isLoggedIn() or lobby.isOpen());
-
-  if (not Result) then
-  begin
-    ImageResetClientArea;
-    Result := (GetColor(954, 85) = 4371174); // Arrow button in top right
-  end;
+  Result := (isLoggedIn() or lobby.isOpen() or __setInputBoxes());
 end;
 
 (*
@@ -79,7 +73,7 @@ begin
   i := 1;
 
   print('If RS is loaded and nothing is happening, make sure the RS client is set'+
-        ' to "Resizable", the screen dimensions are set to 1024x768, and there are no pop-ups open', TDebug.HINT);
+        ' to "Resizable" and there are no pop-ups open.', TDebug.HINT);
 
  {$IFNDEF SMART}
    print('You are not using SMART, be sure to use Simba''s crosshairs'+

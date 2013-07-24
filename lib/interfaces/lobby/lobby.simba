@@ -8,6 +8,7 @@ lobby.
 *)
 
 {$include_once ../interfaces.simba}
+{$include_once ../options.simba}
 {$include_once ../gametabs/logout.simba}
 
 {$f-}
@@ -55,6 +56,18 @@ const
     LOBBY_CLAN = 4;
     LOBBY_OPTIONS = 5;
 
+(*
+const Internal
+~~~~~~~~~~~~~~
+
+Internal lobby constants.
+*)
+const
+  // used in getCurrentTab and _openTab calulations
+  __LOBBY_TAB_WIDTH    = 102;
+  __LOBBY_TAB_OFFSET_X = 7;  // x/y is the midpoint of the left border of the first tab
+  __LOBBY_TAB_OFFSET_Y = 21;
+
 {*
 TRSLobby.__init()
 ~~~~~~~~~~~~~~~~~
@@ -63,12 +76,12 @@ TRSLobby.__init()
 
     procedure TRSLobby.__init();
 
-Initiates the lobby variable. Called at the end of this file.
+Initiates the lobby default values. Called at the end of this file.
 
 .. note::
 
     by Coh3n
-    Last updated: Mar. 3, 2013 by Coh3n
+    Last updated: 23 July 2013 by Coh3n
 
 Example:
 
@@ -84,10 +97,10 @@ begin
     ID := ID_INTERFACE_LOBBY;
     parentID := -1;
     static := true;
-    x1 := 190;
-    y1 := 150;
-    x2 := 843;
-    y2 := 626;
+    x1 := 153;
+    y1 := 82;
+    x2 := 805;
+    y2 := 556;
     w := (x2 - x1);
     h := (y2 - y1);
     cx := self.getCenterPoint().x;
@@ -107,8 +120,8 @@ Handles the validate email screen that comes up when you enter to lobby.
 
 .. note::
 
-    by NCDS
-    Last updated: Mar. 3, 2013 by Coh3n
+    by NCDS & Coh3n
+    Last updated: 23 July 2013 by Coh3n
 
 Example:
 
@@ -117,12 +130,146 @@ Example:
     lobby.__skipEmailScreen();
 *}
 procedure TRSLobby.__skipEmailScreen();
+var
+  tpa: TPointArray;
+  wid, hei: integer;
 begin
-  if (getColor(658, 430) = 5353701) then // part of the "Skip" text
+  getClientDimensions(wid, hei);
+
+  findColors(tpa, 14733486, 0, 0, wid-1, hei-1); // color of the "Skip" text
+  if (length(tpa) = 43) then
+    mouseBox(tpa.getBounds(), MOUSE_LEFT);
+end;
+
+{*
+TRSLobby.__find()
+~~~~~~~~~~~~~~~~~
+
+.. code-block:: pascal
+
+    function TRSLobby.__find(): boolean;
+
+Finds and sets the bounds on the lobby interface. This allows the lobby to be
+anywhere on the screen.  This function is called whenever TRSLobby.isOpen() is
+called.
+
+.. note::
+
+    by Coh3n
+    Last Updated: 23 July 2013 by Coh3n
+
+Example:
+
+.. code-block:: pascal
+
+    lobby.__find();
+*}
+function TRSLobby.__find(): boolean;
+var
+  wid, hei: integer;
+  tpa: TPointArray;
+  bds: TBox;
+begin
+  getClientDimensions(wid, hei);
+
+  findColors(tpa, 11119274, 0, 0, wid-1, hei-1); // white border of the lobby
+
+  if (length(tpa) > 0) then
   begin
-    print('TRSLobby.__skipEmailScreen(): Found email screen', TDebug.SUB);
-    mouseText(['Skip'], ['UpChars'], intToBox(620, 415, 700, 445), MOUSE_LEFT); // box around "Skip" text
+    result := true;
+
+    bds := tpa.getBounds();
+    //smartImage.drawBox(bds, false);
+
+    self.x1 := bds.x1;
+    self.y1 := bds.y1;
+    self.x2 := bds.x2;
+    self.y2 := bds.y2;
+    self.w := (x2 - x1);
+    self.h := (y2 - y1);
+    self.cx := self.getCenterPoint().x;
+    self.cy := self.getCenterPoint().y;
+  end else
+    print('TRSLobby.findBounds(): Failed to find lobby bounds', TDebug.ERROR);
+end;
+
+(*
+TRSLobby.isOpen()
+~~~~~~~~~~~~~~~~~
+
+.. code-block:: pascal
+
+    function TRSLobby.isOpen(): boolean;
+
+Returns true if we are at the lobby screen is loaded. Uses text recognition of
+the tabs.
+
+.. note::
+
+    by Coh3n
+    Last Updated: 23 July 2013 by Coh3n
+
+Example:
+
+.. code-block:: pascal
+
+    while (not lobby.isOpen()) do
+      wait(100 + Random(400));
+
+*)
+function TRSLobby.isOpen(): boolean;
+var
+  wid, hei: integer;
+  dummy: TPoint;
+begin
+  self.__skipEmailScreen(); // just in case
+  getClientDimensions(wid, hei);
+
+  if (findText(dummy, ['World'], ['UpChars'], intToBox(0, 0, wid-1, hei-1)) and
+      findText(dummy, ['Options'], ['UpChars'], intToBox(0, 0, wid-1, hei-1))) then
+  begin
+    result := true;
+    self.__find();
   end;
+end;
+
+(*
+TRSLobby.findPlayButton()
+~~~~~~~~~~~~~~~~~~~~~~~~~~
+
+.. code-block:: pascal
+
+    function findPlayButton(var res: TPoint): boolean;
+
+Returns true if the play button is found somewhere on the client.  Used as an easier
+way to detect the lobby screen since some lobby tabs are different sizes, causing
+lobby interface to change.
+
+.. note::
+
+    by Coh3n
+    Last updated: 23 July 2013 by Coh3n
+
+Example:
+
+.. code-block:: pascal
+
+    lobby.findPlayButton(p);
+*)
+function TRSLobby.findPlayButton(var res: TPoint): boolean;
+var
+  tpa: TPointArray;
+  width, height: integer;
+begin
+  getClientDimensions(width, height);
+
+  if (findColors(tpa, 12235426, 0, 0, width - 1, height - 1)) then // top border of the Play button
+    if (length(tpa) = 247) then
+    begin
+      result := true;
+      res := tpa.getMiddle();
+      res.offset(point(0, 10));
+    end;
 end;
 
 (*
@@ -138,7 +285,7 @@ Gets current lobby tab.
 .. note::
 
     by Bionicle1800, NCDS
-    Last Updated: 17 July 2013 by Coh3n
+    Last Updated: 23 July 2013 by Coh3n
 
 Example:
 
@@ -150,42 +297,18 @@ Example:
 *)
 function TRSLobby.getCurrentTab(): integer;
 begin
+  if (not self.isOpen()) then
+    exit(-1);
+
   for result := 0 to (LOBBY_COUNT - 1) do
-    if (getColor((self.x1 + 8) + result * 102, 176) = 3158838) then // color of an active tab
+    // color of an active tab's border
+    if (getColor((self.x1 + __LOBBY_TAB_OFFSET_X) + (result * __LOBBY_TAB_WIDTH), (self.y1 + __LOBBY_TAB_OFFSET_Y)) = 7831173) then
     begin
       print('TRSLobby.getCurrentTab(): Current tab: '+toStr(result), TDebug.SUB);
       exit;
     end;
 
   Result := -1;
-end;
-
-(*
-TRSLobby.isOpen()
-~~~~~~~~~~~~~~~~~
-
-.. code-block:: pascal
-
-    function TRSLobby.isOpen(): boolean;
-
-Returns true if we are at the lobby screen is loaded.
-
-.. note::
-
-    by IceFire908 & Bionicle1800
-
-Example:
-
-.. code-block:: pascal
-
-    while (not lobby.isOpen()) do
-      wait(100 + Random(400));
-
-*)
-function TRSLobby.isOpen(): boolean;
-begin
-  self.__skipEmailScreen();
-  result := inRange(self.getCurrentTab(), LOBBY_PLAYER, LOBBY_OPTIONS);
 end;
 
 {*
@@ -196,13 +319,13 @@ TRSLobby._open()
 
     function TRSLobby._open(): boolean;
 
-Exits to the lobby screen. Should call players[currentPlayer].exitToLobby()
+Exits from the game to the lobby screen. Should call players[currentPlayer].exitToLobby()
 instead of this function.
 
 .. note::
 
     by Starblaster100, Raymond, IceFire908, Tarajunky, & Coh3n
-    Last Updated: Mar. 3, 2013 by Co3n
+    Last Updated: 23 July 2013 by Co3n
 
 Example:
 
@@ -214,27 +337,24 @@ Example:
 function TRSLobby._open(): boolean;
 var
   t: integer;
+  p: TPoint;
+  b: TBox;
 begin
   if (lobby.isOpen()) then
+    exit(true);
+
+  if (options.open()) then
   begin
-    result := true;
-    exit;
-  end;
+    p := point(options.x1 + round(options.w / 2), options.y2 - 45); // the exit to lobby button
+    mouse(p.rand(randomRange(-50, 50), 5), MOUSE_LEFT);
 
-  if (not tabLogout.open()) then
-    exit;
-
-  wait(100 + random(200));
-
-  if (tabLogout.clickText(['Lobby'])) then
-  begin
-    t := (getSystemTime() + (15000));
+    t := (getSystemTime() + (7000));
 
     while (not result) and (getSystemTime() < t) do
     begin
       print('Waiting for lobby screen...', TDebug.SUB);
       result := lobby.isOpen();
-      wait(700 + random(500));
+      wait(700 + random(300));
     end;
   end;
 end;
@@ -253,8 +373,8 @@ use the lobby file's variables instead.
 
 .. note::
 
-    by Bionicle1800
-    Last Updated: 12 June 2013 by Coh3n
+    by Bionicle1800 & Coh3n
+    Last Updated: 23 July 2013 by Coh3n
 
 Example:
 
@@ -264,38 +384,34 @@ Example:
 
 *}
 function TRSLobby._openTab(tab: integer): boolean;
-  // used to avoid repeated code and possible error
-  function getColorPoint(tab: integer): TPoint;
-  begin
-    result := point(63 + (tab * 102), 82);
-  end;
 var
   p: TPoint;
+  currTab: integer;
 begin
-  if (self.getCurrentTab() = tab) then
+  if (not self.isOpen()) then
+    exit(false);
+
+  currTab := self.getCurrentTab();
+
+  if (currTab = tab) then
     exit(true);
 
-  p := getColorPoint(tab);
-
-  // midpoint of the left boundary of the tab; this is the color when the tab is active
-  if (getColor(p) = 8095117) then
-  begin
-    mouse(point(p.x + random(80), p.y + random(5)), MOUSE_LEFT);
-    wait(200 + random(200));
-    result := true;
-  end;
+  p := point(self.x1 + __LOBBY_TAB_OFFSET_X + (tab * __LOBBY_TAB_WIDTH), self.y1 + __LOBBY_TAB_OFFSET_Y);
+  mouse(p.rand(randomRange(20, 90), randomRange(-10, 10)), MOUSE_LEFT);
+  wait(200 + random(200));
+  result := true;
 
   if (not result) then
     print('TRSLobby._openTab(): Failed to open tab '+toStr(tab), TDebug.ERROR);
 end;
 
 {*
-TRSLobby._leaveLobby
-~~~~~~~~~~~~~~~~~~~~
+TRSLobby._leave()
+~~~~~~~~~~~~~~~~~
 
 .. code-block:: pascal
 
-    function TRSLobby._leaveLobby(): boolean;
+    function TRSLobby._leave(): boolean;
 
 Leaves the lobby screen. This instance of the function is internal.  Use
 players[currentPlayer].logout();.
@@ -303,17 +419,17 @@ players[currentPlayer].logout();.
 .. note::
 
     by IceFire908
-    Last Updated: Mar. 3, 2013 by Coh3n
+    Last Updated: 23 July 2013 by Coh3n
 
 Example:
 
 .. code-block:: pascal
 
     if (lobby.isOpen()) then
-      if (not players[currentPlayer].leaveLobby()) then
+      if (not players[currentPlayer].leave()) then
         writeln('Oh no, we didn''t make it out of the Lobby Screen.');
 *}
-function TRSLobby._leaveLobby(): boolean;
+function TRSLobby._leave(): boolean;
 var
   t: integer;
   exitButton: TPoint;
@@ -321,13 +437,13 @@ begin
   result := (not lobby.isOpen());
 
   t := (getSystemTime() + 30000);
-  exitButton := point(690, 85).rand(3);
+  exitButton := point(self.x2 - 20, self.y1 + 20).rand(3);
 
   while (not result) and (getSystemTime() < t) do
   begin
-    print('Waiting for login screen...', TDebug.SUB);
     mouse(exitButton, MOUSE_LEFT);
-    wait(randomRange(1000, 2000));
+    print('Waiting for login screen...', TDebug.SUB);
+    wait(randomRange(500, 1000));
     result := (not lobby.isOpen());
   end;
 end;

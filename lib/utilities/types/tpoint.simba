@@ -53,8 +53,11 @@ function TPoint.rand(xx, yy : Integer): TPoint;
 var
   nx, ny, rx, ry: integer;
 begin
-  nx := xx div abs(xx);   //div by self to determine positive or negative
-  ny := yy div abs(yy);
+  if (xx <> 0) then
+    nx := xx div abs(xx);   //div by self to determine positive or negative
+
+  if (yy <> 0) then
+    ny := yy div abs(yy);
 
   rx := random(xx) * nx;
   ry := random(yy) * ny;

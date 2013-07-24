@@ -25,8 +25,8 @@ to function correctly.
 
 *)
 const
-  FIXED_CLIENT_W = 1024;
-  FIXED_CLIENT_H = 768;
+  FIXED_CLIENT_W = 960;
+  FIXED_CLIENT_H = 640;
 
 (*
 const URL
@@ -376,7 +376,7 @@ begin
     begin
       print('Using Parameters: ' + toStr(params));
 
-      id := smartSpawnClient(StringReplace(PluginPath, '\', '/', [rfReplaceAll]), Params[0], ',' + Params[1], FIXED_CLIENT_W, FIXED_CLIENT_H, '', '', '');
+      id := smartSpawnClient(StringReplace(PluginPath, '\', '/', [rfReplaceAll]), Params[0], ',' + Params[1], FIXED_CLIENT_W, FIXED_CLIENT_H, '', '', '', 'OpenGL32.dll');
       wait(100);
 
       if (id <> 0) then

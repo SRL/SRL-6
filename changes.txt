@@ -44,7 +44,7 @@ EVERYTHING should be recorded here: new features, function name changes, user-de
   - WS_CurrentWorld/Ex combined into one.
   - OrderWorlds renamed to TRSLobbyWorlds.sort().
   - Added TRSLobbyWorlds._findWorldNumber() that finds and returns the coords of a given world.
-  - FindWorld renamed to TRSLobbyWorlds._scrollToWorld().
+  - FindWorld renamed to TRSLobbyWorlds._scrollToWorld() and now uses the mouse wheel to scroll through the list.
   - RandomWorld renamed TRSLobbyWorlds.selectRandomWorld() and now returns a boolean rather than an integer.
   - QuickSelect removed as it's no longer needed.
   - GetWorldInfo removed.
@@ -212,6 +212,7 @@ EVERYTHING should be recorded here: new features, function name changes, user-de
   - SleepAndMoveMouse moved to anitban.simba
   - mouseBox now takes a TBox parameter.
   - Removed IdleTime, MouseTBox, DidRedClick, DidYelloClick, MouseBoxEx, and DragMouseTBox.
+  - Added mouseScroll().
 
 - timing.simba renamed to time.simba
   - MarkTime/TimeFromMark replaced with TTimeMarker and TTimeMarker functions

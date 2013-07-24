@@ -66,11 +66,6 @@ begin
       if (result) then
         break(2);
     end;
-
-  if (result) then
-    print('findText('+toStr(txt)+'): True, at point '+toStr(p))
-  else
-    print('findText('+toStr(txt)+'): '+toStr(result));
 end;
 
 (*
