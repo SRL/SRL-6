@@ -4,7 +4,6 @@ Debug
 
 The debug file holds any files used for SRL debugging and logging. Debug usage
 guidelines are as follows:
-
     * Use print('TRSMinimap.getDots()', TDebug.HEADER) to initilize a function header.
     * Use print('TRSMinimap.getDots(): '+toStr(result), TDebug.FOOTER) to signal the end of the function.
     * WARNING: If TDebug.HEADER is used, a TDebug.FOOTER MUST be called once before exiting the function.
@@ -26,7 +25,7 @@ guidelines are as follows:
 {$include_once ../utilities/time.simba}
 {$include_once ../utilities/wrappers.simba}
 {$include_once ../utilities/types/types.simba}
-{$include_once ../tmp.simba}
+{$include_once ../utilities/drawing.simba}
 
 {$f-}
 
@@ -67,11 +66,13 @@ External SRL debug variables that can be set scripts:
     * logPath: string; The path the save the SRL log file. Default path is SRL-6/logs/.
     * disableSRLLog: boolean; Disables saving debug to a log file.  Default false.
     * disableSRLDebug: boolean; Disables SRL functions from printing to the debug box.  Default false.
+    * addTimeStamp: boolean; if enabled will add the time before all debug messages.
 *)
 var
   logPath = includePath + 'SRL-6/logs/';
   disableSRLLog = false;
   disableSRLDebug = false;
+  addTimeStamp = false;
 
 {*
 __openLogFile
@@ -203,7 +204,6 @@ print
 Prints txt to the debug box if debugType doesn't equal TDebug.LOG.  Will always
 print to the log file unless disableSRLLog is set to true.  Valid arguements
 for debugType:
-
     * DEBUG (default)
     * LOG
     * HINT
@@ -317,53 +317,6 @@ begin
 end;
 
 (*
-debugTPA
-~~~~~~~~
-
-.. code-block:: pascal
-
-    procedure debugTPA(tpa: TPointArray; bmpName: string);
-
-Shows a TPointArray on the debug image window. Has the option to save the
-window to a file.
-
-    * tpa: The TPointArray to be displayed.
-    * bmpName: The name of the file to be saved.  If bmpName = '' nothing is saved.
-
-.. note::
-
-    by Wizzup?
-    Last Updated: 12 April 2013 by Coh3n
-
-Example:
-
-.. code-block:: pascal
-
-    debugTPA(tpa, 'Example');
-*)
-procedure debugTPA(tpa: TPointArray; bmpName: string);
-var
-  bmp: integer;
-  bds: TBox;
-  tpaTemp : TPointArray;
-begin
-  bds := tpa.getBounds();
-  bmp := bitmapFromClient(bds.x1, bds.y1, bds.x2, bds.y2);
-
-  tpaTemp := tpa.copy();
-  tpaTemp.offset(point(-bds.x1, -bds.y1));
-
-  drawTPABitmap(bmp, tpaTemp, clRed);
-  drawBitmapDebugImg(bmp);
-  displayDebugImgWindow(bds.x2 - bds.x1 + 1, bds.y2 - bds.y1 + 1);
-
-  if (bmpName <> '') then
-    saveBitmap(bmp, scriptPath + bmpName + '.png');
-
-  freeBitmap(bmp);
-end;
-
-(*
 debugATPA
 ~~~~~~~~~
 
@@ -381,7 +334,7 @@ to a file.
 .. note::
 
     by Wizzup?
-    Last Updated: 12 April 2013 by Coh3n
+    Last Updated: 24 July 2013 by Olly
 
 Example:
 
@@ -389,29 +342,19 @@ Example:
 
     debugATPA(atpa, 'Example');
 *)
-procedure debugATPA(atpa: T2DPointArray; bmpName: string);
+procedure debugATPA(const atpa: T2DPointArray);
 var
-  bmp: integer;
-  atpaTemp: T2DPointArray;
-  bds: TBox;
+  tmb: TMufasaBitmap;
+  b: TBox;
 begin
-  if (length(atpa) <= 0) then
-    exit;
+  b := getATPABounds(atpa);
 
-  bds := atpa.getBounds();
-  bmp := bitmapFromClient(bds.x1, bds.y1, bds.x2, bds.y2);
+  tmb.init(client.getMBitmaps());
+  tmb.setSize(b.x2+1, b.y2+1);
+  tmb.drawATPA(atpa);
 
-  atpaTemp := atpa.copy();
-  atpaTemp.offset(point(-bds.x1, -bds.y1));
-
-  drawATPABitmap(bmp, atpaTemp);
-  drawBitmapDebugImg(bmp);
-  displayDebugImgWindow(bds.x2 - bds.x1 + 1, bds.y2 - bds.y1 + 1);
-
-  if (bmpName <> '') then
-    saveBitmap(bmp, scriptPath + bmpName + '.png');
-
-  freeBitmap(bmp);
+  tmb.debug();
+  tmb.free();
 end;
 
 (*
@@ -431,7 +374,7 @@ Has the option to save the window's display to a file.
 .. note::
 
     by Wizzup?
-    Last Updated: 12 April 2013 by Coh3n
+    Last Updated: 24 July 2013 by Olly
 
 Example:
 
@@ -439,56 +382,59 @@ Example:
 
     debugATPABounds(atpa, 'Example');
 *)
-procedure debugATPABounds(ATPA: T2DPointArray; bmpName: string);
+procedure debugATPABounds(const atpa: T2DPointArray);
 var
-  Width, Height, ClientBMP, I: Integer;
-  B, Box: TBox;
-  BoxColors: TIntegerArray;
-  SelColor: Integer;
-  x, y: Integer;
-  BMP: Integer;
+  tmb: TMufasaBitmap;
+  b: TBox;
 begin
-  ATPA.getBounds();
-  Width := Box.X2 + 5;
-  Height := Box.Y2 + 5;
+  b := getATPABounds(atpa);
 
-  DisplayDebugImgWindow(Width, Height);
-  BoxColors := [clRed, clBlue, clBlack, clGreen, clYellow];
+  tmb.init(client.getMBitmaps());
+  tmb.setSize(b.x2+1, b.y2+1);
+  tmb.debugATPA(atpa);
 
-  ClientBMP := BitmapFromClient(0, 0, Width - 1, Height - 1);
+  tmb.debug();
+  tmb.free();
+end;
 
-  for i:= 0 to High(ATPA) do
-  begin
-    SelColor := BoxColors[Random(Length(BoxColors))];
-    B := ATPA[i].getBounds();
+(*
+debugTPA
+~~~~~~~~
 
-    for x := B.x1 to B.x2 do
-    begin
-      FastSetPixel(ClientBMP, x, b.y1, selColor);
-      FastSetPixel(ClientBMP, x, B.y2, selColor);
-    end;
+.. code-block:: pascal
 
-    for y := B.y1 to B.y2 do
-    begin
-      FastSetPixel(ClientBMP, B.x1, y, selColor);
-      FastSetPixel(ClientBMP, B.x2, y, selColor);
-    end;
+    procedure debugTPA(tpa: TPointArray; bmpName: string);
 
-    BMP := BitmapFromText(IntToStr(i), StatChars);
-    FastReplaceColor(bmp, clBlack, clYellow);
-    FastReplaceColor(bmp, clWhite, clBlack);
+Shows a TPointArray on the debug image window. Has the option to save the
+window to a file.
 
-    SetTransparentColor(bmp,clYellow);
-    FastDrawTransparent(B.x1 + 2, b.y1 + 2, BMP, ClientBMP);
+    * tpa: The TPointArray to be displayed.
+    * bmpName: The name of the file to be saved.  If bmpName = '' nothing is saved.
 
-    FreeBitmap(BMP);
-  end;
+.. note::
 
-  if (bmpName <> '') then
-    SaveBitmap(ClientBMP, bmpName + '.png');
+    by Wizzup?
+    Last Updated: 24 July 2013 by Olly
 
-  DrawBitmapDebugImg(ClientBMP);
-  FreeBitmap(ClientBmp);
+Example:
+
+.. code-block:: pascal
+
+    debugTPA(tpa, 'Example');
+*)
+procedure debugTPA(const tpa: TPointArray);
+var
+  tmb: TMufasaBitmap;
+  b: TBox;
+begin
+  b := getTPABounds(tpa);
+
+  tmb.init(client.getMBitmaps());
+  tmb.setSize(b.x2+1, b.y2+1);
+  tmb.debugTPA(tpa);
+
+  tmb.debug();
+  tmb.free();
 end;
 
 (*
@@ -519,6 +465,8 @@ begin
 end;
 
 begin
+  setScriptProp(SP_WriteTimeStamp, [addTimeStamp]);
   addOnTerminate('__closeLogFile');
 end;
+
 
