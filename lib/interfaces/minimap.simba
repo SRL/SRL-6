@@ -1,6 +1,6 @@
 (*
 Minimap
-~~~~~~~
+=======
 
 The minimap file holds all SRL's functions that interact with the Runescape
 minimap.

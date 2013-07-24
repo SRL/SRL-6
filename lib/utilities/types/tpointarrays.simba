@@ -1,3 +1,11 @@
+(*
+TPoint Arrays
+=============
+
+A file that stores type functions to manipulate TPointArrays.
+
+*)
+
 {$include_once ../../tmp.simba}
 {$include_once tpoint.simba}
 

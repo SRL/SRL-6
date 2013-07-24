@@ -1,3 +1,11 @@
+(*
+String
+======
+
+A file that stores type functions to manipulate strings.
+
+*)
+
 {$include_once stringarrays.simba}
 
 {$f-}

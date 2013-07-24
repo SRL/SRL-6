@@ -1,3 +1,11 @@
+(*
+Integer Arrays
+==============
+
+A file that stores type functions to manipulate TIntegerArrays.
+
+*)
+
 {$f-}
 
 (*

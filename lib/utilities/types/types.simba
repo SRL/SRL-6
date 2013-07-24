@@ -1,10 +1,10 @@
-(*
+{*
 Type
 ====
 
 The Type file includes all type editing functions used throughout SRL.
 
-*)
+*}
 
 {$include_once tbox.simba}
 {$include_once tpoint.simba}

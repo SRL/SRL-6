@@ -1,3 +1,11 @@
+(*
+TPoint
+======
+
+A file that stores type functions to manipulate TPoints.
+
+*)
+
 {$f-}
 
 (*

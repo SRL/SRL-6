@@ -1,6 +1,6 @@
 (*
 Worlds
-~~~~~~
+======
 
 The worlds file is used to represent the world tab interface in the RS lobby. It
 stores the functions needed to switch players between servers.
