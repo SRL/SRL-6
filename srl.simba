@@ -46,7 +46,6 @@ SRL library isn't available to you.
 function setupSRL(): boolean;
 var
   t := getSystemTime();
-  w, h: integer;
 begin
   print('setupSRL()', TDebug.HEADER);
   print('Setting up SRL...');
