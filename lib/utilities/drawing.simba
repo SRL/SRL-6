@@ -2,394 +2,216 @@
 Drawing
 =======
 
-The drawing file holds procedures to create and draw on-to bitmaps.
+The drawing file holds TMufasaBitmap drawing functions to aid drawing onto bitmaps.
 
 *)
 
-{$include_once ../core/debug.simba}
+{$include_once ../utilities/wrappers.simba}
 {$include_once ../tmp.simba}
 
+type
+  TColorArray = array of TColor;
+
 {*
-const _DEFAULT_COLOR
+const __SHADOW_COLOR
 ~~~~~~~~~~~~~~~~~~~~
-
-Integer constant that stores the default color which all drawing functions will
-use if the color parameter is not used.
-
-*}
-const
-  _DEFAULT_COLOR := clRed;
-
-{*
-const _COLOR_ARRAY
-~~~~~~~~~~~~~~~~~~
-
-TIntegerArray constant that stores multiple colors. Used for drawing with
-multiple colors.
-
-*}
-const
-   _COLOR_ARRAY := [clAqua, clBlue, clFuchsia, clLime, clMaroon, clOrange, clNavy, clYellow, clRed, clWhite];
-
-{*
-const _SHADOW_COLOR
-~~~~~~~~~~~~~~~~~~~
 
 Integer constant that stores the shadow color for adding a shadow for text drawing.
 
 *}
 const
-  _SHADOW_COLOR := 65536;
+  __SHADOW_COLOR = 65536;
 
 (*
-type TDrawing
-~~~~~~~~~~~~~
-
-A type that stores infomation of the bitmap.
-
-*)
-type
-  TDrawing = record
-   bitmap: TMufasaBitmap;
-   isSetup: boolean;
-end;
-
-(*
-TDrawing.create
-~~~~~~~~~~~~~~~
+TMufasaBitmap.clear
+~~~~~~~~~~~~~~~~~~~
 
 .. code-block:: pascal
 
-    function TDrawing.create(const name: string; const width, height: integer): boolean;
+    procedure TMufasaBitmap.clear();
 
-Creates a blank bitmap, setting the width and height and name values to the bitmap.
+Will clear the entire TMufasaBitmap
 
 .. note::
 
     by Ollybest
-    Last Updated: 21 April 2013 by Ollybest
+    Last Updated: 19 July 2013 by Ollybest
 
 Example:
 
 .. code-block:: pascal
 
-    result := myBitmap.create('bitmap[0]' 250, 250);
+    tmb.clear();
 
 *)
-function TDrawing.create(const name: string; const width, height: integer): boolean;
+procedure TMufasaBitmap.clear();
 begin
-  if (self.isSetup) then
-    exit(true);
-
-  try
-    self.bitmap.init(client.getMBitmaps());
-    self.bitmap.setSize(width, height);
-    self.bitmap.setTransparentColor(0);
-    self.bitmap.setName(name);
-    self.isSetup := true;
-
-    print('TDrawing.create(): Bitmap "'+ name +'" was created', TDebug.SUB);
-  except
-    print('TDrawing.create(): Failed to create bitmap "'+ name +'"', TDebug.SUB);
-  end;
-
-  result := self.isSetup;
+  self.drawClear(0);
 end;
 
 (*
-TDrawing.destroy()
-~~~~~~~~~~~~~~~~~~
+TMufasaBitmap.clearArea
+~~~~~~~~~~~~~~~~~~~~~~~
 
 .. code-block:: pascal
 
-    procedure TDrawing.destroy();
+    procedure TMufasaBitmap.clearArea(area: TBox);
 
-Free's the bitmap and destroys any other data.
+Will clear the desired area of the TMufasaBitmap
 
 .. note::
 
     by Ollybest
-    Last Updated: 21 April 2013 by Ollybest
+    Last Updated: 19 July 2013 by Ollybest
 
 Example:
 
 .. code-block:: pascal
 
-    myBitmap.destory();
+    tmb.clearArea(intToBox(5, 5, 10, 10));
+
 *)
-procedure TDrawing.destroy();
-var
-  s: string;
+procedure TMufasaBitmap.clearArea(area: TBox);
 begin
-  if (not self.isSetup) then
-    exit();
-
-  s := self.bitmap.getName();
-
-  self.bitmap.free();
-  self.isSetup := false;
-  print('TDrawing.destroy(): Destroyed bitmap "' + s + '"', TDebug.SUB);
+  self.rectangle(area, 0);
 end;
 
 (*
-TDrawing.createFromClient
-~~~~~~~~~~~~~~~~~~~~~~~~~
-
-.. code-block:: pascal
-
-    function TDrawing.createFromClient(const name: string; const area: TBox): boolean;
-
-Creates a bitmap from the client from the desired area, setting the
-width and height and name values to the bitmap.
-
-.. note::
-
-    by Ollybest
-    Last Updated: 21 April 2013 by Ollybest
-
-Example:
-
-.. code-block:: pascal
-
-    result := myBitmap.create('bitmap[0]' box);
-
-*)
-function TDrawing.createFromClient(const name: string; const area: TBox): boolean;
-var
-  w, h: integer;
-begin
-  if (self.isSetup) then
-    exit(true);
-
-  self.create(name, 0, 0);
-  self.bitmap.copyClientToBitmap(client.getIOManager(), true, 0, 0, area.x1, area.y1, area.x2, area.y2);
-  self.isSetup := true;
-
-  result := self.isSetup;
-end;
-
-(*
-TDrawing.createFromClient; overload;
-~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
-
-.. code-block:: pascal
-
-    function TDrawing.createFromClient(const name: string): boolean; overload;
-
-Creates a bitmap from the whole client, setting the width and height and
-name values to the bitmap.
-
-.. note::
-
-    by Ollybest
-    Last Updated: 21 April 2013 by Ollybest
-
-Example:
-
-.. code-block:: pascal
-
-    result := myBitmap.create('bitmap[0]);
-*)
-function TDrawing.createFromClient(const name: string): boolean; overload;
-var
-  w, h: integer;
-begin
-  getClientDimensions(w, h);
-
-  result := self.createFromClient(name, intToBox(0, 0, w, h));
-end;
-
-(*
-TDrawing.clear
-~~~~~~~~~~~~~~
-
-.. code-block:: pascal
-
-    procedure TDrawing.clear();
-
-Clears the whole bitmap.
-
-.. note::
-
-    by Ollybest
-    Last Updated: 21 April 2013 by Ollybest
-
-Example:
-
-.. code-block:: pascal
-
-    myBitmap.clear();
-
-*)
-procedure TDrawing.clear();
-begin
-  if (not self.isSetup) then
-    exit();
-
-  self.bitmap.drawClear(0);
-end;
-
-(*
-TDrawing.clearArea
-~~~~~~~~~~~~~~~~~~
-
-.. code-block:: pascal
-
-    procedure TDrawing.clearArea(area: TBox);
-
-Clears the bitmap in the set area.
-
-.. note::
-
-    by Ollybest
-    Last Updated: 21 April 2013 by Ollybest
-
-Example:
-
-.. code-block:: pascal
-
-    myBitmap.clearArea(intToBox(100, 100, 200, 200));
-
-*)
-procedure TDrawing.clearArea(area: TBox);
-begin
-  if (not self.isSetup) then
-    exit();
-
-  self.bitmap.rectangle(area, 0);
-end;
-
-(*
-TDrawing.drawTPA
-~~~~~~~~~~~~~~~~
-
-.. code-block:: pascal
-
-    procedure TDrawing.drawTPA(tpa: TPointArray; color: TColor = _DEFAULT_COLOR);
-
-Draws TPA (tpa) onto the bitmap.
-
-.. note::
-
-    by Ollybest
-    Last Updated: 21 April 2013 by Ollybest
-
-Example:
-
-.. code-block:: pascal
-
-    myBitmap.drawTPA(tpa);
-
-*)
-procedure TDrawing.drawTPA(tpa: TPointArray; color: TColor = _DEFAULT_COLOR);
-var
-  b: TBox;
-begin
-  if (not self.isSetup) then
-    exit;
-
-  try
-    self.bitmap.drawTPA(tpa, color);
-  except
-    print('failed drawing onto the bitmap', TDebug.ERROR);
-
-    // working out if user is attempting to draw outside the bitmap bounds.
-    b := getTPABounds(tpa);
-
-    if (b.x1 < 0) or (b.y1 < 0) or (b.x2 > self.bitmap.getWidth()) or (b.y2 > self.bitmap.getHeight()) then
-      print('reason: You are attempting to draw off the bitmap bounds', TDebug.HINT);
-  end;
-end;
-
-(*
-TDrawing.drawATPA
-~~~~~~~~~~~~~~~~~
-
-.. code-block:: pascal
-
-    procedure TDrawing.drawATPA(atpa: T2DPointArray);
-
-Draws each tpa points in the atpa onto the bitmap.
-
-.. note::
-
-    by Ollybest
-    Last Updated: 21 April 2013 by Ollybest
-
-Example:
-
-.. code-block:: pascal
-
-    myBitmap.drawATPA(atpa);
-
-*)
-procedure TDrawing.drawATPA(atpa: T2DPointArray);
-var
-  h, i, l: integer;
-begin
-  h := high(atpa);
-
-  for i := 0 to h do
-  begin
-    self.drawTPA(atpa[i], _COLOR_ARRAY[l]);
-    inc(l);
-
-    if (l > 9) then
-      l := 0;
-  end;
-end;
-
-(*
-TDrawing.drawBox
-~~~~~~~~~~~~~~~~
-
-.. code-block:: pascal
-
-    procedure TDrawing.drawBox(const box: TBox; const fill: boolean; const color: TColor = _DEFAULT_COLOR);
-
-Draws the TBox onto the bitmap.
-
-.. note::
-
-    by Ollybest
-    Last Updated: 21 April 2013 by Ollybest
-
-Example:
-
-.. code-block:: pascal
-
-    myBitmap.drawBox(intToBox(100, 100, 200, 200), true, clLime);
-
-*)
-procedure TDrawing.drawBox(const box: TBox; const fill: boolean; const color: TColor = _DEFAULT_COLOR);
-begin
-  self.bitmap.rectangle(box, fill, color);
-end;
-
-(*
-TDrawing.drawRoundBox
+TMufasaBitmap.drawBox
 ~~~~~~~~~~~~~~~~~~~~~
 
 .. code-block:: pascal
 
-    procedure TDrawing.drawRoundBox(box: TBox; roundness: integer; fill: boolean; color: TColor);
+    procedure TMufasaBitmap.drawBox(box: TBox; fill: boolean; color: TColor);
 
-Draws a TBox with rounded edges onto the bitmap, the higher the roundess the
-more round the corners will be.
+Draws a TBox onto the TMufasaBitmap
 
 .. note::
 
     by Ollybest
-    Last Updated: 21 April 2013 by Ollybest
+    Last Updated: 19 July 2013 by Ollybest
 
 Example:
 
 .. code-block:: pascal
 
-    myBitmap.drawRoundBox(intToBox(100, 100, 200, 200), 40, true, clLime);
+    tmb.drawBox(intToBox(50, 50, 345, 345), false, clLime);
 
 *)
-procedure TDrawing.drawRoundBox(const box: TBox; const roundness: integer; const fill: boolean; const color: TColor = _DEFAULT_COLOR);
+procedure TMufasaBitmap.drawBox(box: TBox; fill: boolean; color: TColor);
+var
+  tpa: TPointArray;
+begin
+  if (not fill) then
+  begin
+    try
+      tpa := edgeFromBox(box);
+    except
+      tpa := [point(box.x1, box.y1)];
+    finally
+      self.drawTPA(tpa, color);
+    end;
+  end else
+    self.rectangle(box, color);
+end;
+
+(*
+TMufasaBitmap.drawBoxes
+~~~~~~~~~~~~~~~~~~~~~~~
+
+.. code-block:: pascal
+
+    procedure TMufasaBitmap.drawBoxes(boxArr: TBoxArray; fill: boolean; color: TColor);
+
+Draws a TBoxArray onto the TMufasaBitmap.
+
+.. note::
+
+    by Ollybest
+    Last Updated: 19 July 2013 by Ollybest
+
+Example:
+
+.. code-block:: pascal
+
+    tmb.drawBoxes([intToBox(10, 10, 20, 20), intToBox(50, 50, 250, 250),
+                   intToBox(440, 440, 600, 600)], true, clRed);
+
+*)
+procedure TMufasaBitmap.drawBoxes(boxArr: TBoxArray; fill: boolean; color: TColor);
+var
+  i, h: integer;
+begin
+  h := high(boxArr);
+
+  for i := 0 to h do
+    self.drawBox(boxArr[i], fill, color);
+end;
+
+(*
+TMufasaBitmap.drawBoxes; overload
+~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+
+.. code-block:: pascal
+
+    procedure TMufasaBitmap.drawBoxes(boxArr: TBoxArray; fill: boolean; colors: TColorArray); overload;
+
+Same as TMufasaBitmap.drawBoxes() but accepts a extra paramter that allows a
+color for each box.
+
+.. note::
+
+    by Ollybest
+    Last Updated: 19 July 2013 by Ollybest
+
+Example:
+
+.. code-block:: pascal
+
+    tmb.drawBoxes([intToBox(10, 10, 20, 20), intToBox(50, 50, 250, 250),
+                   intToBox(440, 440, 600, 600)], true, [clRed, clLime, clOrange]);
+
+*)
+procedure TMufasaBitmap.drawBoxes(boxArr: TBoxArray; fill: boolean; colors: TColorArray); overload;
+var
+  l, i: integer;
+begin
+  l := length(boxArr);
+
+  if (l <> length(colors)) then
+  begin
+    writeln('-- ERROR: TMufasaBitmap.drawBoxes(): boxArr/colors lengths differ');
+    exit();
+  end;
+
+  for i := 0 to (l-1) do
+    self.drawBox(boxArr[i], fill, colors[i]);
+end;
+
+(*
+TMufasaBitmap.drawRoundBox
+~~~~~~~~~~~~~~~~~~~~~~~~~~
+
+.. code-block:: pascal
+
+    procedure TMufasaBitmap.drawRoundBox(const box: TBox; const roundness: integer; const fill: boolean; const color: TColor);
+
+Draws a box with "round" corners onto the TMufasaBitmap, parameter roundness
+will judge curved the corners are.
+
+.. note::
+
+    by Ollybest
+    Last Updated: 19 July 2013 by Ollybest
+
+Example:
+
+.. code-block:: pascal
+
+    tmb.drawRoundBox(intToBox(222, 222, 666, 666), 111, true, clOrange);
+
+*)
+procedure TMufasaBitmap.drawRoundBox(const box: TBox; const roundness: integer; const fill: boolean; const color: TColor);
 var
   tmpTBitmap: TBitmap;
   tmpMufasa: TMufasaBitmap;
@@ -404,219 +226,153 @@ begin
     tmpTBitmap.getCanvas().getBrush().setColor(0)
   end;
 
-  tmpTBitmap.setWidth(self.bitmap.getWidth());
-  tmpTBitmap.setHeight(self.bitmap.getHeight());
+  tmpTBitmap.setWidth(self.getWidth());
+  tmpTBitmap.setHeight(self.getHeight());
 
   tmpTBitmap.getCanvas().RoundRect(box.x1, box.y1, box.x2, box.y2, roundness, roundness);
 
-  tmpMufasa.SetTransparentColor(self.bitmap.GetTransparentColor());
+  if (self.getTransparentColorSet()) then
+    tmpMufasa.SetTransparentColor(self.getTransparentColor());
 
   tmpMufasa.loadFromTBitmap(tmpTBitmap);
-  tmpMufasa.drawTransparent(0, 0, self.bitmap);
+  tmpMufasa.drawTransparent(0, 0, self);
 
   tmpTBitmap.free();
   tmpMufasa.free();
 end;
 
 (*
-TDrawing.drawBoxes
-~~~~~~~~~~~~~~~~~~
+TMufasaBitmap.drawBitmap
+~~~~~~~~~~~~~~~~~~~~~~~~
 
 .. code-block:: pascal
 
-    procedure TDrawing.drawBoxes(const boxArr: TBoxArray; const fill: boolean; const color: TColor = _DEFAULT_COLOR);
+    procedure TMufasaBitmap.drawBitmap(bmp: integer; pnt: TPoint);
 
-Draws an array of boxes onto the bitmap in the desired color.
+Draws a bitmap onto the TMufasaBitmap at the desired point.
 
 .. note::
 
     by Ollybest
-    Last Updated: 21 April 2013 by Ollybest
+    Last Updated: 19 July 2013 by Ollybest
 
 Example:
 
 .. code-block:: pascal
 
-    myBitmap.drawBoxes(tba, false, clLime);
+    tmb.drawBitmap(bmp, point(50, 50));
 
 *)
-procedure TDrawing.drawBoxes(const boxArr: TBoxArray; const fill: boolean; const color: TColor = _DEFAULT_COLOR);
-var
-  i, h: integer;
+procedure TMufasaBitmap.drawBitmap(bmp: integer; pnt: TPoint);
 begin
-  h := high(boxArr);
-  i := 0;
-
-  for i to h do
-    self.drawBox(boxArr[i], fill, color);
+  if (bitmapExists(bmp)) then
+    getMufasaBitmap(bmp).drawTransparent(pnt.x, pnt.y, self)
+  else
+    writeln('-- ERROR: TMufasaBitmap.drawBitmap(): bitmap does not exist');
 end;
 
 (*
-TDrawing.drawBoxes overload;
-~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+TMufasaBitmap.drawBitmap; overload
+~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
 
 .. code-block:: pascal
 
-    procedure TDrawing.drawBoxes(const boxArr: TBoxArray; const fill: boolean; const colorArr: TIntegerArray); overload;
+    function TMufasaBitmap.drawBitmap(path: string; pnt: TPoint): boolean; overload;
 
-Same as TDrawing.drawBoxes but allows a color for each box.
+Same as TMufasaBitmap.drawBitmap but will load a bitmap from a file specified
+by the paramter "path", will return if succesful or not.
 
 .. note::
 
     by Ollybest
-    Last Updated: 21 April 2013 by Ollybest
+    Last Updated: 19 July 2013 by Ollybest
 
 Example:
 
 .. code-block:: pascal
 
-    TDrawing.drawBoxes([box1, box2], true, [clRed, clLime];
+    tmb.drawBitmap('simba/scripts/foo.png', point(11, 11));
 
 *)
-procedure TDrawing.drawBoxes(const boxArr: TBoxArray; const fill: boolean; const colorArr: TIntegerArray); overload;
+function TMufasaBitmap.drawBitmap(path: string; pnt: TPoint): boolean; overload;
 var
-  i, h: integer;
+  bmp: integer;
 begin
-  h := high(boxArr);
+  result := fileExists(path);
 
-  if ((h + 1) <> length(colorArr)) then
+  if (not result) then
   begin
-    print('Box / color array lengths differ', TDebug.ERROR);
-    exit;
+    writeln('-- ERROR: TMufasaBitmap.drawBitmap(): File path does not exist ("' + path + '"), result = false');
+    exit();
   end;
 
-  for i := 0 to h do
-    self.drawBox(boxArr[i], fill, colorArr[i]);
+  bmp := loadBitmap(path);
+  self.drawBitmap(bmp, pnt);
+  freeBitmap(bmp);
 end;
 
 (*
-TDrawing.drawLine
-~~~~~~~~~~~~~~~~~
+TMufasaBitmap.drawCross
+~~~~~~~~~~~~~~~~~~~~~~~
 
 .. code-block:: pascal
 
-    procedure TDrawing.drawLine(const startPoint, endPoint: TPoint; const color: TColor = _DEFAULT_COLOR);
+    procedure TMufasaBitmap.drawCross(pnt: TPoint; size: integer; color: TColor);
 
-Draws a line on the bitmap from startPoint to endPoint.
+Draws a cross on the TMufasaBitmap at the TPoint(pnt) with the desired size.
 
 .. note::
 
     by Ollybest
-    Last Updated: 21 April 2013 by Ollybest
+    Last Updated: 19 July 2013 by Ollybest
 
 Example:
 
 .. code-block:: pascal
 
-    myBitmap.drawLine(point(100, 100), point(200, 100), clLime);
+    tmb.drawCross(point(200, 200), 4, clLime);
 
 *)
-procedure TDrawing.drawLine(const startPoint, endPoint: TPoint; const color: TColor = _DEFAULT_COLOR);
-var
-  box: TBox;
+procedure TMufasaBitmap.drawCross(pnt: TPoint; size: integer; color: TColor);
 begin
-  try
-    self.bitmap.lineTo(startPoint, endPoint, color);
-  except
-    print('failed drawing a line onto the bitmap', TDebug.ERROR);
-
-    // working out if user is attempting to draw outside the bitmap bounds.
-    box := pointToBox(point(0, 0), point(self.bitmap.getWidth(), self.bitmap.getHeight()));
-
-    if (not pointInBox(startPoint, box)) or (not pointInBox(endPoint, box)) then
-      print('reason: One of your points is off the bitmap bounds', TDebug.HINT);
-  end;
-end;
-
-(*
-TDrawing.drawLine; overload
-~~~~~~~~~~~~~~~~~~~~~~~~~~~
-
-.. code-block:: pascal
-
-    procedure TDrawing.drawLine(const x1, y1, x2, y2: integer; const color: TColor = _DEFAULT_COLOR); overload;
-
-Same as TDrawing.drawLine but accepts x1, y1, x2, y2 parameters rather than TPoints.
-
-.. note::
-
-    by Ollybest
-    Last Updated: 21 April 2013 by Ollybest
-
-Example:
-
-.. code-block:: pascal
-
-    myBitmap.drawLine(100, 100, 200, 200, clLime);
-
-*)
-procedure TDrawing.drawLine(const x1, y1, x2, y2: integer; const color: TColor = _DEFAULT_COLOR); overload;
-begin
-  self.drawLine(point(x1, y1), point(x2, y2), color);
-end;
-
-(*
-TDrawing.drawCrossAt
-~~~~~~~~~~~~~~~~~~~~
-
-.. code-block:: pascal
-
-    procedure TDrawing.drawCrossAt(const mid: TPoint; const size: integer; const color: TColor = _DEFAULT_COLOR);
-
-Draws a cross onto the bitmap.
-
-.. note::
-
-    by Ollybest
-    Last Updated: 21 April 2013 by Ollybest
-
-Example:
-
-.. code-block:: pascal
-
-    myBitmap.drawCrossAt(point(50, 50), 10);
-
-*)
-procedure TDrawing.drawCross(const mid: TPoint; const size: integer; const color: TColor = _DEFAULT_COLOR);
-var
-  b: tbox;
-begin
-  if (size = 0) then
+  if (size < 1) then
     exit();
 
-  b := intToBox(mid.x - size, mid.y - size, mid.x + size, mid.y + size);
-
-  self.drawLine(b.x1, b.y1, b.x2, b.y2, color);
-  self.drawLine(b.x2, b.y1, b.x1, b.y2, color);
+  try
+    self.lineTo(point(pnt.x - size, pnt.y - size), point(pnt.x + size, pnt.y + size), color);
+    self.lineTo(point(pnt.x + size, pnt.y - size), point(pnt.x - size, pnt.y + size), color);
+  except end;
 end;
 
 (*
-TDrawing.drawEllipse
-~~~~~~~~~~~~~~~~~~~~
+TMufasaBitmap.drawEllipse
+~~~~~~~~~~~~~~~~~~~~~~~~~
 
 .. code-block:: pascal
 
-    procedure TDrawing.drawEllipse(const middlePoint: TPoint; const xRadius, yRadius: integer; const fill: boolean; const color: TColor = _DEFAULT_COLOR);
+    procedure TMufasaBitmap.drawEllipse(const pnt: TPoint; const xRadius, yRadius: integer; const fill: boolean; const color: TColor);
 
-Draws a ellipse onto the bitmap.
+Draws an ellipse on the TMufasaBitmap defined by 'pnt', 'xRadius', and
+'yRadius'. If 'fill' is true it will fill the ellipse, otherwise it draws just
+the border.
 
 .. note::
 
     by Ollybest
-    Last Updated: 21 April 2013 by Ollybest
+    Last Updated: 19 July 2013 by Ollybest
 
 Example:
 
 .. code-block:: pascal
 
-    myBitmap.drawEllipse(point(50, 50), 10, 20, true, clRed);
+    tmb.drawEllipse(point(500, 500), 20, 50, true, clLime);
 
 *)
-procedure TDrawing.drawEllipse(const middlePoint: TPoint; const xRadius, yRadius: integer; const fill: boolean; const color: TColor = _DEFAULT_COLOR);
+procedure TMufasaBitmap.drawEllipse(const pnt: TPoint; const xRadius, yRadius: integer; const fill: boolean; const color: TColor);
 var
   tpa: TPointArray;
 begin
-  tpa := tpaFromEllipse(middlePoint.x, middlePoint.y, xRadius, yRadius);
+  tpa := tpaFromEllipse(pnt.x, pnt.y, xRadius, yRadius);
 
   if (fill) then
     fillEllipse(tpa);
@@ -625,372 +381,422 @@ begin
 end;
 
 (*
-TDrawing.drawCircle
-~~~~~~~~~~~~~~~~~~~
+TMufasaBitmap.drawCircle
+~~~~~~~~~~~~~~~~~~~~~~~~
 
 .. code-block:: pascal
 
-    procedure TDrawing.drawCircle(const middlePoint: TPoint; const radius: integer; const fill: boolean; const color: TColor = _DEFAULT_COLOR);
+    procedure TMufasaBitmap.drawCircle(pnt: TPoint; size: integer; fill: boolean; color: TColor);
 
-Draws a circle at the middlePoint with the radius onto the bitmap.
+Draws a circle on the TMufasaBitmap defined by 'pnt' and 'size'. If 'fill'
+is true it will fill the circle, otherwise it draws just the border.
 
 .. note::
 
     by Ollybest
-    Last Updated: 21 April 2013 by Ollybest
+    Last Updated: 19 July 2013 by Ollybest
 
 Example:
 
 .. code-block:: pascal
 
-    myBitmap.drawCircle(point(100, 100), 15, true, clLime);
+    tmb.drawCircle(point(500, 500), 50, false, clLime);
 
 *)
-procedure TDrawing.drawCircle(const middlePoint: TPoint; const radius: integer; const fill: boolean; const color: TColor = _DEFAULT_COLOR);
+procedure TMufasaBitmap.drawCircle(pnt: TPoint; size: integer; fill: boolean; color: TColor);
 begin
-  self.drawEllipse(middlePoint, radius, radius, fill, color);
+  self.drawEllipse(pnt, size, size, fill, color);
 end;
 
 (*
-TDrawing.drawPolygon
-~~~~~~~~~~~~~~~~~~~~
+TMufasaBitmap.drawPolygon
+~~~~~~~~~~~~~~~~~~~~~~~~~
 
 .. code-block:: pascal
 
-    procedure TDrawing.drawPolygon(polygon: TPointArray; color: TColor);
+    procedure TMufasaBitmap.drawPolygon(polygonPnts: TPointArray; color: TColor);
 
-Draws a polygon onto the bitmap.
+Draws a line between all the points(polygonPnts) to draw a polygon-like shape on
+the TMufasaBitmap.
 
 .. note::
 
     by Ollybest
-    Last Updated: 21 April 2013 by Ollybest
+    Last Updated: 19 July 2013 by Ollybest
 
 Example:
 
 .. code-block:: pascal
 
-    myBitmap.drawPolygon([point(100, 100), point(150, 150), point(200, 200)], clLime);
+    tmb.drawPolygon([point(10, 10), point(100, 100), point(500, 500), point(230, 555)], clLime);
 
 *)
-procedure TDrawing.drawPolygon(polygon: TPointArray; color: TColor = _DEFAULT_COLOR);
+procedure TMufasaBitmap.drawPolygon(polygonPnts: TPointArray; color: TColor);
 var
   i, h: Integer;
 begin
-  h := (high(polygon) - 1);
+  h := (high(polygonPnts) - 1);
 
   if (h = -1) then
     exit();
 
   for i := 0 to h do
-    self.drawLine(polygon[i], polygon[i + 1], color);
+    self.lineTo(polygonPnts[i], polygonPnts[i + 1], color);
 
-  self.drawLine(polygon[h + 1], polygon[0], color);
+  self.lineTo(polygonPnts[h + 1], polygonPnts[0], color);
 end;
 
 (*
-TDrawing.drawBitmap
-~~~~~~~~~~~~~~~~~~~
-
-.. code-block:: pascal
-
-    procedure TDrawing.drawBitmap(bmp: integer; const point: TPoint);
-
-Draws a bitmap at the desired point onto our bitmap.
-
-.. note::
-
-    by Ollybest
-    Last Updated: 21 April 2013 by Ollybest
-
-Example:
-
-.. code-block:: pascal
-
-    myBitmap.drawBitmap(bmp, point(50, 50));
-
-*)
-procedure TDrawing.drawBitmap(const bmp: integer; const point: TPoint);
-var
-  w, h: integer;
-begin
-  try
-    getMufasaBitmap(bmp).drawTransparent(point.x, point.y, self.bitmap);
-  except
-    print('failed drawing bitmap onto the bitmap', TDebug.ERROR);
-
-    // detecting a possible error
-    getBitmapSize(bmp, w, h);
-
-    if (point.y or point.x < 0) or (w > self.bitmap.getWidth()) or (h > self.bitmap.getHeight()) then
-       print('reason: A part of the bitmap you are drawing is bigger than the target bitmap', TDebug.HINT);
-  end;
-end;
-
-(*
-TDrawing.drawTextAt
-~~~~~~~~~~~~~~~~~~~
-
-.. code-block:: pascal
-
-    procedure TDrawing.drawTextAt(const text: string; const pos: TPoint; const font: string; const color: TColor = _DEFAULT_COLOR);
-
-Draws text onto the bitmap at the desired point.
-
-.. note::
-
-    by Ollybest
-    Last Updated: 21 April 2013 by Ollybest
-
-Example:
-
-.. code-block:: pascal
-
-    myBitmap.drawTextAt('hello!', point(25, 25), 'statChars', clLime);
-
-*)
-procedure TDrawing.drawTextAt(const text: string; const pos: TPoint; const font: string; const color: TColor = _DEFAULT_COLOR);
-var
-  txt, shadow: TPointArray;
-begin
-  txt := tpaFromText(text, font);
-  txt.offset(pos);
-
-  shadow := txt.copy();
-  shadow.offset(point(1, 1));
-
-  self.drawTPA(shadow, _SHADOW_COLOR);
-  self.drawTPA(txt, color);
-end;
-
-(*
-TDrawing.drawTextAt: overload;
-~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
-
-.. code-block:: pascal
-
-    procedure TDrawing.drawTextAt(const text: string; const pos: TPoint; const color: TColor = _DEFAULT_COLOR); overload;
-
-Same as drawTextAt but no font parameter is reqiured (uses statChars).
-
-.. note::
-
-    by Ollybest
-    Last Updated: 21 April 2013 by Ollybest
-
-Example:
-
-.. code-block:: pascal
-
-    myBitmap.drawTextAt('hello!', point(25, 25), clLime);
-
-*)
-procedure TDrawing.drawTextAt(const text: string; const pos: TPoint; const color: TColor = _DEFAULT_COLOR); overload;
-begin
-  self.drawTextAt(text, pos, 'statChars', color);
-end;
-
-(*
-TDrawing.drawMultiTextAt
-~~~~~~~~~~~~~~~~~~~~~~~~
-
-.. code-block:: pascal
-
-    procedure TDrawing.drawMultiTextAt(const textArr: TStringArray; posArr: TPointArray; const font: string; const color: TColor = _DEFAULT_COLOR); overload;
-
-Draws text onto the bitmap, each index in the textArr will be drawn at the point in the posArr at the same index.
-
-.. note::
-
-    by Ollybest
-    Last Updated: 21 April 2013 by Ollybest
-
-Example:
-
-.. code-block:: pascal
-
-    myBitmap.drawMultiTextAt(['hello', 'bye'], [point(100, 100), point(100, 200)], 'statChars', clLime);
-
-*)
-procedure TDrawing.drawMultiText(const textArr: TStringArray; posArr: TPointArray; const font: string; const color: TColor = _DEFAULT_COLOR); overload;
-var
-  i, h: integer;
-begin
-  h := high(textArr);
-
-  if ((h + 1) <> length(posArr)) then
-  begin
-    print('Array lengths differ', TDebug.ERROR);
-    exit;
-  end;
-
-  for i := 0 to h do
-    self.drawTextAt(textArr[i], posArr[i], font, color);
-end;
-
-(*
-TDrawing.drawTextLines
+TMufasaBitmap.drawText
 ~~~~~~~~~~~~~~~~~~~~~~
 
 .. code-block:: pascal
 
-    procedure TDrawing.drawTextLines(const textArr: TStringArray; startPos: TPoint; shadow: boolean; font: string; color: TColor = _DEFAULT_COLOR);
+    procedure TMufasaBitmap.drawText(txt: string; pnt: TPoint; font: string; shadow: boolean; color: TColor);
 
-Draws text onto the bitmap, each index in the textArr is put on a different line.
+Draws a string(text) with the desired font onto the TMufasaBitmap at the TPoint(pnt).
 
 .. note::
 
     by Ollybest
-    Last Updated: 21 April 2013 by Ollybest
+    Last Updated: 19 July 2013 by Ollybest
 
 Example:
 
 .. code-block:: pascal
 
-    myBitmap.drawTextLines(['this will be line1', 'this will be line 2'], point(1, 50), true, 'statChars', clLime);
+    tmb.drawText('hello world!', point(55, 55), upchars, false, clRed);
 
 *)
-procedure TDrawing.drawTextLines(const textArr: TStringArray; startPos: TPoint; shadow: boolean; font: string; color: TColor = _DEFAULT_COLOR);
+procedure TMufasaBitmap.drawText(txt: string; pnt: TPoint; font: string; shadow: boolean; color: TColor);
 var
-  atpa: T2DPointArray;
-  tpa, shadowTPA: TPointArray;
-  w, h, i, hi: integer;
+  tpa, tpaShadow: TPointArray;
 begin
-  setLength(atpa, length(textArr));
-  hi := high(textArr);
-
-  for i := 0 to hi do
-  begin
-    atpa[i] := tpaFromText(textArr[i], font, w, h);
-    atpa[i].offSet(point(startPos.x, startPos.y + 1 + (i * h)));
-  end;
-
-  tpa := atpa.merge();
+  tpa := tpaFromText(txt, font);
+  offsetTPA(tpa, pnt);
 
   if (shadow) then
   begin
-    shadowTPA := tpa.copy();
-    shadowTPA.offset(point(1, 1));
-    self.drawTPA(shadowTPA, _SHADOW_COLOR);
+    tpaShadow := copyTPA(tpa);
+    offsetTPA(tpaShadow, point(1, 1));
+    self.drawTPA(tpaShadow, __SHADOW_COLOR);
   end;
 
   self.drawTPA(tpa, color);
 end;
 
 (*
-TDrawing.debugDTM
-~~~~~~~~~~~~~~~~~
+TMufasaBitmap.drawText; overload
+~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
 
 .. code-block:: pascal
 
-    procedure TDrawing.debugDTM(const dtm: integer; const color: TColor = _DEFAULT_COLOR);
+    procedure TMufasaBitmap.drawText(txt: string; pnt: TPoint; color: TColor); overload;
 
-Searches the whole client for a dtm and draws crosses at the found points
+Same as TMufasaBitmap.drawText, but no shadow boolean (enabled), and no font
+parameter(will use statchars).
 
 .. note::
 
     by Ollybest
-    Last Updated: 21 April 2013 by Ollybest
+    Last Updated: 19 July 2013 by Ollybest
 
 Example:
 
 .. code-block:: pascal
 
-    myBitmap.debugDTM(dtm, clRed);
+    tmb.drawText('hello world!', point(55, 55), clLime);
 
 *)
-procedure TDrawing.debugDTM(const dtm: integer; const color: TColor = _DEFAULT_COLOR);
-var
-  matches: TPointArray;
-  i, w, h: integer;
+procedure TMufasaBitmap.drawText(txt: string; pnt: TPoint; color: TColor); overload;
 begin
-  getClientDimensions(w, h);
-
-  findDTMs(dtm, matches, intToBox(4, 4, w-4, h-4));
-  h := high(matches);
-
-  for i := 0 to h do
-    self.drawCross(matches[i], 4, color);
+  self.drawText(txt, pnt, statchars, true, color);
 end;
 
 (*
-TDrawing.debugATPA
-~~~~~~~~~~~~~~~~~~
+TMufasaBitmap.drawTextArray
+~~~~~~~~~~~~~~~~~~~~~~~~~~~
 
 .. code-block:: pascal
 
-    procedure TDrawing.debugATPA(atpa: T2DPointArray);
+    procedure TMufasaBitmap.drawTextArray(txtArr: TStringArray; pnts: TPointArray; font: string; shadow: boolean; color: TColor);
 
-Draws the box of each TPA in the ATPA and write the index number in the top
-left corner and a cross at the point found by MiddleTPA.
+Draws an array of text on the TMufasaBitmap, each index in the textArr will be
+be drawn at the same point in the pnt array.
 
 .. note::
 
     by Ollybest
-    Last Updated: 21 April 2013 by Ollybest
+    Last Updated: 19 July 2013 by Ollybest
 
 Example:
 
 .. code-block:: pascal
 
-    myBitmap.debugATPABounds(atpa);
+    tmb.drawTextArray(['hello', 'world'], [point(50, 50), point(100, 111)], bigchars, false, clBlue);
 
 *)
-procedure TDrawing.debugATPA(atpa: T2DPointArray);
+procedure TMufasaBitmap.drawTextArray(txtArr: TStringArray; pnts: TPointArray; font: string; shadow: boolean; color: TColor);
 var
-  c: TColor;
-  i, l, h: integer;
-  b: Tbox;
-  p: TPoint;
+  i, l: integer;
 begin
-  h := high(atpa);
+  l := length(txtArr);
 
-  for i := 0 to h do
+  if (l <> length(pnts)) then
   begin
-    c := _COLOR_ARRAY[l];
+    writeln('-- ERROR: TMufasaBitmap.drawTextArray(): txtArr/pnts length differ');
+    exit();
+  end;
+
+  for i := 0 to l do
+    self.drawText(txtArr[i], pnts[i], font, shadow, color);
+end;
+
+(*
+TMufasaBitmap.drawTextLines
+~~~~~~~~~~~~~~~~~~~~~~~~~~~
+
+.. code-block:: pascal
+
+    procedure TMufasaBitmap.drawTextLines(txtArr: TStringArray; pnt: TPoint; font: string; shadow: boolean; color: TColor);
+
+Draws text onto the TMufasaBitmap, each index in the txtArr is put on a different line.
+
+.. note::
+
+    by Ollybest
+    Last Updated: 19 July 2013 by Ollybest
+
+Example:
+
+.. code-block:: pascal
+
+    tmb.drawTextLines(['olly', 'is', 'the', 'best', ':D'], point(2, 2), statChars, false, clRed);
+
+*)
+procedure TMufasaBitmap.drawTextLines(txtArr: TStringArray; pnt: TPoint; font: string; shadow: boolean; color: TColor);
+var
+  atpa: T2DPointArray;
+  tpa, shadowTPA: TPointArray;
+  w, h, i, l: integer;
+begin
+  l := length(txtArr);
+  setLength(atpa, l);
+
+  for i := 0 to (l-1) do
+  begin
+    atpa[i] := tpaFromText(txtArr[i], font, w, h);
+    offsetTPA(atpa[i], point(pnt.x, pnt.y + 1 + (i * h)));
+  end;
+
+  tpa := mergeATPA(atpa);
+
+  if (shadow) then
+  begin
+    shadowTPA := copyTPA(tpa);
+    offsetTPA(shadowTPA, point(1, 1));
+    self.drawTPA(shadowTPA, __SHADOW_COLOR);
+  end;
+
+  self.drawTPA(tpa, color);
+end;
+
+(*
+TMufasaBitmap.debug
+~~~~~~~~~~~~~~~~~~~
+
+.. code-block:: pascal
+
+    procedure TMufasaBitmap.debug();
+
+Will display the TMufasaBitmap in Simba's debug image form. Note: will only
+work if the bitmap is managed by simba
+
+.. note::
+
+    by Ollybest
+    Last Updated: 19 July 2013 by Ollybest
+
+Example:
+
+.. code-block:: pascal
+
+    tmb.debug();
+    // or for a non TMufasaBitmap
+    getMufasaBitmap(bitmap).debug();
+
+*)
+procedure TMufasaBitmap.debug();
+begin
+  if (not bitmapExists(self.getIndex())) then
+  begin
+    writeln('-- ERROR: Cannot debug the bitmap because it is not managed by Simba');
+    writeln('-- HINT: Example for a managed bitmap is "tmb.init(client.getMBitmaps());"');
+    exit();
+  end;
+
+  clearDebugImg();
+  displayDebugImgWindow(self.getWidth(), self.getHeight());
+  drawBitmapDebugImg(self.getIndex());
+end;
+
+(*
+TMufasaBitmap.debugTPA
+~~~~~~~~~~~~~~~~~~~~~~
+
+.. code-block:: pascal
+
+    procedure TMufasaBitmap.debugTPA(tpa: TPointArray; drawPoints: boolean = true);
+
+Will debug a TPointArray onto the TMufasaBitmap, parameter drawPoints is a optional
+parameter and by default is enabled, if enabled it will draw the points in the array.
+
+.. note::
+
+    by Ollybest
+    Last Updated: 19 July 2013 by Ollybest
+
+Example:
+
+.. code-block:: pascal
+
+    tmb.debugTPA(tpa);
+
+*)
+procedure TMufasaBitmap.debugTPA(tpa: TPointArray; drawPoints: boolean = true);
+var
+  mid: TPoint;
+  l: integer;
+  b: TBox;
+begin
+  b := getTPABounds(tpa);
+  mid := middleTPA(tpa);
+  l := length(tpa);
+
+  if (l < 1) then
+    exit();
+
+  if (drawPoints) then
+    self.drawTPA(tpa, clWhite);
+
+  self.drawBox(b, false, clRed);
+  self.drawCross(mid, 5, clPurple);
+  self.drawText('TPA Length: ' + intToStr(l), point(b.x1+2, b.y1+2), clLime);
+end;
+
+(*
+TMufasaBitmap.debugATPA
+~~~~~~~~~~~~~~~~~~~~~~~
+
+.. code-block:: pascal
+
+    procedure TMufasaBitmap.debugATPA(const atpa: T2DPointArray);
+
+Will debug a T2DPointArray onto the TMufasaBitmap.
+
+.. note::
+
+    by Ollybest
+    Last Updated: 19 July 2013 by Ollybest
+
+Example:
+
+.. code-block:: pascal
+
+    tmb.debugATPA(atpa);
+
+*)
+procedure TMufasaBitmap.debugATPA(const atpa: T2DPointArray);
+var
+  i, l, c: integer;
+  b: TBox;
+  colArr: array [0..9] of TColor;
+  mid: TPoint;
+begin
+  colArr := [clAqua, clBlue, clFuchsia, clLime, clMaroon,
+             clOrange, clNavy, clYellow, clRed, clWhite];
+
+  l := length(atpa);
+  c := 0;
+
+  if (l < 1) then
+    exit();
+
+  for i := 0 to (l-1) do
+  begin
     b := getTPABounds(atpa[i]);
-    p := middleTPA(atpa[i]);
+    mid := middleTPA(atpa[i]);
 
-    self.drawBox(b, false, c);
-    self.drawCross(p, 3, c);
-    self.drawTextAt(intToStr(i), point(b.x1 + 2, b.y1 + 2), c);
+    self.drawBox(b, false, colArr[c]);
+    self.drawCross(mid, 3, colArr[c]);
+    self.drawText(intToStr(i), point(b.x1 + 2, b.y1 + 2), colArr[c]);
 
-    inc(l);
+    inc(c);
 
-    if (l > 9) then
-      l := 0;
+    if (c > high(colArr)) then
+      c := 0;
   end;
 end;
 
 (*
-TDrawing.displayInWindow
-~~~~~~~~~~~~~~~~~~~~~~~~
+TMufasaBitmap.debugDTM
+~~~~~~~~~~~~~~~~~~~~~~
 
 .. code-block:: pascal
 
-    procedure TDrawing.displayInWindow;
+    procedure TMufasaBitmap.debugDTM(dtm: integer; area: TBox; color: TColor);
 
-Displays the bitmap in Simba's debug image.
+Will search for the dtm in the desired area, drawing a cross at each point that
+is found.
 
 .. note::
 
     by Ollybest
-    Last Updated: 21 April 2013 by Ollybest
+    Last Updated: 19 July 2013 by Ollybest
 
 Example:
 
 .. code-block:: pascal
 
-    myBitmap.displayInWindow();
+    tmb.debugDTM(myDTM, mainScreen.getBounds(), clRed);
 
 *)
-procedure TDrawing.displayInWindow;
+procedure TMufasaBitmap.debugDTM(dtm: integer; area: TBox; color: TColor);
+var
+  tpa: TPointArray;
+  atpa: T2DPointArray;
+  l, i: integer;
+  b: TBox;
+const
+  CROSS_SIZE = 4;
 begin
-  clearDebugImg();
-  drawBitmapDebugImg(self.bitmap.getIndex());
-  displayDebugImgWindow(self.bitmap.getWidth(), self.bitmap.getHeight());
+  if (not dtmExists(dtm)) then
+  begin
+    writeln('-- ERROR: TMufasaBitmap.debugDTM(): The dtm you entered does not exist');
+    exit();
+  end;
+
+  findDTMs(dtm, tpa, area);
+  clearDoubleTPA(tpa);
+
+  l := length(tpa);
+  setLength(atpa, l);
+
+  if (l < 1) then
+    exit();
+
+  for i := 0 to (l-1) do
+  begin
+    b := intToBox(tpa[i].x - CROSS_SIZE, tpa[i].y - CROSS_SIZE,
+                  tpa[i].x + CROSS_SIZE, tpa[i].y + CROSS_SIZE);
+
+    atpa[i] := mergeATPA([tpaFromLine(b.x1, b.y1, b.x2, b.y2),
+                          tpaFromLine(b.x2, b.y1, b.x1, b.y2)]);
+  end;
+
+  tpa := mergeATPA(atpa);
+  // a cross could draw off the bitmap
+  filterPointsBox(tpa, area.x1, area.y1, area.x2, area.y2);
+
+  self.drawTPA(tpa, color);
 end;
-
-
-
-

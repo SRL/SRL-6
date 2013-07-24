@@ -30,6 +30,7 @@ var
   clLime = 65280;
   clMaroon = 128;
   clSilver = 12632256;
+  clPink = 11772650;
 
 var
   maxInt = high(integer);
@@ -197,45 +198,6 @@ var
 begin
   for i := 0 to high(bitmaps) do
     freeBitmap(bitmaps[i]);
-end;
-
-(*
-TMufasaBitmap.Rectangle: overload;
-~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
-
-.. code-block:: pascal
-
-    procedure TMufasaBitmap.Rectangle(const box: TBox; fill: boolean; color: TColor); overload;
-
-Accepts a fill parameter.
-
-.. note::
-
-    by Ollybest
-
-Example:
-
-.. code-block:: pascal
-
-     tmb.rectangle(box, false, clRed);
-
-*)
-procedure TMufasaBitmap.rectangle(const box: TBox; const fill: boolean; const color: TColor); overload;
-var
-  tpa: TPointArray;
-begin
-  if (fill) then
-    self.rectangle(box, color)
-  else
-  begin
-    try
-      tpa := EdgeFromBox(box);
-    except
-      tpa := [point(box.x1, box.y1)];
-    finally
-      self.drawTPA(tpa, color);
-    end;
-  end;
 end;
 
 (*

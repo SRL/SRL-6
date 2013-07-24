@@ -25,7 +25,7 @@ guidelines are as follows:
 {$include_once ../utilities/time.simba}
 {$include_once ../utilities/wrappers.simba}
 {$include_once ../utilities/types/types.simba}
-{$include_once ../tmp.simba}
+{$include_once ../utilities/drawing.simba}
 
 {$f-}
 
@@ -66,11 +66,13 @@ External SRL debug variables that can be set scripts:
     * logPath: string; The path the save the SRL log file. Default path is SRL-6/logs/.
     * disableSRLLog: boolean; Disables saving debug to a log file.  Default false.
     * disableSRLDebug: boolean; Disables SRL functions from printing to the debug box.  Default false.
+    * addTimeStamp: boolean; if enabled will add the time before all debug messages.
 *)
 var
   logPath = includePath + 'SRL-6/logs/';
   disableSRLLog = false;
   disableSRLDebug = false;
+  addTimeStamp = false;
 
 {*
 __openLogFile
@@ -314,176 +316,49 @@ begin
   end;
 end;
 
-(*
-debugTPA
-~~~~~~~~
-
-.. code-block:: pascal
-
-    procedure debugTPA(tpa: TPointArray; bmpName: string);
-
-Shows a TPointArray on the debug image window. Has the option to save the
-window to a file.
-    * tpa: The TPointArray to be displayed.
-    * bmpName: The name of the file to be saved.  If bmpName = '' nothing is saved.
-
-.. note::
-
-    by Wizzup?
-    Last Updated: 12 April 2013 by Coh3n
-
-Example:
-
-.. code-block:: pascal
-
-    debugTPA(tpa, 'Example');
-*)
-procedure debugTPA(tpa: TPointArray; bmpName: string);
+procedure debugATPA(const atpa: T2DPointArray);
 var
-  bmp: integer;
-  bds: TBox;
-  tpaTemp : TPointArray;
+  tmb: TMufasaBitmap;
+  b: TBox;
 begin
-  bds := tpa.getBounds();
-  bmp := bitmapFromClient(bds.x1, bds.y1, bds.x2, bds.y2);
+  b := getATPABounds(atpa);
 
-  tpaTemp := tpa.copy();
-  tpaTemp.offset(point(-bds.x1, -bds.y1));
+  tmb.init(client.getMBitmaps());
+  tmb.setSize(b.x2+1, b.y2+1);
+  tmb.drawATPA(atpa);
 
-  drawTPABitmap(bmp, tpaTemp, clRed);
-  drawBitmapDebugImg(bmp);
-  displayDebugImgWindow(bds.x2 - bds.x1 + 1, bds.y2 - bds.y1 + 1);
-
-  if (bmpName <> '') then
-    saveBitmap(bmp, scriptPath + bmpName + '.png');
-
-  freeBitmap(bmp);
+  tmb.debug();
+  tmb.free();
 end;
 
-(*
-debugATPA
-~~~~~~~~~
-
-.. code-block:: pascal
-
-    procedure debugATPA(atpa: T2DPointArray; bmpName: string);
-
-Plots the points of a T2DPointArray to the debug image window.  Will plot each
-element of the array in a different color.  Has the option to save the window
-to a file.
-    * atpa: The T2DPointArray to be drawn.
-    * bmpName: The name of the file to be saved.  If bmpName = '', no file is saved.
-
-.. note::
-
-    by Wizzup?
-    Last Updated: 12 April 2013 by Coh3n
-
-Example:
-
-.. code-block:: pascal
-
-    debugATPA(atpa, 'Example');
-*)
-procedure debugATPA(atpa: T2DPointArray; bmpName: string);
+procedure debugATPABounds(const atpa: T2DPointArray);
 var
-  bmp: integer;
-  atpaTemp: T2DPointArray;
-  bds: TBox;
+  tmb: TMufasaBitmap;
+  b: TBox;
 begin
-  if (length(atpa) <= 0) then
-    exit;
+  b := getATPABounds(atpa);
 
-  bds := atpa.getBounds();
-  bmp := bitmapFromClient(bds.x1, bds.y1, bds.x2, bds.y2);
+  tmb.init(client.getMBitmaps());
+  tmb.setSize(b.x2+1, b.y2+1);
+  tmb.debugATPA(atpa);
 
-  atpaTemp := atpa.copy();
-  atpaTemp.offset(point(-bds.x1, -bds.y1));
-
-  drawATPABitmap(bmp, atpaTemp);
-  drawBitmapDebugImg(bmp);
-  displayDebugImgWindow(bds.x2 - bds.x1 + 1, bds.y2 - bds.y1 + 1);
-
-  if (bmpName <> '') then
-    saveBitmap(bmp, scriptPath + bmpName + '.png');
-
-  freeBitmap(bmp);
+  tmb.debug();
+  tmb.free();
 end;
 
-(*
-debugATPABounds
-~~~~~~~~~~~~~~~
-
-.. code-block:: pascal
-
-    procedure debugATPABounds(ATPA: T2DPointArray; bmpName: string);
-
-Plots the founds of each element of a T2DPointArray to the debug image window.
-Has the option to save the window's display to a file.
-    * ATPA: The T2DPointArray to be drawn.
-    * bmpName: The name of the file to be saved.  If bmpName = '', no file is saved.
-
-.. note::
-
-    by Wizzup?
-    Last Updated: 12 April 2013 by Coh3n
-
-Example:
-
-.. code-block:: pascal
-
-    debugATPABounds(atpa, 'Example');
-*)
-procedure debugATPABounds(ATPA: T2DPointArray; bmpName: string);
+procedure debugTPA(const tpa: TPointArray);
 var
-  Width, Height, ClientBMP, I: Integer;
-  B, Box: TBox;
-  BoxColors: TIntegerArray;
-  SelColor: Integer;
-  x, y: Integer;
-  BMP: Integer;
+  tmb: TMufasaBitmap;
+  b: TBox;
 begin
-  ATPA.getBounds();
-  Width := Box.X2 + 5;
-  Height := Box.Y2 + 5;
+  b := getTPABounds(tpa);
 
-  DisplayDebugImgWindow(Width, Height);
-  BoxColors := [clRed, clBlue, clBlack, clGreen, clYellow];
+  tmb.init(client.getMBitmaps());
+  tmb.setSize(b.x2+1, b.y2+1);
+  tmb.debugTPA(tpa);
 
-  ClientBMP := BitmapFromClient(0, 0, Width - 1, Height - 1);
-
-  for i:= 0 to High(ATPA) do
-  begin
-    SelColor := BoxColors[Random(Length(BoxColors))];
-    B := ATPA[i].getBounds();
-
-    for x := B.x1 to B.x2 do
-    begin
-      FastSetPixel(ClientBMP, x, b.y1, selColor);
-      FastSetPixel(ClientBMP, x, B.y2, selColor);
-    end;
-
-    for y := B.y1 to B.y2 do
-    begin
-      FastSetPixel(ClientBMP, B.x1, y, selColor);
-      FastSetPixel(ClientBMP, B.x2, y, selColor);
-    end;
-
-    BMP := BitmapFromText(IntToStr(i), StatChars);
-    FastReplaceColor(bmp, clBlack, clYellow);
-    FastReplaceColor(bmp, clWhite, clBlack);
-
-    SetTransparentColor(bmp,clYellow);
-    FastDrawTransparent(B.x1 + 2, b.y1 + 2, BMP, ClientBMP);
-
-    FreeBitmap(BMP);
-  end;
-
-  if (bmpName <> '') then
-    SaveBitmap(ClientBMP, bmpName + '.png');
-
-  DrawBitmapDebugImg(ClientBMP);
-  FreeBitmap(ClientBmp);
+  tmb.debug();
+  tmb.free();
 end;
 
 (*
@@ -514,6 +389,7 @@ begin
 end;
 
 begin
+  setScriptProp(SP_WriteTimeStamp, [addTimeStamp]);
   addOnTerminate('__closeLogFile');
 end;
 
