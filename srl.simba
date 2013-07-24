@@ -8,6 +8,8 @@ SRL library isn't available to you.
 
 *)
 
+{$DEFINE SMART} // for now, need to force users to use SMART
+
 {$include_once lib/utilities/types/types.simba}
 {$include_once lib/utilities/time.simba}
 {$include_once lib/utilities/drawing.simba}
@@ -37,8 +39,6 @@ SRL library isn't available to you.
 
 {$IFDEF SMART}
   {$include_once lib/misc/smart.simba}
-{$ELSE}
-  {$loadlib OpenGL}
 {$ENDIF}
 
 {$f+}
