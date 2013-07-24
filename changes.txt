@@ -223,7 +223,7 @@ EVERYTHING should be recorded here: new features, function name changes, user-de
 
 - smartgraphics.simba converted to drawing.simba
   - Using drawing.simba, one can create several different drawings and display them how they wish.
-  - smart.simba has a global variable, smartImage: TDrawing, that can be drawn to using any of the TDrawing procedures (an example being smartImage.drawBox(myBox, false, clLime).
+  - smart.simba has a global variable, smartImage: TMufasaBitmap, that can be drawn to using any TMufasaBitmap procedure (an example being smartImage.drawBox(myBox, false, clLime).
   - All procedures can be found in lib/ulities/drawing.simba
 
 - new file, client.simba
@@ -279,6 +279,9 @@ EVERYTHING should be recorded here: new features, function name changes, user-de
     - findItem
     - isItemIn
   - merged ItemAmount & GetAmount & GetAmountBox to getItemAmount()
+
+- new file, drawing.simba
+  - this file includes extra drawing functions for TMufasaBitmaps.
 
 
 
