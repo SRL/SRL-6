@@ -239,10 +239,12 @@ TRSMainscreen.spiralUptext
 Spirals the mouse in a circle from the center of the defined box. It will continue
 to spiral until it finds a spiral completely outside the box, always skipping
 points outside. Returns the occurance of the first occurance of UpText into p.
+
     * p: The first point that the uptext is found.  Set to (-1, -1) if not found.
     * spiralBox: The box to spiral in.
     * PpC: The number of pixels to increase per spiral.
     * aInc: The number of stops to make around each spiral.
+
 Takes some testing to get the right combination of PpC and aInc.
 
 .. note::
@@ -378,6 +380,7 @@ A very general object finding function.  Will find and click an object in the sp
 Will click ONLY the closest object to the player, no others that may be in the same area.
 It is suggested to use this function on a very distint object.  In other words, use this
 function only when there aren't similar colors to the object in the same area.
+
     * x, y: The coordinates of the object if found.
     * cols: The colors to be found.
     * tols: The tolerances on 'cols'.

@@ -4,6 +4,7 @@ Debug
 
 The debug file holds any files used for SRL debugging and logging. Debug usage
 guidelines are as follows:
+
     * Use print('TRSMinimap.getDots()', TDebug.HEADER) to initilize a function header.
     * Use print('TRSMinimap.getDots(): '+toStr(result), TDebug.FOOTER) to signal the end of the function.
     * WARNING: If TDebug.HEADER is used, a TDebug.FOOTER MUST be called once before exiting the function.
@@ -202,6 +203,7 @@ print
 Prints txt to the debug box if debugType doesn't equal TDebug.LOG.  Will always
 print to the log file unless disableSRLLog is set to true.  Valid arguements
 for debugType:
+
     * DEBUG (default)
     * LOG
     * HINT
@@ -324,6 +326,7 @@ debugTPA
 
 Shows a TPointArray on the debug image window. Has the option to save the
 window to a file.
+
     * tpa: The TPointArray to be displayed.
     * bmpName: The name of the file to be saved.  If bmpName = '' nothing is saved.
 
@@ -371,6 +374,7 @@ debugATPA
 Plots the points of a T2DPointArray to the debug image window.  Will plot each
 element of the array in a different color.  Has the option to save the window
 to a file.
+
     * atpa: The T2DPointArray to be drawn.
     * bmpName: The name of the file to be saved.  If bmpName = '', no file is saved.
 
@@ -420,6 +424,7 @@ debugATPABounds
 
 Plots the founds of each element of a T2DPointArray to the debug image window.
 Has the option to save the window's display to a file.
+
     * ATPA: The T2DPointArray to be drawn.
     * bmpName: The name of the file to be saved.  If bmpName = '', no file is saved.
 

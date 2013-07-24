@@ -13,7 +13,7 @@ Runescape Ability Book tab.
 
 (*
 type TRSAbilityBook
-~~~~~~~~~~~~~~~~~~
+~~~~~~~~~~~~~~~~~~~
 
 A type that stores functions and properties of the Runescape Ability Book tab.
 *)

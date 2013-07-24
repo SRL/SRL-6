@@ -5,7 +5,7 @@
 
 (*
 TPointArray.copy
-~~~~~~~~~~~~~~~
+~~~~~~~~~~~~~~~~
 
 .. code-block:: pascal
 
@@ -1323,7 +1323,7 @@ end;
 
 (*
 T2DPointArray.sortBySize
-~~~~~~~~~~~~~~~~~~~~~~
+~~~~~~~~~~~~~~~~~~~~~~~~
 
 .. code-block:: pascal
 

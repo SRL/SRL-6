@@ -373,6 +373,8 @@ to low, and the minimap compass angle set to north.
 .. note::
 
     by R1ch & Coh3n
+
+.. note::
     Last Updated: 23 May 2013 by Coh3n
 
 Example:
@@ -1229,6 +1231,7 @@ TRSMinimap.tpaWalk
 
 Uses a simple TPA sorting method to walk to a spot on the minimap. Returns true if walked
 successfully.
+
     * color: The color to be found on the minimap.
     * tol: The tolerance on color.
     * sortFrom: The point on the minimap to sort found colors from.

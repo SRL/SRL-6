@@ -126,6 +126,7 @@ Example:
 
     if (tabBackpack.isOpen()) then
       writeln('the Backpack tab is open');
+
 *)
 function TRSTabBackpack.isOpen(): boolean;
 begin
@@ -551,6 +552,7 @@ TRSTabBackpack.dropItems
 Drops items in the TIntegerArray, the parameter slots its optional if untouched
 the procedure will drop all items in slots 1 to 28. Can also be used with
 drop patterns.
+
     * tabBackpack.dropItems(); - would drop items in slots 1..28
     * tabBackpack.dropItems([1, 2, 25, 6]); - would drop items in slots 1, 2, 25 and 6
     * tabBackpack.dropItems(DROP_PATTERN_SNAKE);  - would use the drop pattern "snake"
@@ -697,9 +699,10 @@ TRSTabBackpack.clickItemsDTM
 
 Searches for the dtm if succesful will perform what action is it set.
 Will return how many items were clicked.
-  * clicktype - (MOUSE_MOVE, MOUSE_LEFT, MOUSE_RIGHT)
-  * option    - What option to choose. If not using MOUSE_RIGHT can be left blank.
-  * waitFor   - This is optional and on default is set to 300ms, depending on what
+
+   * clicktype - (MOUSE_MOVE, MOUSE_LEFT, MOUSE_RIGHT)
+   * option    - What option to choose. If not using MOUSE_RIGHT can be left blank.
+   * waitFor   - This is optional and on default is set to 300ms, depending on what
                 your doing you may need shorter or longer waitFor.
 
 .. note::
@@ -745,7 +748,7 @@ TRSTabBackpack.dragSlot
 
 .. code-block:: pascal
 
-     function TRSTabBackpack.dragSlot(fromSlot, toSlot: integer): boolean;
+    function TRSTabBackpack.dragSlot(fromSlot, toSlot: integer): boolean;
 
 .. note::
 

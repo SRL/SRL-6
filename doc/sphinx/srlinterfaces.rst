@@ -10,6 +10,7 @@ SRL Interfaces Reference
     interfaces
     mainscreen
     minimap
+    options
 
     abilitybook
     backpack
