@@ -219,7 +219,7 @@ EVERYTHING should be recorded here: new features, function name changes, user-de
 
 - smart.simba
   - removed function isRealMouseInBox
-  - removed function getReadMousePos because TClient isn't yet supported in Lape
+  - removed function getRealMousePos because TClient isn't yet supported in Lape
 
 - smartgraphics.simba converted to drawing.simba
   - Using drawing.simba, one can create several different drawings and display them how they wish.
