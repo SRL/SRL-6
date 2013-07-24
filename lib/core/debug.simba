@@ -4,6 +4,7 @@ Debug
 
 The debug file holds any files used for SRL debugging and logging. Debug usage
 guidelines are as follows:
+
     * Use print('TRSMinimap.getDots()', TDebug.HEADER) to initilize a function header.
     * Use print('TRSMinimap.getDots(): '+toStr(result), TDebug.FOOTER) to signal the end of the function.
     * WARNING: If TDebug.HEADER is used, a TDebug.FOOTER MUST be called once before exiting the function.
@@ -63,6 +64,7 @@ var External Debug
 ~~~~~~~~~~~~~~~~~~
 
 External SRL debug variables that can be set scripts:
+
     * logPath: string; The path the save the SRL log file. Default path is SRL-6/logs/.
     * disableSRLLog: boolean; Disables saving debug to a log file.  Default false.
     * disableSRLDebug: boolean; Disables SRL functions from printing to the debug box.  Default false.
@@ -204,6 +206,7 @@ print
 Prints txt to the debug box if debugType doesn't equal TDebug.LOG.  Will always
 print to the log file unless disableSRLLog is set to true.  Valid arguements
 for debugType:
+
     * DEBUG (default)
     * LOG
     * HINT

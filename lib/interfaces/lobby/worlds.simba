@@ -362,6 +362,7 @@ TRSLobbyWorlds.sort
 Sorts the worlds list by the order specified by 'by', and 'descending'.  Setting
 'descending' to true will order the worlds with the largest at the top.  Valid
 arguements for 'by' are:
+
     * WORLD_ORDER_WORLDS
     * WORLD_ORDER_PLAYERS
     * WORLD_ORDER_ACTIVITY
