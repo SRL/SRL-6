@@ -23,7 +23,7 @@ Example:
 
 .. code-block:: pascal
 
-    _openGameTab(_TAB_LOGOUT);
+    _openGameTab(_TAB_COMBAT);
 *}
 const
   _TAB_COMBAT       = 0;
@@ -42,7 +42,6 @@ const
   _TAB_EMOTES       = 13;
   _TAB_MUSIC        = 14;
   _TAB_NOTES        = 15;
-  _TAB_LOGOUT       = 16;
 
 {*
 var _gameTabGrid
