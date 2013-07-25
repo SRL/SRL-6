@@ -15,7 +15,6 @@ SRL Interfaces Reference
     abilitybook
     backpack
     gametab
-    logout
 
     lobby
     worlds
