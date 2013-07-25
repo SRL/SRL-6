@@ -5,6 +5,8 @@ Actionbar
 The actionbar file holds functions and procedures that are used in the
 Runescape Action Bar.
 
+The source for this file can be found `here <https://github.com/SRL/SRL-6/blob/master/lib/interfaces/actionbar.simba>`_.
+
 *)
 
 {$include_once interfaces.simba}

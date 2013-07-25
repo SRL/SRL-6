@@ -4,6 +4,9 @@ Worlds
 
 The worlds file is used to represent the world tab interface in the RS lobby. It
 stores the functions needed to switch players between servers.
+
+The source for this file can be found `here <https://github.com/SRL/SRL-6/blob/master/lib/interfaces/lobby/worlds.simba>`_.
+
 *)
 
 {$include_once lobby.simba}

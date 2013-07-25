@@ -5,6 +5,8 @@ Lobby
 The lobby file holds functions and procedures that are used in the Runescape
 lobby.
 
+The source for this file can be found `here <https://github.com/SRL/SRL-6/blob/master/lib/interfaces/lobby/lobby.simba>`_.
+
 *)
 
 {$include_once ../interfaces.simba}

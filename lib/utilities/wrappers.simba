@@ -3,7 +3,9 @@ Wrappers
 ========
 
 The Wrappers include contains wrapper functions used throughout SRL.  These functions should
- be put inside Simba itself, and will be removed from SRL when that is done.
+be put inside Simba itself, and will be removed from SRL when that is done.
+
+The source for this file can be found `here <https://github.com/SRL/SRL-6/blob/master/lib/utilities/wrappers.simba>`_.
 
 *)
 

@@ -4,6 +4,8 @@ Gametab
 
 The gametab file holds any global gametab data.
 
+The source for this file can be found `here <https://github.com/SRL/SRL-6/blob/master/lib/interfaces/gametabs/gametab.simba>`_.
+
 *)
 
 {$include_once ../interfaces.simba}

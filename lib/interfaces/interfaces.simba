@@ -5,6 +5,8 @@ Interfaces
 The interfaces file stores any global interface functions, including TRSInterface
 and all its functions.  All interface files should import this file.
 
+The source for this file can be found `here <https://github.com/SRL/SRL-6/blob/master/lib/interfaces/interfaces.simba>`_.
+
 *)
 
 {$include_once ../core/debug.simba}

@@ -5,6 +5,8 @@ Mainscreen
 The mainscreen file holds functions and procedures that are used in the
 Runescape lobby mainscreen.
 
+The source for this file can be found `here <https://github.com/SRL/SRL-6/blob/master/lib/interfaces/mainscreen.simba>`_.
+
 *)
 
 {$include_once interfaces.simba}

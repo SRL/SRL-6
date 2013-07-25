@@ -6,6 +6,8 @@ The items file stores any functions and procedures that have anything to do with
 RS items.  These functions have their own file because items can appear in many
 different RS interfaces such as the inventory, bank, and chat box.
 
+The source for this file can be found `here <https://github.com/SRL/SRL-6/blob/master/lib/items/items.simba>`_.
+
 *)
 
 {$include_once ../core/globals.simba}

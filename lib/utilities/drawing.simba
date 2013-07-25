@@ -4,6 +4,8 @@ Drawing
 
 The drawing file holds TMufasaBitmap drawing functions to aid drawing onto bitmaps.
 
+The source for this file can be found `here <https://github.com/SRL/SRL-6/blob/master/lib/utilities/drawing.simba>`_.
+
 *)
 
 {$include_once ../utilities/wrappers.simba}

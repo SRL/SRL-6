@@ -20,6 +20,9 @@ guidelines are as follows:
       12345678 with tolerance 15").
     * Use print('Message', TDebug.HINT) for scripting hints.
     * Use print('Message', TDebug.FATAL) to terminate the script.
+
+The source for this file can be found `here <https://github.com/SRL/SRL-6/blob/master/lib/core/debug.simba>`_.
+
 *)
 
 {$include_once globals.simba}

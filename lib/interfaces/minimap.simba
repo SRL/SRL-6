@@ -4,6 +4,9 @@ Minimap
 
 The minimap file holds all SRL's functions that interact with the Runescape
 minimap.
+
+The source for this file can be found `here <https://github.com/SRL/SRL-6/blob/master/lib/interfaces/minimap.simba>`_.
+
 *)
 
 {$include_once interfaces.simba}

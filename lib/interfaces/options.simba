@@ -5,6 +5,8 @@ Options
 The options file holds functions and procedures that are used to interact with
 the Runescape options menu.
 
+The source for this file can be found `here <https://github.com/SRL/SRL-6/blob/master/lib/interfaces/options.simba>`_.
+
 *)
 
 {$include_once interfaces.simba}

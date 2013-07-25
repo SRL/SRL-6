@@ -4,6 +4,8 @@ Mouse
 
 The Mouse include contains all Mouse movement and clicking functions.
 
+The source for this file can be found `here <https://github.com/SRL/SRL-6/blob/master/lib/core/mouse.simba>`_.
+
 *)
 
 {$f-}
@@ -24,6 +26,7 @@ const Mouse Styles
 ~~~~~~~~~~~~~~~~~~
 
 Different ways of moving the mouse:
+
     * MOUSE_BREAK: moves slower when reaching destination.
     * MOUSE_ACCURATE: a slower, more accurate movement.
     * MOUSE_HUMAN: the most human-like movement of the mouse styles.

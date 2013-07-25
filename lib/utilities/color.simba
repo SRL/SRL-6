@@ -5,6 +5,8 @@ Color
 The color type holds all the functions and types that can be used for easy color
 finding, comparing or manupilation.
 
+The source for this file can be found `here <https://github.com/SRL/SRL-6/blob/master/lib/utilities/color.simba>`_.
+
 *)
 
 {$include_once wrappers.simba}

@@ -4,6 +4,8 @@ Globals
 
 The globals file holds any variables used throughout multiple files in SRL.
 
+The source for this file can be found `here <https://github.com/SRL/SRL-6/blob/master/lib/core/globals.simba>`_.
+
 *)
 
 {$f-}

@@ -4,6 +4,8 @@ String
 
 A file that stores type functions to manipulate strings.
 
+The source for this file can be found `here <https://github.com/SRL/SRL-6/blob/master/lib/utilities/types/string.simba>`_.
+
 *)
 
 {$include_once stringarrays.simba}

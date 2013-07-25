@@ -5,6 +5,8 @@ Time
 The time file includes any functions that have anything to do with time: timers,
 the time of day, conversions, etc.
 
+The source for this file can be found `here <https://github.com/SRL/SRL-6/blob/master/lib/utilities/time.simba>`_.
+
 *)
 
 {$f-}

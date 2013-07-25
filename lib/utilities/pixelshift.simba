@@ -3,6 +3,9 @@ Pixel Shift
 ===========
 
 A file that stores all functions that have anything to do with pixel shifting.
+
+The source for this file can be found `here <https://github.com/SRL/SRL-6/blob/master/lib/utilities/pixelshift.simba>`_.
+
 *)
 
 {$include_once ../core/debug.simba}

@@ -5,6 +5,8 @@ Player Management
 The Players file stores the functions related to the Players array. It also
 stores properties of the TPlayer type.
 
+The source for this file can be found `here <https://github.com/SRL/SRL-6/blob/master/lib/core/players.simba>`_.
+
 *)
 
 {$include_once ../interfaces/lobby/worlds.simba}

@@ -4,6 +4,8 @@ TPoint Arrays
 
 A file that stores type functions to manipulate TPointArrays.
 
+The source for this file can be found `here <https://github.com/SRL/SRL-6/blob/master/lib/utilities/types/tpointarrays.simba>`_.
+
 *)
 
 {$include_once ../../tmp.simba}

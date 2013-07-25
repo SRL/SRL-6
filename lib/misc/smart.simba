@@ -6,6 +6,8 @@ The Smart file stores all the functions and procedures used to initiate SMART
 in scripts.  To use SMART in a script, simply add {$DEFINE SMART} before SRL is
 included.
 
+The source for this file can be found `here <https://github.com/SRL/SRL-6/blob/master/lib/misc/smart.simba>`_.
+
 *)
 
 {$f-}
