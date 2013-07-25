@@ -26,7 +26,6 @@ SRL library isn't available to you.
 {$include_once lib/items/items.simba}
 
 {$include_once lib/interfaces/gametabs/gametab.simba}
-{$include_once lib/interfaces/gametabs/logout.simba}
 {$include_once lib/interfaces/gametabs/backpack.simba}
 {$include_once lib/interfaces/gametabs/abilitybook.simba}
 {$include_once lib/interfaces/lobby/lobby.simba}

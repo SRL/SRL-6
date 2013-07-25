@@ -90,7 +90,7 @@ Example:
 *}
 function __isTabValid(tab: integer): boolean;
 begin
-  if (not inRange(tab, _TAB_COMBAT, _TAB_LOGOUT)) then
+  if (not inRange(tab, _TAB_COMBAT, _TAB_NOTES)) then
   begin
     print('__isValidTab(): Invalid gametab '+toStr(tab), TDebug.SUB);
     exit(false);
@@ -129,9 +129,6 @@ begin
 
   if (bankScreen.isOpen()) then
     exit(_TAB_BACKPACK);
-
-  if (getColor(553, 305) = 2070783) then // orange color at the W
-    exit(_TAB_LOGOUT);
 
   for i := 0 to (high(_gameTabGrid) - 1) do // - 1 to skip TAB_LOGOUT
     // "- 8" is to get the top border of the tab
@@ -175,13 +172,6 @@ begin
   // if the bank is open, no tabs exist, but inventory is available
   if (tab = _TAB_BACKPACK) and (bankScreen.isOpen())then
   begin
-    setColorToleranceSpeed(tmpCTS);
-    exit(true);
-  end;
-
-  if (tab = _TAB_LOGOUT) then
-  begin
-    result := findColor(x, y, 3629683, _gameTabGrid[_TAB_LOGOUT]); // color in logout X
     setColorToleranceSpeed(tmpCTS);
     exit(true);
   end;
@@ -314,7 +304,6 @@ begin
   _gameTabGrid := grid(8, 2, 13, 18, 30, 298, point(536, 236));
 
   setLength(_gameTabGrid, length(_gameTabGrid) + 1);
-  _gameTabGrid[_TAB_LOGOUT] := intToBox(750, 55, 760, 65);
 
   _gameTabArea := intToBox(547, 252, 737, 506);
 end;
