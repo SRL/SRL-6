@@ -388,9 +388,9 @@ TMufasaBitmap.drawCircle
 
 .. code-block:: pascal
 
-    procedure TMufasaBitmap.drawCircle(pnt: TPoint; size: integer; fill: boolean; color: TColor);
+    procedure TMufasaBitmap.drawCircle(pnt: TPoint; radius: integer; fill: boolean; color: TColor);
 
-Draws a circle on the TMufasaBitmap defined by 'pnt' and 'size'. If 'fill'
+Draws a circle on the TMufasaBitmap defined by 'pnt' and 'radius'. If 'fill'
 is true it will fill the circle, otherwise it draws just the border.
 
 .. note::
@@ -405,9 +405,9 @@ Example:
     tmb.drawCircle(point(500, 500), 50, false, clLime);
 
 *)
-procedure TMufasaBitmap.drawCircle(pnt: TPoint; size: integer; fill: boolean; color: TColor);
+procedure TMufasaBitmap.drawCircle(pnt: TPoint; radius: integer; fill: boolean; color: TColor);
 begin
-  self.drawEllipse(pnt, size, size, fill, color);
+  self.drawEllipse(pnt, radius, radius, fill, color);
 end;
 
 (*

@@ -19,7 +19,14 @@ The source for this file can be found `here <https://github.com/SRL/SRL-6/blob/m
 const Direction
 ~~~~~~~~~~~~~~~
 
-Constants that represent the NESW directions on the compass.
+Constants that represent the NESW directions on the compass.  Meant to be used
+with compass altering functions.
+
+Example:
+
+.. code-block:: pascal
+
+    minimap.setAngle(MM_DIRECTION_EAST);
 *)
 const
   MM_DIRECTION_NORTH = 0;
@@ -28,12 +35,25 @@ const
   MM_DIRECTION_WEST  = 270;
 
 (*
-const Dots
-~~~~~~~~~~
+const Minimap Dots
+~~~~~~~~~~~~~~~~~~
 
 Constants representing the different dots that appear on the minimap.  Each value
 represents the difference between the two bottom colored pixels of each dot. DO
 NOT modify these values unless you know what you're doing.
+
+These constants are meant to be used with functions that take a minimap dot type
+as a parameter (such as minimap.getDots).
+
+Example:
+
+.. code-block:: pascal
+
+    tpa := minimap.getDots(MM_DOT_NPC, minimap.getBounds());
+
+    if (length(tpa) > 0) then
+      writeln('Found '+toStr(length(tpa))+' NPC dots on the minimap');
+
 *)
 const
   MM_DOT_NPC    = 4369;
@@ -47,6 +67,12 @@ const Radius
 ~~~~~~~~~~~~
 
 The minimap's radius.
+
+Example:
+
+.. code-block:: pascal
+
+    smartImage.drawCircle(minimap.getCenterPoint(), MM_RADIUS, clLime);
 *)
 const
   MM_RADIUS = 75;
@@ -57,6 +83,13 @@ const Symbols
 
 Constants representing all the Runescape symbols.  Each have a bitmap that can
 be found in _getSymbol and are used in the symbol finding functions.
+
+Example:
+
+.. code-block:: pascal
+
+    if (minimap.findSymbol(p, MM_SYMBOL_BANK, minimap.getBounds)) then
+      writeln('Found bank symbol!');
 *)
 const
   MM_SYMBOL_SHOP_ARCHERY    = 0;
@@ -149,15 +182,19 @@ type
     color: integer;
   end;
 
-(*
+{*
 type TRSMinimap
 ~~~~~~~~~~~~~~~
 
 A type that stores all the attributes and functions of the Runescape minimap.
-*)
+*}
 type
   TRSMinimap = record(TRSInterface)
     symbolAccuracy: extended;
+
+    // flag bitmap is only loaded if it's used, and only loaded once
+    self.__bmpFlag: integer;
+    __bmpFlagLoaded: boolean;
   end;
 
 (*
@@ -166,20 +203,19 @@ var minimap
 
 The variable that holds all minimap information. It used when calling any functions
 in this file.
+
+Example:
+
+.. code-block:: pascal
+
+    while (minimap.isFlagPresent()) do
+    begin
+      writeln('Waiting for flag to disappear');
+      wait(200+random(300));
+    end;
 *)
 var
   minimap: TRSMinimap;
-
-{*
-var flag
-~~~~~~~~
-
-Internal variables that store the minimap flag staus.  The flag bitmap is only
-loaded if it's used, and it's only loaded once.
-*}
-var
-  __bmpFlag: integer;
-  __bmpFlagLoaded: boolean;
 
 {*
 TRSMinimap.__init
@@ -791,19 +827,19 @@ begin
   result := false;
 
   // load bitmap if it hasn't already been loaded
-  if (not __bmpFlagLoaded) then
+  if (not self.__bmpFlagLoaded) then
   begin
     print('Loading flag bitmap...', TDebug.SUB);
 
-    __bmpFlag := bitmapFromString(8, 15, 'meJxjYEAHIpr/F8yYgSkozPfE3ty' +
+    self.self.__bmpFlag := bitmapFromString(8, 15, 'meJxjYEAHIpr/F8yYgSkozPfE3ty' +
                   'cGHGgIKY4RBBNHC6ILI4sAkYngOIwNhQJ8bUBBYEIyEBGQO37tm3D' +
                   'dCcdxIGBhlUcCBgZGAA27Tt3');
 
-    __bmpFlagLoaded := true;
-    setBitmapName(__bmpFlag, 'minimap_flag');
+    self.__bmpFlagLoaded := true;
+    setBitmapName(self.self.__bmpFlag, 'minimap_flag');
   end;
 
-  if (findBitmapToleranceIn(__bmpFlag, p.x, p.y, self.getBounds(), 75)) then
+  if (findBitmapToleranceIn(self.__bmpFlag, p.x, p.y, self.getBounds(), 75)) then
   begin
     result := true;
     p.x := (p.x + 7);  // offset the point to the bottom of the flag
@@ -834,8 +870,8 @@ Example:
 *}
 procedure _freeFlagBitmap();
 begin
-  if (__bmpFlagLoaded) then
-    freeBitmap(__bmpFlag);
+  if (minimap.__bmpFlagLoaded) then
+    freeBitmap(minimap.__bmpFlag);
 end;
 
 {*
