@@ -66,6 +66,34 @@ var
   __smartIsDrawingSetup: boolean;
 
 (*
+getClientDimensions; override;
+~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+
+.. code-block:: pascal
+
+     procedure getClientDimensions(var w, h: integer); override;
+
+Overrides GetClientDimensions and sets w and h to the SMART_CLIENT constants.
+
+.. note::
+
+    By: Olly
+    Last Updated: July 24, 2013 by Olly
+
+Example:
+
+.. code-block:: pascal
+
+    getClientDimensions(w, h);
+
+*)
+procedure getClientDimensions(var w, h: integer); override;
+begin
+  w := SMART_CLIENT_W;
+  h := SMART_CLIENT_H;
+end;
+
+(*
 checkOGLPlugin
 ~~~~~~~~~~~~~~
 
@@ -77,8 +105,8 @@ Checks we have the reqiured plugin to read OpenGL colors from SMART.
 
 .. note::
 
-  By: Olly
-  Last Updated: July 24, 2013 by Olly
+    By: Olly
+    Last Updated: July 24, 2013 by Olly
 
 Example:
 
@@ -99,14 +127,14 @@ smartSetDebug; override
 
 .. code-block:: pascal
 
-     procedure smartSetDebug(enable: boolean); override;
+    procedure smartSetDebug(enable: boolean); override;
 
 Overrides smartSetDebug to enable/disable drawing in openGL mode.
 
 .. note::
 
-  By: Olly
-  Last Updated: July 24, 2013 by Olly
+    By: Olly
+    Last Updated: July 24, 2013 by Olly
 
 Example:
 
@@ -125,14 +153,14 @@ smartSetupDrawing
 
 .. code-block:: pascal
 
-     procedure smartSetupDrawing();
+    procedure smartSetupDrawing();
 
 Set ups SMART so its ready to be drawn on-to.
 
 .. note::
 
-  By: Olly
-  Last Updated: July 24, 2013 by Olly
+    By: Olly
+    Last Updated: July 24, 2013 by Olly
 
 Example:
 
@@ -163,14 +191,14 @@ smartFreeDrawing
 
 .. code-block:: pascal
 
-     procedure smartFreeDrawing();
+    procedure smartFreeDrawing();
 
 Free's and destorys the smart image.
 
 .. note::
 
-  By: Olly
-  Last Updated: July 24, 2013 by Olly
+    By: Olly
+    Last Updated: July 24, 2013 by Olly
 
 Example:
 
@@ -196,15 +224,15 @@ smartGetParameters
 
 .. code-block:: pascal
 
-     function smartGetParameters(out params: array of string): boolean;
+    function smartGetParameters(out params: array of string): boolean;
 
 Attempts to grab the correct parameters for spawning a SMART client. Results if
 succesfull or not.
 
 .. note::
 
-  By: Brandon, Mormanman, Benland100
-  Last Updated: May. 26, 2013 by Olly
+    By: Brandon, Mormanman, Benland100
+    Last Updated: May. 26, 2013 by Olly
 
 Example:
 
@@ -235,15 +263,15 @@ smartGetClientIDs
 
 .. code-block:: pascal
 
-     function smartGetClientIDs(only_unpaired: boolean = true): TIntegerArray;
+    function smartGetClientIDs(only_unpaired: boolean = true): TIntegerArray;
 
 Returns the id's of all spawned SMART clients, on default will return all unpaired
 clients.
 
 .. note::
 
-  By: Mormanman
-  Last Updated: May. 26, 2013 by Olly
+    By: Mormanman
+    Last Updated: May. 26, 2013 by Olly
 
 Example:
 
@@ -268,14 +296,14 @@ smartKillClients
 
 .. code-block:: pascal
 
-     procedure smartKillClients(only_unpaired: boolean);
+    procedure smartKillClients(only_unpaired: boolean);
 
 Attempts to kill SMART clients based on the only_unpaired boolean.
 
 .. note::
 
-  By: Mormanman
-  Last Updated: May. 26, 2013 by Olly
+    By: Mormanman
+    Last Updated: May. 26, 2013 by Olly
 
 Example:
 
@@ -303,15 +331,15 @@ smartSetAsClient
 
 .. code-block:: pascal
 
-     function smartSetAsClient(id: integer): boolean;
+    function smartSetAsClient(id: integer): boolean;
 
 Attempts to pair, and then set as Simba's target returns true if succesfull, if
 succesfull will set our current current client as the ID.
 
 .. note::
 
-  By: Ollybest
-  Last Updated: May. 26, 2013 by Olly
+    By: Ollybest
+    Last Updated: May. 26, 2013 by Olly
 
 Example:
 
@@ -352,15 +380,15 @@ pairToExistingClient
 
 .. code-block:: pascal
 
-     function pairToExistingClient(skip: boolean): boolean;
+    function pairToExistingClient(skip: boolean): boolean;
 
 Attempts to spawn to a free already spawned client, will return true if done so.
 If skip is set to true it will exit the function without trying.
 
 .. note::
 
-  By: Ollybest
-  Last Updated: June 1, 2013 by Olly
+    By: Ollybest
+    Last Updated: June 1, 2013 by Olly
 
 Example:
 
@@ -407,7 +435,7 @@ initSmart
 
 .. code-block:: pascal
 
-     procedure initSmart();
+    procedure initSmart();
 
 Initializes us to a SMART client, will attempt to pair to a existing client, if
 that fails we will attempt to spawn a client, will terminate the script if anything
@@ -415,8 +443,8 @@ goes wrong.
 
 .. note::
 
-  By: Benland100, Mormanman, Brandon
-  Last Updated: July 24, 2013 by Olly
+    By: Benland100, Mormanman, Brandon
+    Last Updated: July 24, 2013 by Olly
 
 Example:
 
@@ -461,14 +489,14 @@ reloadCurrentClient
 
 .. code-block:: pascal
 
-     procedure reloadCurrentClient();
+    procedure reloadCurrentClient();
 
 Attempts to reload our current SMART client.
 
 .. note::
 
-  By: Olly
-  Last Updated: June 1, 2013 by Olly
+    By: Olly
+    Last Updated: June 1, 2013 by Olly
 
 Example:
 
