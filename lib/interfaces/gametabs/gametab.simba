@@ -74,8 +74,8 @@ type
     id,              // the constant representing the tab
     parent: integer; // the constant of the tab that needs to be hovered to show this tab
     bounds: TBox;    // the bounds in a grid of the gametab navigation bar
-    bmp: integer;    // bitmap of the tab (used for switching between tabs)
-    bmpLoaded: boolean;
+    _bmp: integer;    // bitmap of the tab (used for switching between tabs)
+    _bmpLoaded: boolean;
   end;
 
 {*
@@ -185,7 +185,7 @@ begin
       tabs[i].id := i;
       tabs[i].parent := -1;
       tabs[i].bounds := navigationGrid[i];
-      tabs[i].bmp := -1;
+      tabs[i]._bmp := -1;
 
       case tabs[i].id of
         _TAB_TASK,
@@ -224,27 +224,27 @@ end;
 procedure TRSGameTabs.__loadBitmap(tab: integer);
 begin
   case tab of
-    _TAB_STATS:        self.tabs[tab].bmp := bitmapFromString(7, 7, 'meJyztXhka/FIhO+dtoZ6/BLO5A1sQGQLFhTkmWIRz5e0hh0iKMz7AYhExOPNk7iT17OhCIqpBrayQEQggpzcBwX0RBKWQ/Wa5bECBQV4JmsbCiathQqaZoJUikp5miSC7A2bxAAktY2EAOsDLdU=');
+    _TAB_STATS:        self.tabs[tab]._bmp := bitmapFromString(7, 7, 'meJyztXhka/FIhO+dtoZ6/BLO5A1sQGQLFhTkmWIRz5e0hh0iKMz7AYhExOPNk7iT17OhCIqpBrayQEQggpzcBwX0RBKWQ/Wa5bECBQV4JmsbCiathQqaZoJUikp5miSC7A2bxAAktY2EAOsDLdU=');
     _TAB_TASK,
-    _TAB_COMPASS_TASK: self.tabs[tab].bmp := bitmapFromString(7, 7, 'meJzjW3uHb+0d67MfrT6+ByLFsi0ctsFcU3cDBdmvfoUIAmX5ktuBInxrbnNN2QligxFH1USQYHAsv5AKUBcnnxqPsiVI0MaPm5OVW5CbMzKN2z4TqFLIKoJTUIxVToBZToBNXwiomD3aml+EF6geyIUjTidRLidRACrELQI=');
-    _TAB_EQUIPMENT:    self.tabs[tab].bmp := bitmapFromString(7, 7, 'meJyb1l4zrb0mKTW5qroagp7cuTF98pTFS2YDBSHiQO7B3TuAyoAMOHfOui1AEqgAohgo7uLkJm9lCWEDBa30dBgZGCAIKAIxSklRDS5o6R4DtyKhpDY+0puFlwNoAgCiqjza');
-    _TAB_BACKPACK:     self.tabs[tab].bmp := bitmapFromString(7, 7, 'meJxzKN7uULxd0TqYR9lSyTZT264Rggzt5gBJoCAQARlAKWQEFARqgYjDZYGC8moWQAYzMx/ENKAafrEgTh4riAI2fjEggigDCmoldELsAqoBCgJ1yVtZatdMBwCWRCF2');
-    _TAB_DEFENCE:      self.tabs[tab].bmp := bitmapFromString(7, 7, 'meJybPnlKVXV1dedEIHlw9w4Img4WBCIIA0jCBees2wJEEMEnd24AEZD75eNLIGNae01dQUp8pDdQCoj2nLi5eMlsFyc3HsFsbvaFQC1JqckQkl8siJ3zZEbeFbggRJmtxaMJE28BAHrlTgg=');
-    _TAB_RANGED:       self.tabs[tab].bmp := bitmapFromString(8, 2, 'meJyTVDeWkPHmt0vms0sRkvAXkvDjtfZVs3B3TOxwTOrktvEHIkHxAH6xIEGzDr7kdgDxgAq2');
-    _TAB_MELEE:        self.tabs[tab].bmp := bitmapFromString(4, 4, 'meJwTF+ScPnnKlz9/Fzz/PmfdFiBjz4mbSanJSbfeZfz4BWS42RtbrzzFNXW3S1SqmCAnANE4Gm4=');
-    _TAB_MAGIC:        self.tabs[tab].bmp := bitmapFromString(7, 7, 'meJwrcdVeXhux0Emw1pY31oQHSGpJsJlMOWC16ZljUieQDRQscdV2cXLjmrqb2z5TsWwLj2C2tl1jYvNKbvaFQDWulVP4ktv5xYIM7eZk5F3h4W501OAyqk5StA5mZuaTV7MA6lWXEQeaDEdAMyF2VdvwAq2+ki6KjADwRyx0');
-    _TAB_PRAYER:       self.tabs[tab].bmp := bitmapFromString(6, 6, 'meJx7dWHxqwuLP15d8fHayudnF947Ovv52UVfPr6EoM8fXjw+NR8oC+L++QtEQBGgyg+oIu+vLAcq+/T+OZAN0fjszIJbB6c/Ojnv47UVH64uf3p6ARABALyyXGE=');
-    _TAB_CLAN_CHAT:    self.tabs[tab].bmp := bitmapFromString(9, 5, 'meJyzPvXWeuUpjqh0jqqJfGvvAEkQI7md1dzG+uxHiCD71a9wKYgsUAuQBApCENfU3VDZqHSrTc8gbKAgQhwsZTLlAIdtMLI5QASyOiodAB8/NiM=');
-    _TAB_FRIENDS_CHAT: self.tabs[tab].bmp := bitmapFromString(8, 5, 'meJyzPvXWatMz7ZrpLC7abIWOrG0x7NHWQGR99iNQkCMqHSjCtLUeKAVBQMVwQSAJRHBxrYROoEaIIFzceuUpHmVLiDhEBGI+AMZFJnU=');
-    _TAB_FRIENDS:      self.tabs[tab].bmp := bitmapFromString(9, 5, 'meJxLbF6Z2Lwye9qG6pVHO2escHFyY3HRZit0ZI+2BgpGV08GooSSWkXrYNa2GKat9UApIHKtnJII1ggXB5IQKa3wTCXbTMekTqAUkAsUhyAge+qhh3PWbQHq4lG2BJoP1wJkAwCtDjAf');
-    _TAB_MUSIC:        self.tabs[tab].bmp := bitmapFromString(7, 7, 'meJxTtA5WREJKtplAVL3yaPa0DYnNKyEounqyY1LnguffgYKW7jEuUalAEaA4kDv10EMgV0xMXF7NAkiy8HIAuUDtEBIoC1GQUFIL1AJkAA3Z8+4HEAFFgAqAWoDiQEGgMqBpQAVABgCuIEQw');
-    _TAB_NOTES:        self.tabs[tab].bmp := bitmapFromString(7, 9, 'meJz78ufvnnc/vnx8+eXPXwha8Py7S1QqlPvx5ZM7N4AkUA0jA4OlewxIMVgLBFV3TgSKy1tZ7jlxE8gF6oUoyJ62AaJ+6qGHEJUQqeqVR5VsM5OnnoELQhBQWcKGwxA1cEEISrr1DpkLUZDx41fCllcA8uqOdA==');
+    _TAB_COMPASS_TASK: self.tabs[tab]._bmp := bitmapFromString(7, 7, 'meJzjW3uHb+0d67MfrT6+ByLFsi0ctsFcU3cDBdmvfoUIAmX5ktuBInxrbnNN2QligxFH1USQYHAsv5AKUBcnnxqPsiVI0MaPm5OVW5CbMzKN2z4TqFLIKoJTUIxVToBZToBNXwiomD3aml+EF6geyIUjTidRLidRACrELQI=');
+    _TAB_EQUIPMENT:    self.tabs[tab]._bmp := bitmapFromString(7, 7, 'meJyb1l4zrb0mKTW5qroagp7cuTF98pTFS2YDBSHiQO7B3TuAyoAMOHfOui1AEqgAohgo7uLkJm9lCWEDBa30dBgZGCAIKAIxSklRDS5o6R4DtyKhpDY+0puFlwNoAgCiqjza');
+    _TAB_BACKPACK:     self.tabs[tab]._bmp := bitmapFromString(7, 7, 'meJxzKN7uULxd0TqYR9lSyTZT264Rggzt5gBJoCAQARlAKWQEFARqgYjDZYGC8moWQAYzMx/ENKAafrEgTh4riAI2fjEggigDCmoldELsAqoBCgJ1yVtZatdMBwCWRCF2');
+    _TAB_DEFENCE:      self.tabs[tab]._bmp := bitmapFromString(7, 7, 'meJybPnlKVXV1dedEIHlw9w4Img4WBCIIA0jCBees2wJEEMEnd24AEZD75eNLIGNae01dQUp8pDdQCoj2nLi5eMlsFyc3HsFsbvaFQC1JqckQkl8siJ3zZEbeFbggRJmtxaMJE28BAHrlTgg=');
+    _TAB_RANGED:       self.tabs[tab]._bmp := bitmapFromString(8, 2, 'meJyTVDeWkPHmt0vms0sRkvAXkvDjtfZVs3B3TOxwTOrktvEHIkHxAH6xIEGzDr7kdgDxgAq2');
+    _TAB_MELEE:        self.tabs[tab]._bmp := bitmapFromString(4, 4, 'meJwTF+ScPnnKlz9/Fzz/PmfdFiBjz4mbSanJSbfeZfz4BWS42RtbrzzFNXW3S1SqmCAnANE4Gm4=');
+    _TAB_MAGIC:        self.tabs[tab]._bmp := bitmapFromString(7, 7, 'meJwrcdVeXhux0Emw1pY31oQHSGpJsJlMOWC16ZljUieQDRQscdV2cXLjmrqb2z5TsWwLj2C2tl1jYvNKbvaFQDWulVP4ktv5xYIM7eZk5F3h4W501OAyqk5StA5mZuaTV7MA6lWXEQeaDEdAMyF2VdvwAq2+ki6KjADwRyx0');
+    _TAB_PRAYER:       self.tabs[tab]._bmp := bitmapFromString(6, 6, 'meJx7dWHxqwuLP15d8fHayudnF947Ovv52UVfPr6EoM8fXjw+NR8oC+L++QtEQBGgyg+oIu+vLAcq+/T+OZAN0fjszIJbB6c/Ojnv47UVH64uf3p6ARABALyyXGE=');
+    _TAB_CLAN_CHAT:    self.tabs[tab]._bmp := bitmapFromString(9, 5, 'meJyzPvXWeuUpjqh0jqqJfGvvAEkQI7md1dzG+uxHiCD71a9wKYgsUAuQBApCENfU3VDZqHSrTc8gbKAgQhwsZTLlAIdtMLI5QASyOiodAB8/NiM=');
+    _TAB_FRIENDS_CHAT: self.tabs[tab]._bmp := bitmapFromString(8, 5, 'meJyzPvXWatMz7ZrpLC7abIWOrG0x7NHWQGR99iNQkCMqHSjCtLUeKAVBQMVwQSAJRHBxrYROoEaIIFzceuUpHmVLiDhEBGI+AMZFJnU=');
+    _TAB_FRIENDS:      self.tabs[tab]._bmp := bitmapFromString(9, 5, 'meJxLbF6Z2Lwye9qG6pVHO2escHFyY3HRZit0ZI+2BgpGV08GooSSWkXrYNa2GKat9UApIHKtnJII1ggXB5IQKa3wTCXbTMekTqAUkAsUhyAge+qhh3PWbQHq4lG2BJoP1wJkAwCtDjAf');
+    _TAB_MUSIC:        self.tabs[tab]._bmp := bitmapFromString(7, 7, 'meJxTtA5WREJKtplAVL3yaPa0DYnNKyEounqyY1LnguffgYKW7jEuUalAEaA4kDv10EMgV0xMXF7NAkiy8HIAuUDtEBIoC1GQUFIL1AJkAA3Z8+4HEAFFgAqAWoDiQEGgMqBpQAVABgCuIEQw');
+    _TAB_NOTES:        self.tabs[tab]._bmp := bitmapFromString(7, 9, 'meJz78ufvnnc/vnx8+eXPXwha8Py7S1QqlPvx5ZM7N4AkUA0jA4OlewxIMVgLBFV3TgSKy1tZ7jlxE8gF6oUoyJ62AaJ+6qGHEJUQqeqVR5VsM5OnnoELQhBQWcKGwxA1cEEISrr1DpkLUZDx41fCllcA8uqOdA==');
   end;
 
-  if (self.tabs[tab].bmp <> -1) then
+  if (self.tabs[tab]._bmp <> -1) then
   begin
     print('TRSGameTabs.__loadBitmap(): Loaded tab '+toStr(tab)+' bitmap', TDebug.SUB);
-    self.tabs[tab].bmpLoaded := true
+    self.tabs[tab]._bmpLoaded := true
   end else
     print('TRSGameTabs.__loadBitmap(): Invalid tab '+toStr(tab), TDebug.WARNING);
 end;
@@ -275,8 +275,8 @@ var
   i: integer;
 begin
   for i := 0 to high(gameTabs.tabs) do
-    if (gameTabs.tabs[i].bmpLoaded) then
-      freeBitmap(gameTabs.tabs[i].bmp);
+    if (gameTabs.tabs[i]._bmpLoaded) then
+      freeBitmap(gameTabs.tabs[i]._bmp);
 end;
 
 (*
@@ -431,10 +431,10 @@ Example:
 *}
 function TRSGameTabs._findTab(var p: TPoint; tab: integer; searchBox: TBox): boolean;
 begin
-  if (not self.tabs[tab].bmpLoaded) then
+  if (not self.tabs[tab]._bmpLoaded) then
     self.__loadBitmap(tab);
 
-  result := findBitmapToleranceIn(self.tabs[tab].bmp, p.x, p.y, searchBox, 10);
+  result := findBitmapToleranceIn(self.tabs[tab]._bmp, p.x, p.y, searchBox, 10);
 end;
 
 {*
@@ -530,13 +530,12 @@ begin
 
   // loop through each tab, checking for the bitmap in the active tab slot
   for i := 0 to high(self.tabs) do
-    if (self.tabs[i].bmp <> -1) then
-      if (self._findTab(p, self.tabs[i].id, tabBox)) then
-      begin
-        mouse(p.rand(3, 5));
-        result := i;
-        break;
-      end;
+    if (self._findTab(p, self.tabs[i].id, tabBox)) then
+    begin
+      mouse(p.rand(3, 5));
+      result := i;
+      break;
+    end;
 end;
 
 (*
@@ -705,5 +704,5 @@ begin
 end;
 
 begin
-
+  gameTabs.__init();
 end;
