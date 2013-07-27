@@ -319,6 +319,11 @@ begin
 
   print('TRSGameTabs._openTab('+toStr(tab)+')', TDebug.HEADER);
 
+  if (self.areMultiOpen()) then
+    self.visibleTabArea := self.__visibleTabAreaMulti
+  else
+    self.visibleTabArea := self.__visibleTabAreaSingle;
+
   if (anyTabOpen) then
   begin
     // see if it's already active
