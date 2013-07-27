@@ -9,7 +9,6 @@ The source for this file can be found `here <https://github.com/SRL/SRL-6/blob/m
 *)
 
 {$include_once ../interfaces.simba}
-
 {$f-}
 
 {*
@@ -55,16 +54,35 @@ const
     _TAB_MUSIC = 39;
     _TAB_NOTES = 31;
 
+{*
+const Internal
+~~~~~~~~~~~~~~
+
+Internal gametab constants.
+*}
 const
   _COLOR_TAB_ACTIVE = 8682089; // the top border color of an active tab
 
+{*
+type TRSGameTab
+~~~~~~~~~~~~~~~
+
+Represents an individual gametab.
+*}
 type
   TRSGameTab = record
-    id, parent: integer;
-    bounds: TBox;
-    bmp: integer;
+    id,              // the constant representing the tab
+    parent: integer; // the constant of the tab that needs to be hovered to show this tab
+    bounds: TBox;    // the bounds in a grid of the gametab navigation bar
+    bmp: integer;    // bitmap of the tab (used for switching between tabs)
   end;
 
+{*
+type TRSGameTabs
+~~~~~~~~~~~~~~~~
+
+A single type for manipulating the entire gametab system.
+*}
 type
   TRSGameTabs = record(TRSInterface)
     tabs: array of TRSGameTab;
@@ -75,9 +93,43 @@ type
     navigationGrid: TBoxArray;
   end;
 
+(*
+var gameTabs
+~~~~~~~~~~~~
+
+An SRL global variable used to manipulate the gametabs in very general ways.
+
+Example:
+
+.. code-block:: pascal
+
+    if (not gameTabs.isTabActive(_TAB_BACKPACK)) then
+      gameTabs._openTab(_TAB_BACKPACK);
+*)
 var
   gameTabs: TRSGameTabs;
 
+{*
+TRSGameTabs.__init
+~~~~~~~~~~~~~~~~~~
+
+.. code-block:: pascal
+
+    procedure TRSGameTabs.__init();
+
+Initiates the TRSGameTabs variable for use.
+
+.. note::
+
+    by Coh3n
+    Last Updated: 26 July 2013 by Coh3n
+
+Example:
+
+.. code-block:: pascal
+
+    gameTabs.__init();
+*}
 procedure TRSGameTabs.__init();
 var
   i, wid, hei: integer;
@@ -184,6 +236,27 @@ begin
   addOnTerminate('__freeGameTabs');
 end;
 
+{*
+__freeGameTabs
+~~~~~~~~~~~~~~
+
+.. code-block:: pascal
+
+    procedure __freeGameTabs();
+
+Frees all the gametab's bitmaps.  Called on script termination.
+
+.. note::
+
+    by Coh3n
+    Last Updated: 26 July 2013 by Coh3n
+
+Example:
+
+.. code-block:: pascal
+
+    addOnTerminate('__freeGameTabs');
+*}
 procedure __freeGameTabs();
 var
   i: integer;
@@ -193,6 +266,29 @@ begin
       freeBitmap(gameTabs.tabs[i].bmp);
 end;
 
+(*
+TRSGameTabs.findX
+~~~~~~~~~~~~~~~~~
+
+.. code-block:: pascal
+
+    function TRSGameTabs.findX(var p: TPoint): boolean;
+
+Finds the X at the top of the game tab area.  Returns it's coordinates in 'p'.
+Used to close gametabs.
+
+.. note::
+
+    by Coh3n
+    Last Updated: 26 July 2013 by Coh3n
+
+Example:
+
+.. code-block:: pascal
+
+    if (gameTabs.findX(p)) then
+      mouse(p.rand(3), MOUSE_LEFT);
+*)
 function TRSGameTabs.findX(var p: TPoint): boolean;
 begin
   p := point(-1, -1);
@@ -205,12 +301,55 @@ begin
               self.__visibleTabAreaSingle.y2, 5);
 end;
 
+(*
+TRSGameTabs.areTabArrowsVisible
+~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+
+.. code-block:: pascal
+
+    function TRSGameTabs.areTabArrowsVisible(): boolean;
+
+Description of the function here.
+
+.. note::
+
+    by Coh3n
+    Last Updated: 26 July 2013 by Coh3n
+
+Example:
+
+.. code-block:: pascal
+
+    Example code here.
+*)
 function TRSGameTabs.areTabArrowsVisible(): boolean;
 begin
   // the lighter gold color in the top half of the right arrow
   result := (getColor(self.__tabSelectionArea.x2 - 13, self.__tabSelectionArea.y1 + 9) = 4179955);
 end;
 
+(*
+TRSGameTabs.areMultiOpen
+~~~~~~~~~~~~~~~~~~~~~~~~
+
+.. code-block:: pascal
+
+    function TRSGameTabs.areMultiOpen(): boolean;
+
+Returns true if more than one tab is open.
+
+.. note::
+
+    by Coh3n
+    Last Updated: 26 July 2013 by Coh3n
+
+Example:
+
+.. code-block:: pascal
+
+    if (gameTabs.areMultiOpen()) then
+      writeln('Multiple tabs are open');
+*)
 function TRSGameTabs.areMultiOpen(): boolean;
 begin
   if (self.areTabArrowsVisible()) then
@@ -219,6 +358,28 @@ begin
   result := (countColor(_COLOR_TAB_ACTIVE, self.__tabSelectionArea) > 25);
 end;
 
+(*
+TRSGameTabs.areAnyOpen
+~~~~~~~~~~~~~~~~~~~~~~
+
+.. code-block:: pascal
+
+    function TRSGameTabs.areAnyOpen(): boolean;
+
+Returns true if any number of tabs are open.
+
+.. note::
+
+    by Coh3n
+    Last Updated: 26 July 2013 by Coh3n
+
+Example:
+
+.. code-block:: pascal
+
+    if (gameTabs.areAnyOpen()) then
+      writeln('Some undetermined number of tabs are open');
+*)
 function TRSGameTabs.areAnyOpen(): boolean;
 var
   p: TPoint;
@@ -229,11 +390,58 @@ begin
     print('TRSGameTabs.areAnyOpen(): No gametabs are open', TDebug.WARNING);
 end;
 
+{*
+TRSGameTabs._findTab
+~~~~~~~~~~~~~~~~~~~~
+
+.. code-block:: pascal
+
+    function TRSGameTabs._findTab(var p: TPoint; tab: integer; searchBox: TBox): boolean;
+
+Returns true if the gametab 'tab' is found in the 'searchBox'.  Sets it's coordinates
+to 'p'.
+
+.. note::
+
+    by Coh3n
+    Last Updated: 26 July 2013 by Coh3n
+
+Example:
+
+.. code-block:: pascal
+
+    if (gameTabs._findTab(p, _TAB_BACKPACK, gameTabs.__navigationTabArea)) then
+    begin
+      writeln('Opening the backpack tab');
+      mouse(p.rand(5), MOUSE_LEFT);
+    end;
+*}
 function TRSGameTabs._findTab(var p: TPoint; tab: integer; searchBox: TBox): boolean;
 begin
   result := findBitmapToleranceIn(self.tabs[tab].bmp, p.x, p.y, searchBox, 10);
 end;
 
+{*
+TRSGameTabs._getActiveTabBox
+~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+
+.. code-block:: pascal
+
+    function TRSGameTabs._getActiveTabBox(): TBox;
+
+Returns a box around the active tab.
+
+.. note::
+
+    by Coh3n
+    Last Updated: 26 July 2013 by Coh3n
+
+Example:
+
+.. code-block:: pascal
+
+    gameTabs._findTab(p, _TAB_BACKPACK, gameTabs._getActiveTabBox());
+*}
 function TRSGameTabs._getActiveTabBox(): TBox;
 var
   p: TPoint;
@@ -266,6 +474,29 @@ begin
   result := intToBox(bds.x1, bds.y1, bds.x2, bds.y2 + 25);
 end;
 
+(*
+TRSGameTabs.getActiveTab
+~~~~~~~~~~~~~~~~~~~~~~~~
+
+.. code-block:: pascal
+
+    function TRSGameTabs.getActiveTab(): integer;
+
+Returns the currently active tab.  If possible, use TRSGameTabs.isTabActive for
+a slight increase in speed.
+
+.. note::
+
+    by Coh3n
+    Last Updated: 26 July 2013 by Coh3n
+
+Example:
+
+.. code-block:: pascal
+
+    if (gameTabs.getActiveTab() = _TAB_BACKPACK) then
+      writeln('Backpack tab is open');
+*)
 function TRSGameTabs.getActiveTab(): integer;
 var
   i: integer;
@@ -292,6 +523,28 @@ begin
       end;
 end;
 
+(*
+TRSGameTabs.isTabActive
+~~~~~~~~~~~~~~~~~~~~~~~
+
+.. code-block:: pascal
+
+    function TRSGameTabs.isTabActive(tab: integer): boolean;
+
+Returns true if the 'tab' is active.
+
+.. note::
+
+    by Coh3n
+    Last Updated: 26 July 2013 by Coh3n
+
+Example:
+
+.. code-block:: pascal
+
+    if (gameTabs.isActiveTab(_TAB_BACKPACK)) then
+      writeln('Backpack tab is open');
+*)
 function TRSGameTabs.isTabActive(tab: integer): boolean;
 var
   p: TPoint;
@@ -306,6 +559,28 @@ begin
   result := self._findTab(p, tab, tabBox);
 end;
 
+{*
+TRSGameTabs._openTab
+~~~~~~~~~~~~~~~~~~~~
+
+.. code-block:: pascal
+
+    function TRSGameTabs._openTab(tab: integer): boolean;
+
+Returns true if the 'tab' is opened (or is already open).
+
+.. note::
+
+    by Coh3n
+    Last Updated: 26 July 2013 by Coh3n
+
+Example:
+
+.. code-block:: pascal
+
+    if (gameTabs._openTab(_TAB_BACKPACK)) then
+      writeln('Backpack tab is open');
+*}
 function TRSGameTabs._openTab(tab: integer): boolean;
 var
   t: integer;
@@ -372,6 +647,29 @@ begin
   print('TRSGameTabs._openTab('+toStr(tab)+'): '+toStr(result), TDebug.FOOTER);
 end;
 
+{*
+TRSGameTabs._closeTab
+~~~~~~~~~~~~~~~~~~~~~
+
+.. code-block:: pascal
+
+    function TRSGameTabs._closeTab(tab: integer): boolean;
+
+Returns true if the 'tab' is closed. The specified tab must be active before
+it can be closed, so it is recommeded that you call gameTabs._openTab() first.
+
+.. note::
+
+    by Coh3n
+    Last Updated: 26 July 2013 by Coh3n
+
+Example:
+
+.. code-block:: pascal
+
+    if (gameTabs._closeTab(_TAB_BACKPACK)) then
+      writeln('Backpack tab is closed');
+*}
 function TRSGameTabs._closeTab(tab: integer): boolean;
 var
   p: TPoint;
@@ -387,15 +685,5 @@ begin
   begin
     mouse(p.rand(2), MOUSE_LEFT);
     result := true;
-    wait(100 + random(100));
   end;
-
-  if (self.areMultiOpen()) then
-    self.visibleTabArea := self.__visibleTabAreaMulti
-  else
-    self.visibleTabArea := self.__visibleTabAreaSingle;
-end;
-
-begin
-  gameTabs.__init();
 end;
