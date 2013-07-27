@@ -193,7 +193,7 @@ type
     symbolAccuracy: extended;
 
     // flag bitmap is only loaded if it's used, and only loaded once
-    self.__bmpFlag: integer;
+    __bmpFlag: integer;
     __bmpFlagLoaded: boolean;
   end;
 
@@ -831,12 +831,12 @@ begin
   begin
     print('Loading flag bitmap...', TDebug.SUB);
 
-    self.self.__bmpFlag := bitmapFromString(8, 15, 'meJxjYEAHIpr/F8yYgSkozPfE3ty' +
+    self.__bmpFlag := bitmapFromString(8, 15, 'meJxjYEAHIpr/F8yYgSkozPfE3ty' +
                   'cGHGgIKY4RBBNHC6ILI4sAkYngOIwNhQJ8bUBBYEIyEBGQO37tm3D' +
                   'dCcdxIGBhlUcCBgZGAA27Tt3');
 
     self.__bmpFlagLoaded := true;
-    setBitmapName(self.self.__bmpFlag, 'minimap_flag');
+    setBitmapName(self.__bmpFlag, 'minimap_flag');
   end;
 
   if (findBitmapToleranceIn(self.__bmpFlag, p.x, p.y, self.getBounds(), 75)) then
@@ -1334,12 +1334,12 @@ begin
 end;
 
 {*
-_getSymbol
-~~~~~~~~~~
+TRSMinimap._getSymbol
+~~~~~~~~~~~~~~~~~~~~~
 
 .. code-block:: pascal
 
-    function _getSymbol(sym: integer): _TRSSymbol;
+    function TRSMinimap._getSymbol(sym: integer): _TRSSymbol;
 
 Returns a _TRSSymbol of "sym".
 
@@ -1352,9 +1352,9 @@ Example:
 
 .. code-block:: pascal
 
-    sym := _getSymbol(MM_SYMBOL_BANK);
+    sym := minimap._getSymbol(MM_SYMBOL_BANK);
 *}
-function _getSymbol(sym: integer): _TRSSymbol;
+function TRSMinimap._getSymbol(sym: integer): _TRSSymbol;
 begin
   case sym of
     MM_SYMBOL_BANK:
@@ -2216,7 +2216,7 @@ var
   acc: extended;
 begin
   result := -1;
-  sym := _getSymbol(symbol);
+  sym := self._getSymbol(symbol);
   print('TRSMinimap._getSymbolColor()', TDebug.HEADER);
 
   if (sym.name <> '') then
@@ -2226,7 +2226,6 @@ begin
     if (findDeformedBitmapToleranceIn(sym.bmp, p.x, p.y, searchBox, 70, 0, true, acc)) then
     begin
       print('Found symbol bitmap '+toStr(symbol));
-      freeBitmap(sym.bmp);
 
       if (acc > self.symbolAccuracy) then
         repeat
@@ -2241,6 +2240,7 @@ begin
             begin
               print('Found '+sym.name+' symbol at '+toStr(p));
               print('TRSMinimap._getSymbolColor(): '+toStr(result), TDebug.FOOTER);
+              freeBitmap(sym.bmp);
               exit();
             end;
           end;
@@ -2253,6 +2253,7 @@ begin
   print('Failed to find '+sym.name+' symbol', TDebug.ERROR);
   print('Report this bug here: http://villavu.com/forum/project.php?projectid=6', TDebug.HINT);
   print('TRSMinimap._getSymbolColor(): '+toStr(result), TDebug.FOOTER);
+  freeBitmap(sym.bmp);
 
   p := point(-1, -1);
 end;
@@ -2321,8 +2322,8 @@ var
   p, _p: TPoint;
   acc: Extended;
 begin
-  sym := _getSymbol(symbol);
-  newColor := _getSymbolColor(_p, symbol, searchBox); // autocolor's the symbol's stored color
+  sym := self._getSymbol(symbol);
+  newColor := self._getSymbolColor(_p, symbol, searchBox); // autocolor's the symbol's stored color
 
   if (sym.color > 0) then
   begin
@@ -2356,6 +2357,8 @@ begin
     if (result) then
       print('TRSMinimap.findSymbols(): Found '+sym.name+' symbol '+toStr(length(tpa))+' times', TDebug.SUB);
   end;
+
+  freeBitmap(sym.bmp);
 end;
 
 (*

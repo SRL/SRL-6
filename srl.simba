@@ -27,11 +27,11 @@ SRL library isn't available to you.
 
 {$include_once lib/interfaces/gametabs/gametab.simba}
 {$include_once lib/interfaces/gametabs/backpack.simba}
-{$include_once lib/interfaces/gametabs/abilitybook.simba}
+//{$include_once lib/interfaces/gametabs/abilitybook.simba}
 {$include_once lib/interfaces/lobby/lobby.simba}
 {$include_once lib/interfaces/lobby/worlds.simba}
 {$include_once lib/interfaces/mainscreen.simba}
-{$include_once lib/interfaces/actionbar.simba}
+//{$include_once lib/interfaces/actionbar.simba}
 {$include_once lib/interfaces/minimap.simba}
 {$include_once lib/interfaces/bankscreen.simba}
 {$include_once lib/interfaces/options.simba}
@@ -57,6 +57,8 @@ begin
     if (smartEnableDrawing) then
       smartSetupDrawing();
   {$ENDIF}
+
+  gameTabs.__init(); // needs to be called after SMART is ready because it calls getClientDimensions
 
   if (waitClientReady()) then
     print('Client is ready.')

@@ -10,7 +10,7 @@ The source for this file can be found `here <https://github.com/SRL/SRL-6/blob/m
 *)
 
 {$include_once interfaces.simba}
-{$include_once actionbar.simba}
+//{$include_once actionbar.simba}
 {$include_once ../utilities/pixelshift.simba}
 {$include_once ../utilities/color.simba}
 
@@ -110,15 +110,15 @@ Example:
     b := mainscreen.getBounds();
 *)
 function TRSMainscreen.getBounds(): TBox; override;
-begin
+begin{
   if (actionbar.isOpen()) then
   begin
     if (self.y2 > actionbar.y1) then
       self.y2 := (self.y2 - actionbar.h);
-  end else
+  end; else
     self.y2 := actionbar.y2;
 
-  result := intToBox(self.x1, self.y1, self.x2, self.y2);
+  result := intToBox(self.x1, self.y1, self.x2, self.y2); }
 end;
 
 (*
