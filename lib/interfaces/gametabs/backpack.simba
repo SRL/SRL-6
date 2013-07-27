@@ -5,8 +5,6 @@ Backpack
 The Backpack file holds functions and procedures that are used in the
 Runescape Backpack gametab.
 
-The source for this file can be found `here <https://github.com/SRL/SRL-6/blob/master/lib/interfaces/gametabs/backpack.simba>`_.
-
 *)
 
 {$include_once gametab.simba}
@@ -88,28 +86,31 @@ Example:
 *}
 procedure TRSTabBackpack.__init();
 begin
-  with self do
+  with (self) do
   begin
     name := 'RS Backpack tab';
     ID := ID_INTERFACE_TAB_BACKPACK;
     tabIndex := _TAB_BACKPACK;
     parentID := -1;
     static := true;
-    x1 := _gameTabArea.x1;
+
+    {x1 := _gameTabArea.x1;
     y1 := _gameTabArea.y1;
     x2 := _gameTabArea.x2;
-    y2 := _gameTabArea.y2;
+    y2 := _gameTabArea.y2; }
+
     w := (x2 - x1);
     h := (y2 - y1);
     cx := self.getCenterPoint().x;
     cy := self.getCenterPoint().y;
-    slots := Grid(4, 7, 31, 31, 42, 36, point(578, 278));
+
+   // slots := grid(4, 7, 34, 31, 52, 39, point(_gameTabArea.x1 + 32, _gameTabArea.y1 + 68));
   end;
 end;
 
 (*
-TRSTabBackpack.isOpen()
-~~~~~~~~~~~~~~~~~~~~~~~
+TRSTabBackpack.isOpen
+~~~~~~~~~~~~~~~~~~~~~
 
 .. code-block:: pascal
 
@@ -128,11 +129,11 @@ Example:
 
     if (tabBackpack.isOpen()) then
       writeln('the Backpack tab is open');
-
 *)
 function TRSTabBackpack.isOpen(): boolean;
 begin
-  result := (getCurrentTab() = self.tabIndex);
+  result := true;
+  // result := (getCurrentTab() = self.tabIndex);
 end;
 
 (*
@@ -161,8 +162,8 @@ function TRSTabBackpack.open(): boolean;
 begin
   result := self.isOpen();
 
-  if (not (result)) then
-    result := _openGameTab(self.tabIndex);
+//  if (not (result)) then
+//    result := _openGameTab(self.tabIndex);
 end;
 
 (*
@@ -463,12 +464,6 @@ begin
   if (not self.open()) or (self.invaildSlot(slot)) then
     exit(false);
 
-  if (not (inRange(mouseAction, 0, 3))) then
-  begin
-    print('mouseSlot: invalid mouse button', TDebug.ERROR);
-    exit(false);
-  end;
-
   result := true;
   mouseBox(self.getSlotBox(slot), mouseAction);
 end;
@@ -554,7 +549,6 @@ TRSTabBackpack.dropItems
 Drops items in the TIntegerArray, the parameter slots its optional if untouched
 the procedure will drop all items in slots 1 to 28. Can also be used with
 drop patterns.
-
     * tabBackpack.dropItems(); - would drop items in slots 1..28
     * tabBackpack.dropItems([1, 2, 25, 6]); - would drop items in slots 1, 2, 25 and 6
     * tabBackpack.dropItems(DROP_PATTERN_SNAKE);  - would use the drop pattern "snake"
@@ -701,10 +695,9 @@ TRSTabBackpack.clickItemsDTM
 
 Searches for the dtm if succesful will perform what action is it set.
 Will return how many items were clicked.
-
-   * clicktype - (MOUSE_MOVE, MOUSE_LEFT, MOUSE_RIGHT)
-   * option    - What option to choose. If not using MOUSE_RIGHT can be left blank.
-   * waitFor   - This is optional and on default is set to 300ms, depending on what
+  * clicktype - (MOUSE_MOVE, MOUSE_LEFT, MOUSE_RIGHT)
+  * option    - What option to choose. If not using MOUSE_RIGHT can be left blank.
+  * waitFor   - This is optional and on default is set to 300ms, depending on what
                 your doing you may need shorter or longer waitFor.
 
 .. note::
@@ -750,7 +743,7 @@ TRSTabBackpack.dragSlot
 
 .. code-block:: pascal
 
-    function TRSTabBackpack.dragSlot(fromSlot, toSlot: integer): boolean;
+     function TRSTabBackpack.dragSlot(fromSlot, toSlot: integer): boolean;
 
 .. note::
 
