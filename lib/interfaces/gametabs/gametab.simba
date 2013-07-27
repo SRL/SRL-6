@@ -387,7 +387,13 @@ begin
   begin
     mouse(p.rand(2), MOUSE_LEFT);
     result := true;
+    wait(100 + random(100));
   end;
+
+  if (self.areMultiOpen()) then
+    self.visibleTabArea := self.__visibleTabAreaMulti
+  else
+    self.visibleTabArea := self.__visibleTabAreaSingle;
 end;
 
 begin
