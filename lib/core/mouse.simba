@@ -531,7 +531,7 @@ Example:
 
     mouseBox(b, MOUSE_LEFT);
 *)
-procedure mouseBox(b: TBox; button: integer = MOUSE_MOVE);
+procedure mouseBox(b: TBox; button: integer = MOUSE_MOVE; mmType: integer = MOUSE_HUMAN);
 var
   p: TPoint;
   x, y: integer;
@@ -541,9 +541,9 @@ begin
   if (not pointInBox(point(x, y), b)) then // if the mouse is already in the box
   begin
     gaussBox(p, b);
-    mouse(p, button);
+    mouse(p, button, mmType);
   end else
-    mouse(point(x, y), button);
+    mouse(point(x, y), button, mmType);
 end;
 
 (*
