@@ -88,7 +88,7 @@ type
   TRSGameTabs = record(TRSInterface)
     tabs: array of TRSGameTab;
     visibleTabArea,              // the current (set in TRSGameTabs._openTab)
-    __visibleTabAreaSingle,      // when there's only a single tab open
+    __visibleTabAreaSingle,      // when there's only a single tab open (excludes title bar)
     __visibleTabAreaMulti: TBox; // when there are multiple tabs open
     __tabSelectionArea: TBox;    // the area where different tabs are clicked to become visible
     navigationGrid: TBoxArray;
@@ -187,7 +187,7 @@ begin
       tabs[i].bounds := navigationGrid[i];
       tabs[i]._bmp := -1;
 
-      case tabs[i].id of
+      case i of
         _TAB_TASK,
         _TAB_STATS:
           tabs[i].parent := _TAB_HERO;
@@ -214,6 +214,9 @@ begin
         _TAB_MUSIC,
         _TAB_NOTES:
           tabs[i].parent := _TAB_OTHER;
+
+        else
+          tabs[i].id := -1;
       end;
     end;
   end;
@@ -277,6 +280,41 @@ begin
   for i := 0 to high(gameTabs.tabs) do
     if (gameTabs.tabs[i]._bmpLoaded) then
       freeBitmap(gameTabs.tabs[i]._bmp);
+end;
+
+{*
+TRSGameTabs._isTabValid
+~~~~~~~~~~~~~~~~~~~~~~~
+
+.. code-block:: pascal
+
+    function TRSGameTabs._isTabValid(tab: integer): boolean;
+
+Returns true if the 'tab' is valid.
+
+.. note::
+
+    by Coh3n
+    Last Updated: 27 July 2013 by Coh3n
+
+Example:
+
+.. code-block:: pascal
+
+    if (not gameTabs._isTabValid(_TAB_BACKPACK)) then
+      exit;
+*}
+function TRSGameTabs._isTabValid(tab: integer): boolean;
+var
+  i: integer;
+begin
+  for i := 0 to high(self.tabs) do
+    if (self.tabs[i].id <> -1) then
+      if (self.tabs[i].id = tab) then
+        exit(true);
+
+  if (not result) then
+    print('TRSGameTabs._isTabValid(): Tab '+toStr(tab)+' is invalid', TDebug.WARNING);
 end;
 
 (*
@@ -431,6 +469,10 @@ Example:
 *}
 function TRSGameTabs._findTab(var p: TPoint; tab: integer; searchBox: TBox): boolean;
 begin
+  if (not self._isTabValid(tab)) then
+    exit(false);
+
+  // load tab bitmap if it hasn't already been loaded
   if (not self.tabs[tab]._bmpLoaded) then
     self.__loadBitmap(tab);
 
@@ -530,23 +572,25 @@ begin
 
   // loop through each tab, checking for the bitmap in the active tab slot
   for i := 0 to high(self.tabs) do
-    if (self._findTab(p, self.tabs[i].id, tabBox)) then
-    begin
-      mouse(p.rand(3, 5));
-      result := i;
-      break;
-    end;
+    if (self.tabs[i].id <> -1) then
+      if (self._findTab(p, self.tabs[i].id, tabBox)) then
+      begin
+        mouse(p.rand(3, 5));
+        result := i;
+        break;
+      end;
 end;
 
 (*
-TRSGameTabs.isTabActive
-~~~~~~~~~~~~~~~~~~~~~~~
+TRSGameTabs._isTabActive
+~~~~~~~~~~~~~~~~~~~~~~~~
 
 .. code-block:: pascal
 
-    function TRSGameTabs.isTabActive(tab: integer): boolean;
+    function TRSGameTabs._isTabActive(tab: integer): boolean;
 
-Returns true if the 'tab' is active.
+Returns true if the 'tab' is active. An internal function. If possible, use
+the tab's interface isOpen() function (i.e. tabBackpack.isOpen()).
 
 .. note::
 
@@ -557,14 +601,17 @@ Example:
 
 .. code-block:: pascal
 
-    if (gameTabs.isActiveTab(_TAB_BACKPACK)) then
+    if (gameTabs._isTabActive(_TAB_BACKPACK)) then
       writeln('Backpack tab is open');
 *)
-function TRSGameTabs.isTabActive(tab: integer): boolean;
+function TRSGameTabs._isTabActive(tab: integer): boolean;
 var
   p: TPoint;
   tabBox: TBox;
 begin
+  if (not self._isTabValid(tab)) then
+    exit(false);
+
   tabBox := self._getActiveTabBox();
   //smartImage.drawBox(tabBox, false, clRed);
 
@@ -582,7 +629,8 @@ TRSGameTabs._openTab
 
     function TRSGameTabs._openTab(tab: integer): boolean;
 
-Returns true if the 'tab' is opened (or is already open).
+Returns true if the 'tab' is opened (or is already open). If possible, use the
+tab's open() function (i.e. tabBackpack.open()).
 
 .. note::
 
@@ -602,6 +650,9 @@ var
   p: TPoint;
   anyTabOpen: boolean;
 begin
+  if (not self._isTabValid(tab)) then
+    exit(false);
+
   anyTabOpen := self.areAnyOpen();
 
   if (not anyTabOpen) then
@@ -617,7 +668,7 @@ begin
   if (anyTabOpen) then
   begin
     // see if it's already active
-    if (self.isTabActive(tab)) then
+    if (self._isTabActive(tab)) then
     begin
       print('Tab already active');
       result := true;
@@ -654,7 +705,7 @@ begin
     if (not anyTabOpen) then
       result := self.findX(p)
     else
-      result := self.isTabActive(tab);
+      result := self._isTabActive(tab);
 
     wait(50 + random(50));
   end;
@@ -672,6 +723,7 @@ TRSGameTabs._closeTab
 
 Returns true if the 'tab' is closed. The specified tab must be active before
 it can be closed, so it is recommeded that you call gameTabs._openTab() first.
+If possible, use the tab's open() function (i.e. tabBackpack.close()).
 
 .. note::
 
@@ -689,7 +741,10 @@ function TRSGameTabs._closeTab(tab: integer): boolean;
 var
   p: TPoint;
 begin
-  if (not self.isTabActive(tab)) then
+  if (not self._isTabValid(tab)) then
+    exit(false);
+
+  if (not self._isTabActive(tab)) then
   begin
     print('TRSGameTabs._closeTab(): Tab '+toStr(tab)+' isn''t open', TDebug.WARNING);
     print('TRSGameTabs._closeTab(): Consider opening the game tab before trying to close it', TDebug.HINT);
