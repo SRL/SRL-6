@@ -169,7 +169,6 @@ function TRSLobby.__find(): boolean;
 var
   wid, hei: integer;
   tpa: TPointArray;
-  bds: TBox;
 begin
   getClientDimensions(wid, hei);
 
@@ -178,18 +177,8 @@ begin
   if (length(tpa) > 0) then
   begin
     result := true;
-
-    bds := tpa.getBounds();
-    //smartImage.drawBox(bds, false);
-
-    self.x1 := bds.x1;
-    self.y1 := bds.y1;
-    self.x2 := bds.x2;
-    self.y2 := bds.y2;
-    self.w := (x2 - x1);
-    self.h := (y2 - y1);
-    self.cx := self.getCenterPoint().x;
-    self.cy := self.getCenterPoint().y;
+    self.setBounds(tpa.getBounds());
+    //smartImage.drawBox(self.getBounds(), false);
   end else
     print('TRSLobby.findBounds(): Failed to find lobby bounds', TDebug.ERROR);
 end;
