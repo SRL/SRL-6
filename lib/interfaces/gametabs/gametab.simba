@@ -511,6 +511,11 @@ begin
   if (not self.areAnyOpen()) then
     exit();
 
+  if (self.areMultiOpen()) then
+    self.visibleTabArea := self.__visibleTabAreaMulti
+  else
+    self.visibleTabArea := self.__visibleTabAreaSingle;
+
   findColors(tpa, _COLOR_TAB_ACTIVE, self.__tabSelectionArea.x1,
                                      self.__tabSelectionArea.y1,
                                      self.__tabSelectionArea.x2,
@@ -659,11 +664,6 @@ begin
     exit();
 
   print('TRSGameTabs._openTab('+toStr(tab)+')', TDebug.HEADER);
-
-  if (self.areMultiOpen()) then
-    self.visibleTabArea := self.__visibleTabAreaMulti
-  else
-    self.visibleTabArea := self.__visibleTabAreaSingle;
 
   if (anyTabOpen) then
   begin
