@@ -75,7 +75,7 @@ Example:
     smartImage.drawCircle(minimap.getCenterPoint(), MM_RADIUS, clLime);
 *)
 const
-  MM_RADIUS = 75;
+  MM_RADIUS = 103;
 
 (*
 const Symbols
@@ -239,17 +239,21 @@ Example:
     minimap.__init();
 *}
 procedure TRSMinimap.__init();
+var
+  wid, hei: integer;
 begin
+  getClientDimensions(wid, hei);
+
   with self do
   begin
     name := 'RS Minimap';
     ID := ID_INTERFACE_MINIMAP;
     parentID := -1;
-    static := true;
-    x1 := 550;
-    y1 := 58;
-    x2 := 703;
-    y2 := 211;
+    static := false;
+    x1 := (wid - 225); // bounds exclude the title bar and logout button
+    y1 := 11;
+    x2 := (wid - 1);
+    y2 := 224;
     w := (x2 - x1);
     h := (y2 - y1);
     cx := self.getCenterPoint().x;
