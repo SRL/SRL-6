@@ -3,8 +3,12 @@ Smart
 =====
 
 The Smart file stores all the functions and procedures used to initiate SMART
-in scripts.  To use SMART in a script, simply add {$DEFINE SMART} before SRL is
+in scripts.  To use SMART in a script, simply add the following code before SRL is
 included.
+
+.. code-block:: pascal
+
+    {$DEFINE SMART}
 
 The source for this file can be found `here <https://github.com/SRL/SRL-6/blob/master/lib/misc/smart.simba>`_.
 
@@ -19,18 +23,6 @@ The source for this file can be found `here <https://github.com/SRL/SRL-6/blob/m
 {$include_once ../core/client.simba}
 
 (*
-const Client W/H
-~~~~~~~~~~~~~~~~
-
-Integer constants that represent the width and height of the client (fixed) needs
-to function correctly.
-
-*)
-const
-  SMART_CLIENT_W = 960;
-  SMART_CLIENT_H = 640;
-
-(*
 const URL
 ~~~~~~~~~
 
@@ -40,13 +32,36 @@ const
   SMART_URL = 'http://www.runescape.com/game.ws?j=1';
 
 (*
+var Client W/H
+~~~~~~~~~~~~~~
+
+Integer variabltes that represent the width and height of the SMART client.  SMART
+can be loaded and SRL will work in any size desired if the in-game interface layout
+is setup properly.  By default, SMART is loaded as 960x640 pixels.
+
+
+Example:
+
+.. code-block:: pascal
+
+    smartClientWidth := 1024;
+    smartClientHeight := 768;
+
+*)
+var
+  smartClientWidth = 960;
+  smartClientHeight = 640;
+
+(*
 var User Set
 ~~~~~~~~~~~~
 
 Variables that can be used in scripts.
+
     * smartForceNewClient: Opens a new SMART client every time a scrpit is run.
     * smartEnableDrawing: Enables drawing onto the SMART window.
     * smartImage: A TMufasaBitmap to be drawn onto that will display on the smart canvas.
+
 *)
 var
   smartForceNewClient = false;
@@ -89,8 +104,8 @@ Example:
 *)
 procedure getClientDimensions(var w, h: integer); override;
 begin
-  w := SMART_CLIENT_W;
-  h := SMART_CLIENT_H;
+  w := smartClientWidth;
+  h := smartClientHeight;
 end;
 
 (*
@@ -175,7 +190,7 @@ begin
   try
     smartImage.init();
     smartImage.setName('SMART Debug Image');
-    smartImage.setPersistentMemory(SmartDebugArray(), SMART_CLIENT_W, SMART_CLIENT_H);
+    smartImage.setPersistentMemory(SmartDebugArray(), smartClientWidth, smartClientHeight);
     smartImage.drawClear(0);
     print('Setup SMART drawing');
   except
@@ -468,7 +483,7 @@ begin
     begin
       print('Using Parameters: ' + toStr(params));
 
-      id := smartSpawnClient(StringReplace(PluginPath, '\', '/', [rfReplaceAll]), Params[0], ',' + Params[1], SMART_CLIENT_W, SMART_CLIENT_H, '', '', '', 'OpenGL32.dll');
+      id := smartSpawnClient(StringReplace(PluginPath, '\', '/', [rfReplaceAll]), Params[0], ',' + Params[1], smartClientWidth, smartClientHeight, '', '', '', 'OpenGL32.dll');
       wait(100);
 
       if (id <> 0) then

@@ -11,6 +11,20 @@ The source for this file can be found `here <https://github.com/SRL/SRL-6/blob/m
 
 {$f-}
 
+(*
+const Date/Time
+~~~~~~~~~~~~~~~
+
+Integer constants that represent the different time formats that can be used
+to display the time and dates in a string.
+
+Example:
+
+.. code-block:: pascal
+
+    writeln(500000, TIME_SHORT);
+
+*)
 const
   TIME_FORMAL = 0;
   TIME_SHORT  = 1;
