@@ -187,7 +187,7 @@ begin
       tabs[i].bounds := navigationGrid[i];
       tabs[i]._bmp := -1;
 
-      case i of
+      case tabs[i].id of
         _TAB_TASK,
         _TAB_STATS:
           tabs[i].parent := _TAB_HERO;
@@ -691,7 +691,7 @@ begin
   print('Opening tab via gametab navigation bar');
 
   // move mouse over the parent tab (nav bar) so sub tabs appear
-  if (self.tabs[self.tabs[tab].parent].id <> -1) then
+  if (self.tabs[tab].parent <> -1) then
   begin
     mouseBox(self.tabs[self.tabs[tab].parent].bounds, MOUSE_MOVE, MOUSE_ACCURATE);
     wait(200 + random(300));
