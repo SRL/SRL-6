@@ -61,6 +61,7 @@ const Internal
 ~~~~~~~~~~~~~~
 
 File's internal constants.
+
     * __PATH_PLAYER: The file army files are saved to.
     * __LOGIN_COLOR_TEXT: The color of the login screen text.
 
@@ -74,12 +75,14 @@ var Internal
 ~~~~~~~~~~~~
 
 File's internal variables.
+
     * _boxUsername: TBox of the username edit box.
     * _boxPassword: TBox of the password edit box.
 
 *}
 var
-  _boxUsername, _boxPassword: TBox; // set at the end of this file
+  _boxUsername: TBox = [-1, -1, -1, -1];
+  _boxPassword: TBox = [-1, -1, -1, -1];
 
 (*
 type TPlayer
@@ -133,9 +136,9 @@ Player Variables
 
 All the variables associated with players.simba.
 
-  * players: used to store player information.
-  * currentPlayer: the player currently running.
-  * disableIPScreenshots: disables the screenshots taken in the lobby screen.
+  * players: TPlayerArray; Used to store player information.
+  * currentPlayer: integer; The player currently running.
+  * disableIPScreenshots: booelean; Disables the screenshots taken in the lobby screen.
 
 *)
 var
@@ -1360,6 +1363,4 @@ begin
 end;
 
 begin
-  _boxUsername := intToBox(-1, -1, -1, -1);
-  _boxPassword := intToBox(-1, -1, -1, -1);
 end;

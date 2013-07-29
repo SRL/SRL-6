@@ -17,6 +17,10 @@ var mouseSpeed
 ~~~~~~~~~~~~~~
 
 Adjustable mouse speed variable. Default set to 20.
+
+.. code-block:: pascal
+
+    mouseSpeed := 50;
 *)
 var
   mouseSpeed: Integer = 20;
@@ -30,6 +34,12 @@ Different ways of moving the mouse:
     * MOUSE_BREAK: moves slower when reaching destination.
     * MOUSE_ACCURATE: a slower, more accurate movement.
     * MOUSE_HUMAN: the most human-like movement of the mouse styles.
+
+Example:
+
+.. code-block:: pascal
+
+    mouse(p, MOUSE_MOVE, MOUSE_ACCURATE);
 *)
 const
   MOUSE_BREAK    = 8;
