@@ -36,8 +36,8 @@ Will clear the entire TMufasaBitmap
 
 .. note::
 
-    by Ollybest
-    Last Updated: 19 July 2013 by Ollybest
+    - by Ollybest
+    - Last Updated: 19 July 2013 by Ollybest
 
 Example:
 
@@ -63,8 +63,8 @@ Will clear the desired area of the TMufasaBitmap
 
 .. note::
 
-    by Ollybest
-    Last Updated: 19 July 2013 by Ollybest
+    - by Ollybest
+    - Last Updated: 19 July 2013 by Ollybest
 
 Example:
 
@@ -90,8 +90,8 @@ Draws a TBox onto the TMufasaBitmap
 
 .. note::
 
-    by Ollybest
-    Last Updated: 19 July 2013 by Ollybest
+    - by Ollybest
+    - Last Updated: 19 July 2013 by Ollybest
 
 Example:
 
@@ -129,8 +129,8 @@ Draws a TBoxArray onto the TMufasaBitmap.
 
 .. note::
 
-    by Ollybest
-    Last Updated: 19 July 2013 by Ollybest
+    - by Ollybest
+    - Last Updated: 19 July 2013 by Ollybest
 
 Example:
 
@@ -163,8 +163,8 @@ color for each box.
 
 .. note::
 
-    by Ollybest
-    Last Updated: 19 July 2013 by Ollybest
+    - by Ollybest
+    - Last Updated: 19 July 2013 by Ollybest
 
 Example:
 
@@ -203,8 +203,8 @@ will judge curved the corners are.
 
 .. note::
 
-    by Ollybest
-    Last Updated: 19 July 2013 by Ollybest
+    - by Ollybest
+    - Last Updated: 19 July 2013 by Ollybest
 
 Example:
 
@@ -255,8 +255,8 @@ Draws a bitmap onto the TMufasaBitmap at the desired point.
 
 .. note::
 
-    by Ollybest
-    Last Updated: 19 July 2013 by Ollybest
+    - by Ollybest
+    - Last Updated: 19 July 2013 by Ollybest
 
 Example:
 
@@ -286,8 +286,8 @@ by the paramter "path", will return if succesful or not.
 
 .. note::
 
-    by Ollybest
-    Last Updated: 19 July 2013 by Ollybest
+    - by Ollybest
+    - Last Updated: 19 July 2013 by Ollybest
 
 Example:
 
@@ -325,8 +325,8 @@ Draws a cross on the TMufasaBitmap at the TPoint(pnt) with the desired size.
 
 .. note::
 
-    by Ollybest
-    Last Updated: 19 July 2013 by Ollybest
+    - by Ollybest
+    - Last Updated: 19 July 2013 by Ollybest
 
 Example:
 
@@ -360,8 +360,8 @@ the border.
 
 .. note::
 
-    by Ollybest
-    Last Updated: 19 July 2013 by Ollybest
+    - by Ollybest
+    - Last Updated: 19 July 2013 by Ollybest
 
 Example:
 
@@ -395,8 +395,8 @@ is true it will fill the circle, otherwise it draws just the border.
 
 .. note::
 
-    by Ollybest
-    Last Updated: 19 July 2013 by Ollybest
+    - by Ollybest
+    - Last Updated: 19 July 2013 by Ollybest
 
 Example:
 
@@ -423,8 +423,8 @@ the TMufasaBitmap.
 
 .. note::
 
-    by Ollybest
-    Last Updated: 19 July 2013 by Ollybest
+    - by Ollybest
+    - Last Updated: 19 July 2013 by Ollybest
 
 Example:
 
@@ -460,8 +460,8 @@ Draws a string(text) with the desired font onto the TMufasaBitmap at the TPoint(
 
 .. note::
 
-    by Ollybest
-    Last Updated: 19 July 2013 by Ollybest
+    - by Ollybest
+    - Last Updated: 19 July 2013 by Ollybest
 
 Example:
 
@@ -500,8 +500,8 @@ parameter(will use statchars).
 
 .. note::
 
-    by Ollybest
-    Last Updated: 19 July 2013 by Ollybest
+    - by Ollybest
+    - Last Updated: 19 July 2013 by Ollybest
 
 Example:
 
@@ -528,8 +528,8 @@ be drawn at the same point in the pnt array.
 
 .. note::
 
-    by Ollybest
-    Last Updated: 19 July 2013 by Ollybest
+    - by Ollybest
+    - Last Updated: 19 July 2013 by Ollybest
 
 Example:
 
@@ -566,8 +566,8 @@ Draws text onto the TMufasaBitmap, each index in the txtArr is put on a differen
 
 .. note::
 
-    by Ollybest
-    Last Updated: 19 July 2013 by Ollybest
+    - by Ollybest
+    - Last Updated: 19 July 2013 by Ollybest
 
 Example:
 
@@ -616,8 +616,8 @@ work if the bitmap is managed by simba
 
 .. note::
 
-    by Ollybest
-    Last Updated: 19 July 2013 by Ollybest
+    - by Ollybest
+    - Last Updated: 19 July 2013 by Ollybest
 
 Example:
 
@@ -655,8 +655,8 @@ parameter and by default is enabled, if enabled it will draw the points in the a
 
 .. note::
 
-    by Ollybest
-    Last Updated: 19 July 2013 by Ollybest
+    - by Ollybest
+    - Last Updated: 19 July 2013 by Ollybest
 
 Example:
 
@@ -698,8 +698,8 @@ Will debug a T2DPointArray onto the TMufasaBitmap.
 
 .. note::
 
-    by Ollybest
-    Last Updated: 19 July 2013 by Ollybest
+    - by Ollybest
+    - Last Updated: 19 July 2013 by Ollybest
 
 Example:
 
@@ -753,8 +753,8 @@ is found.
 
 .. note::
 
-    by Ollybest
-    Last Updated: 19 July 2013 by Ollybest
+    - by Ollybest
+    - Last Updated: 19 July 2013 by Ollybest
 
 Example:
 

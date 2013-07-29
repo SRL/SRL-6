@@ -42,7 +42,7 @@ Str Type:
 
 .. note::
 
-    by Zephyrsfury, Nava2 and Rasta Magician.
+    - by Zephyrsfury, Nava2 and Rasta Magician.
 
 Example:
 
@@ -87,7 +87,7 @@ Returns Time since the script was started (GetTimeRunning).
 
 .. note::
 
-    by Rasta Magician.
+    - by Rasta Magician.
 
 Example:
 
@@ -113,7 +113,7 @@ Returns current time as a string.
 
 .. note::
 
-    by RsN (fixed by Ron and Markus)
+    - by RsN (fixed by Ron and Markus)
 
 Example:
 
@@ -156,7 +156,7 @@ Returns the current date. DateFormats can be:
 
 .. note::
 
-    by Ron, Nava2 & Narcle
+    - by Ron, Nava2 & Narcle
 
 Example:
 
@@ -209,7 +209,7 @@ Timer type which is usefull for loops, timing and writing progress reports.
 
 .. note::
 
-    by Bart de Boer
+    - by Bart de Boer
 *)
 type
   TTimeMarker = record
@@ -229,7 +229,7 @@ Starts the timer. Can also be used when paused to continue where it left.
 
 .. note::
 
-    by Bart de Boer
+    - by Bart de Boer
 
 Example:
 
@@ -263,7 +263,7 @@ Stops the timer and resets it to zero.
 
 .. note::
 
-    by Bart de Boer
+    - by Bart de Boer
 
 Example:
 
@@ -290,7 +290,7 @@ Pauses the timer. It can be continued with start().
 
 .. note::
 
-    by Bart de Boer
+    - by Bart de Boer
 
 Example:
 
@@ -318,7 +318,7 @@ Gets the time from the timer. Returns zero if the timer was not set.
 
 .. note::
 
-    by Bart de Boer
+    - by Bart de Boer
 
 Example:
 
@@ -351,7 +351,7 @@ the timer was not set.
 
 .. note::
 
-    by Bart de Boer
+    - by Bart de Boer
 
 Example:
 

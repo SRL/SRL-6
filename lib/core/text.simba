@@ -30,8 +30,8 @@ Uses a bitmap mask to find text on the screen.  Returns true if the text is foun
 
 .. note::
 
-    by Stupid3ooo, modified by LordJashin & Coh3n
-    Last Updated: Feb. 20, 2013 by Coh3n
+    - by Stupid3ooo, modified by LordJashin & Coh3n
+    - Last Updated: Feb. 20, 2013 by Coh3n
 
 Example:
 
@@ -88,8 +88,8 @@ false.
 
 .. note::
 
-    by Raymond and Coh3n
-    Last Updated: Feb. 20, 2013 by Coh3n
+    - by Raymond and Coh3n
+    - Last Updated: Feb. 20, 2013 by Coh3n
 
 Example:
 
@@ -162,8 +162,8 @@ Uses getTextAtEx to find text and extracts the numbers from it.
 
 .. note::
 
-    by Ollybest
-    Last Updated: May. 24, 2013 by Ollybest
+    - by Ollybest
+    - Last Updated: May. 24, 2013 by Ollybest
 
 Example:
 
@@ -200,8 +200,8 @@ Returns true if the mouse action is performed on the text.
 
 .. note::
 
-    by Coh3n
-    Last Updated: Mar. 1, 2013 by Coh3n
+    - by Coh3n
+    - Last Updated: Mar. 1, 2013 by Coh3n
 
 Example:
 
@@ -232,7 +232,7 @@ Types one character k.
 
 .. note::
 
-    by Mutant Squirrle
+    - by Mutant Squirrle
 
 Example:
 
@@ -266,8 +266,8 @@ enter by default.
 
 .. note::
 
-    by SKy Scripter
-    Last Updated: January 29th, 2013 by Coh3n
+    - by SKy Scripter
+    - Last Updated: January 29th, 2013 by Coh3n
 
 Example:
 
@@ -318,8 +318,8 @@ Prints the options' .str attribute to the printToDebug box.
 
 .. note::
 
-    by Coh3n
-    Last Updated: Feb. 27, 2013 by Coh3n
+    - by Coh3n
+    - Last Updated: Feb. 27, 2013 by Coh3n
 
 Example:
 
@@ -351,8 +351,8 @@ Gets the text from the options menu. Searches for the menu in the entire client.
 
 .. note::
 
-    by Wizzup?, Narcle, Coh3n & Flight
-    Last Updated: Mar. 10, 2013 by Coh3n
+    - by Wizzup?, Narcle, Coh3n & Flight
+    - Last Updated: Mar. 10, 2013 by Coh3n
 
 Example:
 
@@ -486,8 +486,8 @@ Works for RS tabbed menus.
 
 .. note::
 
-    by Wizzup?, Nava2 & N1ke!
-    Last Modified: 30 May 2013 by Coh3n
+    - by Wizzup?, Nava2 & N1ke!
+    - Last Modified: 30 May 2013 by Coh3n
 
 Example:
 
@@ -610,8 +610,8 @@ exist. Default waitTime is 100ms.
 
 .. note::
 
-    by Coh3n
-    Last Updated: May. 24, 2013 by Ollybest
+    - by Coh3n
+    - Last Updated: May. 24, 2013 by Ollybest
 
 Example:
 
@@ -637,8 +637,8 @@ Returns true if one of the strings in txt exists in the options menu.
 
 .. note::
 
-    by Coh3n
-    Last Modified: Mar. 10, 2013 by Coh3n
+    - by Coh3n
+    - Last Modified: Mar. 10, 2013 by Coh3n
 
 Example:
 

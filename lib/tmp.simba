@@ -154,7 +154,7 @@ Free's an array of DTMs.
 
 .. note::
 
-    by Ollybest
+    - by Ollybest
 
 Example:
 
@@ -183,7 +183,7 @@ Free's an array of bitmaps.
 
 .. note::
 
-    by Ollybest
+    - by Ollybest
 
 Example:
 
@@ -213,7 +213,7 @@ color in a TPointArray.
 
 .. note::
 
-    by Dgby714
+    - by Dgby714
 
 Example:
 
@@ -263,7 +263,7 @@ Holds down the desired key for the set waitTime.
 
 .. note::
 
-    by Ollybest
+    - by Ollybest
 
 Example:
 
@@ -295,7 +295,7 @@ Converts 2 integers into a TPoint.
 
 .. note::
 
-    by Ollybest
+    - by Ollybest
 
 Example:
 
@@ -396,7 +396,7 @@ numbers.
 
 .. note::
 
-    by PriSoner and Nava2
+    - by PriSoner and Nava2
 
 Example:
 
@@ -689,7 +689,7 @@ It is a wrapper for `GaussRangeInt`.
 
 .. note::
 
-    by Nava2
+    - by Nava2
 
 Example:
 

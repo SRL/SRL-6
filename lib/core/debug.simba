@@ -91,8 +91,8 @@ Creates the SRL log file.
 
 .. note::
 
-    by Coh3n
-    Last Modified: Feb. 20th, 2012 by Coh3n
+    - by Coh3n
+    - Last Modified: Feb. 20th, 2012 by Coh3n
 
 Example:
 
@@ -141,8 +141,8 @@ Writes the string 's' to the SRL log file.
 
 .. note::
 
-    by Markus
-    Last Modified: Feb. 20th, 2012 by Coh3n
+    - by Markus
+    - Last Modified: Feb. 20th, 2012 by Coh3n
 
 Example:
 
@@ -176,8 +176,8 @@ Closes the log file.
 
 .. note::
 
-    by Coh3n
-    Last Modified: 13 April 2013 by Coh3n
+    - by Coh3n
+    - Last Modified: 13 April 2013 by Coh3n
 
 Example:
 
@@ -221,8 +221,8 @@ for debugType:
 
 .. note::
 
-    by Coh3n & masterBB
-    Last Modified: 24 May 2013 by Coh3n
+    - by Coh3n & masterBB
+    - Last Modified: 24 May 2013 by Coh3n
 
 Example:
 
@@ -300,8 +300,8 @@ Shows a bitmap in the debug image window.
 
 .. note::
 
-    by Cazax
-    Last Updated: 12 April 2013 by Coh3n
+    - by Cazax
+    - Last Updated: 12 April 2013 by Coh3n
 
 Example:
 
@@ -339,8 +339,8 @@ to a file.
 
 .. note::
 
-    by Wizzup?
-    Last Updated: 24 July 2013 by Olly
+    - by Wizzup?
+    - Last Updated: 24 July 2013 by Olly
 
 Example:
 
@@ -379,8 +379,8 @@ Has the option to save the window's display to a file.
 
 .. note::
 
-    by Wizzup?
-    Last Updated: 24 July 2013 by Olly
+    - by Wizzup?
+    - Last Updated: 24 July 2013 by Olly
 
 Example:
 
@@ -419,8 +419,8 @@ window to a file.
 
 .. note::
 
-    by Wizzup?
-    Last Updated: 24 July 2013 by Olly
+    - by Wizzup?
+    - Last Updated: 24 July 2013 by Olly
 
 Example:
 
@@ -455,8 +455,8 @@ Saves a screenshot to fileName, and adds the time to avoid replacing images.
 
 .. note::
 
-    by Harry & Coh3n
-    Last updated: Feb. 09, 2013 by Coh3n
+    - by Harry & Coh3n
+    - Last updated: Feb. 09, 2013 by Coh3n
 
 Example:
 

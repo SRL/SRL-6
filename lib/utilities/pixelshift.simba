@@ -23,8 +23,8 @@ Returns the shifts in a TIntegerArray.
 
 .. note::
 
-    by marpis
-    Last Updated: 23 May 2013 by Coh3n
+    - by marpis
+    - Last Updated: 23 May 2013 by Coh3n
 
 Example:
 
@@ -72,8 +72,8 @@ Overload function. Takes a TBox parameter rather than a TBoxArray.
 
 .. note::
 
-    by marpis
-    Last Updated: 23 May 2013 by Coh3n
+    - by marpis
+    - Last Updated: 23 May 2013 by Coh3n
 
 Example:
 
@@ -102,8 +102,8 @@ Overload function. Returns the number of pixels shifted in each TPointArray in
 
 .. note::
 
-    by Coh3n
-    Last Updated: 23 May 2013 by Coh3n
+    - by Coh3n
+    - Last Updated: 23 May 2013 by Coh3n
 
 Example:
 
@@ -162,8 +162,8 @@ Overload function. Takes a TPointArray parameter rather than a T2DPointArray.
 
 .. note::
 
-    by Coh3n
-    Last Updated: 23 May 2013 by Coh3n
+    - by Coh3n
+    - Last Updated: 23 May 2013 by Coh3n
 
 Example:
 
@@ -192,8 +192,8 @@ Returns the average pixel shifts in each box in "b" over "maxTime", waiting
 
 .. note::
 
-    by Coh3n
-    Last Updated: 23 May 2013 by Coh3n
+    - by Coh3n
+    - Last Updated: 23 May 2013 by Coh3n
 
 Example:
 
@@ -235,8 +235,8 @@ between getPixelShift calls.
 
 .. note::
 
-    by Coh3n
-    Last Updated: 23 May 2013 by Coh3n
+    - by Coh3n
+    - Last Updated: 23 May 2013 by Coh3n
 
 Example:
 
@@ -265,8 +265,8 @@ Returns the average pixel shifts in each TPointArray in "atpa" over "maxTime", w
 
 .. note::
 
-    by Coh3n
-    Last Updated: 23 May 2013 by Coh3n
+    - by Coh3n
+    - Last Updated: 23 May 2013 by Coh3n
 
 Example:
 
@@ -307,8 +307,8 @@ Description of the function here.
 
 .. note::
 
-    by Coh3n
-    Last Updated: 23 May 2013 by Coh3n
+    - by Coh3n
+    - Last Updated: 23 May 2013 by Coh3n
 
 Example:
 

@@ -82,7 +82,7 @@ Returns a TBox of the TRSInterface.
 
 .. note::
 
-    by Coh3n
+    - by Coh3n
 
 Example:
 
@@ -107,8 +107,8 @@ Sets the bounds, width, height, and center point of the TRSInterface.
 
 .. note::
 
-    by Coh3n
-    Last Updated: 16 May 2013 by Coh3n
+    - by Coh3n
+    - Last Updated: 16 May 2013 by Coh3n
 
 Example:
 
@@ -142,8 +142,8 @@ Returns the center point of the TRSInterface.
 
 .. note::
 
-    by Coh3n
-    Last Updated: 21 May 2013 by Coh3n
+    - by Coh3n
+    - Last Updated: 21 May 2013 by Coh3n
 
 Example:
 
@@ -169,7 +169,7 @@ attribute is set to false.
 
 .. note::
 
-    by Coh3n
+    - by Coh3n
 
 Example:
 

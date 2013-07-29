@@ -93,8 +93,8 @@ Loads the world information from an INI file.
 
 .. note::
 
-    by Narcle, Nava2, and Coh3n
-    Last Updated: 26 June 2013 by Coh3n
+    - by Narcle, Nava2, and Coh3n
+    - Last Updated: 26 June 2013 by Coh3n
 
 Example:
 
@@ -131,8 +131,8 @@ Initiates the TRSLobbyWorlds variable.  Called at the end of this file.
 
 .. note::
 
-    by Coh3n
-    Last Updated: 26 June 2013 by Coh3n
+    - by Coh3n
+    - Last Updated: 26 June 2013 by Coh3n
 
 Example:
 
@@ -174,8 +174,8 @@ Retruns the array index the world 'wo' is in.
 
 .. note::
 
-    by Coh3n
-    Last Updated: 24 July 2013 by Coh3n
+    - by Coh3n
+    - Last Updated: 24 July 2013 by Coh3n
 
 Example:
 
@@ -202,8 +202,8 @@ Returns true if the worlds interface is open.
 
 .. note::
 
-    by Icefire908 & Coh3n
-    Last Updated: 23 July 2013 by Coh3n
+    - by Icefire908 & Coh3n
+    - Last Updated: 23 July 2013 by Coh3n
 
 Example:
 
@@ -243,8 +243,8 @@ after the tab is clicked to compensate for lag.
 
 .. note::
 
-    by Bionicle1800 & Coh3n
-    Last Updated: 23 July 2013 by Coh3n
+    - by Bionicle1800 & Coh3n
+    - Last Updated: 23 July 2013 by Coh3n
 
 Example:
 
@@ -291,8 +291,8 @@ Returns the currently selected world.
 
 .. note::
 
-    by Home
-    Last Updated: 23 July 2013 by Coh3n
+    - by Home
+    - Last Updated: 23 July 2013 by Coh3n
 
 Example:
 
@@ -333,8 +333,8 @@ Returns true if the world (wo) is valid.
 
 .. note::
 
-    by Coh3n
-    Last Updated: 26 June 2013 by Coh3n
+    - by Coh3n
+    - Last Updated: 26 June 2013 by Coh3n
 
 Example:
 
@@ -375,8 +375,8 @@ arguements for 'by' are:
 
 .. note::
 
-    by Naum & Coh3n
-    Last Updated: 23 July 2013 by Coh3n
+    - by Naum & Coh3n
+    - Last Updated: 23 July 2013 by Coh3n
 
 Example:
 
@@ -433,8 +433,8 @@ coordinates in 'res'.
 
 .. note::
 
-    by Coh3n
-    Last Updated: 24 July 2013 by Coh3n
+    - by Coh3n
+    - Last Updated: 24 July 2013 by Coh3n
 
 Example:
 
@@ -495,8 +495,8 @@ Function is internal.  Use TRSLobbyWorlds.selectWorld instead.
 
 .. note::
 
-    by Coh3n
-    Last Updated: 24 July 2013 by Coh3n
+    - by Coh3n
+    - Last Updated: 24 July 2013 by Coh3n
 
 Example:
 
@@ -549,8 +549,8 @@ Does NOT log the player in.  Will just click the world on the list.
 
 .. note::
 
-    by Narcle, ZephyrsFury, Ashaman88, and Coh3n
-    Last Updated: 26 June 2013 by Coh3n
+    - by Narcle, ZephyrsFury, Ashaman88, and Coh3n
+    - Last Updated: 26 June 2013 by Coh3n
 
 Example:
 
@@ -613,8 +613,8 @@ Selects a random world. P2P or F2P depends on the value of 'members'.
 
 .. note::
 
-    by Narcle, Mixter, and Coh3n
-    Last Updated: 26 June 2013 by Coh3n
+    - by Narcle, Mixter, and Coh3n
+    - Last Updated: 26 June 2013 by Coh3n
 
 Example:
 

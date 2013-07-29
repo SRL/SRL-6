@@ -51,7 +51,7 @@ speed also starts at origin and ends 80% to destination.
 
 .. note::
 
-    by BenLand100 & Flight
+    - by BenLand100 & Flight
 
 Example:
 
@@ -199,7 +199,7 @@ Description: FLIGHT YOU NEED TO GIVE ME SOMETHING FOR THIS! ;)
 
 .. note::
 
-    by BenLand100 & Flight
+    - by BenLand100 & Flight
 
 Example:
 
@@ -301,7 +301,7 @@ Quickly click the mouse with any button.
 
 .. note::
 
-    by Flight
+    - by Flight
 
 Example:
 
@@ -336,7 +336,7 @@ Moves the mouse to 'pnt' using specified 'mmType' then clicks the mouse 'button'
 
 .. note::
 
-    by NCDS & Flight
+    - by NCDS & Flight
 
 Example:
 
@@ -378,7 +378,7 @@ Moves the mouse to 'pnt'.
 
 .. note::
 
-    by NCDS & Flight
+    - by NCDS & Flight
 
 Example:
 
@@ -403,7 +403,7 @@ Moves the mouse, but initially misses the target point (miss area determined by 
 
 .. note::
 
-    by Flight
+    - by Flight
 
 Example:
 
@@ -445,7 +445,7 @@ Clicks MOUSE_LEFT at current position and drags to dest(ination).
 
 .. note::
 
-    by NCDS & Naum
+    - by NCDS & Naum
 
 Example:
 
@@ -481,8 +481,8 @@ on the "down" parameter (set to true by default).
 
 .. note::
 
-    by Coh3n
-    Last Updated: 23 July 2013 by Coh3n
+    - by Coh3n
+    - Last Updated: 23 July 2013 by Coh3n
 
 Example:
 
@@ -522,8 +522,8 @@ of the box.
 
 .. note::
 
-    by Coh3n
-    Last Updated: Mar. 17, 2013 by Coh3n
+    - by Coh3n
+    - Last Updated: Mar. 17, 2013 by Coh3n
 
 Example:
 
@@ -561,8 +561,8 @@ Clicks a random point within an oval shape.
 
 .. note::
 
-    by mixster
-    Last Updated: Mar. 16, 2013 by Coh3n
+    - by mixster
+    - Last Updated: Mar. 16, 2013 by Coh3n
 
 Example:
 
@@ -592,8 +592,8 @@ Same as mouseOval, but mouses within a circle instead.
 
 .. note::
 
-    by mixster
-    Last Updated: Mar. 21st, 2012 by Coh3n
+    - by mixster
+    - Last Updated: Mar. 21st, 2012 by Coh3n
 
 Example:
 
@@ -619,8 +619,8 @@ Time.  Time default set to 1000.
 
 .. note::
 
-    by Rasta Magician & Narcle
-    Last Updated: Mar. 16, 2013 by Coh3n
+    - by Rasta Magician & Narcle
+    - Last Updated: Mar. 16, 2013 by Coh3n
 
 Example:
 

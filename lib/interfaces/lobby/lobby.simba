@@ -81,8 +81,8 @@ Initiates the lobby default values. Called at the end of this file.
 
 .. note::
 
-    by Coh3n
-    Last updated: 23 July 2013 by Coh3n
+    - by Coh3n
+    - Last updated: 23 July 2013 by Coh3n
 
 Example:
 
@@ -121,8 +121,8 @@ Handles the validate email screen that comes up when you enter to lobby.
 
 .. note::
 
-    by NCDS & Coh3n
-    Last updated: 23 July 2013 by Coh3n
+    - by NCDS & Coh3n
+    - Last updated: 23 July 2013 by Coh3n
 
 Example:
 
@@ -156,8 +156,8 @@ called.
 
 .. note::
 
-    by Coh3n
-    Last Updated: 23 July 2013 by Coh3n
+    - by Coh3n
+    - Last Updated: 23 July 2013 by Coh3n
 
 Example:
 
@@ -196,8 +196,8 @@ the tabs.
 
 .. note::
 
-    by Coh3n
-    Last Updated: 23 July 2013 by Coh3n
+    - by Coh3n
+    - Last Updated: 23 July 2013 by Coh3n
 
 Example:
 
@@ -237,8 +237,8 @@ lobby interface to change.
 
 .. note::
 
-    by Coh3n
-    Last updated: 23 July 2013 by Coh3n
+    - by Coh3n
+    - Last updated: 23 July 2013 by Coh3n
 
 Example:
 
@@ -274,8 +274,8 @@ Gets current lobby tab.
 
 .. note::
 
-    by Bionicle1800, NCDS
-    Last Updated: 23 July 2013 by Coh3n
+    - by Bionicle1800, NCDS
+    - Last Updated: 23 July 2013 by Coh3n
 
 Example:
 
@@ -314,8 +314,8 @@ instead of this function.
 
 .. note::
 
-    by Starblaster100, Raymond, IceFire908, Tarajunky, & Coh3n
-    Last Updated: 23 July 2013 by Co3n
+    - by Starblaster100, Raymond, IceFire908, Tarajunky, & Coh3n
+    - Last Updated: 23 July 2013 by Co3n
 
 Example:
 
@@ -363,8 +363,8 @@ use the lobby file's variables instead.
 
 .. note::
 
-    by Bionicle1800 & Coh3n
-    Last Updated: 23 July 2013 by Coh3n
+    - by Bionicle1800 & Coh3n
+    - Last Updated: 23 July 2013 by Coh3n
 
 Example:
 
@@ -408,8 +408,8 @@ players[currentPlayer].logout();.
 
 .. note::
 
-    by IceFire908
-    Last Updated: 23 July 2013 by Coh3n
+    - by IceFire908
+    - Last Updated: 23 July 2013 by Coh3n
 
 Example:
 

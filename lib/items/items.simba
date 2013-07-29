@@ -45,8 +45,8 @@ the result from (low..high).
 
 .. note::
 
-    by Ollybest
-    Last Updated: May. 26, 2013
+    - by Ollybest
+    - Last Updated: May. 26, 2013
 
 Example:
 
@@ -82,8 +82,8 @@ Same as findItem, but returns the amount of matches.
 
 .. note::
 
-    by Ollybest
-    Last Updated: May. 26, 2013
+    - by Ollybest
+    - Last Updated: May. 26, 2013
 
 Example:
 
@@ -112,8 +112,8 @@ Searches and returns the item amount (top left) in the area.
 
 .. note::
 
-    by Ollybest
-    Last Updated: May. 26, 2013
+    - by Ollybest
+    - Last Updated: May. 26, 2013
 
 Example:
 
@@ -153,8 +153,8 @@ Uses the black outline of a item to result whether or not a item is in the area.
 
 .. note::
 
-    by Ollybest
-    Last Updated: 06 June by Coh3n
+    - by Ollybest
+    - Last Updated: 06 June by Coh3n
 
 Example:
 

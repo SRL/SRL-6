@@ -59,8 +59,8 @@ Initiates the mainscreen variable. Called at the end of this file.
 
 .. note::
 
-    by Coh3n
-    Last updated: Mar. 10, 2013 by Coh3n
+    - by Coh3n
+    - Last updated: Mar. 10, 2013 by Coh3n
 
 Example:
 
@@ -100,8 +100,8 @@ not the action bar is open.
 
 .. note::
 
-    by Coh3n
-    Last Updated: 31 May 2013
+    - by Coh3n
+    - Last Updated: 31 May 2013
 
 Example:
 
@@ -134,7 +134,7 @@ Closes any of the Runescape windows that could be open.
 .. note::
 
     by
-    Last Updated:
+    - Last Updated:
 
 Example:
 
@@ -160,8 +160,8 @@ Gets the current uptext in the upper left corner of the mainscreen.
 
 .. note::
 
-    by Coh3n
-    Last Updated: Mar. 10, 2013 by Coh3n
+    - by Coh3n
+    - Last Updated: Mar. 10, 2013 by Coh3n
 
 Example:
 
@@ -189,8 +189,8 @@ parameter (default 0.6).
 
 .. note::
 
-    by Narcle
-    Last Updated: Mar. 10, 2013 by Coh3n
+    - by Narcle
+    - Last Updated: Mar. 10, 2013 by Coh3n
 
 Example:
 
@@ -251,8 +251,8 @@ Takes some testing to get the right combination of PpC and aInc.
 
 .. note::
 
-    by Nava2
-    Last Updates: Mar. 16, 2013 by Coh3n
+    - by Nava2
+    - Last Updates: Mar. 16, 2013 by Coh3n
 
 Example:
 
@@ -318,8 +318,8 @@ Sets the mainscreen at highest\lowest angle, dependant on constant passed.
 
 .. note::
 
-    by Raymond, edit by Naum
-    Last Updated: 10 May 2013 by Coh3n
+    - by Raymond, edit by Naum
+    - Last Updated: 10 May 2013 by Coh3n
 
 Example:
 
@@ -352,8 +352,8 @@ if the player in animating.
 
 .. note::
 
-    by Coh3n
-    Last Updated: 23 May 2013 by Coh3n
+    - by Coh3n
+    - Last Updated: 23 May 2013 by Coh3n
 
 Example:
 
@@ -396,8 +396,8 @@ function only when there aren't similar colors to the object in the same area.
 
 .. note::
 
-    by Wizzup?, Torrent Of Flame & Coh3n
-    Last Updated: 30 May 2013 by Coh3n
+    - by Wizzup?, Torrent Of Flame & Coh3n
+    - Last Updated: 30 May 2013 by Coh3n
 
 Example:
 
@@ -486,8 +486,8 @@ A very general object finding function.  Will find and mouse an object in the ma
 
 .. note::
 
-    by Wizzup? & Torrent Of Flame
-    Last Updated: 30 May 2013 by Coh3n
+    - by Wizzup? & Torrent Of Flame
+    - Last Updated: 30 May 2013 by Coh3n
 
 Example:
 

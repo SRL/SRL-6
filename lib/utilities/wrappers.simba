@@ -23,7 +23,7 @@ Takes a TPoint variable instead of x, y variables.
 
 .. note::
 
-    by Ollybest
+    - by Ollybest
 
 Example:
 
@@ -50,7 +50,7 @@ Takes an extra parameter, clearSame if true will clear the same integers in the 
 
 .. note::
 
-    by Ollybest
+    - by Ollybest
 
 Example:
 
@@ -79,7 +79,7 @@ Takes a TBox variable instead of x1, y1, x2 and y2 variables.
 
 .. note::
 
-    by Coh3n
+    - by Coh3n
 
 Example:
 
@@ -105,7 +105,7 @@ Takes a TBox variable instead of x1, y1, x2 and y2 variables.
 
 .. note::
 
-    by Ollybest
+    - by Ollybest
 
 Example:
 
@@ -131,7 +131,7 @@ Takes a TBox variable instead of x1, y1, x2 and y2 variables.
 
 .. note::
 
-    by Coh3n
+    - by Coh3n
 
 Example:
 
@@ -157,7 +157,7 @@ Takes a TBox variable instead of x1, y1, x2 and y2 variables.
 
 .. note::
 
-    by Zyt3x
+    - by Zyt3x
 
 Example:
 
@@ -183,7 +183,7 @@ Same as regular findColorsTolerance but searches the bitmap.
 
 .. note::
 
-    by Ollybest
+    - by Ollybest
 
 Example:
 
@@ -222,7 +222,7 @@ variable instead of x1, y1, x2 and y2 variables.
 
 .. note::
 
-    by Ollybest
+    - by Ollybest
 
 Example:
 
@@ -248,7 +248,7 @@ Same as regular findColorsTolerance but searches the entire bitmap.
 
 .. note::
 
-    by Ollybest
+    - by Ollybest
 
 Example:
 
@@ -278,7 +278,7 @@ Takes a TBox variable instead of x1, y1, x2 and y2 variables.
 
 .. note::
 
-    by Ollybest
+    - by Ollybest
 
 Example:
 
@@ -304,7 +304,7 @@ Takes a TBox variable instead of x1, y1, x2 and y2 variables.
 
 .. note::
 
-    by Coh3n
+    - by Coh3n
 
 Example:
 
@@ -330,7 +330,7 @@ Takes a TBox variable instead of x1, y1, x2 and y2 variables.
 
 .. note::
 
-    by Ollybest
+    - by Ollybest
 
 Example:
 
@@ -356,7 +356,7 @@ Takes a TBox variable instead of x1, y1, x2 and y2 variables.
 
 .. note::
 
-    by Coh3n
+    - by Coh3n
 
 Example:
 
@@ -382,7 +382,7 @@ Takes a TBox variable instead of x1, y1, x2 and y2 variables.
 
 .. note::
 
-    by Coh3n
+    - by Coh3n
 
 Example:
 
@@ -408,7 +408,7 @@ Takes a TBox variable instead of x1, y1, x2 and y2 variables.
 
 .. note::
 
-    by Ollybest
+    - by Ollybest
 
 Example:
 
@@ -434,7 +434,7 @@ Takes a TBox variable instead of x1, y1, x2 and y2 variables.
 
 .. note::
 
-    by Ollybest
+    - by Ollybest
 
 Example:
 
@@ -460,7 +460,7 @@ Takes a TBox variable instead of x1, y1, x2 and y2 variables.
 
 .. note::
 
-    by Ollybest
+    - by Ollybest
 
 Example:
 
@@ -486,7 +486,7 @@ Takes a TBox variable instead of x1, y1, x2 and y2 variables.
 
 .. note::
 
-    by Coh3n
+    - by Coh3n
 
 Example:
 
@@ -512,7 +512,7 @@ Takes a TBox variable instead of x1, y1, x2 and y2 variables.
 
 .. note::
 
-    by Ollybest
+    - by Ollybest
 
 Example:
 
@@ -539,7 +539,7 @@ Takes a TBox variable instead of x1, y1, x2 and y2 variables.
 
 .. note::
 
-    by Ollybest
+    - by Ollybest
 
 Example:
 
@@ -566,7 +566,7 @@ Takes a TBox variable instead of x1, y1, x2 and y2 variables.
 
 .. note::
 
-    by Ollybest
+    - by Ollybest
 
 Example:
 
@@ -593,7 +593,7 @@ Wrapper for findDTMRotatedAlternating (commonly used in SRL5).
 
 .. note::
 
-    by Ollybest
+    - by Ollybest
 
 Example:
 
@@ -620,7 +620,7 @@ Takes a TBox variable instead of x1, y1, x2 and y2 variables.
 
 .. note::
 
-    by Ollybest
+    - by Ollybest
 
 Example:
 
@@ -647,7 +647,7 @@ Takes a TBox variable instead of x1, y1, x2 and y2 variables.
 
 .. note::
 
-    by Ollybest
+    - by Ollybest
 
 Example:
 
@@ -674,7 +674,7 @@ Takes a TBox variable instead of x1, y1, x2 and y2 variables.
 
 .. note::
 
-    by Ollybest
+    - by Ollybest
 
 Example:
 
@@ -701,7 +701,7 @@ Takes a TBox variable instead of x1, y1, x2 and y2 variables.
 
 .. note::
 
-    by Ollybest
+    - by Ollybest
 
 Example:
 
@@ -728,7 +728,7 @@ Creates a tpa from text without the need for the W and H parameters.
 
 .. note::
 
-    by Ollybest
+    - by Ollybest
 
 Example:
 
@@ -756,7 +756,7 @@ Used to replicate any string, as opposed to the former replicate() that replicat
 
 .. note::
 
-    by Zyt3x
+    - by Zyt3x
 
 Example:
 
@@ -783,7 +783,7 @@ Explodes a string into a TStringArray, takes an array of delimiters instead of o
 
 .. note::
 
-    by Zyt3x
+    - by Zyt3x
 
 Example:
 
@@ -822,7 +822,7 @@ Takes a extended variable instead of an integer variable.
 
 .. note::
 
-    by Ollybest
+    - by Ollybest
 
 Example:
 
@@ -849,7 +849,7 @@ Accepts two TPoints instead of x1, y1, x2 and y2 variables.
 
 .. note::
 
-    by Ollybest
+    - by Ollybest
 
 Example:
 

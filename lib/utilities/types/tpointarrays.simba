@@ -25,7 +25,7 @@ Copies a TPointArray.
 
 .. note::
 
-    by Coh3n
+    - by Coh3n
 
 Example:
 
@@ -50,7 +50,7 @@ Used to add a point to a TPointArray at a chosen index larger than the array's l
 
 .. note::
 
-    by Zyt3x
+    - by Zyt3x
 
 Example:
 
@@ -87,7 +87,7 @@ Used to delete a point of a TPointArray at a chosen index larger than the array'
 
 .. note::
 
-    by Zyt3x
+    - by Zyt3x
 
 Example:
 
@@ -123,7 +123,7 @@ Used to append a point to a TPointArray.
 
 .. note::
 
-    by Zyt3x
+    - by Zyt3x
 
 Example:
 
@@ -149,7 +149,7 @@ Used to combine two TPointArray variables.
 
 .. note::
 
-    by Zyt3x
+    - by Zyt3x
 
 Example:
 
@@ -175,7 +175,7 @@ Returns the index of where the point was found in a TPointArray.  Returns -1 if 
 
 .. note::
 
-    by Zyt3x
+    - by Zyt3x
 
 Example:
 
@@ -209,7 +209,7 @@ Returns True if the point is present in the TPointArray.
 
 .. note::
 
-    by Zyt3x
+    - by Zyt3x
 
 Example:
 
@@ -235,7 +235,7 @@ Returns a TPointArray which contains points that are present in both arrays.
 
 .. note::
 
-    by Zyt3x
+    - by Zyt3x
 
 Example:
 
@@ -265,7 +265,7 @@ Returns a TPointArray which contains points that are not present in both arrays.
 
 .. note::
 
-    by Zyt3x
+    - by Zyt3x
 
 Example:
 
@@ -295,7 +295,7 @@ Rotates the points in the TPointArray.
 
 .. note::
 
-    by Ollybest
+    - by Ollybest
 
 Example:
 
@@ -321,7 +321,7 @@ Used to clear duplicates in a TPointArray.
 
 .. note::
 
-    by Ollybest
+    - by Ollybest
 
 Example:
 
@@ -347,7 +347,7 @@ Used to invert the TPointArray.
 
 .. note::
 
-    by Zyt3x
+    - by Zyt3x
 
 Example:
 
@@ -373,7 +373,7 @@ Returns the point in the average middle of the TPA.
 
 .. note::
 
-    by Zyt3x
+    - by Zyt3x
 
 Example:
 
@@ -399,7 +399,7 @@ Returns the box boundaries of the TPA.
 
 .. note::
 
-    by Zyt3x
+    - by Zyt3x
 
 Example:
 
@@ -425,7 +425,7 @@ Returns true if both TPointArrays are equal.
 
 .. note::
 
-    by Zyt3x
+    - by Zyt3x
 
 Example:
 
@@ -451,7 +451,7 @@ Returns True if the point is near the array.
 
 .. note::
 
-    by Zyt3x
+    - by Zyt3x
 
 Example:
 
@@ -477,7 +477,7 @@ Returns True if the point is near the array.
 
 .. note::
 
-    by Zyt3x
+    - by Zyt3x
 
 Example:
 
@@ -503,7 +503,7 @@ Returns the TPA where the points in arr matches the points in the TPointArray.
 
 .. note::
 
-    by Zyt3x
+    - by Zyt3x
 
 Example:
 
@@ -530,7 +530,7 @@ Returns True if the TPA where the points in arr matches the points in the TPoint
 
 .. note::
 
-    by Zyt3x
+    - by Zyt3x
 
 Example:
 
@@ -556,7 +556,7 @@ Returns the points in the given box (b) that are not in the TPointArray.
 
 .. note::
 
-    by Coh3n
+    - by Coh3n
 
 Example:
 
@@ -582,7 +582,7 @@ Offsets each point in the TPointArray by the point p.
 
 .. note::
 
-    by Coh3n
+    - by Coh3n
 
 Example:
 
@@ -608,7 +608,7 @@ Used to QuickSort the TPointArray.  PS: Using the TIntegerArray arr to sort.
 
 .. note::
 
-    by Zyt3x
+    - by Zyt3x
 
 Example:
 
@@ -634,7 +634,7 @@ Sorts the TPA from lowest X to highest X or highest X to lowest X, depending on 
 
 .. note::
 
-    by Zyt3x
+    - by Zyt3x
 
 Example:
 
@@ -660,7 +660,7 @@ Sorts the TPA from lowest Y to highest Y or highest Y to lowest Y, depending on 
 
 .. note::
 
-    by Zyt3x
+    - by Zyt3x
 
 Example:
 
@@ -686,7 +686,7 @@ Sorts the TPA from a point
 
 .. note::
 
-    by Zyt3x
+    - by Zyt3x
 
 Example:
 
@@ -712,7 +712,7 @@ Removes all the points outside of the box.
 
 .. note::
 
-    by masterBB
+    - by masterBB
 
 Example:
 
@@ -758,7 +758,7 @@ Accepts a TBox rather than x1, y1, x2, y2 vars.
 
 .. note::
 
-    by Ollybest
+    - by Ollybest
 
 Example:
 
@@ -787,7 +787,7 @@ Removes the points that are in the TPointArray Points that are not within the
 
 .. note::
 
-    by Zyt3x
+    - by Zyt3x
 
 Example:
 
@@ -814,7 +814,7 @@ Removes the points in the TPointArray Points that are not on the line defined  b
 
 .. note::
 
-    by Zyt3x
+    - by Zyt3x
 
 Example:
 
@@ -841,7 +841,7 @@ Removes the points that don't have a dist between mindist/maxdist with (mx,my).
 
 .. note::
 
-    by Zyt3x
+    - by Zyt3x
 
 Example:
 
@@ -868,7 +868,7 @@ Returns True if the text TPA is found within TPointArray.  Also returns the matc
 
 .. note::
 
-    by Zyt3x
+    - by Zyt3x
 
 Example:
 
@@ -894,7 +894,7 @@ Splits the TPointArray into a 2D array of boxes w by h.
 
 .. note::
 
-    by Coh3n
+    - by Coh3n
 
 Example:
 
@@ -920,7 +920,7 @@ Splits the TPointArray into a 2D array of boxes dist by dist.
 
 .. note::
 
-    by Coh3n
+    - by Coh3n
 
 Example:
 
@@ -946,7 +946,7 @@ Removes the points in 'tpa' that are in the TPointArray.
 
 .. note::
 
-    by Coh3n
+    - by Coh3n
 
 Example:
 
@@ -971,7 +971,7 @@ Splits the TPA to boxes with sidelength distance and results them as a T2DPointA
 
 .. note::
 
-    by Ollybest
+    - by Ollybest
 
 Example:
 
@@ -997,7 +997,7 @@ Splits the TPA to boxes with sidelengths W and H and results them as a T2DPointA
 
 .. note::
 
-    by Ollybest
+    - by Ollybest
 
 Example:
 
@@ -1023,7 +1023,7 @@ Fills the TPA.
 
 .. note::
 
-    by Ollybest
+    - by Ollybest
 
 Example:
 
@@ -1049,7 +1049,7 @@ Returns the edges of the TPA
 
 .. note::
 
-    by Ollybest
+    - by Ollybest
 
 Example:
 
@@ -1075,7 +1075,7 @@ Sorts the atpa from sortFrom, from the middle of each TPA.
 
 .. note::
 
-    by Ollybest
+    - by Ollybest
 
 Example:
 
@@ -1101,7 +1101,7 @@ Returns the points that all match in the atpa.
 
 .. note::
 
-    by Ollybest
+    - by Ollybest
 
 Example:
 
@@ -1127,7 +1127,7 @@ Returns the length of the matching points rather than the points that match.
 
 .. note::
 
-    by Ollybest
+    - by Ollybest
 
 Example:
 
@@ -1156,7 +1156,7 @@ Returns each TPA bounds in the atpa in a TBoxArray.
 
 .. note::
 
-    by Ollybest
+    - by Ollybest
 
 Example:
 
@@ -1188,7 +1188,7 @@ Merges the T2DPointArray into a TPointArray.
 
 .. note::
 
-    by Coh3n
+    - by Coh3n
 
 Example:
 
@@ -1214,7 +1214,7 @@ Returns the box boundaries of the TPA.
 
 .. note::
 
-    by Coh3n
+    - by Coh3n
 
 Example:
 
@@ -1240,7 +1240,7 @@ Offsets a T2DPointArray by p.
 
 .. note::
 
-    by Coh3n
+    - by Coh3n
 
 Example:
 
@@ -1266,7 +1266,7 @@ Copies a T2DPointArray.
 
 .. note::
 
-    by Coh3n
+    - by Coh3n
 
 Example:
 
@@ -1291,7 +1291,7 @@ Returns the string of font found inthe T2DPointArray.
 
 .. note::
 
-    by Coh3n
+    - by Coh3n
 
 Example:
 
@@ -1317,7 +1317,7 @@ Sorts the atpa from the desired TPoint.
 
 .. note::
 
-    by Ollybest
+    - by Ollybest
 
 Example:
 
@@ -1345,7 +1345,7 @@ Sorts the ATPA from smallest or largest based on the largestFirst boolean.
 
 .. note::
 
-    by Ollybest
+    - by Ollybest
 
 Example:
 
@@ -1371,7 +1371,7 @@ Sorts the T2DPointArray from size by the closest first if closestFirst is true.
 
 .. note::
 
-    by Ollybest
+    - by Ollybest
 
 Example:
 
@@ -1397,7 +1397,7 @@ Removes the tpas in the atpa if they their length is between min and max.
 
 .. note::
 
-    by Ollybest
+    - by Ollybest
 
 Example:
 

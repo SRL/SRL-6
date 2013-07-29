@@ -74,8 +74,8 @@ Initiates the tabBackpack variable. Called at the end of this file.
 
 .. note::
 
-    by Ollybest
-    Last updated: Mar. 15, 2013 by Ollybest
+    - by Ollybest
+    - Last updated: Mar. 15, 2013 by Ollybest
 
 Example:
 
@@ -120,8 +120,8 @@ Returns true if our current tab is the Backpack tab.
 
 .. note::
 
-    by Ollybest
-    Last Updated: March. 11, 2013
+    - by Ollybest
+    - Last Updated: March. 11, 2013
 
 Example:
 
@@ -148,8 +148,8 @@ Opens the Backpack tab if we're currently not on it.
 
 .. note::
 
-    by Ollybest
-    Last Updated: March. 11, 2013
+    - by Ollybest
+    - Last Updated: March. 11, 2013
 
 Example:
 
@@ -178,8 +178,8 @@ Returns if the desired slot is not vaild.
 
 .. note::
 
-    by Ollybest
-    Last Updated: March. 11, 2013
+    - by Ollybest
+    - Last Updated: March. 11, 2013
 
 Example:
 
@@ -208,8 +208,8 @@ Returns the tbox of the desired Backpack slot.
 
 .. note::
 
-    by Ollybest
-    Last Updated: March. 11, 2013
+    - by Ollybest
+    - Last Updated: March. 11, 2013
 
 Example:
 
@@ -242,8 +242,8 @@ Returns true if an item is in the desired Backpack slot.
 
 .. note::
 
-    by Ollybest
-    Last Updated: March. 11, 2013
+    - by Ollybest
+    - Last Updated: March. 11, 2013
 
 Example:
 
@@ -273,8 +273,8 @@ Returns the Backpack slot number in which the TPoint falls within.
 
 .. note::
 
-    by Ollybest
-    Last Updated: March. 11, 2013
+    - by Ollybest
+    - Last Updated: March. 11, 2013
 
 Example:
 
@@ -307,8 +307,8 @@ Returns how many items are in our Backpack.
 
 .. note::
 
-    by Ollybest
-    Last Updated: March. 11, 2013
+    - by Ollybest
+    - Last Updated: March. 11, 2013
 
 Example:
 
@@ -342,8 +342,8 @@ parameter useful for waiting for a set Backpack count.
 
 .. note::
 
-    by Ollybest
-    Last Updated: March. 11, 2013
+    - by Ollybest
+    - Last Updated: March. 11, 2013
 
 Example:
 
@@ -380,8 +380,8 @@ Returns true if our Backpack is full.
 
 .. note::
 
-    by Ollybest
-    Last Updated: March. 11, 2013
+    - by Ollybest
+    - Last Updated: March. 11, 2013
 
 Example:
 
@@ -417,8 +417,8 @@ Returns true if our Backpack is empty.
 
 .. note::
 
-    by Ollybest
-    Last Updated: March. 11, 2013
+    - by Ollybest
+    - Last Updated: March. 11, 2013
 
 Example:
 
@@ -448,8 +448,8 @@ Moves and performs the desired mouse action at the selected Backpack slot.
 
 .. note::
 
-    by Ollybest
-    Last Updated: March. 11, 2013
+    - by Ollybest
+    - Last Updated: March. 11, 2013
 
 Example:
 
@@ -480,8 +480,8 @@ Will return true if a desired slot is activated.
 
 .. note::
 
-    by Ollybest
-    Last Updated: March. 12, 2013
+    - by Ollybest
+    - Last Updated: March. 12, 2013
 
 Example:
 
@@ -511,8 +511,8 @@ Returns what slot is activated, if none are it will return -1.
 
 .. note::
 
-    by Ollybest
-    Last Updated: March. 12, 2013
+    - by Ollybest
+    - Last Updated: March. 12, 2013
 
 Example:
 
@@ -555,8 +555,8 @@ drop patterns.
 
 .. note::
 
-    by Ollybest
-    Last Updated: March. 12, 2013
+    - by Ollybest
+    - Last Updated: March. 12, 2013
 
 Example:
 
@@ -618,8 +618,8 @@ Attempts to drop the item in the desired slot
 
 .. note::
 
-    by Ollybest
-    Last Updated: April. 25, 2013
+    - by Ollybest
+    - Last Updated: April. 25, 2013
 
 Example:
 
@@ -655,8 +655,8 @@ Searches for the dtm in each Backpack slot and will return how many matches it f
 
 .. note::
 
-    by Ollybest
-    Last Updated: March. 12, 2013
+    - by Ollybest
+    - Last Updated: March. 12, 2013
 
 Example:
 
@@ -702,8 +702,8 @@ Will return how many items were clicked.
 
 .. note::
 
-    by Ollybest
-    Last Updated: March. 12, 2013
+    - by Ollybest
+    - Last Updated: March. 12, 2013
 
 Example:
 
@@ -747,8 +747,8 @@ TRSTabBackpack.dragSlot
 
 .. note::
 
-    by Ollybest
-    Last Updated: April. 25, 2013
+    - by Ollybest
+    - Last Updated: April. 25, 2013
 
 Example:
 

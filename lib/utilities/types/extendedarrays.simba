@@ -22,7 +22,7 @@ Used to add a value to a TExtendedArray at a chosen index larger than the array'
 
 .. note::
 
-    by Zyt3x
+    - by Zyt3x
 
 Example:
 
@@ -59,7 +59,7 @@ Used to delete a value of a TExtendedArray at a chosen index larger than the arr
 
 .. note::
 
-    by Zyt3x
+    - by Zyt3x
 
 Example:
 
@@ -95,7 +95,7 @@ Used to append a value to a TExtendedArray.
 
 .. note::
 
-    by Zyt3x
+    - by Zyt3x
 
 Example:
 
@@ -121,7 +121,7 @@ Used to combine two TExtendedArray variables.
 
 .. note::
 
-    by Zyt3x
+    - by Zyt3x
 
 Example:
 
@@ -150,7 +150,7 @@ Returns the index of where the value was found in a TExtendedArray.  Returns -1 
 
 .. note::
 
-    by Zyt3x
+    - by Zyt3x
 
 Example:
 
@@ -184,7 +184,7 @@ Returns True if the value is present in the TExtendedArray.
 
 .. note::
 
-    by Zyt3x
+    - by Zyt3x
 
 Example:
 
@@ -210,7 +210,7 @@ Returns a TExtendedArray which contains values that are present in both arrays.
 
 .. note::
 
-    by Zyt3x
+    - by Zyt3x
 
 Example:
 
@@ -240,7 +240,7 @@ Returns a TExtendedArray which contains values that are not present in both arra
 
 .. note::
 
-    by Zyt3x
+    - by Zyt3x
 
 Example:
 
@@ -270,7 +270,7 @@ Used to swap two TExtendedArray variables.
 
 .. note::
 
-    by Zyt3x
+    - by Zyt3x
 
 Example:
 
@@ -300,7 +300,7 @@ Used to clear duplicates in a TExtendedArray.
 
 .. note::
 
-    by Zyt3x
+    - by Zyt3x
 
 Example:
 
@@ -332,7 +332,7 @@ Used to invert the TExtendedArray.
 
 .. note::
 
-    by Zyt3x
+    - by Zyt3x
 
 Example:
 
@@ -363,7 +363,7 @@ Returns the sum of all values in a TExtendedArray.
 
 .. note::
 
-    by Zyt3x
+    - by Zyt3x
 
 Example:
 
@@ -392,7 +392,7 @@ Returns the average of all values in a TExtendedArray.
 
 .. note::
 
-    by Zyt3x
+    - by Zyt3x
 
 Example:
 

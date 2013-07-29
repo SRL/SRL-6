@@ -155,8 +155,8 @@ Returns the number of players that are still active in the TPlayerArray.
 
 .. note::
 
-    by ss23 & Coh3n
-    Last updated: Dec. 22nd, 2012 by Coh3n
+    - by ss23 & Coh3n
+    - Last updated: Dec. 22nd, 2012 by Coh3n
 
 Example:
 
@@ -189,8 +189,8 @@ Adds the player with 'info' to the TPlayerArray.
 
 .. note::
 
-    by Zyt3x & Coh3n
-    Last updated: Dec. 22nd, 2012 by Coh3n
+    - by Zyt3x & Coh3n
+    - Last updated: Dec. 22nd, 2012 by Coh3n
 
 Example:
 
@@ -238,8 +238,8 @@ army file 'army'. Loads 'default' by default.
 
 .. note::
 
-    by Bart (masterBB)
-    Last updated: Apr. 4th, 2013 by Bart
+    - by Bart (masterBB)
+    - Last updated: Apr. 4th, 2013 by Bart
 
 Example:
 
@@ -401,8 +401,8 @@ to optional parameter 'active'. Sets previous player to true by default.
 
 .. note::
 
-    by Dankness, Ron, Raymond, ZephyrsFury & Coh3n
-    Last updated: Feb. 10, 2013 by Coh3n
+    - by Dankness, Ron, Raymond, ZephyrsFury & Coh3n
+    - Last updated: Feb. 10, 2013 by Coh3n
 
 Example:
 
@@ -446,8 +446,8 @@ to the optional parameter 'active'. Sets the previous player to true by default.
 
 .. note::
 
-    by ZephyrsFury & Coh3n
-    Last updated: Feb. 10, 2013 by Coh3n
+    - by ZephyrsFury & Coh3n
+    - Last updated: Feb. 10, 2013 by Coh3n
 
 Example:
 
@@ -484,8 +484,8 @@ to the optional parameter 'active'. Sets the previous player to true by default.
 
 .. note::
 
-    by ZephyrsFury & Coh3n
-    Last updated: Feb. 10, 2013 by Coh3n
+    - by ZephyrsFury & Coh3n
+    - Last updated: Feb. 10, 2013 by Coh3n
 
 Example:
 
@@ -526,8 +526,8 @@ Writes the standard information about the player to the Simba debug box.
 
 .. note::
 
-    by Coh3n
-    Last updated: Dec. 22nd, 2012 by Zyt3x
+    - by Coh3n
+    - Last updated: Dec. 22nd, 2012 by Zyt3x
 
 Example:
 
@@ -563,8 +563,8 @@ Returns true if a player is logged in.
 
 .. note::
 
-    by WT-Fakawi
-    Last updated: 30/09/2012 by Coh3n
+    - by WT-Fakawi
+    - Last updated: 30/09/2012 by Coh3n
 
 Example:
 
@@ -594,8 +594,8 @@ designed to work with any screen size.  Returns true if both boxes are found.
 
 .. note::
 
-    by Coh3n
-    Last updated: 23 July 2013 by Coh3n
+    - by Coh3n
+    - Last updated: 23 July 2013 by Coh3n
 
 Example:
 
@@ -653,8 +653,8 @@ pressEnter is set to true. See TPlayer.loginToLobby for usage.
 
 .. note::
 
-    by Starblaster100, Raymond, IceFire908, Tarajunky, NCDS & Coh3n
-    Last updated: 30/09/2012 by Coh3n
+    - by Starblaster100, Raymond, IceFire908, Tarajunky, NCDS & Coh3n
+    - Last updated: 30/09/2012 by Coh3n
 
 Example:
 
@@ -729,8 +729,8 @@ against keyloggers.
 
 .. note::
 
-    by Coh3n & Flight
-    Last updated: Feb. 12, 2013 by Coh3n
+    - by Coh3n & Flight
+    - Last updated: Feb. 12, 2013 by Coh3n
 
 Example:
 
@@ -832,8 +832,8 @@ appears (if any) when a player is logged in.
 
 .. note::
 
-    by Starblaster100, Raymond, IceFire908, Tarajunky, NCDS & Coh3n
-    Last updated: Feb. 10, 2013 by Coh3n
+    - by Starblaster100, Raymond, IceFire908, Tarajunky, NCDS & Coh3n
+    - Last updated: Feb. 10, 2013 by Coh3n
 
 Example:
 
@@ -882,8 +882,8 @@ Returns login response information depending on the login text color count.
 
 .. note::
 
-    by Starblaster100, Raymond, IceFire908, Tarajunky, NCDS & Coh3n
-    Last updated: Feb. 10, 2013 by Coh3n
+    - by Starblaster100, Raymond, IceFire908, Tarajunky, NCDS & Coh3n
+    - Last updated: Feb. 10, 2013 by Coh3n
 
 Example:
 
@@ -956,8 +956,8 @@ Called in loops waiting for the lobby and login screens. Results are as follows:
 
 .. note::
 
-    by Starblaster100, Raymond, IceFire908, Tarajunky, NCDS & Coh3n
-    Last updated: Feb. 10, 2013 by Coh3n
+    - by Starblaster100, Raymond, IceFire908, Tarajunky, NCDS & Coh3n
+    - Last updated: Feb. 10, 2013 by Coh3n
 
 Example:
 
@@ -1037,8 +1037,8 @@ visible.
 
 .. note::
 
-    by The SRL Developers Team
-    Last updated: Feb. 10, 2013 by Coh3n
+    - by The SRL Developers Team
+    - Last updated: Feb. 10, 2013 by Coh3n
 
 Example:
 
@@ -1131,8 +1131,8 @@ logged in.
 
 .. note::
 
-    by The SRL Developers Team
-    Last updated: 22 June 2013 by Coh3n
+    - by The SRL Developers Team
+    - Last updated: 22 June 2013 by Coh3n
 
 Example:
 
@@ -1214,8 +1214,8 @@ Completely logs the player out of the game.
 
 .. note::
 
-    by Coh3n
-    Last updated: 23 July 2013 by Coh3n
+    - by Coh3n
+    - Last updated: 23 July 2013 by Coh3n
 
 Example:
 
@@ -1276,8 +1276,8 @@ Logs the player out to the lobby.
 
 .. note::
 
-    by Coh3n
-    Last updated: Mar. 1, 2013 by Coh3n
+    - by Coh3n
+    - Last updated: Mar. 1, 2013 by Coh3n
 
 Example:
 
@@ -1302,8 +1302,8 @@ Leaves the lobby; goes to the login screen.
 
 .. note::
 
-    by Coh3n
-    Last updated: Mar. 3, 2013 by Coh3n
+    - by Coh3n
+    - Last updated: Mar. 3, 2013 by Coh3n
 
 Example:
 
@@ -1329,8 +1329,8 @@ choose a random world by default.
 
 .. note::
 
-    by Coh3n
-    Last updated: 22 June 2013 by Coh3n
+    - by Coh3n
+    - Last updated: 22 June 2013 by Coh3n
 
 Example:
 

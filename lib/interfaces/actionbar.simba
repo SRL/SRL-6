@@ -53,8 +53,8 @@ Initiates the actionBar variable. Called at the end of this file.
 
 .. note::
 
-    by euphemism
-    Last Updated: 18 April 2013 by euphemism
+    - by euphemism
+    - Last Updated: 18 April 2013 by euphemism
 
 Example:
 
@@ -113,8 +113,8 @@ Returns true if the Action Bar is open.
 
 .. note::
 
-    by euphemism
-    Last Updated: 18 April 2013 by euphemism
+    - by euphemism
+    - Last Updated: 18 April 2013 by euphemism
 
 Example:
 
@@ -146,8 +146,8 @@ Internal function used to toggle the Action Bar open and closed.
 
 .. note::
 
-    by euphemism
-    Last Updated: 18 April 2013 by euphemism
+    - by euphemism
+    - Last Updated: 18 April 2013 by euphemism
 
 Example:
 
@@ -193,8 +193,8 @@ Opens the Action Bar if it is closed.
 
 .. note::
 
-    by euphemism
-    Last Updated: 18 April 2013 by euphemism
+    - by euphemism
+    - Last Updated: 18 April 2013 by euphemism
 
 Example:
 
@@ -221,8 +221,8 @@ Closes the Action Bar if it is open.
 
 .. note::
 
-    by euphemism
-    Last Updated: 18 April 2013 by euphemism
+    - by euphemism
+    - Last Updated: 18 April 2013 by euphemism
 
 Example:
 
@@ -250,8 +250,8 @@ Returns the number of the Action Bar setup currently displayed.  (Members can
 
 .. note::
 
-    by euphemism
-    Last Updated: 18 April 2013 by euphemism
+    - by euphemism
+    - Last Updated: 18 April 2013 by euphemism
 
 Example:
 
@@ -392,8 +392,8 @@ Returns true if the specified Action Bar slot is empty.
 
 .. note::
 
-    by euphemism
-    Last Updated: 18 April 2013 by euphemism
+    - by euphemism
+    - Last Updated: 18 April 2013 by euphemism
 
 Example:
 
@@ -423,8 +423,8 @@ Returns true if every slot in the Action Bar is empty.
 
 .. note::
 
-    by euphemism
-    Last Updated: 18 April 2013 by euphemism
+    - by euphemism
+    - Last Updated: 18 April 2013 by euphemism
 
 Example:
 
@@ -461,8 +461,8 @@ Generic function to click a non-empty slot in the Action Bar.  Returns true
 
 .. note::
 
-    by euphemism
-    Last Updated: 18 April 2013 by euphemism
+    - by euphemism
+    - Last Updated: 18 April 2013 by euphemism
 
 Example:
 
@@ -498,8 +498,8 @@ Returns string representation of the key bind for the given slot.  Striking
 
 .. note::
 
-    by euphemism
-    Last Updated: 18 April 2013 by euphemism
+    - by euphemism
+    - Last Updated: 18 April 2013 by euphemism
 
 Example:
 
@@ -542,8 +542,8 @@ Clears the specified Action Bar slot.
 
 .. note::
 
-    by euphemism
-    Last Updated: 18 April 2013 by euphemism
+    - by euphemism
+    - Last Updated: 18 April 2013 by euphemism
 
 Example:
 
@@ -589,8 +589,8 @@ Clears every slot of the Action Bar.
 
 .. note::
 
-    by euphemism
-    Last Updated: 18 April 2013 by euphemism
+    - by euphemism
+    - Last Updated: 18 April 2013 by euphemism
 
 Example:
 
@@ -645,8 +645,8 @@ Returns integer representation (0 - 100) of the cooldown of the ability
 
 .. note::
 
-    by euphemism
-    Last Updated: 18 April 2013 by euphemism
+    - by euphemism
+    - Last Updated: 18 April 2013 by euphemism
 
 Example:
 
@@ -681,8 +681,8 @@ Uses the ability in the specified slot, returns true if successful.
 
 .. note::
 
-    by euphemism
-    Last Updated: 18 April 2013 by euphemism
+    - by euphemism
+    - Last Updated: 18 April 2013 by euphemism
 
 Example:
 
@@ -732,8 +732,8 @@ Checks if the specified ability is in the given slot.  Function has to open the
 
 .. note::
 
-    by euphemism
-    Last Updated: 18 April 2013 by euphemism
+    - by euphemism
+    - Last Updated: 18 April 2013 by euphemism
 
 Example:
 
@@ -803,8 +803,8 @@ Adds the specified ability to the given slot in the Action Bar.  Returns true
 
 .. note::
 
-    by euphemism
-    Last Updated: 18 April 2013 by euphemism
+    - by euphemism
+    - Last Updated: 18 April 2013 by euphemism
 
 Example:
 
@@ -863,8 +863,8 @@ Adds item in the given inventory slot to the specified Action Bar slot. Returns
 
 .. note::
 
-    by euphemism
-    Last Updated: 18 April 2013 by euphemism
+    - by euphemism
+    - Last Updated: 18 April 2013 by euphemism
 
 Example:
 
@@ -962,8 +962,8 @@ Returns the adrenaline percentage (0 - 100) of the adrenaline bar.
 
 .. note::
 
-    by Slushpuppy
-    Last Updated: 18 April 2013 by euphemism
+    - by Slushpuppy
+    - Last Updated: 18 April 2013 by euphemism
 
 Example:
 
@@ -1012,8 +1012,8 @@ Returns true if the Action Bar is locked.
 
 .. note::
 
-    by euphemism
-    Last Updated: 18 April 2013 by euphemism
+    - by euphemism
+    - Last Updated: 18 April 2013 by euphemism
 
 Example:
 
@@ -1045,8 +1045,8 @@ Internal function to toggle the lock of the Action Bar.
 
 .. note::
 
-    by euphemism
-    Last Updated: 18 April 2013 by euphemism
+    - by euphemism
+    - Last Updated: 18 April 2013 by euphemism
 
 Example:
 
@@ -1088,8 +1088,8 @@ Locks the Action Bar if it is unlocked.  Returns true on success.
 
 .. note::
 
-    by euphemism
-    Last Updated: 18 April 2013 by euphemism
+    - by euphemism
+    - Last Updated: 18 April 2013 by euphemism
 
 Example:
 
@@ -1116,8 +1116,8 @@ Unlocks the Action Bar if it is locked.  Returns true on success.
 
 .. note::
 
-    by euphemism
-    Last Updated: 18 April 2013 by euphemism
+    - by euphemism
+    - Last Updated: 18 April 2013 by euphemism
 
 Example:
 

@@ -22,7 +22,7 @@ Used to add a value to a TIntegerArray at a chosen index larger than the array's
 
 .. note::
 
-    by Zyt3x
+    - by Zyt3x
 
 Example:
 
@@ -59,7 +59,7 @@ Used to delete a value of a TIntegerArray at a chosen index larger than the arra
 
 .. note::
 
-    by Zyt3x
+    - by Zyt3x
 
 Example:
 
@@ -95,7 +95,7 @@ Used to append a value to a TIntegerArray.
 
 .. note::
 
-    by Zyt3x
+    - by Zyt3x
 
 Example:
 
@@ -121,7 +121,7 @@ Used to combine two TIntegerArray variables.
 
 .. note::
 
-    by Zyt3x
+    - by Zyt3x
 
 Example:
 
@@ -149,7 +149,7 @@ Returns the index of where the value was found in a TIntegerArray.  Returns -1 i
 
 .. note::
 
-    by Zyt3x
+    - by Zyt3x
 
 Example:
 
@@ -175,7 +175,7 @@ Returns True if the value is present in the TIntegerArray.
 
 .. note::
 
-    by Zyt3x
+    - by Zyt3x
 
 Example:
 
@@ -201,7 +201,7 @@ Returns a TIntegerArray which contains values that are present in both arrays.
 
 .. note::
 
-    by Zyt3x
+    - by Zyt3x
 
 Example:
 
@@ -231,7 +231,7 @@ Returns a TIntegerArray which contains values that are not present in both array
 
 .. note::
 
-    by Zyt3x
+    - by Zyt3x
 
 Example:
 
@@ -261,7 +261,7 @@ Used to swap two TIntegerArray variables.
 
 .. note::
 
-    by Zyt3x
+    - by Zyt3x
 
 Example:
 
@@ -291,7 +291,7 @@ Used to clear duplicates in a TIntegerArray.
 
 .. note::
 
-    by Zyt3x
+    - by Zyt3x
 
 Example:
 
@@ -323,7 +323,7 @@ Used to invert the TIntegerArray.
 
 .. note::
 
-    by Zyt3x
+    - by Zyt3x
 
 Example:
 
@@ -349,7 +349,7 @@ Returns the sum of all values in a TIntegerArray.
 
 .. note::
 
-    by Zyt3x
+    - by Zyt3x
 
 Example:
 
@@ -375,7 +375,7 @@ Returns the sum of all values in a TIntegerArray.  Returns the value in a Int64 
 
 .. note::
 
-    by Zyt3x
+    - by Zyt3x
     Used for large numbers.
 
 Example:
@@ -402,7 +402,7 @@ Returns the average of all values in a TIntegerArray.
 
 .. note::
 
-    by Zyt3x
+    - by Zyt3x
 
 Example:
 
@@ -428,7 +428,7 @@ Used to QuickSort the TIntegerArray.
 
 .. note::
 
-    by Zyt3x
+    - by Zyt3x
 
 Example:
 
@@ -454,7 +454,7 @@ Turns a TIntegerArray into a TExtendedArray.
 
 .. note::
 
-    by Zyt3x
+    - by Zyt3x
 
 Example:
 

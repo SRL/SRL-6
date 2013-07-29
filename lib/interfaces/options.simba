@@ -45,8 +45,8 @@ Initiates the options default values. Called at the end of this file.
 
 .. note::
 
-    by Coh3n
-    Last updated: 23 July 2013 by Coh3n
+    - by Coh3n
+    - Last updated: 23 July 2013 by Coh3n
 
 Example:
 
@@ -87,8 +87,8 @@ TRSOptions.isOpen() is called.
 
 .. note::
 
-    by Coh3n
-    Last Updated: 23 July 2013 by Coh3n
+    - by Coh3n
+    - Last Updated: 23 July 2013 by Coh3n
 
 Example:
 
@@ -127,8 +127,8 @@ Returns true if the options interface is open.
 
 .. note::
 
-    by Coh3n
-    Last Updated: 23 July 2013 by Co3n
+    - by Coh3n
+    - Last Updated: 23 July 2013 by Co3n
 
 Example:
 
@@ -157,8 +157,8 @@ Opens the in-game options menu.
 
 .. note::
 
-    by Coh3n
-    Last Updated: 23 July 2013 by Co3n
+    - by Coh3n
+    - Last Updated: 23 July 2013 by Co3n
 
 Example:
 

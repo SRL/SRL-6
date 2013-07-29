@@ -229,8 +229,8 @@ Initializes the TRSMinimap.
 
 .. note::
 
-    by Coh3n
-    Last Updated: 23 May 2013 by Coh3n
+    - by Coh3n
+    - Last Updated: 23 May 2013 by Coh3n
 
 Example:
 
@@ -274,8 +274,8 @@ Returns the compass angle in radians.
 
 .. note::
 
-    by Narcle & Flight
-    Last Updated: 23 May 2013 by Coh3n
+    - by Narcle & Flight
+    - Last Updated: 23 May 2013 by Coh3n
 
 Example:
 
@@ -313,8 +313,8 @@ Returns the compass angle in radians.
 
 .. note::
 
-    by Wizzup?
-    Last Updated: 23 May 2013 by Coh3n
+    - by Wizzup?
+    - Last Updated: 23 May 2013 by Coh3n
 
 Example:
 
@@ -340,8 +340,8 @@ successful.
 
 .. note::
 
-    by nielsie95 & Nava2
-    Last Updated: 23 May 2013 by Coh3n
+    - by nielsie95 & Nava2
+    - Last Updated: 23 May 2013 by Coh3n
 
 Example:
 
@@ -415,10 +415,10 @@ to low, and the minimap compass angle set to north.
 
 .. note::
 
-    by R1ch & Coh3n
+    - by R1ch & Coh3n
 
 .. note::
-    Last Updated: 23 May 2013 by Coh3n
+    - Last Updated: 23 May 2013 by Coh3n
 
 Example:
 
@@ -458,8 +458,8 @@ Returns true if "dotType" is valid.  Compares to the minimap dot constants.
 
 .. note::
 
-    by Coh3n
-    Last Updated: 23 May 2013 by Coh3n
+    - by Coh3n
+    - Last Updated: 23 May 2013 by Coh3n
 
 Example:
 
@@ -490,8 +490,8 @@ Returns a TPointArray of every instance of "dotType" found on in "searchBox".
 
 .. note::
 
-    by Nava2 & Sir R. Magician
-    Last Updated: 23 May 2013 by Coh3n
+    - by Nava2 & Sir R. Magician
+    - Last Updated: 23 May 2013 by Coh3n
 
 Example:
 
@@ -568,8 +568,8 @@ to as high as possible, and the camera's zoom is zoomed out as far as it can go.
 
 .. note::
 
-    by Narcle
-    Last Updated: 23 May 2013 by Coh3n
+    - by Narcle
+    - Last Updated: 23 May 2013 by Coh3n
 
 Example:
 
@@ -641,8 +641,8 @@ pMod will add the x and y coodinate to the result.  WARNING: This function is no
 
 .. note::
 
-    by Narcle
-    Last Updated: 23 May 2013 by Coh3n
+    - by Narcle
+    - Last Updated: 23 May 2013 by Coh3n
 
 Example:
 
@@ -699,8 +699,8 @@ Returns the percentage of the specified area occupied by "color".
 
 .. note::
 
-    by Richard & Nava2
-    Last Updated: 23 May 2013 by Coh3n
+    - by Richard & Nava2
+    - Last Updated: 23 May 2013 by Coh3n
 
 Example:
 
@@ -732,8 +732,8 @@ and second+ stories of buildings.
 
 .. note::
 
-    by ZephyrsFury
-    Last Updated: 23 May 2013 by Coh3n
+    - by ZephyrsFury
+    - Last Updated: 23 May 2013 by Coh3n
 
 Example:
 
@@ -789,8 +789,8 @@ Returns true if the point "p" is on the minimap.
 
 .. note::
 
-    by Raymond
-    Last Updated: 23 May 2013 by Coh3n
+    - by Raymond
+    - Last Updated: 23 May 2013 by Coh3n
 
 Example:
 
@@ -817,8 +817,8 @@ in "p".
 
 .. note::
 
-    by Narcle
-    Last Updated: 23 May 2013 by Coh3n
+    - by Narcle
+    - Last Updated: 23 May 2013 by Coh3n
 
 Example:
 
@@ -863,8 +863,8 @@ Frees the flag bitmap.
 
 .. note::
 
-    by Coh3n
-    Last Updated: 31 May 2013 by Coh3n
+    - by Coh3n
+    - Last Updated: 31 May 2013 by Coh3n
 
 Example:
 
@@ -891,8 +891,8 @@ in "p".
 
 .. note::
 
-    by Home
-    Last Updated: 23 May 2013 by Coh3n
+    - by Home
+    - Last Updated: 23 May 2013 by Coh3n
 
 Example:
 
@@ -949,8 +949,8 @@ Returns true if the flag is present on the minimap.  Returns it's coordinates in
 
 .. note::
 
-    by weequ
-    Last Updated: 23 May 2013 by Coh3n
+    - by weequ
+    - Last Updated: 23 May 2013 by Coh3n
 
 Example:
 
@@ -976,8 +976,8 @@ An overload function.  Returns true if the flag is present on the minimap.
 
 .. note::
 
-    by Coh3n
-    Last Updated: 23 May 2013 by Coh3n
+    - by Coh3n
+    - Last Updated: 23 May 2013 by Coh3n
 
 Example:
 
@@ -1006,8 +1006,8 @@ Returns -1 if the flag isn't present.
 
 .. note::
 
-    by weequ
-    Last Updated: 23 May 2013 by Coh3n
+    - by weequ
+    - Last Updated: 23 May 2013 by Coh3n
 
 Example:
 
@@ -1037,8 +1037,8 @@ Returns true the player is within "dist" of the flag.
 
 .. note::
 
-    by Nava2
-    Last Updated: 23 May 2013 by Coh3n
+    - by Nava2
+    - Last Updated: 23 May 2013 by Coh3n
 
 Example:
 
@@ -1113,8 +1113,8 @@ Returns true if the player is moving (i.e. walking or running).
 
 .. note::
 
-    by marpis
-    Last Updated: 23 May 2013 by Coh3n
+    - by marpis
+    - Last Updated: 23 May 2013 by Coh3n
 
 Example:
 
@@ -1143,8 +1143,8 @@ Waits while the player is moving.  Returns true if the player is not moving.
 
 .. note::
 
-    by marpis
-    Last Updated: 23 May 2013 by Coh3n
+    - by marpis
+    - Last Updated: 23 May 2013 by Coh3n
 
 Example:
 
@@ -1195,8 +1195,8 @@ Walks the player to the furthest point found within the given parameters.
 
 .. note::
 
-    by nielsie95 & NCDS
-    Last Updated: 23 May 2013 by Coh3n
+    - by nielsie95 & NCDS
+    - Last Updated: 23 May 2013 by Coh3n
 
 Example:
 
@@ -1283,8 +1283,8 @@ successfully.
 
 .. note::
 
-    by Coh3n
-    Last Updated: 23 May 2013 by Coh3n
+    - by Coh3n
+    - Last Updated: 23 May 2013 by Coh3n
 
 Example:
 
@@ -1349,8 +1349,8 @@ Returns a _TRSSymbol of "sym".
 
 .. note::
 
-    by The SRL Development Team
-    Last Updated: 23 May 2013 by Coh3n
+    - by The SRL Development Team
+    - Last Updated: 23 May 2013 by Coh3n
 
 Example:
 
@@ -2204,8 +2204,8 @@ Stores it's coordinates in "p".
 
 .. note::
 
-    by Coh3n
-    Last Updated: 23 May 2013 by Coh3n
+    - by Coh3n
+    - Last Updated: 23 May 2013 by Coh3n
 
 Example:
 
@@ -2275,8 +2275,8 @@ in "p".
 
 .. note::
 
-    by Stupid3ooo
-    Last Updated: 23 May 2013 by Coh3n
+    - by Stupid3ooo
+    - Last Updated: 23 May 2013 by Coh3n
 
 Example:
 
@@ -2308,8 +2308,8 @@ in "tpa".
 
 .. note::
 
-    by lordsaturn
-    Last Updated: 23 May 2013 by Coh3n
+    - by lordsaturn
+    - Last Updated: 23 May 2013 by Coh3n
 
 Example:
 
@@ -2378,8 +2378,8 @@ each symbol's coordinates in "tpa".
 
 .. note::
 
-    by Nava2 & NCDS
-    Last Updated: 23 May 2013 by Coh3n
+    - by Nava2 & NCDS
+    - Last Updated: 23 May 2013 by Coh3n
 
 Example:
 

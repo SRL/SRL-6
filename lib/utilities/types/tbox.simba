@@ -25,7 +25,7 @@ Returns true if the point is in the TBox.
 
 .. note::
 
-    by Ollybest
+    - by Ollybest
 
 Example:
 
@@ -51,7 +51,7 @@ Returns the width and the height of the box in vars. W and H.
 
 .. note::
 
-    by Ollybest
+    - by Ollybest
 
 Example:
 
@@ -81,7 +81,7 @@ returns tPoint of the TBox's middle.
 
 .. note::
 
-    by Dgby714
+    - by Dgby714
 
 Example:
 
@@ -108,7 +108,7 @@ colors if clearSame is set to true.
 
 .. note::
 
-    by Coh3n
+    - by Coh3n
 
 Example:
 
@@ -138,7 +138,7 @@ tolerance parameter.
 
 .. note::
 
-    by Ollybest
+    - by Ollybest
 
 Example:
 
@@ -166,7 +166,7 @@ Returns true if the dtm is found within the TBox.
 
 .. note::
 
-    by Ollybest
+    - by Ollybest
 
 Example:
 
@@ -194,7 +194,7 @@ Returns true if the bitmap is found within the TBox.
 
 .. note::
 
-    by Ollybest
+    - by Ollybest
 
 Example:
 
@@ -222,7 +222,7 @@ Creates and returns a TPointArray of the TBox.
 
 .. note::
 
-    by Ollybest
+    - by Ollybest
 
 Example:
 
@@ -248,7 +248,7 @@ Creates and returns a TPointArray of the edge of the TBox.
 
 .. note::
 
-    by Ollybest
+    - by Ollybest
 
 Example:
 
@@ -274,7 +274,7 @@ Peforms the desired mouse action on the box (uses mouseBox).
 
 .. note::
 
-    by Ollybest
+    - by Ollybest
 
 Example:
 
@@ -301,7 +301,7 @@ Returns true if the TBox is vaild or not, an invaild box is considered by defaul
 
 .. note::
 
-    by Ollybest
+    - by Ollybest
 
 Example:
 
@@ -329,7 +329,7 @@ Returns true if the TBox is equal to compareBox.
 
 .. note::
 
-    by Coh3n
+    - by Coh3n
 
 Example:
 
@@ -357,7 +357,7 @@ Sets the bounds of the TBox.
 
 .. note::
 
-    by Ollybest
+    - by Ollybest
 
 Example:
 
@@ -383,7 +383,7 @@ Limits the TBox to another TBox (b).
 
 .. note::
 
-    by Ollybest
+    - by Ollybest
 
 Example:
 
@@ -412,7 +412,7 @@ Results a copy of the TBox.
 
 .. note::
 
-    by Ollybest
+    - by Ollybest
 
 Example:
 
@@ -438,7 +438,7 @@ Shifts the TBox by x and y values.
 
 .. note::
 
-    by Ollybest
+    - by Ollybest
 
 Example:
 
@@ -467,7 +467,7 @@ Edits the TBox values.
 
 .. note::
 
-    by Ollybest
+    - by Ollybest
 
 Example:
 
@@ -496,7 +496,7 @@ Results the TBox split into an array of boxes with the width and height.
 
 .. note::
 
-    by Home
+    - by Home
 
 Example:
 
@@ -549,7 +549,7 @@ Returns a gauss point in the TBox. See gaussBox (tmp.simba) for more.
 
 .. note::
 
-    by Ollybest
+    - by Ollybest
 
 Example:
 
@@ -575,7 +575,7 @@ Returns a 100% random point in the TBox.
 
 .. note::
 
-    by Ollybest
+    - by Ollybest
 
 Example:
 

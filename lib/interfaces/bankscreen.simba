@@ -62,8 +62,8 @@ Initializes the TRSBankScreen.
 
 .. note::
 
-    by Ollybest
-    Last Updated: 15 June 2013 by Ollybest
+    - by Ollybest
+    - Last Updated: 15 June 2013 by Ollybest
 
 Example:
 
@@ -106,8 +106,8 @@ Returns if the bankscreen is open or not.
 
 .. note::
 
-    by Ollybest
-    Last Updated: 15 June 2013 by Ollybest
+    - by Ollybest
+    - Last Updated: 15 June 2013 by Ollybest
 
 Example:
 
@@ -152,8 +152,8 @@ Closes the bankscreen, will return if succesful or not.
 
 .. note::
 
-    by Ollybest
-    Last Updated: 15 June 2013 by Ollybest
+    - by Ollybest
+    - Last Updated: 15 June 2013 by Ollybest
 
 Example:
 
@@ -198,8 +198,8 @@ Will scroll the bankscreen up to the top if reqiured.
 
 .. note::
 
-    by Ollybest
-    Last Updated: 15 June 2013 by Ollybest
+    - by Ollybest
+    - Last Updated: 15 June 2013 by Ollybest
 
 Example:
 

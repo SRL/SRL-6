@@ -122,8 +122,8 @@ Initiates the TRSGameTabs variable for use.
 
 .. note::
 
-    by Coh3n
-    Last Updated: 26 July 2013 by Coh3n
+    - by Coh3n
+    - Last Updated: 26 July 2013 by Coh3n
 
 Example:
 
@@ -264,8 +264,8 @@ Frees all the gametab's bitmaps.  Called on script termination.
 
 .. note::
 
-    by Coh3n
-    Last Updated: 26 July 2013 by Coh3n
+    - by Coh3n
+    - Last Updated: 26 July 2013 by Coh3n
 
 Example:
 
@@ -294,8 +294,8 @@ Returns true if the 'tab' is valid.
 
 .. note::
 
-    by Coh3n
-    Last Updated: 27 July 2013 by Coh3n
+    - by Coh3n
+    - Last Updated: 27 July 2013 by Coh3n
 
 Example:
 
@@ -364,8 +364,8 @@ Description of the function here.
 
 .. note::
 
-    by Coh3n
-    Last Updated: 26 July 2013 by Coh3n
+    - by Coh3n
+    - Last Updated: 26 July 2013 by Coh3n
 
 Example:
 
@@ -391,8 +391,8 @@ Returns true if more than one tab is open.
 
 .. note::
 
-    by Coh3n
-    Last Updated: 26 July 2013 by Coh3n
+    - by Coh3n
+    - Last Updated: 26 July 2013 by Coh3n
 
 Example:
 
@@ -421,8 +421,8 @@ Returns true if any number of tabs are open.
 
 .. note::
 
-    by Coh3n
-    Last Updated: 26 July 2013 by Coh3n
+    - by Coh3n
+    - Last Updated: 26 July 2013 by Coh3n
 
 Example:
 
@@ -454,8 +454,8 @@ to 'p'.
 
 .. note::
 
-    by Coh3n
-    Last Updated: 26 July 2013 by Coh3n
+    - by Coh3n
+    - Last Updated: 26 July 2013 by Coh3n
 
 Example:
 
@@ -491,8 +491,8 @@ Returns a box around the active tab.
 
 .. note::
 
-    by Coh3n
-    Last Updated: 26 July 2013 by Coh3n
+    - by Coh3n
+    - Last Updated: 26 July 2013 by Coh3n
 
 Example:
 
@@ -550,8 +550,8 @@ a slight increase in speed.
 
 .. note::
 
-    by Coh3n
-    Last Updated: 26 July 2013 by Coh3n
+    - by Coh3n
+    - Last Updated: 26 July 2013 by Coh3n
 
 Example:
 
@@ -599,8 +599,8 @@ the tab's interface isOpen() function (i.e. tabBackpack.isOpen()).
 
 .. note::
 
-    by Coh3n
-    Last Updated: 26 July 2013 by Coh3n
+    - by Coh3n
+    - Last Updated: 26 July 2013 by Coh3n
 
 Example:
 
@@ -639,8 +639,8 @@ tab's open() function (i.e. tabBackpack.open()).
 
 .. note::
 
-    by Coh3n
-    Last Updated: 26 July 2013 by Coh3n
+    - by Coh3n
+    - Last Updated: 26 July 2013 by Coh3n
 
 Example:
 
@@ -727,8 +727,8 @@ If possible, use the tab's open() function (i.e. tabBackpack.close()).
 
 .. note::
 
-    by Coh3n
-    Last Updated: 26 July 2013 by Coh3n
+    - by Coh3n
+    - Last Updated: 26 July 2013 by Coh3n
 
 Example:
 

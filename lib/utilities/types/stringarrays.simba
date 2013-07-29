@@ -22,7 +22,7 @@ Used to add a value to a TStringArray at a chosen index larger than the array's 
 
 .. note::
 
-    by Zyt3x
+    - by Zyt3x
 
 Example:
 
@@ -59,7 +59,7 @@ Used to delete a value of a TStringArray at a chosen index larger than the array
 
 .. note::
 
-    by Zyt3x
+    - by Zyt3x
 
 Example:
 
@@ -95,7 +95,7 @@ Used to append a value to a TStringArray.
 
 .. note::
 
-    by Zyt3x
+    - by Zyt3x
 
 Example:
 
@@ -121,7 +121,7 @@ Used to combine two TStringArray variables.
 
 .. note::
 
-    by Zyt3x
+    - by Zyt3x
 
 Example:
 
@@ -150,7 +150,7 @@ Returns the index of where the value was found in a TStringArray.  Returns -1 if
 
 .. note::
 
-    by Zyt3x
+    - by Zyt3x
 
 Example:
 
@@ -184,7 +184,7 @@ Returns True if the value is present in the TStringArray.
 
 .. note::
 
-    by Zyt3x
+    - by Zyt3x
 
 Example:
 
@@ -210,7 +210,7 @@ Returns a TStringArray which contains values that are present in both arrays.
 
 .. note::
 
-    by Zyt3x
+    - by Zyt3x
 
 Example:
 
@@ -240,7 +240,7 @@ Returns a TStringArray which contains values that are not present in both arrays
 
 .. note::
 
-    by Zyt3x
+    - by Zyt3x
 
 Example:
 
@@ -270,7 +270,7 @@ Used to swap two TStringArray variables.
 
 .. note::
 
-    by Zyt3x
+    - by Zyt3x
 
 Example:
 
@@ -300,7 +300,7 @@ Used to clear duplicates in a TStringArray.
 
 .. note::
 
-    by Zyt3x
+    - by Zyt3x
 
 Example:
 
@@ -332,7 +332,7 @@ Used to invert the TStringArray.
 
 .. note::
 
-    by Zyt3x
+    - by Zyt3x
 
 Example:
 
@@ -364,7 +364,7 @@ Used to explode the TStringArray using different del strings.
 
 .. note::
 
-    by Zyt3x
+    - by Zyt3x
     Rename this to "TStringArray.explode" once lape requires "self" for internal things.
 
 Example:
@@ -401,7 +401,7 @@ Used to explode the TStringArray.  Uses a string instead of an array of strings.
 
 .. note::
 
-    by Zyt3x
+    - by Zyt3x
     Rename this to "TStringArray.explode" once lape requires "self" for internal things.
 
 Example:
@@ -435,7 +435,7 @@ Used to implode the TStringArray.
 
 .. note::
 
-    by Zyt3x
+    - by Zyt3x
     Rename this to "TStringArray.implode" once lape requires "self" for internal things.
 
 Example:
@@ -462,7 +462,7 @@ Used to lowercase a TStringArray.
 
 .. note::
 
-    by Zyt3x
+    - by Zyt3x
 
 Example:
 
@@ -491,7 +491,7 @@ Used to uppercase a TStringArray.
 
 .. note::
 
-    by Zyt3x
+    - by Zyt3x
 
 Example:
 
@@ -520,7 +520,7 @@ Used to capitalize a TStringArray.
 
 .. note::
 
-    by Zyt3x
+    - by Zyt3x
 
 Example:
 
@@ -549,7 +549,7 @@ Used to turn a TStringArray into a string.
 
 .. note::
 
-    by Zyt3x
+    - by Zyt3x
 
 Example:
 
@@ -576,7 +576,7 @@ Used to implode the T2DStringArray.
 
 .. note::
 
-    by Zyt3x
+    - by Zyt3x
     Rename this to "T2DStringArray.implode" once lape requires "self" for internal things.
 
 Example:
@@ -613,7 +613,7 @@ Used to implode the T2DStringArray using glue strings.  Uses a string instead of
 
 .. note::
 
-    by Zyt3x
+    - by Zyt3x
     Rename this to "T2DStringArray.implode" once lape requires "self" for internal things.
 
 Example:
