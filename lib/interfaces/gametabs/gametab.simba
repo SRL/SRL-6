@@ -545,8 +545,15 @@ TRSGameTabs.getActiveTab
 
     function TRSGameTabs.getActiveTab(): integer;
 
-Returns the currently active tab.  If possible, use TRSGameTabs.isTabActive for
-a slight increase in speed.
+Returns the currently active tab.  If possible, use TRSGameTabs._isTabActive for
+an increase in speed, or the tab's isOpen() function for better reliability (i.e.
+tabBackpack.isOpen()).
+
+.. warning::
+
+    Does NOT currently work if there is only one tab open.  Instead, use the tab's
+    own isOpen() function!
+
 
 .. note::
 
