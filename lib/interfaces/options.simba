@@ -29,6 +29,13 @@ var options
 ~~~~~~~~~~~
 
 Variable that stores functions and properties of the Runescape options menu.
+
+Example:
+
+.. code-block:: pascal
+
+    if (options.open()) then
+      writeln('Options interface opened, preparing to logout');
 *)
 var
   options: TRSOptions;

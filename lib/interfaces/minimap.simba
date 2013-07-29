@@ -182,12 +182,12 @@ type
     color: integer;
   end;
 
-{*
+(*
 type TRSMinimap
 ~~~~~~~~~~~~~~~
 
 A type that stores all the attributes and functions of the Runescape minimap.
-*}
+*)
 type
   TRSMinimap = record(TRSInterface)
     symbolAccuracy: extended;

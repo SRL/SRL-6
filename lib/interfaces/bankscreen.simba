@@ -15,7 +15,7 @@ The source for this file can be found `here <https://github.com/SRL/SRL-6/blob/m
 {$f-}
 
 (*
-const deposit buttons
+const Deposit Buttons
 ~~~~~~~~~~~~~~~~~~~~~
 
 Integer constants that represent the order of the quick deposit buttons.
@@ -45,6 +45,13 @@ var bankScreen
 
 The variable that holds all bankscreen information. It used when calling any functions
 in this file.
+
+Example:
+
+.. code-block:: pascal
+
+    if (bankScreen.isOpen()) then
+      writeln('Bank is open!');
 
 *)
 var

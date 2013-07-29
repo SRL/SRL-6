@@ -30,6 +30,13 @@ var lobby
 ~~~~~~~~~
 
 Variable that stores functions and properties of the Runescape lobby.
+
+Example:
+
+.. code-block:: pascal
+
+    if (lobby.isOpen()) then
+      writeln('Lobby is open!');
 *)
 var
   lobby: TRSLobby;
@@ -57,12 +64,12 @@ const
     LOBBY_CLAN = 4;
     LOBBY_OPTIONS = 5;
 
-(*
+{*
 const Internal
 ~~~~~~~~~~~~~~
 
 Internal lobby constants.
-*)
+*}
 const
   // used in getCurrentTab and _openTab calulations
   __LOBBY_TAB_WIDTH    = 102;

@@ -70,7 +70,7 @@ type TRSGameTab
 Represents an individual gametab.
 *}
 type
-  TRSGameTab = record
+  _TRSGameTab = record
     id,              // the constant representing the tab
     parent: integer; // the constant of the tab that needs to be hovered to show this tab
     bounds: TBox;    // the bounds in a grid of the gametab navigation bar
@@ -78,15 +78,15 @@ type
     _bmpLoaded: boolean;
   end;
 
-{*
+(*
 type TRSGameTabs
 ~~~~~~~~~~~~~~~~
 
 A single type for manipulating the entire gametab system.
-*}
+*)
 type
   TRSGameTabs = record(TRSInterface)
-    tabs: array of TRSGameTab;
+    tabs: array of _TRSGameTab;
     visibleTabArea,              // the current (set in TRSGameTabs._openTab)
     __visibleTabAreaSingle,      // when there's only a single tab open (excludes title bar)
     __visibleTabAreaMulti: TBox; // when there are multiple tabs open

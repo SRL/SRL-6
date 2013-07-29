@@ -30,6 +30,12 @@ const Order
 ~~~~~~~~~~~
 
 Constants to be used with the TRSLobbyWorlds sorting functions.
+
+Example:
+
+.. code-block:: pascal
+
+    lobbyWorlds.sort(WORLD_ORDER_WORLDS, false);
 *)
 const
   WORLD_ORDER_WORLDS   = 0;
@@ -68,6 +74,12 @@ var lobbyWorlds
 ~~~~~~~~~~~~~~~
 
 The global variable used to call any worlds interface functions/procedures.
+
+Example:
+
+.. code-block:: pascal
+
+    lobbyWorlds.selectWorld(132);
 *)
 var
   lobbyWorlds: TRSLobbyWorlds;
