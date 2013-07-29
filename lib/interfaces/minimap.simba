@@ -240,25 +240,25 @@ Example:
 *}
 procedure TRSMinimap.__init();
 var
-  wid, hei: integer;
+  width, height: integer;
 begin
-  getClientDimensions(wid, hei);
+  getClientDimensions(width, height);
 
   with self do
   begin
     name := 'RS Minimap';
     ID := ID_INTERFACE_MINIMAP;
     parentID := -1;
-    static := false;
-    x1 := (wid - 225); // bounds exclude the title bar and logout button
-    y1 := 11;
-    x2 := (wid - 1);
-    y2 := 224;
+    static := true;
+    x1 := width - 225;
+    y1 := 12;
+    x2 := width - 1;
+    y2 := 223;
     w := (x2 - x1);
     h := (y2 - y1);
     cx := self.getCenterPoint().x;
     cy := self.getCenterPoint().y;
-    symbolAccuracy := 0.4;
+    symbolAccuracy := 0.65;
   end;
 end;
 
@@ -516,7 +516,6 @@ begin
 
   freeze();
   findColors(tpa, 65536, searchBox); // the black shadow color of the minimap dots
-  print('Found '+toStr(length(tpa) div 4)+' total dots on the minimap');
 
   // filter out the corners if searching the whole minimap so we only have colors that are actually on the minimap
   if (length(tpa) > 0) then
@@ -552,133 +551,6 @@ begin
 
   print('Found '+toStr(length(result))+' minimap dots (ID: '+toStr(dotType)+')');
   print('TRSMinimap.getDots(): '+toStr(result), TDebug.FOOTER);
-end;
-
-(*
-TRSMinimap.getDotsMainscreen
-~~~~~~~~~~~~~~~~~~~~~~~~~~~~
-
-.. code-block:: pascal
-
-    function TRSMinimap.getDotsMainscreen(dotType: integer): TPointArray;
-
-Returns a TPointArray of all the minimap dots of "dotType" that are visible on
-the mainscreen. This function works best when the mainscreen camera angle is set
-to as high as possible, and the camera's zoom is zoomed out as far as it can go.
-
-.. note::
-
-    - by Narcle
-    - Last Updated: 23 May 2013 by Coh3n
-
-Example:
-
-.. code-block:: pascal
-
-    msDots := minimap.getDotsMainscreen(MM_DOT_ITEM);
-*)
-function TRSMinimap.getDotsMainscreen(dotType: integer): TPointArray;
-var
-  i, l, c: integer;
-  dots: TPointArray;
-  b: TBox;
-begin
-  print('TRSMinimap.getDotsMainscreen()', TDebug.HEADER);
-
-  // confirm valid dot type
-  if (not self._isValidDot(dotType)) then
-  begin
-    print('Invalid dot type '+toStr(dotType), TDebug.ERROR);
-    print('TRSMinimap.getDotsMainscreen(): '+toStr(result), TDebug.FOOTER);
-    exit;
-  end;
-
-  // used for calculating the abstract box (see below)
-  b := intToBox(28, 23, 28, 17);
-
-  // dev HINT: use a TDrawing to draw the below box to see where it's looking for dots
-  dots := self.getDots(dotType, intToBox(self.cx - round(b.x1 * 1.3), self.cy - round(b.y1 * 1.3),
-                                         self.cx + round(b.x2 * 1.3), self.cy + round(b.y2 * 1.3)));
-
-  l := length(dots);
-
-  if (l > 0) then
-  begin
-    setLength(result, l);
-
-    for i := 0 to (l - 1) do
-      // this call is needed because the mainscreen camera isn't directly overhead, it's on a slight angle
-      // meaning you can see futher in the top corners of the mainscreen than the bottom corners
-      if (inAbstractBox(self.cx - b.x1, self.cy - b.y1,
-                        self.cx + b.x1, self.cy - b.y1,
-                        self.cx + b.x2, self.cy + b.y2,
-                        self.cx - b.x2, self.cy + b.y2, dots[i].x, dots[i].y)) then
-      begin
-        result[c] := dots[i];
-        inc(c);
-      end;
-
-    setLength(result, c);
-    sortTPAFrom(result, point(cx, cy));
-  end;
-
-  print('Found '+toStr(length(result))+' minimap dots likely to be on the mainscreen');
-  print('Use minimap.getDotsMainscreen() in combination with minimap.pointToMainscreen() to find a dot''s mainscreen location', TDebug.HINT);
-  print('TRSMinimap.getDotsMainscreen(): '+toStr(result), TDebug.FOOTER);
-end;
-
-(*
-TRSMinimap.pointToMainscreen
-~~~~~~~~~~~~~~~~~~~~~~~~~~~~
-
-.. code-block:: pascal
-
-    function TRSMinimap.pointToMainscreen(p: TPoint; pMod: TPoint = point(0, 0)): TPoint;
-
-Converts the minimap point "p" to a point on the mainscreen.  Optional parameter
-pMod will add the x and y coodinate to the result.  WARNING: This function is not
-100% accurate, and it is recommended that it is used with a failsafe.
-
-.. note::
-
-    - by Narcle
-    - Last Updated: 23 May 2013 by Coh3n
-
-Example:
-
-.. code-block:: pascal
-
-    msPoint := minimap.pointToMainscreen(minimap.getCenterPoint());
-*)
-function TRSMinimap.pointToMainscreen(p: TPoint; pMod: TPoint = point(0, 0)): TPoint;
-var
-  yH, yM, x, y: Extended;
-begin
-  p.x := (p.x - self.cx);
-  p.y := (p.y - self.cy);
-
-  x := (p.x + 0.0);
-  y := (p.y + 0.0);
-
-  yM := 36.0;
-  yH := abs(y + yM);
-
-  result.x := round((mainscreen.cx + pMod.x) + (x * 9.75 / (12.8 - (yH / yM * 3.15))) * 9.75);
-  result.y := round((mainscreen.cy + pMod.y) + y * (6.3 + ((yH / yM) * 2.4)));
-
-  // offsets used to improve accuracy
-  if (result.x > mainscreen.cx) then
-    result.x := (result.x - 40);
-
-  if (result.x < mainscreen.cx) then
-    result.x := (result.x + 30);
-
-  if (not pointInBox(result, mainscreen.getBounds())) then
-  begin
-    print('TRSMinimap.pointToMainscreen(): Point calculated '+toStr(result)+' was not in the mainscreen, returning (-1, -1)', TDebug.SUB);
-    result := point(-1, -1);
-  end else
-    print('TRSMinimap.pointToMainscreen(): Point calculated to be on mainscreen at '+toStr(result), TDebug.SUB);
 end;
 
 (*
@@ -804,138 +676,6 @@ begin
   result := (MM_RADIUS >= distance(p.x, p.y, self.cx, self.cy));
 end;
 
-{*
-TRSMinimap._findFlagBitmap
-~~~~~~~~~~~~~~~~~~~~~~~~~~
-
-.. code-block:: pascal
-
-    function TRSMinimap._findFlagBitmap(var p: TPoint): boolean;
-
-Returns true if the flag is found using a bitmap.  Returns the flag's coordinates
-in "p".
-
-.. note::
-
-    - by Narcle
-    - Last Updated: 23 May 2013 by Coh3n
-
-Example:
-
-.. code-block:: pascal
-
-    flagFound := minimap._findFlagBitmap(p);
-*}
-function TRSMinimap._findFlagBitmap(var p: TPoint): boolean;
-begin
-  result := false;
-
-  // load bitmap if it hasn't already been loaded
-  if (not self.__bmpFlagLoaded) then
-  begin
-    print('Loading flag bitmap...', TDebug.SUB);
-
-    self.__bmpFlag := bitmapFromString(8, 15, 'meJxjYEAHIpr/F8yYgSkozPfE3ty' +
-                  'cGHGgIKY4RBBNHC6ILI4sAkYngOIwNhQJ8bUBBYEIyEBGQO37tm3D' +
-                  'dCcdxIGBhlUcCBgZGAA27Tt3');
-
-    self.__bmpFlagLoaded := true;
-    setBitmapName(self.__bmpFlag, 'minimap_flag');
-  end;
-
-  if (findBitmapToleranceIn(self.__bmpFlag, p.x, p.y, self.getBounds(), 75)) then
-  begin
-    result := true;
-    p.x := (p.x + 7);  // offset the point to the bottom of the flag
-    p.y := (p.y + 14);
-  end;
-end;
-
-{*
-_freeFlagBitmap
-~~~~~~~~~~~~~~~
-
-.. code-block:: pascal
-
-    procedure _freeFlagBitmap();
-
-Frees the flag bitmap.
-
-.. note::
-
-    - by Coh3n
-    - Last Updated: 31 May 2013 by Coh3n
-
-Example:
-
-.. code-block:: pascal
-
-    addOnTerminate('_freeFlagBitmap');
-*}
-procedure _freeFlagBitmap();
-begin
-  if (minimap.__bmpFlagLoaded) then
-    freeBitmap(minimap.__bmpFlag);
-end;
-
-{*
-TRSMinimap._findFlagColor
-~~~~~~~~~~~~~~~~~~~~~~~~~
-
-.. code-block:: pascal
-
-    function TRSMinimap._findFlagColor(var p: TPoint): boolean;
-
-Returns true if the flag is found using straight color.  Returns the flag's coordinates
-in "p".
-
-.. note::
-
-    - by Home
-    - Last Updated: 23 May 2013 by Coh3n
-
-Example:
-
-.. code-block:: pascal
-
-    flagFound := minimap._findFlagColor(p);
-*}
-function TRSMinimap._findFlagColor(var p: TPoint): boolean;
-var
-  kmTarget, iTarget, i, map, wid, hei, t: integer;
-  tpa: TPointArray;
-begin
-  result := false;
-  map := bitmapFromString(self.w, self.h, '');
-  copyClientToBitmap(map, self.x1, self.y1, (self.x1 + self.w), (self.y1 + self.h));
-
-  kmTarget := getKeyMouseTarget();
-  iTarget := getImageTarget();
-
-  setTargetBitmap(map);
-  getBitmapSize(map, wid, hei);
-
-  findColors(tpa, 65536, 0, 0, wid - 1, hei -1);
-  filterPointsDist(tpa, 0, MM_RADIUS, wid div 2, hei div 2);
-
-  for i := 0 to high(tpa) do
-    if ((fastGetPixel(map, tpa[i].x - 1, tpa[i].y - 1) - fastGetPixel(map, tpa[i].x, tpa[i].y - 1)) = 6381921) then
-    begin
-      result := true;
-      p.x := tpa[I].x + self.x1;
-      p.y := tpa[I].y + self.y1;
-      break;
-    end;
-
-  t := getImageTarget();
-
-  setKeyMouseTarget(kmTarget);
-  setImageTarget(iTarget);
-
-  freeTarget(t);
-  freeBitmap(map);
-end;
-
 (*
 TRSMinimap.isFlagPresent
 ~~~~~~~~~~~~~~~~~~~~~~~~
@@ -949,8 +689,8 @@ Returns true if the flag is present on the minimap.  Returns it's coordinates in
 
 .. note::
 
-    - by weequ
-    - Last Updated: 23 May 2013 by Coh3n
+    - by Home
+    - Last Updated: 29 July 2013 by Olly
 
 Example:
 
@@ -960,8 +700,30 @@ Example:
       writeln('Flag is present');
 *)
 function TRSMinimap.isFlagPresent(var p: TPoint): boolean;
+var
+  i, bmp, l: integer;
+  tpa: TPointArray;
 begin
-  result := (self._findFlagBitmap(p) or self._findFlagColor(p));
+  result := false;
+  bmp := bitmapFromClient(self.getBounds());
+
+  findColorsBitmap(bmp, tpa, 65536);
+
+  l := length(tpa);
+
+  if (l < 1) then
+    exit();
+
+  for i := 0 to (l-1) do
+    if ((fastGetPixel(bmp, tpa[i].x - 1, tpa[i].y - 1) - fastGetPixel(bmp, tpa[i].x, tpa[i].y - 1)) = 6381917) then
+    begin
+      result := true;
+      p.x := tpa[i].x + self.x1;
+      p.y := tpa[i].y + self.y1;
+      break;
+    end;
+
+  freeBitmap(bmp);
 end;
 
 (*
@@ -2407,5 +2169,5 @@ end;
 
 begin
   minimap.__init();
-  addOnTerminate('_freeFlagBitmap');
+ // addOnTerminate('_freeFlagBitmap');
 end;
