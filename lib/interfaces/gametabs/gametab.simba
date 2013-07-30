@@ -587,7 +587,6 @@ begin
     if (self.tabs[i].id <> -1) then
       if (self._findTab(p, self.tabs[i].id, tabBox)) then
       begin
-        mouse(p.rand(3, 5));
         result := i;
         break;
       end;
@@ -667,9 +666,6 @@ begin
 
   anyTabOpen := self.areAnyOpen();
 
-  if (not anyTabOpen) then
-    exit();
-
   print('TRSGameTabs._openTab('+toStr(tab)+')', TDebug.HEADER);
 
   if (anyTabOpen) then
@@ -687,7 +683,10 @@ begin
     if (self._findTab(p, tab, self.__tabSelectionArea)) then
     begin
       print('Found tab already open, bringing to front');
-      mouse(p, MOUSE_LEFT);
+
+      // still need more randomness on this IMO.
+      mouse(p.rand(5, 5), MOUSE_LEFT);
+
       wait(50 + random(100));
       result := true;
       print('TRSGameTabs._openTab('+toStr(tab)+'): '+toStr(result), TDebug.FOOTER);
@@ -716,6 +715,12 @@ begin
 
     wait(50 + random(50));
   end;
+
+  if (result) then
+    if (self.areMultiOpen()) then
+      self.visibleTabArea := self.__visibleTabAreaMulti
+    else
+      self.visibleTabArea := self.__visibleTabAreaSingle;
 
   print('TRSGameTabs._openTab('+toStr(tab)+'): '+toStr(result), TDebug.FOOTER);
 end;

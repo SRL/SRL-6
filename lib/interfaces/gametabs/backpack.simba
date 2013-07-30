@@ -31,14 +31,16 @@ const Drop Patterns
 TIntegerArray constants that represent drop patterns.
 
 *)
+ {$IFNDEF CODEINSIGHT}
+
 const
   DROP_PATTERN_REGULAR   := TIntegerArray([1..28]);
   DROP_PATTERN_BACKWARDS := TIntegerArray([28..1]);
   DROP_PATTERN_SNAKE     := [1, 2, 3, 4, 8, 7, 6, 5, 9, 10, 11, 12, 16, 15, 14,
                              13, 17, 18, 19, 20, 24, 23, 22, 21, 25, 26, 27, 28];
-  DROP_PATTERN_UP_DOWN   := [1, 5, 9, 13, 17, 21, 25, 26, 22, 18, 14, 10, 6, 2,
+  DROP_PATTERN_UP_DOWN  := [1, 5, 9, 13, 17, 21, 25, 26, 22, 18, 14, 10, 6, 2,
                              3, 7, 11, 15, 19, 23, 27, 28, 24, 20, 16, 12, 8, 4];
-
+{$ENDIF}
 (*
 type TRSTabBackpack
 ~~~~~~~~~~~~~~~~~~~
@@ -50,6 +52,7 @@ type
   TRSTabBackpack = record(TRSInterface)
     tabIndex: integer;
     slots: TBoxArray;
+    __slots: array [0..1] of TBoxArray;
   end;
 
 (*
@@ -74,8 +77,8 @@ Initiates the tabBackpack variable. Called at the end of this file.
 
 .. note::
 
-    - by Ollybest
-    - Last updated: Mar. 15, 2013 by Ollybest
+    by Olly
+    Last updated: July. 29, 2013 by Olly
 
 Example:
 
@@ -86,7 +89,7 @@ Example:
 *}
 procedure TRSTabBackpack.__init();
 begin
-  with (self) do
+  with self do
   begin
     name := 'RS Backpack tab';
     ID := ID_INTERFACE_TAB_BACKPACK;
@@ -94,18 +97,57 @@ begin
     parentID := -1;
     static := true;
 
-    {x1 := _gameTabArea.x1;
-    y1 := _gameTabArea.y1;
-    x2 := _gameTabArea.x2;
-    y2 := _gameTabArea.y2; }
+    x1 := gameTabs.visibleTabArea.x1;
+    y1 := gameTabs.visibleTabArea.y1;
+    x2 := gameTabs.visibleTabArea.x2;
+    y2 := gameTabs.visibleTabArea.y2;
 
     w := (x2 - x1);
     h := (y2 - y1);
     cx := self.getCenterPoint().x;
     cy := self.getCenterPoint().y;
 
-   // slots := grid(4, 7, 34, 31, 52, 39, point(_gameTabArea.x1 + 32, _gameTabArea.y1 + 68));
+    // the slots when other tabs are visable
+    __slots[0] := grid(4, 7, 34, 31, 52, 39, point(gameTabs.__visibleTabAreaMulti.x1 + 32,
+                       gameTabs.__visibleTabAreaMulti.y1 + 32));
+
+    // the slots when the backpack is the *only* gametab open.
+    __slots[1] := grid(4, 7, 34, 31, 52, 39, point(gameTabs.__visibleTabAreaSingle.x1 + 32,
+                       gameTabs.__visibleTabAreaSingle.y1 + 32));
+
   end;
+end;
+
+(*
+TRSTabBackPack._updateBounds
+~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+
+.. code-block:: pascal
+
+    procedure TRSTabBackPack._updateBounds();
+
+Updates the bounds and the slots of the TRSTabBackPack.
+
+.. note::
+
+    by Olly
+    Last Updated: July. 29, 2013
+
+Example:
+
+.. code-block:: pascal
+
+    if (tabBackpack.isOpen()) then
+      writeln('the Backpack tab is open');
+*)
+procedure TRSTabBackPack._updateBounds();
+begin
+  self.setBounds(gameTabs.visibleTabArea);
+
+  if (self.y1 = gameTabs.__visibleTabAreaMulti.y1) then
+    slots := __slots[0]
+  else
+    slots := __slots[1];
 end;
 
 (*
@@ -120,8 +162,8 @@ Returns true if our current tab is the Backpack tab.
 
 .. note::
 
-    - by Ollybest
-    - Last Updated: March. 11, 2013
+    by Olly
+    Last Updated: July. 29, 2013
 
 Example:
 
@@ -131,14 +173,39 @@ Example:
       writeln('the Backpack tab is open');
 *)
 function TRSTabBackpack.isOpen(): boolean;
+var
+  p: TPoint;
+  tpa: TPointArray;
+  l: integer;
 begin
-  result := true;
-  // result := (getCurrentTab() = self.tabIndex);
+  result := (gameTabs._isTabActive(self.tabIndex));
+
+  if (not result) then   // there maybe a single tab open
+    if (gameTabs.visibleTabArea.x1 = gameTabs.__visibleTabAreaSingle.x1) then
+      if (gameTabs.findX(p)) then // a single tab is open, lets look for the money sign
+      begin
+        findColorsTolerance(tpa, 9295862, gameTabs.visibleTabArea.x1+75, gameTabs.visibleTabArea.y1+300,
+                                          gameTabs.visibleTabArea.x2-125, gameTabs.visibleTabArea.y2-5, 12);
+
+        l := length(tpa);
+
+        if (l < 1) then
+          exit();
+
+        {
+          first lets check to see if the yellow on the money sign is in range
+          then lets see if the distance from the red cross to the money sign is
+          in range.
+        }
+
+        if (inRange(l, 30, 40)) then
+          result := inRange(distance(p, tpa[0]), 350, 370);
+      end;
 end;
 
 (*
-TRSTabBackpack.open()
-~~~~~~~~~~~~~~~~~~~~~
+TRSTabBackpack.open
+~~~~~~~~~~~~~~~~~~~
 
 .. code-block:: pascal
 
@@ -148,8 +215,8 @@ Opens the Backpack tab if we're currently not on it.
 
 .. note::
 
-    - by Ollybest
-    - Last Updated: March. 11, 2013
+    by Ollybest
+    Last Updated: March. 11, 2013
 
 Example:
 
@@ -162,38 +229,42 @@ function TRSTabBackpack.open(): boolean;
 begin
   result := self.isOpen();
 
-//  if (not (result)) then
-//    result := _openGameTab(self.tabIndex);
+  if (not result) then
+    result := gameTabs._openTab(self.tabIndex);
+
+  if (result) then
+    self._updateBounds();
 end;
 
 (*
-TRSTabBackpack.invaildSlot
+TRSTabBackpack.isSlotVaild
 ~~~~~~~~~~~~~~~~~~~~~~~~~~
 
 .. code-block:: pascal
 
-    function TRSTabBackpack.invaildSlot(slot: integer): boolean;
+    function TRSTabBackpack.isSlotVaild(slot: integer): boolean;
 
-Returns if the desired slot is not vaild.
+Returns true if the vaild (within the range of 1..28).
 
 .. note::
 
-    - by Ollybest
-    - Last Updated: March. 11, 2013
+    by Olly
+    Last Updated: July. 27, 2013
 
 Example:
 
 .. code-block:: pascal
 
-    if (tabBackpack.invaildSlot(35)) then
-      writeln('WARNING: slot 35 is invaild');
-*)
-function TRSTabBackpack.invaildSlot(slot: integer): boolean;
-begin
-  result := (not (inRange(slot, INV_SLOT_LOW, INV_SLOT_HIGH)));
+    if (tabBackPack.isSlotValid(25) then
+      writeln('Slot 25 is a vaild backpack slot!');
 
-  if (result) then
-    print('The slot "' + intToStr(slot) + '" is an incorrect slot!', TDebug.ERROR);
+*)
+function TRSTabBackpack.isSlotVaild(slot: integer): boolean;
+begin
+  result := (inRange(slot, INV_SLOT_LOW, INV_SLOT_HIGH));
+
+  if (not result) then
+    print('tabBackpack(): The slot "' + intToStr(slot) + '" is an incorrect slot. Use a slot between 1..28', TDebug.ERROR);
 end;
 
 (*
@@ -204,26 +275,26 @@ TRSTabBackpack.getSlotBox
 
     function TRSTabBackpack.getSlotBox(slot: integer): tbox;
 
-Returns the tbox of the desired Backpack slot.
+Returns the TBox of the desired backpack slot.
 
 .. note::
 
-    - by Ollybest
-    - Last Updated: March. 11, 2013
+    by Ollybest
+    Last Updated: March. 11, 2013
 
 Example:
 
 .. code-block:: pascal
 
    var
-     b: tbox;
+     b: TBox;
    begin
      b := tabBackpack.getSlotBox(1);
 
 *)
-function TRSTabBackpack.getSlotBox(slot: integer): tbox;
+function TRSTabBackpack.getSlotBox(slot: integer): TBox;
 begin
-  if (self.invaildSlot(slot)) then
+  if (not self.isSlotVaild(slot)) then
     exit(intToBox(-1, -1, -1, -1));
 
   // - 1 because the grid (array) starts at 0.
@@ -242,8 +313,8 @@ Returns true if an item is in the desired Backpack slot.
 
 .. note::
 
-    - by Ollybest
-    - Last Updated: March. 11, 2013
+    by Ollybest
+    Last Updated: March. 11, 2013
 
 Example:
 
@@ -255,7 +326,7 @@ Example:
 *)
 function TRSTabBackpack.isItemInSlot(slot: integer): boolean;
 begin
-  if (not self.open()) or (self.invaildSlot(slot))then
+  if (not self.open()) or (not self.isSlotVaild(slot))then
     exit(false);
 
   result := self.getSlotBox(slot).colorExists(ITEM_OUTLINE_BLACK);
@@ -269,12 +340,13 @@ TRSTabBackpack.pointToSlot
 
     function TRSTabBackpack.pointToSlot(p: TPoint): integer;
 
-Returns the Backpack slot number in which the TPoint falls within.
+Returns the backpack slot number in which the TPoint falls within, will return
+-1 if the point isn't located in any slots.
 
 .. note::
 
-    - by Ollybest
-    - Last Updated: March. 11, 2013
+    by Olly
+    Last Updated: March. 11, 2013
 
 Example:
 
@@ -288,7 +360,7 @@ var
   i: integer;
 begin
   if (not (pointInBox(p, self.getBounds()))) then
-    exit(0);
+    exit(-1);
 
   for i := INV_SLOT_LOW to INV_SLOT_HIGH do
     if pointInBox(p, self.getSlotBox(i)) then
@@ -296,33 +368,33 @@ begin
 end;
 
 (*
-TRSTabBackpack.getInvCount
-~~~~~~~~~~~~~~~~~~~~~~~~~~
+TRSTabBackpack.count
+~~~~~~~~~~~~~~~~~~~~
 
 .. code-block:: pascal
 
-    function TRSTabBackpack.getInvCount: integer;
+    function TRSTabBackpack.count(): integer;
 
 Returns how many items are in our Backpack.
 
 .. note::
 
-    - by Ollybest
-    - Last Updated: March. 11, 2013
+    by Ollybest
+    Last Updated: July. 29, 2013
 
 Example:
 
 .. code-block:: pascal
 
-   writeln(tabBackpack.getInvCount);
+   writeln(tabBackpack.count());
 
 *)
-function TRSTabBackpack.getInvCount: integer;
+function TRSTabBackpack.count(): integer;
 var
   i: integer;
 begin
   if (not self.open()) then
-    exit(-1);
+    exit(0);
 
   for i := INV_SLOT_LOW to INV_SLOT_HIGH do
     if (self.isItemInSlot(i)) then
@@ -330,68 +402,66 @@ begin
 end;
 
 (*
-TRSTabBackpack.isInvCount
-~~~~~~~~~~~~~~~~~~~~~~~~~
+TRSTabBackpack.waitCount
+~~~~~~~~~~~~~~~~~~~~~~~~
 
 .. code-block:: pascal
 
-    function TRSTabBackpack.isInvCount(count: integer; waitTime: integer = 0): boolean;
+    function TRSTabBackpack.waitCount(backPackCount: integer; waitTime: integer): boolean;
 
-Returns true if our Backpack count is "count", also includes an optional waitTime
-parameter useful for waiting for a set Backpack count.
+Waits 'waitTime' for the backPack count to become 'count'.
 
 .. note::
 
-    - by Ollybest
-    - Last Updated: March. 11, 2013
+    by Ollybest
+    Last Updated: July. 29, 2013
 
 Example:
 
 .. code-block:: pascal
 
-   if tabBackpack.isInvCount(10) then
-     writeln('we have 10 items in our Backpack.');
+   if tabBackpack.waitCount(28, 1000 + random(500)) then
+     writeln('Backpack count is now 28!');
 
 *)
-function TRSTabBackpack.isInvCount(count: integer; waitTime: integer = 0): boolean;
+function TRSTabBackpack.waitCount(backPackCount: integer; waitTime: integer): boolean;
 var
-  t: integer;
+  timeOut: integer;
 begin
-  t := getSystemTime() + waitTime;
+  timeOut := getSystemTime() + waitTime;
+  result := false;
 
-  if (self.invaildSlot(count)) then
-    exit(false);
-
-  repeat
-    if (self.GetInvCount() = count) then
-      exit(true);
-  until (getSystemTime() >= t);
+  while (timeOut >= getSystemTime()) do
+    if (self.count() = backPackCount) then
+      exit(true)
+    else
+      wait(20 + random(50));
 end;
 
 (*
-TRSTabBackpack.isInvFull
-~~~~~~~~~~~~~~~~~~~~~~~~
+TRSTabBackpack.isFull
+~~~~~~~~~~~~~~~~~~~~~
 
 .. code-block:: pascal
 
-    function TRSTabBackpack.isInvFull: boolean;
+    function TRSTabBackpack.isFull: boolean;
 
 Returns true if our Backpack is full.
 
 .. note::
 
-    - by Ollybest
-    - Last Updated: March. 11, 2013
+    by Ollybest
+    Last Updated: July. 29, 2013
 
 Example:
 
 .. code-block:: pascal
 
-   if tabBackpack.isInvFull then
+   if (tabBackpack.isFull) then
      writeln('our Backpack is full!');
 
 *)
-function TRSTabBackpack.isInvFull: boolean;
+function TRSTabBackpack.isFull: boolean;
 var
   i: integer;
 begin
@@ -406,34 +476,73 @@ begin
 end;
 
 (*
-TRSTabBackpack.isInvEmpty
-~~~~~~~~~~~~~~~~~~~~~~~~~
+TRSTabBackpack.isEmpty
+~~~~~~~~~~~~~~~~~~~~~~
 
 .. code-block:: pascal
 
-    function TRSTabBackpack.isInvEmpty: boolean;
+    function TRSTabBackpack.isEmpty: boolean;
 
 Returns true if our Backpack is empty.
 
 .. note::
 
-    - by Ollybest
-    - Last Updated: March. 11, 2013
+    by Ollybest
+    Last Updated: July. 29, 2013
 
 Example:
 
 .. code-block:: pascal
 
-   if tabBackpack.isInvEmpty then
+   if (tabBackpack.isEmpty) then
      writeln('our Backpack is empty!');
 
 *)
-function TRSTabBackpack.isInvEmpty: boolean;
+function TRSTabBackpack.isEmpty: boolean;
 begin
   if (not self.open()) then
     exit(false);
 
   result := (not (self.getBounds().colorExists(ITEM_OUTLINE_BLACK)));
+end;
+
+
+(*
+TRSTabBackpack.waitForShift
+~~~~~~~~~~~~~~~~~~~~~~~~~~~
+
+.. code-block:: pascal
+
+    function TRSTabBackPack.waitForShift(waitTime: integer): boolean;
+
+Waits up to waitTime for the Backpack count to change.
+
+.. note::
+
+    by Olly
+    Last Updated: July. 29, 2013
+
+Example:
+
+.. code-block:: pascal
+
+   if tabBackpack.waitForShift(5000) then
+     writeln('Backpack has shifted!');
+
+*)
+function TRSTabBackPack.waitForShift(waitTime: integer): boolean;
+var
+  c, timeOut: integer;
+begin
+  result := false;
+  c := self.count();
+  timeOut := getSystemTime() + waitTime;
+
+  while (timeOut >= getSystemTime()) do
+    if (c <> self.count()) then
+      exit(true)
+    else
+      wait(20 + random(50));
 end;
 
 (*
@@ -442,14 +551,14 @@ TRSTabBackpack.mouseSlot
 
 .. code-block:: pascal
 
-    function TRSTabBackpack.mouseInvSlot(slot, button: integer): boolean;
+    function TRSTabBackpack.mouseSlot(slot, mouseAction: integer): boolean;
 
 Moves and performs the desired mouse action at the selected Backpack slot.
 
 .. note::
 
-    - by Ollybest
-    - Last Updated: March. 11, 2013
+    by Ollybest
+    Last Updated: March. 11, 2013
 
 Example:
 
@@ -461,7 +570,7 @@ Example:
 *)
 function TRSTabBackpack.mouseSlot(slot, mouseAction: integer): boolean;
 begin
-  if (not self.open()) or (self.invaildSlot(slot)) then
+  if (not self.open()) or (not self.isSlotVaild(slot)) then
     exit(false);
 
   result := true;
@@ -480,8 +589,8 @@ Will return true if a desired slot is activated.
 
 .. note::
 
-    - by Ollybest
-    - Last Updated: March. 12, 2013
+    by Olly
+    Last Updated: March. 12, 2013
 
 Example:
 
@@ -493,7 +602,7 @@ Example:
 *)
 function TRSTabBackpack.isSlotActivated(slot: integer): boolean;
 begin
-  if (not self.open()) or (self.invaildSlot(slot)) then
+  if (not self.open()) or (not self.isSlotVaild(slot)) then
     exit(false);
 
   result := self.getSlotBox(slot).colorExists(ITEM_OUTLINE_WHITE);
@@ -511,8 +620,8 @@ Returns what slot is activated, if none are it will return -1.
 
 .. note::
 
-    - by Ollybest
-    - Last Updated: March. 12, 2013
+    by Olly
+    Last Updated: March. 12, 2013
 
 Example:
 
@@ -555,8 +664,8 @@ drop patterns.
 
 .. note::
 
-    - by Ollybest
-    - Last Updated: March. 12, 2013
+    by Olly
+    Last Updated: July. 29, 2013
 
 Example:
 
@@ -567,12 +676,13 @@ Example:
 *)
 procedure TRSTabBackpack.dropItems(slotArr: TIntegerArray = DROP_PATTERN_REGULAR);
 var
-  l := length(slots);
-  r, I : Integer;
+  r, I, l: integer;
   tia: TIntegerArray;
 begin
   if (not self.open()) then
     exit;
+
+  l := length(slotArr);
 
   if (l < 1) then
   begin
@@ -580,23 +690,16 @@ begin
     exit;
   end;
 
-  // small chance of mixing some slots up
-  if (random(10) = 5) then
-    if (l = INV_SLOT_HIGH) then
-      for r := 0 to (l - 4) do
-        swap(slotArr[randomRange(r - 1, r + 4)], slotArr[randomRange(r - 1, r + 4)]);
-
-  for i := 1 to (l - 1) do
-    if (not (self.invaildSlot(slotArr[i]))) then
-      if self.isItemInSlot(slotArr[i]) then
+  for i := 0 to (l - 1) do
+    if (self.isSlotVaild(slotArr[i])) and (self.isItemInSlot(slotArr[i])) then
+    begin
+      self.mouseSlot(slotArr[i], MOUSE_RIGHT);
+      if chooseOption(['Drop', 'drop', 'rop']) then
       begin
-        self.mouseSlot(slotArr[i], MOUSE_RIGHT);
-        if chooseOption(['Drop', 'drop', 'rop']) then
-        begin
-          insert(slotArr[i], tia);
-          wait(120 + random(305));
-        end;
+        insert(slotArr[i], tia);
+        wait(120 + random(305));
       end;
+    end;
 
   if (length(tia) > 0) then
   begin
@@ -607,56 +710,19 @@ begin
 end;
 
 (*
-TRSTabBackpack.dropItemInSlot
-~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+TRSTabBackpack.countDTM
+~~~~~~~~~~~~~~~~~~~~~~~
 
 .. code-block:: pascal
 
-    function TRSTabBackpack.dropItemInSlot(slot: integer): boolean;
-
-Attempts to drop the item in the desired slot
-
-.. note::
-
-    - by Ollybest
-    - Last Updated: April. 25, 2013
-
-Example:
-
-.. code-block:: pascal
-
-    if tabBackpack.dropItemInSlot(1) then
-      writeln('dropped item in slot 1');
-
-*)
-function TRSTabBackpack.dropItemInSlot(slot: integer): boolean;
-begin
-  if self.isItemInSlot(slot) then
-    if self.mouseSlot(slot, MOUSE_RIGHT) then
-      result := chooseOption(['Drop', 'drop', 'rop']);
-
-  if (result) then
-  begin
-    wait(95 + random(280));
-    print('Dropped item in slot ' + intToStr(slot));
-  end else
-    print('Failed to drop item in slot ' + intToStr(slot));
-end;
-
-(*
-TRSTabBackpack.countItemsDTM
-~~~~~~~~~~~~~~~~~~~~~~~~~~~~
-
-.. code-block:: pascal
-
-    function TRSTabBackpack.countItemsDTM(dtm: integer): integer;
+    function TRSTabBackpack.countDTM(dtm: integer): integer;
 
 Searches for the dtm in each Backpack slot and will return how many matches it finds.
 
 .. note::
 
-    - by Ollybest
-    - Last Updated: March. 12, 2013
+    by Olly
+    Last Updated: July. 29, 2013
 
 Example:
 
@@ -671,68 +737,85 @@ Example:
       writeln('We counted ' + intToStr(i) + ' items in our Backpack.');
 
 *)
-function TRSTabBackpack.countItemsDTM(dtm: integer): integer;
+function TRSTabBackpack.countDTM(dtm: integer): integer;
 var
-  i: integer;
+  i, l: integer;
 begin
+  result := 0;
+
   if (not self.open()) then
-    exit(-1);
+    exit();
 
-  for i := INV_SLOT_LOW to INV_SLOT_HIGH do
-    if self.getSlotBox(i).dtmExists(dtm) then
-      inc(result);
+  result := findItem(dtm, self.slots);
 
-  print('countItemsDTM: counted ' + intToStr(result) + ' items.');
+  if (result = 0) then
+  begin
+    print('tabBackpack.countDTM(): Found no DTM matches', TDebug.SUB);
+    exit();
+  end;
+
+  print('countItemsDTM: Counted ' + intToStr(result) + ' items.');
 end;
 
 (*
-TRSTabBackpack.clickItemsDTM
-~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+TRSTabBackpack.clickDTM
+~~~~~~~~~~~~~~~~~~~~~~~
 
 .. code-block:: pascal
 
-    function TRSTabBackpack.clickItemsDTM(dtms: TIntegerArray; clicktype: integer; option: string; waitFor: integer = 300): integer;
+    function TRSTabBackpack.clickDTM(dtm: integer; clickType: integer; option: string; waitFor: integer = 300): integer;
 
 Searches for the dtm if succesful will perform what action is it set.
 Will return how many items were clicked.
   * clicktype - (MOUSE_MOVE, MOUSE_LEFT, MOUSE_RIGHT)
   * option    - What option to choose. If not using MOUSE_RIGHT can be left blank.
-  * waitFor   - This is optional and on default is set to 300ms, depending on what
-                your doing you may need shorter or longer waitFor.
+  * waitFor   - This is how long we will wait after interacting with the item, for
+                different things you may need different speeds.
 
 .. note::
 
-    - by Ollybest
-    - Last Updated: March. 12, 2013
+    by Olly
+    Last Updated: July. 29, 2013
 
 Example:
 
 .. code-block:: pascal
 
     //  would search for one dtm and click the item.
-    tabBackpack.clickitemsDTM(dtm, MOUSE_MOVE, '');
+    tabBackpack.clickDTM(dtm, MOUSE_MOVE, '');
 
     //  would search for multiple dtms and a 1000ms wait after burying the item.
-    tabBackpack.clickItemsDTM(dtm, MOUSE_RIGHT, 'bury', 1000);
+    tabBackpack.clickDTM(dtm, MOUSE_RIGHT, 'bury', 1000);
 
 *)
-function TRSTabBackpack.clickItemsDTM(dtm: integer; clickType: integer; option: string; waitFor: integer = 300): integer;
+function TRSTabBackpack.clickDTM(dtm: integer; clickType: integer; option: string; waitFor: integer = 300): integer;
 var
-  i: integer;
+  i, l: integer;
+  arr: TIntegerArray;
 begin
   if (not self.open()) then
-    exit(-1);
+    exit(0);
 
-  for i := INV_SLOT_LOW to INV_SLOT_HIGH do
-    if self.getSlotBox(i).dtmExists(dtm) then
-    begin
-      self.mouseSlot(i, clickType);
-      if (clickType = MOUSE_RIGHT) and (option <> '') then
-        chooseOption([option], 200);
+  arr := findItem(dtm, self.slots, true);
 
-      inc(result);
-      wait(waitFor + random(100));
-    end;
+  l := length(arr);
+
+  if (l < 1) then
+  begin
+    print('tabBackpack.clickDTM(): Found no dtm matches', TDebug.SUB);
+    exit();
+  end;
+
+  for i := 0 to (l-1) do
+  begin
+    self.mouseSlot(i+1, clickType);
+
+    if (clickType = MOUSE_RIGHT) and (option <> '') then
+      chooseOption([option], 200);
+
+    inc(result);
+    wait(waitFor + random(50));
+  end;
 
   print('clickItemsDTM: clicked ' + intToStr(result) + ' items.');
 end;
@@ -747,8 +830,8 @@ TRSTabBackpack.dragSlot
 
 .. note::
 
-    - by Ollybest
-    - Last Updated: April. 25, 2013
+    by Olly
+    Last Updated: April. 25, 2013
 
 Example:
 
