@@ -402,9 +402,9 @@ begin
   if (tabbed) then
   begin
     tpaFilter := TPA.clearTPAFrom(TPAFromBox(excludeBox));
-    ATPA := tpaFilter.split(4);
+    ATPA := splitTPAEx(tpaFilter, 4, 4);
   end else
-    ATPA := TPA.split(4);
+    ATPA := splitTPAEx(TPA, 4, 4);
 
   // gets the right box of colors on the MS by checking the size of each color's area
   for i := 0 to high(ATPA) do
