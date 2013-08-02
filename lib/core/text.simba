@@ -23,6 +23,7 @@ findText
     function findText(var p: TPoint; txt, fonts: TStringArray; searchBox: TBox): boolean;
 
 Uses a bitmap mask to find text on the screen.  Returns true if the text is found.
+
     * p: The point the text is found.
     * txt: The text to look for.
     * fonts: The font(s) of the text.
@@ -156,6 +157,7 @@ findTextNumbers
     function findTextNumbers(col, tol: integer; area: TBox; font: string; spacing: array [0..2] of integer): integer;
 
 Uses getTextAtEx to find text and extracts the numbers from it.
+
     * spacing[0] = minvspacing.
     * spacing[1] = maxvspacing.
     * spacing[2] = hspacing.
@@ -193,6 +195,7 @@ mouseText
     function mouseText(txt, fonts: TStringArray; searchBox: TBox; mouseAction: integer): boolean;
 
 Returns true if the mouse action is performed on the text.
+
     * txt: The text to look for.
     * fonts: The font(s) of the text.
     * searchBox: The box to look for the text.
@@ -346,13 +349,14 @@ __getChooseOptions
     function __getChooseOptions(excludeBox: TBox; tabbed: boolean = false): array of __TOptions;
 
 Gets the text from the options menu. Searches for the menu in the entire client.
+
     * excludeBox: The box to exclude of colors are found. Only used when searching a tabbed menu.
     * tabbed: Optional. Default false. Set to true if looking for tabbed options.
 
 .. note::
 
     - by Wizzup?, Narcle, Coh3n & Flight
-    - Last Updated: Mar. 10, 2013 by Coh3n
+    - Last Updated: 01 August 2013 by Coh3n
 
 Example:
 
@@ -379,7 +383,7 @@ begin
 
   setLength(menuColors, 3);
 
-  menuColors := [131843 {black}, 3682593 {top blue}, 3552822 {grey}];
+  menuColors := [197636 {black}, 3748386 {top blue}, 3618615 {grey}];
   setLength(ATPA, length(menuColors));
 
   // find how many of each menu color is found; store in ATPA
@@ -445,6 +449,13 @@ begin
   l := high(ATPA);
   sortATPAFromFirstPointY(ATPA, point(bW div 2, 0));
 
+  if (length(ATPA) < 1) then
+  begin
+    setImageTarget(oldTarget);
+    freeBitmap(bmp);
+    exit();
+  end;
+
   setLength(result, length(ATPA));
   result[0].bigBox := bigBox;
 
@@ -478,6 +489,7 @@ chooseOption
     function chooseOption(txt, txtTab: TStringArray; mouseAction: integer; close: boolean = true; waitTime: integer = 100): boolean;
 
 Works for RS tabbed menus.
+
     * txtTab: The final option you want to choose. The function looks for this option first.
     * txt: The text that the mouse hovers to activate the tabbed menu.
     * mouseAction: What you want the mouse to do.  Mouse constants are in mouse.simba.
@@ -530,6 +542,7 @@ begin
 
   repeat
     options := __getChooseOptions(b);
+    __debugOptions(options);
 
     // if using the tabbed option
     if (length(txtTab) > 0) then
