@@ -120,10 +120,8 @@ begin
   fileName := logPath + fileName;
 
   try
-    if (fileExists(fileName)) then
-      __logFile := openFile(fileName, true)
-    else
-      __logFile := createFile(fileName);
+    __logFile := appendFile(fileName);
+    result := (__logFile <> -1);
   except
     writeln('Could not open/create log file');
   end;
