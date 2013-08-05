@@ -92,7 +92,7 @@ Overrides GetClientDimensions and sets w and h to the SMART_CLIENT constants.
 
 .. note::
 
-    By: Olly
+    - By: Olly
     - Last Updated: July 24, 2013 by Olly
 
 Example:
@@ -120,7 +120,7 @@ Checks we have the reqiured plugin to read OpenGL colors from SMART.
 
 .. note::
 
-    By: Olly
+    - By: Olly
     - Last Updated: July 24, 2013 by Olly
 
 Example:
@@ -148,7 +148,7 @@ Overrides smartSetDebug to enable/disable drawing in openGL mode.
 
 .. note::
 
-    By: Olly
+    - By: Olly
     - Last Updated: July 24, 2013 by Olly
 
 Example:
@@ -174,7 +174,7 @@ Set ups SMART so its ready to be drawn on-to.
 
 .. note::
 
-    By: Olly
+    - By: Olly
     - Last Updated: July 24, 2013 by Olly
 
 Example:
@@ -212,7 +212,7 @@ Free's and destorys the smart image.
 
 .. note::
 
-    By: Olly
+    - By: Olly
     - Last Updated: July 24, 2013 by Olly
 
 Example:
@@ -246,7 +246,7 @@ succesfull or not.
 
 .. note::
 
-    By: Brandon, Mormanman, Benland100
+    - By: Brandon, Mormanman, Benland100
     - Last Updated: May. 26, 2013 by Olly
 
 Example:
@@ -285,7 +285,7 @@ clients.
 
 .. note::
 
-    By: Mormanman
+    - By: Mormanman
     - Last Updated: May. 26, 2013 by Olly
 
 Example:
@@ -317,7 +317,7 @@ Attempts to kill SMART clients based on the only_unpaired boolean.
 
 .. note::
 
-    By: Mormanman
+    - By: Mormanman
     - Last Updated: May. 26, 2013 by Olly
 
 Example:
@@ -353,7 +353,7 @@ succesfull will set our current current client as the ID.
 
 .. note::
 
-    By: Ollybest
+    - By: Ollybest
     - Last Updated: May. 26, 2013 by Olly
 
 Example:
@@ -402,7 +402,7 @@ If skip is set to true it will exit the function without trying.
 
 .. note::
 
-    By: Ollybest
+    - By: Ollybest
     - Last Updated: June 1, 2013 by Olly
 
 Example:
@@ -458,7 +458,7 @@ goes wrong.
 
 .. note::
 
-    By: Benland100, Mormanman, Brandon
+    - By: Benland100, Mormanman, Brandon
     - Last Updated: July 24, 2013 by Olly
 
 Example:
@@ -510,7 +510,7 @@ Attempts to reload our current SMART client.
 
 .. note::
 
-    By: Olly
+    - By: Olly
     - Last Updated: June 1, 2013 by Olly
 
 Example:
