@@ -283,6 +283,14 @@ EVERYTHING should be recorded here: new features, function name changes, user-de
 - new file, drawing.simba
   - this file includes extra drawing functions for TMufasaBitmaps.
 
+- globalstats.simba renamed to srlstats.simba
+  - removed _ from variable/function names + made some internal.
+  - statsUsername, statsPassword, and statsScriptID need to be set in script.
+  - stats_Commit and stats_IncVariable renamed to statsCommit and statsIncVariable.
+  - SetupSRLStats renamed to statsSetup()
+
+
+
 
 
 

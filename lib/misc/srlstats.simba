@@ -1,0 +1,319 @@
+(*
+Stats
+=====
+
+The Stats include contains wrapper functions provided by the SRL Stats API.
+The functions contained are meant for ease of use for implementation into
+scripts.
+
+The source for this file can be found
+`here <https://github.com/SRL/SRL-6/blob/master/lib/misc/srlstats.simba>`_.
+
+
+*)
+
+{$include_once ../core/debug.simba}
+
+{$f-}
+
+{*
+type __TStatsVar
+~~~~~~~~~~~~~~~~
+
+Stores information about stats variables used in the current script.
+*}
+type
+  __TStatsVar = record
+    name: string;
+    value: integer;
+  end;
+
+{*
+const Internal
+~~~~~~~~~~~~~~
+
+Internal constants of the SRL stats file.
+*}
+const
+  __STATS_SETTING = 'stats_ShowStatsDialog'; // name for the setting that will be set
+
+{*
+const Internal
+~~~~~~~~~~~~~~
+
+Internal variables of the SRL stats file.
+*}
+var
+  __statsVars: array of __TStatsVar;
+  __statsTimer: integer;
+
+(*
+var User-set Variables
+~~~~~~~~~~~~~~~~~~~~~~
+
+The variables that need to be set in any script that uses the SRL stats system.
+
+    * statsUsername: The username of the stats user.  The same username used to login to stats.villavu.com.
+    * statsPassword: The password of the stats user.  The same password used to login to stats.villavu.com.
+    * statsScriptID: The ID of the current script.  Script ID's can be found `here <http://stats.villavu.com/script/all>`_.
+*)
+var
+  statsUsername, statsPassword, statsScriptID: string;
+
+
+(*
+statsSetup
+~~~~~~~~~~
+
+.. code-block:: pascal
+
+    procedure statsSetup(scriptID: integer; username, password: string);
+
+Initializes all variables necessary for SRL stats to function. Username and
+password are not case sensitive.  If stats username and password are not set,
+the global variables are set to Anonymous.
+
+.. note::
+
+    - by Nava2
+    - Last Updated: 05 August 2013 by Coh3n
+
+Example:
+
+.. code-block:: pascal
+
+    statsSetup(64, 'SRL-Developers', 'SRLSRLSRL');
+
+*)
+procedure statsSetup(scriptID: integer; username, userpass: string);
+begin
+  __statsTimer := getSystemTime();
+  statsScriptID := intToStr(scriptID);
+  statsUsername := username;
+  statsPassword := userpass;
+
+  if ((statsUsername = '') and (statsPassword = '')) and (strToBoolDef(getSettingValue(__STATS_SETTING), true)) then
+    case MessageBox('No Stats account entered, would you like to set one up?', 'SRL Stats', 3) of
+      mrYes:
+        openWebPage('');
+
+      mrNo:
+        case MessageBox('Would you want to disable this dialog from showing again in the future? (Not Recommended)', 'Disable this dialog?', mbYesNoCancel) of
+          mrYes: SetSettingValue(__STATS_SETTING, 'FALSE');
+        end;
+    end;
+
+  if (statsUsername = '') then
+  begin
+    statsUsername := 'Anonymous';
+    statsPassword := 'anon1337';
+  end;
+end;
+
+(*
+__statsInitVariable
+~~~~~~~~~~~~~~~~~~~
+
+.. code-block:: pascal
+
+    __statsInitVariable(VarName: String; InitValue: Integer);
+
+Helper method to clean up code in the include. Removes some repeating code
+internally.
+
+.. note::
+
+    - by Nava2
+    - Last Updated: 05 August 2013 by Coh3n
+
+.. WARNING::
+
+    Use of this method outside of this include *may* lead to multiple variables
+    of the same name. It does **not** check to see if the variable is already
+    present.
+
+.. code-block:: pascal
+
+    __statsInitVariable('coal', 0);
+
+*)
+procedure __statsInitVariable(VarName: String; InitValue: Integer);
+var
+  len: Integer;
+begin
+  len := Length(__statsVars);
+  SetLength(__statsVars, len + 1);
+
+  __statsVars[len].Name := LowerCase(VarName);
+  __statsVars[len].Value := InitValue;
+end;
+
+
+(*
+statsSetVariable
+~~~~~~~~~~~~~~~~
+
+.. code-block:: pascal
+
+    statsSetVariable(VarName: string; NewValue: Integer);
+
+Sets the passed variable to the new value regardless of old value. This method
+behaves much like __statsInitVariable but checks for the variable present first.
+
+.. note::
+
+    - by Nava2
+    - Last Updated: 05 August 2013 by Coh3n
+
+Example:
+
+.. code-block:: pascal
+
+    statsSetVariable('runite', 10);
+
+*)
+procedure statsSetVariable(VarName: string; NewValue: Integer);
+var
+  i, h: Integer;
+begin
+  h := High(__statsVars);
+  VarName := LowerCase(VarName); // set it to lowercase since not case sensitive
+
+  if (h >= 0) then
+    for i := h downto 0 do
+      if (VarName = __statsVars[i].Name) then
+      begin
+        __statsVars[i].Value := NewValue;
+        Exit;
+      end;
+
+  // the variable is not present already, thus make a new entry into the dict.
+  __statsInitVariable(VarName, NewValue);
+end;
+
+(*
+statsIncVariable
+~~~~~~~~~~~~~~~~
+
+.. code-block:: pascal
+
+    procedure statsIncVariable(VarName: string; Value: integer);
+
+Increments a variable by the value passed.
+
+.. note::
+
+    - by Nava2
+    - Last Updated: 05 August 2013 by Coh3n
+
+Example:
+
+.. code-block:: pascal
+
+    statsIncVariable('cod', 69);
+
+*)
+procedure statsIncVariable(VarName: string; Value: integer);
+var
+  i, h: Integer;
+begin
+  h := High(__statsVars);
+  VarName := LowerCase(VarName); // set it to lowercase since not case sensitive
+
+  if (h >= 0) then
+    for i := h downto 0 do
+      if (VarName = __statsVars[i].Name) then
+      begin
+        __statsVars[i].Value := __statsVars[i].Value + Value;
+        Exit;
+      end;
+
+  // the variable is not present already, thus make a new entry into the dict.
+  __statsInitVariable(VarName, Value);
+end;
+
+(*
+statsCommit
+~~~~~~~~~~~
+
+.. code-block:: pascal
+
+    function statsCommit: Boolean;
+
+Sends all the information currently stored in the system to the server. Returns
+true if commit was successful, displays error messages. One should note that the
+stats variables are set to 0 on commit.
+
+.. note::
+
+    - by Nava2
+    - Last Updated: 05 August 2013 by Coh3n
+
+Example:
+
+.. code-block:: pascal
+
+    if (statsCommit) then
+      WriteLn('We are success.');
+
+*)
+function statsCommit: Boolean;
+var
+  SRLClient, Worked, i, ExtraTime, Increment: integer;
+  S: String;
+begin
+  ExtraTime := (GetSystemTime() - __statsTimer);
+  Worked :=  Round(ExtraTime div 60000);
+
+  if (Worked < 5) then
+    Exit;
+
+  print('statsCommit():', TDebug.HEADER);
+  print('Initializing stats commit...');
+
+  ExtraTime := ExtraTime - (Worked * 60000);
+
+  __statsTimer := GetSystemTime() - ExtraTime;
+  SRLClient := InitializeHTTPClient(False);
+  ClearPostData(SRLClient);
+
+  AddPostVariable(SRLClient, 'user', statsUsername);
+  AddPostVariable(SRLClient, 'password', statsPassword);
+  AddPostVariable(SRLClient, 'script', statsScriptID);
+  AddPostVariable(SRLClient, 'time', IntToStr(Worked));
+
+  if (Length(__statsVars) > 0) then
+    for i := High(__statsVars) downto 0 do
+      with __statsVars[i] do
+      begin
+        if (Value <= 0) then
+          Continue;
+
+        AddPostVariable(SRLClient, Name, ToStr(Min(Value, 20000))); // Commit Value capped at 20000
+        Value := 0; // Clear for next commit
+      end;
+
+  S := PostHTTPPageEx(SRLClient, 'http://stats.villavu.com/api/commit');
+  FreeHTTPClient(SRLClient);
+  Result := False;
+
+  case StrToIntDef(ExtractFromStr(S, Numbers), -1) of
+    100: begin
+           Result := True; // successful commit
+           print('Commit successful!');
+         end;
+
+    110: print('Incorrect user and/or password', TDebug.ERROR);
+    120: print('Incorrect script ID', TDebug.ERROR);
+    130: print('Invalid time', TDebug.ERROR);
+    140: print('Variable does not exist', TDebug.ERROR);
+    150: print('Wrong info for variable', TDebug.ERROR);
+    160: print('Internal server error', TDebug.ERROR);
+
+    else
+      print('No POST return', TDebug.ERROR);
+  end;
+
+  print('statsCommit(): '+toStr(result));
+end;
+

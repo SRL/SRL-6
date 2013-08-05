@@ -6,3 +6,4 @@ SRL Misc Reference
     :maxdepth: 2
 
     smart
+    srlstats

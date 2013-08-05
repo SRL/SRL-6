@@ -13,6 +13,21 @@ const
   MOUSE_NONE = -1;
   MOUSE_MOVE = 3;
 
+const
+  VK_ENTER = {$IFDEF LINUX}10{$ELSE}VK_RETURN{$ENDIF};
+
+// for the messageBox function
+const
+  mbOk = 0;
+  mbOkCancel = 1;
+  mbAbortRetryIgnore = 2;
+  mbYesNoCancel = 3;
+  mbYesNo = 4;
+  mbCancelRetry = 5;
+
+  mrYes = 6;
+  mrNo = 7;
+
 var
   clWhite = 16777215;
   clBlack = 0;

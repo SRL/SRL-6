@@ -10,9 +10,6 @@ The source for this file can be found `here <https://github.com/SRL/SRL-6/blob/m
 
 {$f-}
 
-const
-  VK_ENTER = {$IFDEF LINUX}10{$ELSE}VK_RETURN{$ENDIF};
-
 (*
 Constant: Events
 ~~~~~~~~~~~~~~~~
