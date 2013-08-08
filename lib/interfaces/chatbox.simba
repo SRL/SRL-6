@@ -64,7 +64,7 @@ begin
   with self do
   begin
     name := 'RS Chat Box';
-    ID := ID_INTERFACE_CHAT;
+    ID := ID_INTERFACE_CHAT_BOX;
     parentID := -1;
     static := false;
     x1 := 0;

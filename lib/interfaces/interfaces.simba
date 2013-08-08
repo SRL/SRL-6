@@ -24,22 +24,23 @@ Integer constants that represent the ID's of each global interface.
 const 
   // gametabs
   ID_INTERFACE_GAMETABS         = 0;
-  ID_INTERFACE_TAB_BACKPACK     = 1;
-  ID_INTERFACE_TAB_MELEE        = 2;
-  ID_INTERFACE_TAB_MAGIC        = 3;
-  ID_INTERFACE_TAB_RANGE        = 4;
-  ID_INTERFACE_TAB_DEFENCE      = 5;
-  ID_INTERFACE_TAB_STATS        = 6;
-  ID_INTERFACE_TAB_EQUIPMENT    = 7;
-  ID_INTERFACE_TAB_PRAYER       = 8;
-  ID_INTERFACE_TAB_ABILITY_BOOK = 9;
-  ID_INTERFACE_TAB_FRIENDS      = 10;
+  ID_INTERFACE_TAB_BACKPACK     = 0;
+  ID_INTERFACE_TAB_LOGOUT       = 1;
+  ID_INTERFACE_TAB_COMBAT       = 2;
+  ID_INTERFACE_TAB_NOTICE       = 3;
+  ID_INTERFACE_TAB_STATS        = 4;
+  ID_INTERFACE_TAB_ACADEMY      = 5;
+  ID_INTERFACE_TAB_EQUIPMENT    = 6;
+  ID_INTERFACE_TAB_PRAYER       = 7;
+  ID_INTERFACE_TAB_ABILITY_BOOK = 8;
+  ID_INTERFACE_TAB_EXTRAS       = 9;
+  ID_INTERFACE_TAB_FRIENDS_LIST = 10;
   ID_INTERFACE_TAB_FRIENDS_CHAT = 11;
   ID_INTERFACE_TAB_CLAN_CHAT    = 12;
-  ID_INTERFACE_TAB_MUSIC        = 13;
-  ID_INTERFACE_TAB_NOTES        = 14;
-  ID_INTERFACE_TAB_TASK         = 15;
-  ID_INTERFACE_TAB_TASK_COMPASS = ID_INTERFACE_TAB_TASK;
+  ID_INTERFACE_TAB_OPTIONS      = 13;
+  ID_INTERFACE_TAB_EMOTES       = 14;
+  ID_INTERFACE_TAB_MUSIC        = 15;
+  ID_INTERFACE_TAB_NOTES        = 16;
 
   // client - logged in
   ID_INTERFACE_CHAT_BOX   = 30;
@@ -48,7 +49,6 @@ const
   ID_INTERFACE_MINIMAP    = 33;
   ID_INTERFACE_BANKSCREEN = 34;
   ID_INTERFACE_OPTIONS    = 35;
-  ID_INTERFACE_CHAT       = 36;
 
   // client - logged out
   ID_INTERFACE_LOBBY        = 40;
@@ -153,7 +153,7 @@ Example:
 *)
 function TRSInterface.getCenterPoint(): TPoint;
 begin
-  result := self.getBounds().getMidPoint();
+  result := self.getBounds().getMiddle();
 end;
 
 (*

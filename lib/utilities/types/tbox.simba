@@ -70,8 +70,8 @@ begin
 end;
 
 (*
-TBox.getMidPoint
-~~~~~~~~~~~~~~~~
+TBox.getMiddle
+~~~~~~~~~~~~~~
 
 .. code-block:: pascal
 
@@ -90,7 +90,7 @@ Example:
     pt := b.getMidPoint();
 
 *)
-function TBox.getMidPoint(): TPoint;
+function TBox.getMiddle(): TPoint;
 begin
   result := Point((self.x2 + self.x1) div 2, (self.y2 + self.y1) div 2);
 end;

@@ -21,12 +21,6 @@ const Angle
 ~~~~~~~~~~~
 
 Constants that represent the possible angles of the mainscreen.
-
-Example:
-
-.. code-block:: pascal
-
-    mainscreen.setAngle(MS_ANGLE_HIGH);
 *)
 const
   MS_ANGLE_HIGH  = 0;
@@ -49,13 +43,6 @@ var mainscreen
 ~~~~~~~~~~~~~~
 
 Variable that stores functions and properties of the Runescape mainscreen.
-
-Example:
-
-.. code-block:: pascal
-
-    if (mainscreen.isPlayerAnimating()) then
-      writeln('Player is doing something');
 *)
 var
   mainscreen: TRSMainscreen;
@@ -456,7 +443,7 @@ begin
   aPoints.filterBetween(0, minCount); // removes objects that don't have enough colors
   print('Possible objects found: '+toStr(length(aPoints)));
 
-  aPoints.sortFromFirstPoint(searchBox.getMidPoint());
+  aPoints.sortFromFirstPoint(searchBox.getMiddle());
 
   // loop through each possible object
   for i := 0 to high(aPoints) do
