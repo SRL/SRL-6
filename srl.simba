@@ -35,6 +35,7 @@ SRL library isn't available to you.
 {$include_once lib/interfaces/minimap.simba}
 {$include_once lib/interfaces/bankscreen.simba}
 {$include_once lib/interfaces/options.simba}
+{$include_once lib/interfaces/chatbox.simba}
 
 {$include_once lib/misc/srlstats.simba}
 
@@ -60,7 +61,11 @@ begin
       smartSetupDrawing();
   {$ENDIF}
 
-  gameTabs.__init(); // needs to be called after SMART is ready because it calls getClientDimensions
+  // needs to be called after SMART is ready because it calls getClientDimensions
+  gameTabs.__init();
+  chatbox.__init();
+  minimap.__init();
+  mainscreen.__init();
 
   if (waitClientReady()) then
     print('Client is ready.')

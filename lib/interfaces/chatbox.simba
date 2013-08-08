@@ -1,0 +1,111 @@
+(*
+Chatbox
+=======
+
+The chatbox file holds functions and procedures that are used in the
+Runescape chat box.
+
+The source for this file can be found
+`here <https://github.com/SRL/SRL-6/blob/master/lib/interfaces/chatbox.simba>`_.
+
+*)
+
+{$include_once interfaces.simba}
+
+{$f-}
+
+(*
+type TRSChatbox
+~~~~~~~~~~~~~~~
+
+A type that stores functions and properties of the Runescape chat box interface.
+*)
+type
+  TRSChatbox = record(TRSInterface)
+    __placeholder: byte;
+  end;
+
+(*
+var chatbox
+~~~~~~~~~~~
+
+Variable that stores functions and properties of the Runescape chatbox interface.
+*)
+var
+  chatbox: TRSChatbox;
+
+{*
+TRSChatbox.__init
+~~~~~~~~~~~~~~~~~
+
+.. code-block:: pascal
+
+    procedure TRSChatbox.__init();
+
+Initiates the chatbox variable.
+
+.. note::
+
+    - by Coh3n
+    - Last Updated: 08 August 2013 by Coh3n
+
+Example:
+
+.. code-block:: pascal
+
+    chatbox.__init();
+*}
+procedure TRSChatbox.__init();
+var
+  wid, hei: integer;
+begin
+  getClientDimensions(wid, hei);
+
+  with self do
+  begin
+    name := 'RS Chat Box';
+    ID := ID_INTERFACE_CHAT;
+    parentID := -1;
+    static := false;
+    x1 := 0;
+    y1 := (hei - 157);
+    x2 := 575;
+    y2 := (hei - 1);
+    w := (x2 - x1);
+    h := (y2 - y1);
+    cx := self.getCenterPoint().x;
+    cy := self.getCenterPoint().y;
+  end;
+end;
+
+(*
+TRSChatbox.isOpen
+~~~~~~~~~~~~~~~~~
+
+.. code-block:: pascal
+
+    function TRSChatbox.isOpen(): boolean;
+
+Returns true if the chatbox interface is open.
+
+.. note::
+
+    - by Coh3n
+    - Last Updated: 08 August 2013 by Coh3n
+
+Example:
+
+.. code-block:: pascal
+
+    if (chatbox.isOpen()) then
+      writeln('The chatbox is open');
+*)
+function TRSChatbox.isOpen(): boolean;
+begin
+  // gold color of the report issue button
+  result := (getColor(self.x2 - 17, self.y1 + 45) = 3982574);
+end;
+
+begin
+  chatbox.__init();
+end;
