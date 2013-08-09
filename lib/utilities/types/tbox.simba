@@ -481,14 +481,14 @@ begin
 end;
 
 (*
-TBox.shift
-~~~~~~~~~~
+TBox.offset
+~~~~~~~~~~~
 
 .. code-block:: pascal
 
-    procedure TBox.shift(const x, y: integer);
+    procedure TBox.offset(const p: TPoint);
 
-Shifts the TBox by x and y values.
+Offsets the TBox by "p".
 
 .. note::
 
@@ -498,15 +498,15 @@ Example:
 
 .. code-block:: pascal
 
-    myBox.shift(10, 10);
+    myBox.offset(point(10, 10));
 
 *)
-procedure TBox.shift(const x, y: integer);
+procedure TBox.offset(const p: TPoint);
 begin
-  self.X1 := self.X1 + x;
-  self.X2 := self.X2 + x;
-  self.Y1 := self.Y1 + y;
-  self.Y2 := self.Y2 + y;
+  self.X1 := self.X1 + p.x;
+  self.X2 := self.X2 + p.x;
+  self.Y1 := self.Y1 + p.y;
+  self.Y2 := self.Y2 + p.y;
 end;
 
 (*

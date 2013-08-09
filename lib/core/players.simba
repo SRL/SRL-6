@@ -677,7 +677,7 @@ begin
 
   repeat
     // check to see if there is already text in the input box
-    tmpBox.shift(8, 0); // to remove the cursor so it doesn't interfere
+    tmpBox.offset(point(8, 0)); // to remove the cursor so it doesn't interfere
     findColors(tpa, __LOGIN_COLOR_TEXT, tmpBox);
 
     if (length(tpa) <= 0) then
