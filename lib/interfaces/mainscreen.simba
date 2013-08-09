@@ -162,164 +162,6 @@ begin
 end;
 
 (*
-TRSMainscreen.getUptext()
-~~~~~~~~~~~~~~~~~~~~~~~~~
-
-.. code-block:: pascal
-
-    function TRSMainscreen.getUptext(): string;
-
-Gets the current uptext in the upper left corner of the mainscreen.
-
-.. note::
-
-    - by Coh3n
-    - Last Updated: Mar. 10, 2013 by Coh3n
-
-Example:
-
-.. code-block:: pascal
-
-    writeln('Current uptext: '+mainscreen.getUptext());
-*)
-function TRSMainscreen.getUptext(): string;
-begin
-  // Simba's rs_GetUptext get's text at (7, 7) which is in the navigation bar
-  result := rs_GetUpTextAt(7, 57);
-end;
-
-(*
-TRSMainscreen.isUptext
-~~~~~~~~~~~~~~~~~~~~~~
-
-.. code-block:: pascal
-
-    function TRSMainscreen.isUptext(txt: TStringArray; waitTime: integer = 50; tol: extended = 0.6): boolean;
-
-Returns true if 'txt' is found in the RS uptext string. Optional parameter
-'waitTime' to wait for the text to appear (default 50ms). Optional tolerance
-parameter (default 0.6).
-
-.. note::
-
-    - by Narcle
-    - Last Updated: Mar. 10, 2013 by Coh3n
-
-Example:
-
-.. code-block:: pascal
-
-    if (mainScreen.isUptext(['Mine', 'rock'])) then
-      writeln('Found uptext!');
-*)
-function TRSMainscreen.isUptext(txt: TStringArray; waitTime: integer = 100; tol: extended = 1.0): boolean;
-var
-  i, t: integer;
-  s: string;
-  acc: extended;
-begin
-  t := (getSystemTime() + waitTime);
-  print('TRSMainscreen.isUptext()', TDebug.HEADER);
-
-  repeat
-    s := self.getUptext();
-    print('Current uptext: "'+s+'"');
-
-    for i := 0 to high(txt) do
-    begin
-      acc := stringMatch(txt[i], s);
-
-      if (acc >= tol) then
-      begin
-        print('Found "'+txt[i]+'" in uptext string: "'+s+'" @ accuracy ' + floatToStr(acc));
-        result := true;
-        break(2);
-      end;
-    end;
-
-    wait(10 + random(20));
-  until (getSystemTime() > t);
-
-  print('TRSMainscreen.isUptext(): '+toStr(result), TDebug.FOOTER);
-end;
-
-(*
-TRSMainscreen.spiralUptext
-~~~~~~~~~~~~~~~~~~~~~~~~~~
-
-.. code-block:: pascal
-
-    function TRSMainscreen.spiralUptext(var p: TPoint; spiralBox: Tbox; upText: TStringArray; PpC, aInc: Integer): boolean;
-
-Spirals the mouse in a circle from the center of the defined box. It will continue
-to spiral until it finds a spiral completely outside the box, always skipping
-points outside. Returns the occurance of the first occurance of UpText into p.
-
-    * p: The first point that the uptext is found.  Set to (-1, -1) if not found.
-    * spiralBox: The box to spiral in.
-    * PpC: The number of pixels to increase per spiral.
-    * aInc: The number of stops to make around each spiral.
-
-Takes some testing to get the right combination of PpC and aInc.
-
-.. note::
-
-    - by Nava2
-    - Last Updates: Mar. 16, 2013 by Coh3n
-
-Example:
-
-.. code-block:: pascal
-
-    if (mainscreen.spiralUptext(p, depoisitAllBox, ['All'], 4, 4)) then
-      mouse(p, MOUSE_LEFT);
-*)
-function TRSMainscreen.spiralUptext(var p: TPoint; spiralBox: Tbox; upText: TStringArray; PpC, aInc: Integer): boolean;
-var
-  aStep, a, rStep, rV, oB: extended;
-  pX, pY, ms: integer;
-  sP: TPoint;
-  L2R: boolean;
-begin
-  result := false;
-
-  ms := mouseSpeed;
-  mouseSpeed := (25 + randomRange(-3, 3));
-  sP := middleTPA([point(spiralBox.x1, spiralBox.y1), point(spiralBox.x2, spiralBox.y2)]);
-  aStep := (pi / (aInc / 2));
-  a := 0;
-  rStep := (PpC / aInc);
-  L2R := (random(2) = 0);
-
-  repeat
-    rV := rV + rStep;
-    pX := round(rV * cos(a)) + sP.x;
-    pY := round(rV * sin(a)) + sP.y;
-
-    if (L2R) then
-      a := (a + aStep)
-    else
-      a := (a - aStep);
-
-    if (pointInBox(point(pX, pY), spiralBox)) then
-    begin
-      oB := 0;
-      mouse(point(pX - 2, pY - 2).rand(5), MOUSE_MOVE);
-
-      if (mainscreen.isUptext(upText, 300)) then
-      begin
-        getMousePos(p.x, p.y);
-        result := true;
-      end;
-    end else
-      oB := (oB + aStep);
-
-  until(result or (oB > (2 * Pi)));
-
-  mouseSpeed := ms;
-end;
-
-(*
 TRSMainscreen.setAngle
 ~~~~~~~~~~~~~~~~~~~~~~
 
@@ -464,7 +306,7 @@ begin
     myPoint := aPoints[i].getMiddle();
     mouse(myPoint.rand(randomRange(-5, 5)), MOUSE_MOVE);
 
-    if (self.isUptext(uptext)) then
+  {  if (self.isUptext(uptext)) then
     begin
       getMousePos(x, y);
       mouse(point(x, y), mouseAction);
@@ -472,7 +314,7 @@ begin
       print('Successfully clicked object');
       result := true;
       break;
-    end;
+    end; }
   end;
 
   print('TRSMainscreen.findObject(): '+toStr(result), TDebug.FOOTER);
