@@ -118,6 +118,34 @@ begin
 end;
 
 (*
+TMufasaBitmap.drawBox
+~~~~~~~~~~~~~~~~~~~~~
+
+.. code-block:: pascal
+
+    procedure TMufasaBitmap.drawBox(box: TBox; color: TColor = clRed); overload;
+
+Overloaded function, will draw the outline of the "box" and includes a optional
+color parameter (default red).
+
+.. note::
+
+    - by Ollybest
+    - Last Updated: 19 August 2013 by Ollybest
+
+Example:
+
+.. code-block:: pascal
+
+    tmb.drawBox(intToBox(50, 50, 345, 345));
+
+*)
+procedure TMufasaBitmap.drawBox(box: TBox; color: TColor = clRed); overload;
+begin
+  self.drawBox(box, false, color);
+end;
+
+(*
 TMufasaBitmap.drawBoxes
 ~~~~~~~~~~~~~~~~~~~~~~~
 
@@ -601,6 +629,48 @@ begin
   end;
 
   self.drawTPA(tpa, color);
+end;
+
+(*
+TMufasaBitmap.drawSystemFont
+~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+
+.. code-block:: pascal
+
+    procedure TMufasaBitmap.drawSystemFont(txt: string; pnt: TPoint; shadow: boolean; fontName: string; fontSize: integer; color: TColor);
+
+Uses LoadSystemFont() to draw a system font onto the TMufasaBitmap.
+
+.. note::
+
+    - by Olly
+    - Last Updated: 09 August 2013 by Olly
+
+Example:
+
+.. code-block:: pascal
+
+    tmb.drawSystemFont('hello world!', point(10, 10), true, 'comic sans', 45, clLime);
+
+*)
+procedure TMufasaBitmap.drawSystemFont(txt: string; pnt: TPoint; shadow: boolean; fontName: string; fontSize: integer; color: TColor);
+var
+  font: TFont;
+  sysFont: string;
+begin
+  font.init();
+  font.setName(fontName);
+  font.setSize(fontSize);
+
+  if (not loadSystemFont(font, sysFont)) then
+  begin
+    writeln('ERROR: drawSystemFont(): Failed to load the font "' + fontName);
+    exit();
+  end;
+
+  self.drawText(txt, pnt, sysFont, shadow, color);
+
+  font.free();
 end;
 
 (*
