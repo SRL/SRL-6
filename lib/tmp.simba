@@ -667,6 +667,8 @@ begin
     inc(t);
   end;
 
+  if (not valid) then
+    writeln('-- ERROR: **Gaussian failed**');
 end;
 
 (*

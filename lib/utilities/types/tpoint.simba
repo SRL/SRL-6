@@ -141,7 +141,7 @@ but can be changed(invaildPoint).
 
 .. note::
 
-    - by Ollybest
+    - by Olly
 
 Example:
 
@@ -168,7 +168,7 @@ Rotates the TPoint by angle around cx and cy.
 
 .. note::
 
-    - by Ollybest
+    - by Olly
 
 Example:
 
@@ -209,33 +209,6 @@ begin
 end;
 
 (*
-TPoint.randPosNeg
-~~~~~~~~~~~~~~~~~
-
-.. code-block:: pascal
-
-    function TPoint.randPosNeg(ran: integer): TPoint;
-
-Randomly adds OR subtracts "ran" from both values of the TPoint.
-
-.. note::
-
-    - by Ollybest
-
-Example:
-
-.. code-block:: pascal
-
-    mouse(point.randPosNeg(5));
-
-*)
-function TPoint.randPosNeg(ran: integer): TPoint;
-begin
-  result.x := randomRange(self.x - ran, self.x + ran);
-  result.y := randomRange(self.y - ran, self.y + ran);
-end;
-
-(*
 TPoint.offset
 ~~~~~~~~~~~~~
 
@@ -247,7 +220,7 @@ Offsets the TPoint by p.
 
 .. note::
 
-    - by Ollybest
+    - by Olly
 
 Example:
 
@@ -274,7 +247,7 @@ Result a copy of the TPoint.
 
 .. note::
 
-    - by Ollybest
+    - by Olly
 
 Example:
 
@@ -300,7 +273,7 @@ Returns if the TPoint is in the box.
 
 .. note::
 
-    - by Ollybest
+    - by Olly
 
 Example:
 
@@ -313,4 +286,143 @@ Example:
 function TPoint.isInBox(const box: TBox): boolean;
 begin
   result := pointInBox(self, box);
+end;
+
+(*
+TPoint.randRange
+~~~~~~~~~~~~~~~~
+
+.. code-block:: pascal
+
+    function TPoint.randRange(const aFrom, aTo: integer): TPoint;
+
+Used to apply the same randomness to both the 'x' and 'y' coordinates of a TPoint.
+
+.. note::
+
+    - by Olly
+
+Example:
+
+.. code-block:: pascal
+
+    writeln(p.randRange(-10, 10));
+
+*)
+function TPoint.randRange(const aFrom, aTo: integer): TPoint;
+begin
+  result.x := randomRange(self.x + aFrom, self.x + aTo);
+  result.y := randomRange(self.y + aFrom, self.y + aTo);
+end;
+
+(*
+TPoint.randRange
+~~~~~~~~~~~~~~~~
+
+.. code-block:: pascal
+
+    function TPoint.randRange(const xFrom, xTo, yFrom, yTo: integer): TPoint; overload;
+
+Overloaded function, but has extra parameters to apply separate randomness to
+both 'x', 'y' cords.
+
+.. note::
+
+    - by Olly
+
+Example:
+
+.. code-block:: pascal
+
+    p.randRange(-10, 10, -10, 10);
+
+*)
+function TPoint.randRange(const xFrom, xTo, yFrom, yTo: integer): TPoint; overload;
+begin
+  result.x := randomRange(self.x + xFrom, self.x + xTo);
+  result.y := randomRange(self.y + yFrom, self.y + yTo);
+end;
+
+(*
+TPoint.gaussRange
+~~~~~~~~~~~~~~~~~
+
+.. code-block:: pascal
+
+    function TPoint.gaussRange(const aFrom, aTo: integer): TPoint;
+
+Uses gaussain to apply the same randomness to both the 'x' and 'y' coordinates
+of a TPoint.
+
+.. note::
+
+    - by Olly
+
+Example:
+
+.. code-block:: pascal
+
+    p.gaussRange(-10, 10);
+
+*)
+function TPoint.gaussRange(const aFrom, aTo: integer): TPoint;
+begin
+  result.x := gaussRangeInt(self.x + aFrom, self.x + aTo);
+  result.y := gaussRangeInt(self.y + aFrom, self.y + aTo);
+end;
+
+(*
+TPoint.gaussRange
+~~~~~~~~~~~~~~~~~
+
+.. code-block:: pascal
+
+    function TPoint.gaussRange(const xFrom, xTo, yFrom, yTo: integer): TPoint; overload;
+
+Overloaded function, but has extra parameters to apply separate gaussian randomness
+to both 'x', 'y' cords.
+
+.. note::
+
+    - by Olly
+
+Example:
+
+.. code-block:: pascal
+
+    p.gaussRange(-10, 10, -5, 5);
+
+*)
+function TPoint.gaussRange(const xFrom, xTo, yFrom, yTo: integer): TPoint; overload;
+begin
+  result.x := gaussRangeInt(self.x + xFrom, self.x + xTo);
+  result.y := gaussRangeInt(self.y + yFrom, self.y + yTo);
+end;
+
+(*
+TPoint.getAngleTo
+~~~~~~~~~~~~~~~~~
+
+.. code-block:: pascal
+
+    function TPoint.getAngleTo(pt2: TPoint): extended;
+
+Returns the angle from the TPoint to "pt2".
+
+.. note::
+
+    - by Janilabo
+
+Example:
+
+.. code-block:: pascal
+
+    writeln(point(100, 100).getAngleTo(point(150, 150));
+
+*)
+function TPoint.getAngleTo(pt2: TPoint): extended;
+begin
+  Result := ((ArcTan2((pt2.Y - self.Y), (pt2.X - self.X)) * (180.0 / Pi)) + 90.0);
+  if (Result < 0.0) then
+    Result := (Result + 360.0);
 end;
