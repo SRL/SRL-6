@@ -45,6 +45,16 @@ SRL library isn't available to you.
 
 {$f+}
 
+procedure __initInterfaces();
+begin
+  // needs to be called after SMART is ready because they call getClientDimensions
+  gameTabs.__init();
+  chatbox.__init();
+  minimap.__init();
+  mainscreen.__init();
+  bankscreen.__init();
+end;
+
 function setupSRL(): boolean;
 var
   t := getSystemTime();
@@ -61,11 +71,7 @@ begin
       smartSetupDrawing();
   {$ENDIF}
 
-  // needs to be called after SMART is ready because it calls getClientDimensions
-  gameTabs.__init();
-  chatbox.__init();
-  minimap.__init();
-  mainscreen.__init();
+  __initInterfaces();
 
   if (waitClientReady()) then
     print('Client is ready.')
