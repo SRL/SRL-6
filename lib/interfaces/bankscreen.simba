@@ -14,6 +14,16 @@ The source for this file can be found `here <https://github.com/SRL/SRL-6/blob/m
 
 {$f-}
 
+{*
+const Internal
+~~~~~~~~~~~~~~
+
+Internal bankscreen constants.
+
+*}
+const
+  _COLOR_BANK_TAB_ACTIVE = 4407350; // light color of an active bank tab
+
 (*
 const Deposit Buttons
 ~~~~~~~~~~~~~~~~~~~~~
@@ -36,7 +46,9 @@ A type that stores all the attributes and functions of the Runescape bankscreen.
 *)
 type
   TRSBankScreen = record(TRSInterface)
-    slots, tabSlots: TBoxArray;
+    __bankItemSlots,
+    __packItemSlots,
+    __tabSlots: TBoxArray;
   end;
 
 (*
@@ -69,8 +81,8 @@ Initializes the TRSBankScreen.
 
 .. note::
 
-    - by Ollybest
-    - Last Updated: 15 June 2013 by Ollybest
+    - by Olly
+    - Last Updated: 10 August 2013 by Coh3n
 
 Example:
 
@@ -80,24 +92,32 @@ Example:
 
 *}
 procedure TRSBankScreen.__init();
+var
+  wid, hei: integer;
 begin
+  getClientDimensions(wid, hei);
+
   with (self) do
   begin
     name := 'RS Bank Screen';
     ID := ID_INTERFACE_BANKSCREEN;
     parentID := -1;
     static := true;
-    x1 := 17;
-    y1 := 74;
-    x2 := 503;
-    y2 := 376;
+
+    // bounds of the entire bank (including the side backpack)
+    x1 := round(wid / 2) - 339;
+    y1 := round(hei / 2) - 297;
+    x2 := round(wid / 2) + 342;
+    y2 := round(hei / 2) + 291;
+
     w := (x2 - x1);
     h := (y2 - y1);
     cx := self.getCenterPoint().x;
     cy := self.getCenterPoint().y;
 
-    slots := grid(10, 5, 31, 32, 44, 44, point(53, 157));
-    tabSlots := grid(9, 1, 36, 33, 48, 44, point(43, 115));
+    __bankItemSlots := grid(10, 10, 37, 33, 44, 44, point(self.x1 + 40, self.y1 + 100));
+    __packItemSlots := grid(4, 7, 36, 33, 42, 36, point(self.x1 + 518, self.y1 + 108));
+    __tabSlots      := grid(9, 1, 45, 35, 48, 0, point(self.x1 + 34, self.y1 + 57));
   end;
 end;
 
@@ -113,8 +133,8 @@ Returns if the bankscreen is open or not.
 
 .. note::
 
-    - by Ollybest
-    - Last Updated: 15 June 2013 by Ollybest
+    - by Olly
+    - Last Updated: 10 August 2013 by Coh3n
 
 Example:
 
@@ -133,8 +153,8 @@ begin
   result := false;
 
   repeat
-    if (getColor(197, 79) = 4106994) then
-      result := findText(p, 4106994, 0, ['ank of Run'], [upCharsEx], intToBox(196, 76, 289, 95));
+    if (getColor(self.x1 + 113, self.y2 - 19) = 13618403) then // pinkish color of the "Bank PIN" text
+      result := findText(p, 13618403, 0, ['ank'], [upChars], intToBox(self.x1 + 100, self.y2 - 30, self.x1 + 175, self.y2 - 9)); // box around "Bank PIN" text
 
     if (result) then
       break();
@@ -144,7 +164,8 @@ begin
 
   until (getSystemTime() >= t);
 
-  print('bankScreen.isOpen(): result = ' + toStr(result) + ', took: ' + intToStr(getSystemTime() + timeOut - t) + 'ms', TDebug.SUB);
+  if (not result) then
+    print('bankScreen.isOpen(): result = ' + toStr(result) + ', took: ' + intToStr(getSystemTime() + timeOut - t) + 'ms', TDebug.SUB);
 end;
 
 (*
@@ -155,7 +176,8 @@ TRSBankScreen.close
 
     function TRSBankScreen.close(): boolean;
 
-Closes the bankscreen, will return if succesful or not.
+Closes the bankscreen, will return if succesful or not.  Closes via the Escape
+key.
 
 .. note::
 
@@ -181,16 +203,300 @@ begin
 
   if (not result) then
   begin
-    mouseBox(intToBox(481, 77, 496, 92), MOUSE_LEFT);
+    typeByte(VK_ESCAPE);
     wait(10 + random(20));
 
-    result := (not self.isOpen());
-
     while (not result) and (timeOut > getSystemTime()) do
-      wait(20 + random(50));
+    begin
+      result := (not self.isOpen());
+      wait(300 + random(300));
+    end;
   end;
 
-  print('depositScreen.close(): result = ' + boolToStr(result), TDebug.SUB);
+  print('bankScreen.close(): result = ' + boolToStr(result), TDebug.SUB);
+end;
+
+{*
+TRSBankScreen._isSlotVaild
+~~~~~~~~~~~~~~~~~~~~~~~~~~
+
+.. code-block:: pascal
+
+    function TRSBankScreen._isSlotVaild(arr: TBoxArray; slot: integer): boolean;
+
+Returns true if the 'slot' value is valid in the box array 'arr'.
+
+.. note::
+
+    - by Coh3n
+    - Last Updated: 10 August 2013 by Coh3n
+
+Example:
+
+.. code-block:: pascal
+
+    if (bankscreen.isSlotValid(bankscreen.__bankItemSlots, 25) then
+      writeln('Slot 25 is a vaild bank slot!');
+
+*}
+function TRSBankScreen._isSlotVaild(arr: TBoxArray; slot: integer): boolean;
+begin
+  result := (inRange(slot, low(arr) + 1, high(arr) + 1));
+end;
+
+(*
+TRSBankScreen.getBankItemBounds
+~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+
+.. code-block:: pascal
+
+    TRSBankScreen.getBankItemBounds(slot: integer): TBox;
+
+Returns the TBox of the desired bank item slot. Bank slots start at the top left
+at 1 and count across the columns. Default slots do NOT line up properly when
+the entire contents of the bank is opened, and "Tab 2", "Tab 3", etc. text can
+be seen.
+
+.. note::
+
+    - by Coh3n
+    - Last Updated: 10 August 2013 by Coh3n
+
+Example:
+
+.. code-block:: pascal
+
+    var
+      b: TBox;
+    begin
+      b := bankscreen.getBankItemBounds(1);
+
+*)
+function TRSBankScreen.getBankItemBounds(slot: integer): TBox;
+begin
+  if (not self._isSlotVaild(self.__bankItemSlots, slot)) then
+  begin
+    print('TRSBankScreen.getBankItemBounds(): Slot '+toStr(slot)+' is invalid', TDebug.WARNING);
+    exit(intToBox(-1, -1, -1, -1));
+  end;
+
+  // - 1 because the grid (array) starts at 0.
+  result := self.__bankItemSlots[slot - 1];
+end;
+
+(*
+TRSBankScreen.getPackItemBounds
+~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+
+.. code-block:: pascal
+
+    function TRSBankScreen.getPackItemBounds(slot: integer): TBox;
+
+Returns the TBox of the desired pack item slot in the bank interface.  Pack slots
+start at the top left at 1 and count across the columns.
+
+.. note::
+
+    - by Coh3n
+    - Last Updated: 10 August 2013 by Coh3n
+
+Example:
+
+.. code-block:: pascal
+
+    var
+      b: TBox;
+    begin
+      b := bankscreen.getPackItemBounds(1);
+
+*)
+function TRSBankScreen.getPackItemBounds(slot: integer): TBox;
+begin
+  if (not self._isSlotVaild(self.__packItemSlots, slot)) then
+  begin
+    print('TRSBankScreen.getPackItemBounds(): Slot '+toStr(slot)+' is invalid', TDebug.WARNING);
+    exit(intToBox(-1, -1, -1, -1));
+  end;
+
+  // - 1 because the grid (array) starts at 0.
+  result := self.__packItemSlots[slot - 1];
+end;
+
+{*
+TRSBankScreen._getTabBounds
+~~~~~~~~~~~~~~~~~~~~~~~~~~~
+
+.. code-block:: pascal
+
+    function TRSBankScreen._getTabBounds(tab: integer): TBox;
+
+Returns the TBox of the desired tab slot in the bank interface.  Tab slots
+start on the left at 1 and count across.
+
+.. note::
+
+    - by Coh3n
+    - Last Updated: 10 August 2013 by Coh3n
+
+Example:
+
+.. code-block:: pascal
+
+    var
+      b: TBox;
+    begin
+      b := bankscreen._getTabBounds(1);
+
+*}
+function TRSBankScreen._getTabBounds(tab: integer): TBox;
+begin
+  if (not self._isSlotVaild(self.__tabSlots, tab)) then
+  begin
+    print('TRSBankScreen._getTabBounds(): Tab '+toStr(tab)+' is invalid', TDebug.WARNING);
+    exit(intToBox(-1, -1, -1, -1));
+  end;
+
+  // - 1 because the grid (array) starts at 0.
+  result := self.__tabSlots[tab - 1];
+end;
+
+{*
+RSBankScreen._doesTabExist
+~~~~~~~~~~~~~~~~~~~~~~~~~~
+
+.. code-block:: pascal
+
+    function TRSBankScreen._doesTabExist(tab: integer): boolean;
+
+Returns true if the 'tab' exists.  If 'tab' is the "Add Tab" tab, it will return
+false.
+
+.. note::
+
+    - by Coh3n
+    - Last Updated: 10 August 2013 by Coh3n
+
+Example:
+
+.. code-block:: pascal
+
+    if (not bankscreen._doesTabExist(3)) then
+      exit();
+*}
+function TRSBankScreen._doesTabExist(tab: integer): boolean;
+var
+  tabBox: TBox;
+  x, y: integer;
+begin
+  result := false;
+
+  if (not self.isOpen()) then
+    exit();
+
+  tabBox := self._getTabBounds(tab);
+
+  if (tabBox.x1 <> -1) then
+    if (countColor(6672631, tabBox) <> 5) then // gold color of the very top of the "+"
+      result := findColorTolerance(x, y, _COLOR_BANK_TAB_ACTIVE, tabBox, 5);
+end;
+
+(*
+RSBankScreen.isTabActive
+~~~~~~~~~~~~~~~~~~~~~~~~
+
+.. code-block:: pascal
+
+    function TRSBankScreen.isTabActive(tab: integer): boolean;
+
+Returns true if the 'tab' is active.
+
+.. note::
+
+    - by Coh3n
+    - Last Updated: 10 August 2013 by Coh3n
+
+Example:
+
+.. code-block:: pascal
+
+    if (not bankscreen.isTabActive(3)) then
+      bankscreen.openTab(3);
+*)
+function TRSBankScreen.isTabActive(tab: integer): boolean;
+var
+  tabBox: TBox;
+begin
+  result := false;
+
+  if (not self.isOpen()) then
+    exit();
+
+  tabBox := self._getTabBounds(tab);
+
+  if (tabBox.x1 <> -1) then
+    // light background color of an active tab - actual count is around 71 for an active tab
+    result := (countColorTolerance(_COLOR_BANK_TAB_ACTIVE, tabBox, 5) > 50);
+end;
+
+(*
+TRSBankScreen.openTab
+~~~~~~~~~~~~~~~~~~~~~
+
+.. code-block:: pascal
+
+    function TRSBankScreen.openTab(tab: integer): boolean;
+
+Opens the bank tab 'tab'.  Returns true if successful.
+
+.. note::
+
+    - by Coh3n
+    - Last Updated: 10 August 2013 by Coh3n
+
+Example:
+
+.. code-block:: pascal
+
+    bankscreen.openTab(4);
+*)
+function TRSBankScreen.openTab(tab: integer): boolean;
+var
+  boxTab: TBox;
+  t: integer;
+begin
+  if (not self._doesTabExist(tab)) then
+  begin
+    print('TRSBankScreen.openTab(): Tab '+toStr(tab)+' doesn''t exist', TDebug.WARNING);
+    exit(false);
+  end;
+
+  print('TRSBankScreen.openTab()', TDebug.HEADER);
+
+  result := self.isTabActive(tab);
+
+  if (not result) then
+  begin
+    boxTab := self._getTabBounds(tab);
+
+    if (boxTab.x1 <> -1) then
+    begin
+      mouseBox(boxTab, MOUSE_LEFT);
+      print('Tab is valid, clicking...');
+
+      t := (getSystemTime() + 3000);
+
+      while (not result) and (getSystemTime() < t) do
+      begin
+        print('Waiting for tab to activate...');
+        result := self.isTabActive(tab);
+        wait(300 + random(200));
+      end;
+    end;
+
+  end else
+    print('Tab '+toStr(tab)+' is already active');
+
+  print('TRSBankScreen.openTab(): '+toStr(result), TDebug.FOOTER);
 end;
 
 (*
@@ -205,8 +511,8 @@ Will scroll the bankscreen up to the top if reqiured.
 
 .. note::
 
-    - by Ollybest
-    - Last Updated: 15 June 2013 by Ollybest
+    - by Olly
+    - Last Updated: 10 August 2013 by Coh3n
 
 Example:
 
@@ -216,28 +522,40 @@ Example:
 
 *)
 procedure TRSBankScreen._scrollUp();
+const
+  COLOR_RESULT = 3321831; // color when scroll bar is all the way up
 var
+  col, t: integer;
   tpa: TPointArray;
-  p: TPoint;
+  scrollP, p: TPoint;
+  itemArea: TBox;
 begin
   if (not self.isOpen()) then
     exit();
 
-  // top of scroller = already at top | area where no scroll exists.
-  if (getColor(489, 151) = 1250841) or (getColor(491, 139) = 2896698) then
+  p := [self.x1 + 473, self.y1 + 94]; // top of the scroll bar (when it's at the top)
+  col := getColor(p);
+
+  // color at top of scroller = already at top | no scroll bar color
+  if (col = COLOR_RESULT) or (col = 1709067) then
     exit();
 
   print('bankScreen.scrollUp(): Going to scroll the bankscreen up to the top');
 
-  // find the scrollbar.
-  if (not findColorsTolerance(tpa, 4544607, 482, 151, 495, 326, 20)) then
-    exit();
+  itemArea := [self.x1 + 13, self.y1 + 97, self.x2 - 221, self.y2 - 61];
+  scrollP := itemArea.getRandomPoint();
 
-  p := tpa.getMiddle();
-  mouse(p.rand(randomRange(-5, 5)));
-  dragMouse(point(483, 131).rand(10, 15));
+  t := (getSystemTime() + 15000);
 
-  wait(50 + random(50));
+  // scroll the mouse using the mouse wheel
+  repeat
+    if (getColor(p) = COLOR_RESULT) then
+      break;
+
+    mouseScroll(scrollP, 7 + random(5), false);
+    wait(10 + random(20));
+
+  until(getSystemTime() > t);
 end;
 
 begin

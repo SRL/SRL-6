@@ -142,9 +142,7 @@ begin
 
   until(getSystemTime() > t);
 
-  if (result) then
-    print('findTextByColor('+toStr(txt)+'): True, at point '+toStr(p), TDebug.SUB)
-  else
+  if (not result) then
     print('findTextByColor('+toStr(txt)+'): '+toStr(result), TDebug.SUB);
 end;
 
