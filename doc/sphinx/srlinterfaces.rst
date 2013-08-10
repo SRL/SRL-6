@@ -7,6 +7,7 @@ SRL Interfaces Reference
 
     actionbar
     bankscreen
+    chatbox
     interfaces
     mainscreen
     minimap

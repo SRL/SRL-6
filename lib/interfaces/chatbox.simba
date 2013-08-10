@@ -277,12 +277,12 @@ begin
 end;
 
 (*
-TRSChatbox.find
-~~~~~~~~~~~~~~~
+TRSChatbox.__find
+~~~~~~~~~~~~~~~~~
 
 .. code-block:: pascal
 
-    function TRSChatbox.find(): boolean;
+    function TRSChatbox.__find(): boolean;
 
 Returns true if the chatbox is found.  Will reset the chatbox's bounds based on
 where it is found.  Calls a series of internal SRL functions to properly identify
@@ -297,15 +297,15 @@ Example:
 
 .. code-block:: pascal
 
-    if (chatbox.find()) then
+    if (chatbox.__find()) then
       writeln('Found the chat box!');
 *)
-function TRSChatbox.find(): boolean;
+function TRSChatbox.__find(): boolean;
 var
   wid, hei, i: integer;
   tmp: TBox;
 begin
-  print('TRSChatbox.find()', TDebug.HEADER);
+  print('TRSChatbox.__find()', TDebug.HEADER);
 
   getClientDimensions(wid, hei);
   wid := (wid - 1);
@@ -347,7 +347,7 @@ begin
     end;
   end;
 
-  print('TRSChatbox.find(): '+toStr(result), TDebug.FOOTER);
+  print('TRSChatbox.__find(): '+toStr(result), TDebug.FOOTER);
 end;
 
 (*
@@ -374,7 +374,7 @@ Example:
 *)
 function TRSChatbox.isOpen(): boolean;
 begin
-  result := self.find();
+  result := self.__find();
 end;
 
 begin
