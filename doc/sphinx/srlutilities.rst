@@ -12,7 +12,6 @@ SRL Utilities Reference
     wrappers
 
     extendedarrays
-    string
     tbox
     tpointarrays
     integerarrays

@@ -12,7 +12,7 @@ items = items
 misc = smart srlstats
 objects = 
 utilities = color drawing pixelshift time wrappers
-types = extendedarrays string tbox tpointarrays integerarrays stringarrays tpoint types
+types = extendedarrays tbox tpointarrays integerarrays stringarrays tpoint types
 
 
 
