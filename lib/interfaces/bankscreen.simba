@@ -92,18 +92,47 @@ Example:
 
 *}
 procedure TRSBankScreen.__init();
-var
-  wid, hei: integer;
 begin
-  getClientDimensions(wid, hei);
-
   with (self) do
   begin
     name := 'RS Bank Screen';
     ID := ID_INTERFACE_BANKSCREEN;
     parentID := -1;
     static := true;
+  end;
+end;
 
+{*
+TRSBankScreen.__find
+~~~~~~~~~~~~~~~~~~~~
+
+.. code-block:: pascal
+
+    function TRSBankScreen.__find(): boolean;
+
+Finds the TRSBankScreen based on the size of the client.
+
+.. note::
+
+    - by Coh3n
+    - Last Updated: 10 August 2013 by Coh3n
+
+Example:
+
+.. code-block:: pascal
+
+    minimap.__find();
+
+*}
+function TRSBankScreen.__find(): boolean;
+var
+  wid, hei: integer;
+begin
+  getClientDimensions(wid, hei);
+  result := true;
+
+  with self do
+  begin
     // bounds of the entire bank (including the side backpack)
     x1 := round(wid / 2) - 339;
     y1 := round(hei / 2) - 297;
@@ -149,6 +178,8 @@ var
   p: TPoint;
   t: integer;
 begin
+  self.__find();
+
   t := getSystemTime() + timeOut;
   result := false;
 
@@ -558,6 +589,3 @@ begin
   until(getSystemTime() > t);
 end;
 
-begin
-  bankScreen.__init();
-end;
