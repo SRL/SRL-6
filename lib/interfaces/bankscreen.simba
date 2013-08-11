@@ -589,3 +589,7 @@ begin
   until(getSystemTime() > t);
 end;
 
+begin
+  bankscreen.__init();
+end;
+
