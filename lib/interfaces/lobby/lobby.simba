@@ -186,8 +186,7 @@ begin
     result := true;
     self.setBounds(tpa.getBounds());
     //smartImage.drawBox(self.getBounds(), false);
-  end else
-    print('TRSLobby.findBounds(): Failed to find lobby bounds', TDebug.ERROR);
+  end;
 end;
 
 (*
@@ -204,7 +203,7 @@ the tabs.
 .. note::
 
     - by Coh3n
-    - Last Updated: 23 July 2013 by Coh3n
+    - Last Updated: 11 August 2013 by Coh3n
 
 Example:
 
@@ -216,7 +215,7 @@ Example:
 *)
 function TRSLobby.isOpen(): boolean;
 var
-  wid, hei: integer;
+  wid, hei, t: integer;
   dummy: TPoint;
 begin
   self.__skipEmailScreen(); // just in case
@@ -225,8 +224,15 @@ begin
   if (findText(dummy, ['World'], ['UpChars'], intToBox(0, 0, wid-1, hei-1)) and
       findText(dummy, ['Options'], ['UpChars'], intToBox(0, 0, wid-1, hei-1))) then
   begin
-    result := true;
-    self.__find();
+    t := (getSystemTime() + 10000);
+
+    // need a loop because the lobby screen fades in to view
+    while ((not result) and (getSystemTime() < t)) do
+    begin
+      print('Waiting for lobby screen...');
+      result := self.__find();
+      wait(300 + random(400));
+    end;
   end;
 end;
 
@@ -266,7 +272,8 @@ begin
       result := true;
       res := tpa.getMiddle();
       res.offset(point(0, 10));
-    end;
+    end else
+      print('TRSLobby.findPlayButton(): Failed to find play button', TDebug.ERROR);
 end;
 
 (*
