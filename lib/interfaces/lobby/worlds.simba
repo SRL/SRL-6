@@ -480,7 +480,7 @@ begin
   // checks TPA length first, then for the text
   for i := 0 to hi do
     if (length(atpa[i]) = l) then
-      if (findTextNumbers(col, 0, atpa[i].getBounds(), statChars, [0, 0, 0]) = wo) then
+      if (strToIntDef(getTextAtEx(atpa[i].getBounds(), 0, 0, 0, col, 0, statChars, Numbers), -1) = wo) then
       begin
         res := atpa[i].getMiddle();
         result := true;

@@ -134,7 +134,7 @@ begin
     b := tpa.getBounds();
     b.edit(-1, -1, +1, +1);
 
-    result := findTextNumbers(ITEM_TEXT_YELLOW, 0, b, 'statChars', [0, 1, 1]);
+    result := strToIntDef(getTextAtEx(b, 0, 1, 1, ITEM_TEXT_YELLOW, 0, statChars, Numbers), 0);
 
     print('getItemAmount(): result = ' + intToStr(result), TDebug.SUB);
   end else

@@ -147,44 +147,6 @@ begin
 end;
 
 (*
-findTextNumbers
-~~~~~~~~~~~~~~~
-
-.. code-block:: pascal
-
-    function findTextNumbers(col, tol: integer; area: TBox; font: string; spacing: array [0..2] of integer): integer;
-
-Uses getTextAtEx to find text and extracts the numbers from it.
-
-    * spacing[0] = minvspacing.
-    * spacing[1] = maxvspacing.
-    * spacing[2] = hspacing.
-
-.. note::
-
-    - by Ollybest
-    - Last Updated: May. 24, 2013 by Ollybest
-
-Example:
-
-.. code-block:: pascal
-
-    writeln(findTextNumbers(clBlack, 10, b, 'statChars', [1, 1, 0]);
-*)
-function findTextNumbers(col, tol: integer; area: TBox; font: string; spacing: array [0..2] of integer): integer;
-var
-  s: string;
-begin
-  s := getTextAtEx(area, spacing[0], spacing[1], spacing[2], col, tol, font);
-  result := strToIntDef(extractFromStr(s, numbers) , -1);
-
-  if (result = -1) then
-    print('findTextNumbers(): Failed to find any numbers in the text('+ s +')')
-  else
-    print('findTextNumbers(): result = ' + intToStr(result));
-end;
-
-(*
 mouseText
 ~~~~~~~~~
 

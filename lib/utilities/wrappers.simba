@@ -715,6 +715,93 @@ begin
   result := GetTextAtEx(searchBox.x1, searchBox.y1, searchBox.x2, searchBox.y2, minvspacing, maxvspacing, hspacing, color, tolerance, font);
 end;
 
+(*
+getTextAtEx: overload;
+~~~~~~~~~~~~~~~~~~~~~~
+
+.. code-block:: pascal
+
+    function getTextAtEx(const xs, ys, xe, ye: integer; const minVSpacing, maxVSpacing, hSpacing, col, tol: integer; const font: string; const extract: strExtr): string; overload;
+
+Overloaded function, Takes an extra paramter "extract" which deterimes what to
+extract from the string, vaild extracts are "Numbers", "Letters" and "Others".
+
+.. note::
+
+    - by Olly
+
+Example:
+
+.. code-block:: pascal
+
+  writeln(getTextAtEx(100, 100, 200, 200, 0, 0, 3, clRed, 5, 'statChars', Numbers));
+
+*)
+function getTextAtEx(const xs, ys, xe, ye: integer; const minVSpacing, maxVSpacing, hSpacing, col, tol: integer; const font: string; const extract: strExtr): string; overload;
+var
+  s: string;
+begin
+  s := getTextAtEx(xs, ys, xe, ye, minVSpacing, maxVSpacing, hSpacing, col, tol, font);
+
+  result := extractFromStr(s, extract);
+end;
+
+(*
+getTextAtEx: overload;
+~~~~~~~~~~~~~~~~~~~~~~
+
+.. code-block:: pascal
+
+    function getTextAtEx(const searchBox: TBox; const minVSpacing, maxVSpacing, hSpacing, col, tol: integer; const font: string; const extract: strExtr): string; overload;
+
+Overloaded function, Takes a TBox variable instead of x1, y1, x2 and y2 variables.
+
+.. note::
+
+    - by Olly
+
+Example:
+
+.. code-block:: pascal
+
+  writeln(getTextAtEx(box, 0, 0, 3, clRed, 5, 'statChars', Numbers));
+
+*)
+function getTextAtEx(const searchBox: TBox; const minVSpacing, maxVSpacing, hSpacing, col, tol: integer; const font: string; const extract: strExtr): string; overload;
+begin
+  result := getTextAtEx(searchBox.x1, searchBox.y1, searchBox.x2, searchBox.y2, minVSpacing, maxVSpacing, hSpacing, col, tol, font, extract);
+end;
+
+(*
+getTextATPA: overload;
+~~~~~~~~~~~~~~~~~~~~~~
+
+.. code-block:: pascal
+
+    function getTextATPA(const atpa: T2DPointArray; const maxVSpacing: integer; const font: string; const extract: strExtr): string; overload;
+
+Overloaded function, Takes an extra paramter "extract" which deterimes what to
+extract from the string, vaild extracts are "Numbers", "Letters" and "Others".
+
+.. note::
+
+    - by Olly
+
+Example:
+
+.. code-block:: pascal
+
+  writeln(getTextATPA(atpa, 5, StatChars, Numbers));
+
+*)
+function getTextATPA(const atpa: T2DPointArray; const maxVSpacing: integer; const font: string; const extract: strExtr): string; overload;
+var
+  s: string;
+begin
+  s := getTextATPA(atpa, maxVSpacing, font);
+
+  result := extractFromStr(s, extract);
+end;
 
 (*
 tpaFromText: overload;
