@@ -54,8 +54,8 @@ EVERYTHING should be recorded here: new features, function name changes, user-de
 - text.simba
   - TypeSendEx removed and an optional pressEnter parameter added to typeSend
   - FindTextTPA/Ex replaced with findTextByColor()
-  - All uptext functions replaced with isUptext, and moved to mainscreen.simba
-  - All option functions replaced with chooseOption, and moved to mainscreen.simba
+  - All uptext functions replaced with mouseOverText functions.
+  - All option functions replaced with chooseOption.
   - Added function findTextNumbers().
   - Two findText functions, one that uses bitmaps, one that uses color.
 
@@ -108,10 +108,8 @@ EVERYTHING should be recorded here: new features, function name changes, user-de
   - GridCoords16Ex renamed to minimap.pointToMainscreen + made more accurate.
 
 - new file, mainscreen.simba
-  - Uptext and option functions moved here.
   - setAngle moved here and renamed TRSMainscreen.setAngle. 
   - Angle constants renamed with a MS_ prefix.
-  - Animating moved here and renamed TRSMainscreen.isPlayerAnimating.
   - FindObjTPA and FindObjTPAMulti moved from object.simba.
 
 - animation.simba renamed to pixelshift.simba

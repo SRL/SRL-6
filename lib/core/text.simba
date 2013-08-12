@@ -663,3 +663,385 @@ begin
   result := chooseOption(txt, TStringArray([]), MOUSE_NONE, 0);
 end;
 
+{*
+__findMouseOverBox
+~~~~~~~~~~~~~~~~~~
+
+.. code-block:: pascal
+
+    function __findMouseOverBox(out box: TBox): boolean;
+
+Returns true if the mouse-over box is found on the client.  Returns it's coordinates
+in 'box'.
+
+.. note::
+
+    - by euphemism
+    - Last Modified: 12 August 2013 by euphemism
+
+Example:
+
+.. code-block:: pascal
+
+    if (__findMouseOverBox(tmpBox)) then
+      writeln('Found mouse-over box!');
+*}
+function __findMouseOverBox(out box: TBox): boolean;
+var
+  h, i, j, len, w, y2OfBounds: integer;
+  tpa: TPointArray;
+  atpa: T2DPointArray;
+begin
+  getClientDimensions(w, h);
+
+  if (not (findColors(tpa, 11579568, 0, 0, w -1, h - 1))) then // Grey text box border
+    exit(false);
+
+  box := intToBox(-1, -1, -1, -1);
+
+  atpa := splitTPAEx(tpa, 2, 2); // Group the points we found
+  len := length(atpa);
+  setLength(tpa, len); // Repurpose tpa variable to contain midpoints of the tpas stored in atpa
+
+  for i := 0 to (len - 1) do // Get midpoint of each group
+    tpa[i] := middleTPA(atpa[i]);
+
+  for i := 0 to (len - 1) do // Compare each midpoints to every other midpoint
+    for j := 0 to (len - 1) do
+      if (tpa[i].y = tpa[j].y) then // If the y coordinates are the same, then the two midpoints are horizontally aligned
+        if (not (tpa[i].x = tpa[j].x)) then // If the x coordinates are also the same, then we are comparing the same point and should continue the inner loop
+        begin // Otherwise, we have two horizontally-aligned midpoints, which means they are most likely the left and right edges of the box
+          y2OfBounds := getTPABounds(atpa[i]).y2 + 5; // Gets the y2 bound of our return box based on the bottom of one of the edge strips
+
+          if (getColor(((tpa[i].x + tpa[j].x) div 2), y2OfBounds + 1)) then // If we get the edge color at the point halfway between the two lines we are testing, and down where the bottom edge should be
+          begin // Then we have definitely found the box
+
+            box.y2 := y2OfBounds; // Here, we set the y2 coordinate of our return box based on the y2 coordinate of the bottom pixel in the group that our midpoint is in
+            break(2); // Break out of both loops
+           end;
+        end else
+          continue;
+
+  if (box.y2 = -1) then // If the y2 coordinate of our return box is still -1, we did not find any horizontally-aligned groups and should return false
+    exit(false);
+
+  if (tpa[i].x > tpa[j].x) then // If the first midpoint is actually further right than the second midpoint, we will swap the indexes so that we just need the code below, and not a duplicate set based on a condition
+    swap(i, j);
+
+  box.x1 := (tpa[i].x + 1); box.x2 := (tpa[j].x - 1); // The x1 coordinate of our return box is the x coordinate of our first midpoint + 1 to get just the black of the hover-text box and not the grey of the border, similar process for the x2 coordinate
+
+  j := (tpa[i].y - (box.y2 - tpa[i].y)); // Difference between y coordinate of the midpoint of one of the edges and the y2 coordinate of the return box, this is then subracted from the y coordinate of the midpoint to get the y1 for our return box
+  box.y1 := j;
+  if (j < 0) then // If j is less than zero, then the box is running off the top of the screen and the y1 coordinate should be set to zero, otherwise there will be out-of-range errors
+    box.y1 := 0
+
+  if (getColor((box.x1 + box.x2) div 2, box.y1) = 11579568) then // The box is sometimes not perfectly symmetric with respect to being reflected around the horizontal line through the box
+    inc(box.y1); // So occasionally we end up with the top 1px of the box, which includes the border, we don't want that
+
+  result := true;
+end;
+
+{*
+__createMouseOverFilter
+~~~~~~~~~~~~~~~~~~~~~~~
+
+.. code-block:: pascal
+
+    procedure __createMouseOverFilter(box: TBox; var cleanBitmap, filteredBitmap: integer);
+
+Creates a filtered bitmap to be used to read the mouse-over text.
+
+.. note::
+
+    - by euphemism
+    - Last Modified: 12 August 2013 by euphemism
+
+Example:
+
+.. code-block:: pascal
+
+    __createMouseOverFilter(tmpBox, bmpClean, bmpFiltered);
+*}
+procedure __createMouseOverFilter(box: TBox; var cleanBitmap, filteredBitmap: integer);
+begin
+  cleanBitmap := bitmapFromClient(box);
+  filteredBitmap := copyBitmap(cleanBitmap);
+
+  getMufasaBitmap(filteredBitmap).contrast(50);
+  getMufasaBitmap(filteredBitmap).desaturate();
+  getMufasaBitmap(filteredBitmap).contrast(255);
+  getMufasaBitmap(filteredBitmap).posterize(255);
+end;
+
+{*
+__getMouseOverText
+~~~~~~~~~~~~~~~~~~
+
+.. code-block:: pascal
+
+    function __getMouseOverText(box: TBox; cleanBitmap, filteredBitmap: integer): string;
+
+Returns the mouse-over text found inside the 'box' based on the clean and
+filtered bitmaps.
+
+.. note::
+
+    - by euphemism
+    - Last Modified: 12 August 2013 by euphemism
+
+Example:
+
+.. code-block:: pascal
+
+    if (__findMouseOverBox(tmpBox)) then
+    begin
+      __createMouseOverFilter(tmpBox, bmpClean, bmpFiltered);
+      text := __getMouseOverText(tmpBox, bmpClean, bmpFiltered);
+      writeln('Mouse-over text: '+text);
+    end;
+*}
+function __getMouseOverText(box: TBox; cleanBitmap, filteredBitmap: integer): string;
+var
+  numberOfLines, badCounter, colorCheck, i, j, len, w, h, startIndex: integer;
+  font: string;
+  p1, p2: TPoint;
+  firstLineCharactersYCords: TIntegerArray;
+  textColors: TIntegerArray;
+  tpa, midPoints: TPointArray;
+  atpa, tempATPA: T2DPointArray;
+  linesOfText: array of T2DPointArray;
+begin
+  textColors := [
+    4305653,      // Burnt Orange, thin text when you mouse over interface items.
+    12378347,     // Beige, generic mouse-over text color.
+    65535,        // Yellow NPC name when mousing over NPC.
+    16776960,     // Cyan color of object name when mousing over an object.
+    clWhite,      // White that shows up when numbers are displayed in the mouseover boxes that have burnt orange text.
+    13750712,     // Grey-ish blue of inventory items.
+    7067128,      // Gold of inventory items.
+    4231423       // Orange of item name under equipment tab.
+  ];
+
+  getMufasaBitmap(filteredBitmap).findColors(tpa, clWhite);
+  getBitmapSize(cleanBitmap, w, h);
+
+  atpa := splitTPAEx(tpa, 1, 1);
+  len := length(atpa);
+  setLength(firstLineCharactersYCords, len);
+
+  for i := 0 to (len - 1) do
+    if (not textColors.isInArray(fastGetPixel(cleanBitmap, atpa[i][0].x, atpa[i][0].y))) then
+    begin
+      setLength(atpa[i], 0);
+      inc(badCounter);
+    end;
+
+  sortATPASize(atpa, true);
+  setLength(atpa, len - badCounter);
+
+  len := length(atpa);
+  setLength(midPoints, len);
+
+  sortATPAFromFirstPointX(atpa, point(0, h div 2));
+
+  for i := 0 to (len - 1) do
+  begin
+    p1 := atpa[i].getMiddle();
+
+    if (numberOfLines <> 0) then
+    begin
+      for j := 0 to (numberOfLines - 1) do
+      begin
+        p2 := atpa[j].getMiddle();
+
+        if (inRange(p1.y, p2.y - 4, p2.y + 4)) then
+          break(2);
+      end;
+
+      firstLineCharactersYCords[numberOfLines] := p1.y;
+      inc(numberOfLines);
+    end else
+    begin
+      firstLineCharactersYCords[numberOfLines] := p1.y;
+      inc(numberOfLines);
+    end;
+  end;
+
+  setLength(linesOfText, numberOfLines);
+
+  sortATPAFromFirstPointY(atpa, point(w div 2, 0));
+
+  for i := 0 to (len - 1) do
+    midPoints[i] := atpa[i].getMiddle();
+
+  startIndex := 0;
+
+  for i := 0 to (numberOfLines - 1) do
+  begin
+    setLength(linesOfText[i], len);
+
+    for j := startIndex to (len - 1) do
+    begin
+      linesOfText[i][j - startIndex] := atpa[j];
+
+      if (not inRange(midPoints[j].y, firstLineCharactersYCords[i] - 6, firstLineCharactersYCords[i] + 6)) then
+      begin
+        setLength(linesOfText[i], j - startIndex);
+        startIndex := j;
+        break;
+      end;
+    end;
+
+    linesOfText[i] := splitTPAEx(mergeATPA(linesOfText[i]), 1, 3);
+    sortATPAFromFirstPointX(linesOfText[i], point(0, h div 2));
+  end;
+
+  for i := 0 to (numberOfLines - 1) do
+  begin
+    colorCheck := fastGetPixel(cleanBitmap, linesOfText[i][0][0].x, linesOfText[i][0][0].y);
+
+    if (not textColors.isInArray(colorCheck)) then
+      continue;
+
+    tempATPA := splitTPAEx(atpa[i], 1, 5);
+    sortATPAFromFirstPointX(tempATPA, point(0, 0));
+
+    case (colorCheck) of
+      4305653, clWhite: font := 'SmallChars';
+      12378347, 65535, 16776960, 4231423: font := 'UpCharsEx';
+    else
+      continue;
+    end;
+
+    if (i = 0) then
+      result := result + linesOfText[i].getTextInATPA(3, font)
+    else
+      result := result + ' ' + linesOfText[i].getTextInATPA(3, font);
+  end;
+end;
+
+(*
+getMouseOverText
+~~~~~~~~~~~~~~~~
+
+.. code-block:: pascal
+
+    function getMouseOverText(): string;
+
+Returns the current mouse-over text.
+
+.. note::
+
+    - by euphemism & Coh3n
+    - Last Modified: 12 August 2013 by Coh3n
+
+Example:
+
+.. code-block:: pascal
+
+    writeln(getMouseOverText());
+*)
+function getMouseOverText(): string;
+var
+  box: TBox;
+  bmpClean, bmpFiltered: integer;
+begin
+  result := '';
+
+  if (__findMouseOverBox(box)) then
+  begin
+    __createMouseOverFilter(box, bmpClean, bmpFiltered);
+    result := __getMouseOverText(box, bmpClean, bmpFiltered);
+
+    freeBitmap(bmpClean);
+    freeBitmap(bmpFiltered);
+  end;
+end;
+
+(*
+isMouseOverText
+~~~~~~~~~~~~~~~
+
+.. code-block:: pascal
+
+    function isMouseOverText(txt: TStringArray; waitTime: integer = 100): boolean;
+
+Returns true if one of the indexes in 'txt' is found in the current mouse-over text.
+Will wait up to 'waitTime' to find the text before exiting the function.
+
+.. note::
+
+    - by Coh3n
+    - Last Modified: 12 August 2013 by Coh3n
+
+Example:
+
+.. code-block:: pascal
+
+    if (isMouseOverText(['Tree'])) then
+    begin
+      getMousePos(x, y);
+      mouse(point(x, y), MOUSE_LEFT);
+    end;
+*)
+function isMouseOverText(txt: TStringArray; waitTime: integer = 100): boolean;
+var
+  i, t: integer;
+  s: string;
+begin
+  print('isMouseOverText()', TDebug.HEADER);
+  t := (getSystemTime() + waitTime);
+
+  repeat
+    s := getMouseOverText();
+    print('Current mouse-over text: "'+s+'"');
+
+    for i := 0 to high(txt) do
+      if (pos(txt[i], s) > 0) then
+      begin
+        print('Found "'+txt[i]+'" in mouse-over string: "'+s+'"');
+        result := true;
+        break(2);
+      end;
+
+    wait(10 + random(20));
+  until (getSystemTime() > t);
+
+  print('isMouseOverText(): '+toStr(result), TDebug.FOOTER);
+end;
+
+(*
+isMouseOverMenuOpen
+~~~~~~~~~~~~~~~~~~~
+
+.. code-block:: pascal
+
+    function isMouseOverMenuOpen(mouseAway: boolean = true; waitTime: integer = 100): boolean;
+
+Returns true if the mouse-over menu is open.  Will wait a maximum of
+'waitTime' for the menu to appear.
+
+.. note::
+
+    - by Coh3n
+    - Last Modified: 12 August 2013 by Coh3n
+
+Example:
+
+.. code-block:: pascal
+
+    if (isMouseOverMenuOpen()) then
+      writeln('Mouse-over menu is open');
+*)
+function isMouseOverMenuOpen(waitTime: integer = 100): boolean;
+var
+  tmpBox: TBox;
+  t := (getSystemTime() + waitTime);
+begin
+  while (getSystemTime() < t) do
+  begin
+    result := __findMouseOverBox(tmpBox);
+    wait(20 + random(20));
+  end;
+end;
+

@@ -151,33 +151,6 @@ begin
 end;
 
 (*
-closeWindow
-~~~~~~~~~~~
-
-.. code-block:: pascal
-
-    function closeWindow(): boolean;
-
-Closes any of the Runescape windows that could be open.
-
-.. note::
-
-    by
-    - Last Updated:
-
-Example:
-
-.. code-block:: pascal
-
-    if (closeWindow()) then
-      print('Window is closed');
-*)
-function closeWindow(): boolean;
-begin
-  result := true;
-end;
-
-(*
 TRSMainscreen.setAngle
 ~~~~~~~~~~~~~~~~~~~~~~
 
@@ -216,7 +189,7 @@ TRSMainscreen.clickObject
 
 .. code-block:: pascal
 
-    function TRSMainscreen.clickObject(var x, y: integer; cols, tols: TIntegerArray; colSettings: TColorSettings; objWidth, objHeight, minCount: integer; upText: TStringArray; searchBox: TBox; mouseAction: integer = MOUSE_LEFT): boolean;
+    function TRSMainscreen.clickObject(var x, y: integer; cols, tols: TIntegerArray; colSettings: TColorSettings; objWidth, objHeight, minCount: integer; mouseOverText: TStringArray; searchBox: TBox; mouseAction: integer = MOUSE_LEFT): boolean;
 
 A very general object finding function.  Will find and click an object in the specified box.
 Will click ONLY the closest object to the player, no others that may be in the same area.
@@ -230,7 +203,7 @@ function only when there aren't similar colors to the object in the same area.
     * objWidth: The width (in pixels) of the object you're trying to find.
     * objHeight: The height (in pixels) of the object you're trying to find.
     * minCount: The minimum number of colors to be found on a single object.
-    * uptext: The uptext of the object.
+    * mouseOverText: The uptext of the object.
     * searchBox: The area to search in.
     * mouseAction: The action of the mouse. Default MOUSE_LEFT.
 
@@ -243,10 +216,10 @@ Example:
 
 .. code-block:: pascal
 
-    if (mainscreen.clickObject(x, y, [123457, 897637], [5, 10], colorSetting(2, 0.02, 0.13), 50, 25, 40, mainscreen.getBounds(), MOUSE_RIGHT)) then
+    if (mainscreen.clickObject(x, y, [123457, 897637], [5, 10], colorSetting(2, 0.02, 0.13), 50, 25, 40, ['Tree'], mainscreen.getBounds(), MOUSE_RIGHT)) then
       writeln('Right-clicked object!');
 *)
-function TRSMainscreen.clickObject(var x, y: integer; cols, tols: TIntegerArray; colSettings: TColorSettings; objWidth, objHeight, minCount: integer; upText: TStringArray; searchBox: TBox; mouseAction: integer = MOUSE_LEFT): boolean;
+function TRSMainscreen.clickObject(var x, y: integer; cols, tols: TIntegerArray; colSettings: TColorSettings; objWidth, objHeight, minCount: integer; mouseOverText: TStringArray; searchBox: TBox; mouseAction: integer = MOUSE_LEFT): boolean;
 var
   i, l: integer;
   myPoint: TPoint;
@@ -291,7 +264,7 @@ begin
     myPoint := aPoints[i].getMiddle();
     mouse(myPoint.rand(randomRange(-5, 5)), MOUSE_MOVE);
 
-  {  if (self.isUptext(uptext)) then
+    if (isMouseOverText(mouseOverText)) then
     begin
       getMousePos(x, y);
       mouse(point(x, y), mouseAction);
@@ -299,7 +272,7 @@ begin
       print('Successfully clicked object');
       result := true;
       break;
-    end; }
+    end;
   end;
 
   print('TRSMainscreen.findObject(): '+toStr(result), TDebug.FOOTER);
@@ -311,7 +284,7 @@ TRSMainscreen.clickObject; overload;
 
 .. code-block:: pascal
 
-    function TRSMainscreen.clickObject(var x, y: integer; col, tol: integer; colSettings: TColorSettings; objWidth, objHeight, minCount: integer; uptext: TStringArray; mouseAction: integer = MOUSE_LEFT): boolean; overload;
+    function TRSMainscreen.clickObject(var x, y: integer; col, tol: integer; colSettings: TColorSettings; objWidth, objHeight, minCount: integer; mouseOverText: TStringArray; mouseAction: integer = MOUSE_LEFT): boolean; overload;
 
 A very general object finding function.  Will find and mouse an object in the mainscreen.
 
@@ -322,7 +295,7 @@ A very general object finding function.  Will find and mouse an object in the ma
     * objWidth: The width (in pixels) of the object you're trying to find.
     * objHeight: The height (in pixels) of the object you're trying to find.
     * minCount: The minimum number of colors to be found on a single object.
-    * uptext: The uptext of the object.
+    * mouseOverText: The uptext of the object.
     * mouseAction: The action of the mouse. Default MOUSE_LEFT.
 
 .. note::
@@ -337,9 +310,9 @@ Example:
     if (mainscreen.clickObject(x, y, 123457, 10, colorSetting(2, 0.02, 0.13), 50, 25, 40, ['ake'])) then
       writeln('Clicked object!');
 *)
-function TRSMainscreen.clickObject(var x, y: integer; col, tol: integer; colSettings: TColorSettings; objWidth, objHeight, minCount: integer; uptext: TStringArray; mouseAction: integer = MOUSE_LEFT): boolean; overload;
+function TRSMainscreen.clickObject(var x, y: integer; col, tol: integer; colSettings: TColorSettings; objWidth, objHeight, minCount: integer; mouseOverText: TStringArray; mouseAction: integer = MOUSE_LEFT): boolean; overload;
 begin
-  result := self.clickObject(x, y, [col], [tol], colSettings, objWidth, objHeight, minCount, uptext, self.getBounds(), mouseAction);
+  result := self.clickObject(x, y, [col], [tol], colSettings, objWidth, objHeight, minCount, mouseOverText, self.getBounds(), mouseAction);
 end;
 
 {$IFNDEF CODEINSIGHT}
