@@ -184,12 +184,12 @@ begin
 end;
 
 (*
-TRSMainscreen.clickObject
-~~~~~~~~~~~~~~~~~~~~~~~~~
+TRSMainscreen.findObject
+~~~~~~~~~~~~~~~~~~~~~~~~
 
 .. code-block:: pascal
 
-    function TRSMainscreen.clickObject(var x, y: integer; cols, tols: TIntegerArray; colSettings: TColorSettings; objWidth, objHeight, minCount: integer; mouseOverText: TStringArray; searchBox: TBox; mouseAction: integer = MOUSE_LEFT): boolean;
+    function TRSMainscreen.findObject(var x, y: integer; cols, tols: TIntegerArray; colSettings: TColorSettings; objWidth, objHeight, minCount: integer; mouseOverText: TStringArray; searchBox: TBox; mouseAction: integer = MOUSE_NONE): boolean;
 
 A very general object finding function.  Will find and click an object in the specified box.
 Will click ONLY the closest object to the player, no others that may be in the same area.
@@ -216,10 +216,10 @@ Example:
 
 .. code-block:: pascal
 
-    if (mainscreen.clickObject(x, y, [123457, 897637], [5, 10], colorSetting(2, 0.02, 0.13), 50, 25, 40, ['Tree'], mainscreen.getBounds(), MOUSE_RIGHT)) then
+    if (mainscreen.findObject(x, y, [123457, 897637], [5, 10], colorSetting(2, 0.02, 0.13), 50, 25, 40, ['Tree'], mainscreen.getBounds(), MOUSE_RIGHT)) then
       writeln('Right-clicked object!');
 *)
-function TRSMainscreen.clickObject(var x, y: integer; cols, tols: TIntegerArray; colSettings: TColorSettings; objWidth, objHeight, minCount: integer; mouseOverText: TStringArray; searchBox: TBox; mouseAction: integer = MOUSE_LEFT): boolean;
+function TRSMainscreen.findObject(var x, y: integer; cols, tols: TIntegerArray; colSettings: TColorSettings; objWidth, objHeight, minCount: integer; mouseOverText: TStringArray; searchBox: TBox; mouseAction: integer = MOUSE_NONE): boolean;
 var
   i, l: integer;
   myPoint: TPoint;
@@ -269,7 +269,7 @@ begin
       getMousePos(x, y);
       mouse(point(x, y), mouseAction);
 
-      print('Successfully clicked object');
+      print('Successfully mouse''d object');
       result := true;
       break;
     end;
@@ -279,12 +279,12 @@ begin
 end;
 
 (*
-TRSMainscreen.clickObject; overload;
-~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+TRSMainscreen.findObject; overload;
+~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
 
 .. code-block:: pascal
 
-    function TRSMainscreen.clickObject(var x, y: integer; col, tol: integer; colSettings: TColorSettings; objWidth, objHeight, minCount: integer; mouseOverText: TStringArray; mouseAction: integer = MOUSE_LEFT): boolean; overload;
+    function TRSMainscreen.findObject(var x, y: integer; col, tol: integer; colSettings: TColorSettings; objWidth, objHeight, minCount: integer; mouseOverText: TStringArray; mouseAction: integer = MOUSE_NONE): boolean; overload;
 
 A very general object finding function.  Will find and mouse an object in the mainscreen.
 
@@ -307,12 +307,12 @@ Example:
 
 .. code-block:: pascal
 
-    if (mainscreen.clickObject(x, y, 123457, 10, colorSetting(2, 0.02, 0.13), 50, 25, 40, ['ake'])) then
+    if (mainscreen.findObject(x, y, 123457, 10, colorSetting(2, 0.02, 0.13), 50, 25, 40, ['ake'])) then
       writeln('Clicked object!');
 *)
-function TRSMainscreen.clickObject(var x, y: integer; col, tol: integer; colSettings: TColorSettings; objWidth, objHeight, minCount: integer; mouseOverText: TStringArray; mouseAction: integer = MOUSE_LEFT): boolean; overload;
+function TRSMainscreen.findObject(var x, y: integer; col, tol: integer; colSettings: TColorSettings; objWidth, objHeight, minCount: integer; mouseOverText: TStringArray; mouseAction: integer = MOUSE_NONE): boolean; overload;
 begin
-  result := self.clickObject(x, y, [col], [tol], colSettings, objWidth, objHeight, minCount, mouseOverText, self.getBounds(), mouseAction);
+  result := self.findObject(x, y, [col], [tol], colSettings, objWidth, objHeight, minCount, mouseOverText, self.getBounds(), mouseAction);
 end;
 
 {$IFNDEF CODEINSIGHT}
