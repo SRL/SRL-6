@@ -10,7 +10,6 @@ The source for this file can be found `here <https://github.com/SRL/SRL-6/blob/m
 *)
 
 {$include_once interfaces.simba}
-{$include_once mainscreen.simba}
 {$include_once ../utilities/color.simba}
 {$include_once ../utilities/pixelshift.simba}
 {$f-}
@@ -287,11 +286,7 @@ Example:
     minimap.__init();
 *}
 procedure TRSMinimap.__init();
-var
-  width, height: integer;
 begin
-  getClientDimensions(width, height);
-
   with self do
   begin
     name := 'RS Minimap';
@@ -460,7 +455,7 @@ begin
   self.setBounds(box);
   self.__createMaskTPA();
 
-  print('minimap.__find(): Sucesfully found and set minimap bounds', TDebug.SUB);
+  print('TRSMinimap.__find(): Sucesfully found and set minimap bounds', TDebug.SUB);
 end;
 
 {*
@@ -2810,5 +2805,5 @@ begin
 end;
 
 begin
- // minimap.__init();
+  minimap.__init();
 end;

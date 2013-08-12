@@ -546,7 +546,7 @@ begin
   if (length(players) < 1) then
     print('No players to login!', TDebug.FATAL);
 
-  if (waitClientReady) then
+  if (waitClientReady()) then
     players[currentPlayer].login()
   else
     print('Succesfully spawned a client, but RS failed to load.', TDebug.FATAL);

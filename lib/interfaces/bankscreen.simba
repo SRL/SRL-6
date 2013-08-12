@@ -134,15 +134,7 @@ begin
   with self do
   begin
     // bounds of the entire bank (including the side backpack)
-    x1 := round(wid / 2) - 339;
-    y1 := round(hei / 2) - 297;
-    x2 := round(wid / 2) + 342;
-    y2 := round(hei / 2) + 291;
-
-    w := (x2 - x1);
-    h := (y2 - y1);
-    cx := self.getCenterPoint().x;
-    cy := self.getCenterPoint().y;
+    setBounds([round(wid / 2) - 339, round(hei / 2) - 297, round(wid / 2) + 342, round(hei / 2) + 291]);
 
     __bankItemSlots := grid(10, 10, 37, 33, 44, 44, point(self.x1 + 40, self.y1 + 100));
     __packItemSlots := grid(4, 7, 36, 33, 42, 36, point(self.x1 + 518, self.y1 + 108));
