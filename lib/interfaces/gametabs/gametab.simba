@@ -9,6 +9,7 @@ The source for this file can be found `here <https://github.com/SRL/SRL-6/blob/m
 *)
 
 {$include_once ../interfaces.simba}
+
 {$f-}
 
 {*
@@ -132,98 +133,39 @@ Example:
     gameTabs.__init();
 *}
 procedure TRSGameTabs.__init();
-var
-  i, wid, hei: integer;
 begin
-  getClientDimensions(wid, hei);
-
   with self do
   begin
     name := 'RS GameTabs (Navigation)';
     ID := ID_INTERFACE_GAMETABS;
     parentID := -1;
     static := false;
-    x1 := (wid - 352);
-    y1 := (hei - 48);
-    x2 := (wid - 1);
-    y2 := (hei - 1);
-    w  := (x2 - x1);
-    h  := (y2 - y1);
-    cx := self.getCenterPoint().x;
-    cy := self.getCenterPoint().y;
-
-    //smartImage.drawBox(getBounds(), false, clYellow);
-
-    __visibleTabAreaSingle := intToBox(wid - 225, hei - 404, wid - 1, hei - 48);
-    __visibleTabAreaMulti  := intToBox(__visibleTabAreaSingle.x1,
-                                       __visibleTabAreaSingle.y1 + 24,
-                                       __visibleTabAreaSingle.x2,
-                                       __visibleTabAreaSingle.y2);
-    visibleTabArea := __visibleTabAreaMulti;
-
-    __tabSelectionArea := intToBox(__visibleTabAreaSingle.x1,
-                                   __visibleTabAreaSingle.y1,
-                                   __visibleTabAreaSingle.x2,
-                                   __visibleTabAreaMulti.y1);
-
-    //smartImage.drawBox(__visibleTabAreaSingle, false, clOrange);
-    //smartImage.drawBox(__visibleTabAreaMulti, false, clOrange);
-
-    // tabs are indexed from left to right, then bottom to top (see constants)
-    navigationGrid := grid(8, 6, 31, 31, 42, 36, point(wid - 324, hei - 205));
-    {
-    for i := 0 to high(navigationGrid) do
-    begin
-      smartImage.drawBox(navigationGrid[i], false, clRed);
-      smartImage.drawText(toStr(i), point(navigationGrid[i].x1, navigationGrid[i].y1), clLime);
-    end;
-    }
-    setLength(tabs, length(navigationGrid));
-
-    for i := 0 to high(tabs) do
-    begin
-      tabs[i].id := i;
-      tabs[i].parent := -1;
-      tabs[i].bounds := navigationGrid[i];
-      tabs[i]._bmp := -1;
-
-      case tabs[i].id of
-        _TAB_TASK,
-        _TAB_STATS:
-          tabs[i].parent := _TAB_HERO;
-
-        _TAB_EQUIPMENT,
-        _TAB_BACKPACK:
-          tabs[i].parent := _TAB_GEAR;
-
-        _TAB_COMPASS_TASK:
-          tabs[i].parent := _TAB_ADVENTURES;
-
-        _TAB_DEFENCE,
-        _TAB_RANGED,
-        _TAB_MELEE,
-        _TAB_MAGIC,
-        _TAB_PRAYER:
-          tabs[i].parent := _TAB_POWERS;
-
-        _TAB_CLAN_CHAT,
-        _TAB_FRIENDS_CHAT,
-        _TAB_FRIENDS:
-          tabs[i].parent := _TAB_SOCIAL;
-
-        _TAB_MUSIC,
-        _TAB_NOTES:
-          tabs[i].parent := _TAB_OTHER;
-
-        else
-          tabs[i].id := -1;
-      end;
-    end;
   end;
 
   addOnTerminate('__freeGameTabs');
 end;
 
+{*
+TRSGameTabs.__loadBitmap
+~~~~~~~~~~~~~~~~~~~~~~~~
+
+.. code-block:: pascal
+
+    procedure TRSGameTabs.__loadBitmap(tab: integer);
+
+Loads the specified tab's bitmap into the global TRSGameTabs variable.
+
+.. note::
+
+    - by Coh3n
+    - Last Updated: 26 July 2013 by Coh3n
+
+Example:
+
+.. code-block:: pascal
+
+    gameTabs.__loadBitmap(_TAB_BACKBACK);
+*}
 procedure TRSGameTabs.__loadBitmap(tab: integer);
 begin
   case tab of
@@ -770,6 +712,117 @@ begin
   end;
 end;
 
+{*
+TRSGameTabs.__find
+~~~~~~~~~~~~~~~~~~
+
+.. code-block:: pascal
+
+    function TRSGameTabs.__find(): boolean;
+
+Finds the gametabs area based on the client's size.
+
+.. note::
+
+    - by Coh3n
+    - Last Updated: 10 August 2013 by Coh3n
+
+Example:
+
+.. code-block:: pascal
+
+    gameTabs.__find();
+*}
+function TRSGameTabs.__find(): boolean;
+var
+  i, wid, hei: integer;
+begin
+  print('TRSGameTabs.__find()', TDebug.HEADER);
+
+  getClientDimensions(wid, hei);
+  result := true;
+
+  with self do
+  begin
+    setBounds([wid - 352, hei - 48, wid - 1, hei - 1]);
+
+    __visibleTabAreaSingle := intToBox(wid - 225, hei - 404, wid - 1, hei - 48);
+    __visibleTabAreaMulti  := intToBox(__visibleTabAreaSingle.x1,
+                                       __visibleTabAreaSingle.y1 + 24,
+                                       __visibleTabAreaSingle.x2,
+                                       __visibleTabAreaSingle.y2);
+
+    if (areMultiOpen()) then
+      visibleTabArea := __visibleTabAreaMulti
+    else
+      visibleTabArea := __visibleTabAreaSingle;
+
+    __tabSelectionArea := intToBox(__visibleTabAreaSingle.x1,
+                                   __visibleTabAreaSingle.y1,
+                                   __visibleTabAreaSingle.x2,
+                                   __visibleTabAreaMulti.y1);
+
+    // tabs are indexed from left to right, then bottom to top (see constants)
+    navigationGrid := grid(8, 6, 31, 31, 42, 36, point(wid - 324, hei - 205));
+
+    setLength(tabs, length(navigationGrid));
+
+    for i := 0 to high(tabs) do
+    begin
+      tabs[i].id := i;
+      tabs[i].parent := -1;
+      tabs[i].bounds := navigationGrid[i];
+      tabs[i]._bmp := -1;
+
+      case tabs[i].id of
+        _TAB_TASK,
+        _TAB_STATS:
+          tabs[i].parent := _TAB_HERO;
+
+        _TAB_EQUIPMENT,
+        _TAB_BACKPACK:
+          tabs[i].parent := _TAB_GEAR;
+
+        _TAB_COMPASS_TASK:
+          tabs[i].parent := _TAB_ADVENTURES;
+
+        _TAB_DEFENCE,
+        _TAB_RANGED,
+        _TAB_MELEE,
+        _TAB_MAGIC,
+        _TAB_PRAYER:
+          tabs[i].parent := _TAB_POWERS;
+
+        _TAB_CLAN_CHAT,
+        _TAB_FRIENDS_CHAT,
+        _TAB_FRIENDS:
+          tabs[i].parent := _TAB_SOCIAL;
+
+        _TAB_MUSIC,
+        _TAB_NOTES:
+          tabs[i].parent := _TAB_OTHER;
+
+        else
+          tabs[i].id := -1;
+      end;
+    end;
+  end;
+
+  print('Set gametabs bounds based on the client''s size');
+  print('Make sure the gametabs navigation bar, and open tabs are in the bottom right corner of the screen', TDebug.WARNING);
+  print('TRSGameTabs.__find(): '+toStr(result), TDebug.FOOTER);
+end;
+
+{$IFNDEF CODEINSIGHT}
+function __findGameTabs(): boolean;
+begin
+  result := gametabs.__find();
+end;
+{$ENDIF}
+
+{$f+} // needed so __findGametabs isn't called when assigned
+
 begin
   gameTabs.__init();
+  __interfaceFindFunctions[gameTabs.ID] := @__findGameTabs;
 end;

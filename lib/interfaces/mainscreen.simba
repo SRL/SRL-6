@@ -9,7 +9,9 @@ The source for this file can be found `here <https://github.com/SRL/SRL-6/blob/m
 
 *)
 
-{$include_once interfaces.simba}
+{$include_once minimap.simba}
+{$include_once chatbox.simba}
+{$include_once gametabs/gametab.simba}
 //{$include_once actionbar.simba}
 {$include_once ../utilities/pixelshift.simba}
 {$include_once ../utilities/color.simba}
@@ -89,49 +91,63 @@ begin
     ID := ID_INTERFACE_MAINSCREEN;
     parentID := -1;
     static := true;
-    x1 := 4;
-    y1 := 54;
-    x2 := 515;
-    y2 := 387;
-    w := (x2 - x1);
-    h := (y2 - y1);
-    cx := self.getCenterPoint().x;
-    cy := self.getCenterPoint().y;
   end;
 end;
 
-(*
-TRSMainscreen.getBounds; override;
-~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+{*
+TRSMainscreen.__find
+~~~~~~~~~~~~~~~~~~~~
 
 .. code-block:: pascal
 
-    function TRSMainscreen.getBounds(): TBox; override;
+    function TRSMainscreen.__find(): boolean;
 
-Returns the coordinates of the mainscree.  Takes into consideration whether or
-not the action bar is open.
+Sets the mainscreen's bounds to the size of the RS client.  This is because the 
+mainscreen take up the entire client, and the other interfaces are rendered on
+top.
 
 .. note::
 
     - by Coh3n
-    - Last Updated: 31 May 2013
+    - Last Updated: 10 August 2013 by Coh3n
 
 Example:
 
 .. code-block:: pascal
 
-    b := mainscreen.getBounds();
-*)
-function TRSMainscreen.getBounds(): TBox; override;
-begin{
-  if (actionbar.isOpen()) then
-  begin
-    if (self.y2 > actionbar.y1) then
-      self.y2 := (self.y2 - actionbar.h);
-  end; else
-    self.y2 := actionbar.y2;
+    mainscreen.__find();
+*}
+function TRSMainscreen.__find(): boolean;
+var
+  wid, hei: integer;
+begin
+  getClientDimensions(wid, hei);
 
-  result := intToBox(self.x1, self.y1, self.x2, self.y2); }
+  wid := wid - 1;
+  hei := hei - 1;
+  self.x1 := 0;
+  self.y1 := 0;
+
+  // set the width by subtracting the wider interface of either the minimap or open gametabs area
+  if (minimap.x1 <= gametabs.visibleTabArea.x1) then
+    self.x2 := (wid - minimap.w)
+  else
+    self.x2 := (wid - gametabs.visibleTabArea.getWidth());
+
+  hei := hei - chatbox.h {- actionbar.h}; // height by removing the chatbox and actionbar
+
+  {
+  if (actionbar.x1 = 0) then // if it's at the top
+    self.y1 := actionbar.h
+  else
+    self.y1 := 0;
+  }
+
+  self.y2 := chatbox.y1;
+
+  self.setBounds([self.x1, self.y1, self.x2, self.y2]);
+
+  print('TRSMainscreen.__find(): Set mainscreen bounds based on the other visible interfaces', TDebug.SUB);
 end;
 
 (*
@@ -192,37 +208,6 @@ begin
   sleep(1000 + random(300));
   keyUp((angle * 2) + 38);
   wait(500 + random(100));
-end;
-
-(*
-TRSMainscreen.isPlayerAnimating
-~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
-
-.. code-block:: pascal
-
-    function TRSMainscreen.isPlayerAnimating(): boolean;
-
-Uses an average pixel shift in a box around the middle of the mainscreen to check
-if the player in animating.
-
-.. note::
-
-    - by Coh3n
-    - Last Updated: 23 May 2013 by Coh3n
-
-Example:
-
-.. code-block:: pascal
-
-    while (mainscreen.isPlayerAnimating()) do
-    begin
-      writeln('Waiting for the player to stop animating');
-      wait(2000 + random(500));
-    end;
-*)
-function TRSMainscreen.isPlayerAnimating(): boolean;
-begin
-  result := (getPixelShiftAverage(intToBox(self.cx - 10, self.cy - 25, self.cx + 15, self.cy + 15), 30, 180) > 75);
 end;
 
 (*
@@ -329,6 +314,7 @@ TRSMainscreen.clickObject; overload;
     function TRSMainscreen.clickObject(var x, y: integer; col, tol: integer; colSettings: TColorSettings; objWidth, objHeight, minCount: integer; uptext: TStringArray; mouseAction: integer = MOUSE_LEFT): boolean; overload;
 
 A very general object finding function.  Will find and mouse an object in the mainscreen.
+
     * x, y: The coordinates of the object if found.
     * col: The color to be found.
     * tol: The tolerance on 'col'.
@@ -356,6 +342,16 @@ begin
   result := self.clickObject(x, y, [col], [tol], colSettings, objWidth, objHeight, minCount, uptext, self.getBounds(), mouseAction);
 end;
 
+{$IFNDEF CODEINSIGHT}
+function __findMainscreen(): boolean;
+begin
+  result := mainscreen.__find();
+end;
+{$ENDIF}
+
+{$f+} // needed so mainscreen.__find isn't called when assigned
+
 begin
   mainscreen.__init();
+  __interfaceFindFunctions[mainscreen.ID] := @__findMainscreen;
 end;

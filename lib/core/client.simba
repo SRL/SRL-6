@@ -38,7 +38,7 @@ Example:
 *)
 function isClientReady(): boolean;
 begin
-  Result := (isLoggedIn() or lobby.isOpen() or __setInputBoxes());
+  Result := (isLoggedIn(true) or lobby.isOpen() or __setInputBoxes());
 end;
 
 (*
@@ -73,9 +73,6 @@ begin
 
   t := getSystemTime();
   i := 1;
-
-  print('If RS is loaded and nothing is happening, make sure the RS client is set'+
-        ' to "Resizable" and there are no pop-ups open.', TDebug.HINT);
 
  {$IFNDEF SMART}
    print('You are not using SMART, be sure to use Simba''s crosshairs'+

@@ -5,7 +5,8 @@ Interfaces
 The interfaces file stores any global interface functions, including TRSInterface
 and all its functions.  All interface files should import this file.
 
-The source for this file can be found `here <https://github.com/SRL/SRL-6/blob/master/lib/interfaces/interfaces.simba>`_.
+The source for this file can be found
+`here <https://github.com/SRL/SRL-6/blob/master/lib/interfaces/interfaces.simba>`_.
 
 *)
 
@@ -21,7 +22,7 @@ const IDs
 
 Integer constants that represent the ID's of each global interface.
 *)
-const 
+const
   // gametabs
   ID_INTERFACE_GAMETABS         = 0;
   ID_INTERFACE_TAB_BACKPACK     = 1;
@@ -44,8 +45,8 @@ const
   // client - logged in
   ID_INTERFACE_CHAT_BOX   = 30;
   ID_INTERFACE_ACTION_BAR = 31;
-  ID_INTERFACE_MAINSCREEN = 32;
-  ID_INTERFACE_MINIMAP    = 33;
+  ID_INTERFACE_MINIMAP    = 32;
+  ID_INTERFACE_MAINSCREEN = 33;
   ID_INTERFACE_BANKSCREEN = 34;
   ID_INTERFACE_OPTIONS    = 35;
 
@@ -68,6 +69,12 @@ type
     cx, cy: integer;
     w, h: integer;
   end;
+
+const
+  __INTERFACE_HIGH = 41; // used for a global find function array
+
+var
+  __interfaceFindFunctions: array[0..__INTERFACE_HIGH] of function: boolean;
 
 (*
 TRSInterface.getBounds

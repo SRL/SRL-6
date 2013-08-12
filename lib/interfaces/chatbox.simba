@@ -56,25 +56,13 @@ Example:
     chatbox.__init();
 *}
 procedure TRSChatbox.__init();
-var
-  wid, hei: integer;
 begin
-  getClientDimensions(wid, hei);
-
   with self do
   begin
     name := 'RS Chat Box';
     ID := ID_INTERFACE_CHAT_BOX;
     parentID := -1;
     static := false;
-    x1 := 0;
-    y1 := (hei - 157);
-    x2 := 575;
-    y2 := (hei - 1);
-    w := (x2 - x1);
-    h := (y2 - y1);
-    cx := self.getCenterPoint().x;
-    cy := self.getCenterPoint().y;
   end;
 end;
 
@@ -276,7 +264,7 @@ begin
     print('Didn''t fine quick chat border color');
 end;
 
-(*
+{*
 TRSChatbox.__find
 ~~~~~~~~~~~~~~~~~
 
@@ -299,8 +287,8 @@ Example:
 
     if (chatbox.__find()) then
       writeln('Found the chat box!');
-*)
-function TRSChatbox.__find(): boolean;
+*}
+function TRSChatBox.__find(): boolean;
 var
   wid, hei, i: integer;
   tmp: TBox;
@@ -314,11 +302,11 @@ begin
   print('Looking for chat text border...');
 
   // if any of the chat tabs are open
-  if (self._findTextBorder(tmp, [0, 0, wid, hei])) then
+  if (chatbox._findTextBorder(tmp, [0, 0, wid, hei])) then
   begin
     print('Found a text tab border');
     result := true;
-    self.setBounds([tmp.x1 - 4, tmp.y1 - 62, tmp.x2 + 4, tmp.y2 + 21]);
+    chatbox.setBounds([tmp.x1 - 4, tmp.y1 - 62, tmp.x2 + 4, tmp.y2 + 21]);
   end;
 
   // if the emotes tab is open
@@ -326,11 +314,11 @@ begin
   begin
     print('Looking for the emote tab...');
 
-    if (self._findEmoteBorder(tmp, [0, 0, wid, hei])) then
+    if (chatbox._findEmoteBorder(tmp, [0, 0, wid, hei])) then
     begin
       print('Found emote tab border');
       result := true;
-      self.setBounds([tmp.x1 - 4, tmp.y1 - 40, tmp.x2 + 4, tmp.y2 + 3]);
+      chatbox.setBounds([tmp.x1 - 4, tmp.y1 - 40, tmp.x2 + 4, tmp.y2 + 3]);
     end;
   end;
 
@@ -339,11 +327,11 @@ begin
   begin
     print('Looking for the quick chat interface...');
 
-    if (self._findQuickChatBorder(tmp, [0, 0, wid, hei])) then
+    if (chatbox._findQuickChatBorder(tmp, [0, 0, wid, hei])) then
     begin
       print('Found quick chat border');
       result := true;
-      self.setBounds([tmp.x1 - 4, tmp.y1 - 40, tmp.x2 + 4, tmp.y2 + 4]);
+      chatbox.setBounds([tmp.x1 - 4, tmp.y1 - 40, tmp.x2 + 4, tmp.y2 + 4]);
     end;
   end;
 
@@ -377,6 +365,16 @@ begin
   result := self.__find();
 end;
 
+{$IFNDEF CODEINSIGHT}
+function __findChatbox(): boolean;
+begin
+  result := chatbox.__find();
+end;
+{$ENDIF}
+
+{$f+} // needed so chatbox.__find isn't called when assigned
+
 begin
   chatbox.__init();
+  __interfaceFindFunctions[chatbox.ID] := @__findChatbox;
 end;

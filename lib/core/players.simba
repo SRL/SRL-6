@@ -10,8 +10,8 @@ The source for this file can be found `here <https://github.com/SRL/SRL-6/blob/m
 *)
 
 {$include_once ../interfaces/lobby/worlds.simba}
-{$include_once ../interfaces/mainscreen.simba}
 {$include_once ../interfaces/options.simba}
+{$include_once ../interfaces/minimap.simba}
 {$include_once ../core/mouse.simba}
 
 {$f-}
@@ -78,11 +78,13 @@ File's internal variables.
 
     * _boxUsername: TBox of the username edit box.
     * _boxPassword: TBox of the password edit box.
+	  * __loggedInReference: The point used as reference to check if a player is logged in.
 
 *}
 var
   _boxUsername: TBox = [-1, -1, -1, -1];
   _boxPassword: TBox = [-1, -1, -1, -1];
+  __loggedInReference: TPoint = [-1, -1];
 
 (*
 type TPlayer
@@ -560,14 +562,15 @@ isLoggedIn()
 
 .. code-block:: pascal
 
-    function isLoggedIn(): boolean;
+    function isLoggedIn(findInterfaces: boolean = false): boolean;
 
-Returns true if a player is logged in.
+Returns true if a player is logged in.  If 'findInterfaces' is set to true,
+it will find and set the bounds of the open interfaces.
 
 .. note::
 
-    - by WT-Fakawi
-    - Last updated: 30/09/2012 by Coh3n
+    - by Olly & Coh3n
+    - Last updated: 11 August 2013 by Coh3n
 
 Example:
 
@@ -576,12 +579,29 @@ Example:
     if (isLoggedIn()) then
       writeln('We are logged in!');
 *)
-function isLoggedIn(): boolean;
+function isLoggedIn(findInterfaces: boolean = false): boolean;
 var
-  w, h: integer;
+  i: integer;
 begin
-  getClientDimensions(w, h);
-  result := (getColor(w - 3, 2) = 6935544); // gold color in the logout button
+  if (findInterfaces) then
+  begin
+    result := minimap.__find();
+
+    // if the minimap isn't visible, we're not logged in
+    if (not result) then
+      exit();
+
+    wait(500 + random(500));
+
+    // call all interface find functions that need to be called
+	  for i := 0 to high(__interfaceFindFunctions) do
+	    if (__interfaceFindFunctions[i] <> nil) then
+	      __interfaceFindFunctions[i]();
+
+    __loggedInReference := [minimap.x2 - 3, minimap.y1 - 3]; // so interface find functions aren't unnecessarily called
+  end;
+
+  result := (getColor(__loggedInReference) = 677526); // gold color in the logout button
 end;
 
 {*
@@ -636,7 +656,6 @@ begin
       _boxUsername := bdsInactive;
       _boxPassword := bdsActive;
     end;
-
   end;
 end;
 
@@ -679,9 +698,6 @@ begin
     // check to see if there is already text in the input box
     tmpBox.offset(point(8, 0)); // to remove the cursor so it doesn't interfere
     findColors(tpa, __LOGIN_COLOR_TEXT, tmpBox);
-
-    if (length(tpa) <= 0) then
-      break;
 
     // click input box; clicks to the right of existing text
     if (length(tpa) > 0) then // if there's text in the box
@@ -863,8 +879,8 @@ begin
         if (@SRL_Events[EVENT_RS_UPDATE] <> nil) then
         begin
           print('RS Update: Waiting 5 minutes before calling update procedure', TDebug.WARNING);
-          wait(5 * 60000);
-          SRL_Events[EVENT_RS_UPDATE];
+          //wait(5 * 60000);
+          SRL_Events[EVENT_RS_UPDATE]();
           exit(false);
         end;
 
@@ -925,7 +941,7 @@ begin
     1057: result := [__LOGIN_TOO_MANY,       5 * 60000, 2,  'false'  ];
      732: result := [__LOGIN_UPDATE,         0,         0,  'update' ];
      591: result := [__LOGIN_TOKEN,          0,         0,  'update' ];
-    1606: result := [__LOGIN_EXPIRE,         0,         0,  'update' ];
+      68: result := [__LOGIN_EXPIRE,         0,         0,  'update' ];
      777: result := [__LOGIN_EXCEED_LIMIT,   20000,     10, ''       ];
      850: result := [__LOGIN_SKILL_LEVEL,    0,         9,  'true'   ];
     1028: result := [__LOGIN_MEMBER_ONLY,    0,         1,  'false'  ];
@@ -935,10 +951,10 @@ begin
     else
       if ((getSystemTime() > timer) and (timer > 0)) then
       begin
-        result :=   ['One minute as passed...',    0,         5,  'false',  'Login failed'         ];
+        result :=   ['One minute as passed...',    0,         0,  'false',  'Login failed'];
         print('Unknown color count: '+toStr(colorCount), TDebug.WARNING);
-        print('Please report this issue at http://villavu.com/forum/project.php?projectid=6', TDebug.HINT);
-        takeScreenshot(logPath + 'unknown_login_count.png');
+        print('Please report this issue in the SRL bugs section of the forum', TDebug.HINT);
+        takeScreenshot('unknown_login_count.png');
       end;
   end;
 end;
@@ -953,6 +969,7 @@ TPlayer.__loginResponse
 
 Handles the login response pop ups that sometimes show when a player logs in.
 Called in loops waiting for the lobby and login screens. Results are as follows:
+
     * __RES_NOTHING: Nothing happens; everything is successful.
     * __RES_POPUP: Popup was found, need to retry.
     * __RES_TERMINATE: Exceeded maximum number of tries, terminate.
@@ -1084,10 +1101,10 @@ begin
     if (not self.secureLogin) then
     begin
       print('Entering username...');
-      __enterLoginInfo(_boxUsername, self.loginName);
+      __enterLoginInfo(_boxUsername, self.loginName, true, true);
 
       print('Entering password...');
-      __enterLoginInfo(_boxPassword, self.password, false);
+      __enterLoginInfo(_boxPassword, self.password, false, true);
     end else begin
       print('Entering info. using a secure method...');
       __secureEnterInfo(self.loginName, self.password);
@@ -1152,7 +1169,7 @@ begin
   print('TPlayer.login()', TDebug.HEADER);
 
   repeat
-    if (isLoggedIn()) then
+    if (isLoggedIn(true)) then
     begin
       print('Already logged in');
       result := true;
@@ -1183,7 +1200,7 @@ begin
             break;
 
         wait(100 + random(100));
-        result := (isLoggedIn());
+        result := (isLoggedIn(true));
 
       until(result or (getSystemTime() > (t + 5000)));
     end;
@@ -1290,7 +1307,8 @@ Example:
 *)
 function TPlayer.exitToLobby(): boolean;
 begin
-  result := lobby._open();
+  if (lobby._open()) then
+    result := true;
 end;
 
 (*

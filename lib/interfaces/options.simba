@@ -69,20 +69,12 @@ begin
     ID := ID_INTERFACE_OPTIONS;
     parentID := -1;
     static := true;
-    x1 := 380;
-    y1 := 132;
-    x2 := 580;
-    y2 := 507;
-    w := (x2 - x1);
-    h := (y2 - y1);
-    cx := self.getCenterPoint().x;
-    cy := self.getCenterPoint().y;
   end;
 end;
 
 {*
 TRSOptions.__find()
-~~~~~~~~~~~~~~~~~~~~~~~~~
+~~~~~~~~~~~~~~~~~~~
 
 .. code-block:: pascal
 
@@ -112,14 +104,7 @@ begin
   getClientDimensions(wid, hei);
   result := true;
 
-  self.x1 := round(wid / 2 - 100);
-  self.y1 := round(hei / 2 - 188);
-  self.x2 := round(wid / 2 + 100);
-  self.y2 := round(hei / 2 + 187);
-  self.w := (x2 - x1);
-  self.h := (y2 - y1);
-  self.cx := self.getCenterPoint().x;
-  self.cy := self.getCenterPoint().y;
+  setBounds([round(wid / 2 - 100), round(hei / 2 - 188), round(wid / 2 + 100), round(hei / 2 + 187)]);
 end;
 
 (*
@@ -176,7 +161,7 @@ Example:
 *)
 function TRSOptions.open(): boolean;
 var
-  t: integer;
+  t, c: integer;
 begin
   if (self.isOpen()) then
     exit(true);
@@ -185,10 +170,23 @@ begin
 
   t := (getSystemTime() + (3000));
 
-  while (not result) and (getSystemTime() < t) do
+  while (getSystemTime() < t) do
   begin
-    result := self.isOpen();
+    if (self.isOpen()) then
+    begin
+      result := true;
+      break;
+    end;
+
     wait(300 + random(200));
+    c := c + 1;
+
+    // failsafe in case the first ESC hit didn't work
+    if (c >= 5) then
+    begin
+      c := 0;
+      typeByte(VK_ESCAPE);
+    end;
   end;
 end;
 
