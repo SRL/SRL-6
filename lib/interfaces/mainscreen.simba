@@ -189,7 +189,7 @@ TRSMainscreen.findObject
 
 .. code-block:: pascal
 
-    function TRSMainscreen.findObject(var x, y: integer; cols, tols: TIntegerArray; colSettings: TColorSettings; objWidth, objHeight, minCount: integer; mouseOverText: TStringArray; searchBox: TBox; mouseAction: integer = MOUSE_NONE): boolean;
+    function TRSMainscreen.findObject(var x, y: integer; cols, tols: TIntegerArray; colSettings: TColorSettings; sortFrom: TPoint; objWidth, objHeight, minCount: integer; mouseOverText: TStringArray; searchBox: TBox; mouseAction: integer = MOUSE_NONE): boolean;
 
 A very general object finding function.  Will find and click an object in the specified box.
 Will click ONLY the closest object to the player, no others that may be in the same area.
@@ -200,6 +200,7 @@ function only when there aren't similar colors to the object in the same area.
     * cols: The colors to be found.
     * tols: The tolerances on 'cols'.
     * colSettings: The color settings (i.e. color tolerance speed and modifiers). See lib/utilities/color.simba.
+    * sortFrom: Sorts the TPA, starting with the point closest to this point.
     * objWidth: The width (in pixels) of the object you're trying to find.
     * objHeight: The height (in pixels) of the object you're trying to find.
     * minCount: The minimum number of colors to be found on a single object.
@@ -216,10 +217,10 @@ Example:
 
 .. code-block:: pascal
 
-    if (mainscreen.findObject(x, y, [123457, 897637], [5, 10], colorSetting(2, 0.02, 0.13), 50, 25, 40, ['Tree'], mainscreen.getBounds(), MOUSE_RIGHT)) then
+    if (mainscreen.findObject(x, y, [123457, 897637], [5, 10], colorSetting(2, 0.02, 0.13), mainscreen.getCenterPoint(), 50, 25, 40, ['Tree'], mainscreen.getBounds(), MOUSE_RIGHT)) then
       writeln('Right-clicked object!');
 *)
-function TRSMainscreen.findObject(var x, y: integer; cols, tols: TIntegerArray; colSettings: TColorSettings; objWidth, objHeight, minCount: integer; mouseOverText: TStringArray; searchBox: TBox; mouseAction: integer = MOUSE_NONE): boolean;
+function TRSMainscreen.findObject(var x, y: integer; cols, tols: TIntegerArray; colSettings: TColorSettings; sortFrom: TPoint; objWidth, objHeight, minCount: integer; mouseOverText: TStringArray; searchBox: TBox; mouseAction: integer = MOUSE_NONE): boolean;
 var
   i, l: integer;
   myPoint: TPoint;
@@ -256,7 +257,7 @@ begin
   aPoints.filterBetween(0, minCount); // removes objects that don't have enough colors
   print('Possible objects found: '+toStr(length(aPoints)));
 
-  aPoints.sortFromFirstPoint(searchBox.getMiddle());
+  aPoints.sortFromFirstPoint(sortFrom);
 
   // loop through each possible object
   for i := 0 to high(aPoints) do
@@ -284,7 +285,7 @@ TRSMainscreen.findObject; overload;
 
 .. code-block:: pascal
 
-    function TRSMainscreen.findObject(var x, y: integer; col, tol: integer; colSettings: TColorSettings; objWidth, objHeight, minCount: integer; mouseOverText: TStringArray; mouseAction: integer = MOUSE_NONE): boolean; overload;
+    function TRSMainscreen.findObject(var x, y: integer; col, tol: integer; colSettings: TColorSettings; sortFrom: TPoint; objWidth, objHeight, minCount: integer; mouseOverText: TStringArray; mouseAction: integer = MOUSE_NONE): boolean; overload;
 
 A very general object finding function.  Will find and mouse an object in the mainscreen.
 
@@ -292,6 +293,7 @@ A very general object finding function.  Will find and mouse an object in the ma
     * col: The color to be found.
     * tol: The tolerance on 'col'.
     * colSettings: The color settings (i.e. color tolerance speed and modifiers). See lib/utilities/color.simba.
+    * sortFrom: Sorts the TPA, starting with the point closest to this point.
     * objWidth: The width (in pixels) of the object you're trying to find.
     * objHeight: The height (in pixels) of the object you're trying to find.
     * minCount: The minimum number of colors to be found on a single object.
@@ -307,12 +309,12 @@ Example:
 
 .. code-block:: pascal
 
-    if (mainscreen.findObject(x, y, 123457, 10, colorSetting(2, 0.02, 0.13), 50, 25, 40, ['ake'])) then
+    if (mainscreen.findObject(x, y, 123457, 10, colorSetting(2, 0.02, 0.13), mainscreen.getCenterPoint(), 50, 25, 40, ['ake'])) then
       writeln('Clicked object!');
 *)
-function TRSMainscreen.findObject(var x, y: integer; col, tol: integer; colSettings: TColorSettings; objWidth, objHeight, minCount: integer; mouseOverText: TStringArray; mouseAction: integer = MOUSE_NONE): boolean; overload;
+function TRSMainscreen.findObject(var x, y: integer; col, tol: integer; colSettings: TColorSettings; sortFrom: TPoint; objWidth, objHeight, minCount: integer; mouseOverText: TStringArray; mouseAction: integer = MOUSE_NONE): boolean; overload;
 begin
-  result := self.findObject(x, y, [col], [tol], colSettings, objWidth, objHeight, minCount, mouseOverText, self.getBounds(), mouseAction);
+  result := self.findObject(x, y, [col], [tol], colSettings, sortFrom, objWidth, objHeight, minCount, mouseOverText, self.getBounds(), mouseAction);
 end;
 
 {$IFNDEF CODEINSIGHT}
