@@ -404,7 +404,7 @@ begin
 
   // look for the outlined text on the bitmap
   for i := 0 to high(ATPA) do
-    findColors(ATPA[i], clRed, 0, (2 + i * 16), bW - 1, (18 + i * 16)); // +2 to y to line it up
+    findColors(ATPA[i], clRed, 0, (2 + i * 16), bW - 1, (18 + i * 16) - 1); // +2 to y to line it up
 
   l := high(ATPA);
   sortATPAFromFirstPointY(ATPA, point(bW div 2, 0));
