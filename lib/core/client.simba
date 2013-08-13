@@ -33,7 +33,7 @@ Example:
 
 .. code-block:: pascal
 
-    while (not isClientReady) do
+    while (not isClientReady()) do
       SleepAndMoveMouse(100 + Random(500));
 *)
 function isClientReady(): boolean;
@@ -92,7 +92,7 @@ begin
       inc(i);
     end;
 
-    wait(250);
+    wait(2000);
   end;
 end;   
 
