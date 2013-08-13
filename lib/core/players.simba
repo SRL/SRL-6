@@ -601,7 +601,8 @@ begin
     __loggedInReference := [minimap.x2 - 3, minimap.y1 - 3]; // so interface find functions aren't unnecessarily called
   end;
 
-  result := (getColor(__loggedInReference) = 677526); // gold color in the logout button
+  if (not result) then
+    result := (getColor(__loggedInReference) = 677526); // gold color in the logout button
 end;
 
 {*

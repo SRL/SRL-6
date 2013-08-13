@@ -42,14 +42,14 @@ begin
 end;
 
 (*
-waitClientLoaded
-~~~~~~~~~~~~~~~~
+waitClientReady
+~~~~~~~~~~~~~~~
 
 .. code-block:: pascal
 
-    function waitClientLoaded(): boolean;
+    function waitClientReady(): boolean;
 
-Waits for the client to load.  Will terminate the script if the client loaded
+Waits until the client is ready.  Will terminate the script if the client loaded
 isn't set to fixed size.
 
 .. note::
