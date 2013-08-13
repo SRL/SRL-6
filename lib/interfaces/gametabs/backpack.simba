@@ -20,9 +20,8 @@ Integer constants that represent the highest and lowest Backpack slots.
 
 *)
 const
-  INV_SLOT_LOW = 1;
-  INV_SLOT_HIGH = 28;
-
+  BACKPACK_SLOT_LOW = 1;
+  BACKPACK_SLOT_HIGH = 28;
 
 (*
 const Drop Patterns
@@ -92,25 +91,6 @@ begin
     tabIndex := _TAB_BACKPACK;
     parentID := -1;
     static := true;
-
-    x1 := gameTabs.visibleTabArea.x1;
-    y1 := gameTabs.visibleTabArea.y1;
-    x2 := gameTabs.visibleTabArea.x2;
-    y2 := gameTabs.visibleTabArea.y2;
-
-    w := (x2 - x1);
-    h := (y2 - y1);
-    cx := self.getCenterPoint().x;
-    cy := self.getCenterPoint().y;
-
-    // the slots when other tabs are visable
-    __slots[0] := grid(4, 7, 34, 31, 52, 39, point(gameTabs.__visibleTabAreaMulti.x1 + 32,
-                       gameTabs.__visibleTabAreaMulti.y1 + 32));
-
-    // the slots when the backpack is the *only* gametab open.
-    __slots[1] := grid(4, 7, 34, 31, 52, 39, point(gameTabs.__visibleTabAreaSingle.x1 + 32,
-                       gameTabs.__visibleTabAreaSingle.y1 + 32));
-
   end;
 end;
 
@@ -139,6 +119,14 @@ Example:
 procedure TRSTabBackPack._updateBounds();
 begin
   self.setBounds(gameTabs.visibleTabArea);
+
+  // the slots when other tabs are visable
+  __slots[0] := grid(4, 7, 34, 31, 52, 39, point(gameTabs.__visibleTabAreaMulti.x1 + 32,
+                     gameTabs.__visibleTabAreaMulti.y1 + 32));
+
+  // the slots when the backpack is the *only* gametab open.
+  __slots[1] := grid(4, 7, 34, 31, 52, 39, point(gameTabs.__visibleTabAreaSingle.x1 + 32,
+                     gameTabs.__visibleTabAreaSingle.y1 + 32));
 
   if (self.y1 = gameTabs.__visibleTabAreaMulti.y1) then
     slots := __slots[0]
@@ -257,7 +245,7 @@ Example:
 *)
 function TRSTabBackpack.isSlotVaild(slot: integer): boolean;
 begin
-  result := (inRange(slot, INV_SLOT_LOW, INV_SLOT_HIGH));
+  result := (inRange(slot, BACKPACK_SLOT_LOW, BACKPACK_SLOT_HIGH));
 
   if (not result) then
     print('tabBackpack(): The slot "' + intToStr(slot) + '" is an incorrect slot. Use a slot between 1..28', TDebug.ERROR);
@@ -293,8 +281,11 @@ begin
   if (not self.isSlotVaild(slot)) then
     exit(intToBox(-1, -1, -1, -1));
 
+  if (length(self.slots) <= 0) then
+    self._updateBounds();
+
   // - 1 because the grid (array) starts at 0.
-  result := slots[slot - 1];
+  result := self.slots[slot - 1];
 end;
 
 (*
@@ -358,7 +349,7 @@ begin
   if (not (pointInBox(p, self.getBounds()))) then
     exit(-1);
 
-  for i := INV_SLOT_LOW to INV_SLOT_HIGH do
+  for i := BACKPACK_SLOT_LOW to BACKPACK_SLOT_HIGH do
     if pointInBox(p, self.getSlotBox(i)) then
       exit(i);
 end;
@@ -392,7 +383,7 @@ begin
   if (not self.open()) then
     exit(0);
 
-  for i := INV_SLOT_LOW to INV_SLOT_HIGH do
+  for i := BACKPACK_SLOT_LOW to BACKPACK_SLOT_HIGH do
     if (self.isItemInSlot(i)) then
       inc(result);
 end;
@@ -464,7 +455,7 @@ begin
   if (not self.open()) then
     exit(false);
 
-  for i := INV_SLOT_LOW to INV_SLOT_HIGH do
+  for i := BACKPACK_SLOT_LOW to BACKPACK_SLOT_HIGH do
     if (not (self.isItemInSlot(i))) then
       exit(false);
 
@@ -636,7 +627,7 @@ begin
   if (not self.open()) or (not (self.getBounds().colorExists(ITEM_OUTLINE_WHITE))) then
     exit(- 1);
 
-  for i := INV_SLOT_LOW to INV_SLOT_HIGH do
+  for i := BACKPACK_SLOT_LOW to BACKPACK_SLOT_HIGH do
     if self.isSlotActivated(i) then
       exit(i);
 
