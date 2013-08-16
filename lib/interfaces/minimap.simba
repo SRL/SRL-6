@@ -62,22 +62,18 @@ const
   MM_DOT_TEAM   = 2171941;
 
 (*
-const Radius
-~~~~~~~~~~~~
+const PixelCount
+~~~~~~~~~~~~~~~~
 
-The minimap's radius.
+Stores the max pixel count of the minimap (the actual map area).
 
 Example:
 
 .. code-block:: pascal
 
-    smartImage.drawCircle(minimap.getCenterPoint(), MM_RADIUS, clLime);
 *)
 const
-  MM_RADIUS = 103;
-
-const
-  MM_PIXEL_COUNT = 36765;
+  MM_PIXEL_COUNT = 35785;
 
 (*
 const Locations
@@ -97,21 +93,23 @@ const
   LOCATION_FREMENNIK       = 3;
   LOCATION_SEERS_VILLAGE   = 4;
   LOCATION_ARDOUGNE        = 5;
-  LOCATION_YANILLE         = 5;
-  LOCATION_OOGLOG          = 6;
-  LOCATION_BURTHORPE       = 7;
-  LOCATION_CATHERBY        = 8;
-  LOCATION_KARAMJA         = 9;
-  LOCATION_WILDERNESS      = 10;
-  LOCATION_EDGEVILLE       = 11;
-  LOCATION_FALADOR         = 12;
-  LOCATION_PORT_SARIM      = 13;
-  LOCATION_VARROCK         = 14;
-  LOCATION_DRAYNOR_VILLAGE = 15;
-  LOCATION_LUMBRIDGE       = 16;
-  LOCATION_BANDIT_CAMP     = 17;
-  LOCATION_AL_KHARID       = 18;
-  LOCATION_CANIFIS         = 19;
+  LOCATION_YANILLE         = 6;
+  LOCATION_OOGLOG          = 7;
+  LOCATION_BURTHORPE       = 8;
+  LOCATION_CATHERBY        = 9;
+  LOCATION_TRAVERLEY       = 10;
+  LOCATION_KARAMJA         = 11;
+  LOCATION_WILDERNESS      = 12;
+  LOCATION_EDGEVILLE       = 13;
+  LOCATION_FALADOR         = 14;
+  LOCATION_PORT_SARIM      = 15;
+  LOCATION_VARROCK         = 16;
+  LOCATION_DRAYNOR_VILLAGE = 17;
+  LOCATION_LUMBRIDGE       = 18;
+  LOCATION_BANDIT_CAMP     = 19;
+  LOCATION_AL_KHARID       = 20;
+  LOCATION_CANIFIS         = 21;
+  LOCATION_PREVIOUS        = 1337;
 
 
 (*
@@ -310,8 +308,8 @@ map in the minimap.
 
 .. note::
 
-    - by Olly
-    - Last Updated: 08 August 2013 by Olly
+    - by euphemism
+    - Last Updated: 14 August 2013 by Olly
 
 Example:
 
@@ -321,34 +319,57 @@ Example:
 *}
 procedure TRSMinimap.__createMaskTPA();
 var
-  bmp: integer;
+  bounds: TBox;
+  bmp, borderBmp, hh, i, tempBmp, ww, res: integer;
+  drawingPoints: array [0..3] of TPoint;
 begin
-  bmp := BitmapFromString(225, 212, 'meJzt0lluFFEABEHf/9LwgYQQ' +
-        'y2vbM3Yl7gjVDSpfXr69mJmZmZnZQ+OH+RH21/Gr+R322/jT/BT7O' +
-        'f5lfo19WzfQNz/o5uM15jfddrze/KwbjreaX3ar8T7z424yHjG/78' +
-        'uPx81P/MLjWeZX/l8jbl7IfMTNC5mPuHkh8xE3L2Q+4uaFzEfcvJD' +
-        '5iJsXMh9x80LmI25eyHzEzQuZj7h5IfMRNy9kPuLmhcxH3LwQfXI2' +
-        'j0SfXJqnok8uzYPRJ5fm2eiTS/N49MmleUL65NI8JH1yaZ6TPrk0j' +
-        '0qfXJqnpU8uzQPTJ5fmmemTS/PYhMcTSZQ4iRInUeIkSpxEiZMocR' +
-        'IlTqLESZQ4iRInUeIkSpxEidMncfqkT5/06ZM+fdKnT/r0SZ8+6dM' +
-        'nffqkT5/0SZQ+idInUfokSpxEiZMocRIlTqLESZQ4iRInUeIkSpxE' +
-        'iZMocRIlTqLESZQ4iRInUeIkSpxEiZMocRIlTqLESZQ4iRInUeIkS' +
-        'pxEiZMocRIlTqLESZQ4iRInUeIkSpxEiZMocRIlTqLESZQ4iRInUe' +
-        'IkSpxEiZMocRIlTqLESZQ4iRInUeIkSpxEiZMocRIlTqLESZQ4iRI' +
-        'nUeIkSpxEiZMocRIlTqLESZQ4iRInUeIkSpxEiZMocRIlTqLESZQ4' +
-        'iRInUeIkSpxEiftXoiql4NCnSpm77FOlDL2yT5Uy8aY+Vcone0efK' +
-        'uXTvLtPlfIJHuxTpXyop/SpUj7IE/tUKU/39D5VyhN9UJ8q5VkkSp' +
-        'xEiZMocRIlTqLESZQ4iRInUeIkSpxEiZMocRIlTqJMfGh4YuZB895' +
-        'UysG8NJVyMG9MpRzM61IpB/OuVMrBvCiVcjBvSaUczCtSKQfzflTK' +
-        'wbwclXIwb0alHMxrUSkH805Uytk8EolyNo9EopzNI5EoZ/NIJMrZP' +
-        'BKJcjaPRKKczSORKGfzSCTK2TwSiXI2j0SinM0jkShn80gkytk8Eo' +
-        'ne0/z6rzeeaP7mVx1PMf/xa48HzR+8w3i3+Xf3Ge8wf+1u403mf91' +
-        'zvNL8qTuPS/OPjIP5O/Zj/NX8F/t1/Gb+iJmZmZnZ/73v1NmOwA==');
+  bounds := self.getBounds();
 
-  findColorsBitmap(bmp, self._maskTPA, clRed);
-  minimap._maskTPA.offset(point(minimap.x1, minimap.y1));
+  try
 
-  freeBitmap(bmp);
+    bmp := bitmapFromString(63, 64, 'meJztztEKwjAAxdD9/09fQRCUzd' +
+          'muXWO35D1wlsXMzC5bEppwsDyjFUfKKxpSXd6iLXXlM5pTUVbRotL' +
+          'Wchy/SSpP/D3xjX7aLl68ePHixYsXfx18i1z8PfGNcvGUnMJ3kSP4' +
+          'XvLx+I7ywfi+8pH47vIx+DPYtfja5TxzC/5/Ek8lnko8lXgq8VTiq' +
+          'e6Ap5nbzStPAZ4G7jWvPLt4mva7eeX5gqdRpT0AxMo+2w==');
+
+    getBitmapSize(bmp, ww, hh);
+    bounds.offset(point(- bounds.x1, - bounds.y1));
+
+    drawingPoints[0] := point(bounds.x1, bounds.y1);
+    drawingPoints[1] := point(bounds.x2 - ww, bounds.y1);
+    drawingPoints[2] := point(bounds.x2 - ww, bounds.y2 - hh);
+    drawingPoints[3] := point(bounds.x1, bounds.y2 - hh);
+
+    res := createBitmap(bounds.x2 - bounds.x1+1, bounds.y2 - bounds.y1 +1);
+    fastDrawClear(res, clWhite);
+
+    borderBmp := createBitmap(bounds.x2 - bounds.x1 - 12, bounds.y2 - bounds.y1 - 12);
+    getMufasaBitmap(borderBmp).drawTransparent(6, 6, getMufasaBitmap(res));
+    invertBitmap(res);
+
+    for i := 0 to 3 do
+    begin
+
+      tempBmp := rotateBitmap(bmp, (- PI / 2) * i);
+      getMufasaBitmap(tempBmp).drawTransparent(drawingPoints[i].x, drawingPoints[i].y, getMufasaBitmap(res));
+      freeBitmap(tempBmp);
+    end;
+  finally
+
+    freeBitmap(bmp);
+    freeBitmap(borderBmp);
+  end;
+
+  findColorsBitmap(res, self._maskTPA, clBlack);
+  self._maskTPA.offset([self.x1, self.y1]);
+
+  if (length(self._maskTPA) > 0) then
+    print('minimap.__createMaskTPA(): Succesfully created mask tpa', TDebug.SUB)
+  else
+    print('minimap.__createMaskTPA(): Failed to create mask tpa', TDebug.FATAL);
+
+  freeBitmap(res);
 end;
 
 {*
@@ -372,7 +393,7 @@ Example:
 
     minimap.__find();
 *}
-function TRSMinimap.__find(): boolean;
+function TRSMinimap.__find(useDebug: boolean = false): boolean;
 const
   COMPASS_CENTER_POINT_COLOR  = 8508157;
   ARBITRARY_UNIQUE_COLOR_ON_WORLD_MAP_BUTTON = 4615518;
@@ -704,7 +725,7 @@ begin
   else
     keyUp(VK_RIGHT);
 
-  wait(10);
+  wait(75 + random(50));
 
   result := (__setCompassAngle_minCheck(angle, directionDeg) <= (7.0 + i));
 
@@ -759,6 +780,36 @@ begin
 end;
 
 (*
+TRSMinimap.isPointOn
+~~~~~~~~~~~~~~~~~~~~
+
+.. code-block:: pascal
+
+    function TRSMinimap.isPointOn(p: TPoint): boolean;
+
+Returns true if the point "p" is on the minimap.
+
+.. note::
+
+    - by Olly
+    - Last Updated: 23 May 2013 by Olly
+
+Example:
+
+.. code-block:: pascal
+
+    if (minimap.isPointOn(someRandomPoint)) then
+      writeln('Point is on the minimap!');
+*)
+function TRSMinimap.isPointOn(p: TPoint): boolean;
+begin
+  result := false;
+
+  if pointInBox(p, self.getBounds()) then
+    result := (not pointInTPA(p, self._maskTPA));
+end;
+
+(*
 TRSMinimap.findDTM
 ~~~~~~~~~~~~~~~~~~
 
@@ -768,18 +819,19 @@ TRSMinimap.findDTM
 
 Attempts to find on the minimap, will search for the dtm +/- 6 degrees of the
 current minimap angle. Includes an optional paramter 'tries' how many tries we
-will seach for the dtm, on default it's set to 1.
+will search for the dtm, on default it's set to 1.
 
 .. note::
 
     - by Olly
-    - Last Updated: 08 August 2013 by Olly
+    - Last Updated: 15 August 2013 by Olly
 
 Example:
 
 .. code-block:: pascal
 
-    blk := minimap.getBlackBackground();
+    if (minimap.findDTM(dtm, x, y)) then
+      writeln('found the dtm');
 *)
 function TRSMinimap.findDTM(dtm: integer; var x, y: integer; tries: integer = 1): boolean;
 var
@@ -790,14 +842,19 @@ begin
 
   a := self.getAngleDegrees();
 
-  se := a - 6.00;
-  ea := a + 6.00;
+  se := a - 8.00;
+  ea := a + 8.00;
 
   for i := 0 to tries do
     if findDTMRotatedAlternating(dtm, x, y, self.getBounds(), se, ea, 0.5, e) then
     begin
-      print('minimap.findDTM(): Found dtm @ angle ' + floatToStr(e), TDebug.SUB);
-      exit(true);
+      result := (self.isPointOn([x, y]));
+
+      if (result) then
+      begin
+        print('minimap.findDTM(): Found dtm @ angle ' + floatToStr(e), TDebug.SUB);
+        exit(true);
+      end;
     end else
       wait(100 + random(200));
 end;
@@ -996,36 +1053,6 @@ begin
 end;
 
 (*
-TRSMinimap.isPointOn
-~~~~~~~~~~~~~~~~~~~~
-
-.. code-block:: pascal
-
-    function TRSMinimap.isPointOn(p: TPoint): boolean;
-
-Returns true if the point "p" is on the minimap.
-
-.. note::
-
-    - by Olly
-    - Last Updated: 23 May 2013 by Olly
-
-Example:
-
-.. code-block:: pascal
-
-    if (minimap.isPointOn(someRandomPoint)) then
-      writeln('Point is on the minimap!');
-*)
-function TRSMinimap.isPointOn(p: TPoint): boolean;
-begin
-  result := false;
-
-  if pointInBox(p, self.getBounds()) then
-    result := (not pointInTPA(p, self._maskTPA));
-end;
-
-(*
 TRSMinimap.filterPoints
 ~~~~~~~~~~~~~~~~~~~~~~~
 
@@ -1089,21 +1116,24 @@ begin
 
   findColorsBitmap(bmp, tpa, 65536);
 
-  freeBitmap(bmp);
-
   l := length(tpa);
 
   if (l < 1) then
+  begin
+    freeBitmap(bmp);
     exit();
+  end;
 
   for i := 0 to (l-1) do
-    if ((fastGetPixel(bmp, tpa[i].x - 1, tpa[i].y - 1) - fastGetPixel(bmp, tpa[i].x, tpa[i].y - 1)) = 6381917) then
+    if ((fastGetPixel(bmp, tpa[i].x - 1, tpa[i].y - 1) - fastGetPixel(bmp, tpa[i].x, tpa[i].y - 1)) = 6381921) then
     begin
       result := true;
       p.x := tpa[i].x + self.x1;
       p.y := tpa[i].y + self.y1;
       break;
     end;
+
+  freeBitmap(bmp);
 end;
 
 (*
@@ -2741,12 +2771,12 @@ begin
 end;
 
 (*
-TRSMinimap.isLodeStoneScreenOpen
-~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+TRSMinimap.isLodeStoneOpen
+~~~~~~~~~~~~~~~~~~~~~~~~~~
 
 .. code-block:: pascal
 
-    function TRSMinimap.isLodeStoneScreenOpen(out bounds: TBox; waitTime: integer = 0): boolean;
+    function isLodeStoneOpen(out bounds: TBox; waitTime: integer = 0): boolean;
 
 Returns true if the lodestone screen is visable, will also return the bounds of
 screen, and includes a optional parameter "waitTime".
@@ -2754,80 +2784,134 @@ screen, and includes a optional parameter "waitTime".
 .. note::
 
     - by Olly
-    - Last Updated: 08 August 2013 by Olly
+    - Last Updated: 15 August 2013 by Olly
 
 Example:
 
 .. code-block:: pascal
 
-    if minimap.isLodeStoneScreenOpen(b, 500 + random(100)) then
+    if minimap.isLodeStoneOpen(b, 500 + random(100)) then
       writeln('lodestone screen is open');
 *)
-function TRSMinimap.isLodeStoneScreenOpen(out bounds: TBox; waitTime: integer = 0): boolean;
+function isLodeStoneOpen(out bounds: TBox; waitTime: integer = 0): boolean;
 var
-  width, height: integer;
-  mid: TPoint;
+  width, height, timeOut, t: integer;
+  tpa: TPointArray;
+  p: TPoint;
   b: TBox;
+const
+  LODESTONE_OFFSET: TPoint = [169, 8];
+  LODESTONE_WIDTH: integer = 500;
+  LODESTONE_HEIGHT: integer = 300;
 begin
-  getClientDimensions(width, height);
   result := false;
+  timeOut := getSystemTime() + waitTime;
+  t := getSystemTime();
 
-  mid.x := (width div 2);
-  mid.y := (height div 2);
+  // middle of the screen
+  getClientDimensions(width, height);
+  p := [width div 2, height div 2];
 
-  b := [mid.x-250, mid.y-150, mid.x+250, mid.y+150];
+  repeat
+    // find the white text
+    if (findColors(tpa, 12378347, p.x-250, p.y-150, p.x+250, p.y+175)) then
+    begin
+      b := tpa.getBounds();
+
+      // count the blue color in the bounds of the text (real = 1400)
+      result := inRange(countColorTolerance(2498582, b, 5), 1380, 1420);
+
+      if (result) then
+      begin
+        bounds := [b.x1 - LODESTONE_OFFSET.x,
+                   b.y1 - LODESTONE_OFFSET.y,
+                   b.x1 + (LODESTONE_WIDTH - LODESTONE_OFFSET.x),
+                   b.y1 + (LODESTONE_HEIGHT - LODESTONE_OFFSET.y)];
+
+        print('minimap.isLodeStoneOpen(): result = ' + boolToStr(result), TDebug.SUB);
+
+        exit();
+      end;
+    end;
+
+  until (getSystemTime() >= timeOut);
 end;
 
 (*
-TRSMinimap.lodeStoneTo
-~~~~~~~~~~~~~~~~~~~~~~
+TRSMinimap.lodestoneTeleportTo
+~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
 
 .. code-block:: pascal
 
-    function TRSMinimap.lodeStoneTo(location: integer): boolean;
+    function lodestoneTeleportTo(location: integer): boolean;
 
 Will click the lodestone teleport to "location".
 
 .. note::
 
     - by Olly
-    - Last Updated: 08 August 2013 by Olly
+    - Last Updated: 15 August 2013 by Olly
 
 Example:
 
 .. code-block:: pascal
 
-    minimap.lodeStoneTo(LOCATION_LUNAR_ISLE);
+    minimap.lodeStoneTeleportTo(LOCATION_LUNAR_ISLE);
 *)
-function TRSMinimap.lodeStoneTo(location: integer): boolean;
+function lodestoneTeleportTo(location: integer): boolean;
 var
-  btn: _TRSMMButton;
-  b: TBox;
-  pntArr: TPointArray;
+  tpa: TPointArray;
+  button: _TRSMMButton;
   p: TPoint;
+  b: TBox;
 begin
-  btn := self._getButton(MM_BUTTON_LODESTONE);
-  mouseCircle(btn.center.x, btn.center.y, btn.radius, MOUSE_LEFT);
+  result := false;
 
-  //isLodeStoneScreenOpen(b, 4000 + random(1000));
+  // all teleport location middle points (ugly.. meh)
+  tpa :=  [[34, 55], [91, 155], [86, 207], [190, 98], [181, 135], [156, 189],
+           [150, 235], [137, 274], [242, 121], [210, 157], [243, 155], [212, 236],
+           [303, 96], [282, 134], [268, 180], [265, 225], [335, 158], [298, 187],
+           [315, 219], [315, 273], [352, 206], [393, 150]];
 
-             {lunar,    eagles,   tiranwn, fremennik, seers,   ardy,   yanile}
-  pntArr := [[34, 55], [91, 155], [86, 207], [191, 98], [181, 135], [156, 189],
-             {ooglog,      burth,        cath,    karamja, wilderness, edgeville, }
-             [137, 274], [244, 123], [210, 157], [212, 236], [301, 96], [279, 134],
-              { fally,    port sarim, varrock,   draynor,     lumby,     bandit, al-karid,  canifis}
-             [267, 187], [264, 244], [333, 158], [296, 187], [314, 219], [315, 273], [350, 206], [392, 152]];
+  button := minimap._getButton(MM_BUTTON_LODESTONE);
+  mouseCircle(button.center.x, button.center.y, button.radius, MOUSE_MOVE);
+
+  if (location = (LOCATION_PREVIOUS)) then
+  begin
+    fastClick(MOUSE_RIGHT);
+    result := chooseOption(['Previous dest', 'estination'], 250 + random(100));
+
+    if (result) then
+      print('minimap.lodestoneTo(): Succesfully teleported to previous destination', TDebug.SUB)
+    else
+      print('minimap.lodestoneTo(): Failed teleport to previous destination (chooseOption must have failed)', TDebug.SUB);
+
+    // regardless of the result, we don't need to go any futher
+    exit();
+  end;
 
   if (inRange(location, LOCATION_LUNAR_ISLE, LOCATION_CANIFIS)) then
   begin
-    p := pntArr[location];
+    if (not isLodeStoneOpen(b)) then
+      fastClick(MOUSE_LEFT);
 
-    p.offset([b.x1, b.y1]);
+    if (isLodeStoneOpen(b, 4000 + random(500))) then
+    begin
+      wait(20 + random(400));
 
-    mouse(p.rand(2));
-  end;
+      p := tpa[location];
+      p.offset([b.x1, b.y1]);
+      mouseBox([p.x - 8, p.y - 8, p.x + 8, p.y + 8], MOUSE_LEFT);
+
+      print('minimap.lodestoneTo(): Succesfully clicked teleport[' + intToStr(location) + ']');
+      result := true;
+    end else
+      print('minimap.lodestoneTo(): Lodestone screen never appeared', TDebug.ERROR);
+  end else
+    print('minimap.lodestoneTo(): The location you entered isn''t a vaild teleport', TDebug.ERROR);
 end;
 
 begin
   minimap.__init();
 end;
+
