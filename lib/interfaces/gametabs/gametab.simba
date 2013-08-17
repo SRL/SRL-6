@@ -813,6 +813,66 @@ begin
   print('TRSGameTabs.__find(): '+toStr(result), TDebug.FOOTER);
 end;
 
+(*
+TRSGameTabs.clearMouseOverText
+~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+
+.. code-block:: pascal
+
+    procedure TRSGameTabs.clearMouseOverText();
+
+Will clear the mouseover text from the gametab visable area, if the mouseover
+text bounds are overlaping.
+
+.. note::
+
+    - by Olly
+    - Last Updated: 17 August 2013 by Olly
+
+Example:
+
+.. code-block:: pascal
+
+    gameTabs.clearMouseOverText();
+*)
+procedure TRSGameTabs.clearMouseOverText();
+var
+  b: TBox;
+  clientW, clientH: integer;
+  textBounds: TBox;
+  mousePnt, p: TPoint;
+begin
+  // if it's not open, or not overlaping the tab area we're done here
+  if (not isMouseOverMenuOpen(textBounds)) then
+    exit();
+
+  if (not textBounds.overlap(self.visibleTabArea)) then
+    exit();
+
+  print('gameTabs.clearMouseOverText(): Mouseover text overlaps gametab area, moving the mouse', TDebug.SUB);
+
+  getClientDimensions(clientW, clientH);
+  getMousePos(mousePnt.x, mousePnt.y);
+
+  textBounds.setLimit(self.visibleTabArea);
+
+  // TBox is the area where we could move the mouse to hopefully close the text
+  b := [0, 0, mousePnt.x - textBounds.getWidth() + random(5), clientH - 1];
+
+  p := b.getGaussPoint();
+
+  // offset the point closer to the gametab, and closer to the mainscreen
+  if (8 > random(10)) then
+  begin
+    p.x := p.x + GaussRangeInt(0, b.x2 - p.x);
+    p.y := p.y - random(35);
+  end;
+
+  mouse(p);
+
+  print('gameTabs.clearMouseOverText(): Mouse moved to ' + toStr(p), TDebug.SUB);
+end;
+
 {$IFNDEF CODEINSIGHT}
 function __findGameTabs(): boolean;
 begin

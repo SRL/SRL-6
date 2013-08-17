@@ -675,6 +675,33 @@ begin
   result.y := randomRange(self.y1, self.y2);
 end;
 
+(*
+TBox.getRandomPoint
+~~~~~~~~~~~~~~~~~~~
+
+.. code-block:: pascal
+
+    function TBox.overlap(b: TBox): boolean;
+
+Returns true if the TBox is in any kind of contact with the TBox "b".
+
+.. note::
+
+    - by Janilabo
+    - Last Updated: 17 August 2013 by Olly
+
+Example:
+
+.. code-block:: pascal
+
+    if b.overlap(box2) then
+      writeln('boxes overlap');
+*)
+function TBox.overlap(b: TBox): boolean;
+begin
+  Result := not ((self.X1 > b.X2) or (self.X2 < b.X1) or (self.Y1 > b.Y2) or (self.Y2 < b.Y1));
+end;
+
 
 
 
