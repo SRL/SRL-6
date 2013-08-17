@@ -324,7 +324,9 @@ procedure fastClick(button: integer);
 var
   x, y: integer;
 begin
-  if (button = MOUSE_MOVE) then Exit;
+  if (button = MOUSE_MOVE) then
+    Exit;
+
   getMousePos(x, y);
   holdMouse(x, y, button);
 
@@ -684,7 +686,7 @@ multiClick
 
 .. code-block:: pascal
 
-  function multiClick(p: TPoint; chance, maxClicks: integer): boolean;
+    function multiClick(p: TPoint; chance, maxClicks: integer): boolean;
 
 Will simulate "spam" clicking on the point, p.  Will do it a random amount
 between 1 and 'maxClicks'.  Will always click once, then has a percent
@@ -692,15 +694,15 @@ between 1 and 'maxClicks'.  Will always click once, then has a percent
 
 .. note::
 
-  | Author: Coh3n
-  | Last Updated: 16 March 2013 by Coh3n
+    - Author: Coh3n
+    - Last Updated: 16 March 2013 by Coh3n
 
 Example:
 
 .. code-block:: pascal
 
-  if (mainscreen.isUptext('Tree')) then
-    multiClick(p, 35, 5, true);
+    if (mainscreen.isUptext('Tree')) then
+      multiClick(p, 35, 5, true);
 *)
 function multiClick(p: TPoint; chance, maxClicks: integer): boolean;
 var
@@ -718,4 +720,3 @@ begin
     wait(50 + random(50));
   until(clicks >= maxClicks);
 end;
-

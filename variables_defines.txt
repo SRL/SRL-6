@@ -28,6 +28,7 @@ VARIABLES:
 		lobby: TRSLobby;			- used to call lobby functions/procedures.
 		lobbyWorlds: TRSLobbyWorlds;		- used to call all world switching routines.
 		minimap: TRSMinimap;			- used to call minimap functions/procedures.
+		chatbox: TRSChatbox;			- used to call chatbox functions/procedures.
 		tabLogout: TRSTabLogout;		- called to interact with the logout gametab.
 		tabInventory: TRSTabInventory;		- called to interact with the inventory gametab.
 		tabAbilityBook: TRSTabAbilityBook;	- called to interact with the ability book gametab.

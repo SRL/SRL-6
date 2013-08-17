@@ -978,7 +978,7 @@ isMouseOverMenuOpen
 
 .. code-block:: pascal
 
-    function isMouseOverMenuOpen(mouseAway: boolean = true; waitTime: integer = 100): boolean;
+    function isMouseOverMenuOpen(var res: TBox; waitTime: integer = 100): boolean;
 
 Returns true if the mouse-over menu is open.  Will wait a maximum of
 'waitTime' for the menu to appear.
@@ -995,14 +995,16 @@ Example:
     if (isMouseOverMenuOpen()) then
       writeln('Mouse-over menu is open');
 *)
-function isMouseOverMenuOpen(waitTime: integer = 100): boolean;
+function isMouseOverMenuOpen(var res: TBox; waitTime: integer = 100): boolean;
 var
-  tmpBox: TBox;
-  t := (getSystemTime() + waitTime);
+  t: integer;
 begin
-  while (getSystemTime() < t) do
+  res := [-1, -1, -1, -1];
+  t := (getSystemTime() + waitTime);
+
+  while ((getSystemTime() < t) and (not result)) do
   begin
-    result := __findMouseOverBox(tmpBox);
+    result := __findMouseOverBox(res);
     wait(20 + random(20));
   end;
 end;

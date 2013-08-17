@@ -445,8 +445,17 @@ begin
 
       print('Found color '+toStr(i)+' ('+toStr(COLORS[i])+') after filtering, setting minimap coordinates...');
 
-      box.x1 := atpa[ii][0].x + OFFSETS[i].x;
-      box.y1 := atpa[ii][0].y + OFFSETS[i].y;
+      if (i = 0) then
+      begin
+
+        box.x1 := tpa[ii].x + OFFSETS[i].x;
+        box.y1 := tpa[ii].y + OFFSETS[i].y;
+      end else
+      begin
+
+        box.x2 := tpa[ii].x + OFFSETS[i].x;
+        box.y2 := tpa[ii].y + OFFSETS[i].y;
+      end;
     end else
     begin
 
@@ -580,7 +589,7 @@ begin
 
   if (len < 1) then
   begin
-    writeln('found not enough red arrow!');
+    print('TRSMinimap.getAngleRadians(): Didn''t find enough of the red arrow color', TDebug.SUB);
     exit;
   end;
 
