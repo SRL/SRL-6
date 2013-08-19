@@ -1,0 +1,318 @@
+(*
+Conversation Box
+================
+
+The converstaion box file holds any functions that manipulate and/or gather
+information from a conversation between the player and NPC's or the player and
+"the game" (i.e. destroying an item).
+
+The source for this file can be found
+`here <https://github.com/SRL/SRL-6/blob/master/lib/interfaces/conversationbox.simba>`_.
+
+*)
+
+{$f-}
+{$include_once interfaces.simba}
+{$include_once ../utilities/color.simba}
+
+{*
+const Internal
+~~~~~~~~~~~~~~
+
+Internal constants used throughout the file.
+*}
+const
+  _COLOR_SPEAKER     = 376558;   // gold color of the name of the speaker
+  _COLOR_SPOKEN_TEXT = 0;        // black
+  _COLOR_OPTION_TEXT = 13158600; // white color of conversation options
+
+(*
+type TRSConversationBox
+~~~~~~~~~~~~~~~~~~~~~~~
+
+The interface type for the conversation box.  Stores attributes and functions
+of the conversation box interface.
+*)
+type
+  TRSConversationBox = record(TRSInterface)
+    __placeholder: byte;
+  end;
+
+(*
+var conversationBox
+~~~~~~~~~~~~~~~~~~~
+
+The variable used to call conversation box functions, procedures and attributes.
+
+Example:
+
+.. code-block:: pascal
+
+    if (conversationBox.areTalking()) then
+      writeln('Player is talking to something or someone');
+*)
+var
+  conversationBox: TRSConversationBox;
+
+{*
+TRSConversationBox.__init
+~~~~~~~~~~~~~~~~~~~~~~~~~
+
+.. code-block:: pascal
+
+    procedure TRSConversationBox.__init();
+
+Initializes the TRSConversationBox variable.
+
+.. note::
+
+    - by Coh3n
+    - Last Updated: 17 August 2013 by Coh3n
+
+Example:
+
+.. code-block:: pascal
+
+    conversationBox.__init();
+*}
+procedure TRSConversationBox.__init();
+begin
+  with self do
+  begin
+    name := 'RS Conversation Box';
+    ID := ID_INTERFACE_CONVERSATION_BOX;
+    parentID := -1;
+    static := true;
+  end;
+end;
+
+{*
+TRSConversationBox.__find
+~~~~~~~~~~~~~~~~~~~~~~~~~
+
+.. code-block:: pascal
+
+    function TRSConversationBox.__find(): boolean;
+
+Returns true of the conversation box interface is found and its bounds are set.
+Called in TRSConversationBox.getSpeaker().
+
+.. note::
+
+    - by Coh3n
+    - Last Updated: 17 August 2013 by Coh3n
+
+Example:
+
+.. code-block:: pascal
+
+    if (not self.__find()) then
+      exit();
+*}
+function TRSConversationBox.__find(): boolean;
+var
+  wid, hei: integer;
+begin
+  getClientDimensions(wid, hei);
+  result := true;
+
+  self.setBounds([0, hei - 146, 521, hei - 1]); // bottom left corner of the client
+end;
+
+(*
+TRSConversationBox.getSpeaker
+~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+
+.. code-block:: pascal
+
+    function TRSConversationBox.getSpeaker(): string;
+
+Returns a string of the curren speaker (i.e. the title of the conversation box).
+
+.. note::
+
+    - by DemiseSythe
+    - Last Updated: 17 August 2013 by Coh3n
+
+Example:
+
+.. code-block:: pascal
+
+    if (conversationBox.getSpeaker = 'Speaker''s Name') then
+      writeln('Talking to Speaker''s Name');
+*)
+function TRSConversationBox.getSpeaker(): string;
+begin
+  if (not self.__find()) then
+    exit();
+
+  // gold color of the text
+  result := getTextAtEx(self.x1 + 120, self.y1 + 8, self.x2 - 8, self.y1 + 34, 0, 50, 30, _COLOR_SPEAKER, 15, CharsNPC);
+end;
+
+(*
+TRSConversationBox.areTalking
+~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+
+.. code-block:: pascal
+
+    function TRSConversationBox.areTalking(): boolean;
+
+Returns true if someone or something is talking.
+
+.. note::
+
+    - by Wizzup?
+    - Last Updated: 17 August 2013 by Coh3n
+
+Example:
+
+.. code-block:: pascal
+
+    if (conversationBox.areTalking()) then
+      writeln('We are talking');
+*)
+function TRSConversationBox.areTalking(): boolean;
+begin
+  result := (self.getSpeaker() <> '');
+end;
+
+(*
+TRSConversationBox.isOpen
+~~~~~~~~~~~~~~~~~~~~~~~~~
+
+.. code-block:: pascal
+
+    function TRSConversationBox.isOpen(): boolean;
+
+Returns true if the conversation box is open.
+
+.. note::
+
+    - by Coh3n
+    - Last Updated: 17 August 2013 by Coh3n
+
+Example:
+
+.. code-block:: pascal
+
+    if (not conversationBox.isOpen()) then
+      exit();
+*)
+function TRSConversationBox.isOpen(): boolean;
+begin
+  result := self.areTalking();
+end;
+
+(*
+TRSConversationBox.findDialogText
+~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+
+.. code-block:: pascal
+
+    function TRSConversationBox.findDialogText(txt: TStringArray; mouseAction: integer = MOUSE_NONE): boolean;
+
+Returns true if 'txt' is found in the conversation dialog.  Will do 'mouseAction'
+on the text if it's found.
+
+.. note::
+
+    - by Coh3n
+    - Last Updated: 17 August 2013 by Coh3n
+
+Example:
+
+.. code-block:: pascal
+
+    if (findDialogText(['1'], MOUSE_LEFT)) then
+      writeln('Chose option 1');
+*)
+function TRSConversationBox.findDialogText(txt: TStringArray; mouseAction: integer = MOUSE_NONE): boolean;
+var
+  p: TPoint;
+begin
+  if (not self.isOpen()) then
+    exit();
+
+  if (findText(p, txt, [upChars], self.getBounds())) then
+  begin
+    mouse(p, mouseAction);
+    result := true;
+  end;
+end;
+
+(*
+TRSConversationBox.continue
+~~~~~~~~~~~~~~~~~~~~~~~~~~~
+
+.. code-block:: pascal
+
+    function TRSConversationBox.continue(spaceBar, doWait: boolean): boolean;
+
+Interacts with the "click to continue" button at the bottom of the conversation
+dialog.  If 'spaceBar' is set to true, it will continue via the space bar, otherwise
+it will click the button.  If 'doWait' is set to true it will wait until new text
+appears, otherwise return true as soon as it continues.
+
+.. note::
+
+    - by Coh3n
+    - Last Updated: 17 August 2013 by Coh3n
+
+Example:
+
+.. code-block:: pascal
+
+    repeat
+      conversationBox.continue(true, true);
+    until(not conversationBox.isOpen());
+*)
+function TRSConversationBox.continue(spaceBar, doWait: boolean): boolean;
+var
+  tpaButton: TPointArray;
+  atpaButton: T2DPointArray;
+  i, t, c, x, y: integer;
+  b: TBox;
+begin
+  if (not self.isOpen()) then
+    exit();
+
+  // yellow of the top of the button
+  findColorsTolerance(tpaButton, 7003134, self.getBounds(), 15, colorSetting(1));
+
+  if (length(tpaButton) <= 0) then
+  begin
+    print('TRSConversationBox.clickContinue(): Failed to find button color', TDebug.ERROR);
+    exit();
+  end;
+
+  atpaButton := splitTPAEx(tpaButton, 2, 2);
+
+  for i := 0 to high(atpaButton) do
+  begin
+    b := atpaButton[i].getBounds();
+
+    if (inRange(b.x2 - b.x1, 58, 75)) then
+      // failsafe to make sure we have the right button
+      if (findColorTolerance(x, y, 11510665, b, 15)) then // light color of the arrow on the button (>)
+      begin
+        c := countColor(_COLOR_SPOKEN_TEXT, self.getBounds());
+
+        if (spaceBar) then
+          typeByte(VK_SPACE)
+        else
+          mouseBox([b.x1, b.y1, b.x2, b.y2 + 10], MOUSE_LEFT);
+
+        result := true;
+
+        t := (getSystemTime() + 10000);
+
+        if (doWait) then
+          while (c = countColor(_COLOR_SPOKEN_TEXT, self.getBounds())) and (getSystemTime() < t) do
+            wait(50 + random(50));
+
+        exit();
+      end else
+        print('TRSConversationBox.clickContinue(): Failed to find button arrow color', TDebug.ERROR);
+  end;
+end;

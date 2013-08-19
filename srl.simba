@@ -36,8 +36,10 @@ SRL library isn't available to you.
 {$include_once lib/interfaces/bankscreen.simba}
 {$include_once lib/interfaces/options.simba}
 {$include_once lib/interfaces/chatbox.simba}
+{$include_once lib/interfaces/conversationbox.simba}
 
 {$include_once lib/misc/srlstats.simba}
+{$include_once lib/misc/antiban.simba}
 
 {$IFDEF SMART}
   {$include_once lib/misc/smart.simba}

@@ -1,0 +1,464 @@
+(*
+Antiban
+=======
+
+The antiban include contains some useful functions that can be used for antiban.
+Antiban is a term used for human-like script behavior, and antiban functions are
+used throughout scripts to lessen the chance of a ban.
+
+The source for this file can be found
+`here <https://github.com/SRL/SRL-6/blob/master/lib/misc/antiban.simba>`_.
+
+*)
+
+{$f-}
+
+{$include_once ../core/debug.simba}
+{$include_once ../core/text.simba}
+{$include_once ../core/players.simba}
+{$include_once ../utilities/color.simba}
+{$include_once ../interfaces/gametabs/backpack.simba}
+{$include_once ../interfaces/conversationbox.simba}
+
+(*
+randomRClickItem
+~~~~~~~~~~~~~~~~
+
+.. code-block:: pascal
+
+    procedure randomRClickItem();
+
+Randomly rights clicks an item in the backpack, randomly chooses Cancel or
+Examine.
+
+.. note::
+
+    Author: phantombmx/EvilChicken!, idea by Naum
+    Last Modified: 13 August 2013 by Coh3n
+
+Example:
+
+.. code-block:: pascal
+
+    randomRClickItem();
+*)
+procedure randomRClickItem();
+var
+  I: array[BACKPACK_SLOT_LOW..BACKPACK_SLOT_HIGH] of Boolean;
+  II, M, R: Byte;
+  Inv: Boolean;
+begin
+  if (not isLoggedIn()) then
+    exit;
+
+  M := mouseSpeed;
+  mouseSpeed := 7 + Random(25);
+
+  if (tabBackpack.isFull()) then
+  begin
+    print('Backpack is full');
+    tabBackpack.mouseSlot(25{random(BACKPACK_SLOT_HIGH - 1) + 1}, MOUSE_RIGHT);
+  end else
+  begin
+    for II := Low(I) to High(I) do
+      I[II] := tabBackpack.isItemInSlot(II);
+
+    R := RandomRange(BACKPACK_SLOT_LOW, BACKPACK_SLOT_HIGH);
+    while (not I[R - 1]) do
+      R := RandomRange(BACKPACK_SLOT_LOW, BACKPACK_SLOT_HIGH);
+
+    tabBackpack.mouseSlot(R, MOUSE_RIGHT);
+  end;
+
+  Inv := False;
+
+  if (Random(3) > 0) then
+    Inv := chooseOption(['xamine']);
+
+  if (not Inv) then
+    chooseOption(['ancel']);
+
+  MouseSpeed := M;
+end;
+
+(*
+sleepAndMoveMouse
+~~~~~~~~~~~~~~~~~
+
+.. code-block:: pascal
+
+    procedure sleepAndMoveMouse(Time: Integer);
+
+Moved the mouse around for the specified "Time". Moves the mouse like a bored
+human would.
+
+.. note::
+
+    by RsN
+    Last Updated: 16 August 2013 by Coh3n
+
+Example:
+
+.. code-block:: pascal
+
+    sleepAndMoveMouse(1000 + random(2000));
+*)
+procedure sleepAndMoveMouse(Time: Integer);
+var
+  Moving: Boolean;
+  mx, my: Integer;
+  x, y, xv, yv: Extended;
+  gx, gy: Extended;
+  T: Integer;
+begin
+  GetMousePos(mx, my);
+
+  x := mx;
+  y := my;
+
+  if (Random(2) = 0) then
+    Moving := False
+  else
+    Moving := True;
+
+  gx := 130 + Random(500);
+  gy := 130 + Random(300);
+  T := GetTickCount();
+
+  repeat
+    Sleep(10);
+
+    if (Moving) then
+    begin
+      if (gx > x) then
+        xv := xv + 0.1
+      else
+        xv := xv - 0.1;
+
+      if (gy > y) then
+        yv := yv + 0.1
+      else
+        yv := yv - 0.1;
+
+      x := x + xv;
+      y := y + yv;
+
+      Mouse(Point(Round(x), Round(y)), MOUSE_MOVE);
+    end;
+
+    if (Random(100) = 0) then
+      Moving := not Moving;
+
+    if (Random(30) = 0) then
+    begin
+      gx := 130 + Random(500);
+      gy := 130 + Random(300);
+    end;
+
+  until(Abs(GetTickCount() - T) >= Time);
+end;
+
+(*
+pickUpMouse
+~~~~~~~~~~~
+
+.. code-block:: pascal
+
+    procedure pickUpMouse();
+
+Acts just like you picked your mouse off the pad, then sets it back down.
+
+.. note::
+
+    - Author: dark_sniper
+    - Last Modified: 15 August 2013 by Coh3n
+
+Example:
+
+.. code-block:: pascal
+
+    pickUpMouse();
+*)
+procedure pickUpMouse();
+var
+  cx, cy, XX, YY: Integer;
+begin
+  GetMousePos(cx, cy);
+
+  XX := cx;
+  YY := cy;
+
+  if (Random(2) = 0) then
+    mouse(point(cx - 3 - Random(5), cy - 8 - Random(17)), MOUSE_MOVE)
+  else
+    mouse(point(cx + 3, cy - 8 - Random(17)).rand(5, 0), MOUSE_MOVE);
+
+  Wait(1131 + Random(358));
+
+  if (Random(2) = 0) then
+    mouse(point(XX + 3, YY + 8).rand(5, 9), MOUSE_MOVE)
+  else
+    mouse(point(XX - 3 - Random(5), YY + 8), MOUSE_MOVE);
+end;
+
+(*
+randomMouseSpeed
+~~~~~~~~~~~~~~~~
+
+.. code-block:: pascal
+
+    procedure randomMouseSpeed(Amount, MinMS, MaxMS: Integer);
+
+Randomly changes the mousespeed by the amount (+/-) within the min and max
+mouse speed limit.
+
+.. note::
+
+    Author: Ollybest
+    Last
+
+Example:
+
+.. code-block:: pascal
+
+    randomMouseSpeed(3, 10, 20);
+
+*)
+procedure randomMouseSpeed(Amount, MinMS, MaxMS: Integer);
+var
+  MS, NewMS: Integer;
+begin
+  MS := MouseSpeed;
+  NewMS := RandomRange(MS - Amount, MS + Amount);
+
+  // setting the mousespeed to the max/min limit if needed
+  if NewMS > MaxMS then
+    NewMS := MaxMS;
+
+  if NewMS < MinMS then
+    NewMS := MinMS;
+
+  if InRange(NewMS, MinMS, MaxMS) then
+    MouseSpeed := NewMS
+end;
+
+(*
+randomCompass
+~~~~~~~~~~~~~
+
+.. code-block:: pascal
+
+    function randomCompass(MinMovement, MaxMovement: Integer; Return: Boolean): Boolean;
+
+Rotates the compass somewhere between MinMovement and MaxMovement.  Will return
+to original angle if Return is set to true.
+
+.. note::
+
+    Author: Nebula
+    Last Modified: Mar. 6th, 2011 by Nebula
+
+Example:
+
+.. code-block:: pascal
+
+    CompassMovement(10, 30, true);
+*)
+function randomCompass(MinMovement, MaxMovement: Integer; Return: Boolean): Boolean;
+var
+  StartAngle, Movement : Integer;
+begin
+  Result := False;
+  StartAngle := round(minimap.getAngleDegrees());
+
+  case Random(2) of
+    0: Movement := RandomRange(-MinMovement, -MaxMovement);
+    1: Movement := RandomRange(MinMovement, MaxMovement);
+  end;
+
+  minimap.setAngle(StartAngle + Movement);
+
+  if (Return = true) then
+  begin
+    wait(RandomRange(100,350));
+    minimap.setAngle(StartAngle);
+  end;
+
+  Result := true;
+end;
+
+(*
+exitSquealOfFortune
+~~~~~~~~~~~~~~~~~~~
+
+.. code-block:: pascal
+
+    function exitSquealOfFortune(): boolean;
+
+Finds and exits the annoying Squeal of Fortune pop up that can be dragged
+anywhere on the screen.
+
+.. note::
+
+    Author: Coh3n & Ashaman88
+    Last Modified: 15 August 2013 by Coh3n
+
+Example:
+
+.. code-block:: pascal
+
+    exitSquealOfFortune();
+*)
+function exitSquealOfFortune(): boolean;
+var
+  w, h, x, y, dtmSqueal: integer;
+  dtmSearchBox, mouseOverBox: TBox;
+  p: TPoint;
+begin
+  print('exitSquealOfFortune()', TDebug.HEADER);
+
+  // DTM of the X
+  dtmSqueal := DTMFromString('mbQAAAHicY2VgYNjOzMCwEIirgLgSiBuB2JiRgUELiGWB2BCIrYH4/1kXhku1MQyLrxcyfPz0iSHA2Z2BH6gfHTNiwWAAAHx8DXE=');
+
+  getClientDimensions(w, h);
+  w := (w - 1);
+  h := (h - 1);
+
+  // green color of the goblin thing
+  if (findColorTolerance(x, y, 7457955, intToBox(1, 1, w, h), 15, colorSetting(1))) then
+  begin
+    print('Found goblin color at '+toStr(point(x, y))+', looking for DTM of the X...');
+
+    dtmSearchBox := [x - 70, y - 70, x + 130, y + 70];
+    dtmSearchBox.setBounds(0, 0, w, h);
+
+    // gold color in the X
+    if (findDTM(dtmSqueal, x, y, dtmSearchBox)) then
+    begin
+      print('Found DTM, attempting to exit...');
+      mouse(point(x, y).rand(3), MOUSE_MOVE);
+
+      if (isMouseOverMenuOpen(mouseOverBox, 1000)) then
+        if (findText(p, ['ueal', 'ortune', 'elps'], [upChars], mouseOverBox)) then
+        begin
+          getMousePos(x, y);
+          mouse(point(x, y), MOUSE_LEFT);
+
+          result := true;
+          print('Successfully exited Squeal Of Fortune');
+        end;
+
+    end else
+      print('Failed to find DTM of the X, may have found a false color');
+
+  end else
+    print('Failed to find goblin color, pop-up may not be open');
+
+  freeDTM(dtmSqueal);
+  print('exitSquealOfFortune(): '+toStr(result), TDebug.FOOTER);
+end;
+
+(*
+findSpinTicket
+~~~~~~~~~~~~~~
+
+.. code-block:: pascal
+
+    function findSpinTicket(var x, y: integer; destroy: boolean = true): boolean;
+
+Returns true if the Squeal Of Fortune spin ticket it found.  Returns its
+coordinates in x, y.  Will destroy the ticket by default.  If 'destroy' is set
+to false, will just return true if the ticket is found.
+
+.. note::
+
+    Author: Kyle Undefined
+    Last Modified: 16 August 2013 by Coh3n
+
+Example:
+
+.. code-block:: pascal
+
+    findSpinTicket(x, y);
+*)
+function findSpinTicket(var x, y: integer; destroy: boolean = true): boolean;
+var
+  oneFreeSpin: integer;
+begin
+  if (not tabBackpack.isOpen()) then
+  begin
+    print('findSpinTicket(): Backpack is not open, consider calling tabBackpack.open() first', TDebug.HINT);
+    exit();
+  end;
+
+  oneFreeSpin := DTMFromString('mrAAAAHic42BgYHjHzMDwFojvQfEDIP4ExL+B+A8Q32ZkYDgPxBeA+D4QP4Hie0B8BYi3RkoCTWHCibmAJD7MSADDAABVYQ/p');
+
+  if (findDTM(oneFreeSpin, x, y, tabBackpack.getBounds())) then
+  begin
+    mouse(point(x, y).rand(5), MOUSE_MOVE);
+
+    if (isMouseOverText(['laim'], 300)) then
+    begin
+      result := true;
+
+      if (destroy) then
+      begin
+        fastClick(MOUSE_RIGHT);
+        chooseOption(['estroy'], 500);
+        wait(randomRange(1500, 2000));
+        result := conversationBox.findDialogText(['All', 'Yes'], MOUSE_LEFT);
+      end;
+    end;
+  end;
+
+  freeDTM(oneFreeSpin);
+end;
+
+(*
+closeAdWindow
+~~~~~~~~~~~~~
+
+.. code-block:: pascal
+
+    function closeAdWindow(): boolean;
+
+Finds and exits the wicked hood and dwarven army axe pop up ads.
+
+.. note::
+
+    Author: litoris
+    Last Modified: 17 August 2013 by Coh3n
+
+Example:
+
+.. code-block:: pascal
+
+    closeAdWindow();
+*)
+function closeAdWindow(): boolean;
+var
+  bmpCross, x, y, wid, hei: Integer;
+begin
+  getClientDimensions(wid, hei);
+
+  bmpCross := BitmapFromString(10, 9, 'meJzT1jbX0HDWzp6jYxipqOwNRDI' +
+             'yXkoq3lKRfSIiKjo6FiCpDX+0pj/QMshQUgqVVE4AsoEikpG9ioqW' +
+             'QF0QLpBUMKvRmgFiq02+yyHiJCVlLy3tpaiSDhGEILUpd3nEAtnYj' +
+             'GVkDYEKpKSCRLVL4LJi2iU8PE4cnMYiIlpCwpbCUpFA9Zh6ublVOE' +
+             'WdIFJAEqgLygbaK2zNzCwlGdkHVS8eCDQQSEIUAN3MyMgNUcApYg0' +
+             '0CoKAbKAUE5MQAMPoVvw=');
+
+  if (findBitmapToleranceIn(bmpCross, x, y, 0, 0, wid - 1, hei - 1, 5)) then
+  begin
+    mouse(point(x, y).rand(2), MOUSE_MOVE);
+
+    if (isMouseOverText(['lose'], 300)) then
+    begin
+      fastClick(MOUSE_LEFT);
+      wait(randomRange(100, 200));
+      result := true;
+    end;
+  end;
+
+  freeBitmap(bmpCross);
+end;

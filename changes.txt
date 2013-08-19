@@ -58,6 +58,7 @@ EVERYTHING should be recorded here: new features, function name changes, user-de
   - All option functions replaced with chooseOption.
   - Added function findTextNumbers().
   - Two findText functions, one that uses bitmaps, one that uses color.
+  - FindNPCChatText renamed TRSChatbox.findNPCText and moved to chatbox.simba.
 
 - players.simba merged with login.simba
   - It's important to know that a player's "world" attribute is, by default, set to -1 which means nothing will happen.  If set to 0, it will select a random world upon login, if set to a certain world, SRL will select that world.
@@ -286,6 +287,27 @@ EVERYTHING should be recorded here: new features, function name changes, user-de
   - statsUsername, statsPassword, and statsScriptID need to be set in script.
   - stats_Commit and stats_IncVariable renamed to statsCommit and statsIncVariable.
   - SetupSRLStats renamed to statsSetup()
+
+- antiban.simba
+  - RandomRClick renamed to randomRClickItem to reflect what it does.
+  - Removed ExamineInv -- did the same thing as RandomRClick.
+  - MultiMouse renamed to multiClick and moved to mouse.simba.
+  - MissMouse moved to mouse.simba.
+  - AdjustMouseSpeed renamed to randomMouseSpeed.
+  - SetScreenMouse moved to mainscreen.simba.
+  - CompassMovement renamed to randomCompass.
+  - Removed randomMovement as it was only calling either randomCompass or sleepAndMoveMouse.
+  - Spin ticket functions combined into one function, findSpinTicket.
+  - FindDwarvenPopup removed as it's handled in closeAdWindow().
+
+- new file, conversation.simba
+  - holds functions that have anything to do with NPC chatting since it now separate from the in-game chat.
+  - Functions:
+	- getNPCChatName renamed to conversationBox.getSpeaker()
+	- conversationBox.areTalking()
+	- findNPCChatText renamed to conversationBox.findSpokenText()
+	- ClickContinueEx, ClickToContinue removed, ClickContinue renamed to conversationBox.continue()
+  	- Removed DoConversation as it's a very simple logic loop of conversationBox.continue()
 
 
 
