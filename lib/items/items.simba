@@ -37,7 +37,7 @@ findItem
 
 .. code-block:: pascal
 
-    function findItem(dtm: integer; boxArr: TBoxArray; sort: boolean = true): TIntegerArray;
+    function findItem(dtm: integer; boxArr: TBoxArray; sort: boolean): TIntegerArray;
 
 Loops though each index of the TBoxArray(boxArr) searching for the DTM(dtm), if
 succesfull will add the box index to the result. If sort is true will order
@@ -52,7 +52,7 @@ Example:
 
 .. code-block:: pascal
 
-    arr := findItem(myDTM, boxArr);
+    arr := findItem(myDTM, boxArr, true);
 
 *)
 function findItem(dtm: integer; boxArr: TBoxArray; sort: boolean): TIntegerArray;
@@ -68,6 +68,75 @@ begin
 
   if (sort) and (length(result) > 0) then
     result.sortQuick();
+end;
+
+(*
+findItem; overload
+~~~~~~~~~~~~~~~~~~
+
+.. code-block:: pascal
+
+    function findItem(bmp, tol: integer; boxArr: TBoxArray; sort: boolean): TIntegerArray; overload;
+
+Loops though each index of the TBoxArray(boxArr) searching for the bitmap 'bmp',
+if succesfull will add the box index to the result. If sort is true will order
+the result from (low..high).
+
+.. note::
+
+    - by Ollybest
+    - Last Updated: 19 August 2013 by Olly
+
+Example:
+
+.. code-block:: pascal
+
+    arr := findItem(bmp, 50, boxArr, true);
+
+*)
+function findItem(bmp, tol: integer; boxArr: TBoxArray; sort: boolean): TIntegerArray; overload;
+var
+  i, h: integer;
+  pnt: TPoint;
+begin
+  h := high(boxArr);
+
+  for i := 0 to h do
+    if (findBitmapToleranceIn(bmp, pnt.x, pnt.y, boxArr[i], tol)) then
+      insert(i, result);
+
+  if (sort) and (length(result) > 0) then
+    result.sortQuick();
+end;
+
+(*
+findItem; overload
+~~~~~~~~~~~~~~~~~~
+
+.. code-block:: pascal
+
+    function findItem(bmp, tol: integer; boxArr: TBoxArray): integer; overload;
+
+Overloaded function, returns the amount of matches.
+
+.. note::
+
+    - by Ollybest
+    - Last Updated: 19 August 2013 by Olly
+
+Example:
+
+.. code-block:: pascal
+
+     writeln(findItem(bmp, 20, boxArr));
+
+*)
+function findItem(bmp, tol: integer; boxArr: TBoxArray): integer; overload;
+var
+  arr: TIntegerArray;
+begin
+  arr := findItem(bmp, tol, boxArr, false);
+  result := length(arr);
 end;
 
 (*
@@ -167,6 +236,7 @@ function isItemIn(area: TBox): boolean;
 var
   p: TPoint;
 begin
-  result := (findColor(p.x, p.y, ITEM_OUTLINE_BLACK, area) or findColor(p.x, p.y, ITEM_OUTLINE_WHITE, area));
+  result := (findColor(p.x, p.y, ITEM_OUTLINE_BLACK, area) or
+             findColor(p.x, p.y, ITEM_OUTLINE_WHITE, area));
 end;
 
