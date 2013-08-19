@@ -677,7 +677,7 @@ end;
 
 (*
 TBox.overlap
-~~~~~~~~~~~~~~~~~~~
+~~~~~~~~~~~~
 
 .. code-block:: pascal
 
@@ -702,11 +702,9 @@ begin
   Result := not ((self.X1 > b.X2) or (self.X2 < b.X1) or (self.Y1 > b.Y2) or (self.Y2 < b.Y1));
 end;
 
-
-
 (*
 TBox.hasEqualDimensions
-~~~~~~~~~~~~~~~~~~~
+~~~~~~~~~~~~~~~~~~~~~~~
 
 .. code-block:: pascal
 
