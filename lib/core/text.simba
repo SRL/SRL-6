@@ -50,7 +50,7 @@ Example:
 *)
 function findText(var p: TPoint; txt, fonts: TStringArray; searchBox: TBox): boolean;
 var
-  s, i, j: integer;
+  s, i, j, w, h: integer;
 begin
   p := point(-1, -1);
 
@@ -63,7 +63,13 @@ begin
       if (searchBox.x1 < 0) then searchBox.x1 := 0;
       if (searchBox.y1 < 0) then searchBox.y1 := 0;
 
-      result := findBitmapMaskTolerance(s, p, searchBox, 30, 30);
+      if (findBitmapMaskTolerance(s, p, searchBox, 30, 30)) then
+      begin
+        getBitmapSize(s, w, h);
+        p := point(p.x + round(w / 2), p.y + round(h / 2));
+        result := true;
+      end;
+
       freeBitmap(s);
 
       if (result) then
