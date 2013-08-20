@@ -7,10 +7,8 @@ interfaces = actionbar bankscreen chatbox interfaces mainscreen minimap options
 gametabs = abilitybook backpack gametab
 lobby = lobby worlds
 
-items = items
+misc = items smart srlstats
 
-misc = smart srlstats
-objects = 
 utilities = color drawing pixelshift time wrappers
 types = extendedarrays tbox tpointarrays integerarrays stringarrays tpoint types
 
@@ -25,12 +23,8 @@ all:
 		's/(\w+)/..\/lib\/interfaces\/gametabs\/\1.simba/g'` > /dev/null
 	@python docgen.py `echo $(lobby) | sed -r \
 		's/(\w+)/..\/lib\/interfaces\/lobby\/\1.simba/g'` > /dev/null
-	@python docgen.py `echo $(items) | sed -r \
-		's/(\w+)/..\/lib\/items\/\1.simba/g'` > /dev/null
 	@python docgen.py `echo $(misc) | sed -r \
 		's/(\w+)/..\/lib\/misc\/\1.simba/g'` > /dev/null
-	@python docgen.py `echo $(objects) | sed -r \
-		's/(\w+)/..\/lib\/objects\/\1.simba/g'` > /dev/null
 	@python docgen.py `echo $(utilities) | sed -r \
 		's/(\w+)/..\/lib\/utilities\/\1.simba/g'` > /dev/null
 	@python docgen.py `echo $(types) | sed -r \
@@ -42,9 +36,7 @@ clean:
 	rm -f `echo $(interfaces) | sed -r 's/(\w+)/sphinx\/\1.rst/g'`
 	rm -f `echo $(gametabs) | sed -r 's/(\w+)/sphinx\/\1.rst/g'`
 	rm -f `echo $(lobby) | sed -r 's/(\w+)/sphinx\/\1.rst/g'`
-	rm -f `echo $(items) | sed -r 's/(\w+)/sphinx\/\1.rst/g'`
 	rm -f `echo $(misc) | sed -r 's/(\w+)/sphinx\/\1.rst/g'`
-	rm -f `echo $(objects) | sed -r 's/(\w+)/sphinx\/\1.rst/g'`
 	rm -f `echo $(utilities) | sed -r 's/(\w+)/sphinx\/\1.rst/g'`
 	rm -f `echo $(types) | sed -r 's/(\w+)/sphinx\/\1.rst/g'`
 	@make -C sphinx/ clean
