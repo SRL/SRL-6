@@ -37,6 +37,17 @@ const
   DROP_PATTERN_UP_DOWN:   TIntegerArray = [1, 5, 9, 13, 17, 21, 25, 26, 22, 18, 14, 10, 6, 2, 3, 7, 11, 15, 19, 23, 27, 28, 24, 20, 16, 12, 8, 4];
 
 (*
+const Quick Inventory
+~~~~~~~~~~~~~~~~~~~~~
+
+Constants that represent the quick inventory slots.
+
+*)
+const
+  QUICK_INVENTORY_A = 50;  {red}
+  QUICK_INVENTORY_B = 100;  {blue}
+
+(*
 type TRSTabBackpack
 ~~~~~~~~~~~~~~~~~~~
 
@@ -48,6 +59,7 @@ type
     tabIndex: integer;
     slots: TBoxArray;
     __slots: array [0..1] of TBoxArray;
+    areSlotsLoaded: boolean;
   end;
 
 (*
@@ -73,7 +85,7 @@ Initiates the tabBackpack variable. Called at the end of this file.
 .. note::
 
     - by Olly
-    - Last updated: July. 29, 2013 by Olly
+    - Last Updated: 19 August 2013 by Olly
 
 Example:
 
@@ -91,10 +103,11 @@ begin
     tabIndex := _TAB_BACKPACK;
     parentID := -1;
     static := true;
+    areSlotsLoaded := false;
   end;
 end;
 
-(*
+{*
 TRSTabBackPack._updateBounds
 ~~~~~~~~~~~~~~~~~~~~~~~~~~~~
 
@@ -102,12 +115,13 @@ TRSTabBackPack._updateBounds
 
     procedure TRSTabBackPack._updateBounds();
 
-Updates the bounds and the slots of the TRSTabBackPack.
+Updates the bounds and the slots of the tab Backpack, this is needed because
+the user could only have one tab open or more.
 
 .. note::
 
     - by Olly
-    - Last Updated: July. 29, 2013
+    - Last Updated: 19 August 2013 by Olly
 
 Example:
 
@@ -115,18 +129,26 @@ Example:
 
     if (tabBackpack.isOpen()) then
       writeln('the Backpack tab is open');
-*)
+*}
 procedure TRSTabBackPack._updateBounds();
 begin
   self.setBounds(gameTabs.visibleTabArea);
 
-  // the slots when other tabs are visable
-  __slots[0] := grid(4, 7, 34, 31, 52, 39, point(gameTabs.__visibleTabAreaMulti.x1 + 32,
-                     gameTabs.__visibleTabAreaMulti.y1 + 32));
+  // heck, lets save ourself some math... load them once
+  if (not self.areSlotsLoaded) then
+  begin
+    __slots[0] := grid(4, 7, 34, 31, 52, 39,
+                       point(gameTabs.__visibleTabAreaMulti.x1 + 32,
+                             gameTabs.__visibleTabAreaMulti.y1 + 32));
 
-  // the slots when the backpack is the *only* gametab open.
-  __slots[1] := grid(4, 7, 34, 31, 52, 39, point(gameTabs.__visibleTabAreaSingle.x1 + 32,
-                     gameTabs.__visibleTabAreaSingle.y1 + 32));
+    __slots[1] := grid(4, 7, 34, 31, 52, 39,
+                       point(gameTabs.__visibleTabAreaSingle.x1 + 32,
+                             gameTabs.__visibleTabAreaSingle.y1 + 32));
+
+    print('tabBackpack._updateBounds(): Loaded slot arrays');
+    self.areSlotsLoaded := true;
+  end;
+
 
   if (self.y1 = gameTabs.__visibleTabAreaMulti.y1) then
     slots := __slots[0]
@@ -142,12 +164,13 @@ TRSTabBackpack.isOpen
 
     function TRSTabBackpack.open(): boolean;
 
-Returns true if our current tab is the Backpack tab.
+Returns true if our current tab is the Backpack tab, will also check if the
+BackPack tab is the only tab open.
 
 .. note::
 
     - by Olly
-    - Last Updated: July. 29, 2013
+    - Last Updated: 19 August 2013 by Olly
 
 Example:
 
@@ -158,33 +181,40 @@ Example:
 *)
 function TRSTabBackpack.isOpen(): boolean;
 var
+  b: TBox;
   p: TPoint;
+  i: integer;
   tpa: TPointArray;
-  l: integer;
+  atpa: T2DPointArray;
 begin
   result := (gameTabs._isTabActive(self.tabIndex));
 
-  if (not result) then   // there maybe a single tab open
-    if (gameTabs.visibleTabArea.x1 = gameTabs.__visibleTabAreaSingle.x1) then
-      if (gameTabs.findX(p)) then // a single tab is open, lets look for the money sign
+  if (not result) then
+    if (gameTabs.findX(p)) then
+    begin
+      // box around where the money pouch should be (based on the X point)
+      b := [p.x -150, p.y +300, p.x -100, p.y +380];
+
+      // gold color on the top of the coins @ the money pouch.
+      if (findColorsTolerance(tpa, 9361657, b, 15)) then
       begin
-        findColorsTolerance(tpa, 9295862, gameTabs.visibleTabArea.x1+75, gameTabs.visibleTabArea.y1+300,
-                                          gameTabs.visibleTabArea.x2-125, gameTabs.visibleTabArea.y2-5, 12);
+        atpa := tpa.split(5, 10);
 
-        l := length(tpa);
+        for i := 0 to high(atpa) do
+          if (length(atpa[i]) < 20) then
+            continue
+          else begin
+            // result = distance between the point, and the middle of the atpa is close to 360.
+            result := (inRange(distance(p, atpa[i].getMiddle()), 350, 370));
 
-        if (l < 1) then
-          exit();
-
-        {
-          first lets check to see if the yellow on the money sign is in range
-          then lets see if the distance from the red cross to the money sign is
-          in range.
-        }
-
-        if (inRange(l, 30, 40)) then
-          result := inRange(distance(p, tpa[0]), 350, 370);
+            if (result) then
+              exit;
+          end;
       end;
+    end;
+
+  if (not result) then
+    print('tabBackpack.isOpen(): Tab is not open', TDebug.WARNING);
 end;
 
 (*
@@ -296,12 +326,13 @@ TRSTabBackpack.isItemInSlot
 
     function TRSTabBackpack.isItemInSlot(slot: integer): boolean;
 
-Returns true if an item is in the desired Backpack slot.
+Returns true if an item is in the desired Backpack slot, works by looking for
+the black outline color in the slot.
 
 .. note::
 
     - by Olly
-    - Last Updated: March. 11, 2013
+    - Last Updated: 18 August 2013 by Olly
 
 Example:
 
@@ -316,7 +347,7 @@ begin
   if (not self.open()) or (not self.isSlotVaild(slot))then
     exit(false);
 
-  result := self.getSlotBox(slot).colorExists(ITEM_OUTLINE_BLACK);
+  result := isItemIn(self.getSlotBox(slot));
 end;
 
 (*
@@ -327,27 +358,28 @@ TRSTabBackpack.pointToSlot
 
     function TRSTabBackpack.pointToSlot(p: TPoint): integer;
 
-Returns the backpack slot number in which the TPoint falls within, will return
--1 if the point isn't located in any slots.
+Returns the slot number where point "p" falls within, if fails to fall in any
+slot will return -1.
 
 .. note::
 
     - by Olly
-    - Last Updated: March. 11, 2013
+    - Last Updated: 18 August 2013 by Olly
 
 Example:
 
 .. code-block:: pascal
 
-   writeln(tabBackpack.pointToSlot(point(577, 279)))
-
+   writeln('Our point is in slot: ' + toStr(tabBackpack.pointToSlot(point(600, 500))));
 *)
 function TRSTabBackpack.pointToSlot(p: TPoint): integer;
 var
   i: integer;
 begin
-  if (not (pointInBox(p, self.getBounds()))) then
-    exit(-1);
+  result := -1;
+
+  if (not pointInBox(p, self.getBounds())) then
+    exit();
 
   for i := BACKPACK_SLOT_LOW to BACKPACK_SLOT_HIGH do
     if pointInBox(p, self.getSlotBox(i)) then
@@ -367,21 +399,22 @@ Returns how many items are in our Backpack.
 .. note::
 
     - by Olly
-    - Last Updated: July. 29, 2013
+    - Last Updated: 18 August 2013 by Olly
 
 Example:
 
 .. code-block:: pascal
 
    writeln(tabBackpack.count());
-
 *)
 function TRSTabBackpack.count(): integer;
 var
   i: integer;
 begin
+  result := 0;
+
   if (not self.open()) then
-    exit(0);
+    exit();
 
   for i := BACKPACK_SLOT_LOW to BACKPACK_SLOT_HIGH do
     if (self.isItemInSlot(i)) then
@@ -409,7 +442,6 @@ Example:
 
    if tabBackpack.waitCount(28, 1000 + random(500)) then
      writeln('Backpack count is now 28!');
-
 *)
 function TRSTabBackpack.waitCount(backPackCount: integer; waitTime: integer): boolean;
 var
@@ -720,9 +752,9 @@ Example:
       i: integer;
     begin
       dtm := dtmFromString('lotsofstuffhere');
-      i := tabBackpack.countItemsDTM(dtm);
+      i := tabBackpack.countDTM(dtm);
       writeln('We counted ' + intToStr(i) + ' items in our Backpack.');
-
+    end;
 *)
 function TRSTabBackpack.countDTM(dtm: integer): integer;
 var
@@ -741,7 +773,53 @@ begin
     exit();
   end;
 
-  print('countItemsDTM: Counted ' + intToStr(result) + ' items.');
+  print('tabBackpack.countDTM(): Counted ' + intToStr(result) + ' items');
+end;
+
+(*
+TRSTabBackpack.countBitmap
+~~~~~~~~~~~~~~~~~~~~~~~~~~
+
+.. code-block:: pascal
+
+    function TRSTabBackpack.countBitmap(bmp, tolerance: integer): integer;
+
+Searches for the bitmap in each Backpack slot and will return how many matches it finds.
+
+.. note::
+
+    - by Olly
+    - Last Updated: 19 August 2013 by Olly
+
+Example:
+
+.. code-block:: pascal
+
+    var
+      bmp: integer;
+      i: integer;
+    begin
+      bmp := bitmapFromString('lotsofstuffhere');
+      i := tabBackpack.countBitmap(dtm);
+      writeln('We counted ' + intToStr(i) + ' items in our Backpack.');
+    end;
+*)
+function TRSTabBackpack.countBitmap(bmp, tolerance: integer): integer;
+begin
+  result := 0;
+
+  if (not self.open()) then
+    exit();
+
+  result := findItem(bmp, tolerance, self.slots);
+
+  if (result = 0) then
+  begin
+    print('tabBackpack.countBitmap(): Found no bitmap matches', TDebug.SUB);
+    exit();
+  end;
+
+  print('tabBackpack.countBitmap(): Counted ' + intToStr(result) + ' items');
 end;
 
 (*
@@ -755,7 +833,7 @@ TRSTabBackpack.clickDTM
 Searches for the dtm if succesful will perform what action is it set.
 Will return how many items were clicked.
   * clicktype - (MOUSE_MOVE, MOUSE_LEFT, MOUSE_RIGHT)
-  * option    - What option to choose. If not using MOUSE_RIGHT can be left blank.
+  * option    - What option to choose. If not using MOUSE_RIGHT can be left blank('').
   * waitFor   - This is how long we will wait after interacting with the item, for
                 different things you may need different speeds.
 
@@ -768,10 +846,10 @@ Example:
 
 .. code-block:: pascal
 
-    //  would search for one dtm and click the item.
-    tabBackpack.clickDTM(dtm, MOUSE_MOVE, '');
+    // would search for the dtm and click the item.
+    tabBackpack.clickDTM(dtm, MOUSE_LEFT, '');
 
-    //  would search for multiple dtms and a 1000ms wait after burying the item.
+    // would search for the dtm and wait 1000ms after selecting the option "bury"
     tabBackpack.clickDTM(dtm, MOUSE_RIGHT, 'bury', 1000);
 
 *)
@@ -831,7 +909,7 @@ function TRSTabBackpack.dragSlot(fromSlot, toSlot: integer): boolean;
 var
   p: TPoint;
 begin
-  if self.isItemInSlot(fromSlot) then
+  if (self.isItemInSlot(fromSlot)) then
   begin
     mouseSlot(fromSlot, MOUSE_MOVE);
     gaussBox(p, self.getSlotBox(toSlot));
@@ -841,6 +919,177 @@ begin
   end else
     print('There is no item to drag in slot ' + intToStr(fromSlot), TDebug.ERROR);
 end;
+
+(*
+TRSTabBackpack.getMoneyPouchAmount
+~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+
+.. code-block:: pascal
+
+    function TRSTabBackpack.getMoneyPouchAmount(): integer;
+
+Will return how much money is in the money pouch.
+
+.. note::
+
+    - by Olly
+    - Last Updated: 19 August 2013 by Olly
+
+Example:
+
+.. code-block:: pascal
+
+   i := tabBackpack.getQuickInventorySlot(QUICK_INVENTORY_A);
+*)
+function TRSTabBackpack.getMoneyPouchAmount(): integer;
+var
+  b, bounds: TBox;
+  tpa: TPointArray;
+  colArr: array [0..1] of integer;
+  s: string;
+  i: integer;
+begin
+  result := 0;
+             { green, white }
+  colArr := [65280, 16777215];
+
+  if (not self.open()) then
+    exit();
+
+  b := [gameTabs.visibleTabArea.x1, gameTabs.visibleTabArea.y2-32,
+        gameTabs.visibleTabArea.x2, gameTabs.visibleTabArea.y2-9];
+
+  for i := 0 to 1 do
+    if (findColors(tpa, colArr[i], b)) then
+    begin
+      bounds := tpa.getBounds();
+      bounds.edit(-1, -1, +1, +1);
+
+      s := getTextAtEx(bounds, 0, 4, 4, colArr[i], 1, upChars);
+
+      result := strToIntDef(ExtractFromStr(s, numbers), 0);
+
+      if pos('K', s) > 0 then
+        result := result * 1000;
+
+      if pos('M', s) > 0 then
+        result := result * 1000000;
+
+      print('tabBackpack.getMoneyPouchAmount(): result = ' + intToStr(result) +
+            ' (' + s + ')', TDebug.SUB);
+      exit();
+    end;
+
+  print('tabBackpack.getMoneyPouchAmount(): Failed to find any text color, resulting as 0', TDebug.ERROR);
+end;
+
+(*
+TRSTabBackpack.getQuickInventorySlot
+~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+
+.. code-block:: pascal
+
+    function TRSTabBackpack.getQuickInventorySlot(quickInvConst: integer): integer;
+
+Will return the slot of what slot the "quickInvConst" is binded to.
+  * vaild quickInvConsts are QUICK_INVENTORY_A or QUICK_INVENTORY_B.
+
+.. note::
+
+    - by Olly
+    - Last Updated: 19 August 2013 by Olly
+
+Example:
+
+.. code-block:: pascal
+
+   i := tabBackpack.getQuickInventorySlot(QUICK_INVENTORY_A);
+*)
+function TRSTabBackpack.getQuickInventorySlot(quickInvConst: integer): integer;
+var
+  i: integer;
+  slot: TBox;
+  r, g, b: integer;
+begin
+  result := 0;
+
+  if (not self.open()) then
+    exit();
+
+  for i := BACKPACK_SLOT_LOW to BACKPACK_SLOT_HIGH do
+  begin
+    slot := self.getSlotBox(i);
+
+    colorToRGB(getColor(slot.x2 +5, slot.y1), r, g, b);
+
+    if (quickInvConst = QUICK_INVENTORY_A) and (r > 80) then
+    begin
+      print('tabBackpack.getQuickInventorySlot(): Found red quick inventory in slot: ' + intToStr(i), TDebug.SUB);
+      exit(i);
+    end;
+
+    if (quickInvConst = QUICK_INVENTORY_B) and (b > 120) then
+    begin
+      print('tabBackpack.getQuickInventorySlot(): Found blue quick inventory in slot: ' + intToStr(i), TDebug.SUB);
+      exit(i);
+    end;
+  end;
+
+  print('tabBackpack.getQuickInventorySlot(): Failed to find the quick inventory slot', TDebug.ERROR);
+end;
+
+(*
+TRSTabBackpack.setQuickInventorySlot
+~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+
+.. code-block:: pascal
+
+    function TRSTabBackpack.setQuickInventorySlot(slot, quickInvConst: integer): boolean;
+
+Will set "slot" as the quick inventory slot based on "quickInvConst"
+  * vaild quickInvConsts are QUICK_INVENTORY_A or QUICK_INVENTORY_B.
+
+.. note::
+
+    - by Olly
+    - Last Updated: 19 August 2013 by Olly
+
+Example:
+
+.. code-block:: pascal
+
+   if tabBackpack.setQuickInventorySlot(1, QUICK_INVENTORY_A) then
+     writeln('slot 1 is now binded to quick inventory a');
+
+*)
+function TRSTabBackpack.setQuickInventorySlot(slot, quickInvConst: integer): boolean;
+var
+  otherID: byte;
+  s: string;
+begin
+  if (getQuickInventorySlot(quickInvConst) = slot) then
+    exit(true);
+
+  if (quickInvConst = QUICK_INVENTORY_A) then
+  begin
+    otherID := QUICK_INVENTORY_B;
+    s := 'A';
+  end else begin
+    otherID := QUICK_INVENTORY_A;
+    s := 'B';
+  end;
+
+  if (getQuickInventorySlot(otherID) = slot) then
+  begin
+    print('tabBackpack.setQuickInventorySlot(): Slot ' + intToStr(slot) + ' is already taken by the other quick inventory slot', TDebug.ERROR);
+    exit(false);
+  end;
+
+  self.mouseSlot(slot, MOUSE_RIGHT);
+  result := chooseOption(['Set quick-inventory '+ s, 'quick-inventory ' + s], 300);
+end;
+
+
 
 begin
   tabBackpack.__init();

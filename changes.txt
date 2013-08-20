@@ -56,7 +56,6 @@ EVERYTHING should be recorded here: new features, function name changes, user-de
   - FindTextTPA/Ex replaced with findTextByColor()
   - All uptext functions replaced with mouseOverText functions.
   - All option functions replaced with chooseOption.
-  - Added function findTextNumbers().
   - Two findText functions, one that uses bitmaps, one that uses color.
   - FindNPCChatText renamed TRSChatbox.findNPCText and moved to chatbox.simba.
 
@@ -85,7 +84,7 @@ EVERYTHING should be recorded here: new features, function name changes, user-de
   - Logout renamed to TPlayer.logout()
 
 - New file, minimap.simba. Combination of mapwalk.simba, flag.simba, and symbol.simba.
-  - Added minimap dot and direction constants.
+  - Added minimap dot, max pixel count and location direction constants.
   - Removed VariantToDirection() as it is now obsolete.
   - "SRL_" prefix removed from angle constants.
   - SetAngle moved to mainscreen.simba and renamed to TRSMainscreen.setAngle().
@@ -97,6 +96,7 @@ EVERYTHING should be recorded here: new features, function name changes, user-de
   - rs_OnMinimap renamed to TRSMinimap.isPointOn().
   - FindFlag and FindFlag2 renamed to _findFlagBitmap and _findFlagColor.
   - FlagPresent renamed to TRSMinimap.isFlagPresent.
+  - Overloaded FlagPresent which has a waitTime parameter.
   - roadColorChecker and all components have been comepletely removed from SRL6
   - Flag functions combined to waitFlag(flagDist: integer = 0).
   - Removed MouseFlagEx, MFF, MFNF, MouseFlag removed because they're trivial clicking and waitFlag functions.
@@ -106,7 +106,9 @@ EVERYTHING should be recorded here: new features, function name changes, user-de
   - FindSymbols and FindSymbolsIn combined into one.
   - getColorPercent and getBlackBackground moved from SRL-5's color.simba.
   - PlayerMoving and WaitPlayerMoving moved from animation.simba.
-  - GridCoords16Ex renamed to minimap.pointToMainscreen + made more accurate.
+  - removed mmToMS stuff since there's so many screen size/angle/height possibilies
+  - moved all toggle run from gametab.simba to here.
+  - updated and moved lodestone functions here.
 
 - new file, mainscreen.simba
   - setAngle moved here and renamed TRSMainscreen.setAngle. 
@@ -135,20 +137,25 @@ EVERYTHING should be recorded here: new features, function name changes, user-de
   - ExistsItem > isItemInSlot
   - InvMouse > mouseSlot
   - DragItem > dragSlot
-  - InvCount > getInvCount
-  - InvEmpty > isInvEmpty
-  - InvFull > isInvFull
+  - InvCount > Count
+  - InvEmpty > isEmpty
+  - InvFull > isFull
   - CountItems > countItemsDTM
   - ActivatedItem > getActivatedSlot
   - ItemActivated > isSlotActivated
-  - dropItem > dropItemInSlot
+  - dropItem > dropItems
 
   added: 
   - clickItemsDTM
   - isInvCount
   - dropItems
   - countItemsDTM
-
+  - countItemsBitmap
+  - waitForShift
+  - getMoneyPouchAmount
+  - getQuickInventorySlot
+  - setQuickInventorySlot
+  
   removed: 
   - GetInven
   - GetInventoryArray  
@@ -218,7 +225,7 @@ EVERYTHING should be recorded here: new features, function name changes, user-de
 
 - smart.simba
   - removed function isRealMouseInBox
-  - removed function getRealMousePos because TClient isn't yet supported in Lape
+  - removed function getRealMousePos because TClient isn't yet supported in Lape 
 
 - smartgraphics.simba converted to drawing.simba
   - Using drawing.simba, one can create several different drawings and display them how they wish.
@@ -240,6 +247,8 @@ EVERYTHING should be recorded here: new features, function name changes, user-de
   - replicate Can now enter a string instead of only one char.
   - explode now accepts a TStringArray intead of a string.
   - distance will now accept two TPoints rather than x1, y1, x2 and y2 variables.
+  - inRange will now accept extended parameters
+  - getTextAtEx and getTextATPA will now accept a extra parameter "extract" this will extract what is reqiured from the text (numbers, letters, others)
 
   - Functions that may take a TBox variable instead of x1, y1, x2 and y2 variables:
    - findColors
@@ -275,7 +284,7 @@ EVERYTHING should be recorded here: new features, function name changes, user-de
     - FindItemEx
     - shopScreen
   - added:
-    - findItem
+    - findItem (support for dtms and bitmaps)
     - isItemIn
   - merged ItemAmount & GetAmount & GetAmountBox to getItemAmount()
 

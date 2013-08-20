@@ -676,8 +676,8 @@ begin
 end;
 
 (*
-TBox.getRandomPoint
-~~~~~~~~~~~~~~~~~~~
+TBox.overlap
+~~~~~~~~~~~~
 
 .. code-block:: pascal
 
@@ -702,6 +702,32 @@ begin
   Result := not ((self.X1 > b.X2) or (self.X2 < b.X1) or (self.Y1 > b.Y2) or (self.Y2 < b.Y1));
 end;
 
+(*
+TBox.hasEqualDimensions
+~~~~~~~~~~~~~~~~~~~~~~~
+
+.. code-block:: pascal
+
+    function TBox.hasEqualDimensions(other: TBox): Boolean;
+
+Returns true if the TBox has equal width & height, with TBox "other".
+
+.. note::
+
+    - by Le Jingle(Fratello)
+
+Example:
+
+.. code-block:: pascal
+
+    if someBox.hasEqualDimensions(anotherBox) then
+      writeln('boxes have same width and height');
+*)
+function TBox.hasEqualDimensions(other: TBox): Boolean;
+begin
+  Result := ((Self.X2 - Self.X1) = (other.X2 - other.X1)) and
+            ((Self.Y2 - Self.Y1) = (other.Y2 - other.Y1));
+end;
 
 
 
