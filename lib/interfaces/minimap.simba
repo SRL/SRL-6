@@ -378,9 +378,10 @@ function TRSMinimap.__find(): boolean
 
 .. code-block:: pascal
 
-    function TRSMinimap.__find(): boolean;
+    function TRSMinimap.__find(useDebug: boolean = true): boolean;
 
-Attempts to find the interface "minimap", will return if succesfull or not.
+Attempts to find the interface "minimap", will return if succesfull or not.  Will
+print debug text if 'useDebug' is set to true.  Set to true by default.
 
 .. note::
 
@@ -393,7 +394,7 @@ Example:
 
     minimap.__find();
 *}
-function TRSMinimap.__find(useDebug: boolean = false): boolean;
+function TRSMinimap.__find(useDebug: boolean = true): boolean;
 const
   COMPASS_CENTER_POINT_COLOR  = 8508157;
   ARBITRARY_UNIQUE_COLOR_ON_WORLD_MAP_BUTTON = 4615518;
@@ -410,7 +411,8 @@ var
   atpa: T2DPointArray;
   box: TBox;
 begin
-  print('TRSMinimap.__find()', TDebug.HEADER);
+  if (useDebug) then
+    print('TRSMinimap.__find()', TDebug.HEADER);
 
   result := false;
   box := intToBox(-1, -1, -1, -1);
@@ -422,8 +424,12 @@ begin
 
     if (not findColorsTolerance(tpa, COLORS[i], searchBox, 1)) then //If we didn't find the color of the center of the compass
     begin
-      print('Failed to find minimap color '+toStr(i)+' ('+toStr(COLORS[i])+')', TDebug.ERROR);
-      print('TRSMinimap.__find(): False', TDebug.FOOTER);
+      if (useDebug) then
+      begin
+        print('Failed to find minimap color '+toStr(i)+' ('+toStr(COLORS[i])+')', TDebug.ERROR);
+        print('TRSMinimap.__find(): False', TDebug.FOOTER);
+      end;
+
       exit(false);
     end;
 
@@ -432,7 +438,8 @@ begin
 
     if (not (len = 1)) then //If we found more than one point, then we need to try to find the one for which we are looking
     begin
-      print('Found too many points for color '+toStr(i)+' ('+toStr(COLORS[i])+'), filtering bad points...');
+      if (useDebug) then
+        print('Found too many points for color '+toStr(i)+' ('+toStr(COLORS[i])+'), filtering bad points...');
 
       atpa := splitTPAEx(tpa, 1, 1); //Group found points
       sortATPASize(atpa, false);
@@ -451,20 +458,29 @@ begin
 
       if (not wasFound) then
       begin
-        print('Failed to find the proper length TPA for color '+toStr(i)+' ('+toStr(COLORS[i])+')', TDebug.ERROR);
-        print('TRSMinimap.__find(): False', TDebug.FOOTER);
+        if (useDebug) then
+        begin
+          print('Failed to find the proper length TPA for color '+toStr(i)+' ('+toStr(COLORS[i])+')', TDebug.ERROR);
+          print('TRSMinimap.__find(): False', TDebug.FOOTER);
+        end;
+
         exit(false);
       end;
 
       if (i = 1) then
         if (not ((atpa[ii][0].x > box.x1) and (atpa[ii][0].y > box.y1))) then
         begin
-          print('Failed to find world map color right of compass color after filtering', TDebug.ERROR);
-          print('TRSMinimap.__find(): False', TDebug.FOOTER);
+          if (useDebug) then
+          begin
+            print('Failed to find world map color right of compass color after filtering', TDebug.ERROR);
+            print('TRSMinimap.__find(): False', TDebug.FOOTER);
+          end;
+
           exit(false);
         end;
 
-      print('Found color '+toStr(i)+' ('+toStr(COLORS[i])+') after filtering, setting minimap coordinates...');
+      if (useDebug) then
+        print('Found color '+toStr(i)+' ('+toStr(COLORS[i])+') after filtering, setting minimap coordinates...');
 
       if (i = 0) then
       begin
@@ -483,12 +499,17 @@ begin
       if (i = 1) then
         if (not ((tpa[0].x > box.x1) and (tpa[0].y > box.y1))) then
         begin
-          print('Failed to find world map color right of compass color', TDebug.ERROR);
-          print('TRSMinimap.__find(): False', TDebug.FOOTER);
+          if (useDebug) then
+          begin
+            print('Failed to find world map color right of compass color', TDebug.ERROR);
+            print('TRSMinimap.__find(): False', TDebug.FOOTER);
+          end;
+
           exit(false);
         end;
 
-      print('Found color '+toStr(i)+' ('+toStr(COLORS[i])+'), setting minimap coordinates...');
+      if (useDebug) then
+        print('Found color '+toStr(i)+' ('+toStr(COLORS[i])+'), setting minimap coordinates...');
 
       if (i = 0) then
       begin
@@ -508,8 +529,11 @@ begin
   self.setBounds(box);
   self.__createMaskTPA();
 
-  print('TRSMinimap.__find(): Sucesfully found and set minimap bounds at '+toStr(self.getBounds()));
-  print('TRSMinimap.__find(): '+toStr(result), TDebug.FOOTER);
+  if (useDebug) then
+  begin
+    print('TRSMinimap.__find(): Sucesfully found and set minimap bounds at '+toStr(self.getBounds()));
+    print('TRSMinimap.__find(): '+toStr(result), TDebug.FOOTER);
+  end;
 end;
 
 {*
