@@ -39,6 +39,37 @@ begin
 end;
 
 (*
+TPointArray.copy; overload
+~~~~~~~~~~~~~~~~~~~~~~~~~~
+
+.. code-block:: pascal
+
+    function TPointArray.copy(area: TBox): TPointArray; overload;
+
+Copies all the points that fall within the bounds of 'area'.
+
+.. note::
+
+    - by Olly
+
+Example:
+
+.. code-block:: pascal
+
+    newTPA := TPA.copy(b);
+*)
+function TPointArray.copy(area: TBox): TPointArray; overload;
+var
+  tmp: TPointArray;
+begin
+  tmp := self.copy();
+
+  filterPointsBox(tmp, area.x1 -1, area.y1 -1, area.x2 +1, area.y2 +1);
+
+  result := tmp;
+end;
+
+(*
 TPointArray.addIndex
 ~~~~~~~~~~~~~~~~~~~~
 
@@ -411,6 +442,39 @@ Example:
 function TPointArray.getBounds() : TBox;
 begin
   result := getTPABounds(self);
+end;
+
+(*
+TPointArray.getDensity
+~~~~~~~~~~~~~~~~~~~~~~
+
+.. code-block:: pascal
+
+    function TPointArray.getDensity(): extended;
+
+Returns the density of the TPointArray.
+
+.. note::
+
+    - by Ollybest
+
+Example:
+
+.. code-block:: pascal
+
+  writeln(tpa.getDensity());
+*)
+function TPointArray.getDensity(): extended;
+var
+  tmp: TPointArray;
+  b: TBox;
+begin
+  tmp := copyTPA(self);
+
+  clearDoubleTPA(tmp);
+  b := getTPABounds(tmp);
+
+  result := (extended(length(tmp)) / (((b.x2 - b.x1) + 1) * ((b.x2 - b.x1) + 1)));
 end;
 
 (*
@@ -1410,3 +1474,4 @@ procedure T2DPointArray.filterBetween(const min, max: integer);
 begin
   filterTPAsBetween(self, min, max);
 end;
+
