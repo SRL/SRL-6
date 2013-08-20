@@ -48,18 +48,18 @@ Example:
 
 .. code-block:: pascal
 
-    tpa := minimap.getDots(MM_DOT_NPC, minimap.getBounds());
+    tpa := minimap.getDots(__MM_DOT_NPC, minimap.getBounds());
 
     if (length(tpa) > 0) then
       writeln('Found '+toStr(length(tpa))+' NPC dots on the minimap');
 
 *)
 const
-  MM_DOT_NPC    = 4369;
-  MM_DOT_ITEM   = 23;
-  MM_DOT_PLAYER = 1907997;
-  MM_DOT_FRIEND = 5376;
-  MM_DOT_TEAM   = 2171941;
+  __MM_DOT_NPC    = 4369;
+  __MM_DOT_ITEM   = 23;
+  __MM_DOT_PLAYER = 1907997;
+  __MM_DOT_FRIEND = 5376;
+  __MM_DOT_TEAM   = 2171941;
 
 (*
 const PixelCount
@@ -887,15 +887,15 @@ Example:
 
 .. code-block:: pascal
 
-    if (not minimap._isValidDot(MM_DOT_NPC)) then
+    if (not minimap._isValidDot(__MM_DOT_NPC)) then
       exit(false);
 *}
 function TRSMinimap._isValidDot(dotType: integer): boolean;
 var
   arr: TIntegerArray;
 begin
-  arr := [ MM_DOT_NPC, MM_DOT_ITEM, MM_DOT_PLAYER,
-           MM_DOT_FRIEND, MM_DOT_TEAM ];
+  arr := [ __MM_DOT_NPC, __MM_DOT_ITEM, __MM_DOT_PLAYER,
+           __MM_DOT_FRIEND, __MM_DOT_TEAM ];
 
   result := inIntArray(arr, dotType);
 end;
@@ -919,7 +919,7 @@ Example:
 
 .. code-block:: pascal
 
-    dots := minimap.getDots(MM_DOT_NPC, minimap.getBounds());
+    dots := minimap.getDots(__MM_DOT_NPC, minimap.getBounds());
 *)
 function TRSMinimap.getDots(dotType: integer; searchBox: TBox): TPointArray;
 var

@@ -523,12 +523,12 @@ begin
 end;
 
 (*
-TRSBankScreen._scrollUp
-~~~~~~~~~~~~~~~~~~~~~~~
+TRSBankScreen.scrollUp
+~~~~~~~~~~~~~~~~~~~~~~
 
 .. code-block:: pascal
 
-    procedure TRSBankScreen._scrollUp();
+    procedure TRSBankScreen.scrollUp();
 
 Will scroll the bankscreen up to the top if reqiured.
 
@@ -544,7 +544,7 @@ Example:
     bankScreen.scrollUp();
 
 *)
-procedure TRSBankScreen._scrollUp();
+procedure TRSBankScreen.scrollUp();
 const
   COLOR_RESULT = 3321831; // color when scroll bar is all the way up
 var
