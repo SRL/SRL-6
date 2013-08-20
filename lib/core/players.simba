@@ -591,8 +591,6 @@ begin
     if (not result) then
       exit();
 
-    wait(500 + random(500));
-
     // call all interface find functions that need to be called
 	  for i := 0 to high(__interfaceFindFunctions) do
 	    if (__interfaceFindFunctions[i] <> nil) then
@@ -1153,7 +1151,7 @@ logged in.
 .. note::
 
     - by The SRL Developers Team
-    - Last updated: 22 June 2013 by Coh3n
+    - Last updated: 20 August 2013 by Coh3n
 
 Example:
 
@@ -1166,6 +1164,7 @@ function TPlayer.login(): boolean;
 var
   tries, t, popup: integer;
   p: TPoint;
+  skipPlay: boolean;
 begin
   print('TPlayer.login()', TDebug.HEADER);
 
@@ -1184,13 +1183,21 @@ begin
         if (self.world = 0) then
           lobbyWorlds.selectRandomWorld(self.isMember)
         else
-          lobbyWorlds.selectWorld(self.world);
+          if (lobby.quickSelectWorld(self.world)) then
+            skipPlay := true
+          else
+            lobbyWorlds.selectWorld(self.world);
 
-      lobby.findPlayButton(p);
-      mouse(p.rand(randomRange(-50, 50), randomRange(-10, 10)), MOUSE_LEFT);
+      if (not skipPlay) then
+      begin
+        lobby.findPlayButton(p);
+        mouse(p.rand(randomRange(-50, 50), randomRange(-10, 10)), MOUSE_LEFT);
+      end;
+
       t := (getSystemTime() + 60000);
 
       repeat
+        skipPlay := false;
         popup := self.__loginResponse(tries, t);
 
         // if exceeded maximum tries, break, otherwise terminate
@@ -1200,7 +1207,7 @@ begin
           if (popup = __RES_POPUP) then
             break;
 
-        wait(100 + random(100));
+        wait(500 + random(500));
         result := (isLoggedIn(true));
 
       until(result or (getSystemTime() > (t + 5000)));

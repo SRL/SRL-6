@@ -438,7 +438,7 @@ var
   t: integer;
   exitButton: TPoint;
 begin
-  result := (not lobby.isOpen());
+  result := (not self.isOpen());
 
   t := (getSystemTime() + 30000);
   exitButton := point(self.x2 - 20, self.y1 + 20).rand(3);
@@ -450,6 +450,55 @@ begin
     wait(randomRange(500, 1000));
     result := (not lobby.isOpen());
   end;
+end;
+
+(*
+TRSLobby.quickSelectWorld
+~~~~~~~~~~~~~~~~~~~~~~~~~
+
+.. code-block:: pascal
+
+    function TRSLobby.quickSelectWorld(wo: integer): boolean;
+
+Returns true if the desired world appears in the quick select favorites boxes
+in the bottom right of the interface.  Will click the world if found.
+
+.. note::
+
+    - by Coh3n
+    - Last Updated: 19 August 2013 by Coh3n
+
+Example:
+
+.. code-block:: pascal
+
+    if (not lobby.isOpen()) then
+      lobby.open();
+*)
+function TRSLobby.quickSelectWorld(wo: integer): boolean;
+var
+  woBoxes: TBoxArray;
+  i: integer;
+begin
+  if (not self.isOpen()) then
+    exit(false);
+
+  // because the quick-select buttons don't appear in the options tab
+  if (self.getCurrentTab() = LOBBY_OPTIONS) then
+    if (not self._openTab(LOBBY_PLAYER)) then
+      exit(false);
+
+  // a box around each of the quick select world boxes
+  woBoxes := grid(2, 1, 41, 30, 44, 0, point(self.x2 - 125, self.y2 - 28));
+
+  for i := 0 to high(woBoxes) do
+    if (getTextAtEx(woBoxes[i], 0, 5, 2, 12378347, 10, 'SmallCharsNS') = toStr(wo)) then
+    begin
+      print('TRSLobby.quickSelectWorld(): Found quick-select world '+toStr(wo));
+      mouseBox(woBoxes[i], MOUSE_LEFT);
+      result := true;
+      break;
+    end;
 end;
 
 begin
