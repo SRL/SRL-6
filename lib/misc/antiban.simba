@@ -33,8 +33,8 @@ Examine.
 
 .. note::
 
-    Author: phantombmx/EvilChicken!, idea by Naum
-    Last Modified: 13 August 2013 by Coh3n
+    - by phantombmx/EvilChicken!, idea by Naum
+    - Last Updated: 13 August 2013 by Coh3n
 
 Example:
 
@@ -94,8 +94,8 @@ human would.
 
 .. note::
 
-    by RsN
-    Last Updated: 16 August 2013 by Coh3n
+    - by RsN
+    - Last Updated: 16 August 2013 by Coh3n
 
 Example:
 
@@ -170,8 +170,8 @@ Acts just like you picked your mouse off the pad, then sets it back down.
 
 .. note::
 
-    - Author: dark_sniper
-    - Last Modified: 15 August 2013 by Coh3n
+    - by dark_sniper
+    - Last Updated: 15 August 2013 by Coh3n
 
 Example:
 
@@ -202,6 +202,117 @@ begin
 end;
 
 (*
+mouseOffClient
+~~~~~~~~~~~~~~
+
+.. code-block:: pascal
+
+    procedure mouseOffClient(Direction: Integer);
+
+Moves the mouse off the client in a specified direction.  Valid arguments for
+'Direction':
+
+    - OFF_CLIENT_TOP
+    - OFF_CLIENT_BOTTOM
+    - OFF_CLIENT_LEFT
+    - OFF_CLIENT_RIGHT
+    - OFF_CLIENT_RANDOM
+
+.. note::
+
+    - by Ollybest
+    - Last Updated: 21 August 2013 by Coh3n
+
+Example:
+
+.. code-block:: pascal
+
+    mouseOffClient(OFF_CLIENT_RANDOM);
+*)
+const
+  OFF_CLIENT_TOP    = 0;
+  OFF_CLIENT_BOTTOM = 1;
+  OFF_CLIENT_LEFT   = 2;
+  OFF_CLIENT_RIGHT  = 3;
+  OFF_CLIENT_RANDOM = 4;
+procedure mouseOffClient(Direction: Integer);
+var
+  B: TBoxArray;
+  P: TPoint;
+  i, W, H: Integer;
+begin
+  GetClientDimensions(W, H);
+
+  SetLength(B, 4);
+
+  B[OFF_CLIENT_TOP] := [-300, -300, W, 0]; // top
+  B[OFF_CLIENT_BOTTOM] := [0, H, W, H +300];  // bottom
+  B[OFF_CLIENT_LEFT] := [0-300, 0, 0, H];   // left
+  B[OFF_CLIENT_RIGHT] := [W, 0, W +300, H];  // right
+
+  if (Direction = OFF_CLIENT_RANDOM) then
+    i := Random(4)
+  else
+    i := Direction;
+
+  P := Point(RandomRange(B[i].X1, B[i].X2), RandomRange(B[i].Y1, B[i].Y2));
+  Mouse(Point(P.X, P.Y), MOUSE_MOVE);
+end;
+
+(*
+smallRandomMouse
+~~~~~~~~~~~~~~~~
+
+.. code-block:: pascal
+
+    procedure smallRandomMouse();
+
+Randomly moves the mouse in a max radius of 80 of its current postion, has alot
+of gravity and wind so it can simulate a human flicking/spiraling the mouse.
+
+.. note::
+
+    - by Flight
+    - Last Updated: 21 August 2013 by Coh3n
+
+Example:
+
+.. code-block:: pascal
+
+    smallRandomMouse();
+*)
+procedure smallRandomMouse();
+var
+  RandSpeed: Extended;
+  x, y, rx, ry, FS, W, H: Integer;
+begin
+  GetClientDimensions(W, H);
+  FS := MouseSpeed;
+  MouseSpeed := RandomRange(7, 10);
+  RandSpeed := (random(MouseSpeed) / 2.0 + MouseSpeed) / 10.0;
+  GetMousePos(x, y);
+
+  rx := RandomRange(x-80, x+80);
+  ry := RandomRange(y-80, y+80);
+
+  // make sure mouse stays the client
+  if rx < 0 then
+    rx := 1;
+
+  if ry < 0 then
+    ry := 1;
+
+  if rx > W then
+    rx := W - 1;
+
+  if ry > H then
+    ry := H - 1;
+
+  _humanWindMouse(x, y, rx, ry, 30, 55, (10.0/randSpeed), (12.0/randSpeed), (10.0*randSpeed));
+  MouseSpeed := FS;
+end;
+
+(*
 randomMouseSpeed
 ~~~~~~~~~~~~~~~~
 
@@ -214,8 +325,8 @@ mouse speed limit.
 
 .. note::
 
-    Author: Ollybest
-    Last
+    - by Ollybest
+    - Last Updated: Unknown
 
 Example:
 
@@ -255,8 +366,8 @@ to original angle if Return is set to true.
 
 .. note::
 
-    Author: Nebula
-    Last Modified: Mar. 6th, 2011 by Nebula
+    - by Nebula
+    - Last Updated: Mar. 6th, 2011 by Nebula
 
 Example:
 
@@ -300,8 +411,8 @@ anywhere on the screen.
 
 .. note::
 
-    Author: Coh3n & Ashaman88
-    Last Modified: 15 August 2013 by Coh3n
+    - by Coh3n & Ashaman88
+    - Last Updated: 15 August 2013 by Coh3n
 
 Example:
 
@@ -372,8 +483,8 @@ to false, will just return true if the ticket is found.
 
 .. note::
 
-    Author: Kyle Undefined
-    Last Modified: 16 August 2013 by Coh3n
+    - by Kyle Undefined
+    - Last Updated: 16 August 2013 by Coh3n
 
 Example:
 
@@ -426,8 +537,8 @@ Finds and exits the wicked hood and dwarven army axe pop up ads.
 
 .. note::
 
-    Author: litoris
-    Last Modified: 17 August 2013 by Coh3n
+    - by litoris
+    - Last Updated: 17 August 2013 by Coh3n
 
 Example:
 
