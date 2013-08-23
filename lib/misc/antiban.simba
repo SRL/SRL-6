@@ -399,6 +399,58 @@ begin
 end;
 
 (*
+dragRandomItem
+~~~~~~~~~~~~~~
+
+.. code-block:: pascal
+
+    procedure dragRandomItem(excludeSlots: TIntegerArray = []);
+
+Moves an item in your backpack to a random free slot.  Will exclude all slots
+in the 'excludeSlots' array.  By default, it won't exclude any slots.
+
+.. note::
+
+    - by Ollybest
+    - Last Updated: 23 August 2013 by Coh3n
+
+Example:
+
+.. code-block:: pascal
+
+    dragRandomItem();
+*)
+procedure dragRandomItem(excludeSlots: TIntegerArray = []);
+var
+  i, fullL, emptyL: integer;
+  fullSlots, emptySlots: TIntegerArray;
+begin
+  if (not isLoggedIn()) or (tabBackpack.isFull()) or (tabBackpack.isEmpty()) then
+    exit();
+
+  // collecting full and empty inv slots
+  for i := BACKPACK_SLOT_LOW to BACKPACK_SLOT_HIGH do
+  begin
+    if (excludeSlots.isInArray(i)) then
+      continue;
+
+    if (tabBackpack.isItemInSlot(i)) then
+    begin
+      setLength(fullSlots, length(fullSlots) + 1);
+      fullSlots[fullL] := i;
+      inc(fullL);
+    end else begin
+      setLength(emptySlots, length(emptySlots) + 1);
+      emptySlots[emptyL] := i;
+      inc(emptyL);
+    end;
+  end;
+
+  if (length(fullSlots) > 0) and (length(emptySlots) > 0) then
+    tabBackpack.dragSlot(fullSlots[random(length(fullSlots))], emptySlots[random(length(emptySlots))]);
+end;
+
+(*
 exitSquealOfFortune
 ~~~~~~~~~~~~~~~~~~~
 
