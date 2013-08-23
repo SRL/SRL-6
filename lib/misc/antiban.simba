@@ -19,6 +19,7 @@ The source for this file can be found
 {$include_once ../utilities/color.simba}
 {$include_once ../interfaces/gametabs/backpack.simba}
 {$include_once ../interfaces/conversationbox.simba}
+{$include_once ../interfaces/mainscreen.simba}
 
 (*
 randomRClickItem
@@ -399,6 +400,110 @@ begin
 end;
 
 (*
+randomCameraAngle
+~~~~~~~~~~~~~~~~~
+
+.. code-block:: pascal
+
+    procedure randomCameraAngle(endAngle: integer);
+
+Randomly changes the angle of the 3D game area's camera. Finishes depending on
+'endAngle'.  Valid arguments for 'endAngle':
+
+    - MS_ANGLE_HIGH
+    - MS_ANGLE_LOW
+    - MS_ANGLE_NONE
+
+.. note::
+
+    - by R1ch
+    - Last Updated: 23 August 2013 by Coh3n
+
+Example:
+
+.. code-block:: pascal
+
+    randomCameraAngle(MS_ANGLE_HIGH);
+*)
+procedure randomCameraAngle(endAngle: integer);
+var
+  Key: Byte;
+  B: Integer;
+begin
+  B := Random(2);
+
+  if (B = MS_ANGLE_LOW) then
+    Key := VK_UP
+  else
+    Key := VK_DOWN;
+
+  mainscreen.setAngle(B);
+
+  Wait(RandomRange(50, 300));
+  KeyDown(Key);
+  Wait(RandomRange(50, 300));
+  KeyUp(Key);
+  Wait(RandomRange(50, 300));
+
+  mainscreen.setAngle(endAngle);
+end;
+
+(*
+randomGameTab
+~~~~~~~~~~~~~
+
+.. code-block:: pascal
+
+    procedure randomGameTab(returnToOriginal: boolean = false);
+
+Switches to a random gametab, more of a 50% chance of switching to a more
+used tab. Will return to the original tab if 'returnToOriginal' is set to true
+(set to false by default).
+
+.. note::
+
+    - by Ollybest
+    - Last Updated: 23 August 2013 by Coh3n
+
+Example:
+
+.. code-block:: pascal
+
+    randomGameTab(true);
+*)
+procedure randomGameTab(returnToOriginal: boolean = false);
+var
+  allTabs, commonTabs, t: Integer;
+  TIA: TIntegerArray;
+begin
+  if not (isLoggedIn()) then
+    exit();
+
+  t := gameTabs.getActiveTab();
+  TIA := [_TAB_STATS, _TAB_BACKPACK, _TAB_EQUIPMENT, _TAB_FRIENDS, _TAB_MAGIC];
+
+  // every tab
+  repeat
+    allTabs := gameTabs.tabs[random(length(gameTabs.tabs))].id;
+  until((allTabs <> t) and (gameTabs._isTabValid(allTabs)));
+
+  // more commanly used tabs
+  repeat
+    commonTabs := TIA[random(length(TIA))];
+  until(commonTabs <> t);
+
+  if (random(2) = 0) then
+    gameTabs._openTab(allTabs)
+  else
+    gameTabs._openTab(commonTabs);
+
+  wait(randomRange(300, 600));
+
+  if (returnToOriginal) then
+    gameTabs._openTab(t);
+end;
+
+(*
 dragRandomItem
 ~~~~~~~~~~~~~~
 
@@ -448,6 +553,72 @@ begin
 
   if (length(fullSlots) > 0) and (length(emptySlots) > 0) then
     tabBackpack.dragSlot(fullSlots[random(length(fullSlots))], emptySlots[random(length(emptySlots))]);
+end;
+
+(*
+mouseMovingObject
+~~~~~~~~~~~~~~~~~
+
+.. code-block:: pascal
+
+    procedure mouseMovingObject(playerBox: TBox = [0, 0, 0, 0]);
+
+Splits the screen up into boxes and hovers the one with the most pixel shifts.
+Will randomly right-click and examine the object.  Will exclude all points in
+'playerBox'.
+
+.. note::
+
+    - by Ollybest
+    - Last Updated: 23 August 2013 by Coh3n
+
+Example:
+
+.. code-block:: pascal
+
+    mouseMovingObject();
+*)
+procedure mouseMovingObject(playerBox: TBox = [0, 0, 0, 0]);
+var
+  TBA: TBoxArray;
+  TIA: TIntegerArray;
+  i, L, boxSize: Integer;
+  ATPA, ATPA2: T2DPointArray;
+  TPA: TPointArray;
+  b: TBox;
+begin
+  if (not isLoggedIn()) then
+    exit;
+
+  boxSize := 20;
+
+  TBA := Grid(round(mainscreen.w / boxSize), round(mainscreen.h / boxSize), boxSize, boxSize, boxSize, boxSize, Point(Round(boxSize / 2), Round(boxSize / 2)));
+  TIA := GetPixelShift(TBA, 100 + Random(100));
+
+  for i := 0 to High(TBA) do
+    if TIA[i] > 5 then
+    begin
+      Inc(L);
+      SetLength(ATPA, L);
+      ATPA[L - 1] := TPAFromBox(TBA[i]);
+    end;
+
+  TPA := MergeATPA(ATPA);
+  TPA := ClearTPAFromTPA(TPA, TPAFromBox(playerBox));
+  ATPA2 := SplitTPAEx(TPA, 1, 1);
+  SortATPASize(ATPA2, True);
+
+  if Length(ATPA2) > 1 then
+  begin
+    MouseBox(GetTPABounds(ATPA2[0]), MOUSE_MOVE);
+
+    if (Random(2) = 0) then
+      if isMouseOverMenuOpen(b) then
+      begin
+        fastClick(MOUSE_RIGHT);
+        chooseOption(['xamine', 'ancel'], 100 + Random(100));
+      end;
+  end;
 end;
 
 (*
@@ -624,4 +795,50 @@ begin
   end;
 
   freeBitmap(bmpCross);
+end;
+
+(*
+leaveDangerZone
+~~~~~~~~~~~~~~~
+
+.. code-block:: pascal
+
+    function leaveDangerZone(): boolean;
+
+Handles the 'danger zone' message users get when their total level is less than
+60, and they try to enter the wilderness.
+
+.. note::
+
+    - by Coh3n
+    - Last Modified: 23 August 2013 by Coh3n
+
+Example:
+
+.. code-block:: pascal
+
+    if (leaveDangerZone()) then
+      continueWalking;
+*)
+function leaveDangerZone(): boolean;
+var
+  t: integer;
+begin
+  if (conversationBox.findDialogText(['erous'])) then // Only if total level < 60
+  begin
+    conversationBox.continue(true, true);
+
+    t := (getSystemTime() + 5000);
+
+    while (getSystemTime() < t) do
+    begin
+      wait(500 + random(300));
+
+      if (conversationBox.findDialogText(['eave'])) then
+      begin
+        result := true;
+        break;
+      end;
+    end;
+  end;
 end;
