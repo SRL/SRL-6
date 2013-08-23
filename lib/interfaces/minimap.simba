@@ -529,11 +529,10 @@ begin
   self.setBounds(box);
   self.__createMaskTPA();
 
+  print('TRSMinimap.__find(): Sucesfully found and set minimap bounds at '+toStr(self.getBounds()));
+
   if (useDebug) then
-  begin
-    print('TRSMinimap.__find(): Sucesfully found and set minimap bounds at '+toStr(self.getBounds()));
     print('TRSMinimap.__find(): '+toStr(result), TDebug.FOOTER);
-  end;
 end;
 
 {*

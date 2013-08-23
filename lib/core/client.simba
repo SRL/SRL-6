@@ -38,7 +38,7 @@ Example:
 *)
 function isClientReady(): boolean;
 begin
-  Result := (isLoggedIn(false) or lobby.isOpen() or __setInputBoxes());
+  Result := (isLoggedIn(true) or lobby.isOpen() or __setInputBoxes());
 end;
 
 (*

@@ -585,7 +585,7 @@ var
 begin
   if (findInterfaces) then
   begin
-    result := minimap.__find();
+    result := minimap.__find(false);
 
     // if the minimap isn't visible, we're not logged in
     if (not result) then
