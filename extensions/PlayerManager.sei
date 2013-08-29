@@ -25,6 +25,7 @@ var
 
   mainForm: TForm;
   Btn_Save: TButton;
+  Btn_SavePlayerList: TButton;
 
   PlayerBox: TGroupBox;
   NewLabel: TLabel;
@@ -54,12 +55,13 @@ var
   CButtons: Array of TCustomButton;
   EditID: Integer; //the index of the player in the playerlist we are currently editing (-1 otherwise)    TODO: -1 is magic, something else!
 
-procedure DeleteFromList(list: TListBox; element: integer);
+procedure DeleteFromList(var list: TListBox; element: integer);
 begin
-  if (element = 0) then
-    list.itemIndex := 1
-  else
-    list.itemIndex := list.itemIndex - 1;
+  if (list.items.count <> 1) then
+    if (element = 0) then
+      list.itemIndex := 1
+    else
+      list.itemIndex := list.itemIndex - 1;
 
   list.items.delete(element);
 end;
@@ -69,13 +71,25 @@ var
   I: Integer;
 begin
   for I := High(Army) downto 0 do
-   if Army[I].NickName = name then
-   begin
-    Result := I;
-    Exit;
-   end;
+    if Army[I].NickName = name then
+    begin
+      Result := I;
+      Exit;
+    end;
 
   Result := -1;
+end;
+
+procedure EditPlayer(nick: String);
+begin
+  EditID := GetPlayer(nick);
+
+  PlayerBox.Enabled := true;
+  InlognameField.Caption := Army[EditId].LoginName;
+  NicknameField.Caption := Army[EditId].NickName;
+  DisplaynameField.Caption := Army[EditId].Displayname;
+  PasswordField.Caption := Army[EditId].Password;
+  BankpinField.Caption := Army[EditId].BankPin;
 end;
 
 procedure AddPlayer();
@@ -94,18 +108,8 @@ begin
   Army[Hia].NickName := 'New Player ' + ToStr(i);
 
   Lb_PlayerList.ITEMS.Add(Army[Hia].NickName);
-end;
-
-procedure EditPlayer(nick: String);
-begin
-  EditID := GetPlayer(nick);
-
-  PlayerBox.Show();
-  InlognameField.Caption := Army[EditId].LoginName;
-  NicknameField.Caption := Army[EditId].NickName;
-  DisplaynameField.Caption := Army[EditId].Displayname;
-  PasswordField.Caption := Army[EditId].Password;
-  BankpinField.Caption := Army[EditId].BankPin;
+  Lb_PlayerList.ItemIndex := High(Army);
+  EditPlayer(Lb_PlayerList.Items[Lb_PlayerList.ItemIndex]);
 end;
 
 procedure SavePlayer(Sender: TObject);
@@ -125,7 +129,7 @@ begin
   Army[EditId].Password := PasswordField.Caption;
   Army[EditId].BankPin := BankpinField.Caption;
 
-  PlayerBox.Hide();
+  PlayerBox.Enabled := false;
   EditID := -1;
 end;
 
@@ -134,15 +138,13 @@ var
   index, i: Integer;
 begin
   index := GetPlayer(nick);
-  if not(index = High(Army)) then
-    for i := index to High(Army)-1 do
-      Army[i] := Army[i+1];
 
-  if EditID = index then
-  begin
+  if (index <> High(Army)) then
+    for i := index to (High(Army) - 1) do
+      Army[i] := Army[i + 1];
+
+  if (EditID = index) then
     EditID := -1;
-    PlayerBox.Hide();
-  end;
 
   SetLength(Army, High(Army));
 end;
@@ -150,9 +152,9 @@ end;
 procedure SetEncryption(Sender: TOBject);
 begin
   if Cb_UseEnc.CHECKED then
-    Gb_Encryption.Show()
+    Gb_Encryption.Enabled := true
   else
-    Gb_Encryption.Hide();
+    Gb_Encryption.Enabled := false;
 end;
 
 procedure HoverMain(Sender: TObject; Shift: TShiftState; X, Y: Integer);
@@ -209,16 +211,29 @@ begin
 
     'del': //remove selected user
       begin
-        iIndex := Lb_PlayerList.ITEMINDEX;
+        iIndex := Lb_PlayerList.ItemIndex;
 
         RemovePlayer(Lb_PlayerList.Items[iIndex]);
         DeleteFromList(Lb_PlayerList, iIndex);
+
+        if (Lb_PlayerList.Items.Count > 0) then
+        begin
+          iIndex := Lb_PlayerList.ItemIndex;
+          EditPlayer(Lb_PlayerList.Items[Lb_PlayerList.ItemIndex]);
+        end else begin
+          PlayerBox.Enabled := False;
+          InlognameField.Caption := '';
+          NicknameField.Caption := '';
+          DisplaynameField.Caption := '';
+          PasswordField.Caption := '';
+          BankpinField.Caption := '';
+        end;
       end;
   end;
 
 end;
 
-procedure DblClickList(o: TObject);
+procedure ClickList(o: TObject);
 begin
   EditPlayer(Lb_PlayerList.Items[Lb_PlayerList.ItemIndex]);
 end;
@@ -278,8 +293,8 @@ begin
 
     img.Width := w;
     img.Height := h;
-    img.Top := x;
-    img.Left := y;
+    img.Top := y;
+    img.Left := x;
     img.Hint := images[I];
     img.ONCLICK := @ClickCB;
     img.ONMOUSEMOVE := @HoverCB;
@@ -456,15 +471,10 @@ begin
       Army[I].BankPin := Between('<bankPin>', '</bankPin>', PlayersTSA[I]);
       Lb_PlayerList.ITEMS.Add(Army[I].NickName);
     end;
-
-    writeln(PlayersTSA);
   end;
 
-  writeln(Length(data));
   MasterEncrypt(data, 'hello');
-  writeln(data);
   MasterDecrypt(data, 'hello');
-  writeln(data);
 end;
 
 procedure LoadArmy(path: String);
@@ -487,6 +497,13 @@ procedure NewArmy(Sender: TObject);
 begin
   ArmyNameField.TEXT := '';
   Lb_PlayerList.CLEAR;
+  InlognameField.clear();
+  DisplaynameField.clear();
+  NicknameField.clear();
+  PasswordField.clear();
+  BankpinField.clear();
+  PlayerBox.Enabled := false;
+
   setLength(Army, 0);
 end;
 
@@ -538,7 +555,7 @@ begin
   path := IncludePath + 'Players/' + ArmyName + extension;
 
   fileTSL := TStringList.Create;
-  writeln(FileExists(path));
+  //writeln(FileExists(path));
 
   fileString := ArmyToString(Army);
 
@@ -567,7 +584,7 @@ begin
   case Sender of
     Mi_Forum: addr := 'http://villavu.com/forum/showthread.php?t=47714';
     Mi_ForumTut: addr := 'http://villavu.com/forum/showthread.php?p=851555';
-    Mi_FeedBack: addr := 'http://villavu.com/forum/project.php?projectid=6';
+    Mi_FeedBack: addr := 'http://villavu.com/forum/project.php?projectid=10';
   end;
 
   OpenWebPage(addr);
@@ -585,8 +602,8 @@ begin
   mainForm := TForm.Create(nil);
   with mainForm do
   begin
-    Width := 400;
-    Height := 400;
+    Width := 392;
+    Height := 423;
     Caption := 'Rafiki Player Manager';
     Position := poScreenCenter;
     onClose := @FormClosed;
@@ -604,7 +621,7 @@ begin
   Mm_MainMenu := TMAINMENU.CREATE(mainForm);
 
   Mi_Army := TMenuItem.Create(Mm_MainMenu);
-  Mi_Army.Caption := 'Armies';
+  Mi_Army.Caption := 'File';
 
   Mm_MainMenu.Items.Add(Mi_Army);
 
@@ -658,8 +675,8 @@ begin
   Lb_PlayerList := TListBox.Create(mainForm);
   Lb_PlayerList.Left := 10;
   Lb_PlayerList.Top := 30;
-  Lb_PlayerList.Width := 140;
-  Lb_PlayerList.Height := 340;
+  Lb_PlayerList.Width := 160;
+  Lb_PlayerList.Height := 329;
 
   //TODO: Remove this example
   {Lb_PlayerList.Items.Add('Zezima');
@@ -671,28 +688,27 @@ begin
   Lbl_PlayerList := TLABEL.Create(mainForm);
   Lbl_PlayerList.Top := 10;
   Lbl_PlayerList.Left := 15;
-  Lbl_PlayerList.CAPTION := 'Players';
-  Lb_PlayerList.ONDBLCLICK := @DblClickList;
+  Lbl_PlayerList.CAPTION := 'Player List';
+  Lb_PlayerList.ONCLICK := @ClickList;
   Lbl_PlayerList.Parent := mainForm;
 
   mainForm.ONMOUSEMOVE := @HoverMain;   //used to reset the buttons(Dirty fix)
 
-  CreateCustomButton(12, 12, 15, 95, ['plus', 'plus_hover'], mainForm);
-  CreateCustomButton(11, 11, 16, 112, ['edit', 'edit_hover'], mainForm);
-  CreateCustomButton(11, 11, 16, 128, ['del', 'del_hover'], mainForm);
+  CreateCustomButton(12, 12, 142, 11, ['plus', 'plus_hover'], mainForm);
+  CreateCustomButton(11, 11, 158, 12, ['del', 'del_hover'], mainForm);
 
   {*
   *     Formatting the army name thingy
   *}
   Lbl_ArmyName := TLABEL.Create(mainForm);
-  Lbl_ArmyName.top := 10;
-  Lbl_ArmyName.left := 188;
-  Lbl_ArmyName.CAPTION := 'Army name';
+  Lbl_ArmyName.top := Lbl_PlayerList.Top;
+  Lbl_ArmyName.left := 187;
+  Lbl_ArmyName.CAPTION := 'File Name';
   Lbl_ArmyName.Parent := mainForm;
 
   ArmyNameField := TEdit.Create(mainForm);
-  ArmyNameField.top := 10;
-  ArmyNameField.left := 267;
+  ArmyNameField.top := 7;
+  ArmyNameField.left := 272;
   ArmyNameField.Width := 100;
   ArmyNameField.TEXT := 'default';
   ArmyNameField.parent := mainForm;
@@ -708,64 +724,65 @@ begin
   PlayerBox.Top := 45;
   PlayerBox.Left := 180;
   PlayerBox.Parent := mainForm;
-  PlayerBox.Hide();
+  PlayerBox.Enabled := false;
 
   NewLabel := TLABEL.Create(mainForm);
   NewLabel.CAPTION := 'Login name';
   NewLabel.Parent := PlayerBox;
   NewLabel.Left := 5;
+  NewLabel.Top := 3;
 
   NewLabel := TLABEL.Create(mainForm);
   NewLabel.CAPTION := 'Display name';
   NewLabel.Parent := PlayerBox;
-  NewLabel.Top := 30;
+  NewLabel.Top := 33;
   NewLabel.Left := 5;
 
   NewLabel := TLABEL.Create(mainForm);
   NewLabel.CAPTION := 'Nick name';
   NewLabel.Parent := PlayerBox;
-  NewLabel.Top := 60;
+  NewLabel.Top := 63;
   NewLabel.Left := 5;
 
   NewLabel := TLABEL.Create(mainForm);
   NewLabel.CAPTION := 'Password';
   NewLabel.Parent := PlayerBox;
-  NewLabel.Top := 90;
+  NewLabel.Top := 93;
   NewLabel.Left := 5;
 
   NewLabel := TLABEL.Create(mainForm);
   NewLabel.CAPTION := 'Bank pin';
   NewLabel.Parent := PlayerBox;
-  NewLabel.Top := 120;
+  NewLabel.Top := 123;
   NewLabel.Left := 5;
 
   InlognameField := TEdit.Create(mainForm);
-  InlognameField.Left := 85;
-  InlognameField.top := 0
+  InlognameField.Left := 90;
+  InlognameField.top := 0;
   InlognameField.Width := 100;
   InlognameField.Parent := PlayerBox;
 
   DisplaynameField := TEdit.Create(mainForm);
-  DisplaynameField.Left := 85;
+  DisplaynameField.Left := InlognameField.Left;
   DisplaynameField.Top := 30;
   DisplaynameField.Width := 100;
   DisplaynameField.Parent := PlayerBox;
 
   NicknameField := TEdit.Create(mainForm);
-  NicknameField.Left := 85;
+  NicknameField.Left := InlognameField.Left;
   NicknameField.top := 60;
   NicknameField.Width := 100;
   NicknameField.Parent := PlayerBox;
 
   PasswordField := TEdit.Create(mainForm);
-  PasswordField.Left := 85;
+  PasswordField.Left := InlognameField.Left;
   PasswordField.top := 90;
   PasswordField.Width := 100;
   PasswordField.PASSWORDCHAR := '*';
   PasswordField.Parent := PlayerBox;
 
   BankpinField := TEdit.Create(mainForm);
-  BankpinField.Left := 85;
+  BankpinField.Left := InlognameField.Left;
   BankpinField.top := 120;
   BankpinField.Width := 100;
   BankpinField.PASSWORDCHAR := '*';
@@ -784,18 +801,17 @@ begin
   *}
   Cb_UseEnc := TCHECKBOX.Create(mainForm);
   Cb_UseEnc.top := 260;
-  Cb_UseEnc.Left := 200;
-  Cb_UseEnc.CAPTION := 'Use encryption';
+  Cb_UseEnc.Left := 201;
+  Cb_UseEnc.CAPTION := ' Encrypt Player Infomation';
   Cb_UseEnc.ONCLICK := @SetEncryption;
   Cb_UseEnc.Parent := mainForm;
 
   Gb_Encryption := TGROUPBOX.Create(mainForm);
   Gb_Encryption.Width := 200;
   Gb_Encryption.Height := 80;
-  Gb_Encryption.Top := 290;
+  Gb_Encryption.Top := 280;
   Gb_Encryption.left := 180;
-  Gb_Encryption.CAPTION := 'Encryption';
-  Gb_Encryption.Hide();
+  Gb_Encryption.Enabled := false;
   Gb_Encryption.Parent := mainForm;
 
   NewLabel := TLABEL.Create(mainForm);
@@ -821,6 +837,14 @@ begin
   Pass2Field.Left := 85;
   Pass2Field.Width := 100;
   Pass2Field.Parent := Gb_Encryption;
+
+  Btn_SavePlayerList := TButton.Create(mainForm);
+  Btn_SavePlayerList.Caption := 'Save Player List';
+  Btn_SavePlayerList.Parent := mainForm;
+  Btn_SavePlayerList.top := Lb_PlayerList.Top + Lb_PlayerList.Height + 10;
+  Btn_SavePlayerList.Width := 150;
+  Btn_SavePlayerList.Left := (Btn_SavePlayerList.parent.width / 2) - (Btn_SavePlayerList.width / 2);
+  Btn_SavePlayerList.ONCLICK := @SaveArmy;
 
   //done
   mainForm.ShowModal;
