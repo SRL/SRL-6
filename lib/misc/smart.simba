@@ -14,43 +14,18 @@ The source for this file can be found `here <https://github.com/SRL/SRL-6/blob/m
 
 *)
 
+{$loadlib libsmartremote}
+
+{$include_once ../core/debug.simba}
+{$include_once ../tmp.simba}
+
 {$f-}
 
-{$loadlib libsmartremote}
-{$include_once ../utilities/drawing.simba}
-{$include_once ../core/debug.simba}
-{$include_once ../core/players.simba}
-{$include_once ../core/client.simba}
-
-(*
-const URL
-~~~~~~~~~
-
-The Runescape web address for SMART to load.
-*)
 const
   SMART_URL = 'http://www.runescape.com/game.ws?j=1';
 
-(*
-var Client W/H
-~~~~~~~~~~~~~~
-
-Integer variabltes that represent the width and height of the SMART client.  SMART
-can be loaded and SRL will work in any size desired if the in-game interface layout
-is setup properly.  By default, SMART is loaded as 960x640 pixels.
-
-
-Example:
-
-.. code-block:: pascal
-
-    smartClientWidth := 1024;
-    smartClientHeight := 768;
-
-*)
-var
-  smartClientWidth = 960;
-  smartClientHeight = 640;
+const
+  OGL_PLUGIN = 'OpenGL32.dll';
 
 (*
 var User Set
@@ -58,27 +33,36 @@ var User Set
 
 Variables that can be used in scripts.
 
-    * smartForceNewClient: Opens a new SMART client every time a scrpit is run.
-    * smartEnableDrawing: Enables drawing onto the SMART window.
-    * smartImage: A TMufasaBitmap to be drawn onto that will display on the smart canvas.
+  * smartClientWidth, smartClientHeight - The dimensions of the smart client
+  * smartGetJavaPath - If enabled will attempt to find your java path
+  * smartShowConole - If enabled will show the java console else wont.
+  * smartForceNewClient - If enabled will skip attempting to pair to a previously spawned client
+  * smartEnableDrawing - If enabled will allow drawing on smart.
 
 *)
 var
+  smartClientWidth = 960;
+  smartClientHeight = 640;
+  smartGetJavaPath = true;
+  smartShowConsole = true;
   smartForceNewClient = false;
-  smartEnableDrawing = true;
-  smartImage: TMufasaBitmap;
+  smartEnableDrawing = false;
 
 {*
 var Internal
 ~~~~~~~~~~~~
 
 Internal SMART variables used only in smart.simba.
-    * __smartCurrentClient: keeps track of the current SMART client.
-    * __smartIsDrawingSetup: keeps track if smart drawing is setup or not.
+    ** Target <> PID. PID for identifying smarts. Target for targetting a specific applet and cleaning up.
+    * __smartCurrentPid: Keeps track of the current smart PID.
+    * __smartCurrentTarget: Keeps track of the current smart target.
+    * __smartIsDrawingSetup: Keeps track if smart drawing is setup or not.
+    * smartImage: TMufasaBitmap that is displayed onto smart.
 *}
-var
-  __smartCurrentClient: integer;
+  __smartCurrentPid: integer;
+  __smartCurrentTarget: integer;
   __smartIsDrawingSetup: boolean;
+  smartImage: TMufasaBitmap;
 
 (*
 getClientDimensions; override;
@@ -109,128 +93,165 @@ begin
 end;
 
 (*
-checkOGLPlugin
-~~~~~~~~~~~~~~
+findJavaPath
+~~~~~~~~~~~~
 
 .. code-block:: pascal
 
-     procedure checkOGLPlugin();
+     Function findJavaPath(out res: string): boolean;
 
-Checks we have the reqiured plugin to read OpenGL colors from SMART.
+Attempts to locate the users java path, will return if succesfull or not
 
 .. note::
 
-    - By: Olly
-    - Last Updated: July 24, 2013 by Olly
+    - By: Brandon
+    - Last Updated: August 26, 2013 by Olly
 
 Example:
 
 .. code-block:: pascal
 
+   findJavaPath(s);
 *)
-procedure checkOGLPlugin();
-begin
-  if (not fileExists(PluginPath + 'OpenGL32.dll')) then
-    print('Could not find the OpenGL32.dll plugin', TDebug.FATAL)
-  else
-    print('Found OpenGL plugin');
+Function findJavaPath(out res: string): boolean;
+
+   Function GetDirectoryName(Directory, Path: String): String;
+   var
+    I: Integer;
+    Directories: TStringArray;
+   Begin
+     Directories := GetDirectories(Path);
+     For I := 0 To High(Directories) Do
+      If ExecRegExpr(Directory, Directories[I]) Then
+      Begin
+        Result := Directories[I];
+        Exit;
+      End;
+   End;
+
+  Function FindDirectory(Directory, Path: String): Boolean;
+  Begin
+    Result := Length(GetDirectoryName(Directory, Path)) > 0;
+  End;
+
+var
+  Drive: String;
+  CurrentPath: String;
+Begin
+  result := false;
+  res := '';
+
+  drive := Copy(PluginPath, 0, 3);
+
+  If (FindDirectory('Program\sFiles\s\(x86\)', Drive)) Then
+  Begin
+    CurrentPath := Drive + 'Program Files (x86)\';
+  End Else
+    CurrentPath := Drive + 'Program Files\';
+
+  If (FindDirectory('Java|java', CurrentPath + '\')) Then
+  Begin
+    CurrentPath := CurrentPath + 'Java\';
+  End Else
+    Begin
+      print('Failed To Find Path: ' + CurrentPath + 'Java\', TDebug.ERROR);
+      exit;
+    End;
+
+  Drive := GetDirectoryName('jre', CurrentPath);
+
+  if (length(drive) > 0) then
+  Begin
+    If (smartShowConsole) Then
+      CurrentPath := CurrentPath + Drive + '\bin\java.exe'
+    Else
+      CurrentPath := CurrentPath + Drive + '\bin\javaw.exe';
+  End Else
+    Begin
+      Drive := GetDirectoryName('jdk', CurrentPath);
+
+      If (smartShowConsole) Then
+        CurrentPath := CurrentPath + Drive + 'jre\bin\java.exe'
+      Else
+        CurrentPath := CurrentPath + Drive + 'jre\bin\javaw.exe';
+    End;
+
+  result := FileExists(CurrentPath);
+  res := currentPath;
 end;
 
 (*
-smartSetDebug; override
+getJavaPath
+~~~~~~~~~~~
+
+.. code-block:: pascal
+
+     function getJavaPath(): string;
+
+Will return the Java path needed for the first parameter of SmartSpawnClient.
+
+.. note::
+
+    - By: Olly
+    - Last Updated: August 26, 2013 by Olly
+
+Example:
+
+.. code-block:: pascal
+
+   getJavaPath();
+*)
+function getJavaPath(): string;
+begin
+  print('getJavaPath():', TDebug.HEADER);
+
+  if (not smartGetJavaPath) then
+  begin
+    if (smartShowConsole) then
+      result := 'java.exe'
+    else
+      result := 'javaw.exe';
+
+    print('Not searching for your Java path. Make sure the JRE is in your system''s PATH before JDK (if you have JDK).');
+    print('getJavaPath()', TDebug.FOOTER);
+    exit();
+  end;
+
+  print('Attempting to search for your Java path');
+
+  if (findJavaPath(result)) then
+    print('Found your java path @ ' + result)
+  else
+    print('Failed to find your Java path, add JRE to your system''s PATH before JDK (if you have JDK), and disable smartGetJavaPath', TDebug.FATAL);
+
+  print('getJavaPath()', TDebug.FOOTER);
+end;
+
+(*
+smartSetDebug; overload
 ~~~~~~~~~~~~~~~~~~~~~~~
 
 .. code-block:: pascal
 
-    procedure smartSetDebug(enable: boolean); override;
+     procedure smartSetDebug(enable: boolean); overload;
 
-Overrides smartSetDebug to enable/disable drawing in openGL mode.
+Overloaded function that toggles the debug image on smart without need the target
+parameter.
 
 .. note::
 
     - By: Olly
-    - Last Updated: July 24, 2013 by Olly
+    - Last Updated: August 26, 2013 by Olly
 
 Example:
 
 .. code-block:: pascal
 
+   findJavaPath(s);
 *)
-procedure smartSetDebug(enable: boolean); override;
+procedure smartSetDebug(enable: boolean); overload;
 begin
-  // small bug where the boolean is actually flipped.
-  smartSetNativeButton(0, 101, not enable);
-end;
-
-(*
-smartSetupDrawing
-~~~~~~~~~~~~~~~~~
-
-.. code-block:: pascal
-
-    procedure smartSetupDrawing();
-
-Set ups SMART so its ready to be drawn on-to.
-
-.. note::
-
-    - By: Olly
-    - Last Updated: July 24, 2013 by Olly
-
-Example:
-
-.. code-block:: pascal
-
-*)
-procedure smartSetupDrawing();
-begin
-  smartSetDebug(true);
-  __smartIsDrawingSetup := true;
-
-  try
-    smartImage.init();
-    smartImage.setName('SMART Debug Image');
-    smartImage.setPersistentMemory(SmartDebugArray(), smartClientWidth, smartClientHeight);
-    smartImage.drawClear(0);
-    print('Setup SMART drawing');
-  except
-    print('Unable to setup SMART drawing', TDebug.FATAL);
-  end;
-
-  addOnTerminate('smartFreeDrawing');
-end;
-
-(*
-smartFreeDrawing
-~~~~~~~~~~~~~~~~
-
-.. code-block:: pascal
-
-    procedure smartFreeDrawing();
-
-Free's and destorys the smart image.
-
-.. note::
-
-    - By: Olly
-    - Last Updated: July 24, 2013 by Olly
-
-Example:
-
-.. code-block:: pascal
-
-*)
-procedure smartFreeDrawing();
-begin
-  if (not __smartIsDrawingSetup) then
-    exit();
-
-  try
-    smartImage.resetPersistentMemory();
-    smartImage.free();
-  except end;
-
-  __smartIsDrawingSetup := false;
+  smartSetNativeButton(__smartCurrentTarget, 0, 101, not enable);
 end;
 
 (*
@@ -254,194 +275,213 @@ Example:
 .. code-block:: pascal
 
 *)
-function smartGetParameters(out params: array of string): boolean;
+function smartGetParameters(out params: TStringArray): boolean;
 var
   page: string;
 begin
   page := getPage(SMART_URL);
 
   params := explode(',', between('<iframe id="game" src="', '"', page));
+
   result := (length(params) = 2);
 
   if (not result) then
   begin
-    print('Cannot acess the RS website, make sure you can acces it currently', TDebug.HINT);
-    print('Could not grab parameters needed to spawn a SMART client', TDebug.FATAL);
+    print('Error while grabbing parameters', TDebug.ERROR);
+    print('Make sure you can reach the RS website, and no active firewall is blocking Simba', TDebug.HINT);
+    exit(false);
   end;
 
   print('smartGetParameters(): Succesfully grabbed paramters', TDebug.SUB);
 end;
 
 (*
-smartGetClientIDs
+smartSetAsTarget
+~~~~~~~~~~~~~~~~
+
+.. code-block:: pascal
+
+     function smartSetAsTarget(pid: integer): boolean;
+
+Pairs Simba to the smart client via EIOS.
+
+.. note::
+
+    - By: Olly
+    - Last Updated: August 28, 2013 by Olly
+
+Example:
+
+.. code-block:: pascal
+
+*)
+function smartSetAsTarget(pid: integer): boolean;
+begin
+  result := true;
+
+  try
+    setEIOSTarget('libsmartremote', intToStr(pid));
+    print('smartSetAsTarget(): Succesfully set SMART['+ intToStr(pid) +'] as Simba''s target', TDebug.SUB);
+  except
+    print('smartSetAsTarget(): Failed to set SMART['+ intToStr(pid) +'] as Simba''s target', TDebug.SUB);
+    result := false;
+  end;
+end;
+
+(*
+smartCreateClient
 ~~~~~~~~~~~~~~~~~
 
 .. code-block:: pascal
 
-    function smartGetClientIDs(only_unpaired: boolean = true): TIntegerArray;
+     procedure smartCreateClient(w, h: integer);
 
-Returns the id's of all spawned SMART clients, on default will return all unpaired
-clients.
+Creates a smart client using the dimensions "w" and "h".
 
 .. note::
 
-    - By: Mormanman
-    - Last Updated: May. 26, 2013 by Olly
+    - By: Olly
+    - Last Updated: August 28, 2013 by Olly
 
 Example:
 
 .. code-block:: pascal
 
 *)
-function smartGetClientIDs(only_unpaired: boolean = true): TIntegerArray;
+procedure smartCreateClient(w, h: integer);
+var
+  params: TStringArray;
+  path: string;
+begin
+  print('smartCreateClient():', TDebug.HEADER);
+
+  if (not smartGetParameters(params)) then
+    print('Failed to grab parameters', TDebug.FATAL);
+
+  print('Using parameters "' + toStr(params) + '"');
+
+  path := getJavaPath();
+
+  __smartCurrentTarget := smartSpawnClient(path, stringReplace(PluginPath, '\', '/', [rfReplaceAll]),
+                                           params[0], ',' + params[1], w, h, '', '', '', OGL_PLUGIN);
+
+  if (__smartCurrentTarget <> 0) then
+  begin
+    print('Succesfully spawned a client, attempting to target');
+
+    __smartCurrentPID := smartGetClientPID(__smartCurrentTarget);
+
+    if (smartSetAsTarget(__smartCurrentPID)) then
+    begin
+      print('smartCreateClient(): result = true', TDebug.FOOTER);
+      exit();
+    end;
+  end else
+    print('Failed to spawn a SMART client', TDebug.FATAL);
+
+end;
+
+(*
+smartGetPIDs
+~~~~~~~~~~~~
+
+.. code-block:: pascal
+
+     function smartGetPIDs(): TIntegerArray;
+
+Returns all true, non pair PIDs of smart clients.
+
+.. note::
+
+    - By: Olly
+    - Last Updated: August 28, 2013 by Olly
+
+Example:
+
+.. code-block:: pascal
+
+*)
+function smartGetPIDs(): TIntegerArray;
 var
   i, count: Integer;
 begin
-  count := smartGetClients(only_unpaired);
+  count := SmartGetClients(true);
   setLength(result, count);
 
   if (count > 0) then
     for i := 0 to (count - 1) do
-      result[i] := SmartClientID(i);
+      result[i] := SmartGetAvailablePID(i);
 end;
 
 (*
-smartKillClients
-~~~~~~~~~~~~~~~~
+smartPairToExistingClient
+~~~~~~~~~~~~~~~~~~~~~~~~~
 
 .. code-block:: pascal
 
-    procedure smartKillClients(only_unpaired: boolean);
+     function smartPairToExistingClient(): boolean;
 
-Attempts to kill SMART clients based on the only_unpaired boolean.
+Attempts to pair us to a previously spawned smart client, will result true if
+succesfull or not.
 
 .. note::
 
-    - By: Mormanman
-    - Last Updated: May. 26, 2013 by Olly
+    - By: Olly
+    - Last Updated: August 28, 2013 by Olly
 
 Example:
 
 .. code-block:: pascal
 
 *)
-procedure smartKillClients(only_unpaired: boolean);
+function smartPairToExistingClient(): boolean;
 var
-  ids: TIntegerArray;
-  I: integer;
+  pidArr: TIntegerArray;
+  i, t, p: integer;
 begin
-  ids := smartGetClientIDs(only_unpaired);
-  i := high(ids);
-
-  for i downto 0 do
-    if smartKillClient(ids[i]) then
-      print('smartKillClients(): Succesfully killed client: ' + intToStr(ids[i]), TDebug.SUB)
-    else
-      print('smartKillClients(): Failed to kill client: ' + intToStr(ids[i]), TDebug.SUB);
-end;
-
-(*
-smartSetAsClient
-~~~~~~~~~~~~~~~~
-
-.. code-block:: pascal
-
-    function smartSetAsClient(id: integer): boolean;
-
-Attempts to pair, and then set as Simba's target returns true if succesfull, if
-succesfull will set our current current client as the ID.
-
-.. note::
-
-    - By: Ollybest
-    - Last Updated: May. 26, 2013 by Olly
-
-Example:
-
-.. code-block:: pascal
-
-*)
-function smartSetAsClient(id: integer): boolean;
-var
-  id_string: string;
-begin
-  id_string := intToStr(id);
   result := false;
 
-  print('smartSetAsClient():', TDebug.HEADER);
-  print('Attempting to pair to SMART['+ id_string +']');
+  print('smartPairToExistingClient():', TDebug.HEADER);
 
-  if smartPairClient(id) then
+  pidArr := smartGetPIDs();
+
+  if (length(pidArr) < 1) then
   begin
-    print('Succesfully paired, attempting to set target');
-
-    try
-      setEIOSTarget('libsmartremote', id_string);
-      print('Set SMART['+ id_string +'] as Simba''s target');
-      __smartcurrentClient := id;
-      result := true;
-    except
-      print('Failed to set SMART['+ id_string +'] as Simba''s target');
-    end;
-  end else
-    print('Failed to pair to SMART['+ id_string +']');
-
-  print('smartSetAsClient(): result = '+ toStr(result), TDebug.FOOTER);
-end;
-
-(*
-pairToExistingClient
-~~~~~~~~~~~~~~~~~~~~
-
-.. code-block:: pascal
-
-    function pairToExistingClient(skip: boolean): boolean;
-
-Attempts to spawn to a free already spawned client, will return true if done so.
-If skip is set to true it will exit the function without trying.
-
-.. note::
-
-    - By: Ollybest
-    - Last Updated: June 1, 2013 by Olly
-
-Example:
-
-.. code-block:: pascal
-
-*)
-function pairToExistingClient(skip: boolean): boolean;
-var
-  ids: TIntegerArray;
-  i: integer;
-begin
-  result := false;
-
-  if (skip) then
+    print('Found no free clients to pair to');
+    print('smartPairToExistingClient(): result = false', TDebug.FOOTER);
     exit();
+  end;
 
-  print('pairToExistingClient():', TDebug.HEADER);
+  print('Found ' + intToStr(length(pidArr)) + ' free client(s), attempting to pair to one...');
 
-  ids := smartGetClientIds(true);
-
-  if (length(ids) > 0) then
+  for i := 0 to high(pidArr) do
   begin
-    for i := 0 to high(ids) do
+    t := 0;
+    t := SmartPairClient(pidArr[i]);
+
+    if (t <> 0) then
     begin
-      print('Found free existing SMART['+ intToStr(ids[i]) +']');
+       p := pidArr[i];
 
-      result := smartSetAsClient(ids[i]);
+       result := smartSetAsTarget(p);
 
-      if (result) then
-        break();
-    end;
-  end else
-    print('No free clients to pair to');
+       if (result) then
+       begin
+         __smartCurrentPID := p;
+         __smartCurrentTarget := t;
 
-  if (result) then
-    print('Succesfully paired to a existing client, SMART['+ intToStr(ids[i]) +']');
+         if (not smartEnabled(__smartCurrentTarget)) then
+           smartSetEnabled(__smartCurrentTarget, true);
 
-  print('pairToExistingClient(): result = '+ toStr(result), TDebug.FOOTER);
+         print('Succesfully paired to a existing client, SMART['+ intToStr(__smartCurrentPID) +']');
+         print('smartPairToExistingClient(): result = true', TDebug.FOOTER);
+         exit();
+       end;
+    end else
+      print('Failed to pair to SMART['+ intToStr(pidArr[i]) +']');
+  end;
+
+  print('smartPairToExistingClient(): result = false', TDebug.FOOTER);
 end;
 
 (*
@@ -458,112 +498,197 @@ goes wrong.
 
 .. note::
 
-    - By: Benland100, Mormanman, Brandon
-    - Last Updated: July 24, 2013 by Olly
+    - By: Olly
+    - Last Updated: August 26, 2013 by Olly
 
 Example:
 
 .. code-block:: pascal
 
 *)
-procedure initSmart(force: boolean);
-var
-  id: integer;
-  params: TStringArray;
+procedure initSmart(forceNew: boolean);
 begin
   print('initSmart():', TDebug.HEADER);
-  checkOGLPlugin();
 
-  // if we dont pair to a existing client lets spawn a new one.
-  if (not pairToExistingClient(force)) then
+  if (not forceNew) then
   begin
-    print('Attempting to spawn a SMART client');
+    print('Attempting to pair to a previously spawned client');
 
-    if smartGetParameters(params) then
+    if (smartPairToExistingClient()) then
     begin
-      print('Using Parameters: ' + toStr(params));
-
-      id := smartSpawnClient(StringReplace(PluginPath, '\', '/', [rfReplaceAll]), Params[0], ',' + Params[1], smartClientWidth, smartClientHeight, '', '', '', 'OpenGL32.dll');
-      wait(100);
-
-      if (id <> 0) then
-      begin
-        if (not smartSetAsClient(id)) then
-          print('Failed to set SMART['+ intToStr(id) +'] as Simba''s target.', TDebug.FATAL);
-      end else
-        print('Failed to spawn a SMART client.', TDebug.FATAL);
+      print('Succesfully initialized via pairing to a previously spawned client');
+      print('initSmart()', TDebug.FOOTER);
+      exit();
     end;
   end;
+
+  print('Attempting to spawn a new client..');
+
+  smartCreateClient(smartClientWidth, smartClientHeight);
+
+  print('Succesfully initialized via spawning a new client');
+
+  smartSetDebug(false);
+  addOnTerminate('smartFreeCurrentClient');
 
   print('initSmart()', TDebug.FOOTER);
 end;
 
 (*
-reloadCurrentClient
-~~~~~~~~~~~~~~~~~~~
+smartFreeCurrentClient
+~~~~~~~~~~~~~~~~~~~~~~
 
 .. code-block:: pascal
 
-    procedure reloadCurrentClient();
+     procedure smartFreeCurrentClient();
 
-Attempts to reload our current SMART client.
+Free's our current smart client.
 
 .. note::
 
     - By: Olly
-    - Last Updated: June 1, 2013 by Olly
+    - Last Updated: August 28, 2013 by Olly
 
 Example:
 
 .. code-block:: pascal
 
 *)
-procedure reloadCurrentClient();
-var
-  oldRefresh: integer;
-  oldImage: TMufasaBitmap;
+procedure smartFreeCurrentClient();
 begin
-  print('reloadCurrentClient():', TDebug.HEADER);
+  if (__smartCurrentTarget <> 0) then
+    smartFreeClient(__smartCurrentTarget);
+end;
 
-  oldRefresh := smartGetRefresh();
+(*
+smartSetupDrawing
+~~~~~~~~~~~~~~~~~
 
-  if (smartEnableDrawing) then
+.. code-block:: pascal
+
+     procedure smartSetupDrawing();
+
+Setups SMART so its ready to be drawn on-to.
+
+.. note::
+
+    - By: Olly
+    - Last Updated: August 28, 2013 by Olly
+
+Example:
+
+.. code-block:: pascal
+
+*)
+procedure smartSetupDrawing();
+begin
+  if (__smartIsDrawingSetup) then
+    exit();
+
+  smartSetDebug(true);
+
+  try
+    smartImage.init(client.getMBitmaps());
+    smartImage.setName('SMART Debug Image');
+    smartImage.setPersistentMemory(SmartDebugArray(__smartCurrentTarget), smartClientWidth, smartClientHeight);
+    smartImage.drawClear(0);
+
+    print('smartSetupDrawing(): Succesfull setup SMART drawing', TDebug.SUB);
+  except
+    print('smartSetupDrawing(): Unable to setup SMART drawing', TDebug.FATAL);
+  end;
+
+  __smartIsDrawingSetup := true;
+  addOnTerminate('smartFreeDrawing');
+end;
+
+(*
+smartFreeDrawing
+~~~~~~~~~~~~~~~~
+
+.. code-block:: pascal
+
+     procedure smartFreeDrawing();
+
+Frees the TMufasaBitmap used for smart drawing.
+
+.. note::
+
+    - By: Olly
+    - Last Updated: August 28, 2013 by Olly
+
+Example:
+
+.. code-block:: pascal
+
+*)
+procedure smartFreeDrawing();
+begin
+  try
+    smartImage.resetPersistentMemory();
+    smartImage.free();
+  except finally
+    __smartIsDrawingSetup := false;
+  end;
+end;
+
+(*
+smartReloadClient
+~~~~~~~~~~~~~~~~~
+
+.. code-block:: pascal
+
+     procedure smartReloadClient();
+
+Kills the current client, and spawns a new one.
+
+.. note::
+
+    - By: Olly
+    - Last Updated: August 28, 2013 by Olly
+
+Example:
+
+.. code-block:: pascal
+
+*)
+procedure smartReloadClient();
+var
+  img, r: integer;
+begin
+  print('smartReloadClient()', TDebug.HEADER);
+  img := -999;
+
+  if (__smartIsDrawingSetup) then
   begin
-    oldImage.init();
-    oldImage := smartImage.copy();
+    img := copyBitmap(smartImage.getIndex());
     smartFreeDrawing();
   end;
 
-  if (not smartKillClient(__smartCurrentClient)) then
-    print('Failed to kill our current client', TDebug.FATAL);
+  r := SmartGetRefresh(__smartCurrentTarget);
 
-  // lets force a client just to be safe.
+  smartFreeCurrentClient();
+  smartKillClient(__smartCurrentPID);
   initSmart(true);
 
-  print('Restoring refresh rate back to ' + intToStr(oldRefresh));
-  smartSetRefresh(oldRefresh);
+  print('Restoring refresh rate back to ' + intToStr(r));
+  SmartSetRefresh(__smartCurrentTarget, r);
 
-  if (length(players) < 1) then
-    print('No players to login!', TDebug.FATAL);
-
-  if (waitClientReady()) then
-    players[currentPlayer].login()
-  else
-    print('Succesfully spawned a client, but RS failed to load.', TDebug.FATAL);
-
-  if (smartEnableDrawing) then
+  if (bitmapExists(img)) then
   begin
-    print('Restoring smart debug image');
-
     smartSetupDrawing();
-    oldImage.drawTransparent(0, 0, smartImage);
-    oldImage.free();
+
+    print('Re-drawing the smartImage bitmap');
+
+    getMufasaBitmap(img).drawTransparent(0, 0, smartImage);
+    freeBitmap(img);
   end;
 
-  print('reloadCurrentClient()', TDebug.FOOTER);
+  print('smartReloadClient()', TDebug.FOOTER);
 end;
 
 begin
-  SRL_Events[EVENT_RS_UPDATE] := reloadCurrentClient;
+  // check for the plugin on compile
+  if (not fileExists(PluginPath + OGL_PLUGIN)) then
+    print('SMART - Unable to find the OpenGL32.dll (plugin reqired for SRL to work with SMART)', TDebug.FATAL);
 end;
-
