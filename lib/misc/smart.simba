@@ -16,14 +16,23 @@ The source for this file can be found `here <https://github.com/SRL/SRL-6/blob/m
 
 {$loadlib libsmartremote}
 
-{$include_once ../core/debug.simba}
-{$include_once ../tmp.simba}
+{$include_once ../core/client.simba}
 
 {$f-}
 
+(*
+const URL
+~~~~~~~~~
+  The Runescape web address for SMART to load.
+*)
 const
   SMART_URL = 'http://www.runescape.com/game.ws?j=1';
 
+(*
+const OGLPlugin
+~~~~~~~~~
+  The name of the OpenGL plugin.
+*)
 const
   OGL_PLUGIN = 'OpenGL32.dll';
 
@@ -687,7 +696,53 @@ begin
   print('smartReloadClient()', TDebug.FOOTER);
 end;
 
+(*
+sixHourFix
+~~~~~~~~~~
+
+.. code-block:: pascal
+
+     procedure sixHourFix();
+
+Kills the current client, and spawns a new one.
+
+.. note::
+
+    - By: Olly
+    - Last Updated: September 2, 2013 by Olly
+
+Example:
+
+.. code-block:: pascal
+
+*)
+procedure sixHourFix();
 begin
+  print('sixHourFix():', TDebug.HEADER);
+
+  if (length(players) < 1) then
+    print('No active players, no point reloading the client!', TDebug.FATAL);
+
+  smartReloadClient();
+
+  if (waitClientReady) then
+  begin
+    print('Client succesfully loaded after reload..');
+
+    if (players[currentPlayer].login) then
+    begin
+      print('Succesfully logged in after client was reloaded');
+      print('sixHourFix()', TDebug.FOOTER);
+      exit();
+    end else
+      print('Failed to login player after restart', TDebug.FATAL);
+  end else
+    print('Client never reloaded after restart..', TDebug.FATAL);
+end;
+
+begin
+  SRL_Events[EVENT_RS_UPDATE] := sixHourFix;
+
   // check for the plugin on compile
   if (not fileExists(PluginPath + OGL_PLUGIN)) then
     print('SMART - Unable to find the OpenGL32.dll (plugin reqired for SRL to work with SMART)', TDebug.FATAL);
