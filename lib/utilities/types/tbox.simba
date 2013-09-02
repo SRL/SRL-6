@@ -65,8 +65,8 @@ Example:
 *)
 procedure TBox.getDimensions(var w, h: integer);
 begin
-  w := self.x2 - self.x1;
-  h := self.y2 - self.y1;
+  w := self.x2 - self.x1 + 1;
+  h := self.y2 - self.y1 + 1;
 end;
 
 (*
@@ -92,7 +92,7 @@ Example:
 *)
 function TBox.getWidth(): integer;
 begin
-  result := (self.x2 - self.x1);
+  result := self.x2 - self.x1 + 1;
 end;
 
 (*
@@ -119,7 +119,7 @@ Example:
 *)
 function TBox.getHeight(): integer;
 begin
-  result := (self.y2 - self.y1);
+  result := self.y2 - self.y1 +1;
 end;
 
 (*
@@ -727,6 +727,32 @@ function TBox.hasEqualDimensions(other: TBox): Boolean;
 begin
   Result := ((Self.X2 - Self.X1) = (other.X2 - other.X1)) and
             ((Self.Y2 - Self.Y1) = (other.Y2 - other.Y1));
+end;
+
+(*
+TBox.expand
+~~~~~~~~~~~
+
+.. code-block:: pascal
+
+    procedure TBox.expand(const size: integer);
+
+Increases (expands) the size of the box by "size".
+
+.. note::
+
+    - by Olly
+    - Last Updated: 02 September 2013 by Olly
+
+Example:
+
+.. code-block:: pascal
+
+    box.expand(10);
+*)
+procedure TBox.expand(const size: integer);
+begin
+  self.edit(-size, -size, +size, +size);
 end;
 
 
