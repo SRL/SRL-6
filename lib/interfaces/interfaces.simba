@@ -12,7 +12,6 @@ The source for this file can be found
 
 {$include_once ../core/debug.simba}
 {$include_once ../core/mouse.simba}
-{$include_once ../core/text.simba}
 
 {$f-}
 

@@ -9,6 +9,8 @@ The source for this file can be found `here <https://github.com/SRL/SRL-6/blob/m
 
 *)
 
+
+{$include_once ../interfaces/interfaces.simba}
 {$include_once debug.simba}
 {$include_once mouse.simba}
 
@@ -52,7 +54,7 @@ function findText(var p: TPoint; txt, fonts: TStringArray; searchBox: TBox): boo
 var
   s, i, j, w, h: integer;
 begin
-  p := point(-1, -1);
+  p := [-1, -1];
 
   for i := 0 to high(txt) do
     for j := 0 to high(fonts) do
@@ -149,7 +151,7 @@ begin
   until(getSystemTime() > t);
 
   if (not result) then
-    print('findTextByColor('+toStr(txt)+'): '+toStr(result), TDebug.SUB);
+    print('findText('+toStr(txt)+'): '+toStr(result), TDebug.SUB);
 end;
 
 (*
@@ -264,374 +266,6 @@ begin
 end;
 
 {*
-type __TOptions
-~~~~~~~~~~~~~~~
-
-Used to store an RS right click menu.
-*}
-type
-  __TOptions = record
-    str: string;
-    bounds, bigBox: TBox;
-  end;
-
-{*
-__debugOptions
-~~~~~~~~~~~~~~
-
-.. code-block:: pascal
-
-    procedure __debugOptions(options: array of __TOptions);
-
-Prints the options' .str attribute to the printToDebug box.
-
-.. note::
-
-    - by Coh3n
-    - Last Updated: Feb. 27, 2013 by Coh3n
-
-Example:
-
-.. code-block:: pascal
-
-    __debugOptions(options);
-*}
-procedure __debugOptions(options: array of __TOptions);
-var
-  i: integer;
-begin
-  print('Options found: ');
-
-  for i := 0 to high(options) do
-    print(options[i].str, TDebug.SUB);
-end;
-
-{*
-__getChooseOptions
-~~~~~~~~~~~~~~~~~~
-
-.. code-block:: pascal
-
-    function __getChooseOptions(excludeBox: TBox; tabbed: boolean = false): array of __TOptions;
-
-Gets the text from the options menu. Searches for the menu in the entire client.
-
-    * excludeBox: The box to exclude of colors are found. Only used when searching a tabbed menu.
-    * tabbed: Optional. Default false. Set to true if looking for tabbed options.
-
-.. note::
-
-    - by Wizzup?, Narcle, Coh3n & Flight
-    - Last Updated: 01 August 2013 by Coh3n
-
-Example:
-
-.. code-block:: pascal
-
-    tabbedOptions := __getChooseOptions(MS_BOX, true);
-*}
-function __getChooseOptions(excludeBox: TBox; tabbed: boolean = false): array of __TOptions;
-var
-  b, bb, bigBox: TBox;
-  TPA, TPA1, TPA2, tpaText, tpaNotText, tpaShadow, tpaFilter: TPointArray;
-  ATPA, tmpATPA: T2DPointArray;
-  i, l, bW, bH, bmp, oldTarget, oldCTS, t: integer;
-  menuColors: TIntegerArray;
-begin
-  oldTarget := getImageTarget();
-
-  // the entire RS client
-  getClientDimensions(b.x2, b.y2);
-  b := intToBox(0, 0, b.x2 - 1, b.y2 - 1);
-
-  oldCTS := getToleranceSpeed();
-  setColorToleranceSpeed(1);
-
-  setLength(menuColors, 3);
-
-  menuColors := [197636 {black}, 3748386 {top blue}, 3618615 {grey}];
-  setLength(ATPA, length(menuColors));
-
-  // find how many of each menu color is found; store in ATPA
-  for i := 0 to high(menuColors) do
-    findColors(ATPA[i], menuColors[i], b);
-
-  TPA := ATPA.merge();
-
-  if (length(tpa) < 1) then
-  begin
-    print('__getChooseOptions(): Failed to find any choose option box color', TDebug.SUB);
-    setColorToleranceSpeed(oldCTS);
-    exit();
-  end;
-
-  if (tabbed) then
-  begin
-    tpaFilter := TPA.clearTPAFrom(TPAFromBox(excludeBox));
-    ATPA := splitTPAEx(tpaFilter, 4, 4);
-  end else
-    ATPA := splitTPAEx(TPA, 4, 4);
-
-  // gets the right box of colors on the MS by checking the size of each color's area
-  for i := 0 to high(ATPA) do
-  begin
-    b := ATPA[i].getBounds();
-
-    if ((b.x2 - b.x1) > 90) and ((b.y2 - b.y1) > 18) then
-      break;
-  end;
-
-  bigBox := b; // used in chooseOption to move the mouse away if the options don't exist
-  setColorToleranceSpeed(3);
-
-  // get TPAs of the text, around text, and shadow
-  findColorsTolerance(tpaText, 4996381, b, 18);
-  tpaNotText := tpaText.returnNotInTPA(tpaText.getBounds());
-  findColorsTolerance(tpaShadow, 460291, b, 6);
-
-  setColorToleranceSpeed(oldCTS);
-
-  // create a bitmap of size b (the size of the menu)
-  bmp := createBitmap(b.x2 - b.x1 + 2, b.y2 - b.y1 + 2);
-
-  // "reset" not text/shadow TPAs so they can be drawn on bmp
-  tpaNotText.offset(point(-b.x1, -b.y1));
-  tpaShadow.offset(point(-b.x1, -b.y1));
-
-  fastDrawClear(bmp, 0);
-  drawTPABitmap(bmp, tpaNotText, clRed);
-  drawTPABitmap(bmp, tpaShadow, clPurple);
-
-  ocr_FilterUpTextByCharacteristics(getMufasaBitmap(bmp));
-  getBitmapSize(bmp, bW, bH);
-
-  setTargetBitmap(bmp); // new target for findColors
-  setLength(ATPA, bH div 16);
-
-  // look for the outlined text on the bitmap
-  for i := 0 to high(ATPA) do
-    findColors(ATPA[i], clRed, 0, (2 + i * 16), bW - 1, (18 + i * 16) - 1); // +2 to y to line it up
-
-  l := high(ATPA);
-  sortATPAFromFirstPointY(ATPA, point(bW div 2, 0));
-
-  if (length(ATPA) < 1) then
-  begin
-    setImageTarget(oldTarget);
-    freeBitmap(bmp);
-    exit();
-  end;
-
-  setLength(result, length(ATPA));
-  result[0].bigBox := bigBox;
-
-  for i := 0 to l do
-  begin
-    tmpATPA := ATPA[i].split(1, 10); // split one into characters
-    sortATPAFromFirstPointX(tmpATPA, point(0, 0));
-
-    result[i].str := tmpATPA.getTextInATPA(5, 'UpCharsEx');
-    //writeln(result[i].str);
-
-    bb := ATPA[i].getBounds();
-    result[i].bounds := intToBox((bb.x1 + b.x1), (bb.y1 + b.y1), (bb.x2 + b.x1), (bb.y2 + b.Y1));
-  end;
-
-  setColorToleranceSpeed(oldCTS);
-  t := getImageTarget();
-
-  setImageTarget(oldTarget);
-
-  freeTarget(t);
-  freeBitmap(bmp);
-end;
-
-(*
-chooseOption
-~~~~~~~~~~~~
-
-.. code-block:: pascal
-
-    function chooseOption(txt, txtTab: TStringArray; mouseAction: integer; close: boolean = true; waitTime: integer = 100): boolean;
-
-Works for RS tabbed menus.
-
-    * txtTab: The final option you want to choose. The function looks for this option first.
-    * txt: The text that the mouse hovers to activate the tabbed menu.
-    * mouseAction: What you want the mouse to do.  Mouse constants are in mouse.simba.
-    * close: Optional; default true. Will move the mouse away from the menu if the option isn't found.
-    * waitTime: Optional; default 100ms. The time you want the function to wait for the options to be found.
-
-.. note::
-
-    - by Wizzup?, Nava2 & N1ke!
-    - Last Modified: 30 May 2013 by Coh3n
-
-Example:
-
-.. code-block:: pascal
-
-    if (chooseOption(['Bank'], ['Use'], MOUSE_LEFT)) then
-      writeln('Using bank');
-*)
-function chooseOption(txt, txtTab: TStringArray; mouseAction: integer; close: boolean = true; waitTime: integer = 100): boolean;
-  // used to move the mouse away from the options menu if the option isn't found
-  procedure __mouseAway(bigBox: TBox; mouseAction: integer; close: boolean);
-  var
-    j: integer;
-  begin
-    if (mouseAction <> MOUSE_NONE) and (close) then
-    begin
-      print('Closing the menu');
-
-      j := max(bigBox.x1 - 52, 0);
-
-      if (j = 0) then
-        j := (bigBox.x2 + 10);
-
-      mouse(point(j, max(bigBox.y1 - 50, 0)).rand(40, bigBox.y2 - bigBox.y1));
-      wait(200 + random(100));
-    end;
-  end;
-var
-  b: TBox;
-  p: TPoint;
-  textFound: boolean;
-  i, t: integer;
-  options: array of __TOptions;
-begin
-  print('chooseOption()', TDebug.HEADER);
-
-  result := false;
-  wait(waitTime + random(50)); // an initial wait after mouse is clicked
-  t := (getSystemTime() + waitTime);
-
-  repeat
-    options := __getChooseOptions(b);
-    __debugOptions(options);
-
-    // if using the tabbed option
-    if (length(txtTab) > 0) then
-    begin
-      if (chooseOption(txtTab, TStringArray([]), MOUSE_LEFT, false, 0)) then // choose the final option if it exists
-      begin
-        print('chooseOption(): True', TDebug.FOOTER);
-        exit(true);
-      end else
-        if (not chooseOption(txt, TStringArray([]), MOUSE_MOVE, false, 0)) then // move the mouse to the first option
-        begin
-          if (length(options) > 0) then
-            __mouseAway(options[0].bigBox, mouseAction, close);
-
-          print('Text '+toStr(txt)+' not found');
-          print('chooseOption(): False', TDebug.FOOTER);
-          exit(false);
-        end;
-
-      wait(100 + random(100));
-      options := __getChooseOptions(options[0].bigBox, true);
-    end;
-
-    if (length(options) <= 0) then
-    begin
-      print('No options available');
-      print('chooseOption(): False', TDebug.FOOTER);
-      exit(false);
-    end;
-
-    for i := 0 to high(options) do
-    begin
-      if (length(txtTab) > 0) then
-        textFound := isArrInStr(txtTab, options[i].str)
-      else
-        textFound := isArrInStr(txt, options[i].str);
-
-      if (textFound) then
-      begin
-        // carefully move the mouse to the tabbed menu
-        if (length(txtTab) > 0) then
-        begin
-          getMousePos(p.x, p.y);
-          mouse(point(randomRange(options[0].bigBox.x1, options[0].bigBox.x2), p.y), MOUSE_MOVE, MOUSE_ACCURATE);
-        end;
-
-        mouseBox(options[i].bounds, mouseAction);
-        print('Found option: '+ options[i].str);
-        print('chooseOption(): True', TDebug.FOOTER);
-        exit(true);
-      end;
-    end;
-
-    wait(25 + random(25));
-  until(getSystemTime() > t);
-
-  // lets debug the options if we didnt find any match
-  print('Didn''t find any matches');
-  __debugOptions(options);
-
-  if (length(options) > 0) then
-    __mouseAway(options[0].bigBox, mouseAction, close);
-
-  print('chooseOption(): '+toStr(result), TDebug.FOOTER);
-end;
-
-(*
-chooseOption; overload;
-~~~~~~~~~~~~~~~~~~~~~~~
-
-.. code-block:: pascal
-
-    function chooseOption(txt: TStringArray; waitTime: integer = 100): boolean; overload;
-
-Chooses the first option in txt that's found in the RS right click menu. Will
-left click the option if found. Will wait (waitTime) for the options to
-exist. Default waitTime is 100ms.
-
-.. note::
-
-    - by Coh3n
-    - Last Updated: May. 24, 2013 by Ollybest
-
-Example:
-
-.. code-block:: pascal
-
-    if (chooseOption(['Examine'])) then
-      writeln('Examining something...');
-*)
-function chooseOption(txt: TStringArray; waitTime: integer = 100): boolean; overload;
-begin
-  result := chooseOption(txt, TStringArray([]), MOUSE_LEFT, waitTime);
-end;
-
-(*
-optionsExist
-~~~~~~~~~~~~
-
-.. code-block:: pascal
-
-    function optionsExist(txt: TStringArray): boolean;
-
-Returns true if one of the strings in txt exists in the options menu.
-
-.. note::
-
-    - by Coh3n
-    - Last Modified: Mar. 10, 2013 by Coh3n
-
-Example:
-
-.. code-block:: pascal
-
-    if (optionsExist(['Examine'])) then
-      writeln('Option exists');
-*)
-function optionsExist(txt: TStringArray): boolean;
-begin
-  result := chooseOption(txt, TStringArray([]), MOUSE_NONE, 0);
-end;
-
-{*
 __findMouseOverBox
 ~~~~~~~~~~~~~~~~~~
 
@@ -654,6 +288,7 @@ Example:
     if (__findMouseOverBox(tmpBox)) then
       writeln('Found mouse-over box!');
 *}
+{$IFNDEF CODEINSIGHT}
 function __findMouseOverBox(out box: TBox): boolean;
 var
   h, i, j, len, w, y2OfBounds: integer;
@@ -708,6 +343,7 @@ begin
 
   result := true;
 end;
+{$ENDIF}
 
 {*
 __createMouseOverFilter
@@ -730,6 +366,7 @@ Example:
 
     __createMouseOverFilter(tmpBox, bmpClean, bmpFiltered);
 *}
+{$IFNDEF CODEINSIGHT}
 procedure __createMouseOverFilter(box: TBox; var cleanBitmap, filteredBitmap: integer);
 begin
   cleanBitmap := bitmapFromClient(box);
@@ -740,6 +377,7 @@ begin
   getMufasaBitmap(filteredBitmap).contrast(255);
   getMufasaBitmap(filteredBitmap).posterize(255);
 end;
+{$ENDIF}
 
 {*
 __getMouseOverText
@@ -768,6 +406,7 @@ Example:
       writeln('Mouse-over text: '+text);
     end;
 *}
+{$IFNDEF CODEINSIGHT}
 function __getMouseOverText(box: TBox; cleanBitmap, filteredBitmap: integer): string;
 var
   numberOfLines, badCounter, colorCheck, i, j, len, w, h, startIndex: integer;
@@ -887,6 +526,7 @@ begin
       result := result + ' ' + linesOfText[i].getTextInATPA(3, font);
   end;
 end;
+{$ENDIF}
 
 (*
 getMouseOverText
@@ -1014,4 +654,523 @@ begin
     wait(20 + random(20));
   end;
 end;
+
+type
+  TRSChooseOption = record(TRSInterface)
+    __placeholder: byte;
+  end;
+
+type
+  __TOption = record
+    bounds: TBox;
+    str: string;
+ end;
+
+type
+  __TOptionArray = array of __TOption;
+
+var
+  chooseOption: TRSChooseOption;
+
+(*
+TRSChooseOption.isOpen
+~~~~~~~~~~~~~~~~~~~~~~
+
+.. code-block:: pascal
+
+    function TRSChooseOption.isOpen(debug: boolean = true): boolean;
+
+Will return if the chooseoption menu is open or not.
+
+.. note::
+
+    - by Olly
+    - Last Modified: 12 September 2013 by Olly
+
+Example:
+
+.. code-block:: pascal
+
+    if (chooseOption.isOpen()) then
+      chooseOption.close();
+*)
+function TRSChooseOption.isOpen(debug: boolean = true): boolean;
+var
+  b, clientArea, tpaBounds: TBox;
+  colArr: array [0..2] of integer;
+  i, j, z, width, height: integer;
+  tpa: TPointArray;
+  atpa: T2DPointArray;
+begin
+  result := false;
+
+  getClientDimensions(b.x2, b.y2);
+  clientArea := [0, 0, b.x2 -1, b.y2 -1];
+
+  colArr := [197636 {black}, 3748386 {top blue}, 3618615 {grey}];
+
+  setLength(atpa, length(colArr));
+
+  for i := 0 to high(colArr) do
+    findColors(atpa[i], colArr[i], clientArea);
+
+  tpa := atpa.merge();
+
+  if (length(tpa) < 10) then
+    exit();
+
+  // we can re-use this.. :)
+  setLength(atpa, 0);
+
+  atpa := tpa.split(4, 4);
+  atpa.sortBySize();
+
+  for i := 0 to high(atpa) do
+  begin
+    tpaBounds := atpa[i].getBounds();
+    tpaBounds.getDimensions(width, height);
+
+    // too small
+    if (width < 15) or (height < 10) then
+      continue;
+
+    z := 0;
+
+    // lets see if there's more than 5 black pixels in a row above our bounds
+    for j := tpaBounds.x1 to tpaBounds.x2 do
+      if (getColor(j, tpaBounds.y1 - 1) = 263429) then
+      begin
+        inc(z);
+
+        // more than five black pixels in a row? we've found it
+        if (z > 5) then
+        begin
+          if (debug) then
+            print('chooseOption.isOpen(): result = true');
+
+          // we store the bounds in the chooseoption type.
+          self.setBounds(tpaBounds);
+          exit(true);
+        end;
+      end else
+        z := 0;
+  end;
+end;
+
+(*
+TRSChooseOption.isOpen; overload
+~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+
+.. code-block:: pascal
+
+    function TRSChooseOption.isOpen(waitTime: integer; debug: boolean = true): boolean; overload;
+
+Overloaded function, reqiures a 'waitTime' parameter. Will wait up to 'waitTime'
+for the chooseoption menu to appear.
+
+.. note::
+
+    - by Olly
+    - Last Modified: 12 September 2013 by Olly
+
+Example:
+
+.. code-block:: pascal
+
+    if (chooseOption.isOpen(500)) then
+    begin
+      writeln('menu appeared!');
+      exit();
+    end;
+*)
+function TRSChooseOption.isOpen(waitTime: integer; debug: boolean = true): boolean; overload;
+var
+  timeOut: integer;
+begin
+  timeOut := (getSystemTime() + waitTime + random(25));
+
+  while (timeOut > getSystemTime()) do
+    if (self.isOpen()) then
+      exit(true)
+    else
+      wait(16 + random(30));
+
+  if (debug) then
+    print('chooseOption.isOpen(): result = false');
+end;
+
+(*
+TRSChooseOption.close
+~~~~~~~~~~~~~~~~~~~~~
+
+.. code-block:: pascal
+
+    function TRSChooseOption.close(): boolean;
+
+Closes the chooseoption menu by moving the mouse off the menu, returns true if succesfull.
+
+.. note::
+
+    - by Olly
+    - Last Modified: 12 September 2013 by Olly
+
+Example:
+
+.. code-block:: pascal
+
+    if (chooseOption.isOpen()) then
+      chooseOption.close();
+*)
+function TRSChooseOption.close(): boolean;
+var
+  b, mouseRange, clientArea: TBox;
+  p: TPoint;
+begin
+  if (not self.isOpen(false)) then
+    exit();
+
+  getClientDimensions(clientArea.x2, clientArea.y2);
+
+  b := self.getBounds();
+  b.edit(-10, -25, 10, 10);
+
+  mouseRange := [b.x1 -50, b.y1 -50, b.x2 +50, b.y2 +50];
+  mouseRange.setLimit([0, 0, clientArea.x2 -1, clientArea.y2 -1]);
+
+  // get a point that is in mouseRange but not in b (choose option bounds);
+  p := mouseRange.getRandomPoint([b]);
+
+  if (p.x <> -1) then
+  begin
+    mouse(p, MOUSE_MOVE);
+    print('chooseOption.close(): Succesfully closed the menu', TDebug.SUB);
+  end else
+    print('chooseOption.close(): Failed to close the menu', TDebug.ERROR);
+end;
+
+{*
+TRSChooseOption.__getOptions
+~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+
+.. code-block:: pascal
+
+    function TRSChooseOptions.__getOptions(): __TOptionArray;
+
+Returns all text & bounds of the ChooseOption text in the TOptionArray.
+
+.. note::
+
+    - by Wizzup?, Narcle, Coh3n & Olly
+    - Last Updated: 06 September 2013 by Olly
+
+Example:
+
+.. code-block:: pascal
+
+    optionArr := choseOption.__getOptions();
+*}
+{$IFNDEF CODEINSIGHT}
+function TRSChooseOption.__getOptions(): __TOptionArray;
+var
+  tmb: TMufasaBitmap;
+  atpa, tmp: T2DPointArray;
+  i, t, hi, tmbW, tmbH, oldCTS, oldTarget: integer;
+  tpaBackground, tpaShadow, tpaText: TPointArray;
+  b: TBox;
+begin
+  oldCTS := getToleranceSpeed();
+  oldTarget := getImageTarget();
+
+  //get a TMufasaBitmap of the chooseoption menu (without the border)
+  tmb.init(client.getMBitmaps());
+  tmb.copyClientToBitmap(client.getIOManager(), true, self.x1+1, self.y1+1, self.x2-1, self.y2-1);
+
+  tmbW := tmb.getWidth() -1;
+  tmbH := tmb.getHeight() -1;
+
+  // set the bitmap as our target
+  setTargetBitmap(tmb.getIndex());
+
+  // find the blue background, and the shadow
+  setColorToleranceSpeed(3);
+  findColorsTolerance(tpaBackground, 4996381, 0, 0, tmbW, tmbH, 18);
+  findColorsTolerance(tpaShadow, 460291, 0, 0, tmbW, tmbH, 6);
+
+  setColorToleranceSpeed(1);
+
+  // the text is the points left that arent in the background
+  tpaText := returnPointsNotInTPA(tpaBackGround, [0, 0, tmbW, tmbH]);
+
+  if (length(tpaText) > 0) then
+  begin
+    // clear our bitmap, and draw the text and the shadow
+    tmb.drawClear(0);
+    tmb.drawTPA(tpaText, clRed);
+    tmb.drawTPA(tpaShadow, clPurple);
+
+    // filter bad points out
+    ocr_FilterUpTextByCharacteristics(tmb);
+
+    setLength(atpa, tmb.getHeight() div 16);
+    setLength(result, length(atpa));
+
+    hi := high(atpa);
+
+    // now, lets gather all the text in lines
+    for i := 0 to hi do
+      findColors(atpa[i], clRed, 0, (2 + i * 16), tmbW - 1, (18 + i * 16) - 2);
+
+    // restore, free created/old stuff
+    t := getImageTarget();
+    setImageTarget(oldTarget);
+    freeTarget(t);
+
+    setColorToleranceSpeed(oldCTS);
+    tmb.free();
+
+    // sort it in lines (high..low)
+    sortATPAFromFirstPointY(atpa, [tmbW div 2, 0]);
+
+    for i := 0 to hi do
+    begin
+      // split into single chars
+      tmp := atpa[i].split(1, 10);
+      b := atpa[i].getBounds();
+
+      // sort chars from (left..right) and then read the text
+      sortATPAFromFirstPointX(tmp, [b.x1, atpa[i][0].y]);
+      result[i].str := getTextATPA(tmp, 5, UpCharsEx);
+
+      //get the bounds for the option, and offset them so it's in the correct mainscreen postion.
+      result[i].bounds := [b.x1, b.y1, b.x2 + (self.w - b.x2) - 2, b.y2 + 2];
+      result[i].bounds.offset([self.x1, self.y1]);
+    end;
+
+    // we're done.
+    exit();
+  end;
+
+  // restore, free created/old stuff
+  t := getImageTarget();
+  setImageTarget(oldTarget);
+  freeTarget(t);
+
+  setColorToleranceSpeed(oldCTS);
+  tmb.free();
+end;
+{$ENDIF}
+
+(*
+TRSChooseOption.optionsExist
+~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+
+.. code-block:: pascal
+
+    function TRSChooseOption.optionsExist(options: TStringArray; matchPercent: extended = 1.00): boolean;
+
+Returns true if any of the options exist, if matchPercent is different from 1.00
+it will use stringmatch, else wont.
+
+.. note::
+
+    - by Olly
+    - Last Modified: 12 September 2013 by Olly
+
+Example:
+
+.. code-block:: pascal
+
+    if chooseOption.optionsExist(['alk here']) then
+      writeln('the option walk here is there!');
+*)
+function TRSChooseOption.optionsExist(options: TStringArray; matchPercent: extended = 1.00): boolean;
+begin
+  if (not self.isOpen(false)) then
+    exit(false);
+
+  result := self._select(options, MOUSE_NONE, false, matchPercent, 0);
+end;
+
+(*
+TRSChooseOption.select
+~~~~~~~~~~~~~~~~~~~~~~
+
+.. code-block:: pascal
+
+    function TRSChooseOption._select(txt: TStringArray; mouseAction: integer; close: boolean; matchPercent: extended; waitTime: integer): boolean;
+
+     * txt - An array of text you want to find in any of the options.
+     * mouseAction - What to do if we succesfully find a option (MOUSE_MOVE, MOUSE_LEFT, MOUSE_RIGHT, MOUSE_NONE).
+     * close - Will we close the menu after we're done with it?
+     * matchPercent - The min percentage that will we count as match (if using stringmatch) if not using stringmatch
+                      and want the old the method of finding txt anywhere in the string set it as 1.00.
+     * waitTime - how long will we wait for the chooseoptions menu to appear?.
+
+.. note::
+
+    - by Olly
+    - Last Modified: 06 September 2013 by Olly
+
+Example:
+
+.. code-block:: pascal
+
+    // to not use string match
+    chooseOption._select(['alk', 'lk To', 'Walk'], MOUSE_LEFT, true, 1.00, 150);
+
+    // to use string match
+    chooseOption._select(['Walk To'], MOUSE_LEFT, true, 0.85, 150);
+*)
+function TRSChooseOption._select(txt: TStringArray; mouseAction: integer; close: boolean; matchPercent: extended; waitTime: integer): boolean;
+var
+  optionArr: __TOptionArray;
+  l, t, i, j: integer;
+  s: TStringArray;
+  a: extended;
+begin
+  result := false;
+  t := getSystemTime();
+
+  print('chooseOption._select():', TDebug.HEADER);
+
+  if (not self.isOpen(waitTime)) then
+  begin
+    print('chooseOption menu never appeared', TDebug.ERROR);
+    print('chooseOption.select() result = false', TDebug.FOOTER);
+    exit();
+  end;
+
+  optionArr := self.__getOptions();
+
+  l := length(optionArr);
+
+  if (l < 1) then
+  begin
+    print('Failed to find any options', TDebug.ERROR);
+    print('chooseOption.select() result = false', TDebug.FOOTER);
+
+    if (close) then
+      self.close();
+
+    exit();
+  end else
+  begin
+    // format the matches so we don't spam the debug box
+    setLength(s, l);
+
+    for i := 0 to (l -1) do
+      s[i] := optionArr[i].str;
+
+    print('Options found: ' + toStr(s));
+  end;
+
+  for i := 0 to high(optionArr) do
+    for j := 0 to high(txt) do
+    begin
+      if (matchPercent = 1.00) then // not using stringmatch
+        if (pos(txt[j], optionArr[i].str) > 0) then
+        begin
+          print('Found option "' + txt[j] + '" in "' + optionArr[i].str + '", took: ' + intToStr(getSystemTime() - t) + 'ms');
+          print('chooseOption.select() result = true', TDebug.FOOTER);
+
+          if (mouseAction <> MOUSE_NONE) then
+            mouseBox(optionArr[i].bounds, mouseAction)
+          else // if it's mouse none lets see if we need to close
+            if (close) then
+              self.close();
+
+          exit(true);
+        end else
+          continue;
+
+      // if we're here we are using string match
+      a := stringMatch(optionArr[i].str, txt[j]);
+
+      if (a >= matchPercent) then
+      begin
+        print('Found option "' + txt[j] + '" @ accuracy ' + floatToStr(a) + ', took: ' + intToStr(getSystemTime() - t) + 'ms');
+        print('chooseOption.select() result = true', TDebug.FOOTER);
+
+        if (mouseAction <> MOUSE_NONE) then
+          mouseBox(optionArr[i].bounds, mouseAction)
+        else // if it's mouse none lets see if we need to close
+          if (close) then
+            self.close();
+
+        exit(true);
+      end;
+   end;
+
+  // close the menu since we found no matches
+  if (close) then
+    self.close();
+
+  print('Failed to find any text matches');
+  print('ChooseOptions._select() result = false');
+end;
+
+(*
+TRSChooseOption.select; overload
+~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+
+.. code-block:: pascal
+
+    function TRSChooseOption.select(txt: TStringArray; waitTime: integer = 150): boolean; overload;
+
+A overloaded function that will use the tradional method.
+
+  * txt: The text we will look for in any of the options.
+  * waitTime: How long we will wait for the chooseoption menu to appear, default set at 150ms.
+
+.. note::
+
+    - by Olly
+    - Last Modified: 12 September 2013 by Olly
+
+Example:
+
+.. code-block:: pascal
+
+    chooseOption.select(['Walk here', 'alk he']);
+*)
+function TRSChooseOption.select(txt: TStringArray; waitTime: integer = 150): boolean; overload;
+begin
+  result := self._select(txt, MOUSE_LEFT, true, 1.00, waitTime);
+end;
+
+(*
+TRSChooseOption.select; overload
+~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+
+.. code-block:: pascal
+
+    function TRSChooseOption.select(txt: TStringArray; matchPercent: extended; waitTime: integer = 150): boolean; overload;
+
+A overloaded function that will use the "string matching" method.
+
+   * txt: The txt will try and match against in any of the options.
+   * matchPercent: The min percent that we will count a match.
+   * waitTime: How long we will wait for the chooseoption menu to appear, default set at 150ms.
+
+.. note::
+
+    - by Olly
+    - Last Modified: 12 September 2013 by Olly
+
+Example:
+
+.. code-block:: pascal
+
+    chooseOption.select(['Walk here'], 0.80);
+*)
+function TRSChooseOption.select(txt: TStringArray; matchPercent: extended; waitTime: integer = 150): boolean; overload;
+begin
+  result := self._select(txt, MOUSE_LEFT, true, matchPercent, waitTime);
+end;
+
+
+
+
+
+
 

@@ -754,6 +754,16 @@ begin
     writeln('GaussBox',Format('Point invalid (%d, %d)', [p.x, p.y]));
 end;
 
+function getBitmapName(index: integer): string;
+begin
+  result := client.getMBitmaps().getBMP(index).getName();
+end;
+
+function getDTMName(index: integer): string;
+begin
+  result := client.getMDTMs().getDTM(index).getName();
+end;
+
 begin
   __gaussPoint := 0.4;
   __gaussRange := 0.3;

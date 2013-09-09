@@ -74,10 +74,10 @@ begin
   Inv := False;
 
   if (Random(3) > 0) then
-    Inv := chooseOption(['xamine']);
+    Inv := chooseOption.select(['xamine']);
 
   if (not Inv) then
-    chooseOption(['ancel']);
+    chooseOption.select(['ancel']);
 
   MouseSpeed := M;
 end;
@@ -616,7 +616,7 @@ begin
       if isMouseOverMenuOpen(b) then
       begin
         fastClick(MOUSE_RIGHT);
-        chooseOption(['xamine', 'ancel'], 100 + Random(100));
+        chooseOption.select(['xamine', 'ancel'], 100 + Random(100));
       end;
   end;
 end;
@@ -738,7 +738,7 @@ begin
       if (destroy) then
       begin
         fastClick(MOUSE_RIGHT);
-        chooseOption(['estroy'], 500);
+        chooseOption.select(['estroy'], 500);
         wait(randomRange(1500, 2000));
         result := conversationBox.findDialogText(['All', 'Yes'], MOUSE_LEFT);
       end;

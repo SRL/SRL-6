@@ -676,6 +676,56 @@ begin
 end;
 
 (*
+TBox.getRandomPoint
+~~~~~~~~~~~~~~~~~~~
+
+.. code-block:: pascal
+
+    function TBox.getRandomPoint(clearBoxes: TBoxArray): TPoint;
+
+Will return a random point that is in the TBox, but is *not* in any of "clearBoxes".
+
+.. note::
+
+    - by Olly
+
+Example:
+
+.. code-block:: pascal
+
+    p := myBox.getRandomPoint(boxArr);
+
+*)
+function TBox.getRandomPoint(clearBoxes: TBoxArray): TPoint; overload;
+var
+  i, h: integer;
+  atpa: T2DPointArray;
+  tpa, boxTPA: TPointArray;
+begin
+  result := [-1, -1];
+
+  h := high(clearBoxes);
+  if (h = -1) then
+    exit();
+
+  setLength(atpa, h +1);
+
+  for i := 0 to h do
+    atpa[i] := tpaFromBox(clearBoxes[i]);
+
+  tpa := mergeATPA(atpa);
+  clearDoubleTPA(tpa);
+
+  boxTPA := tpaFromBox(self);
+  boxTPA := clearTPAFromTPA(boxTPA, tpa);
+
+  if (length(boxTPA) > 0) then
+    result := boxTPA[random(high(boxTPA))]
+  else
+    writeln('-- ERROR: TBox.getRandomPoint(): No points left to get a point from! resulting as (-1, -1)');
+end;
+
+(*
 TBox.overlap
 ~~~~~~~~~~~~
 

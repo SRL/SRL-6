@@ -713,7 +713,7 @@ begin
     if (self.isSlotVaild(slotArr[i])) and (self.isItemInSlot(slotArr[i])) then
     begin
       self.mouseSlot(slotArr[i], MOUSE_RIGHT);
-      if chooseOption(['Drop', 'drop', 'rop']) then
+      if chooseOption.select(['Drop', 'drop', 'rop']) then
       begin
         insert(slotArr[i], tia);
         wait(120 + random(305));
@@ -876,7 +876,7 @@ begin
     self.mouseSlot(i+1, clickType);
 
     if (clickType = MOUSE_RIGHT) and (option <> '') then
-      chooseOption([option], 200);
+      chooseOption.select([option]);
 
     inc(result);
     wait(waitFor + random(50));
@@ -1086,10 +1086,8 @@ begin
   end;
 
   self.mouseSlot(slot, MOUSE_RIGHT);
-  result := chooseOption(['Set quick-inventory '+ s, 'quick-inventory ' + s], 300);
+  result := chooseOption.select(['Set quick-inventory '+ s, 'ventory ' + s], 300);
 end;
-
-
 
 begin
   tabBackpack.__init();

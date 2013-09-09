@@ -12,6 +12,7 @@ The source for this file can be found `here <https://github.com/SRL/SRL-6/blob/m
 {$include_once interfaces.simba}
 {$include_once ../utilities/color.simba}
 {$include_once ../utilities/pixelshift.simba}
+{$include_once ../core/text.simba}
 {$f-}
 
 (*
@@ -801,7 +802,7 @@ begin
   if (random(4) = 2) then
   begin
     fastClick(MOUSE_RIGHT);
-    if (not chooseOption(['Face North', 'Face', 'ace north'])) then
+    if (not chooseOption.select(['Face North', 'Face', 'ace north'], 1.00, 500)) then
       fastClick(MOUSE_LEFT); // failsafe.
   end else
     fastClick(MOUSE_LEFT);
@@ -2911,7 +2912,7 @@ begin
   if (location = (LOCATION_PREVIOUS)) then
   begin
     fastClick(MOUSE_RIGHT);
-    result := chooseOption(['Previous dest', 'estination'], 250 + random(100));
+    result := chooseOption.select(['Previous dest', 'estination', 'evious'], 1.00, 250 + random(100));
 
     if (result) then
       print('minimap.lodestoneTo(): Succesfully teleported to previous destination', TDebug.SUB)
@@ -2929,7 +2930,7 @@ begin
 
     if (isLodeStoneOpen(b, 4000 + random(500))) then
     begin
-      wait(20 + random(400));
+      wait(20 + random(500));
 
       p := tpa[location];
       p.offset([b.x1, b.y1]);
