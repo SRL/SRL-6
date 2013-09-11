@@ -137,23 +137,26 @@ begin
   // heck, lets save ourself some math... load them once
   if (not self.areSlotsLoaded) then
   begin
-    __slots[0] := grid(4, 7, 34, 31, 52, 39,
-                       point(gameTabs.__visibleTabAreaMulti.x1 + 32,
-                             gameTabs.__visibleTabAreaMulti.y1 + 32));
+    __slots[0] := grid(5, 6, 34, 31, 43, 36,
+                      point(gameTabs.__visibleTabAreaMulti.x1 + 27,
+                            gameTabs.__visibleTabAreaMulti.y1 + 26));
 
-    __slots[1] := grid(4, 7, 34, 31, 52, 39,
-                       point(gameTabs.__visibleTabAreaSingle.x1 + 32,
-                             gameTabs.__visibleTabAreaSingle.y1 + 32));
+    __slots[1] := grid(5, 6, 34, 31, 43, 36,
+                       point(gameTabs.__visibleTabAreaSingle.x1 + 27,
+                             gameTabs.__visibleTabAreaSingle.y1 + 22));
+
+    setLength(__slots[0], 28);
+    setLength(__slots[1], 28);
 
     print('tabBackpack._updateBounds(): Loaded slot arrays');
     self.areSlotsLoaded := true;
   end;
 
 
-  if (self.y1 = gameTabs.__visibleTabAreaMulti.y1) then
-    slots := __slots[0]
-  else
-    slots := __slots[1];
+ if (self.y1 = gameTabs.__visibleTabAreaMulti.y1) then
+   slots := __slots[0]
+ else
+   slots := __slots[1];
 end;
 
 (*
@@ -1020,7 +1023,7 @@ begin
   begin
     slot := self.getSlotBox(i);
 
-    colorToRGB(getColor(slot.x2 +5, slot.y1), r, g, b);
+    colorToRGB(getColor(slot.x2, slot.y1), r, g, b);
 
     if (quickInvConst = QUICK_INVENTORY_A) and (r > 80) then
     begin
