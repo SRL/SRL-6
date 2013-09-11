@@ -484,6 +484,7 @@ begin
 
          print('Succesfully paired to a existing client, SMART['+ intToStr(__smartCurrentPID) +']');
          print('smartPairToExistingClient(): result = true', TDebug.FOOTER);
+         addOnTerminate('smartFreeCurrentClient');
          exit();
        end;
     end else
@@ -745,5 +746,5 @@ begin
 
   // check for the plugin on compile
   if (not fileExists(PluginPath + OGL_PLUGIN)) then
-    print('SMART - Unable to find the OpenGL32.dll (plugin reqired for SRL to work with SMART)', TDebug.FATAL);
+    print('SMART - Unable to find the OpenGL32.dll (plugin required for SRL to work with SMART)', TDebug.FATAL);
 end;

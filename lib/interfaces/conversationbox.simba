@@ -14,6 +14,7 @@ The source for this file can be found
 {$f-}
 {$include_once interfaces.simba}
 {$include_once ../utilities/color.simba}
+{$include_once ../core/text.simba}
 
 {*
 const Internal
@@ -205,39 +206,199 @@ begin
 end;
 
 (*
-TRSConversationBox.findDialogText
-~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+TRSConversationBox.getChatArea
+~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
 
 .. code-block:: pascal
 
-    function TRSConversationBox.findDialogText(txt: TStringArray; mouseAction: integer = MOUSE_NONE): boolean;
+    function TRSConversationBox.getChatArea(): TBox;
 
-Returns true if 'txt' is found in the conversation dialog.  Will do 'mouseAction'
-on the text if it's found.
+Returns a TBox of the area where chat is located in the conversation box.
 
 .. note::
 
-    - by Coh3n
-    - Last Updated: 17 August 2013 by Coh3n
+    - by Olly
+    - Last Updated: 11 September 2013 by Olly
 
 Example:
 
 .. code-block:: pascal
 
-    if (findDialogText(['1'], MOUSE_LEFT)) then
-      writeln('Chose option 1');
+    b := conversationBox.getChatArea();
 *)
-function TRSConversationBox.findDialogText(txt: TStringArray; mouseAction: integer = MOUSE_NONE): boolean;
+function TRSConversationBox.getChatArea(): TBox;
 var
-  p: TPoint;
+  b: TBox;
+  left: boolean;
+  tpaBrown, tpaGrey: TPointArray;
+begin
+  if (not conversationBox.isOpen()) then
+    exit();
+
+  findColorsTolerance(tpaBrown, 7116210, conversationBox.getBounds(), 20, colorSetting(2, 0.05, 0.28));
+  result := tpaBrown.getBounds();
+
+  findColorsTolerance(tpaGrey, 9934999, result, 12, colorSetting(2, 3.48, 0.06));
+
+  // no head in the area? nothing to filter it out then.
+  if (length(tpaGrey) < 200) then
+    exit();
+
+  b := tpaGrey.getBounds();
+  b.expand(15);
+
+  left := (b.x1 < result.getMiddle().x);
+
+  if (left) then
+    result := [b.x2, result.y1, result.x2, result.y2]
+  else
+    result := [result.x1, result.y1, b.x1, result.y2];
+end;
+
+(*
+TRSConversationBox.getChat
+~~~~~~~~~~~~~~~~~~~~~~~~~~
+
+.. code-block:: pascal
+
+    function TRSConversationBox.getChat(): string;
+
+Returns player or NPC chat.
+
+.. note::
+
+    - by Olly
+    - Last Updated: 11 September 2013 by Olly
+
+Example:
+
+.. code-block:: pascal
+
+    s := conversationBox.getChat();
+*)
+function TRSConversationBox.getChat(): string;
+var
+  tpa: TPointArray;
+  atpa, atpaLines: T2DPointArray;
+  modifers: array [0..1] of array [0..1] of extended;
+  cols: array [0..1] of array [0..1] of integer;
+  i: integer;
+  b: TBox;
+begin
+  result := '';
+
+  if (not conversationBox.isOpen()) then
+  begin
+    print('conversationBox.getChat(): Unable to read any text because we aren''t in a conversation', TDebug.ERROR);
+    exit();
+  end;
+
+  b := getChatArea();
+  b.edit(+5, +15, -5, -5);
+
+  modifers := [[0.31, 0.58], [0.11, 0.46]];
+  cols := [[3225152, 23], [7243671 , 6]];
+
+  setLength(atpa, 2);
+
+  for i := 0 to high(cols) do
+    findColorsTolerance(atpa[i], cols[i][0], b, cols[i][1], colorSetting(2, modifers[i][0], modifers[i][1]));
+
+  tpa := atpa.merge();
+
+  atpaLines := tpa.split(b.getWidth(), 3);
+  sortATPAFromFirstPointY(atpaLines, [b.x1 + (b.getWidth() div 2), b.y1]);
+
+  for i := 0 to high(atpaLines) do
+  begin
+    setLength(atpa, 0);
+    atpa := atpaLines[i].split(1, 10);
+
+    if (length(atpa) > 10) then
+    begin
+      sortATPAFromFirstPointX(atpa, [b.x1, b.y1]);
+      result := result + getTextATPA(atpa, 3, 'NPCCharsSmooth') + ' ';
+    end;
+  end;
+
+  print('conversationBox.getChat(): Text found: ' + result, TDebug.SUB);
+end;
+
+(*
+TRSConversationBox.findChat
+~~~~~~~~~~~~~~~~~~~~~~~~~~~
+
+.. code-block:: pascal
+
+    function TRSConversationBox.findChat(txt: TStringArray): boolean;
+
+Returns true if 'txt' is found in the chat dialog.
+
+.. note::
+
+    - by Olly
+    - Last Updated: 11 September 2013 by Olly
+
+Example:
+
+.. code-block:: pascal
+
+     if (conversationBox.findChat(['Well-Done'])) then
+       writeln('We have finished!');
+*)
+function TRSConversationBox.findChat(txt: TStringArray): boolean;
 begin
   if (not self.isOpen()) then
     exit();
 
-  if (findText(p, txt, [upChars], self.getBounds())) then
+  result := isArrInStr(txt, self.getChat());
+end;
+
+(*
+TRSConversationBox.selectOption
+~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+
+.. code-block:: pascal
+
+    function TRSConversationBox.selectOption(number: integer): boolean;
+
+Will select the option number if its available, will return if succesful or not.
+
+.. note::
+
+    - by Olly
+    - Last Updated: 11 September 2013 by Olly
+
+Example:
+
+.. code-block:: pascal
+
+     if (conversationBox.selectOption(2)) then
+       writeln('Selected option two');
+*)
+function TRSConversationBox.selectOption(number: integer): boolean;
+var
+  tpa: TPointArray;
+  atpa: T2DPointArray;
+  b: TBox;
+begin
+  b := self.getChatArea();
+
+  if (not findColorsTolerance(tpa, 1972239, b, 2, colorSetting(2, 0.40, 2.84))) then
+    exit();
+
+  atpa := tpa.split(100, 4);
+  atpa.filterBetween(0, 50);
+
+  sortATPAFromFirstPointY(atpa, [b.x1, b.y1]);
+
+  result := (number <= length(atpa));
+
+  if (result) then
   begin
-    mouse(p, mouseAction);
-    result := true;
+    print('conversationBox.selectOption(): Selected option ' + intToStr(number), TDebug.SUB);
+    mouseBox(atpa[number -1].getBounds(), MOUSE_LEFT);
+    wait(100 + random(250));
   end;
 end;
 

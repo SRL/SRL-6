@@ -203,7 +203,7 @@ the tabs.
 .. note::
 
     - by Coh3n
-    - Last Updated: 11 August 2013 by Coh3n
+    - Last Updated: 11 September 2013 by Olly
 
 Example:
 
@@ -211,29 +211,36 @@ Example:
 
     while (not lobby.isOpen()) do
       wait(100 + Random(400));
-
 *)
 function TRSLobby.isOpen(): boolean;
 var
-  wid, hei, t: integer;
+  wid, hei, t, i, hi: integer;
   dummy: TPoint;
+  tpa: TPointArray;
 begin
   self.__skipEmailScreen(); // just in case
   getClientDimensions(wid, hei);
 
-  if (findText(dummy, ['World'], ['UpChars'], intToBox(0, 0, wid-1, hei-1)) and
-      findText(dummy, ['Options'], ['UpChars'], intToBox(0, 0, wid-1, hei-1))) then
+  // on the globe we check if there is 3 colors in a vertical line (going up)
+  if (findColors(tpa, 4960879, intToBox(0, 0, wid-1, hei-1))) then
   begin
-    t := (getSystemTime() + 10000);
+    hi := high(tpa);
 
-    // need a loop because the lobby screen fades in to view
-    while ((not result) and (getSystemTime() < t)) do
-    begin
-      print('Waiting for lobby screen...');
-      result := self.__find();
-      wait(300 + random(400));
+    for i := 0 to hi do
+      if (getColor(tpa[i].x, tpa[i].y-1) = 9010006) then
+        if (getColor(tpa[i].x, tpa[i].y-2) = 8352334) then
+        begin
+          t := (getSystemTime() + 10000);
+
+          // need a loop because the lobby screen fades in to view
+          while ((not result) and (getSystemTime() < t)) do
+          begin
+            print('Waiting for lobby screen...');
+            result := self.__find();
+            wait(300 + random(400));
+         end;
+       end;
     end;
-  end;
 end;
 
 (*
@@ -466,7 +473,7 @@ in the bottom right of the interface.  Will click the world if found.
 .. note::
 
     - by Coh3n
-    - Last Updated: 19 August 2013 by Coh3n
+    - Last Updated: 11 September 2013 by Olly
 
 Example:
 
@@ -478,7 +485,9 @@ Example:
 function TRSLobby.quickSelectWorld(wo: integer): boolean;
 var
   woBoxes: TBoxArray;
-  i: integer;
+  i, bmp: integer;
+  tpa: TPointArray;
+  atpa: T2DPointArray;
 begin
   if (not self.isOpen()) then
     exit(false);
@@ -489,16 +498,31 @@ begin
       exit(false);
 
   // a box around each of the quick select world boxes
-  woBoxes := grid(2, 1, 41, 30, 44, 0, point(self.x2 - 125, self.y2 - 28));
+  woBoxes := grid(2, 1, 25, 15, 44, 0, point(self.x2 - 125, self.y2 - 27));
 
   for i := 0 to high(woBoxes) do
-    if (getTextAtEx(woBoxes[i], 0, 5, 2, 12378347, 10, 'SmallCharsNS') = toStr(wo)) then
+  begin
+    bmp := bitmapFromClient(woBoxes[i]);
+
+    getMufasaBitmap(bmp).posterize(222);
+    getMufasaBitmap(bmp).findColors(tpa, 14606046);
+
+    freeBitmap(bmp);
+
+    if (length(tpa) < 1) then
+      continue();
+
+    atpa := tpa.split(1, 10);
+    sortATPAFromFirstPointX(atpa, [0, 0]);
+
+    if (getTextATPA(atpa, 3, 'NumberCharsSmooth', numbers) = intToStr(wo)) then
     begin
-      print('TRSLobby.quickSelectWorld(): Found quick-select world '+toStr(wo));
+      print('TRSLobby.quickSelectWorld(): Found quick-select world '+toStr(wo), TDebug.SUB);
       mouseBox(woBoxes[i], MOUSE_LEFT);
       result := true;
       break;
     end;
+  end;
 end;
 
 begin

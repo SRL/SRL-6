@@ -698,27 +698,28 @@ findSpinTicket
 
 .. code-block:: pascal
 
-    function findSpinTicket(var x, y: integer; destroy: boolean = true): boolean;
+    function findSpinTicket(var p: TPoint): boolean;
 
-Returns true if the Squeal Of Fortune spin ticket it found.  Returns its
-coordinates in x, y.  Will destroy the ticket by default.  If 'destroy' is set
-to false, will just return true if the ticket is found.
+Returns true if the Squeal Of Fortune spin ticket it found. Returns its
+coordinates in a TPoint 'p'.
 
 .. note::
 
     - by Kyle Undefined
-    - Last Updated: 16 August 2013 by Coh3n
+    - Last Updated: 10 September 2013 by Olly
 
 Example:
 
 .. code-block:: pascal
 
-    findSpinTicket(x, y);
+    findSpinTicket(p);
 *)
-function findSpinTicket(var x, y: integer; destroy: boolean = true): boolean;
+function findSpinTicket(var p: TPoint): boolean;
 var
   oneFreeSpin: integer;
 begin
+  result := false;
+
   if (not tabBackpack.isOpen()) then
   begin
     print('findSpinTicket(): Backpack is not open, consider calling tabBackpack.open() first', TDebug.HINT);
@@ -727,22 +728,11 @@ begin
 
   oneFreeSpin := DTMFromString('mrAAAAHic42BgYHjHzMDwFojvQfEDIP4ExL+B+A8Q32ZkYDgPxBeA+D4QP4Hie0B8BYi3RkoCTWHCibmAJD7MSADDAABVYQ/p');
 
-  if (findDTM(oneFreeSpin, x, y, tabBackpack.getBounds())) then
+  if (findDTM(oneFreeSpin, p.x, p.y, tabBackpack.getBounds())) then
   begin
-    mouse(point(x, y).rand(5), MOUSE_MOVE);
+    tabBackpack.mouseSlot(tabBackpack.pointToSlot(p), MOUSE_MOVE);
 
-    if (isMouseOverText(['laim'], 300)) then
-    begin
-      result := true;
-
-      if (destroy) then
-      begin
-        fastClick(MOUSE_RIGHT);
-        chooseOption.select(['estroy'], 500);
-        wait(randomRange(1500, 2000));
-        result := conversationBox.findDialogText(['All', 'Yes'], MOUSE_LEFT);
-      end;
-    end;
+    result := (isMouseOverText(['Claim', 'laim'], 300));
   end;
 
   freeDTM(oneFreeSpin);
@@ -797,48 +787,3 @@ begin
   freeBitmap(bmpCross);
 end;
 
-(*
-leaveDangerZone
-~~~~~~~~~~~~~~~
-
-.. code-block:: pascal
-
-    function leaveDangerZone(): boolean;
-
-Handles the 'danger zone' message users get when their total level is less than
-60, and they try to enter the wilderness.
-
-.. note::
-
-    - by Coh3n
-    - Last Modified: 23 August 2013 by Coh3n
-
-Example:
-
-.. code-block:: pascal
-
-    if (leaveDangerZone()) then
-      continueWalking;
-*)
-function leaveDangerZone(): boolean;
-var
-  t: integer;
-begin
-  if (conversationBox.findDialogText(['erous'])) then // Only if total level < 60
-  begin
-    conversationBox.continue(true, true);
-
-    t := (getSystemTime() + 5000);
-
-    while (getSystemTime() < t) do
-    begin
-      wait(500 + random(300));
-
-      if (conversationBox.findDialogText(['eave'])) then
-      begin
-        result := true;
-        break;
-      end;
-    end;
-  end;
-end;
