@@ -56,14 +56,8 @@ const
     _TAB_MUSIC = 39;
     _TAB_NOTES = 31;
 
-{*
-const Internal
-~~~~~~~~~~~~~~
-
-Internal gametab constants.
-*}
 const
-  _COLOR_TAB_ACTIVE = 8682089; // the top border color of an active tab
+  __COLORS_ACTIVE_TAB = [7037013, 8682089];
 
 {*
 type TRSGameTab
@@ -174,7 +168,7 @@ begin
     _TAB_TASK,
     _TAB_COMPASS_TASK: self.tabs[tab]._bmp := bitmapFromString(7, 7, 'meJzjW3uHb+0d67MfrT6+ByLFsi0ctsFcU3cDBdmvfoUIAmX5ktuBInxrbnNN2QligxFH1USQYHAsv5AKUBcnnxqPsiVI0MaPm5OVW5CbMzKN2z4TqFLIKoJTUIxVToBZToBNXwiomD3aml+EF6geyIUjTidRLidRACrELQI=');
     _TAB_EQUIPMENT:    self.tabs[tab]._bmp := bitmapFromString(7, 7, 'meJyb1l4zrb0mKTW5qroagp7cuTF98pTFS2YDBSHiQO7B3TuAyoAMOHfOui1AEqgAohgo7uLkJm9lCWEDBa30dBgZGCAIKAIxSklRDS5o6R4DtyKhpDY+0puFlwNoAgCiqjza');
-    _TAB_BACKPACK:     self.tabs[tab]._bmp := bitmapFromString(7, 7, 'meJxzKN7uULxd0TqYR9lSyTZT264Rggzt5gBJoCAQARlAKWQEFARqgYjDZYGC8moWQAYzMx/ENKAafrEgTh4riAI2fjEggigDCmoldELsAqoBCgJ1yVtZatdMBwCWRCF2');
+    _TAB_BACKPACK:     self.tabs[tab]._bmp := BitmapFromString(10, 13, 'meJxdkDEKAjEURLESZcl2lgYU05pGWCOylRfYE4i1Ym1hZW21goWHsLH0Ot7Dt458loUhTP7M//OTWNaxrIvDE4xTlU2Xk/U+/opp+xCxCqoMAlxqu8IQCOfABdBR/ayA5KMKoPb6TgPxN5UswRfXl6VgcMNcjair3eX4/kAUDeiC4/Epzc93pXT2VJFemTWNRK0K2ASVXIgMUuWXZ3O6NS/yQarSbQdJUu0T2svY5P/VB7r0cK5flkxUrg==');
     _TAB_DEFENCE:      self.tabs[tab]._bmp := bitmapFromString(7, 7, 'meJybPnlKVXV1dedEIHlw9w4Img4WBCIIA0jCBees2wJEEMEnd24AEZD75eNLIGNae01dQUp8pDdQCoj2nLi5eMlsFyc3HsFsbvaFQC1JqckQkl8siJ3zZEbeFbggRJmtxaMJE28BAHrlTgg=');
     _TAB_RANGED:       self.tabs[tab]._bmp := bitmapFromString(8, 2, 'meJyTVDeWkPHmt0vms0sRkvAXkvDjtfZVs3B3TOxwTOrktvEHIkHxAH6xIEGzDr7kdgDxgAq2');
     _TAB_MELEE:        self.tabs[tab]._bmp := bitmapFromString(4, 4, 'meJwTF+ScPnnKlz9/Fzz/PmfdFiBjz4mbSanJSbfeZfz4BWS42RtbrzzFNXW3S1SqmCAnANE4Gm4=');
@@ -345,11 +339,20 @@ Example:
       writeln('Multiple tabs are open');
 *)
 function TRSGameTabs.areMultiOpen(): boolean;
+var
+  i: integer;
+  atpa: array [0..1] of TPointArray;
+  tpa: TPointArray;
 begin
   if (self.areTabArrowsVisible()) then
     exit(true);
 
-  result := (countColor(_COLOR_TAB_ACTIVE, self.__tabSelectionArea) > 25);
+  for i := 0 to 1 do
+    findColors(atpa[i], __COLORS_ACTIVE_TAB[i], self.__tabSelectionArea);
+
+  tpa := mergeATPA(atpa);
+
+  result := (length(tpa) > 25);
 end;
 
 (*
@@ -419,7 +422,7 @@ begin
   if (not self.tabs[tab]._bmpLoaded) then
     self.__loadBitmap(tab);
 
-  result := findBitmapToleranceIn(self.tabs[tab]._bmp, p.x, p.y, searchBox, 10);
+  result := findBitmapToleranceIn(self.tabs[tab]._bmp, p.x, p.y, searchBox, 15);
 end;
 
 {*
@@ -448,6 +451,9 @@ var
   p: TPoint;
   tpa: TPointArray;
   bds: TBox;
+  cols: array [0..1] of integer;
+  atpa: array [0..1] of TPointArray;
+  i: integer;
 begin
   result := intToBox(-1, -1, -1, -1);
 
@@ -459,10 +465,13 @@ begin
   else
     self.visibleTabArea := self.__visibleTabAreaSingle;
 
-  findColors(tpa, _COLOR_TAB_ACTIVE, self.__tabSelectionArea.x1,
-                                     self.__tabSelectionArea.y1,
-                                     self.__tabSelectionArea.x2,
-                                     self.__tabSelectionArea.y2 - 1); // get rid of stray points on the last line
+  for i := 0 to 1 do
+    findColors(atpa[i], __COLORS_ACTIVE_TAB[i], self.__tabSelectionArea.x1,
+                                                self.__tabSelectionArea.y1,
+                                                self.__tabSelectionArea.x2,
+                                                self.__tabSelectionArea.y2 - 1); // get rid of stray points on the last line
+
+  tpa := mergeATPA(atpa);
 
   if (length(tpa) <= 0) then
     if (self.areMultiOpen()) then
@@ -473,8 +482,6 @@ begin
       print('TRSGameTabs._getActiveTabBox(): There''s only a single tab open, failed to identify', TDebug.WARNING);
       exit;
     end;
-
-  //smartImage.drawTPA(tpa, clLime);
 
   bds := tpa.getBounds();
   result := intToBox(bds.x1, bds.y1, bds.x2, bds.y2 + 25);
