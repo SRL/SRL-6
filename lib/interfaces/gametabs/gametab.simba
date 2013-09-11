@@ -352,7 +352,7 @@ begin
 
   tpa := mergeATPA(atpa);
 
-  result := (length(tpa) > 25);
+  result := (length(tpa) > 10);
 end;
 
 (*
