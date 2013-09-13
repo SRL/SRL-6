@@ -570,7 +570,6 @@ begin
 
   if (__findMouseOverBox(box)) then
   begin
-    writeln(box);
     __createMouseOverFilter(box, bmpClean, bmpFiltered);
     result := __getMouseOverText(box, bmpClean, bmpFiltered);
 
