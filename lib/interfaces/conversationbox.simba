@@ -76,6 +76,7 @@ Example:
 
     conversationBox.__init();
 *}
+{$IFNDEF CODEINSIGHT}
 procedure TRSConversationBox.__init();
 begin
   with self do
@@ -86,6 +87,7 @@ begin
     static := true;
   end;
 end;
+{$ENDIF}
 
 {*
 TRSConversationBox.__find
@@ -110,6 +112,7 @@ Example:
     if (not self.__find()) then
       exit();
 *}
+{$IFNDEF CODEINSIGHT}
 function TRSConversationBox.__find(): boolean;
 var
   wid, hei: integer;
@@ -119,6 +122,7 @@ begin
 
   self.setBounds([0, hei - 146, 521, hei - 1]); // bottom left corner of the client
 end;
+{$ENDIF}
 
 (*
 TRSConversationBox.getSpeaker

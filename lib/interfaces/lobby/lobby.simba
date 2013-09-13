@@ -97,6 +97,7 @@ Example:
 
     lobby.__init();
 *}
+{$IFNDEF CODEINSIGHT}
 procedure TRSLobby.__init();
 begin
   with self do
@@ -115,6 +116,7 @@ begin
     cy := self.getCenterPoint().y;
   end;
 end;
+{$ENDIF}
 
 {*
 TRSLobby.__skipEmailScreen()
@@ -137,6 +139,7 @@ Example:
 
     lobby.__skipEmailScreen();
 *}
+{$IFNDEF CODEINSIGHT}
 procedure TRSLobby.__skipEmailScreen();
 var
   tpa: TPointArray;
@@ -148,6 +151,7 @@ begin
   if (length(tpa) = 43) then
     mouseBox(tpa.getBounds(), MOUSE_LEFT);
 end;
+{$ENDIF}
 
 {*
 TRSLobby.__find()
@@ -172,6 +176,7 @@ Example:
 
     lobby.__find();
 *}
+{$IFNDEF CODEINSIGHT}
 function TRSLobby.__find(): boolean;
 var
   wid, hei: integer;
@@ -188,6 +193,7 @@ begin
     //smartImage.drawBox(self.getBounds(), false);
   end;
 end;
+{$ENDIF}
 
 (*
 TRSLobby.isOpen()

@@ -127,6 +127,7 @@ Example:
 
     gameTabs.__init();
 *}
+{$IFNDEF CODEINSIGHT}
 procedure TRSGameTabs.__init();
 begin
   with self do
@@ -139,6 +140,7 @@ begin
 
   addOnTerminate('__freeGameTabs');
 end;
+{$ENDIF}
 
 {*
 TRSGameTabs.__loadBitmap
@@ -161,6 +163,7 @@ Example:
 
     gameTabs.__loadBitmap(_TAB_BACKBACK);
 *}
+{$IFNDEF CODEINSIGHT}
 procedure TRSGameTabs.__loadBitmap(tab: integer);
 begin
   case tab of
@@ -188,6 +191,7 @@ begin
   end else
     print('TRSGameTabs.__loadBitmap(): Invalid tab '+toStr(tab), TDebug.WARNING);
 end;
+{$ENDIF}
 
 {*
 __freeGameTabs
@@ -210,6 +214,7 @@ Example:
 
     addOnTerminate('__freeGameTabs');
 *}
+{$IFNDEF CODEINSIGHT}
 procedure __freeGameTabs();
 var
   i: integer;
@@ -218,6 +223,7 @@ begin
     if (gameTabs.tabs[i]._bmpLoaded) then
       freeBitmap(gameTabs.tabs[i]._bmp);
 end;
+{$ENDIF}
 
 {*
 TRSGameTabs._isTabValid
@@ -741,6 +747,7 @@ Example:
 
     gameTabs.__find();
 *}
+{$IFNDEF CODEINSIGHT}
 function TRSGameTabs.__find(): boolean;
 var
   i, wid, hei: integer;
@@ -820,6 +827,7 @@ begin
   print('Make sure the gametabs navigation bar, and open tabs are in the bottom right corner of the screen', TDebug.WARNING);
   print('TRSGameTabs.__find(): '+toStr(result), TDebug.FOOTER);
 end;
+{$ENDIF}
 
 (*
 TRSGameTabs.clearMouseOverText

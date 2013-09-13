@@ -114,6 +114,7 @@ Example:
 
     self.__loadFromINI();
 *}
+{$IFNDEF CODEINSIGHT}
 procedure TRSLobbyWorlds.__loadFromINI();
 var
   i, c: integer;
@@ -130,6 +131,7 @@ begin
 
   setLength(self.worlds, c);
 end;
+{$ENDIF}
 
 {*
 TRSLobbyWorlds.__init
@@ -152,6 +154,7 @@ Example:
 
     lobbyWorlds.__init();
 *}
+{$IFNDEF CODEINSIGHT}
 procedure TRSLobbyWorlds.__init();
 begin
   with self do
@@ -173,6 +176,7 @@ begin
     self.__loadFromINI();
   end;
 end;
+{$ENDIF}
 
 {*
 TRSLobbyWorlds._getWorldIndex

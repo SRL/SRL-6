@@ -55,6 +55,7 @@ Example:
 
     chatbox.__init();
 *}
+{$IFNDEF CODEINSIGHT}
 procedure TRSChatbox.__init();
 begin
   with self do
@@ -65,6 +66,7 @@ begin
     static := false;
   end;
 end;
+{$ENDIF}
 
 {*
 TRSChatbox._findTextBorder
@@ -288,6 +290,7 @@ Example:
     if (chatbox.__find()) then
       writeln('Found the chat box!');
 *}
+{$IFNDEF CODEINSIGHT}
 function TRSChatBox.__find(): boolean;
 var
   wid, hei, i: integer;
@@ -337,6 +340,7 @@ begin
 
   print('TRSChatbox.__find(): '+toStr(result), TDebug.FOOTER);
 end;
+{$ENDIF}
 
 (*
 TRSChatbox.isOpen

@@ -83,6 +83,7 @@ Example:
 
     mainscreen.__init();
 *}
+{$IFNDEF CODEINSIGHT}
 procedure TRSMainscreen.__init();
 begin
   with self do
@@ -93,6 +94,7 @@ begin
     static := true;
   end;
 end;
+{$ENDIF}
 
 {*
 TRSMainscreen.__find
@@ -117,6 +119,7 @@ Example:
 
     mainscreen.__find();
 *}
+{$IFNDEF CODEINSIGHT}
 function TRSMainscreen.__find(): boolean;
 var
   wid, hei: integer;
@@ -149,6 +152,7 @@ begin
 
   print('TRSMainscreen.__find(): Set mainscreen bounds based on the other visible interfaces', TDebug.SUB);
 end;
+{$ENDIF}
 
 (*
 TRSMainscreen.setAngle

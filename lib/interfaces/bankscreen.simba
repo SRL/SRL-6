@@ -91,6 +91,7 @@ Example:
     minimap.__init();
 
 *}
+{$IFNDEF CODEINSIGHT}
 procedure TRSBankScreen.__init();
 begin
   with (self) do
@@ -101,6 +102,7 @@ begin
     static := true;
   end;
 end;
+{$ENDIF}
 
 {*
 TRSBankScreen.__find
@@ -124,6 +126,7 @@ Example:
     minimap.__find();
 
 *}
+{$IFNDEF CODEINSIGHT}
 function TRSBankScreen.__find(): boolean;
 var
   wid, hei: integer;
@@ -141,6 +144,7 @@ begin
     __tabSlots      := grid(9, 1, 45, 35, 48, 0, point(self.x1 + 34, self.y1 + 57));
   end;
 end;
+{$ENDIF}
 
 (*
 TRSBankScreen.isOpen

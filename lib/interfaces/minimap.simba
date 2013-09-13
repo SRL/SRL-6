@@ -9,6 +9,8 @@ The source for this file can be found `here <https://github.com/SRL/SRL-6/blob/m
 
 *)
 
+{$DEFINE CODEINSIGHT}
+
 {$include_once interfaces.simba}
 {$include_once ../utilities/color.simba}
 {$include_once ../utilities/pixelshift.simba}
@@ -205,6 +207,13 @@ const
   MM_SYMBOL_UNDERGROUND     = 91;
   MM_SYMBOL_WATER           = 92;
 
+(*
+const Buttons
+~~~~~~~~~~~~~
+
+Constants representing the minimap buttons.
+
+*)
 const
   MM_BUTTON_COMPASS = 0;
   MM_BUTTON_RUN = 1;
@@ -224,6 +233,12 @@ type
     color: integer;
   end;
 
+{*
+type _TRSMMButton
+~~~~~~~~~~~~~~~~~
+
+A type that stores minimap button information.
+*}
 type
   _TRSMMButton = record
     bounds: TBox;
@@ -284,6 +299,7 @@ Example:
 
     minimap.__init();
 *}
+{$IFNDEF CODEINSIGHT}
 procedure TRSMinimap.__init();
 begin
   with self do
@@ -295,6 +311,7 @@ begin
     symbolAccuracy := 0.65;
   end;
 end;
+{$ENDIF}
 
 {*
 TRSMinimap.__createMaskTPA
@@ -318,6 +335,7 @@ Example:
 
     minimap.__createMaskTPA();
 *}
+{$IFNDEF CODEINSIGHT}
 procedure TRSMinimap.__createMaskTPA();
 var
   bounds: TBox;
@@ -372,6 +390,7 @@ begin
 
   freeBitmap(res);
 end;
+{$ENDIF}
 
 {*
 function TRSMinimap.__find(): boolean
@@ -395,6 +414,7 @@ Example:
 
     minimap.__find();
 *}
+{$IFNDEF CODEINSIGHT}
 function TRSMinimap.__find(useDebug: boolean = true): boolean;
 const
   COMPASS_CENTER_POINT_COLOR  = 8508157;
@@ -535,6 +555,7 @@ begin
   if (useDebug) then
     print('TRSMinimap.__find(): '+toStr(result), TDebug.FOOTER);
 end;
+{$ENDIF}
 
 {*
 TRSMinimap._getButton
