@@ -303,7 +303,13 @@ begin
   box := intToBox(-1, -1, -1, -1);
 
   atpa := splitTPAEx(tpa, 2, 2); // Group the points we found
+  atpa.filterBetween(0, 5); // get rid of tiny tpa's
+
   len := length(atpa);
+
+  if (len < 1) then // no points left over after removing tiny tpa's
+    exit(false);
+
   setLength(tpa, len); // Repurpose tpa variable to contain midpoints of the tpas stored in atpa
 
   for i := 0 to (len - 1) do // Get midpoint of each group
@@ -312,8 +318,13 @@ begin
   for i := 0 to (len - 1) do // Compare each midpoints to every other midpoint
     for j := 0 to (len - 1) do
       if (tpa[i].y = tpa[j].y) then // If the y coordinates are the same, then the two midpoints are horizontally aligned
+      begin
+        if (distance(tpa[i], tpa[j]) < 15) then // if the box width is less than 15, then its too small
+          continue;
+
         if (not (tpa[i].x = tpa[j].x)) then // If the x coordinates are also the same, then we are comparing the same point and should continue the inner loop
         begin // Otherwise, we have two horizontally-aligned midpoints, which means they are most likely the left and right edges of the box
+
           y2OfBounds := getTPABounds(atpa[i]).y2 + 5; // Gets the y2 bound of our return box based on the bottom of one of the edge strips
 
           if (getColor(((tpa[i].x + tpa[j].x) div 2), y2OfBounds + 1)) then // If we get the edge color at the point halfway between the two lines we are testing, and down where the bottom edge should be
@@ -324,6 +335,7 @@ begin
            end;
         end else
           continue;
+      end;
 
   if (box.y2 = -1) then // If the y2 coordinate of our return box is still -1, we did not find any horizontally-aligned groups and should return false
     exit(false);
@@ -558,6 +570,7 @@ begin
 
   if (__findMouseOverBox(box)) then
   begin
+    writeln(box);
     __createMouseOverFilter(box, bmpClean, bmpFiltered);
     result := __getMouseOverText(box, bmpClean, bmpFiltered);
 
@@ -653,6 +666,7 @@ begin
     result := __findMouseOverBox(res);
     wait(20 + random(20));
   end;
+
 end;
 
 type
