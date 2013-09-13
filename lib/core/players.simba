@@ -596,7 +596,7 @@ begin
 	    if (__interfaceFindFunctions[i] <> nil) then
 	      __interfaceFindFunctions[i]();
 
-    __loggedInReference := [minimap.x2 - 3, minimap.y1 - 3]; // so interface find functions aren't unnecessarily called
+    __loggedInReference := [minimap.x+minimap.w - 3, minimap.y - 3]; // so interface find functions aren't unnecessarily called
   end;
 
   if (not result) then
@@ -1272,7 +1272,7 @@ begin
 
   if (options.open()) then
   begin
-    p := point(options.x1 + round(options.w / 2), options.y2 - 20); // the logout button
+    p := point(options.x + round(options.w / 2), options.x + options.w - 20); // the logout button
     mouse(p.rand(randomRange(-50, 50), 5), MOUSE_LEFT);
 
     t := (getSystemTime() + (7000));

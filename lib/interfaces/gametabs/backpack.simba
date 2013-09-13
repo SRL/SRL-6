@@ -155,7 +155,7 @@ begin
   end;
 
 
- if (self.y1 = gameTabs.__visibleTabAreaMulti.y1) then
+ if (self.y = gameTabs.__visibleTabAreaMulti.y1) then
    slots := __slots[0]
  else
    slots := __slots[1];

@@ -163,15 +163,6 @@ begin
     ID := ID_INTERFACE_LOBBY_WORLDS;
     parentID := ID_INTERFACE_LOBBY;
     static := true;
-    x1 := -1;
-    y1 := -1;
-    x2 := -1;
-    y2 := -1;
-    w := (x2 - x1);
-    h := (y2 - y1);
-    cx := self.getCenterPoint().x;
-    cy := self.getCenterPoint().y;
-
     lobbyID := LOBBY_WORLDS;
     self.__loadFromINI();
   end;
@@ -234,16 +225,7 @@ begin
 
   // set the world's bounds to the same as the lobby's
   if (result) then
-  begin
-    self.x1 := lobby.x1;
-    self.y1 := lobby.y1;
-    self.x2 := lobby.x2;
-    self.y2 := lobby.y2;
-    self.w := (x2 - x1);
-    self.h := (y2 - y1);
-    self.cx := self.getCenterPoint().x;
-    self.cy := self.getCenterPoint().y;
-  end;
+    self.setBounds(lobby.getBounds());
 end;
 
 (*
@@ -285,7 +267,7 @@ begin
 
     while (getSystemTime() < t) do
     begin
-      if (getColor(self.x1 + 22, self.y1 + 133) = 16777215) then // white color of some text in the interface
+      if (getColor(self.x + 22, self.y + 133) = 16777215) then // white color of some text in the interface
         exit(true);
 
       wait(50);
@@ -327,7 +309,7 @@ begin
   if (not self.isOpen()) then
     exit();
 
-  if (findColors(tpa, 12378347, self.x1 + 575, self.y1 + 60, self.x2, self.y1 + 75)) then // box around the current world
+  if (findColors(tpa, 12378347, self.x + 575, self.y + 60, self.x+self.w, self.y + 75)) then // box around the current world
   begin
     box := getTPABounds(tpa);
     result := strToIntDef(extractFromStr(getTextAtEx(box.x1, box.y1, box.x2, box.y2, 0, 3, 4, 12378347, 0, upChars), numbers), -1);
@@ -412,12 +394,12 @@ begin
     exit(false);
 
   // long box around the arrows
-  if (findColorsTolerance(TPA, _WORLD_COLOR_ARROW, self.x1, self.y1 + 115, self.x2, self.y1 + 130, 1)) then
+  if (findColorsTolerance(TPA, _WORLD_COLOR_ARROW, self.x, self.y + 115, self.x+self.w, self.y + 130, 1)) then
   begin
     print('Found _WORLD_COLOR_ARROW');
 
     ATPA := splitTPA(TPA, 2);
-    sortATPAFromFirstPoint(ATPA, point(self.x1, self.y1));
+    sortATPAFromFirstPoint(ATPA, point(self.x, self.y));
 
     if (length(ATPA) < (by * 2)) then
     begin
@@ -468,7 +450,7 @@ var
   p: TPoint;
 begin
   // box is the world number column
-  worldsArea := intToBox(self.x1 + 55, self.y1 + 115, self.x1 + 80, self.y2 - 50);
+  worldsArea := intToBox(self.x + 55, self.y + 115, self.x + 80, self.y+self.h - 50);
 
   if (self.worlds[self._getWorldIndex(wo)].members) then
     col := 6618364

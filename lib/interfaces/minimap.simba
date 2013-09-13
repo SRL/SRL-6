@@ -9,8 +9,6 @@ The source for this file can be found `here <https://github.com/SRL/SRL-6/blob/m
 
 *)
 
-{$DEFINE CODEINSIGHT}
-
 {$include_once interfaces.simba}
 {$include_once ../utilities/color.simba}
 {$include_once ../utilities/pixelshift.simba}
@@ -381,7 +379,7 @@ begin
   end;
 
   findColorsBitmap(res, self._maskTPA, clBlack);
-  self._maskTPA.offset([self.x1, self.y1]);
+  self._maskTPA.offset([self.x, self.y]);
 
   if (length(self._maskTPA) > 0) then
     print('minimap.__createMaskTPA(): Succesfully created mask tpa', TDebug.SUB)
@@ -584,7 +582,7 @@ begin
     MM_BUTTON_COMPASS:
       with result do
       begin
-        bounds := [self.x1 + 6, self.y1 + 5, self.x1 + 40, self.y1 + 39];
+        bounds := [self.x + 6, self.y + 5, self.x + 40, self.y + 39];
         center := bounds.getMiddle();
         radius := 16;
       end;
@@ -592,7 +590,7 @@ begin
     MM_BUTTON_RUN:
       with result do
       begin
-        bounds := [self.x2 -40, self.y1 + 5, self.x2 - 6, self.y1 + 40];
+        bounds := [self.x+self.w -40, self.y + 5, self.x+self.w - 6, self.y + 40];
         center := bounds.getMiddle();
         radius := 16;
       end;
@@ -600,7 +598,7 @@ begin
     MM_BUTTON_LODESTONE:
       with result do
       begin
-        bounds := [self.x1 + 10, self.y2 -37, self.x1 + 37, self.y2-11];
+        bounds := [self.x + 10, self.y+self.h -37, self.x + 37, self.y+self.h-11];
         center := bounds.getMiddle();
         radius := 13;
       end;
@@ -608,7 +606,7 @@ begin
     MM_BUTTON_MAP:
       with result do
       begin
-        bounds := [self.x2-35, self.y2-36, self.x2-11, self.y2-13];
+        bounds := [self.x+self.w-35, self.y+self.h-36, self.x+self.w-11, self.y+self.h-13];
         center := bounds.getMiddle();
         radius := 12;
       end;
@@ -1182,8 +1180,8 @@ begin
     if ((fastGetPixel(bmp, tpa[i].x - 1, tpa[i].y - 1) - fastGetPixel(bmp, tpa[i].x, tpa[i].y - 1)) = 6381921) then
     begin
       result := true;
-      p.x := tpa[i].x + self.x1;
-      p.y := tpa[i].y + self.y1;
+      p.x := tpa[i].x + self.x;
+      p.y := tpa[i].y + self.y;
       break;
     end;
 
@@ -1257,12 +1255,15 @@ Example:
 *)
 function TRSMinimap.getFlagDistance(): integer;
 var
-  p: TPoint;
+  p, c: TPoint;
 begin
   result := -1;
 
   if (self.isFlagPresent(p)) then
-    result := distance(self.cx, self.cy, p.x, p.y);
+  begin
+    c := self.getCenterPoint();
+    result := distance(c.x, c.y, p.x, p.y);
+  end;
 end;
 
 (*
@@ -1289,7 +1290,7 @@ Example:
 function TRSMinimap.waitFlag(dist: integer = 0): boolean;
 var
   m, t, d1, d2: integer;
-  p: TPoint;
+  p, c: TPoint;
 begin
   result := false;
   m := getSystemTime();
@@ -1306,7 +1307,8 @@ begin
       break;
     end;
 
-    d1 := distance(p.x, p.y, self.cx, self.cy);
+    c := self.getCenterPoint();
+    d1 := distance(p.x, p.y, c.x, c.y);
 
     if (d1 <= dist) then
     begin
@@ -1366,8 +1368,10 @@ Example:
 function TRSMinimap.isPlayerMoving(shiftInterval: integer = 500): boolean;
 var
   shiftBox: TBox;
+  c: TPoint;
 begin
-  shiftBox.setBounds(self.cx - 30, self.cy - 30, self.cx + 30, self.cy + 30);
+  c := self.getCenterPoint();
+  shiftBox.setBounds(c.x - 30, c.y - 30, c.x + 30, c.y + 30);
   result := (getPixelShift(shiftBox, shiftInterval) > 200);
 end;
 
@@ -1449,6 +1453,7 @@ var
   sd, ed, direction, i: integer;
   linear: boolean;
   tpa: TPointArray;
+  c: TPoint;
 begin
   result := false;
   print('TRSMinimap.radialWalk()', TDebug.HEADER);
@@ -1474,13 +1479,15 @@ begin
     if (sd > ed) then
       swap(sd, ed);
 
+  c := self.getCenterPoint();
+
   findColorsTolerance(tpa, theColor, self.getBounds(), tol);
-  filterPointsPie(tpa, sd, ed, 10, radius, self.cx, self.cy);
+  filterPointsPie(tpa, sd, ed, 10, radius, c.x, c.y);
 
   if (linear) then
-    linearSort(tpa, self.cx, self.cy, direction, false)
+    linearSort(tpa, c.x, c.y, direction, false)
   else
-    sortCircleWise(tpa, self.cx, self.cy, startRadial, false, startRadial > endRadial);
+    sortCircleWise(tpa, c.x, c.y, startRadial, false, startRadial > endRadial);
 
   if (length(tpa) > 0) then
   begin

@@ -65,9 +65,7 @@ type
     name: string;
     ID, parentID: integer;
     static: boolean;
-    x1, y1, x2, y2: integer;
-    cx, cy: integer;
-    w, h: integer;
+    x, y, w, h: integer;
   end;
 
 const
@@ -84,11 +82,12 @@ TRSInterface.getBounds
 
     function TRSInterface.getBounds(): TBox;
 
-Returns a TBox of the TRSInterface.
+Returns a TBox of the TRSInterface's location.
 
 .. note::
 
     - by Coh3n
+    - Last Updated: 13 September 2013 by Coh3n
 
 Example:
 
@@ -98,7 +97,7 @@ Example:
 *)
 function TRSInterface.getBounds(): TBox;
 begin
-  result := intToBox(self.x1, self.y1, self.x2, self.y2);
+  result := intToBox(self.x, self.y, self.x + self.w, self.y + self.h);
 end;
 
 (*
@@ -114,7 +113,7 @@ Sets the bounds, width, height, and center point of the TRSInterface.
 .. note::
 
     - by Coh3n
-    - Last Updated: 16 May 2013 by Coh3n
+    - Last Updated: 13 September 2013 by Coh3n
 
 Example:
 
@@ -124,16 +123,10 @@ Example:
 *)
 procedure TRSInterface.setBounds(newBounds: TBox);
 begin
-  self.x1 := newBounds.x1;
-  self.y1 := newBounds.y1;
-  self.x2 := newBounds.x2;
-  self.y2 := newBounds.y2;
-
-  self.w := (newBounds.x2 - newBounds.x1);
-  self.h := (newBounds.y2 - newBounds.y1);
-
-  self.cx := self.getCenterPoint().x;
-  self.cy := self.getCenterPoint().y;
+  self.x := newBounds.x1;
+  self.y := newBounds.y1;
+  self.w := newBounds.x2 - newBounds.x1;
+  self.h := newBounds.y2 - newBounds.y1;
 end;
 
 (*
@@ -160,52 +153,4 @@ Example:
 function TRSInterface.getCenterPoint(): TPoint;
 begin
   result := self.getBounds().getMiddle();
-end;
-
-(*
-TRSInterface.drag
-~~~~~~~~~~~~~~~~~
-
-.. code-block:: pascal
-
-    function TRSInterface.drag(dest: TPoint): boolean;
-
-Drags the TRSInterface to a destination point (dest) if the interface's static
-attribute is set to false.
-
-.. note::
-
-    - by Coh3n
-
-Example:
-
-.. code-block:: pascal
-
-    squealOfFortune.drag(point(0, 0));
-*)
-function TRSInterface.drag(dest: TPoint): boolean;
-var
-  mouseDownPoint, currMousePos, diff, dragTo: TPoint;
-begin
-  if (self.static = true) then
-  begin
-    print('Interface '+self.name+' is static; cannot be dragged');
-    exit(false);
-  end;
-
-  // point to start the drag
-  mouseDownPoint := point(self.x1 + random(self.w), self.y1 + random(self.h)); // point to start the drag
-  mouse(mouseDownPoint);
-
-  // calculate where to drag to and from
-  getMousePos(currMousePos.x, currMousePos.y);
-  diff.x := (self.x1 - dest.x);
-  diff.y := (self.y1 - dest.y);
-  dragTo.x := (currMousePos.x - diff.x);
-  dragTo.y := (currMousePos.y - diff.y);
-
-  // drag the mouse & reset attributes
-  dragMouse(dragTo);
-  self.setBounds(intToBox(dest.x, dest.y, (self.x1 + self.w), (self.y1 + self.h)));
-  result = true;
 end;

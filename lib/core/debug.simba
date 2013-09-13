@@ -101,6 +101,7 @@ Example:
     __openLogFile();
 
 *}
+{$IFNDEF CODEINSIGHT}
 function __openLogFile(): boolean;
 var
   fileName, start: string;
@@ -126,6 +127,7 @@ begin
     writeln('Could not open/create log file');
   end;
 end;
+{$ENDIF}
 
 {*
 __printToLog
@@ -149,6 +151,7 @@ Example:
     printToLog('Adding to SRL log file!');
 
 *}
+{$IFNDEF CODEINSIGHT}
 procedure __printToLog(s: string);
 begin
   if (disableSRLLog) then
@@ -161,6 +164,7 @@ begin
       writeln('Could not write to log file');
     end;
 end;
+{$ENDIF}
 
 {*
 __closeLogFile
@@ -184,6 +188,7 @@ Example:
     __closeLogFile();
 
 *}
+{$IFNDEF CODEINSIGHT}
 procedure __closeLogFile();
 begin
   if (disableSRLLog) then
@@ -195,6 +200,7 @@ begin
     writeln('Error closing log file');
   end;
 end;
+{$ENDIF}
 
 (*
 print

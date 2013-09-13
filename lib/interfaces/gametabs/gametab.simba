@@ -889,12 +889,10 @@ begin
   print('gameTabs.clearMouseOverText(): Mouse moved to ' + toStr(p), TDebug.SUB);
 end;
 
-{$IFNDEF CODEINSIGHT}
 function __findGameTabs(): boolean;
 begin
   result := gametabs.__find();
 end;
-{$ENDIF}
 
 {$f+} // needed so __findGametabs isn't called when assigned
 
