@@ -234,10 +234,16 @@ begin
           while ((not result) and (getSystemTime() < t)) do
           begin
             print('Waiting for lobby screen...');
-            result := self.__find();
+
+            if (self.__find()) then
+            begin
+              result := true;
+              break(2);
+            end;
+
             wait(300 + random(400));
-         end;
-       end;
+          end;
+        end;
     end;
 end;
 
@@ -496,7 +502,7 @@ begin
       exit(false);
 
   // a box around each of the quick select world boxes
-  woBoxes := grid(2, 1, 25, 15, 44, 0, point(self.x + self.w - 125, self.y + self.w - 27));
+  woBoxes := grid(2, 1, 25, 15, 44, 0, point(self.x + self.w - 125, self.y + self.h - 27));
 
   for i := 0 to high(woBoxes) do
   begin
