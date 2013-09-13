@@ -257,7 +257,7 @@ function findColorTolerance(var x, y: Integer; color: integer; searchBox: TBox; 
 var
   cs: TColorSettings;
 begin
-  cs.retrieve;
+  cs.retrieve();
   settings.apply();
   Result := findColorTolerance(x, y, color, searchBox, tol);
   cs.apply();
