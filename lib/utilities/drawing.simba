@@ -578,7 +578,7 @@ begin
     exit();
   end;
 
-  for i := 0 to l do
+  for i := 0 to (l -1) do
     self.drawText(txtArr[i], pnts[i], font, shadow, color);
 end;
 

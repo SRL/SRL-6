@@ -152,11 +152,10 @@ begin
     self.areSlotsLoaded := true;
   end;
 
-
- if (self.y1 = gameTabs.__visibleTabAreaMulti.y1) then
-   slots := __slots[0]
- else
-   slots := __slots[1];
+  if (self.y1 = gameTabs.__visibleTabAreaMulti.y1) then
+    slots := __slots[0]
+  else
+    slots := __slots[1];
 end;
 
 (*
@@ -168,7 +167,7 @@ TRSTabBackpack.isOpen
     function TRSTabBackpack.open(): boolean;
 
 Returns true if our current tab is the Backpack tab, will also check if the
-BackPack tab is the only tab open.
+Backpack tab is the only tab open.
 
 .. note::
 
@@ -725,10 +724,44 @@ begin
 
   if (length(tia) > 0) then
   begin
-    tia.sortQuick;
+    tia.sortQuick();
     print('dropItems: Dropped items in slots ' + toStr(tia));
   end else
     print('dropItems: Failed finding any items to drop');
+end;
+
+(*
+TRSTabBackpack.dropItemsExcept
+~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+
+.. code-block:: pascal
+
+    procedure TRSTabBackpack.dropItemsExcept(ignoreSlots: TIntegerArray);
+
+Drops all items apart from the slots in 'ignoreSlots'.
+
+.. note::
+
+    - by Olly
+    - Last Updated: September 13, 2013
+
+Example:
+
+.. code-block:: pascal
+
+    tabBackpack.dropItemsExcept([1]);
+*)
+procedure TRSTabBackpack.dropItemsExcept(ignoreSlots: TIntegerArray);
+var
+  arr: TIntegerArray;
+  i: integer;
+begin
+  for i := 28 downto 1 do
+    if (not inIntArray(ignoreSlots, i)) then
+      insert(i, arr);
+
+  if (length(arr) > 0) then
+    self.dropItems(arr);
 end;
 
 (*
