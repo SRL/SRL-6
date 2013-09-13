@@ -114,6 +114,7 @@ Example:
 
     self.__loadFromINI();
 *}
+{$IFNDEF CODEINSIGHT}
 procedure TRSLobbyWorlds.__loadFromINI();
 var
   i, c: integer;
@@ -130,6 +131,7 @@ begin
 
   setLength(self.worlds, c);
 end;
+{$ENDIF}
 
 {*
 TRSLobbyWorlds.__init
@@ -152,6 +154,7 @@ Example:
 
     lobbyWorlds.__init();
 *}
+{$IFNDEF CODEINSIGHT}
 procedure TRSLobbyWorlds.__init();
 begin
   with self do
@@ -160,19 +163,11 @@ begin
     ID := ID_INTERFACE_LOBBY_WORLDS;
     parentID := ID_INTERFACE_LOBBY;
     static := true;
-    x1 := -1;
-    y1 := -1;
-    x2 := -1;
-    y2 := -1;
-    w := (x2 - x1);
-    h := (y2 - y1);
-    cx := self.getCenterPoint().x;
-    cy := self.getCenterPoint().y;
-
     lobbyID := LOBBY_WORLDS;
     self.__loadFromINI();
   end;
 end;
+{$ENDIF}
 
 {*
 TRSLobbyWorlds._getWorldIndex
@@ -230,16 +225,7 @@ begin
 
   // set the world's bounds to the same as the lobby's
   if (result) then
-  begin
-    self.x1 := lobby.x1;
-    self.y1 := lobby.y1;
-    self.x2 := lobby.x2;
-    self.y2 := lobby.y2;
-    self.w := (x2 - x1);
-    self.h := (y2 - y1);
-    self.cx := self.getCenterPoint().x;
-    self.cy := self.getCenterPoint().y;
-  end;
+    self.setBounds(lobby.getBounds());
 end;
 
 (*
@@ -268,6 +254,7 @@ Example:
 function TRSLobbyWorlds.open(): boolean;
 var
   t: integer;
+  p: TPoint;
 begin
   result := lobby._openTab(self.lobbyID);
 
@@ -281,7 +268,7 @@ begin
 
     while (getSystemTime() < t) do
     begin
-      if (getColor(self.x1 + 22, self.y1 + 133) = 16777215) then // white color of some text in the interface
+      if (findText(p, ['Free', 'Members'], [statChars], self.getBounds())) then
         exit(true);
 
       wait(50);
@@ -289,48 +276,6 @@ begin
 
     print('TRSLobbyWorlds.open(): Worlds list taking to long to load', TDebug.SUB);
   end;
-end;
-
-(*
-TRSLobbyWorlds.getCurrentWorld
-~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
-
-.. code-block:: pascal
-
-    function TRSLobbyWorlds.getCurrentWorld(): integer;
-
-Returns the currently selected world.
-
-.. note::
-
-    - by Home
-    - Last Updated: 23 July 2013 by Coh3n
-
-Example:
-
-.. code-block:: pascal
-
-    if (not lobbyWorlds.getCurrentWorld(115)) then
-      lobbyWorlds.selectWorld(115);
-*)
-function TRSLobbyWorlds.getCurrentWorld(): integer;
-var
-  box: TBox;
-  tpa: TPointArray;
-begin
-  result := -1;
-
-  if (not self.isOpen()) then
-    exit();
-
-  if (findColors(tpa, 12378347, self.x1 + 575, self.y1 + 60, self.x2, self.y1 + 75)) then // box around the current world
-  begin
-    box := getTPABounds(tpa);
-    result := strToIntDef(extractFromStr(getTextAtEx(box.x1, box.y1, box.x2, box.y2, 0, 3, 4, 12378347, 0, upChars), numbers), -1);
-  end else
-    print('TRSLobbyWorlds.getCurrentWorld(): Failed to find text color', TDebug.ERROR);
-
-  print('TRSLobbyWorlds.getCurrentWorld(): Current world is '+toStr(result), TDebug.SUB);
 end;
 
 {*
@@ -364,6 +309,60 @@ begin
       exit(true);
 
   print('TRSLobbyWorlds._isWorldValid(): '+toStr(wo)+' is an invalid world', TDebug.ERROR);
+end;
+
+(*
+TRSLobbyWorlds.getCurrentWorld
+~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+
+.. code-block:: pascal
+
+    function TRSLobbyWorlds.getCurrentWorld(): integer;
+
+Returns the currently selected world.
+
+.. note::
+
+    - by Home
+    - Last Updated: 23 July 2013 by Coh3n
+
+Example:
+
+.. code-block:: pascal
+
+    if (not lobbyWorlds.getCurrentWorld(115)) then
+      lobbyWorlds.selectWorld(115);
+*)
+function TRSLobbyWorlds.getCurrentWorld(): integer;
+var
+  atpa: T2DPointArray;
+  tpa: TPointArray;
+  bmp, n: integer;
+begin
+  result := -1;
+
+  if (not self.isOpen()) then
+    exit();
+
+  bmp := bitmapFromClient(self.x + 575, self.y + 60, self.x+self.w - 10, self.y + 75); // box around the current world
+
+  getMufasaBitmap(bmp).posterize(222);
+  getMufasaBitmap(bmp).findColors(tpa, 14606046);
+
+  freeBitmap(bmp);
+
+  if (length(tpa) > 0) then
+  begin
+    atpa := tpa.split(1, 10);
+    sortATPAFromFirstPointX(atpa, [0, 0]);
+
+    n := strToInt(getTextATPA(atpa, 3, 'NumberCharsSmooth', numbers));
+    if (self._isWorldValid(n)) then
+      result := n;
+  end else
+    print('TRSLobbyWorlds.getCurrentWorld(): Failed to find text color', TDebug.ERROR);
+
+  print('TRSLobbyWorlds.getCurrentWorld(): Current world is '+toStr(result), TDebug.SUB);
 end;
 
 (*
@@ -408,12 +407,12 @@ begin
     exit(false);
 
   // long box around the arrows
-  if (findColorsTolerance(TPA, _WORLD_COLOR_ARROW, self.x1, self.y1 + 115, self.x2, self.y1 + 130, 1)) then
+  if (findColorsTolerance(TPA, _WORLD_COLOR_ARROW, self.x, self.y + 115, self.x+self.w, self.y + 130, 1)) then
   begin
     print('Found _WORLD_COLOR_ARROW');
 
     ATPA := splitTPA(TPA, 2);
-    sortATPAFromFirstPoint(ATPA, point(self.x1, self.y1));
+    sortATPAFromFirstPoint(ATPA, point(self.x, self.y));
 
     if (length(ATPA) < (by * 2)) then
     begin
@@ -464,7 +463,7 @@ var
   p: TPoint;
 begin
   // box is the world number column
-  worldsArea := intToBox(self.x1 + 55, self.y1 + 115, self.x1 + 80, self.y2 - 50);
+  worldsArea := intToBox(self.x + 55, self.y + 115, self.x + 80, self.y+self.h - 50);
 
   if (self.worlds[self._getWorldIndex(wo)].members) then
     col := 6618364

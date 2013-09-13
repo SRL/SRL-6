@@ -83,6 +83,7 @@ Example:
 
     mainscreen.__init();
 *}
+{$IFNDEF CODEINSIGHT}
 procedure TRSMainscreen.__init();
 begin
   with self do
@@ -93,6 +94,7 @@ begin
     static := true;
   end;
 end;
+{$ENDIF}
 
 {*
 TRSMainscreen.__find
@@ -117,38 +119,40 @@ Example:
 
     mainscreen.__find();
 *}
+{$IFNDEF CODEINSIGHT}
 function TRSMainscreen.__find(): boolean;
 var
   wid, hei: integer;
+  bds: TBox;
 begin
   getClientDimensions(wid, hei);
 
   wid := wid - 1;
   hei := hei - 1;
-  self.x1 := 0;
-  self.y1 := 0;
+  bds.x1 := 0;
+  bds.y1 := 0;
 
   // set the width by subtracting the wider interface of either the minimap or open gametabs area
-  if (minimap.x1 <= gametabs.visibleTabArea.x1) then
-    self.x2 := (wid - minimap.w)
+  if (minimap.x <= gametabs.visibleTabArea.x1) then
+    bds.x2 := (wid - minimap.w)
   else
-    self.x2 := (wid - gametabs.visibleTabArea.getWidth());
+    bds.x2 := (wid - gametabs.visibleTabArea.getWidth());
 
   hei := hei - chatbox.h {- actionbar.h}; // height by removing the chatbox and actionbar
 
   {
-  if (actionbar.x1 = 0) then // if it's at the top
-    self.y1 := actionbar.h
+  if (actionbar.x = 0) then // if it's at the top
+    self.y := actionbar.h
   else
-    self.y1 := 0;
+    self.y := 0;
   }
+  bds.y2 := chatbox.y;
 
-  self.y2 := chatbox.y1;
-
-  self.setBounds([self.x1, self.y1, self.x2, self.y2]);
+  self.setBounds(bds);
 
   print('TRSMainscreen.__find(): Set mainscreen bounds based on the other visible interfaces', TDebug.SUB);
 end;
+{$ENDIF}
 
 (*
 TRSMainscreen.setAngle

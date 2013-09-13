@@ -9,7 +9,6 @@ The source for this file can be found `here <https://github.com/SRL/SRL-6/blob/m
 
 *)
 
-
 {$include_once ../interfaces/interfaces.simba}
 {$include_once debug.simba}
 {$include_once mouse.simba}
@@ -668,20 +667,45 @@ begin
 
 end;
 
+(*
+type _TRSMMButton
+~~~~~~~~~~~~~~~~~
+
+A type that stores the choose option interface properties.
+*)
 type
   TRSChooseOption = record(TRSInterface)
     __placeholder: byte;
   end;
 
+{*
+type __TOption
+~~~~~~~~~~~~~~
+
+A type that stores specific option information.  Each line in the choose option
+menu is a __TOption.
+*}
 type
   __TOption = record
     bounds: TBox;
     str: string;
- end;
+  end;
 
-type
   __TOptionArray = array of __TOption;
 
+(*
+var chooseOption
+~~~~~~~~~~~~~~~~
+
+Variable that stores functions and properties of the Runescape choose option menu.
+
+Example:
+
+.. code-block:: pascal
+
+    if (chooseOption.select(['Mine rock')) then
+      writeln('Mining a rock!');
+*)
 var
   chooseOption: TRSChooseOption;
 
@@ -896,10 +920,10 @@ begin
 
   //get a TMufasaBitmap of the chooseoption menu (without the border)
   tmb.init(client.getMBitmaps());
-  tmb.copyClientToBitmap(client.getIOManager(), true, self.x1+1, self.y1+1, self.x2-1, self.y2-1);
+  tmb.copyClientToBitmap(client.getIOManager(), true, self.x+1, self.y+1, self.x+self.w-1, self.y+self.h-1);
 
-  tmbW := tmb.getWidth() -1;
-  tmbH := tmb.getHeight() -1;
+  tmbW := tmb.getWidth() - 1;
+  tmbH := tmb.getHeight() - 1;
 
   // set the bitmap as our target
   setTargetBitmap(tmb.getIndex());
@@ -956,7 +980,7 @@ begin
 
       //get the bounds for the option, and offset them so it's in the correct mainscreen postion.
       result[i].bounds := [b.x1, b.y1, b.x2 + (self.w - b.x2) - 2, b.y2 + 2];
-      result[i].bounds.offset([self.x1, self.y1]);
+      result[i].bounds.offset([self.x, self.y]);
     end;
 
     // we're done.
@@ -1010,14 +1034,14 @@ TRSChooseOption.select
 
 .. code-block:: pascal
 
-    function TRSChooseOption._select(txt: TStringArray; mouseAction: integer; close: boolean; matchPercent: extended; waitTime: integer): boolean;
+function TRSChooseOption._select(txt: TStringArray; mouseAction: integer; close: boolean; matchPercent: extended; waitTime: integer): boolean;
 
-     * txt - An array of text you want to find in any of the options.
-     * mouseAction - What to do if we succesfully find a option (MOUSE_MOVE, MOUSE_LEFT, MOUSE_RIGHT, MOUSE_NONE).
-     * close - Will we close the menu after we're done with it?
-     * matchPercent - The min percentage that will we count as match (if using stringmatch) if not using stringmatch
-                      and want the old the method of finding txt anywhere in the string set it as 1.00.
-     * waitTime - how long will we wait for the chooseoptions menu to appear?.
+  * txt - An array of text you want to find in any of the options.
+  * mouseAction - What to do if we succesfully find a option (MOUSE_MOVE, MOUSE_LEFT, MOUSE_RIGHT, MOUSE_NONE).
+  * close - Will we close the menu after we're done with it?
+  * matchPercent - The min percentage that will we count as match (if using stringmatch) if not using stringmatch
+                   and want the old the method of finding txt anywhere in the string set it as 1.00.
+  * waitTime - how long will we wait for the chooseoptions menu to appear?.
 
 .. note::
 

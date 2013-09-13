@@ -97,6 +97,7 @@ Example:
 
     lobby.__init();
 *}
+{$IFNDEF CODEINSIGHT}
 procedure TRSLobby.__init();
 begin
   with self do
@@ -105,16 +106,9 @@ begin
     ID := ID_INTERFACE_LOBBY;
     parentID := -1;
     static := true;
-    x1 := 153;
-    y1 := 82;
-    x2 := 805;
-    y2 := 556;
-    w := (x2 - x1);
-    h := (y2 - y1);
-    cx := self.getCenterPoint().x;
-    cy := self.getCenterPoint().y;
   end;
 end;
+{$ENDIF}
 
 {*
 TRSLobby.__skipEmailScreen()
@@ -137,6 +131,7 @@ Example:
 
     lobby.__skipEmailScreen();
 *}
+{$IFNDEF CODEINSIGHT}
 procedure TRSLobby.__skipEmailScreen();
 var
   tpa: TPointArray;
@@ -148,6 +143,7 @@ begin
   if (length(tpa) = 43) then
     mouseBox(tpa.getBounds(), MOUSE_LEFT);
 end;
+{$ENDIF}
 
 {*
 TRSLobby.__find()
@@ -172,6 +168,7 @@ Example:
 
     lobby.__find();
 *}
+{$IFNDEF CODEINSIGHT}
 function TRSLobby.__find(): boolean;
 var
   wid, hei: integer;
@@ -188,6 +185,7 @@ begin
     //smartImage.drawBox(self.getBounds(), false);
   end;
 end;
+{$ENDIF}
 
 (*
 TRSLobby.isOpen()
@@ -236,10 +234,16 @@ begin
           while ((not result) and (getSystemTime() < t)) do
           begin
             print('Waiting for lobby screen...');
-            result := self.__find();
+
+            if (self.__find()) then
+            begin
+              result := true;
+              break(2);
+            end;
+
             wait(300 + random(400));
-         end;
-       end;
+          end;
+        end;
     end;
 end;
 
@@ -313,7 +317,7 @@ begin
 
   for result := 0 to (LOBBY_COUNT - 1) do
     // color of an active tab's border
-    if (getColor((self.x1 + __LOBBY_TAB_OFFSET_X) + (result * __LOBBY_TAB_WIDTH), (self.y1 + __LOBBY_TAB_OFFSET_Y)) = 7831173) then
+    if (getColor((self.x + __LOBBY_TAB_OFFSET_X) + (result * __LOBBY_TAB_WIDTH), (self.y + __LOBBY_TAB_OFFSET_Y)) = 7831173) then
     begin
       print('TRSLobby.getCurrentTab(): Current tab: '+toStr(result), TDebug.SUB);
       exit;
@@ -356,7 +360,7 @@ begin
 
   if (options.open()) then
   begin
-    p := point(options.x1 + round(options.w / 2), options.y2 - 45); // the exit to lobby button
+    p := point(options.x + round(options.w / 2), options.y+options.h - 45); // the exit to lobby button
     mouse(p.rand(randomRange(-50, 50), 5), MOUSE_LEFT);
 
     t := (getSystemTime() + (7000));
@@ -407,7 +411,7 @@ begin
   if (currTab = tab) then
     exit(true);
 
-  p := point(self.x1 + __LOBBY_TAB_OFFSET_X + (tab * __LOBBY_TAB_WIDTH), self.y1 + __LOBBY_TAB_OFFSET_Y);
+  p := point(self.x + __LOBBY_TAB_OFFSET_X + (tab * __LOBBY_TAB_WIDTH), self.y + __LOBBY_TAB_OFFSET_Y);
   mouse(p.rand(randomRange(20, 90), randomRange(-10, 10)), MOUSE_LEFT);
   wait(200 + random(200));
   result := true;
@@ -448,7 +452,7 @@ begin
   result := (not self.isOpen());
 
   t := (getSystemTime() + 30000);
-  exitButton := point(self.x2 - 20, self.y1 + 20).rand(3);
+  exitButton := point(self.x+self.w - 20, self.y + 20).rand(3);
 
   while (not result) and (getSystemTime() < t) do
   begin
@@ -498,7 +502,7 @@ begin
       exit(false);
 
   // a box around each of the quick select world boxes
-  woBoxes := grid(2, 1, 25, 15, 44, 0, point(self.x2 - 125, self.y2 - 27));
+  woBoxes := grid(2, 1, 25, 15, 44, 0, point(self.x + self.w - 125, self.y + self.h - 27));
 
   for i := 0 to high(woBoxes) do
   begin

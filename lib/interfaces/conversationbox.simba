@@ -76,6 +76,7 @@ Example:
 
     conversationBox.__init();
 *}
+{$IFNDEF CODEINSIGHT}
 procedure TRSConversationBox.__init();
 begin
   with self do
@@ -86,6 +87,7 @@ begin
     static := true;
   end;
 end;
+{$ENDIF}
 
 {*
 TRSConversationBox.__find
@@ -110,6 +112,7 @@ Example:
     if (not self.__find()) then
       exit();
 *}
+{$IFNDEF CODEINSIGHT}
 function TRSConversationBox.__find(): boolean;
 var
   wid, hei: integer;
@@ -119,6 +122,7 @@ begin
 
   self.setBounds([0, hei - 146, 521, hei - 1]); // bottom left corner of the client
 end;
+{$ENDIF}
 
 (*
 TRSConversationBox.getSpeaker
@@ -148,7 +152,7 @@ begin
     exit();
 
   // gold color of the text
-  result := getTextAtEx(self.x1 + 120, self.y1 + 8, self.x2 - 8, self.y1 + 34, 0, 50, 30, _COLOR_SPEAKER, 15, CharsNPC);
+  result := getTextAtEx(self.x + 120, self.y + 8, self.x+self.w - 8, self.y + 34, 0, 50, 30, _COLOR_SPEAKER, 15, CharsNPC);
 end;
 
 (*
@@ -432,7 +436,7 @@ function TRSConversationBox.continue(spaceBar, doWait: boolean): boolean;
 var
   tpaButton: TPointArray;
   atpaButton: T2DPointArray;
-  i, t, c, x, y: integer;
+  i, t, c, px, py: integer;
   b: TBox;
 begin
   if (not self.isOpen()) then
@@ -455,7 +459,7 @@ begin
 
     if (inRange(b.x2 - b.x1, 58, 75)) then
       // failsafe to make sure we have the right button
-      if (findColorTolerance(x, y, 11510665, b, 15)) then // light color of the arrow on the button (>)
+      if (findColorTolerance(px, py, 11510665, b, 15)) then // light color of the arrow on the button (>)
       begin
         c := countColor(_COLOR_SPOKEN_TEXT, self.getBounds());
 

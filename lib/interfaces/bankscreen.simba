@@ -91,6 +91,7 @@ Example:
     minimap.__init();
 
 *}
+{$IFNDEF CODEINSIGHT}
 procedure TRSBankScreen.__init();
 begin
   with (self) do
@@ -101,6 +102,7 @@ begin
     static := true;
   end;
 end;
+{$ENDIF}
 
 {*
 TRSBankScreen.__find
@@ -124,6 +126,7 @@ Example:
     minimap.__find();
 
 *}
+{$IFNDEF CODEINSIGHT}
 function TRSBankScreen.__find(): boolean;
 var
   wid, hei: integer;
@@ -136,11 +139,12 @@ begin
     // bounds of the entire bank (including the side backpack)
     setBounds([round(wid / 2) - 339, round(hei / 2) - 297, round(wid / 2) + 342, round(hei / 2) + 291]);
 
-    __bankItemSlots := grid(10, 10, 37, 33, 44, 44, point(self.x1 + 40, self.y1 + 100));
-    __packItemSlots := grid(4, 7, 36, 33, 42, 36, point(self.x1 + 518, self.y1 + 108));
-    __tabSlots      := grid(9, 1, 45, 35, 48, 0, point(self.x1 + 34, self.y1 + 57));
+    __bankItemSlots := grid(10, 10, 37, 33, 44, 44, point(self.x + 40, self.y + 100));
+    __packItemSlots := grid(4, 7, 36, 33, 42, 36, point(self.x + 518, self.y + 108));
+    __tabSlots      := grid(9, 1, 45, 35, 48, 0, point(self.x + 34, self.y + 57));
   end;
 end;
+{$ENDIF}
 
 (*
 TRSBankScreen.isOpen
@@ -176,8 +180,8 @@ begin
   result := false;
 
   repeat
-    if (getColor(self.x1 + 113, self.y2 - 19) = 13618403) then // pinkish color of the "Bank PIN" text
-      result := findText(p, 13618403, 0, ['ank'], [upChars], intToBox(self.x1 + 100, self.y2 - 30, self.x1 + 175, self.y2 - 9)); // box around "Bank PIN" text
+    if (getColor(self.x + 113, self.y+self.h - 19) = 13618403) then // pinkish color of the "Bank PIN" text
+      result := findText(p, 13618403, 0, ['ank'], [upChars], intToBox(self.x + 100, self.y+self.h - 30, self.x + 175, self.y+self.h - 9)); // box around "Bank PIN" text
 
     if (result) then
       break();
@@ -409,7 +413,7 @@ Example:
 function TRSBankScreen._doesTabExist(tab: integer): boolean;
 var
   tabBox: TBox;
-  x, y: integer;
+  px, py: integer;
 begin
   result := false;
 
@@ -420,7 +424,7 @@ begin
 
   if (tabBox.x1 <> -1) then
     if (countColor(6672631, tabBox) <> 5) then // gold color of the very top of the "+"
-      result := findColorTolerance(x, y, _COLOR_BANK_TAB_ACTIVE, tabBox, 5);
+      result := findColorTolerance(px, py, _COLOR_BANK_TAB_ACTIVE, tabBox, 5);
 end;
 
 (*
@@ -551,12 +555,12 @@ var
   col, t: integer;
   tpa: TPointArray;
   scrollP, p: TPoint;
-  itemArea: TBox;
+  itemArea, b: TBox;
 begin
   if (not self.isOpen()) then
     exit();
 
-  p := [self.x1 + 473, self.y1 + 94]; // top of the scroll bar (when it's at the top)
+  p := [self.x + 473, self.y + 94]; // top of the scroll bar (when it's at the top)
   col := getColor(p);
 
   // color at top of scroller = already at top | no scroll bar color
@@ -565,7 +569,9 @@ begin
 
   print('bankScreen.scrollUp(): Going to scroll the bankscreen up to the top');
 
-  itemArea := [self.x1 + 13, self.y1 + 97, self.x2 - 221, self.y2 - 61];
+  b := self.getBounds();
+
+  itemArea := [b.x1 + 13, b.y1 + 97, b.x2 - 221, b.y2 - 61];
   scrollP := itemArea.getRandomPoint();
 
   t := (getSystemTime() + 15000);

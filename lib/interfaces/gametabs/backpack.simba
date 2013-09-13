@@ -94,6 +94,7 @@ Example:
     tabBackpack.__init();
 
 *}
+{$IFNDEF CODEINSIGHT}
 procedure TRSTabBackpack.__init();
 begin
   with self do
@@ -106,6 +107,7 @@ begin
     areSlotsLoaded := false;
   end;
 end;
+{$ENDIF}
 
 {*
 TRSTabBackPack._updateBounds
@@ -152,7 +154,7 @@ begin
     self.areSlotsLoaded := true;
   end;
 
-  if (self.y1 = gameTabs.__visibleTabAreaMulti.y1) then
+  if (self.y = gameTabs.__visibleTabAreaMulti.y1) then
     slots := __slots[0]
   else
     slots := __slots[1];
