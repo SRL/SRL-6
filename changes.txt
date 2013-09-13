@@ -17,7 +17,7 @@ EVERYTHING should be recorded here: new features, function name changes, user-de
   - Logs are automatically saved to srl/logs/
   - Function TakeIPScreen replaced with takeScreenshot()
   - Functions moved from SRL/SRL/misc/debug.simba:
-    - debugBitmap
+    - debugBitmap was changed to getMufasaBitmap(myBitmap).debug();
     - debugTPA
     - debugATPA
     - debugATPABounds
@@ -46,18 +46,18 @@ EVERYTHING should be recorded here: new features, function name changes, user-de
   - Added TRSLobbyWorlds._findWorldNumber() that finds and returns the coords of a given world.
   - FindWorld renamed to TRSLobbyWorlds._scrollToWorld() and now uses the mouse wheel to scroll through the list.
   - RandomWorld renamed TRSLobbyWorlds.selectRandomWorld() and now returns a boolean rather than an integer.
-  - QuickSelect removed as it's no longer needed.
+  - QuickSelect renamed to TRSLobby.quickSelectWorld.
   - GetWorldInfo removed.
   - ChangeWorld moved to players.simba and renamed to TPlayer.switchWorld.
   - ChooseWorldsBy removed as it isn't needed.
 
 - text.simba
   - TypeSendEx removed and an optional pressEnter parameter added to typeSend
-  - FindTextTPA/Ex replaced with findTextByColor()
+  - FindTextTPA/Ex replaced with findText().
   - All uptext functions replaced with mouseOverText functions.
   - All option functions replaced with chooseOption.
   - Two findText functions, one that uses bitmaps, one that uses color.
-  - FindNPCChatText renamed TRSChatbox.findNPCText and moved to chatbox.simba.
+  - FindNPCChatText renamed TRSConversationBox.findChat and moved to ConversationBox.simba.
 
 - players.simba merged with login.simba
   - It's important to know that a player's "world" attribute is, by default, set to -1 which means nothing will happen.  If set to 0, it will select a random world upon login, if set to a certain world, SRL will select that world.
@@ -106,9 +106,9 @@ EVERYTHING should be recorded here: new features, function name changes, user-de
   - FindSymbols and FindSymbolsIn combined into one.
   - getColorPercent and getBlackBackground moved from SRL-5's color.simba.
   - PlayerMoving and WaitPlayerMoving moved from animation.simba.
-  - removed mmToMS stuff since there's so many screen size/angle/height possibilies
-  - moved all toggle run from gametab.simba to here.
-  - updated and moved lodestone functions here.
+  - Removed mmToMS stuff since there's so many screen size/angle/height possibilies
+  - Moved all toggle run from gametab.simba to here.
+  - Updated and moved lodestone functions here.
 
 - new file, mainscreen.simba
   - setAngle moved here and renamed TRSMainscreen.setAngle. 
@@ -167,7 +167,6 @@ EVERYTHING should be recorded here: new features, function name changes, user-de
   - ClickAllItemsExcept
   - ClickAllItems
   - DropPattern (now constants)
-  - DropAllExcept
   - DropItemsByIdentifer
   - ArrangeInv
   - CountItemBlackLine
@@ -269,7 +268,7 @@ EVERYTHING should be recorded here: new features, function name changes, user-de
    - getTextAtEx
    - bitmapFromClient
 
-- amount.simba
+- amount.simba remaned to items.simba
   - removed:
     - shopSwitchTab
     - RuneAmount
@@ -314,7 +313,7 @@ EVERYTHING should be recorded here: new features, function name changes, user-de
   - Functions:
 	- getNPCChatName renamed to conversationBox.getSpeaker()
 	- conversationBox.areTalking()
-	- findNPCChatText renamed to conversationBox.findSpokenText()
+	- findNPCChatText renamed to conversationBox.findChat()
 	- ClickContinueEx, ClickToContinue removed, ClickContinue renamed to conversationBox.continue()
   	- Removed DoConversation as it's a very simple logic loop of conversationBox.continue()
 

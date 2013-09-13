@@ -20,9 +20,13 @@ VARIABLES:
 	currentPlayer: integer; 		- the current active player.
 
 	smartForceNewClient: boolean; 		- force a new SMART client when a script is started. Default false.
-	smartEnableDrawing: boolean;		- enables drawing on the SMART window.
-	smartImage: TDrawing;			- used to draw on the SMART window.
-	
+	smartEnableDrawing: boolean;		- enables drawing on the SMART window. Default false.
+	smartImage: TMufasaBitmap;	        - used to draw on the SMART window.
+        smartClientWidth: integer;              - width of the smart client, default 960.
+        smartClientHeight: integer;             - height of the smart client, default 640.
+        smartGetJavaPath: boolean;              - will attempt to find your java path. NOTE: if not using you will must have JRE on your systems path (before JDK if you have it).
+        smartShowConsole: boolean;              - will show the java console for smart
+  
 	Interfaces/gametabs:
 		mainscreen: TRSMainscreen; 		- used to call mainscreen functions/procedures (i.e. mainscreen.isUptext, mainscreen.chooseOption).
 		lobby: TRSLobby;			- used to call lobby functions/procedures.
