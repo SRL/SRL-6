@@ -635,7 +635,7 @@ anywhere on the screen.
 .. note::
 
     - by Coh3n & Ashaman88
-    - Last Updated: 15 August 2013 by Coh3n
+    - Last Updated: 14 September 2013 by Olly
 
 Example:
 
@@ -645,51 +645,63 @@ Example:
 *)
 function exitSquealOfFortune(): boolean;
 var
-  w, h, x, y, dtmSqueal: integer;
-  dtmSearchBox, mouseOverBox: TBox;
+  w, h, i, x, y, dtmSqueal: integer;
+  dtmSearchBox, mouseOverBox, clientArea: TBox;
   p: TPoint;
+  tpa: TPointArray;
+  atpa: T2DPointArray;
 begin
-  print('exitSquealOfFortune()', TDebug.HEADER);
-
-  // DTM of the X
-  dtmSqueal := DTMFromString('mbQAAAHicY2VgYNjOzMCwEIirgLgSiBuB2JiRgUELiGWB2BCIrYH4/1kXhku1MQyLrxcyfPz0iSHA2Z2BH6gfHTNiwWAAAHx8DXE=');
+  result := false;
 
   getClientDimensions(w, h);
-  w := (w - 1);
-  h := (h - 1);
+  clientArea := [0, 0, w-1, h-1];
 
   // green color of the goblin thing
-  if (findColorTolerance(x, y, 7457955, intToBox(1, 1, w, h), 15, colorSetting(1))) then
+  if (not findColorsTolerance(tpa, 7457955, clientArea, 15, colorSetting(1))) then
+    exit(false);
+
+  print('exitSquealOfFortune()', TDebug.HEADER);
+
+  // dtm of the X
+  dtmSqueal := DTMFromString('mbQAAAHicY2VgYFBghmBVKFYG4jhGBoZkKAax04D43+VKhpcbrBjWNGozfNobxWDJysHACtSPjhmxYDAAAKZdCpE=');
+  setDTMName(dtmSqueal, 'SRL - DTM Squeal');
+
+  atpa := tpa.split(10, 10);
+
+  for i := 0 to high(atpa) do
   begin
-    print('Found goblin color at '+toStr(point(x, y))+', looking for DTM of the X...');
+    p := atpa[i].getMiddle();
 
-    dtmSearchBox := [x - 70, y - 70, x + 130, y + 70];
-    dtmSearchBox.setBounds(0, 0, w, h);
+    dtmSearchBox := [p.x - 70, p.y - 70, p.x + 130, p.y + 70];
+    dtmSearchBox.setLimit(clientArea);
 
-    // gold color in the X
+    print('Found goblin color around ' + toStr(p) + ' looking for the dtm of the X..');
+
     if (findDTM(dtmSqueal, x, y, dtmSearchBox)) then
     begin
       print('Found DTM, attempting to exit...');
-      mouse(point(x, y).rand(3), MOUSE_MOVE);
+      mouse(point(x, y).rand(6), MOUSE_MOVE);
 
-      if (isMouseOverMenuOpen(mouseOverBox, 1000)) then
-        if (findText(p, ['ueal', 'ortune', 'elps'], [upChars], mouseOverBox)) then
+      if (isMouseOverMenuOpen(mouseOverBox, 2500 + random(500))) then
+      begin
+        findColors(tpa, 4305653, mouseOverBox); // color of the orange text
+
+        if (length(tpa) > 500) then
         begin
-          getMousePos(x, y);
-          mouse(point(x, y), MOUSE_LEFT);
+          fastClick(MOUSE_LEFT);
 
+          print('Successfully exited the Squeal Of Fortune');
+          wait(500 + random(250));
           result := true;
-          print('Successfully exited Squeal Of Fortune');
+          break();
         end;
-
+      end;
     end else
-      print('Failed to find DTM of the X, may have found a false color');
-
-  end else
-    print('Failed to find goblin color, pop-up may not be open');
+      print('Failed to find the DTM, we may have found a false area of color');
+  end;
 
   freeDTM(dtmSqueal);
-  print('exitSquealOfFortune(): '+toStr(result), TDebug.FOOTER);
+  print('exitSquealOfFortune(): result = ' + toStr(result), TDebug.FOOTER);
 end;
 
 (*
