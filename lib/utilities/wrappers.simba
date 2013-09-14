@@ -397,6 +397,114 @@ begin
 end;
 
 (*
+freeDTM
+~~~~~~~
+
+.. code-block:: pascal
+
+    procedure freeDTM(DTMs: TIntegerArray);
+
+Free's an array of DTMs.
+
+.. note::
+
+    - by Ollybest
+
+Example:
+
+.. code-block:: pascal
+
+     freeDTMs([dtm1, dtm2]);
+
+*)
+procedure freeDTM(DTMs: TIntegerArray); overload;
+var
+  i: integer;
+begin
+  for i := 0 to high(dtms) do
+    freeDTM(dtms[i]);
+end;
+
+(*
+freeBitmap
+~~~~~~~~~~
+
+.. code-block:: pascal
+
+    procedure freeBitmap(bitmaps: TIntegerArray);
+
+Free's an array of bitmaps.
+
+.. note::
+
+    - by Ollybest
+
+Example:
+
+.. code-block:: pascal
+
+     freeBitmaps([bmp1, bmp2]);
+
+*)
+procedure freeBitmap(bitmaps: TIntegerArray); overload;
+var
+  i: integer;
+begin
+  for i := 0 to high(bitmaps) do
+    freeBitmap(bitmaps[i]);
+end;
+
+(*
+getBitmapName
+~~~~~~~~~~~~~
+
+.. code-block:: pascal
+
+    function getBitmapName(index: integer): string;
+
+Returns the name of the bitmap stored in 'index'.
+
+.. note::
+
+    - by Ollybest
+
+Example:
+
+.. code-block:: pascal
+
+     n := getBitmapName(bmpOre);
+*)
+function getBitmapName(index: integer): string;
+begin
+  result := client.getMBitmaps().getBMP(index).getName();
+end;
+
+(*
+getDTMName
+~~~~~~~~~~
+
+.. code-block:: pascal
+
+    function getDTMName(index: integer): string;
+
+Returns the name of the dtm stored in 'index'.
+
+.. note::
+
+    - by Ollybest
+
+Example:
+
+.. code-block:: pascal
+
+     n := getDTMName(bmpOre);
+*)
+function getDTMName(index: integer): string;
+begin
+  result := client.getMDTMs().getDTM(index).getName();
+end;
+
+(*
 bitmapFromClient: overload;
 ~~~~~~~~~~~~~~~~~~~~~~~~~~~
 

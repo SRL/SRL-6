@@ -7,6 +7,7 @@ SRL Utilities Reference
 
     color
     drawing
+    math
     pixelshift
     time
     wrappers

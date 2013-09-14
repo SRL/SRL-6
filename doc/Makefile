@@ -9,7 +9,7 @@ lobby = lobby worlds
 
 misc = items smart srlstats
 
-utilities = color drawing pixelshift time wrappers
+utilities = color drawing math pixelshift time wrappers
 types = extendedarrays tbox tpointarrays integerarrays stringarrays tpoint types
 
 
