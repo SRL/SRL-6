@@ -165,13 +165,13 @@ Example:
 *}
 {$IFNDEF CODEINSIGHT}
 procedure TRSGameTabs.__loadBitmap(tab: integer);
-begin
+begin                               {done: stats, backpack}
   case tab of
-    _TAB_STATS:        self.tabs[tab]._bmp := bitmapFromString(7, 7, 'meJyztXhka/FIhO+dtoZ6/BLO5A1sQGQLFhTkmWIRz5e0hh0iKMz7AYhExOPNk7iT17OhCIqpBrayQEQggpzcBwX0RBKWQ/Wa5bECBQV4JmsbCiathQqaZoJUikp5miSC7A2bxAAktY2EAOsDLdU=');
+    _TAB_STATS:        self.tabs[tab]._bmp := bitmapFromString(6, 8, 'meJwT5v0gDEZ8vIlmSfzJG9iEYSIiYqqBrSxwEU7ugwJ6IgnL2eEiArw92ppCSWsRIqJSnsaJvEBu2CQGIJed8zi/oGJgGxNQxDSPCyjCyzWBX0c4uJsRyIWI8HAnaWsKQ7hABADwIifh');
     _TAB_TASK,
     _TAB_COMPASS_TASK: self.tabs[tab]._bmp := bitmapFromString(7, 7, 'meJzjW3uHb+0d67MfrT6+ByLFsi0ctsFcU3cDBdmvfoUIAmX5ktuBInxrbnNN2QligxFH1USQYHAsv5AKUBcnnxqPsiVI0MaPm5OVW5CbMzKN2z4TqFLIKoJTUIxVToBZToBNXwiomD3aml+EF6geyIUjTidRLidRACrELQI=');
     _TAB_EQUIPMENT:    self.tabs[tab]._bmp := bitmapFromString(7, 7, 'meJyb1l4zrb0mKTW5qroagp7cuTF98pTFS2YDBSHiQO7B3TuAyoAMOHfOui1AEqgAohgo7uLkJm9lCWEDBa30dBgZGCAIKAIxSklRDS5o6R4DtyKhpDY+0puFlwNoAgCiqjza');
-    _TAB_BACKPACK:     self.tabs[tab]._bmp := BitmapFromString(10, 13, 'meJxdkDEKAjEURLESZcl2lgYU05pGWCOylRfYE4i1Ym1hZW21goWHsLH0Ot7Dt458loUhTP7M//OTWNaxrIvDE4xTlU2Xk/U+/opp+xCxCqoMAlxqu8IQCOfABdBR/ayA5KMKoPb6TgPxN5UswRfXl6VgcMNcjair3eX4/kAUDeiC4/Epzc93pXT2VJFemTWNRK0K2ASVXIgMUuWXZ3O6NS/yQarSbQdJUu0T2svY5P/VB7r0cK5flkxUrg==');
+    _TAB_BACKPACK:     self.tabs[tab]._bmp := bitmapFromString(9, 9, 'meJxTss1RgiEeZUs5qyAgA0IqoUrJq1oAGfxiQUDEyM4HFIGoBHI5eayAbNPeLRBBoCwfFz9EC1DKOqk5f8/TpM7VBvaTgQioHigFVCBvZaVfOx2o3iJ3PUQjsnVAXUCVwjK5QEOAtsCdxMmnBpQC2gU0EOJgiBvgJrhWTknYcBgiBbERbi9QL5AEAAYAO0M=');
     _TAB_DEFENCE:      self.tabs[tab]._bmp := bitmapFromString(7, 7, 'meJybPnlKVXV1dedEIHlw9w4Img4WBCIIA0jCBees2wJEEMEnd24AEZD75eNLIGNae01dQUp8pDdQCoj2nLi5eMlsFyc3HsFsbvaFQC1JqckQkl8siJ3zZEbeFbggRJmtxaMJE28BAHrlTgg=');
     _TAB_RANGED:       self.tabs[tab]._bmp := bitmapFromString(8, 2, 'meJyTVDeWkPHmt0vms0sRkvAXkvDjtfZVs3B3TOxwTOrktvEHIkHxAH6xIEGzDr7kdgDxgAq2');
     _TAB_MELEE:        self.tabs[tab]._bmp := bitmapFromString(4, 4, 'meJwTF+ScPnnKlz9/Fzz/PmfdFiBjz4mbSanJSbfeZfz4BWS42RtbrzzFNXW3S1SqmCAnANE4Gm4=');
