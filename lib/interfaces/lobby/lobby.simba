@@ -136,11 +136,20 @@ procedure TRSLobby.__skipEmailScreen();
 var
   tpa: TPointArray;
   wid, hei: integer;
+  b: TBox;
 begin
   getClientDimensions(wid, hei);
 
-  findColors(tpa, 14733486, 0, 0, wid-1, hei-1); // color of the "Skip" text
-  if (length(tpa) = 43) then
+  if (not findColors(tpa, 658491, 0, 0, wid-1, hei-1)) then  // the red background of the text at the top
+    exit();
+
+  b := getTPABounds(tpa);
+  b.offset([0, 370]); //offset the red background bounds to where we think the button should be
+
+  if (not findColors(tpa, 14733486, b)) then // color of the "Skip" text
+    exit();
+
+  if (inRange(length(tpa), 30, 60)) then
     mouseBox(tpa.getBounds(), MOUSE_LEFT);
 end;
 {$ENDIF}
