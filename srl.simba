@@ -13,6 +13,7 @@ SRL library isn't available to you.
 {$include_once lib/utilities/drawing.simba}
 {$include_once lib/utilities/pixelshift.simba}
 {$include_once lib/utilities/color.simba}
+{$include_once lib/utilities/math.simba}
 
 {$include_once lib/core/globals.simba}
 {$include_once lib/core/mouse.simba}

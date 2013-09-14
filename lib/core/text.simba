@@ -224,6 +224,37 @@ begin
 end;
 
 (*
+typeByteWait
+~~~~~~~~~~~~
+
+.. code-block:: pascal
+
+    procedure typeByteWait(key: Byte; waitTime: integer);
+
+Holds down the desired key for the set waitTime.
+
+.. note::
+
+    - by Ollybest
+
+Example:
+
+.. code-block:: pascal
+
+     typeByteWait(vk_up, 800 + random(200));
+*)
+procedure typeByteWait(key: Byte; waitTime: integer);
+begin
+  if (not (isKeyDown(key))) then
+    keyDown(key);
+
+  wait(waitTime);
+
+  if isKeyDown(key) then
+    keyUp(key);
+end;
+
+(*
 typeSend
 ~~~~~~~~
 

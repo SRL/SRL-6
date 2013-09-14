@@ -1,0 +1,452 @@
+(*
+Math
+====
+
+This file stores math utility functions that don't quite fit in Simba or Lape.
+
+*)
+
+{$f-}
+
+(*
+var Math
+~~~~~~~~
+
+Global math variables meant to aid scripters.
+*)
+var
+  maxInt = high(integer);
+
+(*
+gridBox
+~~~~~~~
+
+.. code-block:: pascal
+
+    function gridBox(slot, columns, rows, w, h, diffX, diffY: integer; starTPoint: TPoint): TBox;
+
+Returns a TBox of the slot 'slot' in a grid created by the other parameters.
+Slots start with 0 being the top left of the grid, and counting accross.
+
+    * columns: number of columns in the grid
+    * rows: number of rows in the grid
+    * w: the width of each box in the grid
+    * h: the height of each box in the grid
+    * diffX: pixels from center to center (x)
+    * diffY: pixels from center to center (y)
+    * starTPoint: the center point of the top left box in the grid
+
+.. note::
+
+    - by Coh3n
+    - Last Modified: Jan. 25th, 2012 by Coh3n
+
+Example:
+
+.. code-block:: pascal
+
+    result := gridBox(Slot, 4, 2, 95, 80, 0, 150, point(110, 100));
+*)
+function gridBox(slot, columns, rows, w, h, diffX, diffY: integer; startPoint: TPoint): TBox;
+begin
+  if (slot > (columns * rows)) then
+  begin
+    writeln('gridBox: Invalid slot: '+toStr(slot));
+    exit;
+  end;
+
+  result.x1 := (startPoint.x + ((slot mod columns) * diffX) - (w div 2));
+  result.y1 := (startPoint.y + ((slot div columns) * diffY) - (h div 2));
+  result.x2 := (result.x1 + w);
+  result.y2 := (result.y1 + h);
+end;
+
+(*
+grid
+~~~~
+
+.. code-block:: pascal
+
+    function grid(columns, rows, w, h, diffX, diffY: integer; starTPoint: TPoint): TBoxArray;
+
+Returns a grid of TBoxes (see gridBox for parameters).
+
+.. note::
+
+    - by Coh3n
+    - Last Modified: Jan. 25th, 2012 by Coh3n
+
+Example:
+
+.. code-block:: pascal
+
+    SMART_DrawBoxes(false, grid(5, 10, 20, 20, 25, 25, point(30, 30)), clYellow);
+*)
+function grid(columns, rows, w, h, diffX, diffY: integer; starTPoint: TPoint): TBoxArray;
+var
+  i: integer;
+begin
+  setLength(result, (columns * rows));
+
+  for i := 0 to high(result) do
+    result[i] := gridBox(i, columns, rows, w, h, diffX, diffY, starTPoint);
+end;
+
+(*
+groupDigits
+~~~~~~~~~~~
+
+.. code-block:: pascal
+
+    function groupDigits(n: integer; token: string): string;
+
+Nicely formats the number passed by placing *token* in between groups of three
+numbers.
+
+.. note::
+
+    - by PriSoner and Nava2
+
+Example:
+
+.. code-block:: pascal
+
+    foo := groupDigits(1000, ','); // foo -> '1,000'
+    bar := groupDigits(1500423, ' '); // bar -> '1 500 423'
+
+*)
+function groupDigits(n: integer; token: string): string;
+var
+  b: integer;
+begin
+  Result := IntToStr(n);
+
+  b := length(Result) + 1;
+  if (b > 3) then
+  repeat
+    b := b - 3;
+    if (b > 1) then
+      insert(token, Result, b);
+  until (b < 3);
+end;
+
+{*
+var Gauss Internal
+~~~~~~~~~~~~~~~~~~
+
+Internal global gaussian variables.
+*}
+{$IFNDEF CODEINSIGHT}
+var
+  __gaussPoint: extended;
+  __gaussRange: extended;
+{$ENDIF}
+
+{*
+__gaussPoly
+~~~~~~~~~~~
+
+.. code-block:: pascal
+
+    function __gaussPoly(r, rsqr: Extended): Extended;
+
+Helper method for cal_normal_random. Does polynomial calculation using the
+`Horner Scheme`_
+
+..http://en.wikipedia.org/wiki/Horner_scheme
+
+.. note::
+
+    - by: Nava2
+
+*}
+{$IFNDEF CODEINSIGHT}
+const
+  __gauss_norm_0 = 0.029899776;
+  __gauss_norm_1 = 0.008355968;
+  __gauss_norm_2 = 0.076542912;
+  __gauss_norm_3 = 0.252408784;
+  __gauss_norm_4 = 3.949846138;
+
+function __gaussPoly(r, rsqr: Extended): Extended;
+begin
+  Result := __gauss_norm_0*rsqr + __gauss_norm_1;
+  Result := Result*rsqr + __gauss_norm_2;
+  Result := Result*rsqr + __gauss_norm_3;
+  Result := Result*rsqr + __gauss_norm_4;
+  Result := Result*r;
+end;
+{$ENDIF}
+
+(*
+gauss
+~~~~~
+
+.. code-block:: pascal
+
+    function gauss(): Extended;
+
+Calculates a standard normal value (N(0, 1)). By definition, 68.2% of points
+will lie within +/- 1*sigma, 95.4% within +/- 2.
+
+.. note::
+
+    - by: Nava2
+
+*)
+function gauss(): Extended;
+var
+  r: Extended;
+  i: Integer;
+begin
+  r := 0.0;
+  for i := 0 to 11 do
+    r := r + (random(MaxInt)*1.0)/MaxInt;
+
+  r := (r-6.0)/4.0 ;
+  result := __gaussPoly(r, r*r);
+end;
+
+{*
+__gaussMarsPolar
+~~~~~~~~~~~~~~~~
+
+.. code-block:: pascal
+
+    function __gaussMarsPolar(): Extended;
+
+Calculates a standard normal value (N(0, 1]).
+
+By definition, 68.2% of points will lie within +/- 1*sigma, 95.4% within +/- 2.
+
+.. note::
+    Please use `__gaussRand` instead of this function directly, feel free to
+    set `__gaussRand` to this function if you choose.
+    Currently, this is the default.
+
+.. note::
+
+    - by: BenLand100
+
+*}
+{$IFNDEF CODEINSIGHT}
+function __gaussRand(): Extended;
+begin
+  Result := sqrt(-2.0*ln(RandomE()))*cos(2.0*PI*RandomE());
+end;
+{$ENDIF}
+
+(*
+gaussRand
+~~~~~~~~~
+
+..code-block:: pascal
+
+    function gaussRand(mean, dev: Extended): Extended;
+
+Calculates a normally distributed point around mean (u) with a standard
+deviation of dev (o).
+
+..note::
+
+    - by: Nava2
+
+Example:
+
+..code-block:: pascal
+
+    // shooting arrows simulation:
+    pt := Point(gaussRand(center.x, 0.5), gaussRand(center.y, 0.5));
+    WriteLn(Format('Hit the target at (%d, %d).', [pt.x, pt.y]));
+
+*)
+function gaussRand(mean, dev: Extended): Extended;
+begin
+  result := mean + dev*__gaussRand();
+end;
+
+
+(*
+gaussPoint
+~~~~~~~~~~~
+
+.. code-block:: pascal
+
+    procedure gaussPoint(cX, cY: Integer; sAngle, eAngle: Extended; maxRad: Integer; out oX, oY: Integer);
+
+Calculates a point about cX, cY with radius maxRad. The sangle and eangle are
+in radians. The point is returned in the reference parameters oX, oY.
+
+.. note::
+
+    - by: Nava2
+
+Example:
+
+.. code-block:: pascal
+
+    var
+      gX, gY: Integer;
+    begin
+      // get a gaussian pt in a circle:
+      gaussPoint(MMCX, MMCY, 0, math_2PI, MMX2-MMCX, gX, gY);
+      WriteLn(Format("gX, gY -> %d, %d", gX, gY);
+    end;
+*)
+procedure gaussPoint(cX, cY: Integer; sAngle, eAngle: Extended; maxRad: Integer; out oX, oY: Integer);
+var
+  angle: Extended;
+  radius: Extended;
+  xShift, yShift: Integer;
+begin
+
+  if (eAngle < sAngle) then
+    swap(eAngle, sAngle);
+
+  { random angle about the center }
+  angle := sAngle + (eAngle-sAngle)*__gaussRand()/2.0;
+
+  { get normal pt about zero, where 68% lie within .5*maxRad }
+  radius := gaussRand(maxRad,maxRad*__gaussPoint) - maxRad;
+
+
+  { the shifting distance based on the radius and angle (both rand) }
+  xShift := round(radius * Cos(angle));
+  yShift := round(radius * Sin(angle));
+
+  oX := cX + xShift;
+  oY := cY + yShift;
+end;
+
+(*
+gaussRangeExt
+~~~~~~~~~~~~~
+
+.. code-block:: pascal
+
+    function gaussRangeExt(minI, maxI: Extended): Extended;
+
+Returns a number between minI and maxI that is normally distributed in the range.
+
+.. note::
+
+    - by: Nava2
+
+Example:
+
+.. code-block:: pascal
+
+    randMean := gaussRangeExt(0, 20);
+
+*)
+function gaussRangeExt(minI, maxI: Extended): Extended;
+var
+  valid: Boolean;
+  mean: Extended;
+  dev: Extended;
+  t: Integer;
+begin
+  { calculate the mean }
+  mean := (maxI+minI)/2.0;
+  dev  := abs(maxI-minI)/2.0 * __gaussRange;
+
+  t := 0;
+  while ((not valid) and (t < 100)) do
+  begin
+    Result := gaussRand(mean, dev);
+    valid := ((Result >= minI) and (Result <= MaxI));
+
+    inc(t);
+  end;
+
+  if (not valid) then
+    writeln('-- ERROR: **gaussian failed**');
+end;
+
+(*
+gaussRangeInt
+~~~~~~~~~~~~~
+
+.. code-block:: pascal
+
+    function gaussRangeInt(minI, maxI: Integer): Integer;
+
+See `gaussRangeExt` for more detail. Same function, but with integers.
+
+.. note::
+
+    - by: Nava2
+
+*)
+function gaussRangeInt(minI, maxI: Integer): Integer;
+begin
+  Result := Round(gaussRangeExt(minI, maxI));
+end;
+
+(*
+gaussRandom
+~~~~~~~~~~~
+
+.. code-block:: pascal
+
+    function gaussRandom(maxExt: Integer): Integer;
+
+Computes a normally distributed number in [0, maxExt). Thus, it behaves like
+Random() would be expected to. But normally distributed about maxExt/2.
+
+It is a wrapper for `gaussRangeInt`.
+
+.. note::
+
+    - by Nava2
+
+Example:
+
+.. code-block:: pascal
+
+*)
+function gaussRandom(maxExt: Integer): Integer;
+begin
+  Result := gaussRangeInt(0, maxExt-1);
+end;
+
+(*
+gaussBox
+~~~~~~~~
+
+.. code-block:: pascal
+
+    procedure gaussBox(out px, py: Integer; x1, y1, x2, y2: Integer);
+
+Calculates a point normally distributed from the center of the passed box. It
+checks for outlying points and will regenerate points if necessary.
+
+.. note::
+
+    - by: Nava2
+
+Example:
+
+.. code-block:: pascal
+
+    var
+      gX, gY: Integer;
+    begin
+      // get a gaussian pt in a circle:
+      gauss_Box(gX, gY, MMX1, MMY1, MMX2, MMY2);
+      WriteLn(Format("gX, gY -> %d, %d", gX, gY);
+    end;
+*)
+procedure gaussBox(out p: TPoint; box: TBox);
+begin
+  p.x := gaussRangeInt(box.x1, box.x2);
+  p.y := gaussRangeInt(box.y1, box.y2);
+
+  if (not PointInBox(p, box)) then
+    writeln('gaussBox',Format('Point invalid (%d, %d)', [p.x, p.y]));
+end;
+
+begin
+  __gaussPoint := 0.4;
+  __gaussRange := 0.3;
+end;

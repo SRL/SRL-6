@@ -471,3 +471,54 @@ begin
   for I := 0 to high(self) do
     result[I] := self[I] * 1.0;
 end;
+
+(*
+TIntegerArray.getMostCommon
+~~~~~~~~~~~~~~~~~~~~~~~~~~~
+
+.. code-block:: pascal
+
+    function TIntegerArray.getMostCommon(): LongInt;
+
+Returns the most common number in the array, useful for finding the most common
+color in a TPointArray.
+
+.. note::
+
+    - by Dgby714
+
+Example:
+
+.. code-block:: pascal
+
+     mostCol := getColors(tpa).getMostCommon();
+
+*)
+function TIntegerArray.getMostCommon(): LongInt;
+var
+  H, I, Cur, Count, HighCount: LongInt;
+begin
+  QuickSort(self);
+
+  Cur := self[0] - 1;
+  Count := 0;
+  HighCount := 0;
+
+  H := High(self);
+  for I := 0 to H do
+  begin
+    if (Cur <> self[I]) then
+    begin
+      if (Count > HighCount) then
+      begin
+        HighCount := Count;
+        Result := Cur;
+      end;
+
+      Count := 0;
+      Cur := self[I];
+    end;
+
+    Inc(Count);
+  end;
+end;

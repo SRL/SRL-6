@@ -56,8 +56,8 @@ begin
   for i := 0 to (l - 1) do
     result[i] := calculatePixelShift(bmpBefore[i], bmpAfter[i], intToBox(0, 0, (b[i].x2 - b[i].x1), (b[i].y2 - b[i].y1)));
 
-  freeBitmaps(bmpBefore);
-  freeBitmaps(bmpAfter);
+  freeBitmap(bmpBefore);
+  freeBitmap(bmpAfter);
 end;
 
 (*
@@ -146,8 +146,8 @@ begin
     result[i] := calculatePixelShiftTPA(bmpBefore[i], bmpAfter[i], atpa[i]);
   end;
 
-  freeBitmaps(bmpBefore);
-  freeBitmaps(bmpAfter);
+  freeBitmap(bmpBefore);
+  freeBitmap(bmpAfter);
 end;
 
 (*
