@@ -13,6 +13,15 @@ var Math
 ~~~~~~~~
 
 Global math variables meant to aid scripters.
+
+  * maxInt: The maximum integer value.
+
+Example:
+
+.. code-block:: pascal
+
+    for i := 0 to maxInt do
+      writeln(i);
 *)
 var
   maxInt = high(integer);

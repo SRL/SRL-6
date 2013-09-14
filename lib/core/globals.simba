@@ -42,6 +42,12 @@ var Colors
 ~~~~~~~~~~
 
 Convenient colors for scripters to use.  Used mainly for SMART debugging.
+
+Example:
+
+.. code-block:: pascal
+
+    smartImage.drawBox(minimap.getBounds(), false, clFuchsia);
 *)
 var
   clWhite   = 16777215;
