@@ -29,7 +29,7 @@ Example:
     players[currentPlayer].skillLevel[SKILL_ATTACK] := 50;
 *)
 const
-  SKILL_COUNT = 25;
+  SKILL_COUNT = 26;
     SKILL_ATTACK        = 0;
     SKILL_HITPOINTS     = 1;
     SKILL_MINING        = 2;
@@ -55,6 +55,7 @@ const
     SKILL_HUNTER        = 22;
     SKILL_SUMMONING     = 23;
     SKILL_DUNGEONEERING = 24;
+    SKILL_DIVINATION    = 25;
 
 {*
 const Internal
