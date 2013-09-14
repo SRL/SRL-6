@@ -727,7 +727,7 @@ begin
   PlayerBox.Enabled := false;
 
   NewLabel := TLABEL.Create(mainForm);
-  NewLabel.CAPTION := 'Login name';
+  NewLabel.CAPTION := '* Login name';
   NewLabel.Parent := PlayerBox;
   NewLabel.Left := 5;
   NewLabel.Top := 3;
@@ -745,7 +745,7 @@ begin
   NewLabel.Left := 5;
 
   NewLabel := TLABEL.Create(mainForm);
-  NewLabel.CAPTION := 'Password';
+  NewLabel.CAPTION := '* Password';
   NewLabel.Parent := PlayerBox;
   NewLabel.Top := 93;
   NewLabel.Left := 5;
