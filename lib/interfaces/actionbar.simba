@@ -143,13 +143,9 @@ Example:
 *}
 {$IFNDEF CODEINSIGHT}
 function TRSActionBar.__find(): boolean;
-const
-  X1_OFFSET = - 566;
-  Y1_OFFSET = - 10;
-  X2_OFFSET = 9;
-  Y2_OFFSET = 65;
 var
   center: TPoint;
+  offset: TBox;
 begin
   print('TRSActionBar.__find()', TDebug.HEADER);
 
@@ -160,10 +156,15 @@ begin
     exit(false);
   end;
 
-  self.x := center.x + X1_OFFSET;
-  self.y := center.y + Y1_OFFSET;
-  self.w := center.x + X2_OFFSET - self.x;
-  self.h := center.y + Y2_OFFSET - self.y;
+  if (getColor(center.x - 543, center.y + 47) = 950986) then // gold color around the action bar number
+    offset := [-566, -10, 9, 65]
+  else
+    offset := [-566, -10, 9, 27];
+
+  self.x := center.x + offset.x1;
+  self.y := center.y + offset.y1;
+  self.w := center.x + offset.x2 - self.x;
+  self.h := center.y + offset.y2 - self.y;
 
   self.__slots := grid(14, 1, 29, 29, 36, 0, point(self.getBounds().x1 + 67, self.getBounds().y1 + 53));
 
@@ -174,8 +175,8 @@ begin
 
   result := true;
 
-  print('Found and set actionBar properties', TDebug.FOOTER);
-  print('TRSActionBar.__find(): '+toStr(result));
+  print('Found and set actionBar properties');
+  print('TRSActionBar.__find(): '+toStr(result), TDebug.FOOTER);
 end;
 {$ENDIF}
 
@@ -296,6 +297,55 @@ begin
 end;
 {$ENDIF}
 
+{*
+TRSActionBar.__toggleSelf
+~~~~~~~~~~~~~~~~~~~~~~~~~
+
+.. code-block:: pascal
+
+    function TRSActionBar.__toggleSelf(open: boolean): boolean;
+
+Internal function used to toggle the Action Bar open and closed.
+
+.. note::
+
+    - by euphemism
+    - Last Updated: 18 April 2013 by euphemism
+
+Example:
+
+.. code-block:: pascal
+
+    if (actionBar.__toggleSelf(true)) then
+      writeln('Action Bar is open.');
+*}
+{$IFNDEF CODEINSIGHT}
+function TRSActionBar.__toggleSelf(open: boolean): boolean;
+var
+
+  center: TPoint;
+  t: TTimeMarker;
+begin
+
+  if (((open) and (not self.isOpen())) or ((not open) and (self.isOpen()))) then // Lape currently does weird things with xor
+  begin
+
+    if (not self._findMinimizeButton(center)) then
+      exit(false);
+
+    intToBox(center.x - 6, center.y - 6, center.x + 6, center.y + 6).mouse(MOUSE_LEFT);
+
+    t.start();
+    repeat
+
+      wait(randomRange(10, 30));
+      result := (open = self.isOpen());
+    until ((result) or (t.getTime() > 950 + random(100)));
+  end else
+    result := true;
+end;
+{$ENDIF}
+
 (*
 TRSActionBar.isOpen
 ~~~~~~~~~~~~~~~~~~~
@@ -330,55 +380,6 @@ begin
   print('actionBar.isOpen() returned ' + toStr(result) + ' and found the color ' +
    toStr(color) + '. We were looking for the silver border of the Action Bar, if it was open.', TDebug.LOG);
 end;
-
-{*
-TRSActionBar.__toggleSelf
-~~~~~~~~~~~~~~~~~~~~~~~~~
-
-.. code-block:: pascal
-
-    function TRSActionBar.__toggleSelf(open: boolean): boolean;
-
-Internal function used to toggle the Action Bar open and closed.
-
-.. note::
-
-    - by euphemism
-    - Last Updated: 18 April 2013 by euphemism
-
-Example:
-
-.. code-block:: pascal
-
-    if (actionBar.__toggleSelf(true)) then
-      writeln('Action Bar is open.');
-*}
-{$IFNDEF CODEINSIGHT}
-function TRSActionBar.__toggleSelf(open: boolean): boolean;
-var
-
-  center: TPoint;
-  t: TTimeMarker;
-begin
-
-  if (((open) and (not self.isOpen())) or ((not open) and (self.isOpen()))) then //Lape currently does weird things with xor
-  begin
-
-    if (not self._findMinimizeButton(center)) then
-      exit(false);
-
-    intToBox(center.x - 6, center.y - 6, center.x + 6, center.y + 6).mouse(MOUSE_LEFT);
-
-    t.start();
-    repeat
-
-      wait(randomRange(10, 30));
-      result := (open = self.isOpen());
-    until ((result) or (t.getTime() > 950 + random(100)));
-  end else
-    result := true;
-end;
-{$ENDIF}
 
 (*
 TRSActionBar.open
