@@ -11,7 +11,9 @@ The source for this file can be found `here <https://github.com/SRL/SRL-6/blob/m
 
 {$include_once interfaces.simba}
 {$include_once ../core/text.simba}
+{$include_once ../core/players.simba}
 {$include_once gametabs/backpack.simba}
+{$include_once gametabs/powers/powers.simba}
 
 {$f-}
 
@@ -20,10 +22,15 @@ type TRSActionBar
 ~~~~~~~~~~~~~~~~~
 
 A type that stores functions and properties of the Runescape Action Bar.
+
+Example
+
+.. code-block:: pascal
+
+    actionBar.open();
 *)
 type
   TRSActionBar = record(TRSInterface)
-
     __slots: TBoxArray;
   end;
 
@@ -32,14 +39,55 @@ var actionBar
 ~~~~~~~~~~~~~
 
 Variable that stores functions and properties of the Runescape Action Bar.
+
+Example
+
+.. code-block:: pascal
+
+    actionBar.close();
 *)
 var
   actionBar: TRSActionBar;
 
+(*
+const Action Bar Slots
+~~~~~~~~~~~~~~~~~~~~~~
+
+Variable that stores functions and properties of the Runescape Action Bar.
+
+Example
+
+.. code-block:: pascal
+
+    actionBar.isSlotEmpty(ACTION_BAR_SLOT_LOW);
+*)
 const
   ACTION_BAR_SLOT_LOW = 1;
   ACTION_BAR_SLOT_HIGH = 12;
 
+{*
+TRSActionBar._findMinimizeButton
+~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+
+.. code-block:: pascal
+
+    function TRSActionBar._findMinimizeButton(out center: TPoint): boolean;
+
+Returns true if the action bar's minimize button is found.  Returns it's
+coordinates in 'center'.
+
+.. note::
+
+    - by euphemism
+    - Last Updated: 15 September 2013 by euphemism
+
+Example:
+
+.. code-block:: pascal
+
+    if (actionBar._findMinimizeButton()) then
+      print('Found minimize button');
+*}
 function TRSActionBar._findMinimizeButton(out center: TPoint): boolean;
 const
 
@@ -72,6 +120,27 @@ begin
   result := true;
 end;
 
+{*
+TRSActionBar.__find
+~~~~~~~~~~~~~~~~~~~
+
+.. code-block:: pascal
+
+    function TRSActionBar.__find(): boolean;
+
+Returns true if the action bar is found.
+
+.. note::
+
+    - by euphemism
+    - Last Updated: 15 September 2013 by euphemism
+
+Example:
+
+.. code-block:: pascal
+
+    actionBar.__find();
+*}
 {$IFNDEF CODEINSIGHT}
 function TRSActionBar.__find(): boolean;
 const
@@ -157,6 +226,28 @@ begin
 end;
 {$ENDIF}
 
+{*
+TRSActionBar.__isSlotValid
+~~~~~~~~~~~~~~~~~~~~~~~~~~
+
+.. code-block:: pascal
+
+    function TRSActionBar.__isSlotValid(var slot: integer): boolean;
+
+Returns true if the 'slot' is valid.
+
+.. note::
+
+    - by euphemism
+    - Last Updated: 15 September 2013 by euphemism
+
+Example:
+
+.. code-block:: pascal
+
+    if (actionBar.__isSlotValid(5)) then
+      actionBar.clickSlot(5);
+*}
 {$IFNDEF CODEINSIGHT}
 function TRSActionBar.__isSlotValid(var slot: integer): boolean;
 begin
@@ -171,6 +262,27 @@ begin
 end;
 {$ENDIF}
 
+{*
+TRSActionBar.__printWarning
+~~~~~~~~~~~~~~~~~~~~~~~~~~~
+
+.. code-block:: pascal
+
+    function TRSActionBar.__printWarning(methodName, resultValue: variant): variant;
+
+Prints an action bar specific warning.
+
+.. note::
+
+    - by euphemism
+    - Last Updated: 15 September 2013 by euphemism
+
+Example:
+
+.. code-block:: pascal
+
+    actionBar.__printWarning('switchToBar', -1);
+*}
 {$IFNDEF CODEINSIGHT}
 function TRSActionBar.__printWarning(methodName, resultValue: variant): variant;
 begin
@@ -329,7 +441,7 @@ TRSActionBar.getCurrentBar
     function TRSActionBar.getCurrentBar(): Integer;
 
 Returns the number of the Action Bar setup currently displayed.  (Members can
- have up to five different Action Bar setups.')
+have up to five different Action Bar setups).
 
 .. note::
 
@@ -352,9 +464,29 @@ begin
   print('actionBar.getCurrentBar() returned ' + toStr(result), TDebug.LOG);
 end;
 
+(*
+TRSActionBar.switchToBar
+~~~~~~~~~~~~~~~~~~~~~~~~
 
+.. code-block:: pascal
 
-function TRSActionBar.switchToBar(barNumber: integer; useBindKey: boolean = false): boolean; //Waiting on the chat interface to be finished.  As such, this is not currently a working function.  By riwu.
+    function TRSActionBar.switchToBar(barNumber: integer; useBindKey: boolean = false): boolean;
+
+Switches to the specified action bar setup.
+
+.. note::
+
+    - by euphemism
+    - Last Updated: 18 April 2013 by euphemism
+
+Example:
+
+.. code-block:: pascal
+
+    if (actionBar.switchToBar(barNumber)) then
+      writeln('Switched to '+toStr(barNumber));
+*)
+function TRSActionBar.switchToBar(barNumber: integer; useBindKey: boolean = false): boolean;
 var
 
   currentBar, r, i, diff: integer;
@@ -367,14 +499,12 @@ begin
   if (length(players) > 0) then
     if (not players[currentPlayer].isMember) then
     begin
-
       print('actionBar.switchToBar: F2P cannot switch to this bar.', TDebug.ERROR);
       exit;
     end;
 
   if (not inRange(barNumber, 1, 5)) then
   begin
-
     print('actionBar.switchToBar: barNumber must be within 1-5.', TDebug.ERROR);
     exit;
   end;
@@ -803,7 +933,6 @@ Example:
     if (actionBar.clear()) then
       writeln('Successfully cleared the Action Bar.');
 *)
-(*
 function TRSActionBar.clear(): boolean;
 var
 
@@ -819,7 +948,7 @@ begin
   timeMarker := getSystemTime() + randomRange(1504, 2306);
 
   while (getSystemTime() < timeMarker) do
-    if (chooseOption(['Clear', 'all', 'r-a', 'ear', 'ar'])) then
+    if (chooseOption.select(['Clear', 'all', 'r-a', 'ear', 'ar'])) then
     begin
 
       result := true;
@@ -836,7 +965,7 @@ begin
     result := self.isEmpty();
   until (result or (getSystemTime() > TimeMarker));
 end;
-*)
+
 (*
 TRSActionBar.getAbilityCooldown
 ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
@@ -846,7 +975,7 @@ TRSActionBar.getAbilityCooldown
     function TRSActionBar.getAbilityCooldown(slot: integer): integer;
 
 Returns integer representation (0 - 100) of the cooldown of the ability
- in the specified slot.
+in the specified slot.
 
 .. note::
 

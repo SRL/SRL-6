@@ -18,6 +18,8 @@ var mouseSpeed
 
 Adjustable mouse speed variable. Default set to 20.
 
+Example
+
 .. code-block:: pascal
 
     mouseSpeed := 50;
