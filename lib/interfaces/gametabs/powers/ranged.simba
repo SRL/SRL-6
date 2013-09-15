@@ -1,0 +1,48 @@
+{$include_once powers.simba}
+
+{$f-}
+
+const
+  __ABILITY_SET_RANGED       = [TAbility.PIERCING_SHOT .. TAbility.UNLOAD];
+
+  __RANGED_ABILITY_SETS = [__ABILITY_SET_RANGED];
+
+var
+  tabRanged: TRSTabRanged;
+
+procedure TRSTabRanged.__init();
+begin
+
+  with self do
+  begin
+
+    name := 'RS Ranged tab';
+    ID := ID_INTERFACE_TAB_RANGED;
+    tabIndex := _TAB_RANGED;
+    parentID := _TAB_POWERS;//-1;
+    static := true;
+
+    __numberOfSubTabs := 1;
+    //__subTabGrid := grid(self.__numberOfSubTabs, 1, 19, 19, 26, 0, point(gameTabs.visibleTabArea.x1 + 15 + 9, gameTabs.visibleTabArea.y1 + 7 + 9));
+    __abilitySets := __RANGED_ABILITY_SETS;
+    __firstAbilityInSubTab := [TAbility.PIERCING_SHOT];
+  end;
+end;
+
+{$IFNDEF CODEINSIGHT}
+function __findTabRanged(): boolean;
+begin
+
+  result := tabRanged.__find();
+end;
+{$ENDIF}
+
+{$f+}
+
+begin
+
+  tabRanged.__init();
+  powers.ranged.__init();
+
+  __interfaceFindFunctions[tabRanged.ID] := @__findTabRanged;
+end;
