@@ -16,6 +16,7 @@ SRL Interfaces Reference
     abilitybook
     backpack
     gametab
+    stats
 
     lobby
     worlds
