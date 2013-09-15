@@ -21,8 +21,8 @@ begin
 
     name := 'RS Ranged tab';
     ID := ID_INTERFACE_TAB_RANGED;
-    tabIndex := _TAB_RANGED;
-    parentID := _TAB_POWERS;//-1;
+    tabIndex := TAB_RANGED;
+    parentID := TAB_POWERS;//-1;
     static := true;
 
     __numberOfSubTabs := 1;

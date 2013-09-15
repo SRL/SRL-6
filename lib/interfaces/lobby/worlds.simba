@@ -256,7 +256,7 @@ var
   t: integer;
   p: TPoint;
 begin
-  result := lobby._openTab(self.lobbyID);
+  result := lobby.openTab(self.lobbyID);
 
   if (not self.isOpen()) then
     exit(false);

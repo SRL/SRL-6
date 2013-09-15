@@ -480,7 +480,7 @@ begin
     exit();
 
   t := gameTabs.getActiveTab();
-  TIA := [_TAB_STATS, _TAB_BACKPACK, _TAB_EQUIPMENT, _TAB_FRIENDS, _TAB_MAGIC];
+  TIA := [TAB_STATS, TAB_BACKPACK, TAB_EQUIPMENT, TAB_FRIENDS, TAB_MAGIC];
 
   // every tab
   repeat
@@ -493,14 +493,14 @@ begin
   until(commonTabs <> t);
 
   if (random(2) = 0) then
-    gameTabs._openTab(allTabs)
+    gameTabs.openTab(allTabs)
   else
-    gameTabs._openTab(commonTabs);
+    gameTabs.openTab(commonTabs);
 
   wait(randomRange(300, 600));
 
   if (returnToOriginal) then
-    gameTabs._openTab(t);
+    gameTabs.openTab(t);
 end;
 
 (*

@@ -25,39 +25,39 @@ the grid.
 
 *}
 const
-  _TAB_HERO = 40;
-    _TAB_TASK  = 32;
-    _TAB_STATS = 24;
+  TAB_HERO = 40;
+    TAB_TASK  = 32;
+    TAB_STATS = 24;
 
-  _TAB_GEAR = 41;
-    _TAB_EQUIPMENT = 33;
-    _TAB_BACKPACK  = 25;
+  TAB_GEAR = 41;
+    TAB_EQUIPMENT = 33;
+    TAB_BACKPACK  = 25;
 
-  _TAB_ADVENTURES = 42;
-    _TAB_COMPASS_TASK = 34;
+  TAB_ADVENTURES = 42;
+    TAB_COMPASS_TASK = 34;
 
-  _TAB_POWERS = 43;
-    _TAB_DEFENSIVE = 35;
-    _TAB_RANGED    = 27;
-    _TAB_MELEE     = 19;
-    _TAB_MAGIC     = 11;
-    _TAB_PRAYER    = 3;
+  TAB_POWERS = 43;
+    TAB_DEFENSIVE = 35;
+    TAB_RANGED    = 27;
+    TAB_MELEE     = 19;
+    TAB_MAGIC     = 11;
+    TAB_PRAYER    = 3;
 
-  _TAB_SOCIAL = 44;
-    _TAB_CLAN_CHAT    = 36;
-    _TAB_FRIENDS_CHAT = 28;
-    _TAB_FRIENDS      = 20;
+  TAB_SOCIAL = 44;
+    TAB_CLAN_CHAT    = 36;
+    TAB_FRIENDS_CHAT = 28;
+    TAB_FRIENDS      = 20;
 
-  _TAB_EXTRAS = 45;
+  TAB_EXTRAS = 45;
 
-  _TAB_HELP = 46;
+  TAB_HELP = 46;
 
-  _TAB_OTHER = 47;
-    _TAB_MUSIC = 39;
-    _TAB_NOTES = 31;
+  TAB_OTHER = 47;
+    TAB_MUSIC = 39;
+    TAB_NOTES = 31;
 
 const
-  __COLORS_ACTIVE_TAB = [7037013, 8682089];
+  __COLOR_ACTIVE_TAB = [7037013, 8682089];
 
 {*
 type TRSGameTab
@@ -83,7 +83,7 @@ A single type for manipulating the entire gametab system.
 type
   TRSGameTabs = record(TRSInterface)
     tabs: array of _TRSGameTab;
-    visibleTabArea,              // the current (set in TRSGameTabs._openTab)
+    visibleTabArea,              // the current (set in TRSGameTabs.openTab)
     __visibleTabAreaSingle,      // when there's only a single tab open (excludes title bar)
     __visibleTabAreaMulti: TBox; // when there are multiple tabs open
     __tabSelectionArea: TBox;    // the area where different tabs are clicked to become visible
@@ -100,8 +100,8 @@ Example:
 
 .. code-block:: pascal
 
-    if (not gameTabs.isTabActive(_TAB_BACKPACK)) then
-      gameTabs._openTab(_TAB_BACKPACK);
+    if (not gameTabs.isTabActive(TAB_BACKPACK)) then
+      gameTabs.openTab(TAB_BACKPACK);
 *)
 var
   gameTabs: TRSGameTabs;
@@ -161,27 +161,27 @@ Example:
 
 .. code-block:: pascal
 
-    gameTabs.__loadBitmap(_TAB_BACKBACK);
+    gameTabs.__loadBitmap(TAB_BACKBACK);
 *}
 {$IFNDEF CODEINSIGHT}
 procedure TRSGameTabs.__loadBitmap(tab: integer);
 begin                               {done: stats, backpack}
   case tab of
-    _TAB_STATS:        self.tabs[tab]._bmp := bitmapFromString(6, 8, 'meJwT5v0gDEZ8vIlmSfzJG9iEYSIiYqqBrSxwEU7ugwJ6IgnL2eEiArw92ppCSWsRIqJSnsaJvEBu2CQGIJed8zi/oGJgGxNQxDSPCyjCyzWBX0c4uJsRyIWI8HAnaWsKQ7hABADwIifh');
-    _TAB_TASK,
-    _TAB_COMPASS_TASK: self.tabs[tab]._bmp := bitmapFromString(7, 7, 'meJzjW3uHb+0d67MfrT6+ByLFsi0ctsFcU3cDBdmvfoUIAmX5ktuBInxrbnNN2QligxFH1USQYHAsv5AKUBcnnxqPsiVI0MaPm5OVW5CbMzKN2z4TqFLIKoJTUIxVToBZToBNXwiomD3aml+EF6geyIUjTidRLidRACrELQI=');
-    _TAB_EQUIPMENT:    self.tabs[tab]._bmp := bitmapFromString(7, 7, 'meJyb1l4zrb0mKTW5qroagp7cuTF98pTFS2YDBSHiQO7B3TuAyoAMOHfOui1AEqgAohgo7uLkJm9lCWEDBa30dBgZGCAIKAIxSklRDS5o6R4DtyKhpDY+0puFlwNoAgCiqjza');
-    _TAB_BACKPACK:     self.tabs[tab]._bmp := bitmapFromString(9, 9, 'meJxTss1RgiEeZUs5qyAgA0IqoUrJq1oAGfxiQUDEyM4HFIGoBHI5eayAbNPeLRBBoCwfFz9EC1DKOqk5f8/TpM7VBvaTgQioHigFVCBvZaVfOx2o3iJ3PUQjsnVAXUCVwjK5QEOAtsCdxMmnBpQC2gU0EOJgiBvgJrhWTknYcBgiBbERbi9QL5AEAAYAO0M=');
-    _TAB_DEFENSIVE:    self.tabs[tab]._bmp := bitmapFromString(7, 7, 'meJybPnlKVXV1dedEIHlw9w4Img4WBCIIA0jCBees2wJEEMEnd24AEZD75eNLIGNae01dQUp8pDdQCoj2nLi5eMlsFyc3HsFsbvaFQC1JqckQkl8siJ3zZEbeFbggRJmtxaMJE28BAHrlTgg=');
-    _TAB_RANGED:       self.tabs[tab]._bmp := bitmapFromString(2, 8, 'meJyzyFmrpaEpm9CpbBrEbZfNY+HGLxYkoGgAZCuaugFJUUlXYZlcISEDJdscfn4+ABAACfE=');
-    _TAB_MELEE:        self.tabs[tab]._bmp := bitmapFromString(4, 4, 'meJwTF+ScPnnKlz9/Fzz/PmfdFiBjz4mbSanJSbfeZfz4BWS42RtbrzzFNXW3S1SqmCAnANE4Gm4=');
-    _TAB_MAGIC:        self.tabs[tab]._bmp := bitmapFromString(7, 7, 'meJwrcdVeXhux0Emw1pY31oQHSGpJsJlMOWC16ZljUieQDRQscdV2cXLjmrqb2z5TsWwLj2C2tl1jYvNKbvaFQDWulVP4ktv5xYIM7eZk5F3h4W501OAyqk5StA5mZuaTV7MA6lWXEQeaDEdAMyF2VdvwAq2+ki6KjADwRyx0');
-    _TAB_PRAYER:       self.tabs[tab]._bmp := bitmapFromString(6, 6, 'meJx7dWHxqwuLP15d8fHayudnF947Ovv52UVfPr6EoM8fXjw+NR8oC+L++QtEQBGgyg+oIu+vLAcq+/T+OZAN0fjszIJbB6c/Ojnv47UVH64uf3p6ARABALyyXGE=');
-    _TAB_CLAN_CHAT:    self.tabs[tab]._bmp := bitmapFromString(9, 5, 'meJyzPvXWeuUpjqh0jqqJfGvvAEkQI7md1dzG+uxHiCD71a9wKYgsUAuQBApCENfU3VDZqHSrTc8gbKAgQhwsZTLlAIdtMLI5QASyOiodAB8/NiM=');
-    _TAB_FRIENDS_CHAT: self.tabs[tab]._bmp := bitmapFromString(8, 5, 'meJyzPvXWatMz7ZrpLC7abIWOrG0x7NHWQGR99iNQkCMqHSjCtLUeKAVBQMVwQSAJRHBxrYROoEaIIFzceuUpHmVLiDhEBGI+AMZFJnU=');
-    _TAB_FRIENDS:      self.tabs[tab]._bmp := bitmapFromString(9, 5, 'meJxLbF6Z2Lwye9qG6pVHO2escHFyY3HRZit0ZI+2BgpGV08GooSSWkXrYNa2GKat9UApIHKtnJII1ggXB5IQKa3wTCXbTMekTqAUkAsUhyAge+qhh3PWbQHq4lG2BJoP1wJkAwCtDjAf');
-    _TAB_MUSIC:        self.tabs[tab]._bmp := bitmapFromString(7, 7, 'meJxTtA5WREJKtplAVL3yaPa0DYnNKyEounqyY1LnguffgYKW7jEuUalAEaA4kDv10EMgV0xMXF7NAkiy8HIAuUDtEBIoC1GQUFIL1AJkAA3Z8+4HEAFFgAqAWoDiQEGgMqBpQAVABgCuIEQw');
-    _TAB_NOTES:        self.tabs[tab]._bmp := bitmapFromString(7, 9, 'meJz78ufvnnc/vnx8+eXPXwha8Py7S1QqlPvx5ZM7N4AkUA0jA4OlewxIMVgLBFV3TgSKy1tZ7jlxE8gF6oUoyJ62AaJ+6qGHEJUQqeqVR5VsM5OnnoELQhBQWcKGwxA1cEEISrr1DpkLUZDx41fCllcA8uqOdA==');
+    TAB_STATS:        self.tabs[tab]._bmp := bitmapFromString(6, 8, 'meJwT5v0gDEZ8vIlmSfzJG9iEYSIiYqqBrSxwEU7ugwJ6IgnL2eEiArw92ppCSWsRIqJSnsaJvEBu2CQGIJed8zi/oGJgGxNQxDSPCyjCyzWBX0c4uJsRyIWI8HAnaWsKQ7hABADwIifh');
+    TAB_TASK,
+    TAB_COMPASS_TASK: self.tabs[tab]._bmp := bitmapFromString(7, 7, 'meJzjW3uHb+0d67MfrT6+ByLFsi0ctsFcU3cDBdmvfoUIAmX5ktuBInxrbnNN2QligxFH1USQYHAsv5AKUBcnnxqPsiVI0MaPm5OVW5CbMzKN2z4TqFLIKoJTUIxVToBZToBNXwiomD3aml+EF6geyIUjTidRLidRACrELQI=');
+    TAB_EQUIPMENT:    self.tabs[tab]._bmp := bitmapFromString(7, 7, 'meJyb1l4zrb0mKTW5qroagp7cuTF98pTFS2YDBSHiQO7B3TuAyoAMOHfOui1AEqgAohgo7uLkJm9lCWEDBa30dBgZGCAIKAIxSklRDS5o6R4DtyKhpDY+0puFlwNoAgCiqjza');
+    TAB_BACKPACK:     self.tabs[tab]._bmp := bitmapFromString(9, 9, 'meJxTss1RgiEeZUs5qyAgA0IqoUrJq1oAGfxiQUDEyM4HFIGoBHI5eayAbNPeLRBBoCwfFz9EC1DKOqk5f8/TpM7VBvaTgQioHigFVCBvZaVfOx2o3iJ3PUQjsnVAXUCVwjK5QEOAtsCdxMmnBpQC2gU0EOJgiBvgJrhWTknYcBgiBbERbi9QL5AEAAYAO0M=');
+    TAB_DEFENSIVE:    self.tabs[tab]._bmp := bitmapFromString(7, 7, 'meJybPnlKVXV1dedEIHlw9w4Img4WBCIIA0jCBees2wJEEMEnd24AEZD75eNLIGNae01dQUp8pDdQCoj2nLi5eMlsFyc3HsFsbvaFQC1JqckQkl8siJ3zZEbeFbggRJmtxaMJE28BAHrlTgg=');
+    TAB_RANGED:       self.tabs[tab]._bmp := bitmapFromString(2, 8, 'meJyzyFmrpaEpm9CpbBrEbZfNY+HGLxYkoGgAZCuaugFJUUlXYZlcISEDJdscfn4+ABAACfE=');
+    TAB_MELEE:        self.tabs[tab]._bmp := bitmapFromString(4, 4, 'meJwTF+ScPnnKlz9/Fzz/PmfdFiBjz4mbSanJSbfeZfz4BWS42RtbrzzFNXW3S1SqmCAnANE4Gm4=');
+    TAB_MAGIC:        self.tabs[tab]._bmp := bitmapFromString(7, 7, 'meJwrcdVeXhux0Emw1pY31oQHSGpJsJlMOWC16ZljUieQDRQscdV2cXLjmrqb2z5TsWwLj2C2tl1jYvNKbvaFQDWulVP4ktv5xYIM7eZk5F3h4W501OAyqk5StA5mZuaTV7MA6lWXEQeaDEdAMyF2VdvwAq2+ki6KjADwRyx0');
+    TAB_PRAYER:       self.tabs[tab]._bmp := bitmapFromString(6, 6, 'meJx7dWHxqwuLP15d8fHayudnF947Ovv52UVfPr6EoM8fXjw+NR8oC+L++QtEQBGgyg+oIu+vLAcq+/T+OZAN0fjszIJbB6c/Ojnv47UVH64uf3p6ARABALyyXGE=');
+    TAB_CLAN_CHAT:    self.tabs[tab]._bmp := bitmapFromString(9, 5, 'meJyzPvXWeuUpjqh0jqqJfGvvAEkQI7md1dzG+uxHiCD71a9wKYgsUAuQBApCENfU3VDZqHSrTc8gbKAgQhwsZTLlAIdtMLI5QASyOiodAB8/NiM=');
+    TAB_FRIENDS_CHAT: self.tabs[tab]._bmp := bitmapFromString(8, 5, 'meJyzPvXWatMz7ZrpLC7abIWOrG0x7NHWQGR99iNQkCMqHSjCtLUeKAVBQMVwQSAJRHBxrYROoEaIIFzceuUpHmVLiDhEBGI+AMZFJnU=');
+    TAB_FRIENDS:      self.tabs[tab]._bmp := bitmapFromString(9, 5, 'meJxLbF6Z2Lwye9qG6pVHO2escHFyY3HRZit0ZI+2BgpGV08GooSSWkXrYNa2GKat9UApIHKtnJII1ggXB5IQKa3wTCXbTMekTqAUkAsUhyAge+qhh3PWbQHq4lG2BJoP1wJkAwCtDjAf');
+    TAB_MUSIC:        self.tabs[tab]._bmp := bitmapFromString(7, 7, 'meJxTtA5WREJKtplAVL3yaPa0DYnNKyEounqyY1LnguffgYKW7jEuUalAEaA4kDv10EMgV0xMXF7NAkiy8HIAuUDtEBIoC1GQUFIL1AJkAA3Z8+4HEAFFgAqAWoDiQEGgMqBpQAVABgCuIEQw');
+    TAB_NOTES:        self.tabs[tab]._bmp := bitmapFromString(7, 9, 'meJz78ufvnnc/vnx8+eXPXwha8Py7S1QqlPvx5ZM7N4AkUA0jA4OlewxIMVgLBFV3TgSKy1tZ7jlxE8gF6oUoyJ62AaJ+6qGHEJUQqeqVR5VsM5OnnoELQhBQWcKGwxA1cEEISrr1DpkLUZDx41fCllcA8uqOdA==');
   end;
 
   if (self.tabs[tab]._bmp <> -1) then
@@ -244,7 +244,7 @@ Example:
 
 .. code-block:: pascal
 
-    if (not gameTabs._isTabValid(_TAB_BACKPACK)) then
+    if (not gameTabs._isTabValid(TAB_BACKPACK)) then
       exit;
 *}
 function TRSGameTabs._isTabValid(tab: integer): boolean;
@@ -354,7 +354,7 @@ begin
     exit(true);
 
   for i := 0 to 1 do
-    findColors(atpa[i], __COLORS_ACTIVE_TAB[i], self.__tabSelectionArea);
+    findColors(atpa[i], __COLOR_ACTIVE_TAB[i], self.__tabSelectionArea);
 
   tpa := mergeATPA(atpa);
 
@@ -413,7 +413,7 @@ Example:
 
 .. code-block:: pascal
 
-    if (gameTabs._findTab(p, _TAB_BACKPACK, gameTabs.__navigationTabArea)) then
+    if (gameTabs._findTab(p, TAB_BACKPACK, gameTabs.__navigationTabArea)) then
     begin
       writeln('Opening the backpack tab');
       mouse(p.rand(5), MOUSE_LEFT);
@@ -450,7 +450,7 @@ Example:
 
 .. code-block:: pascal
 
-    gameTabs._findTab(p, _TAB_BACKPACK, gameTabs._getActiveTabBox());
+    gameTabs._findTab(p, TAB_BACKPACK, gameTabs._getActiveTabBox());
 *}
 function TRSGameTabs._getActiveTabBox(): TBox;
 var
@@ -472,7 +472,7 @@ begin
     self.visibleTabArea := self.__visibleTabAreaSingle;
 
   for i := 0 to 1 do
-    findColors(atpa[i], __COLORS_ACTIVE_TAB[i], self.__tabSelectionArea.x1,
+    findColors(atpa[i], __COLOR_ACTIVE_TAB[i], self.__tabSelectionArea.x1,
                                                 self.__tabSelectionArea.y1,
                                                 self.__tabSelectionArea.x2,
                                                 self.__tabSelectionArea.y2 - 1); // get rid of stray points on the last line
@@ -520,7 +520,7 @@ Example:
 
 .. code-block:: pascal
 
-    if (gameTabs.getActiveTab() = _TAB_BACKPACK) then
+    if (gameTabs.getActiveTab() = TAB_BACKPACK) then
       writeln('Backpack tab is open');
 *)
 function TRSGameTabs.getActiveTab(): integer;
@@ -568,7 +568,7 @@ Example:
 
 .. code-block:: pascal
 
-    if (gameTabs._isTabActive(_TAB_BACKPACK)) then
+    if (gameTabs._isTabActive(TAB_BACKPACK)) then
       writeln('Backpack tab is open');
 *)
 function TRSGameTabs._isTabActive(tab: integer): boolean;
@@ -589,12 +589,12 @@ begin
 end;
 
 {*
-TRSGameTabs._openTab
-~~~~~~~~~~~~~~~~~~~~
+TRSGameTabs.openTab
+~~~~~~~~~~~~~~~~~~~
 
 .. code-block:: pascal
 
-    function TRSGameTabs._openTab(tab: integer): boolean;
+    function TRSGameTabs.openTab(tab: integer): boolean;
 
 Returns true if the 'tab' is opened (or is already open). If possible, use the
 tab's open() function (i.e. tabBackpack.open()).
@@ -608,10 +608,10 @@ Example:
 
 .. code-block:: pascal
 
-    if (gameTabs._openTab(_TAB_BACKPACK)) then
+    if (gameTabs.openTab(TAB_BACKPACK)) then
       writeln('Backpack tab is open');
 *}
-function TRSGameTabs._openTab(tab: integer): boolean;
+function TRSGameTabs.openTab(tab: integer): boolean;
 var
   t: integer;
   p: TPoint;
@@ -622,7 +622,7 @@ begin
 
   anyTabOpen := self.areAnyOpen();
 
-  print('TRSGameTabs._openTab('+toStr(tab)+')', TDebug.HEADER);
+  print('TRSGameTabs.openTab('+toStr(tab)+')', TDebug.HEADER);
 
   if (anyTabOpen) then
   begin
@@ -631,7 +631,7 @@ begin
     begin
       print('Tab already active');
       result := true;
-      print('TRSGameTabs._openTab('+toStr(tab)+'): '+toStr(result), TDebug.FOOTER);
+      print('TRSGameTabs.openTab('+toStr(tab)+'): '+toStr(result), TDebug.FOOTER);
       exit;
     end;
 
@@ -645,7 +645,7 @@ begin
 
       wait(50 + random(100));
       result := true;
-      print('TRSGameTabs._openTab('+toStr(tab)+'): '+toStr(result), TDebug.FOOTER);
+      print('TRSGameTabs.openTab('+toStr(tab)+'): '+toStr(result), TDebug.FOOTER);
       exit;
     end;
   end;
@@ -678,7 +678,7 @@ begin
     else
       self.visibleTabArea := self.__visibleTabAreaSingle;
 
-  print('TRSGameTabs._openTab('+toStr(tab)+'): '+toStr(result), TDebug.FOOTER);
+  print('TRSGameTabs.openTab('+toStr(tab)+'): '+toStr(result), TDebug.FOOTER);
 end;
 
 {*
@@ -690,7 +690,7 @@ TRSGameTabs._closeTab
     function TRSGameTabs._closeTab(tab: integer): boolean;
 
 Returns true if the 'tab' is closed. The specified tab must be active before
-it can be closed, so it is recommeded that you call gameTabs._openTab() first.
+it can be closed, so it is recommeded that you call gameTabs.openTab() first.
 If possible, use the tab's open() function (i.e. tabBackpack.close()).
 
 .. note::
@@ -702,7 +702,7 @@ Example:
 
 .. code-block:: pascal
 
-    if (gameTabs._closeTab(_TAB_BACKPACK)) then
+    if (gameTabs._closeTab(TAB_BACKPACK)) then
       writeln('Backpack tab is closed');
 *}
 function TRSGameTabs._closeTab(tab: integer): boolean;
@@ -790,32 +790,32 @@ begin
       tabs[i]._bmp := -1;
 
       case tabs[i].id of
-        _TAB_TASK,
-        _TAB_STATS:
-          tabs[i].parent := _TAB_HERO;
+        TAB_TASK,
+        TAB_STATS:
+          tabs[i].parent := TAB_HERO;
 
-        _TAB_EQUIPMENT,
-        _TAB_BACKPACK:
-          tabs[i].parent := _TAB_GEAR;
+        TAB_EQUIPMENT,
+        TAB_BACKPACK:
+          tabs[i].parent := TAB_GEAR;
 
-        _TAB_COMPASS_TASK:
-          tabs[i].parent := _TAB_ADVENTURES;
+        TAB_COMPASS_TASK:
+          tabs[i].parent := TAB_ADVENTURES;
 
-        _TAB_DEFENSIVE,
-        _TAB_RANGED,
-        _TAB_MELEE,
-        _TAB_MAGIC,
-        _TAB_PRAYER:
-          tabs[i].parent := _TAB_POWERS;
+        TAB_DEFENSIVE,
+        TAB_RANGED,
+        TAB_MELEE,
+        TAB_MAGIC,
+        TAB_PRAYER:
+          tabs[i].parent := TAB_POWERS;
 
-        _TAB_CLAN_CHAT,
-        _TAB_FRIENDS_CHAT,
-        _TAB_FRIENDS:
-          tabs[i].parent := _TAB_SOCIAL;
+        TAB_CLAN_CHAT,
+        TAB_FRIENDS_CHAT,
+        TAB_FRIENDS:
+          tabs[i].parent := TAB_SOCIAL;
 
-        _TAB_MUSIC,
-        _TAB_NOTES:
-          tabs[i].parent := _TAB_OTHER;
+        TAB_MUSIC,
+        TAB_NOTES:
+          tabs[i].parent := TAB_OTHER;
 
         else
           tabs[i].id := -1;

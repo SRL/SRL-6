@@ -23,8 +23,8 @@ begin
 
     name := 'RS Melee tab';
     ID := ID_INTERFACE_TAB_MELEE;
-    tabIndex := _TAB_MELEE;
-    parentID := _TAB_POWERS;//-1;
+    tabIndex := TAB_MELEE;
+    parentID := TAB_POWERS;//-1;
     static := true;
 
     __numberOfSubTabs := 2;

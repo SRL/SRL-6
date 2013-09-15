@@ -101,7 +101,7 @@ begin
   begin
     name := 'RS Backpack tab';
     ID := ID_INTERFACE_TAB_BACKPACK;
-    tabIndex := _TAB_BACKPACK;
+    tabIndex := TAB_BACKPACK;
     parentID := -1;
     static := true;
     areSlotsLoaded := false;
@@ -248,7 +248,7 @@ begin
   result := self.isOpen();
 
   if (not result) then
-    result := gameTabs._openTab(self.tabIndex);
+    result := gameTabs.openTab(self.tabIndex);
 
   if (result) then
     self._updateBounds();

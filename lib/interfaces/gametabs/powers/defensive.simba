@@ -23,8 +23,8 @@ begin
 
     name := 'RS Defensive tab';
     ID := ID_INTERFACE_TAB_DEFENSIVE;
-    tabIndex := _TAB_DEFENSIVE;
-    parentID := _TAB_POWERS;//-1;
+    tabIndex := TAB_DEFENSIVE;
+    parentID := TAB_POWERS;//-1;
     static := true;
 
     __numberOfSubTabs := 2;

@@ -71,7 +71,7 @@ const Internal
 Internal lobby constants.
 *}
 const
-  // used in getCurrentTab and _openTab calulations
+  // used in getCurrentTab and openTab calulations
   __LOBBY_TAB_WIDTH    = 102;
   __LOBBY_TAB_OFFSET_X = 7;  // x/y is the midpoint of the left border of the first tab
   __LOBBY_TAB_OFFSET_Y = 21;
@@ -384,12 +384,12 @@ begin
 end;
 
 {*
-TRSLobby._openTab
-~~~~~~~~~~~~~~~~~
+TRSLobby.openTab
+~~~~~~~~~~~~~~~~
 
 .. code-block:: pascal
 
-    function TRSLobby._openTab(tab: integer): boolean;
+    function TRSLobby.openTab(tab: integer): boolean;
 
 Opens the lobby tab specified by 'tab'. Valied arguments for 'tab' are the
 lobby tab constants at the top of the file. Is an internal SRL function, should
@@ -404,10 +404,10 @@ Example:
 
 .. code-block:: pascal
 
-    lobby._openTab(LOBBY_WORLDS);
+    lobby.openTab(LOBBY_WORLDS);
 
 *}
-function TRSLobby._openTab(tab: integer): boolean;
+function TRSLobby.openTab(tab: integer): boolean;
 var
   p: TPoint;
   currTab: integer;
@@ -426,7 +426,7 @@ begin
   result := true;
 
   if (not result) then
-    print('TRSLobby._openTab(): Failed to open tab '+toStr(tab), TDebug.ERROR);
+    print('TRSLobby.openTab(): Failed to open tab '+toStr(tab), TDebug.ERROR);
 end;
 
 {*
@@ -507,7 +507,7 @@ begin
 
   // because the quick-select buttons don't appear in the options tab
   if (self.getCurrentTab() = LOBBY_OPTIONS) then
-    if (not self._openTab(LOBBY_PLAYER)) then
+    if (not self.openTab(LOBBY_PLAYER)) then
       exit(false);
 
   // a box around each of the quick select world boxes

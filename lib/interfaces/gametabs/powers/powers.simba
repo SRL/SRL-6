@@ -183,7 +183,7 @@ begin
   result := self.isOpen();
 
   if (not result) then
-    result := gameTabs._openTab(self.tabIndex);
+    result := gameTabs.openTab(self.tabIndex);
 end;
 
 {$IFNDEF CODEINSIGHT}

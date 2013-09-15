@@ -21,8 +21,8 @@ begin
 
     name := 'RS Magic tab';
     ID := ID_INTERFACE_TAB_MAGIC;
-    tabIndex := _TAB_MAGIC;
-    parentID := _TAB_POWERS;//-1;
+    tabIndex := TAB_MAGIC;
+    parentID := TAB_POWERS;//-1;
     static := true;
 
     __numberOfSubTabs := 4;

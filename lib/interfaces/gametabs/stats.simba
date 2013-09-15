@@ -84,7 +84,7 @@ begin
   begin
     name := 'RS Stats tab';
     ID := ID_INTERFACE_TAB_STATS;
-    tabIndex := _TAB_STATS;
+    tabIndex := TAB_STATS;
     parentID := -1;
     static := true;
   end;
@@ -153,7 +153,7 @@ begin
   result := self.isOpen();
 
   if (not result) then
-    result := gameTabs._openTab(self.tabIndex);
+    result := gameTabs.openTab(self.tabIndex);
 end;
 
 (*
