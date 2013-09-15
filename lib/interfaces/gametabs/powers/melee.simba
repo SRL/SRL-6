@@ -1,0 +1,54 @@
+{$include_once powers.simba}
+
+{$f-}
+
+{$IFNDEF CODEINSIGHT}
+const
+  __ABILITY_SET_ATTACK   = [TAbility.SLICE .. TAbility.METEOR_STRIKE];
+  __ABILITY_SET_STRENGTH = [TAbility.KICK .. TAbility.FRENZY];
+
+  __MELEE_ABILITY_SETS = [__ABILITY_SET_ATTACK,
+                          __ABILITY_SET_STRENGTH];
+{$ENDIF}
+
+var
+  tabMelee: TRSTabMelee;
+
+{$IFNDEF CODEINSIGHT}
+procedure TRSTabMelee.__init();
+begin
+
+  with self do
+  begin
+
+    name := 'RS Melee tab';
+    ID := ID_INTERFACE_TAB_MELEE;
+    tabIndex := _TAB_MELEE;
+    parentID := _TAB_POWERS;//-1;
+    static := true;
+
+    __numberOfSubTabs := 2;
+    //__subTabGrid := grid(self.__numberOfSubTabs, 1, 19, 19, 26, 0, point(gameTabs.visibleTabArea.x1 + 15 + 9, gameTabs.visibleTabArea.y1 + 7 + 9));
+    __abilitySets := __MELEE_ABILITY_SETS;
+    __firstAbilityInSubTab := [TAbility.SLICE, TAbility.KICK];
+  end;
+end;
+{$ENDIF}
+
+{$IFNDEF CODEINSIGHT}
+function __findTabMelee(): boolean;
+begin
+
+  result := tabMelee.__find();
+end;
+{$ENDIF}
+
+{$f+}
+
+begin
+
+  tabMelee.__init();
+  powers.melee.__init();
+
+  __interfaceFindFunctions[tabMelee.ID] := @__findTabMelee;
+end;

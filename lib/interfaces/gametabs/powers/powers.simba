@@ -1,0 +1,472 @@
+{$include_once ../gametab.simba}
+
+{$f-}
+
+{$S+}
+
+(*
+type TPowersTab
+~~~~~~~~~~~~~~~
+
+A enum type for the tabs of the Powers group.
+*)
+type
+  TPowersTab = (
+    DEFENSIVE,
+    RANGED,
+    MELEE,
+    MAGIC,
+    PRAYERS);
+
+(*
+type TAbility
+~~~~~~~~~~~~~
+
+A enum type for the Abilities of the Ability Book.
+*)
+  TAbility = (
+
+    //Defence
+    ANTICIPATION,
+    BASH,
+    REVENGE,
+    PROVOKE,
+    IMMORTALITY,
+    FREEDOM,
+    REFLECT,
+    RESONANCE,
+    REJUVENATE,
+    DEBILITATE,
+    PREPARATION,
+    BARRICADE,
+
+    //Constitution
+    REGENERATE,
+    MOMENTUM,
+    INCITE,
+    SINGLE_WAY_WILDERNESS,
+
+    //Ranged
+    PIERCING_SHOT,
+    SNAP_SHOT,
+    DEADSHOT,
+    SNIPE,
+    DAZING_SHOT,
+    NEEDLE_STRIKE,
+    BINDING_SHOT,
+    FRAGMENTATION_SHOT,
+    ESCAPE,
+    RAPID_FIRE,
+    RICOCHET,
+    BOMBARDMENT,
+    INCENDIARY_SHOT,
+    UNLOAD,
+
+    //Attack
+    SLICE,
+    SLAUGHTER,
+    OVERPOWER,
+    HAVOC,
+    BACKHAND,
+    SMASH,
+    BARGE,
+    FLURRY,
+    SEVER,
+    HURRICANE,
+    MASSACRE,
+    METEOR_STRIKE,
+
+    //Strength
+    KICK,
+    PUNISH,
+    DISMEMBER,
+    FURY,
+    DESTROY,
+    QUAKE,
+    BERSERK,
+    CLEAVE,
+    ASSAULT,
+    DECIMATE,
+    PULVERISE,
+    FRENZY,
+
+    //Magic
+    WRACK,
+    ASPHYXIATE,
+    OMNIPOWER,
+    DRAGON_BREATH,
+    SONIC_WAVE,
+    CONCENTRATED_BLAST,
+    IMPACT,
+    COMBUST,
+    SURGE,
+    DETONATE,
+    CHAIN,
+    WILD_MAGIC,
+    METAMORPHOSIS,
+    TSUNAMI);
+
+{$S-}
+
+type
+  TRSAbilityTab = record(TRSInterface)
+    tabIndex: integer;
+    __numberOfSubTabs: integer;
+    __subTabGrid: TBoxArray;
+    __abilityGrid: TBoxArray;
+    __abilitySets: array of set of TAbility;
+    __firstAbilityInSubTab: array of TAbility;
+  end;
+
+type
+  TRSTabDefensive = record(TRSAbilityTab)
+    _placeHolder: byte;
+  end;
+
+type
+  TRSTabMagic = record(TRSAbilityTab)
+    _placeHolder: byte;
+  end;
+
+type
+  TRSTabMelee = record(TRSAbilityTab)
+    _placeHolder: byte;
+  end;
+
+type
+  TRSTabRanged = record(TRSAbilityTab)
+    _placeHolder: byte;
+  end;
+
+type
+  TRSPowers = record(TRSInterface)
+    defensive: TRSTabDefensive;
+    magic: TRSTabMagic;
+    melee: TRSTabMelee;
+    ranged: TRSTabRanged;
+  end;
+
+var
+  powers: TRSPowers;
+
+function TRSAbilityTab.isOpen(): boolean;
+begin
+
+  result := (gameTabs._isTabActive(self.tabIndex));
+end;
+
+(*
+TRSAbilityTab.open
+~~~~~~~~~~~~~~~~~~~
+
+.. code-block:: pascal
+
+    function TRSAbilityTab.open(): boolean;
+
+Opens the tab of the ability 'object' calling this function, if we're currently not on it.
+
+.. note::
+
+    - by Olly
+    - Last Updated: March. 11, 2013 by euphemism
+
+Example:
+
+.. code-block:: pascal
+
+    if (tabDefence.open()) then
+      writeln('We opened the Defence tab');
+*)
+function TRSAbilityTab.open(): boolean;
+begin
+
+  result := self.isOpen();
+
+  if (not result) then
+    result := gameTabs._openTab(self.tabIndex);
+end;
+
+{$IFNDEF CODEINSIGHT}
+function TRSAbilityTab.__getSubTab(): integer;
+var
+
+  i: integer;
+begin
+
+  if (not (self.isOpen())) then
+    if (not self.open()) then
+      exit(0);
+
+  for i := 0 to (self.__numberOfSubTabs - 1) do
+    if (getColor(self.__subTabGrid[i].x1, self.__subTabGrid[i].y1) = clWhite) then
+      exit(i);
+end;
+{$ENDIF}
+
+{$IFNDEF CODEINSIGHT}
+procedure TRSAbilityTab.__setAbilityGrid();
+var
+
+  columns, height, rows, width, xDistance, yDistance: integer;
+  offset: TPoint;
+begin
+
+  columns := 5;
+  height := 26;
+  rows := 7;
+  width := 26;
+  xDistance := 43;
+  yDistance := 34;
+  offset := point(gameTabs.visibleTabArea.x1 + 24, gameTabs.visibleTabArea.y1 + 77{51});
+
+  self.__abilityGrid := grid(columns, rows, width, height, xDistance, yDistance, offset);
+end;
+{$ENDIF}
+
+{$IFNDEF CODEINSIGHT}
+procedure TRSAbilityTab.__setSubTabGrid();
+var
+
+  columns, height, rows, width, xDistance, yDistance: integer;
+  offset: TPoint;
+begin
+
+  columns := self.__numberOfSubTabs;
+  height := 19;
+  rows := 1;
+  width := 19;
+  xDistance := 26;
+  yDistance := 0;
+  offset := point(gameTabs.visibleTabArea.x1 + 15 + 9, gameTabs.visibleTabArea.y1 + 44(*7 + 9*));
+
+  self.__subTabGrid := grid(columns, rows, width, height, xDistance, yDistance,
+   offset);
+end;
+{$ENDIF}
+
+{$IFNDEF CODEINSIGHT}
+function TRSAbilityTab.__find(): boolean;
+begin
+
+  self.__setAbilityGrid();
+  self.__setSubTabGrid();
+
+  result := true;
+end;
+{$ENDIF}
+
+{$IFNDEF CODEINSIGHT}
+function TRSAbilityTab.__setTab(tab: integer): boolean;
+var
+
+  timeMarker: TTimeMarker;
+begin
+
+  if ((tab + 1) > self.__numberOfSubTabs) then
+  begin
+
+    print(self.name + ', __setTab: Specified tab index is out-of-range of the number of sub tabs.', TDebug.ERROR);
+    exit(false);
+  end;
+
+  self.__subTabGrid[tab].mouse(MOUSE_LEFT);
+
+  timeMarker.start();
+
+  repeat
+
+    if (self.__getSubTab() = tab) then
+      exit(true);
+
+  until (timeMarker.getTime() >= (1000 + random(300)));
+
+  result := false;
+end;
+{$ENDIF}
+
+{$IFNDEF CODEINSIGHT}
+function TRSAbilityTab.__getAbilityLocation(ability: TAbility; out gridPosition, subTab: integer): boolean;
+var
+
+  i: integer;
+  valid: boolean;
+begin
+
+  for i := 0 to high(self.__abilitySets) do
+    if (ability in self.__abilitySets[i]) then
+    begin
+
+      valid := true;
+      break;
+    end;
+
+  if (not valid) then
+  begin
+
+    print(self.name + ', __getAbilityGridLocation(): Specified ability does not exist in this tab!.', TDebug.ERROR);
+    exit(false);
+  end;
+
+  gridPosition := (ord(ability) - ord(self.__firstAbilityInSubTab[i]));
+  subTab := i;
+
+  result := true;
+end;
+{$ENDIF}
+
+{$IFNDEF CODEINSIGHT}
+function TRSAbilityTab.__setSubTabBasedOnAbility(ability: TAbility): boolean;
+var
+
+  gridPosition, i, subTab: integer;
+  valid: boolean;
+begin
+
+  if (not self.__getAbilityLocation(ability, gridPosition, subTab)) then
+    exit(false);
+
+  if (self.__getSubTab() = subTab) then
+    exit(true);
+
+  result := self.__setTab(subTab);
+end;
+{$ENDIF}
+
+{$IFNDEF CODEINSIGHT}
+function TRSPowers.__getAbilityCooldown(boxToCheck: TBox; inActionBar: boolean = false): integer;
+var
+
+  colorFix, clientBitmap, i, len, sumTotal, tempBitmap: integer;
+  valid: boolean;
+  midPoint: TPoint;
+  boxEdge, line, tpa: TPointArray;
+  edgeSegments: T2DPointArray;
+begin
+
+  result := - 1;
+
+  try
+    clientBitmap := bitmapFromClient(boxToCheck.x1, boxToCheck.y1, boxToCheck.x2, boxToCheck.y2);
+    setBitmapName(clientBitmap, 'Cooldown Bitmap');
+
+    if (inActionBar) then
+    begin
+
+      tpa := tpaFromBox(intToBox(boxToCheck.x1 + 2, boxToCheck.y1 + 18, boxToCheck.x1 + 8, boxToCheck.y1 + 25));
+      tpa.offset(point( - boxToCheck.x1, - boxToCheck.y1));
+
+      for i := 0 to high(tpa) do
+        fastSetPixel(clientBitmap, tpa[i].x, tpa[i].y, 0);
+    end;
+
+    tempBitmap := brightnessBitmap(clientBitmap, 100);
+    freeBitmap(clientBitmap);
+
+    clientBitmap := posterizeBitmap(tempBitmap, 60);
+    freeBitmap(tempBitmap);
+
+    tempBitmap := contrastBitmap(clientBitmap, 30);
+    freeBitmap(clientBitmap);
+
+    clientBitmap := desaturate(tempBitmap);
+    freeBitmap(tempBitmap);
+
+    boxToCheck.offset(point(- boxToCheck.x1, - boxToCheck.y1));
+
+    if ((boxToCheck.x2 mod 2) = 0) then
+      boxEdge := tpaFromLine(boxToCheck.x2 div 2 - 1, 0, 0, 0)
+    else
+      boxEdge := tpaFromLine(boxToCheck.x2 div 2, 0, 0, 0);
+
+    appendTPA(boxEdge, tpaFromLine(0, 1, 0, boxToCheck.y2));
+    appendTPA(boxEdge, tpaFromLine(1, boxToCheck.y2, boxToCheck.x2, boxToCheck.y2));
+    appendTPA(boxEdge, tpaFromLine(boxToCheck.x2, boxToCheck.y2 - 1, boxToCheck.x2, 0));
+    appendTPA(boxEdge, tpaFromLine(boxToCheck.x2 - 1, 0, boxEdge[0].x + 1, 0));
+
+    len := length(boxEdge);
+
+    for i := 0 to (len - 1) do
+    begin
+
+      if (inActionBar) then
+      begin
+
+        if (inRange(i, 0, len div 2)) then
+          midPoint := point(14, 15)
+        else
+          midPoint := point(15, 14);
+      end else
+      begin
+
+        if (inRange(i, 0, len div 2)) then
+          midPoint := point(13, 14)
+        else
+          midPoint := point(14, 13);
+      end;
+
+      tpaFromLineWrap(midPoint.x, midPoint.y, boxEdge[i].x, boxEdge[i].y, line);
+      line.sortFromPoint(midPoint);
+      line.invert();
+
+      if (i = 0) then
+        setlength(line, 6)
+      else
+        setlength(line, length(line) - 3);
+
+      sumTotal := 0;
+      sumTotal := sumintegerArray(fastGetPixels(clientBitmap, line));
+
+      if (sumTotal <> 0) then
+      begin
+
+        result := ceil((round(fixD(degrees(arcTan2(boxEdge[i].x - midPoint.x, - (boxEdge[i].y - midPoint.y))))) / 360.0) * 100) + 1;
+
+        if (result = 99) then
+        begin
+
+          colorFix := getColor(boxToCheck.x1 + 14, boxToCheck.y1 + 2);
+
+          if ((colorFix = 6706) or (colorFix = 1710617)) then
+          begin
+
+            print('tabAbilityBook.__getAbilityCooldown() used the colorFix check.', TDebug.LOG);
+            result := 100;
+          end;
+        end;
+
+        break;
+      end else
+        if (i = (len - 1)) then
+          result := 0;
+    end;
+  finally
+    freeBitmap(clientBitmap);
+  end;
+end;
+{$ENDIF}
+
+function TRSAbilityTab.getAbilityCooldown(ability: TAbility): integer;
+var
+
+  gridPosition, i, subTab: integer;
+begin
+
+  result := -1;
+
+  if (not self.open()) then
+    exit;
+
+  if (not self.__getAbilityLocation(ability, gridPosition, subTab)) then
+    exit;
+
+  if (not self.__setTab(subTab)) then
+    exit;
+
+  result := powers.__getAbilityCooldown(self.__subTabGrid[gridPosition]);
+end;
+
+function TRSPowers.getAbilityCooldown(ability: TAbility): integer;
+begin
+
+  result := -1;
+end;

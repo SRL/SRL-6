@@ -922,7 +922,7 @@ TRSChooseOption.__getOptions
 
 .. code-block:: pascal
 
-    function TRSChooseOptions.__getOptions(): __TOptionArray;
+    function TRSChooseOption.__getOptions(): __TOptionArray;
 
 Returns all text & bounds of the ChooseOption text in the TOptionArray.
 
@@ -1174,7 +1174,7 @@ begin
     self.close();
 
   print('Failed to find any text matches');
-  print('ChooseOptions._select() result = false');
+  print('ChooseOption._select() result = false');
 end;
 
 (*

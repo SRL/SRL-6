@@ -1,0 +1,54 @@
+{$include_once powers.simba}
+
+{$f-}
+
+{$IFNDEF CODEINSIGHT}
+const
+  __ABILITY_SET_DEFENCE      = [TAbility.ANTICIPATION .. TAbility.BARRICADE];
+  __ABILITY_SET_CONSTITUTION = [TAbility.REGENERATE .. TAbility.SINGLE_WAY_WILDERNESS];
+
+  __DEFENSIVE_ABILITY_SETS = [__ABILITY_SET_DEFENCE,
+                              __ABILITY_SET_CONSTITUTION];
+{$ENDIF}
+
+var
+  tabDefensive: TRSTabDefensive;
+
+{$IFNDEF CODEINSIGHT}
+procedure TRSTabDefensive.__init();
+begin
+
+  with self do
+  begin
+
+    name := 'RS Defensive tab';
+    ID := ID_INTERFACE_TAB_DEFENSIVE;
+    tabIndex := _TAB_DEFENSIVE;
+    parentID := _TAB_POWERS;//-1;
+    static := true;
+
+    __numberOfSubTabs := 2;
+    //__subTabGrid := grid(self.__numberOfSubTabs, 1, 19, 19, 26, 0, point(gameTabs.visibleTabArea.x1 + 15 + 9, gameTabs.visibleTabArea.y1 + 7 + 9));
+    __abilitySets := __DEFENSIVE_ABILITY_SETS;
+    __firstAbilityInSubTab := [TAbility.ANTICIPATION, TAbility.REGENERATE];
+  end;
+end;
+{$ENDIF}
+
+{$IFNDEF CODEINSIGHT}
+function __findTabDefensive(): boolean;
+begin
+
+  result := tabDefensive.__find();
+end;
+{$ENDIF}
+
+{$f+}
+
+begin
+
+  tabDefensive.__init();
+  powers.defensive.__init();
+
+  __interfaceFindFunctions[tabDefensive.ID] := @__findTabDefensive;
+end;
