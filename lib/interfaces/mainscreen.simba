@@ -12,7 +12,7 @@ The source for this file can be found `here <https://github.com/SRL/SRL-6/blob/m
 {$include_once minimap.simba}
 {$include_once chatbox.simba}
 {$include_once gametabs/gametab.simba}
-//{$include_once actionbar.simba}
+{$include_once actionbar.simba}
 {$include_once ../utilities/pixelshift.simba}
 {$include_once ../utilities/color.simba}
 
@@ -138,15 +138,12 @@ begin
   else
     bds.x2 := (wid - gametabs.visibleTabArea.getWidth());
 
-  hei := hei - chatbox.h {- actionbar.h}; // height by removing the chatbox and actionbar
+  bds.y2 := (actionbar.y);
 
-  {
-  if (actionbar.x = 0) then // if it's at the top
-    self.y := actionbar.h
+  if (actionbar.y = 0) then // if it's at the top
+    bds.y1 := actionbar.h
   else
-    self.y := 0;
-  }
-  bds.y2 := chatbox.y;
+    bds.y1 := 0;
 
   self.setBounds(bds);
 

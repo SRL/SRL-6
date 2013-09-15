@@ -144,34 +144,38 @@ Example:
 {$IFNDEF CODEINSIGHT}
 function TRSActionBar.__find(): boolean;
 const
-
   X1_OFFSET = - 566;
   Y1_OFFSET = - 10;
   X2_OFFSET = 9;
   Y2_OFFSET = 65;
 var
-
   center: TPoint;
 begin
+  print('TRSActionBar.__find()', TDebug.HEADER);
 
   if (not self._findMinimizeButton(center)) then
+  begin
+    print('Failed to find action bar minimize button', TDebug.ERROR);
+    print('TRSActionBar.__find(): '+toStr(result), TDebug.FOOTER);
     exit(false);
+  end;
 
   self.x := center.x + X1_OFFSET;
   self.y := center.y + Y1_OFFSET;
   self.w := center.x + X2_OFFSET - self.x;
   self.h := center.y + Y2_OFFSET - self.y;
 
-  self.__slots := grid(14, 1, 29, 29, 36, 0, point(self.getBounds().x1 + 67,
-   self.getBounds().y1 + 53));
+  self.__slots := grid(14, 1, 29, 29, 36, 0, point(self.getBounds().x1 + 67, self.getBounds().y1 + 53));
 
-  self.__slots[high(self.__slots) - 1] := intToBox(self.__slots[high(self.__slots) - 2].x1 + 54,
-   self.getBounds().y1 + 39, self.__slots[high(self.__slots) - 2].x1 + 83, self.getBounds().y1 + 68);
+  self.__slots[high(self.__slots) - 1] := intToBox(self.__slots[high(self.__slots) - 2].x1 + 54, self.getBounds().y1 + 39, self.__slots[high(self.__slots) - 2].x1 + 83, self.getBounds().y1 + 68);
 
   self.__slots[high(self.__slots)] := self.__slots[high(self.__slots) - 1].copy();
   self.__slots[high(self.__slots)].offset(point(36, 0));
 
   result := true;
+
+  print('Found and set actionBar properties', TDebug.FOOTER);
+  print('TRSActionBar.__find(): '+toStr(result));
 end;
 {$ENDIF}
 
