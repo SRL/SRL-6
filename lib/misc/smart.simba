@@ -213,7 +213,7 @@ Example:
 function getJavaPath(): string;
 begin
   print('getJavaPath():', TDebug.HEADER);
-
+  {$IFDEF WINDOWS}
   if (not smartGetJavaPath) then
   begin
     if (smartShowConsole) then
@@ -221,7 +221,7 @@ begin
     else
       result := 'javaw.exe';
 
-    print('Not searching for your Java path. Make sure the JRE is in your system''s PATH before JDK (if you have JDK).');
+    print('Not searching for your Java path. Make sure the JRE is in your system''s PATH before JDK (if you have JDK).', TDebug.WARNING);
     print('getJavaPath()', TDebug.FOOTER);
     exit();
   end;
@@ -232,7 +232,14 @@ begin
     print('Found your java path @ ' + result)
   else
     print('Failed to find your Java path, add JRE to your system''s PATH before JDK (if you have JDK), and disable smartGetJavaPath', TDebug.FATAL);
+  {$ELSE}
+  print('Not searching for your Java path. Make sure the JRE is in your system''s PATH before JDK (if you have JDK).', TDebug.WARNING);
 
+  if (smartShowConsole) then
+    result := 'java.exe'
+  else
+    result := 'javaw.exe';
+  {$ENDIF}
   print('getJavaPath()', TDebug.FOOTER);
 end;
 
