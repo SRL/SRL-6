@@ -2,16 +2,19 @@
 
 {$f-}
 
+{$IFNDEF CODEINSIGHT}
 const
   __ABILITY_SET_DEFENCE      = [TAbility.ANTICIPATION .. TAbility.BARRICADE];
   __ABILITY_SET_CONSTITUTION = [TAbility.REGENERATE .. TAbility.SINGLE_WAY_WILDERNESS];
 
   __DEFENSIVE_ABILITY_SETS = [__ABILITY_SET_DEFENCE,
                               __ABILITY_SET_CONSTITUTION];
+{$ENDIF}
 
 var
   tabDefensive: TRSTabDefensive;
 
+{$IFNDEF CODEINSIGHT}
 procedure TRSTabDefensive.__init();
 begin
 
@@ -30,6 +33,7 @@ begin
     __firstAbilityInSubTab := [TAbility.ANTICIPATION, TAbility.REGENERATE];
   end;
 end;
+{$ENDIF}
 
 {$IFNDEF CODEINSIGHT}
 function __findTabDefensive(): boolean;

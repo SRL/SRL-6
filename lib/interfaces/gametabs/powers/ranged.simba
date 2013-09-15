@@ -2,14 +2,17 @@
 
 {$f-}
 
+{$IFNDEF CODEINSIGHT}
 const
-  __ABILITY_SET_RANGED       = [TAbility.PIERCING_SHOT .. TAbility.UNLOAD];
+  __ABILITY_SET_RANGED  = [TAbility.PIERCING_SHOT .. TAbility.UNLOAD];
 
   __RANGED_ABILITY_SETS = [__ABILITY_SET_RANGED];
+{$ENDIF}
 
 var
   tabRanged: TRSTabRanged;
 
+{$IFNDEF CODEINSIGHT}
 procedure TRSTabRanged.__init();
 begin
 
@@ -28,6 +31,7 @@ begin
     __firstAbilityInSubTab := [TAbility.PIERCING_SHOT];
   end;
 end;
+{$ENDIF}
 
 {$IFNDEF CODEINSIGHT}
 function __findTabRanged(): boolean;

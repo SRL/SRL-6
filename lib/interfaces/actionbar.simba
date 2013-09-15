@@ -11,7 +11,6 @@ The source for this file can be found `here <https://github.com/SRL/SRL-6/blob/m
 
 {$include_once interfaces.simba}
 {$include_once ../core/text.simba}
-//{$include_once gametabs/abilitybook.simba}
 {$include_once gametabs/backpack.simba}
 
 {$f-}
@@ -73,6 +72,7 @@ begin
   result := true;
 end;
 
+{$IFNDEF CODEINSIGHT}
 function TRSActionBar.__find(): boolean;
 const
 
@@ -104,6 +104,7 @@ begin
 
   result := true;
 end;
+{$ENDIF}
 
 {*
 TRSActionBar.__init
@@ -126,6 +127,7 @@ Example:
 
     actionBar.__init();
 *}
+{$IFNDEF CODEINSIGHT}
 procedure TRSActionBar.__init();
 begin
 
@@ -153,7 +155,9 @@ begin
     self.__slots[high(self.__slots)].offset(point(36, 0));
   end;
 end;
+{$ENDIF}
 
+{$IFNDEF CODEINSIGHT}
 function TRSActionBar.__isSlotValid(var slot: integer): boolean;
 begin
 
@@ -165,13 +169,16 @@ begin
   slot := 1;
   result := false;
 end;
+{$ENDIF}
 
+{$IFNDEF CODEINSIGHT}
 function TRSActionBar.__printWarning(methodName, resultValue: variant): variant;
 begin
 
   print(methodName + ' will now exit, returning ' + toStr(resultValue) + '.', TDebug.WARNING);
   exit(resultValue);
 end;
+{$ENDIF}
 
 (*
 TRSActionBar.isOpen
@@ -230,6 +237,7 @@ Example:
     if (actionBar.__toggleSelf(true)) then
       writeln('Action Bar is open.');
 *}
+{$IFNDEF CODEINSIGHT}
 function TRSActionBar.__toggleSelf(open: boolean): boolean;
 var
 
@@ -254,6 +262,7 @@ begin
   end else
     result := true;
 end;
+{$ENDIF}
 
 (*
 TRSActionBar.open
@@ -644,6 +653,7 @@ Example:
     if (actionBar.__toggleLock(true)) then
       writeln('Successfully locked the Action Bar.');
 *}
+{$IFNDEF CODEINSIGHT}
 function TRSActionBar.__toggleLock(lock: boolean): boolean;
 var
 
@@ -666,6 +676,7 @@ begin
   end else
     result := true;
 end;
+{$ENDIF}
 
 (*
 TRSActionBar.lock

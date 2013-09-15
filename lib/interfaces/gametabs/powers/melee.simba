@@ -2,16 +2,19 @@
 
 {$f-}
 
+{$IFNDEF CODEINSIGHT}
 const
-  __ABILITY_SET_ATTACK       = [TAbility.SLICE .. TAbility.METEOR_STRIKE];
-  __ABILITY_SET_STRENGTH     = [TAbility.KICK .. TAbility.FRENZY];
+  __ABILITY_SET_ATTACK   = [TAbility.SLICE .. TAbility.METEOR_STRIKE];
+  __ABILITY_SET_STRENGTH = [TAbility.KICK .. TAbility.FRENZY];
 
   __MELEE_ABILITY_SETS = [__ABILITY_SET_ATTACK,
                           __ABILITY_SET_STRENGTH];
+{$ENDIF}
 
 var
   tabMelee: TRSTabMelee;
 
+{$IFNDEF CODEINSIGHT}
 procedure TRSTabMelee.__init();
 begin
 
@@ -30,6 +33,7 @@ begin
     __firstAbilityInSubTab := [TAbility.SLICE, TAbility.KICK];
   end;
 end;
+{$ENDIF}
 
 {$IFNDEF CODEINSIGHT}
 function __findTabMelee(): boolean;

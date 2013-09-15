@@ -2,14 +2,17 @@
 
 {$f-}
 
+{$IFNDEF CODEINSIGHT}
 const
   __ABILITY_SET_ABILITIES = [TAbility.WRACK .. TAbility.TSUNAMI];
 
   __MAGIC_ABILITY_SETS = [__ABILITY_SET_ABILITIES];
+{$ENDIF}
 
 var
   tabMagic: TRSTabMagic;
 
+{$IFNDEF CODEINSIGHT}
 procedure TRSTabMagic.__init();
 begin
 
@@ -28,6 +31,7 @@ begin
     __firstAbilityInSubTab := [TAbility.WRACK];
   end;
 end;
+{$ENDIF}
 
 {$IFNDEF CODEINSIGHT}
 function __findTabMagic(): boolean;

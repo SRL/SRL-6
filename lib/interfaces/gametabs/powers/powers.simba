@@ -140,10 +140,10 @@ type
 
 type
   TRSPowers = record(TRSInterface)
-      defensive: TRSTabDefensive;
-      magic: TRSTabMagic;
-      melee: TRSTabMelee;
-      ranged: TRSTabRanged;
+    defensive: TRSTabDefensive;
+    magic: TRSTabMagic;
+    melee: TRSTabMelee;
+    ranged: TRSTabRanged;
   end;
 
 var
@@ -181,11 +181,12 @@ function TRSAbilityTab.open(): boolean;
 begin
 
   result := self.isOpen();
-               writeln(self.name);
+
   if (not result) then
     result := gameTabs._openTab(self.tabIndex);
 end;
 
+{$IFNDEF CODEINSIGHT}
 function TRSAbilityTab.__getSubTab(): integer;
 var
 
@@ -197,11 +198,12 @@ begin
       exit(0);
 
   for i := 0 to (self.__numberOfSubTabs - 1) do
-    writeln(getColor(self.__subTabGrid[i].x1, self.__subTabGrid[i].y1));
-    //if (getColor(self.__subTabGrid[i].x1, self.__subTabGrid[i].y1) = clWhite) then
-      //exit(i);
+    if (getColor(self.__subTabGrid[i].x1, self.__subTabGrid[i].y1) = clWhite) then
+      exit(i);
 end;
+{$ENDIF}
 
+{$IFNDEF CODEINSIGHT}
 procedure TRSAbilityTab.__setAbilityGrid();
 var
 
@@ -219,7 +221,9 @@ begin
 
   self.__abilityGrid := grid(columns, rows, width, height, xDistance, yDistance, offset);
 end;
+{$ENDIF}
 
+{$IFNDEF CODEINSIGHT}
 procedure TRSAbilityTab.__setSubTabGrid();
 var
 
@@ -238,7 +242,9 @@ begin
   self.__subTabGrid := grid(columns, rows, width, height, xDistance, yDistance,
    offset);
 end;
+{$ENDIF}
 
+{$IFNDEF CODEINSIGHT}
 function TRSAbilityTab.__find(): boolean;
 begin
 
@@ -247,7 +253,9 @@ begin
 
   result := true;
 end;
+{$ENDIF}
 
+{$IFNDEF CODEINSIGHT}
 function TRSAbilityTab.__setTab(tab: integer): boolean;
 var
 
@@ -274,7 +282,9 @@ begin
 
   result := false;
 end;
+{$ENDIF}
 
+{$IFNDEF CODEINSIGHT}
 function TRSAbilityTab.__getAbilityLocation(ability: TAbility; out gridPosition, subTab: integer): boolean;
 var
 
@@ -302,7 +312,9 @@ begin
 
   result := true;
 end;
+{$ENDIF}
 
+{$IFNDEF CODEINSIGHT}
 function TRSAbilityTab.__setSubTabBasedOnAbility(ability: TAbility): boolean;
 var
 
@@ -318,8 +330,9 @@ begin
 
   result := self.__setTab(subTab);
 end;
+{$ENDIF}
 
-
+{$IFNDEF CODEINSIGHT}
 function TRSPowers.__getAbilityCooldown(boxToCheck: TBox; inActionBar: boolean = false): integer;
 var
 
@@ -430,6 +443,7 @@ begin
     freeBitmap(clientBitmap);
   end;
 end;
+{$ENDIF}
 
 function TRSAbilityTab.getAbilityCooldown(ability: TAbility): integer;
 var
