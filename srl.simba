@@ -25,11 +25,6 @@ SRL library isn't available to you.
 {$include_once lib/interfaces/gametabs/gametab.simba}
 {$include_once lib/interfaces/gametabs/backpack.simba}
 {$include_once lib/interfaces/gametabs/stats.simba}
-{$include_once lib/interfaces/gametabs/powers/powers.simba}
-{$include_once lib/interfaces/gametabs/powers/defensive.simba}
-{$include_once lib/interfaces/gametabs/powers/magic.simba}
-{$include_once lib/interfaces/gametabs/powers/melee.simba}
-{$include_once lib/interfaces/gametabs/powers/ranged.simba}
 
 {$include_once lib/interfaces/lobby/lobby.simba}
 {$include_once lib/interfaces/lobby/worlds.simba}

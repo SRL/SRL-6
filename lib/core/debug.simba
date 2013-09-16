@@ -126,6 +126,9 @@ begin
   except
     writeln('Could not open/create log file');
   end;
+
+  if (result) then
+    addOnTerminate('__closeLogFile');
 end;
 {$ENDIF}
 
@@ -476,7 +479,6 @@ end;
 
 begin
   setScriptProp(SP_WriteTimeStamp, [addTimeStamp]);
-  addOnTerminate('__closeLogFile');
 end;
 
 

@@ -13,7 +13,6 @@ The source for this file can be found `here <https://github.com/SRL/SRL-6/blob/m
 {$include_once ../core/text.simba}
 {$include_once ../core/players.simba}
 {$include_once gametabs/backpack.simba}
-{$include_once gametabs/powers/powers.simba}
 
 {$f-}
 
@@ -971,6 +970,140 @@ begin
   until (result or (getSystemTime() > TimeMarker));
 end;
 
+{*
+TRSActionBar.__getAbilityCooldown
+~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+
+.. code-block:: pascal
+
+    function TRSActionBar.getAbilityCooldown(slot: integer): integer;
+
+Returns integer representation (0 - 100) of the cooldown of the ability
+in the specified slot.
+
+.. note::
+
+    - by euphemism
+    - Last Updated: 15 September 2013 by euphemism
+
+Example:
+
+.. code-block:: pascal
+
+    result := self.__getAbilityCooldown(self.__slots[slot - 1], true);
+*}
+{$IFNDEF CODEINSIGHT}
+function TRSActionBar.__getAbilityCooldown(boxToCheck: TBox; inActionBar: boolean = false): integer;
+var
+  colorFix, clientBitmap, i, len, sumTotal, tempBitmap: integer;
+  valid: boolean;
+  midPoint: TPoint;
+  boxEdge, line, tpa: TPointArray;
+  edgeSegments: T2DPointArray;
+begin
+  result := - 1;
+
+  try
+    clientBitmap := bitmapFromClient(boxToCheck.x1, boxToCheck.y1, boxToCheck.x2, boxToCheck.y2);
+    setBitmapName(clientBitmap, 'Cooldown Bitmap');
+
+    if (inActionBar) then
+    begin
+
+      tpa := tpaFromBox(intToBox(boxToCheck.x1 + 2, boxToCheck.y1 + 18, boxToCheck.x1 + 8, boxToCheck.y1 + 25));
+      tpa.offset(point( - boxToCheck.x1, - boxToCheck.y1));
+
+      for i := 0 to high(tpa) do
+        fastSetPixel(clientBitmap, tpa[i].x, tpa[i].y, 0);
+    end;
+
+    tempBitmap := brightnessBitmap(clientBitmap, 100);
+    freeBitmap(clientBitmap);
+
+    clientBitmap := posterizeBitmap(tempBitmap, 60);
+    freeBitmap(tempBitmap);
+
+    tempBitmap := contrastBitmap(clientBitmap, 30);
+    freeBitmap(clientBitmap);
+
+    clientBitmap := desaturate(tempBitmap);
+    freeBitmap(tempBitmap);
+
+    boxToCheck.offset(point(- boxToCheck.x1, - boxToCheck.y1));
+
+    if ((boxToCheck.x2 mod 2) = 0) then
+      boxEdge := tpaFromLine(boxToCheck.x2 div 2 - 1, 0, 0, 0)
+    else
+      boxEdge := tpaFromLine(boxToCheck.x2 div 2, 0, 0, 0);
+
+    appendTPA(boxEdge, tpaFromLine(0, 1, 0, boxToCheck.y2));
+    appendTPA(boxEdge, tpaFromLine(1, boxToCheck.y2, boxToCheck.x2, boxToCheck.y2));
+    appendTPA(boxEdge, tpaFromLine(boxToCheck.x2, boxToCheck.y2 - 1, boxToCheck.x2, 0));
+    appendTPA(boxEdge, tpaFromLine(boxToCheck.x2 - 1, 0, boxEdge[0].x + 1, 0));
+
+    len := length(boxEdge);
+
+    for i := 0 to (len - 1) do
+    begin
+
+      if (inActionBar) then
+      begin
+
+        if (inRange(i, 0, len div 2)) then
+          midPoint := point(14, 15)
+        else
+          midPoint := point(15, 14);
+      end else
+      begin
+
+        if (inRange(i, 0, len div 2)) then
+          midPoint := point(13, 14)
+        else
+          midPoint := point(14, 13);
+      end;
+
+      tpaFromLineWrap(midPoint.x, midPoint.y, boxEdge[i].x, boxEdge[i].y, line);
+      line.sortFromPoint(midPoint);
+      line.invert();
+
+      if (i = 0) then
+        setlength(line, 6)
+      else
+        setlength(line, length(line) - 3);
+
+      sumTotal := 0;
+      sumTotal := sumIntegerArray(fastGetPixels(clientBitmap, line));
+
+      if (sumTotal <> 0) then
+      begin
+
+        result := ceil((round(fixD(degrees(arcTan2(boxEdge[i].x - midPoint.x, - (boxEdge[i].y - midPoint.y))))) / 360.0) * 100) + 1;
+
+        if (result = 99) then
+        begin
+
+          colorFix := getColor(boxToCheck.x1 + 14, boxToCheck.y1 + 2);
+
+          if ((colorFix = 6706) or (colorFix = 1710617)) then
+          begin
+
+            print('tabAbilityBook.__getAbilityCooldown() used the colorFix check.', TDebug.LOG);
+            result := 100;
+          end;
+        end;
+
+        break;
+      end else
+        if (i = (len - 1)) then
+          result := 0;
+    end;
+
+  finally
+    freeBitmap(clientBitmap);
+  end;
+end;
+{$ENDIF}
+
 (*
 TRSActionBar.getAbilityCooldown
 ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
@@ -996,14 +1129,13 @@ Example:
 *)
 function TRSActionBar.getAbilityCooldown(slot: integer): integer;
 begin
-
   if (not (self.__isSlotValid(slot))) then
     exit(self.__printWarning('actionBar.getAbilityCooldown()', -1));
 
   if (self.isSlotEmpty(slot)) then
     exit(-1);
 
-  result := powers.__getAbilityCooldown(self.__slots[slot - 1], true);
+  result := self.__getAbilityCooldown(self.__slots[slot - 1], true);
 
   print('actionBar.getAbilityCooldown() checked slot ' + toStr(slot) + 'and got ' + toStr(result), TDebug.LOG);
 end;
@@ -1011,7 +1143,6 @@ end;
 {$IFNDEF CODEINSIGHT}
 function __findActionBar(): boolean;
 begin
-
   result := actionBar.__find();
 end;
 {$ENDIF}
