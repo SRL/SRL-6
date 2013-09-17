@@ -955,6 +955,9 @@ begin
         print('Unknown color count: '+toStr(colorCount), TDebug.WARNING);
         print('Please report this issue in the SRL bugs section of the forum', TDebug.HINT);
         takeScreenshot('unknown_login_count.png');
+
+        if (players.getActive() < 1) then
+          print('No other players left, terminating', TDebug.FATAL);
       end;
   end;
 end;

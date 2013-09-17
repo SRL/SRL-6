@@ -574,8 +574,12 @@ Example:
 *)
 procedure smartFreeCurrentClient();
 begin
-  if (__smartCurrentTarget <> 0) then
+  try
     smartFreeClient(__smartCurrentTarget);
+    print('Succesfully free''d SMART[' + intToStr(__smartCurrentPid) + ']', TDebug.SUB);
+  except
+    print('Error freeing SMART[' + intToStr(__smartCurrentPid) + ']', TDebug.ERROR);
+  end;
 end;
 
 (*
