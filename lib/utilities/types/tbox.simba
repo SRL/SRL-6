@@ -805,6 +805,54 @@ begin
   self.edit(-size, -size, +size, +size);
 end;
 
+(*
+TBoxArray.getBounds
+~~~~~~~~~~~~~~~~~~~
+
+.. code-block:: pascal
+
+    function TBoxArray.getBounds(): TBox;
+
+Returns the bounds of the TBoxArray.
+
+.. note::
+
+    - by Janilabo
+    - Last Updated: 17 September 2013 by Janilabo
+
+Example:
+
+.. code-block:: pascal
+
+    b := tba.getBounds();
+*)
+function TBoxArray.getBounds(): TBox;
+var
+  h, i: Integer;
+  e: TBox;
+begin
+  h := High(self);
+  if (h > -1) then
+  begin
+    Result := TBox(self[0]);
+    if (h < 1) then
+      Exit;
+    for i := 1 to h do
+    begin
+      if (Result.X1 > self[i].X1) then
+        Result.X1 := Integer(self[i].X1);
+      if (Result.Y1 > self[i].Y1) then
+        Result.Y1 := Integer(self[i].Y1);
+      if (Result.X2 < self[i].X2) then
+        Result.X2 := Integer(self[i].X2);
+      if (Result.Y2 < self[i].Y2) then
+        Result.Y2 := Integer(self[i].Y2);
+    end;
+  end else
+    Result := e;
+end;
+
+
 
 
 
