@@ -268,8 +268,9 @@ smallRandomMouse
 
     procedure smallRandomMouse();
 
-Randomly moves the mouse in a max radius of 80 of its current postion, has alot
-of gravity and wind so it can simulate a human flicking/spiraling the mouse.
+Randomly moves the mouse in a max radius of 'radius' (default 80) of its current
+postion, has alot of gravity and wind so it can simulate a human flicking/spiraling
+the mouse.
 
 .. note::
 
@@ -282,35 +283,21 @@ Example:
 
     smallRandomMouse();
 *)
-procedure smallRandomMouse();
+procedure smallRandomMouse(radius: integer = 80);
 var
-  RandSpeed: Extended;
-  x, y, rx, ry, FS, W, H: Integer;
+  randSpeed: Extended;
+  x, y, rx, ry, fs: Integer;
 begin
-  GetClientDimensions(W, H);
-  FS := MouseSpeed;
-  MouseSpeed := RandomRange(7, 10);
-  RandSpeed := (random(MouseSpeed) / 2.0 + MouseSpeed) / 10.0;
-  GetMousePos(x, y);
+  fs := MouseSpeed;
+  mouseSpeed := randomRange(7, 12);
+  randSpeed := (random(MouseSpeed) / 2.0 + MouseSpeed) / 10.0;
+  getMousePos(x, y);
 
-  rx := RandomRange(x-80, x+80);
-  ry := RandomRange(y-80, y+80);
-
-  // make sure mouse stays the client
-  if rx < 0 then
-    rx := 1;
-
-  if ry < 0 then
-    ry := 1;
-
-  if rx > W then
-    rx := W - 1;
-
-  if ry > H then
-    ry := H - 1;
+  rx := randomRange(x-radius, x+radius);
+  ry := randomRange(y-radius, y+radius);
 
   _humanWindMouse(x, y, rx, ry, 30, 55, (10.0/randSpeed), (12.0/randSpeed), (10.0*randSpeed));
-  MouseSpeed := FS;
+  MouseSpeed := fs;
 end;
 
 (*
@@ -570,7 +557,7 @@ Will randomly right-click and examine the object.  Will exclude all points in
 .. note::
 
     - by Ollybest
-    - Last Updated: 23 August 2013 by Coh3n
+    - Last Updated: 17 September 2013 by Olly
 
 Example:
 
@@ -578,47 +565,42 @@ Example:
 
     mouseMovingObject();
 *)
-procedure mouseMovingObject(playerBox: TBox = [0, 0, 0, 0]);
+procedure mouseMovingObject(playerBox: TBox = [-1, -1, -1, -1]);
 var
-  TBA: TBoxArray;
-  TIA: TIntegerArray;
-  i, L, boxSize: Integer;
-  ATPA, ATPA2: T2DPointArray;
-  TPA: TPointArray;
+  boxes: TBoxArray;
+  i, mostShift: integer;
+  tia: TIntegerArray;
   b: TBox;
 begin
   if (not isLoggedIn()) then
     exit;
 
-  boxSize := 20;
+  boxes := mainscreen.getBounds().split(30, 30);
+  tia := getPixelShift(boxes, 50 + random(50));
 
-  TBA := Grid(round(mainscreen.w / boxSize), round(mainscreen.h / boxSize), boxSize, boxSize, boxSize, boxSize, Point(Round(boxSize / 2), Round(boxSize / 2)));
-  TIA := GetPixelShift(TBA, 100 + Random(100));
+  mostShift := 0;
 
-  for i := 0 to High(TBA) do
-    if TIA[i] > 5 then
+  for i := 0 to high(boxes) do
+    if (not boxes[i].overlap(playerBox)) then
+      if (tia[i] > mostShift) then
+      begin
+        mostShift := tia[i];
+        b := boxes[i];
+      end;
+
+  if (mostShift < 10) then
+    exit();
+
+  mouseBox(b, MOUSE_MOVE);
+
+  if (random(2) = 0) then
+    if (isMouseOverMenuOpen(b)) then
     begin
-      Inc(L);
-      SetLength(ATPA, L);
-      ATPA[L - 1] := TPAFromBox(TBA[i]);
+      fastClick(MOUSE_RIGHT);
+      chooseOption.select(['Examine', 'Exam', 'mine']);
     end;
 
-  TPA := MergeATPA(ATPA);
-  TPA := ClearTPAFromTPA(TPA, TPAFromBox(playerBox));
-  ATPA2 := SplitTPAEx(TPA, 1, 1);
-  SortATPASize(ATPA2, True);
-
-  if Length(ATPA2) > 1 then
-  begin
-    MouseBox(GetTPABounds(ATPA2[0]), MOUSE_MOVE);
-
-    if (Random(2) = 0) then
-      if isMouseOverMenuOpen(b) then
-      begin
-        fastClick(MOUSE_RIGHT);
-        chooseOption.select(['xamine', 'ancel'], 100 + Random(100));
-      end;
-  end;
+  wait(300 + random(4000));
 end;
 
 (*

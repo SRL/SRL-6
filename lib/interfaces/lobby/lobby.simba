@@ -150,7 +150,10 @@ begin
     exit();
 
   if (inRange(length(tpa), 30, 60)) then
+  begin
     mouseBox(tpa.getBounds(), MOUSE_LEFT);
+    print('TRSLobby.__skipEmailScreen(): Closed validate email screen', TDebug.SUB);
+  end;
 end;
 {$ENDIF}
 

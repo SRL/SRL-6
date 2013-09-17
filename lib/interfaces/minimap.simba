@@ -821,7 +821,7 @@ begin
   if (random(4) = 2) then
   begin
     fastClick(MOUSE_RIGHT);
-    if (not chooseOption.select(['Face North', 'Face', 'ace north'], 1.00, 500)) then
+    if (not chooseOption.select(['Face North', 'Face', 'ace north', 'orth'], 500)) then
       fastClick(MOUSE_LEFT); // failsafe.
   end else
     fastClick(MOUSE_LEFT);

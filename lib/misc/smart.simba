@@ -378,6 +378,7 @@ begin
 
   path := getJavaPath();
 
+  __smartCurrentTarget := 0;
   __smartCurrentTarget := smartSpawnClient(path, stringReplace(PluginPath, '\', '/', [rfReplaceAll]),
                                            params[0], ',' + params[1], w, h, '', '', '', OGL_PLUGIN);
 
