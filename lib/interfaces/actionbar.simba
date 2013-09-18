@@ -62,7 +62,7 @@ Example
 *)
 const
   ACTION_BAR_SLOT_LOW = 1;
-  ACTION_BAR_SLOT_HIGH = 12;
+  ACTION_BAR_SLOT_HIGH = 14;
 
 {*
 TRSActionBar._findMinimizeButton
@@ -638,7 +638,36 @@ begin
     if (not self.isSlotEmpty(i)) then
       exit;
 
-  result:= true;
+  result := true;
+end;
+
+(*
+TRSActionBar.getSlotBox
+~~~~~~~~~~~~~~~~~~~~~~~
+
+.. code-block:: pascal
+
+    function TRSActionBar.getSlotBox(slot: integer): TBox;
+
+Returns a TBox of the slot, 'slot'.
+
+.. note::
+
+    - by Olly
+    - Last Updated: 18 September 2013 by Olly
+
+Example:
+
+.. code-block:: pascal
+
+    b := actionBar.getSlotBox(1);
+*)
+function TRSActionBar.getSlotBox(slot: integer): TBox;
+begin
+  if (not (self.__isSlotValid(slot))) then
+    exit(intToBox(-1, -1, -1, -1));
+
+  result := self.__slots[slot - 1];
 end;
 
 (*
@@ -647,10 +676,11 @@ TRSActionBar.clickSlot
 
 .. code-block:: pascal
 
-    function TRSActionBar.clickSlot(slot: integer): boolean;
+    function TRSActionBar.clickSlot(slot: integer; clickType: integer = MOUSE_LEFT): boolean;
 
-Generic function to click a non-empty slot in the Action Bar.  Returns true
- if the slot is non-empty, false if otherwise.
+Generic function to click a non-empty slot in the Action Bar. Will click what
+'clickType' is set to (default set as a left click). Returns true if the slot is
+non-empty, false if otherwise.
 
 .. note::
 
@@ -664,7 +694,7 @@ Example:
     if (actionBar.clickSlot(1)) then
       writeln('There was something in slot 1 and we clicked it!');
 *)
-function TRSActionBar.clickSlot(slot: integer): boolean;
+function TRSActionBar.clickSlot(slot: integer; clickType: integer = MOUSE_LEFT): boolean;
 begin
 
   if (not (self.__isSlotValid(slot))) then
@@ -673,57 +703,9 @@ begin
   if (self.isSlotEmpty(slot)) then
     exit(false);
 
-  self.__slots[slot - 1].mouse(MOUSE_LEFT);
+  self.__slots[slot - 1].mouse(clickType);
 
   result := true;
-end;
-
-(*
-TRSActionBar.getKeyBind
-~~~~~~~~~~~~~~~~~~~~~~~
-
-.. code-block:: pascal
-
-    function TRSActionBar.getKeyBind(slot: integer): string;
-
-Returns string representation of the key bind for the given slot.  Striking
- the key on the keyboard causes the slot to be activated.
-
-.. note::
-
-    - by euphemism
-    - Last Updated: 18 April 2013 by euphemism
-
-Example:
-
-.. code-block:: pascal
-
-    slotOneKeyBind := actionBar.getKeyBind(1);
-
-    writeln('The key bind for slot 1 is: ', slotOneKeyBind);
-*)
-function TRSActionBar.getKeyBind(slot: integer): char;
-var
-
-  tempResult: string;
-begin
-
-  if (not (self.__isSlotValid(slot))) then
-    exit(self.__printWarning('actionBar.getKeyBind()', ' '));
-
-  if (not self.open()) then
-    exit(self.__printWarning('actionBar.getKeyBind()', ' '));
-
-  tempResult := getTextAtEx(intToBox(self.__slots[slot - 1].x1 + 2,
-   self.__slots[slot - 1].y1 + 18, self.__slots[slot - 1].x1 + 8,
-    self.__slots[slot - 1].y1 + 25), 0, 0, 0, 16777215, 0, 'UpChars'); //Color is key bind character in bottom-left of slot.
-
-  if (tempResult = '__') then //Simba's OCR detects an equals sign as two underscores.
-    tempResult := '=';
-
-  print('actionBar.getKeyBind() checked slot ' + toStr(slot) +
-   ' and found the key bind to be ' + tempResult, TDebug.LOG);
-  result := tempResult[1];
 end;
 
 (*
@@ -798,7 +780,7 @@ begin
   begin
 
     intToBox(self.getBounds().x1 + 486, self.getBounds().y1 + 62,
-     self.getBounds().x1 + 492, self.getBounds().y1 + 70).mouse(MOUSE_LEFT);
+    self.getBounds().x1 + 492, self.getBounds().y1 + 70).mouse(MOUSE_LEFT);
 
     timeMarker.start();
 

@@ -1475,3 +1475,110 @@ begin
   filterTPAsBetween(self, min, max);
 end;
 
+(*
+TPointArray.getConvexHull
+~~~~~~~~~~~~~~~~~~~~~~~~~
+
+.. code-block:: pascal
+
+    procedure TPointArray.getConvexHull(out tpa: TPointArray);
+
+Returns the Convex Hull of the TPointArray.
+
+.. note::
+
+    - by Janilabo, slacky.
+    - Last Updated: 18 September 2013 by Olly.
+
+Example:
+
+.. code-block:: pascal
+
+   tpa.getCovexHull(pnts);
+*)
+procedure TPointArray.getConvexHull(out tpa: TPointArray);
+var
+  p, Lower: TPointArray;
+  LH, H, I, UH, c, j, idx, x, y: Integer;
+  area: TBox;
+  m: array of TBoolArray;
+  b: Boolean;
+begin
+  tpa := self.copy();
+
+  h := High(TPA);
+  if (h > 0) then
+  begin
+    area := GetTPABounds(TPA);
+    SetLength(m, ((area.X2 - area.X1) + 1));
+    for i := 0 to (area.X2 - area.X1) do
+      SetLength(m[i], ((area.Y2 - area.Y1) + 1));
+    C := 0;
+
+    for i := 0 to h do
+    begin
+      x := (TPA[i].X - area.X1);
+      y := (TPA[i].Y - area.Y1);
+      if m[x][y] then
+        Continue;
+      m[x][y] := True;
+      Inc(C);
+    end;
+
+    SetLength(p, C);
+    idx := 0;
+    b := False;
+    for y := area.Y1 to area.Y2 do
+    begin
+      for x := area.X1 to area.X2 do
+        if m[(x - area.X1)][(y - area.Y1)] then
+        begin
+          p[idx] := Point(x, y);
+          Inc(idx);
+          b := (idx >= C);
+          if b then
+            Break;
+        end;
+      if b then
+        Break;
+    end;
+
+    h := High(p);
+    if (h > 0) then
+    begin
+      UH := 2;
+      SetLength(TPA, (h + 1));
+      TPA[0] := p[0];
+      TPA[1] := p[1];
+      for i := 2 to h do
+      begin
+        TPA[UH] := p[i];
+        Inc(UH);
+        while ((UH > 2) and not (((TPA[(UH - 2)].x * TPA[(UH - 1)].y + TPA[(UH - 3)].x * TPA[(UH - 2)].y + TPA[(UH - 1)].x * TPA[(UH - 3)].y) - (TPA[(UH - 2)].x * TPA[(UH - 3)].y + TPA[(UH - 1)].x * TPA[(UH - 2)].y + TPA[(UH - 3)].x * TPA[(UH - 1)].y)) < 0)) do
+        begin
+          Dec(UH);
+          TPA[(UH - 1)] := TPA[UH];
+        end;
+      end;
+      LH := 2;
+      SetLength(Lower, (h + 1));
+      Lower[0] := p[h];
+      Lower[1] := p[(h - 1)];
+      for i := 2 to h do
+      begin
+        Lower[LH] := p[(h - i)];
+        Inc(LH);
+        while ((LH > 2) and not (((Lower[(LH - 2)].x * Lower[(LH - 1)].y + Lower[(LH - 3)].x * Lower[(LH - 2)].y + Lower[(LH - 1)].x * Lower[(LH - 3)].y) - (Lower[(LH - 2)].x * Lower[(LH - 3)].y + Lower[(LH - 1)].x * Lower[(LH - 2)].y + Lower[(LH - 3)].x * Lower[(LH - 1)].y)) < 0)) do
+        begin
+          Dec(LH);
+          Lower[(LH - 1)] := Lower[LH];
+        end;
+      end;
+      Dec(LH);
+      SetLength(TPA, (UH + LH));
+      for i := UH to ((UH + LH) - 1) do
+        TPA[i] := Lower[(i - UH)];
+    end;
+  end;
+end;
+
