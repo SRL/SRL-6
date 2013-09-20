@@ -615,7 +615,7 @@ begin
     smartImage.setPersistentMemory(SmartDebugArray(__smartCurrentTarget), smartClientWidth, smartClientHeight);
     smartImage.drawClear(0);
 
-    print('smartSetupDrawing(): Succesfull setup SMART drawing', TDebug.SUB);
+    print('smartSetupDrawing(): Succesfully setup SMART drawing', TDebug.SUB);
   except
     print('smartSetupDrawing(): Unable to setup SMART drawing', TDebug.FATAL);
   end;
@@ -662,19 +662,20 @@ smartReloadClient
 
      procedure smartReloadClient();
 
-Kills the current client, and spawns a new one.
+Kills the current client, and spawns a new one, parameter 'waitTime' is how long
+we will wait before spawning a new client after killing our current.
 
 .. note::
 
     - By: Olly
-    - Last Updated: August 28, 2013 by Olly
+    - Last Updated: September 20, 2013 by Olly
 
 Example:
 
 .. code-block:: pascal
 
 *)
-procedure smartReloadClient();
+procedure smartReloadClient(waitTime: integer);
 var
   img, r: integer;
 begin
@@ -691,9 +692,13 @@ begin
 
   smartFreeCurrentClient();
   smartKillClient(__smartCurrentPID);
+
+  print('Killed our current client, waiting ' + intToStr(waitTime) + ' ms before reloading client');
+  wait(waitTime);
+
   initSmart(true);
 
-  print('Restoring refresh rate back to ' + intToStr(r));
+  print('Setting refresh rate back to ' + intToStr(r));
   SmartSetRefresh(__smartCurrentTarget, r);
 
   if (bitmapExists(img)) then
@@ -733,16 +738,16 @@ procedure sixHourFix();
 begin
   print('sixHourFix():', TDebug.HEADER);
 
-  if (length(players) < 1) then
-    print('No active players, no point reloading the client!', TDebug.FATAL);
+  if (players.getActive() < 1) then
+    print('No active players, no use in reloading the client!', TDebug.FATAL);
 
-  smartReloadClient();
+  smartReloadClient((5 * 60000) + random(15000));
 
-  if (waitClientReady) then
+  if (waitClientReady()) then
   begin
-    print('Client succesfully loaded after reload..');
+    print('Client succesfully loaded after reload');
 
-    if (players[currentPlayer].login) then
+    if (players[currentPlayer].login()) then
     begin
       print('Succesfully logged in after client was reloaded');
       print('sixHourFix()', TDebug.FOOTER);
@@ -758,5 +763,5 @@ begin
 
   // check for the plugin on compile
   if (not fileExists(PluginPath + OGL_PLUGIN)) then
-    print('SMART - Unable to find the OpenGL32.dll (plugin required for SRL to work with SMART)', TDebug.FATAL);
+    print('SMART - Unable to find OpenGL32.dll (plugin required for SRL to work with SMART)', TDebug.FATAL);
 end;

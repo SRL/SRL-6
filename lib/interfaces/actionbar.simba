@@ -670,6 +670,17 @@ begin
   result := self.__slots[slot - 1];
 end;
 
+function TRSActionBar.pointToSlot(const p: TPoint): integer;
+var
+  i: byte;
+begin
+  result := -1;
+
+  for i := ACTION_BAR_SLOT_LOW to ACTION_BAR_SLOT_HIGH do
+    if (pointInBox(p, self.getSlotBox(i))) then
+      exit(i);
+end;
+
 (*
 TRSActionBar.clickSlot
 ~~~~~~~~~~~~~~~~~~~~~~

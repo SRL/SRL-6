@@ -878,8 +878,7 @@ begin
       begin
         if (@SRL_Events[EVENT_RS_UPDATE] <> nil) then
         begin
-          print('RS Update: Waiting 5 minutes before calling update procedure', TDebug.WARNING);
-          //wait(5 * 60000);
+          print('RS Update: Going to call EVENT_RS_UPDATE procedure', TDebug.WARNING);
           SRL_Events[EVENT_RS_UPDATE]();
           exit(false);
         end;
@@ -933,20 +932,20 @@ function __getLoginResponse(colorCount, timer: integer): TVariantArray;
 begin
   case (colorCount) of
     //               debug message     | wait time | tries | action
-     414: result := [__LOGIN_INVALID_INFO,   0,         2,  'false'  ];
-    1088: result := [__LOGIN_DISABLED,       0,         0,  'false'  ];
-     951: result := [__LOGIN_LOGGED_IN,      5000,      5,  'true'   ];
-    1239: result := [__LOGIN_NOT_MEMBER,     0,         1,  'true'   ];
-     364: result := [__LOGIN_ERROR_CONNECT,  20000,     9,  'halt'   ];
-    1057: result := [__LOGIN_TOO_MANY,       5 * 60000, 2,  'false'  ];
-     732: result := [__LOGIN_UPDATE,         0,         0,  'update' ];
-     591: result := [__LOGIN_TOKEN,          0,         0,  'update' ];
-      68: result := [__LOGIN_EXPIRE,         0,         0,  'update' ];
-     777: result := [__LOGIN_EXCEED_LIMIT,   20000,     10, ''       ];
-     850: result := [__LOGIN_SKILL_LEVEL,    0,         9,  'true'   ];
-    1028: result := [__LOGIN_MEMBER_ONLY,    0,         1,  'false'  ];
-     812: result := [__LOGIN_CANNOT_CONNECT, 2000,      5,  'true'   ];
-     662: typeByte(VK_ESCAPE); // the "Your saved game has been updated" popup
+     889: result := [__LOGIN_INVALID_INFO,   0,         2,  'false'  ];
+      -1: result := [__LOGIN_DISABLED,       0,         0,  'false'  ];
+      -1: result := [__LOGIN_LOGGED_IN,      5000,      5,  'true'   ];
+      -1: result := [__LOGIN_NOT_MEMBER,     0,         1,  'true'   ];
+      -1: result := [__LOGIN_ERROR_CONNECT,  20000,     9,  'halt'   ];
+      -1: result := [__LOGIN_TOO_MANY,       5 * 60000, 2,  'false'  ];
+      -1: result := [__LOGIN_UPDATE,         0,         0,  'update' ];
+      -1: result := [__LOGIN_TOKEN,          0,         0,  'update' ];
+     694: result := [__LOGIN_EXPIRE,         0,         0,  'update' ];
+      -1: result := [__LOGIN_EXCEED_LIMIT,   20000,     10, ''       ];
+      -1: result := [__LOGIN_SKILL_LEVEL,    0,         9,  'true'   ];
+      -1: result := [__LOGIN_MEMBER_ONLY,    0,         1,  'false'  ];
+      -1: result := [__LOGIN_CANNOT_CONNECT, 2000,      5,  'true'   ];
+      -1: typeByte(VK_ESCAPE); // the "Your saved game has been updated" popup
 
     else
       if ((getSystemTime() > timer) and (timer > 0)) then
@@ -992,6 +991,7 @@ const
   __RES_NOTHING   = -1;
   __RES_POPUP     = 0;
   __RES_TERMINATE = 1;
+  __LOGIN_RESPONSE_TEXT = 16777215;
 
 function TPlayer.__loginResponse(const tries: integer; const timer: integer): integer;
 var
@@ -1002,7 +1002,7 @@ begin
 
   // counts the colors in the lobby pop up screen
   getClientDimensions(w, h);
-  c := countColor(__LOGIN_COLOR_TEXT, 0, 0, w-1, h-1);
+  c := countColor(__LOGIN_RESPONSE_TEXT, 0, 0, w-1, h-1);
   arr := __getLoginResponse(c, timer);
 
   if (length(arr) > 0) then // if there was an error logging in
@@ -1037,7 +1037,7 @@ begin
 
     result := __RES_POPUP;
 
-    if (tries > arr[__RES_TRIES]) then
+    if (tries >= arr[__RES_TRIES]) then
     begin
       wait(500 + random(500));
       self.location := arr[__RES_DEBUG];
