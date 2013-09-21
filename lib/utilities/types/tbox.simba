@@ -14,6 +14,42 @@ The source for this file can be found `here <https://github.com/SRL/SRL-6/blob/m
 {$f-}
 
 (*
+TBoxArray.deleteIndex
+~~~~~~~~~~~~~~~~~~~~~
+
+.. code-block:: pascal
+
+    procedure TBoxArray.deleteIndex(const index : Integer);
+
+Used to delete a value of a TBoxArray at a chosen index larger than the array's lowest index.
+
+.. note::
+
+    - by Zyt3x
+
+Example:
+
+.. code-block:: pascal
+
+    tba.deleteIndex(0);
+
+*)
+procedure TBoxArray.deleteIndex(const index : Integer);
+var
+  I : Integer;
+begin
+  if not inRange(index, low(self), high(self)) then
+  begin
+    WriteLn('ERROR: deleteIndex: index larger than array length.');
+    Exit;
+  end;
+
+  for I := index to high(self)-1 do
+    self[I] := self[I+1];
+  setLength(self, length(self)-1);
+end;
+
+(*
 TBox.isPointInside
 ~~~~~~~~~~~~~~~~~~
 

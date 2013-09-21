@@ -194,8 +194,8 @@ Returns true if the conversation box is open.
 
 .. note::
 
-    - by Coh3n
-    - Last Updated: 17 August 2013 by Coh3n
+    - by Olly
+    - Last Updated: 21 September 2013 by Olly
 
 Example:
 
@@ -205,8 +205,32 @@ Example:
       exit();
 *)
 function TRSConversationBox.isOpen(): boolean;
+var
+  tpaBorder, tpaPaper: TPointArray;
+  i, j, hi: integer;
+  b: TBox;
 begin
-  result := self.areTalking();
+  b := self.getBounds();
+
+  if (findColors(tpaBorder, 5919042, b)) then
+    if (findColorsTolerance(tpaPaper, 9942987, tpaBorder.getBounds(), 6)) then
+    begin
+      hi := high(tpaBorder);
+      j := 0;
+
+      // if tpa[i].y -1 is in the paper tpa, and then if tpa[i].y -138 is in the border tpa, it's for sure bart of the chatbox.
+      for i := 0 to hi do
+        if (pointInTPA([tpaBorder[i].x, tpaBorder[i].y -1], tpaPaper)) then
+          if (pointInTPA([tpaBorder[i].x, tpaBorder[i].y -138], tpaBorder)) then
+          begin
+            inc(j);
+
+            result := (j > 10);
+
+            if (result) then
+              break();
+          end;
+    end;
 end;
 
 (*
@@ -481,3 +505,18 @@ begin
         print('TRSConversationBox.clickContinue(): Failed to find button arrow color', TDebug.ERROR);
   end;
 end;
+
+{$IFNDEF CODEINSIGHT}
+function __findConversationBox(): boolean;
+begin
+  result := ConversationBox.__find();
+end;
+{$ENDIF}
+
+{$f+}
+
+begin
+  conversationBox.__init();
+  __interfaceFindFunctions[conversationBox.ID] := @__findConversationBox;
+end;
+
