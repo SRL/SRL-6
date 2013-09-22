@@ -32,6 +32,7 @@ SRL library isn't available to you.
 {$include_once lib/interfaces/actionbar.simba}
 {$include_once lib/interfaces/minimap.simba}
 {$include_once lib/interfaces/bankscreen.simba}
+{$include_once lib/interfaces/pinscreen.simba}
 {$include_once lib/interfaces/options.simba}
 {$include_once lib/interfaces/chatbox.simba}
 {$include_once lib/interfaces/conversationbox.simba}
