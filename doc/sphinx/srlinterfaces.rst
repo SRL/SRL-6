@@ -7,6 +7,7 @@ SRL Interfaces Reference
 
     actionbar
     bankscreen
+    pinscreen    
     chatbox
     interfaces
     mainscreen

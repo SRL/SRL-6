@@ -1,3 +1,14 @@
+(*
+Pinscreen
+=========
+
+The pinscreen file holds functions and procedures that are used in the
+Runescape pinscreen.
+
+The source for this file can be found `here <https://github.com/SRL/SRL-6/blob/master/lib/interfaces/pinscreen.simba>`_.
+
+*)
+
 {$f-}
 
 {$include_once interfaces.simba}
