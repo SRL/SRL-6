@@ -2,7 +2,7 @@
 
 core = client debug globals mouse players text
 
-interfaces = actionbar bankscreen chatbox interfaces mainscreen minimap options
+interfaces = actionbar bankscreen pinscreen chatbox interfaces mainscreen minimap options
 
 gametabs = abilitybook backpack gametab stats
 lobby = lobby worlds
