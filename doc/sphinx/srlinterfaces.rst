@@ -6,13 +6,13 @@ SRL Interfaces Reference
     :maxdepth: 2
 
     actionbar
-    bankscreen
-    pinscreen    
+    bankscreen    
     chatbox
     interfaces
     mainscreen
     minimap
     options
+    pinscreen
 
     abilitybook
     backpack
