@@ -29,12 +29,12 @@ const
   SMART_URL = 'http://www.runescape.com/game.ws?j=1';
 
 (*
-const OGLPlugin
-~~~~~~~~~
-  The name of the OpenGL plugin.
+var SMART plugins
+~~~~~~~~~~~~~~~~~
+  A TStringArray of smart plugins
 *)
-const
-  OGL_PLUGIN = 'OpenGL32.dll';
+var
+  smartPlugins: TStringArray = ['OpenGL32.dll'];
 
 (*
 var User Set
@@ -47,6 +47,7 @@ Variables that can be used in scripts.
   * smartShowConole - If enabled will show the java console else wont.
   * smartForceNewClient - If enabled will skip attempting to pair to a previously spawned client
   * smartEnableDrawing - If enabled will allow drawing on smart.
+  * smartInitSeq - Key that smart will press while smart is loading.
 
 *)
 var
@@ -56,6 +57,7 @@ var
   smartShowConsole = true;
   smartForceNewClient = false;
   smartEnableDrawing = false;
+  smartInitSeq = '';
 
 {*
 var Internal
@@ -66,11 +68,13 @@ Internal SMART variables used only in smart.simba.
     * __smartCurrentPid: Keeps track of the current smart PID.
     * __smartCurrentTarget: Keeps track of the current smart target.
     * __smartIsDrawingSetup: Keeps track if smart drawing is setup or not.
+    * __smartNativeDebugButtonID: The id of the debug button (if not using a native button) set as -1.
     * smartImage: TMufasaBitmap that is displayed onto smart.
 *}
   __smartCurrentPid: integer;
   __smartCurrentTarget: integer;
   __smartIsDrawingSetup: boolean;
+  __smartNativeDebugButtonID: integer = 101;
   smartImage: TMufasaBitmap;
 
 (*
@@ -263,11 +267,14 @@ Example:
 
 .. code-block:: pascal
 
-   findJavaPath(s);
+   smartSetDebug(true);
 *)
 procedure smartSetDebug(enable: boolean); overload;
 begin
-  smartSetNativeButton(__smartCurrentTarget, 0, 101, not enable);
+  if (__smartNativeDebugButtonID <> -1) then
+    smartSetNativeButton(__smartCurrentTarget, 0, __smartNativeDebugButtonID, not enable)
+  else
+    smartSetDebug(__smartCurrentTarget, enable);
 end;
 
 (*
@@ -366,6 +373,7 @@ Example:
 *)
 procedure smartCreateClient(w, h: integer);
 var
+  plugins: string;
   params: TStringArray;
   path: string;
 begin
@@ -374,13 +382,15 @@ begin
   if (not smartGetParameters(params)) then
     print('Failed to grab parameters', TDebug.FATAL);
 
-  print('Using parameters "' + toStr(params) + '"');
-
   path := getJavaPath();
+  plugins := implode(',', smartPlugins);
+
+  print('Using parameters ' + toStr(params));
+  print('Using plugins "' + plugins + '"');
 
   __smartCurrentTarget := 0;
   __smartCurrentTarget := smartSpawnClient(path, stringReplace(PluginPath, '\', '/', [rfReplaceAll]),
-                                           params[0], ',' + params[1], w, h, '', '', '', OGL_PLUGIN);
+                                           params[0], ',' + params[1], w, h, smartInitSeq, '', '', plugins);
 
   if (__smartCurrentTarget <> 0) then
   begin
@@ -495,8 +505,10 @@ begin
          addOnTerminate('smartFreeCurrentClient');
          exit();
        end;
-    end else
+    end else begin
       print('Failed to pair to SMART['+ intToStr(pidArr[i]) +']');
+      smartFreeClient(t);
+    end;
   end;
 
   print('smartPairToExistingClient(): result = false', TDebug.FOOTER);
@@ -762,6 +774,6 @@ begin
   SRL_Events[EVENT_RS_UPDATE] := sixHourFix;
 
   // check for the plugin on compile
-  if (not fileExists(PluginPath + OGL_PLUGIN)) then
+  if (not fileExists(PluginPath + 'OpenGL32.dll')) then
     print('SMART - Unable to find OpenGL32.dll (plugin required for SRL to work with SMART)', TDebug.FATAL);
 end;
