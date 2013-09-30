@@ -14,7 +14,6 @@ SRL Interfaces Reference
     options
     pinscreen
 
-    abilitybook
     backpack
     gametab
     stats
