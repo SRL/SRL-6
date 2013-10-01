@@ -126,68 +126,68 @@ Example:
 
    findJavaPath(s);
 *)
-Function findJavaPath(out res: string): boolean;
+function findJavaPath(out res: string): boolean;
 
-   Function GetDirectoryName(Directory, Path: String): String;
+   function GetDirectoryName(Directory, Path: String): String;
    var
     I: Integer;
     Directories: TStringArray;
-   Begin
+   begin
      Directories := GetDirectories(Path);
-     For I := 0 To High(Directories) Do
-      If ExecRegExpr(Directory, Directories[I]) Then
-      Begin
-        Result := Directories[I];
-        Exit;
-      End;
-   End;
+     for I := 0 To High(Directories) Do
+       if ExecRegExpr(Directory, Directories[I]) then
+       begin
+         Result := Directories[I];
+         Exit;
+       end;
+   end;
 
-  Function FindDirectory(Directory, Path: String): Boolean;
-  Begin
+  function FindDirectory(Directory, Path: String): Boolean;
+  begin
     Result := Length(GetDirectoryName(Directory, Path)) > 0;
-  End;
+  end;
 
 var
   Drive: String;
   CurrentPath: String;
-Begin
+begin
   result := false;
   res := '';
 
   drive := Copy(PluginPath, 0, 3);
 
-  If (FindDirectory('Program\sFiles\s\(x86\)', Drive)) Then
-  Begin
+  if (FindDirectory('Program\sFiles\s\(x86\)', Drive)) then
+  begin
     CurrentPath := Drive + 'Program Files (x86)\';
-  End Else
+  end else
     CurrentPath := Drive + 'Program Files\';
 
-  If (FindDirectory('Java|java', CurrentPath + '\')) Then
-  Begin
+  if (FindDirectory('Java|java', CurrentPath + '\')) then
+  begin
     CurrentPath := CurrentPath + 'Java\';
-  End Else
-    Begin
+  end else
+    begin
       print('Failed To Find Path: ' + CurrentPath + 'Java\', TDebug.ERROR);
       exit;
-    End;
+    end;
 
   Drive := GetDirectoryName('jre', CurrentPath);
 
   if (length(drive) > 0) then
-  Begin
-    If (smartShowConsole) Then
+  begin
+    if (smartShowConsole) then
       CurrentPath := CurrentPath + Drive + '\bin\java.exe'
-    Else
+    else
       CurrentPath := CurrentPath + Drive + '\bin\javaw.exe';
-  End Else
-    Begin
+  end else
+    begin
       Drive := GetDirectoryName('jdk', CurrentPath);
 
-      If (smartShowConsole) Then
+      if (smartShowConsole) then
         CurrentPath := CurrentPath + Drive + 'jre\bin\java.exe'
-      Else
+      else
         CurrentPath := CurrentPath + Drive + 'jre\bin\javaw.exe';
-    End;
+    end;
 
   result := FileExists(CurrentPath);
   res := currentPath;
