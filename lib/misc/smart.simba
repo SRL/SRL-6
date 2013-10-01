@@ -234,8 +234,10 @@ begin
 
   if (findJavaPath(result)) then
     print('Found your java path @ ' + result)
-  else
-    print('Failed to find your Java path, add JRE to your system''s PATH before JDK (if you have JDK), and disable smartGetJavaPath', TDebug.FATAL);
+  else begin
+    print('Failed to find your Java path', TDebug.WARNING);
+    print('If RS is failing to switch to OpenGL mode, add JRE to your systems path before JDK (if you have JDK)', TDebug.HINT);
+  end;
   {$ELSE}
   print('Not searching for your Java path. Make sure the JRE is in your system''s PATH before JDK (if you have JDK).', TDebug.WARNING);
 
