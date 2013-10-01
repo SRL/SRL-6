@@ -129,6 +129,8 @@ begin
   Army[EditId].Password := PasswordField.Caption;
   Army[EditId].BankPin := BankpinField.Caption;
 
+  writeln('Player Manager: Saved player information');
+
   PlayerBox.Enabled := false;
   EditID := -1;
 end;
@@ -573,6 +575,8 @@ begin
 
   fileTSL.Text := fileString;
   fileTSL.SaveToFile(path);
+
+  writeln('Player Manager: Saved player list');
 
   fileTSL.Free;
 end;
