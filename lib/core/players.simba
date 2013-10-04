@@ -1276,8 +1276,8 @@ begin
 
   if (options.open()) then
   begin
-    p := point(options.x + round(options.w / 2), options.x + options.w - 20); // the logout button
-    mouse(p.rand(randomRange(-50, 50), 5), MOUSE_LEFT);
+    p := point(options.x + round(options.w / 2), options.y + options.h - 25);
+    mouse(p.rand(randomRange(-75, 75), randomRange(-5, 5)), MOUSE_LEFT);
 
     t := (getSystemTime() + (7000));
 
