@@ -2854,7 +2854,7 @@ Example:
     if minimap.isLodeStoneOpen(b, 500 + random(100)) then
       writeln('lodestone screen is open');
 *)
-function isLodeStoneOpen(out bounds: TBox; waitTime: integer = 0): boolean;
+function TRSMinimap.isLodeStoneOpen(out bounds: TBox; waitTime: integer = 0): boolean;
 var
   width, height, timeOut, t: integer;
   tpa: TPointArray;
@@ -2919,7 +2919,7 @@ Example:
 
     minimap.lodeStoneTeleportTo(LOCATION_LUNAR_ISLE);
 *)
-function lodestoneTeleportTo(location: integer): boolean;
+function TRSMinimap.lodestoneTeleportTo(location: integer): boolean;
 var
   tpa: TPointArray;
   button: _TRSMMButton;
