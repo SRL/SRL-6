@@ -468,7 +468,8 @@ begin
     clWhite,      // White that shows up when numbers are displayed in the mouseover boxes that have burnt orange text.
     13750712,     // Grey-ish blue of inventory items.
     7067128,      // Gold of inventory items.
-    4231423       // Orange of item name under equipment tab.
+    4231423,       // Orange of item name under equipment tab.
+    2070783       // Orange when mousing a item in bankscreen
   ];
 
   getMufasaBitmap(filteredBitmap).findColors(tpa, clWhite);
@@ -563,9 +564,9 @@ begin
     end;
 
     if (i = 0) then
-      result := result + linesOfText[i].getTextInATPA(3, font)
+      result := result + linesOfText[i].getTextInATPA(5, font)
     else
-      result := result + ' ' + linesOfText[i].getTextInATPA(3, font);
+      result := result + ' ' + linesOfText[i].getTextInATPA(5, font);
   end;
 end;
 {$ENDIF}
@@ -654,7 +655,7 @@ begin
         break(2);
       end;
 
-    wait(10 + random(20));
+    wait(20 + random(20));
   until (getSystemTime() > t);
 
   print('isMouseOverText(): '+toStr(result), TDebug.FOOTER);
