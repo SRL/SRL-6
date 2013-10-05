@@ -25,14 +25,17 @@ Internal bankscreen constants.
 const
   _COLOR_BANK_TAB_ACTIVE = 4407350; // light color of an active bank tab
 
+{*
+const Internal
+~~~~~~~~~~~~~~
+
+Internal bankscreen constants.
+
+*}
 const
  _BANK_SLOTS_OFFSET: TPoint = [41, 108];
  _PACK_SLOTS_OFFSET: TPoint = [523, 111];
  _TAB_OFFSET: TPoint = [34, 65];
-
-const
-  BANK_SLOT_LOW = 1;
-  BANK_SLOT_HIGH = 100;
 
 (*
 const Deposit Buttons
@@ -226,8 +229,6 @@ begin
       wait(20 + random(30));
 
   until (getSystemTime() >= t);
-
-  print('bankScreen.isOpen(): result = ' + boolToStr(result));
 end;
 
 (*
@@ -274,6 +275,28 @@ begin
   end;
 
   print('bankScreen.close(): result = ' + boolToStr(result), TDebug.SUB);
+end;
+
+function TRSBankScreen._isDepositButtonVaild(depositType: integer): boolean;
+const
+  DEPOSIT_BUTTON_LOW = 0;
+  DEPOSIT_BUTTON_HIGH = 3;
+begin
+  result := inRange(depositType, DEPOSIT_BUTTON_LOW, DEPOSIT_BUTTON_HIGH);
+
+  if (not result) then
+    print('bankScreen._isDepositButtonVaild(): Button "' + intToStr(depositType) + '" is invaild', TDebug.WARNING);
+end;
+
+function TRSBankScreen._isBankSlotVaild(slot: integer): boolean;
+const
+  BANK_SLOT_LOW = 1;
+  BANK_SLOT_HIGH = 100;
+begin
+  result := inRange(slot, BANK_SLOT_LOW, BANK_SLOT_HIGH);
+
+  if (not result) then
+    print('bankScreen._isBankSlotVaild(): Slot '+toStr(slot)+' is invalid', TDebug.WARNING);
 end;
 
 (*
@@ -331,11 +354,8 @@ Example:
 *)
 function TRSBankScreen.getBankSlotBox(slot: integer): TBox;
 begin
-  if (not inRange(slot, BANK_SLOT_LOW, BANK_SLOT_HIGH)) then
-  begin
-    print('bankScreen.getBankSlotBox(): Slot '+toStr(slot)+' is invalid', TDebug.WARNING);
-    exit(intToBox(-1, -1, -1, -1));
-  end;
+  if (not self._isBankSlotVaild(slot)) then
+    exit();
 
   if (not self.isOpen()) then
   begin
@@ -620,7 +640,6 @@ Example:
 .. code-block:: pascal
 
     bankScreen.scrollUp();
-
 *)
 procedure TRSBankScreen.scrollUp();
 const
@@ -634,7 +653,8 @@ begin
   if (not self.isOpen()) then
     exit();
 
-  p := [self.x + 473, self.y + 94]; // top of the scroll bar (when it's at the top)
+  p := [self.x + 474, self.y + 102]; // top of the scroll bar (when it's at the top)
+
   col := getColor(p);
 
   // color at top of scroller = already at top | no scroll bar color
@@ -655,11 +675,65 @@ begin
     if (getColor(p) = COLOR_RESULT) then
       break;
 
-    mouseScroll(scrollP, 7 + random(5), false);
+    mouseScroll(scrollP, 10 + random(10), false);
     wait(10 + random(20));
 
   until(getSystemTime() > t);
 end;
+
+(*
+TRSBankScreen.quickDeposit
+~~~~~~~~~~~~~~~~~~~~~~~~~~
+
+.. code-block:: pascal
+
+    function TRSBankScreen.quickDeposit(depositType: integer): boolean;
+
+Will click the quick deposit button 'depositType', vaild deposit types are:
+  * QUICK_DEPOSIT_INVENTORY
+  * QUICK_DEPOSIT_EQIUPMENT
+  * QUICK_DEPOSIT_BOB
+  * QUICK_DEPOSIT_MONEY_POUCH
+
+.. note::
+
+    - by Olly
+    - Last Updated: 05 October 2013 by Olly
+
+Example:
+
+.. code-block:: pascal
+
+    bankScreen.quickDeposit(QUICK_DEPOSIT_INVENTORY);
+*)
+function TRSBankScreen.quickDeposit(depositType: integer): boolean;
+const
+  DEPOSIT_BUTTON_OFFSET: TPoint = [357, 575];
+var
+  b: TBox;
+begin
+  result := true;
+
+  if (not self._isDepositButtonVaild(depositType)) then
+    exit(false);
+
+  if (not self.isOpen()) then
+  begin
+    print('bankScreen.quickDeposit(): Unable to quick-deposit since bankscreen isn''t open', TDebug.ERROR);
+    exit(false);
+  end;
+
+  b := gridBox(depositType, 4, 1, 30, 20, 35, 0,
+               point(self.x + DEPOSIT_BUTTON_OFFSET.x,
+                     self.y + DEPOSIT_BUTTON_OFFSET.y));
+
+  mouseBox(b, MOUSE_LEFT);
+  wait(200 + random(300));
+
+  print('bankScreen.quickDeposit(): Clicked quick deposit id ' + intToStr(depositType), TDebug.SUB);
+end;
+
+
 
 begin
   bankscreen.__init();
