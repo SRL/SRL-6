@@ -132,7 +132,7 @@ Example:
     if (tabBackpack.isOpen()) then
       writeln('the Backpack tab is open');
 *}
-procedure TRSTabBackPack._updateBounds();
+procedure TRSTabBackpack._updateBounds();
 begin
   self.setBounds(gameTabs.visibleTabArea);
 
@@ -553,7 +553,7 @@ Example:
      writeln('Backpack has shifted!');
 
 *)
-function TRSTabBackPack.waitForShift(waitTime: integer): boolean;
+function TRSTabBackpack.waitForShift(waitTime: integer): boolean;
 var
   c, timeOut: integer;
 begin

@@ -123,10 +123,7 @@ begin
   p := point(-1, -1);
 
   if (not findColorsTolerance(tpaColors, col, lookIn, tol)) then
-  begin
-    print('findText: failed to find text color', TDebug.SUB);
     exit(false);
-  end;
 
   repeat
     // loop through the fonts and texts to look for
@@ -146,11 +143,7 @@ begin
           break(3);
         end;
       end;
-
   until(getSystemTime() > t);
-
-  if (not result) then
-    print('findText('+toStr(txt)+'): '+toStr(result), TDebug.SUB);
 end;
 
 (*

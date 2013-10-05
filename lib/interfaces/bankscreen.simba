@@ -10,6 +10,7 @@ The source for this file can be found `here <https://github.com/SRL/SRL-6/blob/m
 *)
 
 {$include_once interfaces.simba}
+{$include_once ../interfaces/gametabs/backpack.simba}
 {$include_once ../core/text.simba}
 
 {$f-}
@@ -23,6 +24,15 @@ Internal bankscreen constants.
 *}
 const
   _COLOR_BANK_TAB_ACTIVE = 4407350; // light color of an active bank tab
+
+const
+ _BANK_SLOTS_OFFSET: TPoint = [41, 108];
+ _PACK_SLOTS_OFFSET: TPoint = [523, 111];
+ _TAB_OFFSET: TPoint = [34, 65];
+
+const
+  BANK_SLOT_LOW = 1;
+  BANK_SLOT_HIGH = 100;
 
 (*
 const Deposit Buttons
@@ -46,8 +56,6 @@ A type that stores all the attributes and functions of the Runescape bankscreen.
 *)
 type
   TRSBankScreen = record(TRSInterface)
-    __bankItemSlots,
-    __packItemSlots,
     __tabSlots: TBoxArray;
   end;
 
@@ -112,36 +120,67 @@ TRSBankScreen.__find
 
     function TRSBankScreen.__find(): boolean;
 
-Finds the TRSBankScreen based on the size of the client.
+Finds the TRSBankScreen by finding the text 'bank' in a button.
 
 .. note::
 
-    - by Coh3n
-    - Last Updated: 10 August 2013 by Coh3n
+    - by Olly
+    - Last Updated: 04 October 2013 by Olly
 
 Example:
 
 .. code-block:: pascal
 
-    minimap.__find();
-
+    bankScreen.__find();
 *}
 {$IFNDEF CODEINSIGHT}
 function TRSBankScreen.__find(): boolean;
+const
+  TOP_BORDER_COLOR = 9998984;
+  BOTTOM_BORDER_COLOR = 4998196;
+  TEXT_COLOR = 13618403;
+  BUTTON_WIDTH = 107;
 var
-  wid, hei: integer;
+  clientBox, b: TBox;
+  tpa: TPointArray;
+  atpa: T2DPointArray;
+  i: integer;
+  p: TPoint;
 begin
-  getClientDimensions(wid, hei);
-  result := true;
+  result := false;
 
-  with self do
+  getClientDimensions(clientBox.x2, clientBox.y2);
+
+  dec(clientBox.x2);
+  dec(clientBox.y2);
+
+  if (not findColors(tpa, TOP_BORDER_COLOR, 0, 0, clientBox.x2, clientBox.y2)) then
+    exit();
+
+  atpa := clusterTPAEx(tpa, 1, 1);
+
+  for i := 0 to high(atpa) do
   begin
-    // bounds of the entire bank (including the side backpack)
-    setBounds([round(wid / 2) - 339, round(hei / 2) - 297, round(wid / 2) + 342, round(hei / 2) + 291]);
+    b := atpa[i].getBounds();
 
-    __bankItemSlots := grid(10, 10, 37, 33, 44, 44, point(self.x + 40, self.y + 100));
-    __packItemSlots := grid(4, 7, 36, 33, 42, 36, point(self.x + 518, self.y + 108));
-    __tabSlots      := grid(9, 1, 45, 35, 48, 0, point(self.x + 34, self.y + 57));
+    // wrong width?
+    if (b.getWidth() <> BUTTON_WIDTH) then
+      continue;
+
+    incEx(b.y2, 24);
+
+    // prevent out of bounds errors
+    b.setLimit(clientBox);
+
+    // if the bottom corners of the box are the bottom border colors there a button
+    if (getColor(b.x1, b.y2) and getColor(b.x2, b.y2) = BOTTOM_BORDER_COLOR) then
+      if (findText(p, TEXT_COLOR, 0, ['Bank'], [UpChars], b)) then
+      begin
+        // set the bounds based on where we found the text point.
+        self.setBounds([p.x-114, p.y-572, p.x+573, p.y+27]);
+        result := true;
+        break();
+      end;
   end;
 end;
 {$ENDIF}
@@ -152,47 +191,43 @@ TRSBankScreen.isOpen
 
 .. code-block:: pascal
 
-    function TRSBankScreen.close(): boolean;
+    function TRSBankScreen.isOpen(waitTime: integer = 0): boolean;
 
-Returns if the bankscreen is open or not.
+Returns if the Bankscreen is open or not, optional parameter 'waitTime' which will wait
+x amount of ms for the bankscreen to be open.
 
 .. note::
 
     - by Olly
-    - Last Updated: 10 August 2013 by Coh3n
+    - Last Updated: 04 October 2013 by Olly
 
 Example:
 
 .. code-block:: pascal
 
     if (bankScreen.isOpen()) then
-      writeln('bankscreen is open! lets start depositing items');
-
+      writeln('bankscreen is open! lets start banking items...');
 *)
-function TRSBankScreen.isOpen(timeOut: integer = 0): boolean;
+function TRSBankScreen.isOpen(waitTime: integer = 0): boolean;
 var
-  p: TPoint;
   t: integer;
 begin
-  self.__find();
-
-  t := getSystemTime() + timeOut;
+  t := getSystemTime() + waitTime;
   result := false;
 
   repeat
-    if (getColor(self.x + 113, self.y+self.h - 19) = 13618403) then // pinkish color of the "Bank PIN" text
-      result := findText(p, 13618403, 0, ['ank'], [upChars], intToBox(self.x + 100, self.y+self.h - 30, self.x + 175, self.y+self.h - 9)); // box around "Bank PIN" text
-
-    if (result) then
+    if (self.__find()) then
+    begin
+      result := true;
       break();
+    end;
 
-    if (timeOut <> 0) then
-      wait(20 + random(40));
+    if (waitTime > 0) then
+      wait(20 + random(30));
 
   until (getSystemTime() >= t);
 
-  if (not result) then
-    print('bankScreen.isOpen(): result = ' + toStr(result) + ', took: ' + intToStr(getSystemTime() + timeOut - t) + 'ms', TDebug.SUB);
+  print('bankScreen.isOpen(): result = ' + boolToStr(result));
 end;
 
 (*
@@ -208,8 +243,8 @@ key.
 
 .. note::
 
-    - by Ollybest
-    - Last Updated: 15 June 2013 by Ollybest
+    - by Olly
+    - Last Updated: 15 June 2013 by Olly
 
 Example:
 
@@ -217,21 +252,19 @@ Example:
 
     if (bankScreen.close()) then
       writeln('closed the bankscreen');
-
 *)
 function TRSBankScreen.close(): boolean;
 var
-  t, timeOut: integer;
+  timeOut: integer;
 begin
   timeOut := getSystemTime() + 5000;
-  t := getSystemTime();
 
   result := (not self.isOpen());
 
   if (not result) then
   begin
     typeByte(VK_ESCAPE);
-    wait(10 + random(20));
+    wait(20 + random(30));
 
     while (not result) and (timeOut > getSystemTime()) do
     begin
@@ -243,72 +276,107 @@ begin
   print('bankScreen.close(): result = ' + boolToStr(result), TDebug.SUB);
 end;
 
-{*
-TRSBankScreen._isSlotVaild
-~~~~~~~~~~~~~~~~~~~~~~~~~~
+(*
+TRSBankScreen.getBankSlotBoxes
+~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
 
 .. code-block:: pascal
 
-    function TRSBankScreen._isSlotVaild(arr: TBoxArray; slot: integer): boolean;
+    function TRSBankScreen.getBankSlotBoxes(): TBoxArray;
 
-Returns true if the 'slot' value is valid in the box array 'arr'.
+Returns a TBoxArray of all of the bank slot boxes.
 
 .. note::
 
-    - by Coh3n
-    - Last Updated: 10 August 2013 by Coh3n
+    - by Olly
+    - Last Updated: 04 October 2013 by Olly
 
 Example:
 
 .. code-block:: pascal
 
-    if (bankscreen.isSlotValid(bankscreen.__bankItemSlots, 25) then
-      writeln('Slot 25 is a vaild bank slot!');
-
-*}
-function TRSBankScreen._isSlotVaild(arr: TBoxArray; slot: integer): boolean;
+    boxArr := bankScreen.getBankSlotBoxes();
+*)
+function TRSBankScreen.getBankSlotBoxes(): TBoxArray;
 begin
-  result := (inRange(slot, low(arr) + 1, high(arr) + 1));
+  if (not self.isOpen()) then
+  begin
+    print('bankScreen.getBankSlotBoxes(): Unable to return bank slots since the bank isn''t open', TDebug.ERROR);
+    exit();
+  end;
+
+  result := grid(10, 10, 35, 31, 44, 44, point(self.x + _BANK_SLOTS_OFFSET.x, self.y + _BANK_SLOTS_OFFSET.y));
 end;
 
 (*
-TRSBankScreen.getBankItemBounds
-~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+TRSBankScreen.getBankSlotBox
+~~~~~~~~~~~~~~~~~~~~~~~~~~~~
 
 .. code-block:: pascal
 
-    TRSBankScreen.getBankItemBounds(slot: integer): TBox;
+    function TRSBankScreen.getBankSlotBox(slot: integer): TBox;
 
-Returns the TBox of the desired bank item slot. Bank slots start at the top left
-at 1 and count across the columns. Default slots do NOT line up properly when
-the entire contents of the bank is opened, and "Tab 2", "Tab 3", etc. text can
-be seen.
+Returns a TBox of the bank slot "slot". Layout: http://i.imgur.com/9yGO1zV.png
 
 .. note::
 
-    - by Coh3n
-    - Last Updated: 10 August 2013 by Coh3n
+    - by Olly
+    - Last Updated: 04 October 2013 by Olly
 
 Example:
 
 .. code-block:: pascal
 
-    var
-      b: TBox;
-    begin
-      b := bankscreen.getBankItemBounds(1);
-
+    box := bankScreen.getBankSlotBox(1);
 *)
-function TRSBankScreen.getBankItemBounds(slot: integer): TBox;
+function TRSBankScreen.getBankSlotBox(slot: integer): TBox;
 begin
-  if (not self._isSlotVaild(self.__bankItemSlots, slot)) then
+  if (not inRange(slot, BANK_SLOT_LOW, BANK_SLOT_HIGH)) then
   begin
-    print('TRSBankScreen.getBankItemBounds(): Slot '+toStr(slot)+' is invalid', TDebug.WARNING);
+    print('bankScreen.getBankSlotBox(): Slot '+toStr(slot)+' is invalid', TDebug.WARNING);
     exit(intToBox(-1, -1, -1, -1));
   end;
 
+  if (not self.isOpen()) then
+  begin
+    print('bankScreen.getBankSlotBox(): Unable to return bank slots since the bank isn''t open', TDebug.ERROR);
+    exit();
+  end;
+
   // - 1 because the grid (array) starts at 0.
-  result := self.__bankItemSlots[slot - 1];
+  result := gridBox(slot -1, 10, 10, 35, 31, 44, 44, point(self.x + _BANK_SLOTS_OFFSET.x, self.y + _BANK_SLOTS_OFFSET.y));
+end;
+
+(*
+TRSBankScreen.getPackSlotBoxes
+~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+
+.. code-block:: pascal
+
+    function TRSBankScreen.getPackSlotBoxes: TBoxArray;
+
+Returns a TBoxArray of all of the Backpack slots in the bank interface.
+
+.. note::
+
+    - by Olly
+    - Last Updated: 04 October 2013 by Olly
+
+Example:
+
+.. code-block:: pascal
+
+    boxArr := bankScreen.getBankSlotBoxes();
+*)
+function TRSBankScreen.getPackSlotBoxes: TBoxArray;
+begin
+  if (not self.isOpen()) then
+  begin
+    print('bankScreen.getpackSlotBoxes(): Unable to return backpack slots since the bank isn''t open', TDebug.ERROR);
+    exit();
+  end;
+
+  result := grid(4, 7, 35, 31, 42, 36, point(self.x + _PACK_SLOTS_OFFSET.x, self.y + _PACK_SLOTS_OFFSET.y));
 end;
 
 (*
@@ -337,16 +405,22 @@ Example:
       b := bankscreen.getPackItemBounds(1);
 
 *)
-function TRSBankScreen.getPackItemBounds(slot: integer): TBox;
+function TRSBankScreen.getPackSlotBounds(slot: integer): TBox;
 begin
-  if (not self._isSlotVaild(self.__packItemSlots, slot)) then
+  if (not inRange(slot, BACKPACK_SLOT_LOW, BACKPACK_SLOT_HIGH)) then
   begin
-    print('TRSBankScreen.getPackItemBounds(): Slot '+toStr(slot)+' is invalid', TDebug.WARNING);
+    print('bankScreen.getPackSlotBox(): Slot '+toStr(slot)+' is invalid', TDebug.WARNING);
     exit(intToBox(-1, -1, -1, -1));
   end;
 
+  if (not self.isOpen()) then
+  begin
+    print('bankScreen.getPackSlotBox(): Unable to return pack slots since the bank isn''t open', TDebug.ERROR);
+    exit();
+  end;
+
   // - 1 because the grid (array) starts at 0.
-  result := self.__packItemSlots[slot - 1];
+  result := gridBox(slot -1, 4, 7, 35, 31, 42, 36, point(self.x + _PACK_SLOTS_OFFSET.x, self.y + _PACK_SLOTS_OFFSET.y));
 end;
 
 {*
@@ -377,14 +451,14 @@ Example:
 *}
 function TRSBankScreen._getTabBounds(tab: integer): TBox;
 begin
-  if (not self._isSlotVaild(self.__tabSlots, tab)) then
+  if (not self.isOpen()) then
   begin
-    print('TRSBankScreen._getTabBounds(): Tab '+toStr(tab)+' is invalid', TDebug.WARNING);
-    exit(intToBox(-1, -1, -1, -1));
+    print('Unable to get tab bounds since the bankscreen isn''t open', TDebug.ERROR);
+    exit();
   end;
 
   // - 1 because the grid (array) starts at 0.
-  result := self.__tabSlots[tab - 1];
+  result := gridBox(tab -1, 9, 1, 45, 35, 48, 0, point(self.x + _TAB_OFFSET.x, self.y + _TAB_OFFSET.y));
 end;
 
 {*
