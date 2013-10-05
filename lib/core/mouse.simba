@@ -538,7 +538,7 @@ begin
     else
       scrollMouse(x, y, -1);
 
-    wait(50 + random(300));
+    wait(16 + random(200));
     inc(c);
   until(c >= scrolls);
 end;

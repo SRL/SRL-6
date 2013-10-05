@@ -911,6 +911,38 @@ begin
 end;
 
 {*
+TRSChooseOption.__applyFilter
+~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+
+.. code-block:: pascal
+
+    procedure TRSChooseOption.__applyFilter(var bmp: TMufasaBitmap);
+
+Filters the choose option bitmap so the only part left is the text.
+Exact same filter as mouseover text.
+
+.. note::
+
+    - by euphemism
+    - Last Updated: 05 October 2013 by Olly
+
+Example:
+
+.. code-block:: pascal
+
+    optionArr := choseOption.__getOptions();
+*}
+{$IFNDEF CODEINSIGHT}
+procedure TRSChooseOption.__applyFilter(var bmp: TMufasaBitmap);
+begin
+  bmp.contrast(50);
+  bmp.desaturate();
+  bmp.contrast(255);
+  bmp.posterize(255);
+end;
+{$ENDIF}
+
+{*
 TRSChooseOption.__getOptions
 ~~~~~~~~~~~~~~~~~~~~~~~~~~~~
 
@@ -923,7 +955,7 @@ Returns all text & bounds of the ChooseOption text in the TOptionArray.
 .. note::
 
     - by Wizzup?, Narcle, Coh3n & Olly
-    - Last Updated: 06 September 2013 by Olly
+    - Last Updated: 05 October 2013 by Olly
 
 Example:
 
@@ -937,7 +969,7 @@ var
   tmb: TMufasaBitmap;
   atpa, tmp: T2DPointArray;
   i, t, hi, tmbW, tmbH, oldCTS, oldTarget: integer;
-  tpaBackground, tpaShadow, tpaText: TPointArray;
+  tpaShadow, tpaText: TPointArray;
   b: TBox;
 begin
   oldCTS := getToleranceSpeed();
@@ -955,24 +987,16 @@ begin
 
   // find the blue background, and the shadow
   setColorToleranceSpeed(3);
-  findColorsTolerance(tpaBackground, 4996381, 0, 0, tmbW, tmbH, 18);
   findColorsTolerance(tpaShadow, 460291, 0, 0, tmbW, tmbH, 6);
 
   setColorToleranceSpeed(1);
 
-  // the text is the points left that arent in the background
-  tpaText := returnPointsNotInTPA(tpaBackGround, [0, 0, tmbW, tmbH]);
+  self.__applyFilter(tmb);
+
+  findColors(tpaText, clWhite, 0, 0, tmbW, tmbH);
 
   if (length(tpaText) > 0) then
   begin
-    // clear our bitmap, and draw the text and the shadow
-    tmb.drawClear(0);
-    tmb.drawTPA(tpaText, clRed);
-    tmb.drawTPA(tpaShadow, clPurple);
-
-    // filter bad points out
-    ocr_FilterUpTextByCharacteristics(tmb);
-
     setLength(atpa, tmb.getHeight() div 16);
     setLength(result, length(atpa));
 
@@ -980,7 +1004,7 @@ begin
 
     // now, lets gather all the text in lines
     for i := 0 to hi do
-      findColors(atpa[i], clRed, 0, (2 + i * 16), tmbW - 1, (18 + i * 16) - 2);
+      findColors(atpa[i], clWhite, 0, (2 + i * 16), tmbW - 1, min((18 + i * 16) - 2, tmbH));
 
     // restore, free created/old stuff
     t := getImageTarget();
@@ -1012,7 +1036,7 @@ begin
     exit();
   end;
 
-  // restore, free created/old stuff
+  // found no text? restore, free created/old stuff
   t := getImageTarget();
   setImageTarget(oldTarget);
   freeTarget(t);
@@ -1086,12 +1110,11 @@ Example:
 function TRSChooseOption._select(txt: TStringArray; mouseAction: integer; close: boolean; matchPercent: extended; waitTime: integer): boolean;
 var
   optionArr: __TOptionArray;
-  l, t, i, j: integer;
+  l, i, j: integer;
   s: TStringArray;
   a: extended;
 begin
   result := false;
-  t := getSystemTime();
 
   print('chooseOption._select():', TDebug.HEADER);
 
@@ -1132,7 +1155,7 @@ begin
       if (matchPercent = 1.00) then // not using stringmatch
         if (pos(txt[j], optionArr[i].str) > 0) then
         begin
-          print('Found option "' + txt[j] + '" in "' + optionArr[i].str + '", took: ' + intToStr(getSystemTime() - t) + 'ms');
+          print('Found option "' + txt[j] + '" in "' + optionArr[i].str + '"');
           print('chooseOption.select() result = true', TDebug.FOOTER);
 
           if (mouseAction <> MOUSE_NONE) then
@@ -1150,7 +1173,7 @@ begin
 
       if (a >= matchPercent) then
       begin
-        print('Found option "' + txt[j] + '" @ accuracy ' + floatToStr(a) + ', took: ' + intToStr(getSystemTime() - t) + 'ms');
+        print('Found option "' + txt[j] + '" @ accuracy ' + floatToStr(a));
         print('chooseOption.select() result = true', TDebug.FOOTER);
 
         if (mouseAction <> MOUSE_NONE) then
