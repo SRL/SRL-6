@@ -199,6 +199,7 @@ begin
 
   try
     closeFile(__logFile);
+    disableSRLLog := true; //disable logging so we can debug any things that also get called on terminate
   except
     writeln('Error closing log file');
   end;
