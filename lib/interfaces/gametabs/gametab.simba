@@ -229,6 +229,8 @@ procedure __freeGameTabs();
 var
   i: integer;
 begin
+  print('Freeing gametabs bitmaps..');
+
   for i := 0 to high(gameTabs.tabs) do
     if (gameTabs.tabs[i]._bmpLoaded) then
       freeBitmap(gameTabs.tabs[i]._bmp);
