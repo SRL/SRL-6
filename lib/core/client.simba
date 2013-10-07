@@ -68,7 +68,8 @@ Example:
 *)
 function waitClientReady(): boolean;
 var
-  t, i: integer;
+  t: UInt32;
+  i: integer;
 begin
   result := false;
 
