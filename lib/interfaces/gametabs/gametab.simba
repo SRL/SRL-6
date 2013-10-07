@@ -799,7 +799,9 @@ begin
       tabs[i].id := i;
       tabs[i].parent := -1;
       tabs[i].bounds := navigationGrid[i];
-      tabs[i]._bmp := -1;
+
+      if (not tabs[i]._bmpLoaded) then
+        tabs[i]._bmp := -1;
 
       case tabs[i].id of
         TAB_TASK,
