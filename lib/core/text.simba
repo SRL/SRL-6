@@ -1083,11 +1083,11 @@ TRSChooseOption.select
 
 .. code-block:: pascal
 
-function TRSChooseOption._select(txt: TStringArray; mouseAction: integer; close: boolean; matchPercent: extended; waitTime: integer): boolean;
+function TRSChooseOption._select(txt: TStringArray; mouseAction: integer; aclose: boolean; matchPercent: extended; waitTime: integer): boolean;
 
   * txt - An array of text you want to find in any of the options.
   * mouseAction - What to do if we succesfully find a option (MOUSE_MOVE, MOUSE_LEFT, MOUSE_RIGHT, MOUSE_NONE).
-  * close - Will we close the menu after we're done with it?
+  * aclose - Will we close the menu after we're done with it?
   * matchPercent - The min percentage that will we count as match (if using stringmatch) if not using stringmatch
                    and want the old the method of finding txt anywhere in the string set it as 1.00.
   * waitTime - how long will we wait for the chooseoptions menu to appear?.
@@ -1107,7 +1107,7 @@ Example:
     // to use string match
     chooseOption._select(['Walk To'], MOUSE_LEFT, true, 0.85, 150);
 *)
-function TRSChooseOption._select(txt: TStringArray; mouseAction: integer; close: boolean; matchPercent: extended; waitTime: integer): boolean;
+function TRSChooseOption._select(txt: TStringArray; mouseAction: integer; aclose: boolean; matchPercent: extended; waitTime: integer): boolean;
 var
   optionArr: __TOptionArray;
   l, i, j: integer;
@@ -1134,8 +1134,8 @@ begin
     print('Failed to find any options', TDebug.ERROR);
     print('chooseOption.select() result = false', TDebug.FOOTER);
 
-    if (close) then
-      self.close();
+    if (aclose) then
+      close();
 
     exit();
   end else
@@ -1161,8 +1161,8 @@ begin
           if (mouseAction <> MOUSE_NONE) then
             mouseBox(optionArr[i].bounds, mouseAction)
           else // if it's mouse none lets see if we need to close
-            if (close) then
-              self.close();
+            if (aclose) then
+              close();
 
           exit(true);
         end else
@@ -1179,16 +1179,16 @@ begin
         if (mouseAction <> MOUSE_NONE) then
           mouseBox(optionArr[i].bounds, mouseAction)
         else // if it's mouse none lets see if we need to close
-          if (close) then
-            self.close();
+          if (aclose) then
+            close();
 
         exit(true);
       end;
    end;
 
   // close the menu since we found no matches
-  if (close) then
-    self.close();
+  if (aclose) then
+    close();
 
   print('Failed to find any text matches');
   print('ChooseOption._select() result = false');

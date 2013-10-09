@@ -51,13 +51,13 @@ Variables that can be used in scripts.
 
 *)
 var
-  smartClientWidth = 960;
-  smartClientHeight = 640;
-  smartGetJavaPath = true;
-  smartShowConsole = true;
-  smartForceNewClient = false;
-  smartEnableDrawing = false;
-  smartInitSeq = '';
+  smartClientWidth: UInt32 := 960;
+  smartClientHeight: UInt32 := 640;
+  smartGetJavaPath: boolean := true;
+  smartShowConsole: boolean := true;
+  smartForceNewClient: boolean := false;
+  smartEnableDrawing: boolean := false;
+  smartInitSeq: string := '';
 
 {*
 var Internal
@@ -71,10 +71,10 @@ Internal SMART variables used only in smart.simba.
     * __smartNativeDebugButtonID: The id of the debug button (if not using a native button) set as -1.
     * smartImage: TMufasaBitmap that is displayed onto smart.
 *}
-  __smartCurrentPid: integer;
-  __smartCurrentTarget: integer;
-  __smartIsDrawingSetup: boolean;
-  __smartNativeDebugButtonID: integer = 101;
+  __smartCurrentPid: Int32 := 0;
+  __smartCurrentTarget: PtrUInt := 0;
+  __smartIsDrawingSetup: boolean := False;
+  __smartNativeDebugButtonID: integer := 101;
   smartImage: TMufasaBitmap;
 
 (*
@@ -241,10 +241,9 @@ begin
   {$ELSE}
   print('Not searching for your Java path. Make sure the JRE is in your system''s PATH before JDK (if you have JDK).', TDebug.WARNING);
 
-  if (smartShowConsole) then
-    result := 'java.exe'
-  else
-    result := 'javaw.exe';
+  Result := 'java';
+  if (not (smartShowConsole)) then
+    Result := Result + 'w';
   {$ENDIF}
   print('getJavaPath()', TDebug.FOOTER);
 end;
@@ -340,7 +339,7 @@ Example:
 .. code-block:: pascal
 
 *)
-function smartSetAsTarget(pid: integer): boolean;
+function smartSetAsTarget(pid: Int32): boolean;
 begin
   result := true;
 
@@ -401,13 +400,9 @@ begin
     __smartCurrentPID := smartGetClientPID(__smartCurrentTarget);
 
     if (smartSetAsTarget(__smartCurrentPID)) then
-    begin
       print('smartCreateClient(): result = true', TDebug.FOOTER);
-      exit();
-    end;
   end else
     print('Failed to spawn a SMART client', TDebug.FATAL);
-
 end;
 
 (*
@@ -466,7 +461,8 @@ Example:
 function smartPairToExistingClient(): boolean;
 var
   pidArr: TIntegerArray;
-  i, t, p: integer;
+  t: PtrUInt;
+  i, p: Int32;
 begin
   result := false;
 
@@ -499,8 +495,8 @@ begin
          __smartCurrentPID := p;
          __smartCurrentTarget := t;
 
-         if (not smartEnabled(__smartCurrentTarget)) then
-           smartSetEnabled(__smartCurrentTarget, true);
+         if (not (smartEnabled(__smartCurrentTarget))) then
+           smartSetEnabled(__smartCurrentTarget, True);
 
          print('Succesfully paired to a existing client, SMART['+ intToStr(__smartCurrentPID) +']');
          print('smartPairToExistingClient(): result = true', TDebug.FOOTER);
@@ -624,7 +620,7 @@ begin
   smartSetDebug(true);
 
   try
-    smartImage.init(client.getMBitmaps());
+    smartImage.init(Client.getMBitmaps());
     smartImage.setName('SMART Debug Image');
     smartImage.setPersistentMemory(SmartDebugArray(__smartCurrentTarget), smartClientWidth, smartClientHeight);
     smartImage.drawClear(0);
@@ -775,7 +771,9 @@ end;
 begin
   SRL_Events[EVENT_RS_UPDATE] := sixHourFix;
 
+  {$IFDEF WINDOWS}
   // check for the plugin on compile
   if (not fileExists(PluginPath + 'OpenGL32.dll')) then
     print('SMART - Unable to find OpenGL32.dll (plugin required for SRL to work with SMART)', TDebug.FATAL);
+  {$ENDIF}
 end;
