@@ -999,6 +999,59 @@ begin
 end;
 
 (*
+TPointArray.cluster
+~~~~~~~~~~~~~~~~~~~
+
+.. code-block:: pascal
+
+    function TPointArray.cluster(const dist: integer): T2DPointArray;
+
+Splits the points with max distance ‘dist’ to their own TPointArrays. An
+alternative to SplitTPA, will be extremely fast compared to SplitTPA with a distance less than 100.
+
+.. note::
+
+    - by Olly
+
+Example:
+
+.. code-block:: pascal
+
+    atpa := tpa.cluster(5);
+*)
+function TPointArray.cluster(const dist: integer): T2DPointArray;
+begin
+  result := clusterTPA(self, dist);
+end;
+
+(*
+TPointArray.cluster; overload
+~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+
+.. code-block:: pascal
+
+    function TPointArray.cluster(const width, height: integer): T2DPointArray; overload;
+
+Splits the points to their own TPointArrays if they fall outside of ‘width’ and
+‘height’ bounds. An alternative to SplitTPAEx, will be extremely fast compared
+to SplitTPAEx with a width/height less than 100.
+
+.. note::
+
+    - by Olly
+
+Example:
+
+.. code-block:: pascal
+
+    atpa := tpa.cluster(5, 5);
+*)
+function TPointArray.cluster(const width, height: integer): T2DPointArray; overload;
+begin
+  result := clusterTPAEx(self, width, height);
+end;
+
+(*
 TPointArray.clearTPAFrom
 ~~~~~~~~~~~~~~~~~~~~~~~~
 
