@@ -253,7 +253,7 @@ A type that stores all the attributes and functions of the Runescape minimap.
 type
   TRSMinimap = record(TRSInterface)
     symbolAccuracy: extended;
-    _maskTPA: TPointArray;
+    bmpMask: integer;
   end;
 
 (*
@@ -307,25 +307,26 @@ begin
     parentID := -1;
     static := true;
     symbolAccuracy := 0.65;
+    bmpMask := -1;
   end;
 end;
 {$ENDIF}
 
 {*
-TRSMinimap.__createMaskTPA
-~~~~~~~~~~~~~~~~~~~~~~~~~~
+TRSMinimap.__createMask
+~~~~~~~~~~~~~~~~~~~~~~~
 
 .. code-block:: pascal
 
-    procedure TRSMinimap.__createMaskTPA();
+    procedure TRSMinimap.__createMask();
 
-Creates a TPointArray (stored in minimap._maskTPA) of the points that aren't on
-map in the minimap.
+Creates a bitmap mask of the minimap, saved as 'minimap.bmpMask' main use is to
+tell if a point is on actual map or not.
 
 .. note::
 
     - by euphemism
-    - Last Updated: 14 August 2013 by Olly
+    - Last Updated: 09 October 2013 by Olly
 
 Example:
 
@@ -334,16 +335,17 @@ Example:
     minimap.__createMaskTPA();
 *}
 {$IFNDEF CODEINSIGHT}
-procedure TRSMinimap.__createMaskTPA();
+procedure TRSMinimap.__createMask();
 var
   bounds: TBox;
-  bmp, borderBmp, hh, i, tempBmp, ww, res: integer;
+  bmp, hh, i, tempBmp, ww: integer;
   drawingPoints: array [0..3] of TPoint;
 begin
   bounds := self.getBounds();
 
   try
 
+    // bitmap of a corner of the minimap
     bmp := bitmapFromString(63, 64, 'meJztztEKwjAAxdD9/09fQRCUzd' +
           'muXWO35D1wlsXMzC5bEppwsDyjFUfKKxpSXd6iLXXlM5pTUVbRotL' +
           'Wchy/SSpP/D3xjX7aLl68ePHixYsXfx18i1z8PfGNcvGUnMJ3kSP4' +
@@ -358,41 +360,69 @@ begin
     drawingPoints[2] := point(bounds.x2 - ww, bounds.y2 - hh);
     drawingPoints[3] := point(bounds.x1, bounds.y2 - hh);
 
-    res := createBitmap(bounds.x2 - bounds.x1+1, bounds.y2 - bounds.y1 +1);
-    fastDrawClear(res, clWhite);
+    if (bitmapExists(self.bmpMask)) then // if it's already created lets set the size, else lets create it.
+    begin
+      print('minimap.__createMask(): Bitmap mask is already created, going to set the size again', TDebug.SUB);
+      setBitmapSize(self.bmpMask, bounds.x2 - bounds.x1 +1, bounds.y2 - bounds.y1 +1)
+    end else begin
+      print('minimap.__createMask(): Creating the bitmap mask', TDebug.SUB);
 
-    borderBmp := createBitmap(bounds.x2 - bounds.x1 - 12, bounds.y2 - bounds.y1 - 12);
-    getMufasaBitmap(borderBmp).drawTransparent(6, 6, getMufasaBitmap(res));
-    invertBitmap(res);
+      self.bmpMask := createBitmap(bounds.x2 - bounds.x1 +1, bounds.y2 - bounds.y1 +1);
+      setBitmapName(self.bmpMask, 'Minimap mask');
+      addOnTerminate('__freeMinimapMask');
+    end;
+
+    fastDrawClear(self.bmpMask, clWhite);
+
+    rectangleBitmap(self.bmpMask, intToBox(7, 7, bounds.x2 - bounds.x1 - 7, bounds.y2 - bounds.y1 - 7), clBlack);
+    invertBitmap(self.bmpMask);
 
     for i := 0 to 3 do
     begin
 
       tempBmp := rotateBitmap(bmp, (- PI / 2) * i);
-      getMufasaBitmap(tempBmp).drawTransparent(drawingPoints[i].x, drawingPoints[i].y, getMufasaBitmap(res));
+      getMufasaBitmap(tempBmp).drawTransparent(drawingPoints[i].x, drawingPoints[i].y, getMufasaBitmap(self.bmpMask));
       freeBitmap(tempBmp);
     end;
   finally
 
     freeBitmap(bmp);
-    freeBitmap(borderBmp);
   end;
+end;
 
-  findColorsBitmap(res, self._maskTPA, clBlack);
-  self._maskTPA.offset([self.x, self.y]);
+{*
+__freeMinimapMask
+~~~~~~~~~~~~~~~~~~~~~
 
-  if (length(self._maskTPA) > 0) then
-    print('minimap.__createMaskTPA(): Succesfully created mask tpa', TDebug.SUB)
-  else
-    print('minimap.__createMaskTPA(): Failed to create mask tpa', TDebug.FATAL);
+.. code-block:: pascal
 
-  freeBitmap(res);
+    procedure __freeMinimapMask();
+
+Free's the minimap mask bitmap.
+
+.. note::
+
+    - by Olly
+    - Last Updated: 09 October 2013 by Olly
+
+Example:
+
+.. code-block:: pascal
+
+    __freeMinimapMask();
+*}
+procedure __freeMinimapMask();
+begin
+  print('Freeing the minimap mask');
+
+  if (minimap.bmpMask <> -1) then
+    freeBitmap(minimap.bmpMask);
 end;
 {$ENDIF}
 
 {*
-function TRSMinimap.__find(): boolean
-~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+TRSMinimap.__find
+~~~~~~~~~~~~~~~~~
 
 .. code-block:: pascal
 
@@ -545,8 +575,9 @@ begin
   end;
 
   result := true;
+
   self.setBounds(box);
-  self.__createMaskTPA();
+  self.__createMask();
 
   print('TRSMinimap.__find(): Sucesfully found and set minimap bounds at '+toStr(self.getBounds()));
 
@@ -781,7 +812,7 @@ begin
 
   result := (__setCompassAngle_minCheck(angle, directionDeg) <= (7.0 + i));
 
-  print('minimap.setAngle(): Set the angle @ ' + floatToStr(self.getAngleDegrees()) + 'degrees', TDebug.SUB);
+  print('minimap.setAngle(): Set the angle @ ' + floatToStr(self.getAngleDegrees()) + ' degrees', TDebug.SUB);
 end;
 
 (*
@@ -822,7 +853,7 @@ begin
   begin
     fastClick(MOUSE_RIGHT);
     if (not chooseOption.select(['Face North', 'Face', 'ace north', 'orth'], 500)) then
-      fastClick(MOUSE_LEFT); // failsafe.
+      fastClick(MOUSE_LEFT); // failsafe (chooseoptions will close its self)
   end else
     fastClick(MOUSE_LEFT);
 
@@ -839,12 +870,12 @@ TRSMinimap.isPointOn
 
     function TRSMinimap.isPointOn(p: TPoint): boolean;
 
-Returns true if the point "p" is on the minimap.
+Returns true if the point 'p' is on the minimap.
 
 .. note::
 
     - by Olly
-    - Last Updated: 23 May 2013 by Olly
+    - Last Updated: 09 October 2013 by Olly
 
 Example:
 
@@ -857,8 +888,8 @@ function TRSMinimap.isPointOn(p: TPoint): boolean;
 begin
   result := false;
 
-  if pointInBox(p, self.getBounds()) then
-    result := (not pointInTPA(p, self._maskTPA));
+  if (pointInBox(p, self.getBounds())) then
+    result := (fastGetPixel(self.bmpMask, p.x - self.x, p.y - self.y) = clWhite);
 end;
 
 (*
@@ -1112,27 +1143,32 @@ TRSMinimap.filterPoints
 
     procedure TRSMinimap.filterPoints(var tpa: TPointArray);
 
-Filters all the points in the tpa that are not on the minimap (the actual map area)
+Filters all the points in the tpa that are not on the minimap (the actual map area).
 
 .. note::
 
     - by Olly
-    - Last Updated: 23 May 2013 by Olly
+    - Last Updated: 09 October 2013 by Olly
 
 Example:
 
 .. code-block:: pascal
 
-    minimap.filterPoints(tpa);
+    begin
+      findColors(tpa, clWhite, minimap.getBounds());
+      minimap.filterPoints(tpa);
+
+      writeln('We found ' + intToStr(length(tpa)) + 'points on the map!');
+    end;
 *)
 procedure TRSMinimap.filterPoints(var tpa: TPointArray);
 var
-  res: TPointArray;
+  tpaMask: TPointArray;
 begin
-  res := clearTPAFromTPA(tpa, self._maskTPA);
-  setLength(tpa, 0);
+  findColorsBitmap(self.bmpMask, tpaMask, clBlack);
+  offsetTPA(tpaMask, point(self.x, self.y));
 
-  tpa := res;
+  tpa := clearTPAFromTPA(tpa, tpaMask);
 end;
 
 (*

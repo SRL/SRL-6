@@ -590,7 +590,7 @@ procedure smartFreeCurrentClient();
 begin
   try
     smartFreeClient(__smartCurrentTarget);
-    print('Succesfully free''d SMART[' + intToStr(__smartCurrentPid) + ']', TDebug.SUB);
+    print('Succesfully freed SMART[' + intToStr(__smartCurrentPid) + ']');
   except
     print('Error freeing SMART[' + intToStr(__smartCurrentPid) + ']', TDebug.ERROR);
   end;
