@@ -914,7 +914,7 @@ begin
 
   for i := 0 to (l-1) do
   begin
-    self.mouseSlot(i+1, clickType);
+    self.mouseSlot(arr[i] +1, clickType);
 
     if (clickType = MOUSE_RIGHT) and (option <> '') then
       chooseOption.select([option]);
