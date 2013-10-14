@@ -233,7 +233,7 @@ begin
   getClientDimensions(wid, hei);
 
   // on the globe we check if there is 3 colors in a vertical line (going up)
-  if (findColors(tpa, 4960879, intToBox(0, 0, wid-1, hei-1))) then
+  if (findColors(tpa, 4960879, intToBox(4, 4, wid-4, hei-4))) then
   begin
     hi := high(tpa);
 
