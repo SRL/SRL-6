@@ -100,6 +100,13 @@ Example:
     pinScreen.__find();
 *}
 function TRSPinScreen.__find(): boolean;
+const
+  BORDER_COLOR = 9998984;
+  BUTTON_WIDTH = 156;
+  TEXT_COLOR = 13618403;
+  OFFSET: TPoint = [-396, -290];
+  WIDTH = 512;
+  HEIGHT = 335;
 var
   clientW, clientH, i: integer;
   tpa: TPointArray;
@@ -113,23 +120,23 @@ begin
   if (not findColors(tpa, 9998984, 0, 0, clientW -1, clientH -1)) then
     exit(false);
 
-  atpa := tpa.split(10, 1);
+  atpa := tpa.cluster(1, 1);
 
   for i := 0 to high(atpa) do
   begin
     b := atpa[i].getBounds();
 
-    if ((b.getWidth()) < 130) then
+    if ((b.getWidth()) <> BUTTON_WIDTH) then
       continue;
 
-    b.y2 := b.y1 + 20;
+    incEx(b.y2, 20);
 
-    result := findText(p, ['Exit'], [UpChars], b);
+    result := findText(p, TEXT_COLOR, 0, ['Exit'], [UpChars], b);
 
     if (result) then
     begin
       //set the bounds around the text point we found
-      self.setBounds([p.x - 406, p.y - 293, p.x + 105, p.y + 40]);
+      self.setBounds([p.x + OFFSET.x, p.y + OFFSET.y, p.x + OFFSET.x + WIDTH, p.y + OFFSET.y + HEIGHT]);
       break();
     end;
   end;
@@ -341,6 +348,36 @@ end;
 {$ENDIF}
 
 (*
+TRSPinScreen.isPinVaild
+~~~~~~~~~~~~~~~~~~~~~~~
+
+.. code-block:: pascal
+
+    function TRSPinScreen.isPinVaild(pin: string): boolean;
+
+Returns if the pin 'pin' is vaild or not.
+
+.. note::
+
+    - by Olly
+    - Last Updated: 13 October 2013 by Olly
+
+Example:
+
+.. code-block:: pascal
+
+   if (pinScreen.isPinVaild('1234')) then
+      writeln('1234 is a vaild pin!');
+*)
+function TRSPinScreen.isPinVaild(pin: string): boolean;
+begin
+  result := (length(extractFromStr(pin, numbers)) = 4);
+
+  if (not result) then
+    print('The player''s in isn''t vaild!', TDebug.ERROR);
+end;
+
+(*
 TRSPinScreen.enter
 ~~~~~~~~~~~~~~~~~~
 
@@ -419,6 +456,7 @@ begin
 
   exit(self.__exit('Failed to enter our pin after two tries', TDebug.ERROR, false));
 end;
+
 
 begin
   pinScreen.__init();
