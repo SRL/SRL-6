@@ -145,6 +145,7 @@ begin
 
   b := getTPABounds(tpa);
   b.offset([0, 370]); //offset the red background bounds to where we think the button should be
+  b.setLimit([0, 0, wid-1, hei-1]); // prevent out of bound errors
 
   if (not findColors(tpa, 14733486, b)) then // color of the "Skip" text
     exit();
