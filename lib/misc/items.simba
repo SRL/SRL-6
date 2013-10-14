@@ -30,6 +30,8 @@ const
   ITEM_OUTLINE_BLACK = 131072;
   ITEM_OUTLINE_WHITE = 16777215;
   ITEM_TEXT_YELLOW   = 65535;
+  ITEM_TEXT_WHITE = ITEM_OUTLINE_WHITE;
+  ITEM_TEXT_GREEN = 8453888;
 
 (*
 findItem
@@ -170,45 +172,6 @@ begin
 end;
 
 (*
-getItemAmount
-~~~~~~~~~~~~~
-
-.. code-block:: pascal
-
-    function getItemAmount(area: TBox): integer;
-
-Searches and returns the item amount (top left) in the area.
-
-.. note::
-
-    - by Ollybest
-    - Last Updated: May. 26, 2013
-
-Example:
-
-.. code-block:: pascal
-
-     writeln(getItemAmount(area));
-
-*)
-function getItemAmount(area: TBox): integer;
-var
-  tpa: TPointArray;
-  b: TBox;
-begin
-  result := 0;
-
-  if findColors(tpa, ITEM_TEXT_YELLOW, area) then
-  begin
-    b := tpa.getBounds();
-    b.edit(-1, -1, +1, +1);
-
-    result := strToIntDef(getTextAtEx(b, 0, 1, 1, ITEM_TEXT_YELLOW, 0, statChars, Numbers), 0);
-  end else
-    print('getItemAmount(): Didn''t find any text color, result = 0', TDebug.WARNING);
-end;
-
-(*
 isItemIn
 ~~~~~~~~
 
@@ -236,5 +199,56 @@ var
 begin
   result := (findColor(p.x, p.y, ITEM_OUTLINE_BLACK, area) or
              findColor(p.x, p.y, ITEM_OUTLINE_WHITE, area));
+end;
+
+(*
+getItemAmount
+~~~~~~~~~~~~~
+
+.. code-block:: pascal
+
+    function getItemAmount(area: TBox): integer;
+
+Searches and returns the item amount (top left) in the area.
+
+.. note::
+
+    - by Ollybest
+    - Last Updated: May. 26, 2013
+
+Example:
+
+.. code-block:: pascal
+
+     writeln(getItemAmount(area));
+
+*)
+function getItemAmount(area: TBox): integer;
+var
+  tpa: TPointArray;
+  b: TBox;
+  cols: TIntegerArray = [ITEM_TEXT_YELLOW, ITEM_TEXT_WHITE, ITEM_TEXT_GREEN];
+  i: integer;
+begin
+  result := 0;
+
+  if (not isItemIn(area)) then
+    exit;
+
+  for i := 0 to high(cols) do
+    if (findColors(tpa, cols[i], area)) then
+    begin
+      b := tpa.getBounds();
+      b.edit(-1, -1, +1, +1);
+
+      result := strToIntDef(getTextAtEx(b, 0, 1, 1, cols[i], 0, statChars, Numbers), 0);
+
+      case i of
+        1: result := result * 1000;
+        2: result := result * 1000000;
+      end;
+    end;
+  {if (result = 0) then
+    print('getItemAmount(): Didn''t find any text color, result = 0', TDebug.WARNING);  }
 end;
 
