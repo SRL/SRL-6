@@ -213,15 +213,14 @@ Searches and returns the item amount (top left) in the area.
 
 .. note::
 
-    - by Ollybest
-    - Last Updated: May. 26, 2013
+    - by Olly
+    - Last Updated: October 14th, 2013 by Olly
 
 Example:
 
 .. code-block:: pascal
 
-     writeln(getItemAmount(area));
-
+     writeln(getItemAmount(tabBackpack.getSlotBox(1)));
 *)
 function getItemAmount(area: TBox): integer;
 var
@@ -230,7 +229,7 @@ var
   cols: TIntegerArray = [ITEM_TEXT_YELLOW, ITEM_TEXT_WHITE, ITEM_TEXT_GREEN];
   i: integer;
 begin
-  result := 0;
+  result := -1;
 
   if (not isItemIn(area)) then
     exit;
@@ -248,7 +247,8 @@ begin
         2: result := result * 1000000;
       end;
     end;
-  {if (result = 0) then
-    print('getItemAmount(): Didn''t find any text color, result = 0', TDebug.WARNING);  }
+
+  if (result = -1) then
+    print('getItemAmount(): Didn''t find any text color, result = -1', TDebug.WARNING);
 end;
 
