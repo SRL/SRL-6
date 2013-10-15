@@ -443,8 +443,8 @@ print debug text if 'useDebug' is set to true.  Set to true by default.
 
 .. note::
 
-    - by euphemism
-    - Last Updated: 13 August 2013 by Coh3n
+    - by euphemism & Olly
+    - Last Updated: 15 October 2013 by Olly
 
 Example:
 
@@ -454,6 +454,79 @@ Example:
 *}
 {$IFNDEF CODEINSIGHT}
 function TRSMinimap.__find(useDebug: boolean = true): boolean;
+const
+  LODESTONE_H_COLOR = 16579321;
+  LODESTONE_H_WIDTH = 8;
+  LODESTONE_OFFSET_Y = 29;
+  COMPASS_CENTER_COLOR = 8508157;
+  COMPASS_CENTER_OFFSET: TPoint = [- 23, - 22];
+  LOGOUT_BUTTON_COLOR = 8249;
+  LOGOUT_BUTTON_W = 5;
+  LOGOUT_BUTTON_H = 1;
+  LOGOUT_BUTTON_OFFSET_X = 8;
+  LOGOUT_BUTTON_COLOR_CHECK = 1469355;
+var
+  clientW, clientH, i, j, k: integer;
+  tpa: TPointArray;
+  atpaH, atpaCompass, atpaLogout: T2DPointArray;
+  midLodestone: TPoint;
+  b, res: TBox;
+begin
+  result := false;
+
+  getClientDimensions(clientW, clientH);
+
+  if (not findColors(tpa, LODESTONE_H_COLOR, 0, 0, clientW -1, clientH -1)) then
+    exit;
+
+  atpaH := clusterTPAEx(tpa, 5, 1);
+
+  for i := 0 to high(atpaH) do
+  begin
+    b := getTPABounds(atpaH[i]);
+
+    if (b.getWidth() = LODESTONE_H_WIDTH) then
+    begin
+      midLodestone := middleTPA(atpaH[i]);
+
+      if (not findColors(tpa, COMPASS_CENTER_COLOR, b.x1, 0, b.x2, b.y2)) then // find the compass color above where we may have found the lodestone 'h'
+        continue;
+
+      atpaCompass := clusterTPAEx(tpa, 1, 1); // group found points
+      sortATPASize(atpaCompass, false);
+
+      for j := 0 to high(atpaCompass) do
+        if (length(atpaCompass[j]) = 1) and (atpaCompass[j][0].x = midLodestone.x) then  // check if it's a single point and if it's on the x axis of our lodestone 'h'
+        begin
+          if (not findColors(tpa, LOGOUT_BUTTON_COLOR, atpaCompass[j][0].x, 0, clientW -1, atpaCompass[j][0].y)) then // search for the logout button, on the right and above the compass
+            continue;
+
+          atpaLogout := clusterTPAEx(tpa, 1, 1);
+
+          for k := 0 to high(atpaLogout) do  // check the logout button(s) are the right height, length, and then do a simple color check to make sure
+          begin
+            b := getTPABounds(atpaLogout[k]);
+
+            if (b.getWidth() = LOGOUT_BUTTON_W) and (b.getHeight() = LOGOUT_BUTTON_H) then
+              if (getColor(atpaLogout[k][0].x, atpaLogout[k][0].y + 1) = LOGOUT_BUTTON_COLOR_CHECK) then
+              begin
+                // set the bounds based on the three buttons we have found (lodestone, compass, logout).
+                res := [atpaCompass[j][0].x + COMPASS_CENTER_OFFSET.x, atpaCompass[j][0].y + COMPASS_CENTER_OFFSET.y,
+                        atpaLogout[k][0].x + LOGOUT_BUTTON_OFFSET_X, midLodestone.y + LODESTONE_OFFSET_Y];
+
+                self.setBounds(res);
+                self.__createMask();
+
+                print('TRSMinimap.__find(): Sucesfully found and set minimap bounds at ' + toStr(self.getBounds()));
+
+                exit(true);
+              end;
+          end;
+        end;
+    end;
+  end;
+end;
+{function TRSMinimap.__find(useDebug: boolean = true): boolean;
 const
   COMPASS_CENTER_POINT_COLOR  = 8508157;
   ARBITRARY_UNIQUE_COLOR_ON_WORLD_MAP_BUTTON = 4615518;
@@ -593,7 +666,7 @@ begin
 
   if (useDebug) then
     print('TRSMinimap.__find(): '+toStr(result), TDebug.FOOTER);
-end;
+end; }
 {$ENDIF}
 
 {*
