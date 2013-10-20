@@ -12,6 +12,7 @@ The source for this file can be found `here <https://github.com/SRL/SRL-6/blob/m
 {$include_once interfaces.simba}
 {$include_once ../interfaces/gametabs/backpack.simba}
 {$include_once ../core/text.simba}
+{$include_once ../utilities/color.simba}
 
 {$f-}
 
@@ -49,6 +50,10 @@ const
   QUICK_DEPOSIT_EQIUPMENT   = 1;
   QUICK_DEPOSIT_BOB         = 2;
   QUICK_DEPOSIT_MONEY_POUCH = 3;
+
+const
+  WITHDRAW_AMOUNT_ALL = -1;
+  WITHDRAW_AMOUNT_ALL_BUT_ONE = -2;
 
 (*
 type TRSBankScreen
@@ -214,6 +219,7 @@ Example:
 function TRSBankScreen.isOpen(waitTime: integer = 0): boolean;
 var
   t: integer;
+  b: TBox;
 begin
   t := getSystemTime() + waitTime;
   result := false;
@@ -245,7 +251,7 @@ key.
 .. note::
 
     - by Olly
-    - Last Updated: 15 June 2013 by Olly
+    - Last Updated: 19 October 2013 by Olly
 
 Example:
 
@@ -256,27 +262,64 @@ Example:
 *)
 function TRSBankScreen.close(): boolean;
 var
-  timeOut: integer;
+  timeOut, t: integer;
 begin
-  timeOut := getSystemTime() + 5000;
+  result := false;
+  timeOut := (getSystemTime() + 10000);
+  t := 0;
 
-  result := (not self.isOpen());
+  if (not self.isOpen()) then
+    exit(true);
 
-  if (not result) then
+  typeByteWait(VK_ESCAPE, 150 + random(100));
+  wait(50 + random(50));
+
+  while (timeOut > getSystemTime()) do
   begin
-    typeByte(VK_ESCAPE);
-    wait(20 + random(30));
-
-    while (not result) and (timeOut > getSystemTime()) do
+    if (not self.isOpen()) then
     begin
-      result := (not self.isOpen());
-      wait(300 + random(300));
+      result := true;
+      break;
+    end;
+
+    inc(t);
+
+    wait(150 + random(100));
+
+    // more than 9 loops, let's press the escape key again
+    if (t > 9) then
+    begin
+      typeByteWait(VK_ESCAPE, 50 + random(100));
+      wait(50 + random(50));
+      t := 0;
     end;
   end;
 
   print('bankScreen.close(): result = ' + boolToStr(result), TDebug.SUB);
 end;
 
+(*
+TRSBankScreen._isDepositButtonVaild
+~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+
+.. code-block:: pascal
+
+    function TRSBankScreen._isDepositButtonVaild(depositType: integer): boolean;
+
+Returns if the deposit button is vaild or not.
+
+.. note::
+
+    - by Olly
+    - Last Updated: 20 October 2013 by Olly
+
+Example:
+
+.. code-block:: pascal
+
+    if (bankscreen._isDepositButtonVaild(DEPOSIT_BUTTON_DEPOSIT_ALL)) then
+      writeln('yey!');
+*)
 function TRSBankScreen._isDepositButtonVaild(depositType: integer): boolean;
 const
   DEPOSIT_BUTTON_LOW = 0;
@@ -288,6 +331,28 @@ begin
     print('bankScreen._isDepositButtonVaild(): Button "' + intToStr(depositType) + '" is invaild', TDebug.WARNING);
 end;
 
+(*
+TRSBankScreen._isBankSlotVaild
+~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+
+.. code-block:: pascal
+
+    function TRSBankScreen._isBankSlotVaild(slot: integer): boolean;
+
+Returns if the bank slot is vaild or not.
+
+.. note::
+
+    - by Olly
+    - Last Updated: 20 October 2013 by Olly
+
+Example:
+
+.. code-block:: pascal
+
+    if (bankscreen._isBankSlotVaild(25)) then
+      writeln('yey!');
+*)
 function TRSBankScreen._isBankSlotVaild(slot: integer): boolean;
 const
   BANK_SLOT_LOW = 1;
@@ -354,6 +419,8 @@ Example:
 *)
 function TRSBankScreen.getBankSlotBox(slot: integer): TBox;
 begin
+  result := [-1, -1, -1, -1];
+
   if (not self._isBankSlotVaild(slot)) then
     exit();
 
@@ -400,12 +467,12 @@ begin
 end;
 
 (*
-TRSBankScreen.getPackItemBounds
-~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+TRSBankScreen.getPackSlotBox
+~~~~~~~~~~~~~~~~~~~~~~~~~~~~
 
 .. code-block:: pascal
 
-    function TRSBankScreen.getPackItemBounds(slot: integer): TBox;
+    function TRSBankScreen.getPackSlotBox(slot: integer): TBox;
 
 Returns the TBox of the desired pack item slot in the bank interface.  Pack slots
 start at the top left at 1 and count across the columns.
@@ -413,7 +480,7 @@ start at the top left at 1 and count across the columns.
 .. note::
 
     - by Coh3n
-    - Last Updated: 10 August 2013 by Coh3n
+    - Last Updated: 04 October 2013 by Olly
 
 Example:
 
@@ -425,7 +492,7 @@ Example:
       b := bankscreen.getPackItemBounds(1);
 
 *)
-function TRSBankScreen.getPackSlotBounds(slot: integer): TBox;
+function TRSBankScreen.getPackSlotBox(slot: integer): TBox;
 begin
   if (not inRange(slot, BACKPACK_SLOT_LOW, BACKPACK_SLOT_HIGH)) then
   begin
@@ -733,7 +800,273 @@ begin
   print('bankScreen.quickDeposit(): Clicked quick deposit id ' + intToStr(depositType), TDebug.SUB);
 end;
 
+(*
+TRSBankScreen._enterAmount
+~~~~~~~~~~~~~~~~~~~~~~~~~
 
+.. code-block:: pascal
+
+    function TRSBankScreen._enterAmount(amount, waitTime: integer): boolean;
+
+Will enter the amount of items we want to deposit/withdraw if the interface is open
+extremely similar to the convo box, but is different.
+
+.. note::
+
+    - by Olly
+    - Last Updated: 20 October 2013 by Olly
+
+Example:
+
+.. code-block:: pascal
+
+    bankScreen._enterAmount(50, 5000);
+*)
+function TRSBankScreen._enterAmount(amount, waitTime: integer): boolean;
+var
+  tpa: TPointArray;
+  atpa: T2DPointArray;
+  b: TBox;
+  i, timeOut: integer;
+begin
+  result := false;
+  getClientDimensions(b.x2, b.y2);
+
+  timeout := (getSystemTime() + waitTime);
+
+  dec(b.x2);
+  dec(b.y2);
+
+  repeat
+    if (findColors(tpa, 0, b)) then
+    begin
+      atpa := tpa.cluster(10, 10);
+
+      for i := 0 to high(atpa) do
+        if (findText(tpa[0], 0, 0, ['Enter'], [UpCharsEx], atpa[i].getBounds())) then
+        begin
+          result := true;
+          typeSend(toStr(amount), true);
+          break(2);
+        end;
+    end;
+
+    wait(200 + random(200));
+  until (getSystemTime() > timeOut);
+
+  print('bankScreen._enterAmount(): result = ' + boolToStr(result), TDebug.SUB);
+end;
+
+(*
+TRSBankScreen.withdraw
+~~~~~~~~~~~~~~~~~~~~~~
+
+.. code-block:: pascal
+
+    function TRSBankScreen.withdraw(slot, amount: integer; mouseOverText: TStringArray): boolean;
+
+Withdraws the the amount 'amount' from the bank slot 'slot', if the mouse-over
+text is correct, mouse-over text can also be skipped.
+
+ * extra vaild constants for 'amount' are:
+   - WITHDRAW_AMOUNT_ALL = -1;
+   - WITHDRAW_AMOUNT_ALL_BUT_ONE = -2;
+
+
+.. note::
+
+    - by Olly
+    - Last Updated: 20 October 2013 by Olly
+
+Example:
+
+.. code-block:: pascal
+
+    // To withdraw 28 items from slot 1 if mouseover text is vaild
+    bankscreen.withdraw(1, 28, ['Yew Log', 'Log']);
+
+     // To withdraw all items from slot 10 if mouseover text is vaild
+    bankscreen.withdraw(10, WITHDRAW_AMOUNT_ALL, ['Yew Log', 'Log']);
+
+    // To withdraw 28 items from slot 1 and will *ignore* mouse-over text
+    bankScreen.withdraw(1, 28, ['']);
+*)
+function TRSBankScreen.withdraw(slot, amount: integer; mouseOverText: TStringArray): boolean;
+var
+  b: TBox;
+begin
+  result := false;
+  b := self.getBankSlotBox(slot);
+
+  if (b.x1 = -1) then // invaild slot
+    exit;
+
+  if (not isItemIn(b)) then // no item in the slot?
+    exit;
+
+  mouseBox(b, MOUSE_MOVE);
+
+  if (length(mouseOverText[0]) > 0) then
+    if (not isMouseOverText(mouseOverText, 130 + random(20))) then
+    begin
+      print('bankscreen.withdraw(): Incorrect Mouse-over text, result = false', TDebug.SUB);
+      exit(false);
+    end;
+
+  if (amount = 1) then     // single item? let's just click it
+  begin
+    fastClick(MOUSE_LEFT);
+    wait(400 + random(300));
+    print('bankscreen.withdraw(): result = true', TDebug.SUB);
+    exit(true);
+  end else
+    fastClick(MOUSE_RIGHT);  // more than 1 item? open choose options
+
+  wait(20 + random(50));
+
+  case (amount) of
+    WITHDRAW_AMOUNT_ALL: result := chooseOption.select(['Withdraw-All', '-All']);
+    WITHDRAW_AMOUNT_ALL_BUT_ONE: result := chooseOption.select(['Withdraw-All but one', 'All but one']);
+
+    // check if the number is already availble, else let's withdraw X it
+    else
+      if (not chooseOption.optionsExist(['Withdraw-' + intToStr(amount) + ' ', '-' + intToStr(amount) + ' '])) then
+      begin
+        if (chooseOption.select(['Withdraw-X', '-X'])) then
+          result := (self._enterAmount(amount, 6000))
+      end else
+        result := chooseOption.select(['Withdraw-' + intToStr(amount) + ' ', '-' + intToStr(amount) + ' '])
+   end;
+
+   if (result) then
+     wait(400 + random(300));
+
+   print('bankscreen.withdraw(): result = ' + boolToStr(result), TDebug.SUB);
+end;
+
+(*
+TRSBankScreen.pointToSlot
+~~~~~~~~~~~~~~~~~~~~~~~~~
+
+.. code-block:: pascal
+
+    function TRSBankScreen.pointToSlot(pnt: TPoint): integer;
+
+Returns the slot in which the TPoint 'pnt' fall within, if fails to fall in any
+slot will return -1.
+
+.. note::
+
+    - by Olly
+    - Last Updated: 20 October 2013 by Olly
+
+Example:
+
+.. code-block:: pascal
+
+    writeln(bankscreen.pointToSlot(p));
+*)
+function TRSBankScreen.pointToSlot(pnt: TPoint): integer;
+var
+  i: integer;
+  slots: TBoxArray;
+  hi: integer;
+begin
+  result := -1;
+
+  slots := self.getBankSlotBoxes();
+  hi := high(slots);
+
+  for i := 0 to hi do
+    if (pointInBox(pnt, slots[i])) then
+      exit(i + 1); // +1 since array starts at 0.
+end;
+
+(*
+TRSBankScreen.withdraw; overload
+~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+
+.. code-block:: pascal
+
+    function TRSBankScreen.withdraw(dtm, amount: integer): boolean; overload;
+
+Searches for the dtm 'dtm' in each slot if found, will withdraw the amount
+'amount' from that bank slot.
+
+.. note::
+
+    - by Olly
+    - Last Updated: 20 October 2013 by Olly
+
+Example:
+
+.. code-block:: pascal
+
+    bankScreen.withdraw(dtm, 28);
+*)
+function TRSBankScreen.withdraw(dtm, amount: integer): boolean; overload;
+var
+  p: TPoint;
+  slot: integer;
+  b: TBox;
+begin
+  result := false;
+
+  // just to wait for items to appear in bank
+  b := self.getBankSlotBoxes().getBounds();
+  waitColorCountRange(ITEM_OUTLINE_BLACK, 0, b, 3600 + random(500), 1);
+
+  if (not findDTM(dtm, p.x, p.y, b)) then
+    exit;
+
+  slot := self.pointToSlot(p);
+
+  if (slot <> -1) then
+    result := self.withdraw(slot, amount, ['']);
+end;
+
+(*
+TRSBankScreen.withdraw; overload
+~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+
+.. code-block:: pascal
+
+    function TRSBankScreen.withdraw(bitmap, tolerance, amount: integer): boolean; overload;
+
+Searches for the bitmap 'bitmap' with the tolerance 'tolerance' in each slot
+if found, will withdraw the amount 'amount' from that bank slot.
+
+.. note::
+
+    - by Olly
+    - Last Updated: 20 October 2013 by Olly
+
+Example:
+
+.. code-block:: pascal
+
+    bankScreen.withdraw(bmp, 10, 28);
+*)
+function TRSBankScreen.withdraw(bitmap, tolerance, amount: integer): boolean; overload;
+var
+  p: TPoint;
+  slot: integer;
+  b: TBox;
+begin
+  result := false;
+
+  // just to wait for items to appear in bank
+  b := self.getBankSlotBoxes().getBounds();
+  waitColorCountRange(ITEM_OUTLINE_BLACK, 0, b, 2500 + random(500), 1);
+
+  if (not findBitmapToleranceIn(bitmap, p.x, p.y, b, tolerance)) then
+    exit;
+
+  slot := self.pointToSlot(p);
+
+  if (slot <> -1) then
+    result := self.withdraw(slot, amount, ['']);
+end;
 
 begin
   bankscreen.__init();
