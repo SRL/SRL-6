@@ -541,6 +541,18 @@ begin
 
   for i := 0 to (numberOfLines - 1) do
   begin
+    if (length(linesOfText[i]) < 1) then
+    begin
+      print('__getMouseOverText(): Length linesOfText[i] = 0', TDebug.ERROR);
+      break;
+    end;
+
+    if (length(linesOfText[i][0]) < 1) then
+    begin
+      print('__getMouseOverText(): Length linesOfText[i][0] = 0', TDebug.ERROR);
+      break;
+    end;
+
     colorCheck := fastGetPixel(cleanBitmap, linesOfText[i][0][0].x, linesOfText[i][0][0].y);
 
     if (not textColors.isInArray(colorCheck)) then
