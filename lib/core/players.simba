@@ -938,7 +938,7 @@ begin
       -1: result := [__LOGIN_NOT_MEMBER,     0,         1,  'true'   ];
       -1: result := [__LOGIN_ERROR_CONNECT,  20000,     9,  'halt'   ];
       -1: result := [__LOGIN_TOO_MANY,       5 * 60000, 2,  'false'  ];
-      -1: result := [__LOGIN_UPDATE,         0,         0,  'update' ];
+     316: result := [__LOGIN_UPDATE,         0,         0,  'update' ];
       -1: result := [__LOGIN_TOKEN,          0,         0,  'update' ];
      694: result := [__LOGIN_EXPIRE,         0,         0,  'update' ];
       -1: result := [__LOGIN_EXCEED_LIMIT,   20000,     10, ''       ];
@@ -1391,5 +1391,3 @@ begin
   end;
 end;
 
-begin
-end;

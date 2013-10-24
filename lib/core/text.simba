@@ -313,70 +313,48 @@ Example:
 *}
 {$IFNDEF CODEINSIGHT}
 function __findMouseOverBox(out box: TBox): boolean;
+const
+  BORDER_COLOR = 3024407;
+  BORDER_TOLERANCE = 6;
+  COLOR_CHECK = 7103059;
 var
-  h, i, j, len, w, y2OfBounds: integer;
+  mousePnt: TPoint;
+  clientArea, searchBox: TBox;
   tpa: TPointArray;
   atpa: T2DPointArray;
+  i: integer;
+  b: TBox;
 begin
-  getClientDimensions(w, h);
+  result := false;
 
-  if (not (findColors(tpa, 11579568, 0, 0, w -1, h - 1))) then // Grey text box border
-    exit(false);
+  getMousePos(mousePnt.x, mousePnt.y);
+  getClientDimensions(clientArea.x2, clientArea.y2);
 
-  box := intToBox(-1, -1, -1, -1);
+  dec(clientArea.x2); dec(clientArea.y2);
 
-  atpa := splitTPAEx(tpa, 2, 2); // Group the points we found
-  atpa.filterBetween(0, 5); // get rid of tiny tpa's
+  searchBox := [mousePnt.x - 200, mousePnt.y - 100, mousePnt.x + 350, mousePnt.y + 150];
+  searchBox.setLimit(clientArea);
 
-  len := length(atpa);
+  if (not findColorsTolerance(tpa, BORDER_COLOR, searchBox, BORDER_TOLERANCE)) then
+    exit;
 
-  if (len < 1) then // no points left over after removing tiny tpa's
-    exit(false);
+  atpa := tpa.cluster(1, 1);
+  atpa.sortBySize(true);
 
-  setLength(tpa, len); // Repurpose tpa variable to contain midpoints of the tpas stored in atpa
+  for i := 0 to high(atpa) do
+  begin
+    b := atpa[i].getBounds();
 
-  for i := 0 to (len - 1) do // Get midpoint of each group
-    tpa[i] := middleTPA(atpa[i]);
+    if (b.getWidth() < 20) or (b.getHeight() < 10) then
+      continue;
 
-  for i := 0 to (len - 1) do // Compare each midpoints to every other midpoint
-    for j := 0 to (len - 1) do
-      if (tpa[i].y = tpa[j].y) then // If the y coordinates are the same, then the two midpoints are horizontally aligned
-      begin
-        if (distance(tpa[i], tpa[j]) < 15) then // if the box width is less than 15, then its too small
-          continue;
-
-        if (not (tpa[i].x = tpa[j].x)) then // If the x coordinates are also the same, then we are comparing the same point and should continue the inner loop
-        begin // Otherwise, we have two horizontally-aligned midpoints, which means they are most likely the left and right edges of the box
-
-          y2OfBounds := getTPABounds(atpa[i]).y2 + 5; // Gets the y2 bound of our return box based on the bottom of one of the edge strips
-
-          if (getColor(((tpa[i].x + tpa[j].x) div 2), y2OfBounds + 1)) then // If we get the edge color at the point halfway between the two lines we are testing, and down where the bottom edge should be
-          begin // Then we have definitely found the box
-
-            box.y2 := y2OfBounds; // Here, we set the y2 coordinate of our return box based on the y2 coordinate of the bottom pixel in the group that our midpoint is in
-            break(2); // Break out of both loops
-           end;
-        end else
-          continue;
-      end;
-
-  if (box.y2 = -1) then // If the y2 coordinate of our return box is still -1, we did not find any horizontally-aligned groups and should return false
-    exit(false);
-
-  if (tpa[i].x > tpa[j].x) then // If the first midpoint is actually further right than the second midpoint, we will swap the indexes so that we just need the code below, and not a duplicate set based on a condition
-    swap(i, j);
-
-  box.x1 := (tpa[i].x + 1); box.x2 := (tpa[j].x - 1); // The x1 coordinate of our return box is the x coordinate of our first midpoint + 1 to get just the black of the hover-text box and not the grey of the border, similar process for the x2 coordinate
-
-  j := (tpa[i].y - (box.y2 - tpa[i].y)); // Difference between y coordinate of the midpoint of one of the edges and the y2 coordinate of the return box, this is then subracted from the y coordinate of the midpoint to get the y1 for our return box
-  box.y1 := j;
-  if (j < 0) then // If j is less than zero, then the box is running off the top of the screen and the y1 coordinate should be set to zero, otherwise there will be out-of-range errors
-    box.y1 := 0
-
-  if (getColor((box.x1 + box.x2) div 2, box.y1) = 11579568) then // The box is sometimes not perfectly symmetric with respect to being reflected around the horizontal line through the box
-    inc(box.y1); // So occasionally we end up with the top 1px of the box, which includes the border, we don't want that
-
-  result := true;
+    if (getColor(b.x1, b.y1 -1) and getColor(b.x2, b.y2 +1) = COLOR_CHECK) then
+    begin
+      box := [b.x1 + 3, b.y1 + 3, b.x2 - 3, b.y2 - 3];
+      result := true;
+      break;
+    end;
+  end;
 end;
 {$ENDIF}
 
@@ -704,9 +682,51 @@ begin
 
 end;
 
+function getMouseOverTextCount(): integer;
+var
+  bmpClean, bmpFiltered: integer;
+  tpa: TPointArray;
+  box: TBox;
+begin
+  result := -1;
+
+  if (__findMouseOverBox(box)) then
+  begin
+    __createMouseOverFilter(box, bmpClean, bmpFiltered);
+
+    if (findColorsBitmap(bmpFiltered, tpa, clWhite)) then
+      result := length(tpa);
+
+    freeBitmap(bmpClean);
+    freeBitmap(bmpFiltered);
+  end;
+end;
+
+function isMouseOverTextCount(count: integer; waitTime: integer = 100): boolean;
+var
+  t, c: integer;
+begin
+  print('isMouseOverTextCount()', TDebug.HEADER);
+  t := getSystemTime() + waitTime;
+
+  repeat
+    c := getMouseOverTextCount();
+    print('Current mouse-over text length: "'+ intToStr(c) +'"');
+
+    result := (c = count);
+
+    if (result) then
+      break;
+
+    wait(20 + random(20));
+  until (getSystemTime() > t);
+
+  print('isMouseOverTextCount(): '+ boolToStr(result), TDebug.FOOTER);
+end;
+
 (*
-type _TRSMMButton
-~~~~~~~~~~~~~~~~~
+type TRSChooseOption
+~~~~~~~~~~~~~~~~~~~~
 
 A type that stores the choose option interface properties.
 *)
