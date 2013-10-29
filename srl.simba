@@ -54,6 +54,8 @@ begin
   print('setupSRL()', TDebug.HEADER);
   print('Setting up SRL...');
 
+  setSupressExceptions(true);
+
   {$IFNDEF SMART}
     activateClient();
   {$ELSE}

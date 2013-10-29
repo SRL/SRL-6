@@ -146,6 +146,67 @@ begin
 end;
 
 (*
+TMufasaBitmap.drawBox; overload
+~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+
+.. code-block:: pascal
+
+    procedure TMufasaBitmap.drawBox(x1, y1, x2, y2: integer; fill: boolean; color: TColor); overload;
+
+Draws a box using the x1, y1, x2, y2 parameters, will fill if 'fill' is set to
+true using color 'color'.
+
+.. note::
+
+    - by Olly
+    - Last Updated: 29 October 2013 by Olly
+
+Example:
+
+.. code-block:: pascal
+
+    tmb.drawBox(intToBox(50, 50, 345, 345));
+*)
+procedure TMufasaBitmap.drawBox(x1, y1, x2, y2: integer; fill: boolean; color: TColor); overload;
+begin
+  self.drawBox(intToBox(x1, y2, x2, y2), fill, color);
+end;
+
+(*
+TMufasaBitmap.drawClippedBox
+~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+
+.. code-block:: pascal
+
+    procedure TMufasaBitmap.drawClippedBox(box: TBox; fill: boolean; color: TColor); overload;
+
+Same as the other TMufasaBitmap.drawBox but is clipped so it won't draw off the
+bounds of the bitmap.
+
+.. note::
+
+    - by Olly
+    - Last Updated: 29 October 2013 by Olly
+
+Example:
+
+.. code-block:: pascal
+
+    tmb.drawClippedBox(intToBox(50, 50, 100, 100), true, clLime);
+*)
+procedure TMufasaBitmap.drawClippedBox(box: TBox; fill: boolean; color: TColor);
+var
+  b: TBox;
+begin
+  b.x1 := max(box.x1, 0);
+  b.y1 := max(box.y1, 0);
+  b.x2 := min(box.x2, self.getWidth() - 1);
+  b.y2 := min(box.y2, self.getHeight() - 1);
+
+  self.drawBox(b, fill, color);
+end;
+
+(*
 TMufasaBitmap.drawBoxes
 ~~~~~~~~~~~~~~~~~~~~~~~
 
@@ -541,6 +602,46 @@ Example:
 procedure TMufasaBitmap.drawText(txt: string; pnt: TPoint; color: TColor); overload;
 begin
   self.drawText(txt, pnt, statchars, true, color);
+end;
+
+(*
+TMufasaBitmap.drawClippedText
+~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+
+.. code-block:: pascal
+
+    procedure TMufasaBitmap.drawClippedText(txt: string; pnt: TPoint; font: string; shadow: boolean; color: TColor);
+
+Same as drawText, but is clipped so it won't draw off the bounds of the bitmap.
+
+.. note::
+
+    - by Ollybest
+    - Last Updated: 19 July 2013 by Ollybest
+
+Example:
+
+.. code-block:: pascal
+
+    tmb.drawClippedText('hello world!', point(55, 55), 'StatChars', true, clLime);
+*)
+procedure TMufasaBitmap.drawClippedText(txt: string; pnt: TPoint; font: string; shadow: boolean; color: TColor);
+var
+  tpa, tpaShadow: TPointArray;
+begin
+  tpa := tpaFromText(txt, font);
+  offsetTPA(tpa, pnt);
+
+  if (shadow) then
+  begin
+    tpaShadow := copyTPA(tpa);
+    offsetTPA(tpaShadow, point(1, 1));
+    filterPointsBox(tpaShadow, 0, 0, self.getWidth() -1, self.getHeight() -1);
+    self.drawTPA(tpaShadow, __SHADOW_COLOR);
+  end;
+
+  filterPointsBox(tpa, 0, 0, self.getWidth() -1, self.getHeight() -1);
+  self.drawTPA(tpa, color);
 end;
 
 (*

@@ -145,7 +145,7 @@ Example:
 function TRSBankScreen.__find(): boolean;
 const
   TOP_BORDER_COLOR = 9998984;
-  BOTTOM_BORDER_COLOR = 4998196;
+  BOTTOM_BORDER_COLOR = 4932919;
   TEXT_COLOR = 13618403;
   BUTTON_WIDTH = 107;
 var

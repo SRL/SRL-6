@@ -143,7 +143,7 @@ begin
   setLength(__slots[1], 28);
 
   self.areSlotsLoaded := true;
-  print('TRSTabBackpack)_: Loaded slot arrays');
+  print('TRSTabBackpack.initSlots(): Loaded slot arrays', TDebug.SUB);
 end;
 
 (*

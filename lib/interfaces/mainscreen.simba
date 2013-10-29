@@ -127,16 +127,12 @@ var
 begin
   getClientDimensions(wid, hei);
 
-  wid := wid - 1;
-  hei := hei - 1;
+  wid := (wid - 1);
+  hei := (hei - 1);
   bds.x1 := 0;
   bds.y1 := 0;
 
-  // set the width by subtracting the wider interface of either the minimap or open gametabs area
-  if (minimap.x <= gametabs.visibleTabArea.x1) then
-    bds.x2 := (wid - minimap.w)
-  else
-    bds.x2 := (wid - gametabs.visibleTabArea.getWidth());
+  bds.x2 := minimap.x;
 
   bds.y2 := (actionbar.y);
 
