@@ -114,16 +114,24 @@ Example:
       writeln('The stats tab is currently open!');
 *)
 function TRSTabStats.isOpen(): boolean;
+const
+  BAR_COLOR = 7714304;
 var
   p: TPoint;
   tpa: TPointArray;
+  b: TBox;
 begin
   result := (gameTabs._isTabActive(self.tabIndex));
 
   if (not result) then
-    if (gameTabs.findX(p)) then  //look for the green bar around the total level area
-      if (findColors(tpa, 5872896, intToBox(p.x -150, p.y +300, p.x -100, p.y +380))) then
-        result := inRange(distance(p, tpa.getMiddle()), 350, 370);
+    if (gameTabs.__findGameTabArea()) then
+    begin
+      findColors(tpa, BAR_COLOR, intToBox(gameTabs.visibleTabArea.x1, gameTabs.visibleTabArea.y2 - 35, gameTabs.visibleTabArea.x2, gameTabs.visibleTabArea.y2));
+      result := inRange(length(tpa), 6, 10);
+    end;
+
+  if (not result) then
+    print('TRSTabStats.isOpen() result = false', TDebug.WARNING);
 end;
 
 (*

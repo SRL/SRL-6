@@ -67,7 +67,7 @@ const Color
 Internal color constants used in the gametabs functions.
 *}
 const
-  __COLORS_ACTIVE_TAB = [7037013, 8682089];
+  __COLOR_ACTIVE_TAB = 7037012;
 
 {*
 type TRSGameTab
@@ -93,11 +93,13 @@ A single type for manipulating the entire gametab system.
 type
   TRSGameTabs = record(TRSInterface)
     tabs: array of _TRSGameTab;
-    visibleTabArea,              // the current (set in TRSGameTabs.openTab)
-    __visibleTabAreaSingle,      // when there's only a single tab open (excludes title bar)
+    __tabArea: TBox;
+    visibleTabArea: TBox;        // the current (set in TRSGameTabs.openTab)
+    __visibleTabAreaSingle: TBox; // when there's only a single tab open (excludes title bar)
     __visibleTabAreaMulti: TBox; // when there are multiple tabs open
     __tabSelectionArea: TBox;    // the area where different tabs are clicked to become visible
     navigationGrid: TBoxArray;
+    setAreas: boolean;
   end;
 
 (*
@@ -229,7 +231,7 @@ procedure __freeGameTabs();
 var
   i: integer;
 begin
-  print('Freeing gametabs bitmaps..');
+  print('Freeing gametabs bitmaps...');
 
   for i := 0 to high(gameTabs.tabs) do
     if (gameTabs.tabs[i]._bmpLoaded) then
@@ -273,68 +275,6 @@ begin
 end;
 
 (*
-TRSGameTabs.findX
-~~~~~~~~~~~~~~~~~
-
-.. code-block:: pascal
-
-    function TRSGameTabs.findX(var p: TPoint): boolean;
-
-Finds the X at the top of the game tab area.  Returns it's coordinates in 'p'.
-Used to close gametabs.
-
-.. note::
-
-    - by Coh3n
-    - Last Updated: 26 July 2013 by Coh3n
-
-Example:
-
-.. code-block:: pascal
-
-    if (gameTabs.findX(p)) then
-      mouse(p.rand(3), MOUSE_LEFT);
-*)
-function TRSGameTabs.findX(var p: TPoint): boolean;
-begin
-  p := point(-1, -1);
-
-  // gold color of the X
-  result := findColorTolerance(p.x, p.y, 5621500,
-              self.__visibleTabAreaSingle.x1,
-              self.__visibleTabAreaSingle.y1 - 10,
-              self.__visibleTabAreaSingle.x2,
-              self.__visibleTabAreaSingle.y2, 5);
-end;
-
-(*
-TRSGameTabs.areTabArrowsVisible
-~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
-
-.. code-block:: pascal
-
-    function TRSGameTabs.areTabArrowsVisible(): boolean;
-
-Description of the function here.
-
-.. note::
-
-    - by Coh3n
-    - Last Updated: 26 July 2013 by Coh3n
-
-Example:
-
-.. code-block:: pascal
-
-    Example code here.
-*)
-function TRSGameTabs.areTabArrowsVisible(): boolean;
-begin
-  // the lighter gold color in the top half of the right arrow
-  result := (getColor(self.__tabSelectionArea.x2 - 13, self.__tabSelectionArea.y1 + 9) = 4179955);
-end;
-
-(*
 TRSGameTabs.areMultiOpen
 ~~~~~~~~~~~~~~~~~~~~~~~~
 
@@ -359,18 +299,19 @@ Example:
 function TRSGameTabs.areMultiOpen(): boolean;
 var
   i: integer;
-  atpa: array [0..1] of TPointArray;
+  atpa: T2DPointArray;
   tpa: TPointArray;
 begin
-  if (self.areTabArrowsVisible()) then
-    exit(true);
+  if (not self.__findGameTabArea()) then
+    exit(false);
 
-  for i := 0 to 1 do
-    findColors(atpa[i], __COLORS_ACTIVE_TAB[i], self.__tabSelectionArea);
+  if (findColors(tpa, 3288098, self.__tabSelectionArea)) then // color of a tab
+  begin
+     atpa := tpa.cluster(5, 5);
+     atpa.filterBetween(0, 10);
 
-  tpa := mergeATPA(atpa);
-
-  result := (length(tpa) > 10);
+     result := (length(atpa) > 0);
+  end;
 end;
 
 (*
@@ -399,7 +340,7 @@ function TRSGameTabs.areAnyOpen(): boolean;
 var
   p: TPoint;
 begin
-  result := (self.findX(p) or self.areTabArrowsVisible() or self.areMultiOpen());
+  result := self.__findGameTabArea();
 
   if (not result) then
     print('TRSGameTabs.areAnyOpen(): No gametabs are open', TDebug.WARNING);
@@ -464,45 +405,23 @@ Example:
 
     gameTabs._findTab(p, TAB_BACKPACK, gameTabs._getActiveTabBox());
 *}
-function TRSGameTabs._getActiveTabBox(): TBox;
+function TRSGameTabs._getActiveTabBox(out b: TBox): boolean;
 var
-  p: TPoint;
   tpa: TPointArray;
-  bds: TBox;
-  cols: array [0..1] of integer;
-  atpa: array [0..1] of TPointArray;
-  i: integer;
 begin
-  result := intToBox(-1, -1, -1, -1);
+  result := true;
 
-  if (not self.areAnyOpen()) then
-    exit();
+  if (not self.areMultiOpen()) then // only there is a active tab is multiple are open
+    exit(false);
 
-  if (self.areMultiOpen()) then
-    self.visibleTabArea := self.__visibleTabAreaMulti
-  else
-    self.visibleTabArea := self.__visibleTabAreaSingle;
+  if (not findColors(tpa, __COLOR_ACTIVE_TAB, self.__tabSelectionArea)) then
+  begin
+    print('TRSGameTabs._getActiveTabBox(): Multiple tabs are open but failed to find active tab color', TDebug.ERROR);
+    exit(false);
+  end;
 
-  for i := 0 to 1 do
-    findColors(atpa[i], __COLORS_ACTIVE_TAB[i], self.__tabSelectionArea.x1,
-                                                self.__tabSelectionArea.y1,
-                                                self.__tabSelectionArea.x2,
-                                                self.__tabSelectionArea.y2 - 1); // get rid of stray points on the last line
-
-  tpa := mergeATPA(atpa);
-
-  if (length(tpa) <= 0) then
-    if (self.areMultiOpen()) then
-    begin
-      print('TRSGameTabs._getActiveTabBox(): Failed to find active tab color', TDebug.ERROR);
-      exit;
-    end else begin
-      print('TRSGameTabs._getActiveTabBox(): There''s only a single tab open, failed to identify', TDebug.WARNING);
-      exit;
-    end;
-
-  bds := tpa.getBounds();
-  result := intToBox(bds.x1, bds.y1, bds.x2, bds.y2 + 25);
+  b := tpa.getBounds();
+  incEx(b.y2, 25);
 end;
 
 (*
@@ -544,10 +463,7 @@ var
 begin
   result := -1;
 
-  tabBox := self._getActiveTabBox();
-  //smartImage.drawBox(tabBox, false, clRed);
-
-  if (tabBox.x1 = -1) then
+  if (not self._getActiveTabBox(tabBox)) then
     exit;
 
   // loop through each tab, checking for the bitmap in the active tab slot
@@ -558,6 +474,8 @@ begin
         result := i;
         break;
       end;
+
+  print('TRSGameTabs.getActiveTab(): result ID = ' + intToStr(i));
 end;
 
 (*
@@ -591,13 +509,13 @@ begin
   if (not self._isTabValid(tab)) then
     exit(false);
 
-  tabBox := self._getActiveTabBox();
-  //smartImage.drawBox(tabBox, false, clRed);
+  if (self._getActiveTabBox(tabBox)) then
+    result := self._findTab(p, tab, tabBox);
 
-  if (tabBox.x1 = -1) then
-    exit;
-
-  result := self._findTab(p, tab, tabBox);
+  if (self.areMultiOpen()) then
+    self.visibleTabArea := self.__visibleTabAreaMulti
+  else
+    self.visibleTabArea := self.__visibleTabAreaSingle;
 end;
 
 {*
@@ -676,9 +594,7 @@ begin
   t := (getSystemTime() + 3000);
   while ((getSystemTime() < t) and (not result)) do
   begin
-    if (not anyTabOpen) then
-      result := self.findX(p)
-    else
+    if (self.__findGameTabArea()) then
       result := self._isTabActive(tab);
 
     wait(50 + random(50));
@@ -694,47 +610,91 @@ begin
 end;
 
 {*
-TRSGameTabs._closeTab
-~~~~~~~~~~~~~~~~~~~~~
+TRSGameTabs.__findGameTabArea
+~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
 
 .. code-block:: pascal
 
-    function TRSGameTabs._closeTab(tab: integer): boolean;
+    function TRSGameTabs.__findGameTabArea(): boolean;
 
-Returns true if the 'tab' is closed. The specified tab must be active before
-it can be closed, so it is recommeded that you call gameTabs.openTab() first.
-If possible, use the tab's open() function (i.e. tabBackpack.close()).
+Locates the gametab area, will also set the area if it's not been set before.
+Works in both locked and non logged mode.
 
 .. note::
 
-    - by Coh3n
-    - Last Updated: 26 July 2013 by Coh3n
+    - by Olly
+    - Last Updated: 29 October 2013 by Olly
 
 Example:
 
 .. code-block:: pascal
 
-    if (gameTabs._closeTab(TAB_BACKPACK)) then
-      writeln('Backpack tab is closed');
+   gameTabs.__findGameTabArea();
 *}
-function TRSGameTabs._closeTab(tab: integer): boolean;
+function TRSGameTabs.__findGameTabArea(): boolean;
 var
-  p: TPoint;
+  tpa: TPointArray;
+  atpa: T2DPointArray;
+  searchBox, b: TBox;
+  i, wid, hei, j, hi, res: integer;
+  cols, tols, widths, checks: array [0..1] of integer;
 begin
-  if (not self._isTabValid(tab)) then
-    exit(false);
+  result := false;
+  getClientDimensions(wid, hei);
 
-  if (not self._isTabActive(tab)) then
+  if (not self.setAreas) then
   begin
-    print('TRSGameTabs._closeTab(): Tab '+toStr(tab)+' isn''t open', TDebug.WARNING);
-    print('TRSGameTabs._closeTab(): Consider opening the game tab before trying to close it', TDebug.HINT);
-    exit(false);
+    searchBox := gameTabs.navigationGrid.getBounds();
+
+    dec(searchBox.y1, searchBox.y1 - 1);
+    inc(searchBox.x2, wid - searchBox.x2 - 1);
+  end else
+    searchBox := self.__tabArea;
+
+  widths := [207, 214];
+  cols := [2572908, 4668975];
+  tols := [13, 7];
+  checks := [1913172, 3879459];
+
+  for i := 0 to high(cols) do
+  begin
+    if (not findColorsTolerance(tpa, cols[i], searchBox, tols[i])) then
+      continue;
+
+    atpa := tpa.cluster(1);
+    hi := high(atpa);
+
+    for j := 0 to hi do
+    begin
+      if (length(atpa[j]) < 150) then
+        continue;
+
+      b := atpa[j].getBounds();
+      b.getDimensions(wid, hei);
+
+      if (wid = widths[i]) and (hei = 1) then
+        if (getColor(max(0, b.x1-1), b.y1) = checks[i]) then
+          if (getColor(b.x2 + 2, b.y2) <> 867950) then // check it's not the minimap
+          begin
+            res := (b.y1 - 10);
+            result := true;
+            break(2);
+          end;
+    end;
   end;
 
-  if (self.findX(p)) then
+  if (result) and (not self.setAreas) then
+  with self do
   begin
-    mouse(p.rand(2), MOUSE_LEFT);
-    result := true;
+    print('TRSGametabs.__findGameTabArea(): Setting the gametab areas..', TDebug.SUB);
+
+    __tabArea := [x + 127, res, x + w, y];
+    __visibleTabAreaSingle := [__tabArea.x1, __tabArea.y1 + 12, __tabArea.x2, __tabArea.y2];
+    __visibleTabAreaMulti := [__tabArea.x1, __tabArea.y1 + 44, __tabArea.x2, __tabArea.y2];
+    __tabSelectionArea := [__tabArea.x1, __tabArea.y1 + 12, __tabArea.x2, __visibleTabAreaMulti.y1];
+    visibleTabArea := __visibleTabAreaMulti;
+
+    setAreas := true;
   end;
 end;
 
@@ -764,30 +724,12 @@ function TRSGameTabs.__find(): boolean;
 var
   i, wid, hei: integer;
 begin
-  print('TRSGameTabs.__find()', TDebug.HEADER);
-
   getClientDimensions(wid, hei);
   result := true;
 
   with self do
   begin
     setBounds([wid - 352, hei - 48, wid - 1, hei - 1]);
-
-    __visibleTabAreaSingle := intToBox(wid - 225, hei - 404, wid - 1, hei - 48);
-    __visibleTabAreaMulti  := intToBox(__visibleTabAreaSingle.x1,
-                                       __visibleTabAreaSingle.y1 + 24,
-                                       __visibleTabAreaSingle.x2,
-                                       __visibleTabAreaSingle.y2);
-
-    if (areMultiOpen()) then
-      visibleTabArea := __visibleTabAreaMulti
-    else
-      visibleTabArea := __visibleTabAreaSingle;
-
-    __tabSelectionArea := intToBox(__visibleTabAreaSingle.x1,
-                                   __visibleTabAreaSingle.y1,
-                                   __visibleTabAreaSingle.x2,
-                                   __visibleTabAreaMulti.y1);
 
     // tabs are indexed from left to right, then bottom to top (see constants)
     navigationGrid := grid(8, 6, 31, 31, 42, 36, point(wid - 324, hei - 205));
@@ -836,72 +778,8 @@ begin
       end;
     end;
   end;
-
-  print('Set gametabs bounds based on the client''s size');
-  print('Make sure the gametabs navigation bar, and open tabs are in the bottom right corner of the screen', TDebug.WARNING);
-  print('TRSGameTabs.__find(): '+toStr(result), TDebug.FOOTER);
 end;
 {$ENDIF}
-
-(*
-TRSGameTabs.clearMouseOverText
-~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
-
-.. code-block:: pascal
-
-    procedure TRSGameTabs.clearMouseOverText();
-
-Will clear the mouseover text from the gametab visable area, if the mouseover
-text bounds are overlaping.
-
-.. note::
-
-    - by Olly
-    - Last Updated: 17 August 2013 by Olly
-
-Example:
-
-.. code-block:: pascal
-
-    gameTabs.clearMouseOverText();
-*)
-procedure TRSGameTabs.clearMouseOverText();
-var
-  b: TBox;
-  clientW, clientH: integer;
-  textBounds: TBox;
-  mousePnt, p: TPoint;
-begin
-  // if it's not open, or not overlaping the tab area we're done here
-  if (not isMouseOverMenuOpen(textBounds)) then
-    exit();
-
-  if (not textBounds.overlap(self.visibleTabArea)) then
-    exit();
-
-  print('gameTabs.clearMouseOverText(): Mouseover text overlaps gametab area, moving the mouse', TDebug.SUB);
-
-  getClientDimensions(clientW, clientH);
-  getMousePos(mousePnt.x, mousePnt.y);
-
-  textBounds.setLimit(self.visibleTabArea);
-
-  // TBox is the area where we could move the mouse to hopefully close the text
-  b := [0, 0, mousePnt.x - textBounds.getWidth() + random(5), clientH - 1];
-
-  p := b.getGaussPoint();
-
-  // offset the point closer to the gametab, and closer to the mainscreen
-  if (8 > random(10)) then
-  begin
-    p.x := p.x + GaussRangeInt(0, b.x2 - p.x);
-    p.y := p.y - random(35);
-  end;
-
-  mouse(p);
-
-  print('gameTabs.clearMouseOverText(): Mouse moved to ' + toStr(p), TDebug.SUB);
-end;
 
 function __findGameTabs(): boolean;
 begin
