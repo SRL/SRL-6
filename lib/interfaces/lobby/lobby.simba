@@ -275,7 +275,7 @@ lobby interface to change.
 .. note::
 
     - by Coh3n
-    - Last updated: 23 July 2013 by Coh3n
+    - Last updated: 30 October by Olly
 
 Example:
 
@@ -286,18 +286,26 @@ Example:
 function TRSLobby.findPlayButton(var res: TPoint): boolean;
 var
   tpa: TPointArray;
-  width, height: integer;
+  atpa: T2DPointArray;
+  width, height, i: integer;
 begin
+  result := false;
   getClientDimensions(width, height);
 
-  if (findColors(tpa, 12235426, 0, 0, width - 1, height - 1)) then // top border of the Play button
-    if (length(tpa) = 247) then
-    begin
-      result := true;
-      res := tpa.getMiddle();
-      res.offset(point(0, 10));
-    end else
-      print('TRSLobby.findPlayButton(): Failed to find play button', TDebug.ERROR);
+  if (findColorsTolerance(tpa, 3324410, 0, 0, width -1, height -1, 4)) then
+  begin
+    atpa := tpa.cluster(8, 2);
+
+    for i := 0 to high(atpa) do
+      if (inRange(length(atpa[i]), 620, 680)) then
+      begin
+        res := atpa[i].getMiddle();
+        result := true;
+        break;
+      end;
+  end;
+
+  print('TRSLobby.findPlayButton(): result = ' + boolToStr(result), TDebug.SUB);
 end;
 
 (*

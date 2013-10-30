@@ -470,3 +470,49 @@ begin
 
   cs.apply();
 end;
+
+(*
+type TColorSettings
+~~~~~~~~~~~~~~~~~~~
+
+A record that stores the colors, tolerances, and modiferes of a object
+
+  var
+    bankerColors: TObj;
+
+  begin
+    with bankerColors do
+    begin
+      cols := [454534, 5656565];
+      tols := [15, 20];
+      // modifers for each color (cts, hue, sat)
+      mods := [[2, 0.44, 0.77], [2, 0.44, 0.44]];
+    end;
+  end;
+*)
+type
+  TColorData = record
+    cols, tols: TIntegerArray;
+    mods: array of record cts: byte; hue, sat: extended;  end;
+ end;
+
+function TColorData.gather(out tpa: TPointArray; searchArea: TBox): boolean;
+var
+  atpa: T2DPointArray;
+  i, h: integer;
+begin
+  h := high(self.cols);
+
+  setLength(atpa, h +1);
+
+  for i := 0 to h do
+    findColorsTolerance(atpa[i], self.cols[i], searchArea, self.tols[i],
+                        colorSetting(self.mods[i].cts, self.mods[i].hue, self.mods[i].sat));
+
+  tpa := mergeATPA(atpa);
+
+  if (h > 0) then
+    clearDoubleTPA(tpa);
+
+  result := (length(tpa) > 0);
+end;

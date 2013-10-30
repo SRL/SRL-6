@@ -343,16 +343,6 @@ var
 begin
   bounds := self.getBounds();
 
-  print('minimap.createMask()', TDebug.HEADER);
-
-  print('bounds = ' + toStr(bounds));
-  if (bounds.x1 > bounds.x2) or (bounds.y1 > bounds.y2) then
-    print('bounds aren''t vaild!')
-  else
-    print('bounds are vaild');
-
-  print('minimap.createMask()', TDebug.FOOTER);
-
   try
 
     // bitmap of a corner of the minimap
