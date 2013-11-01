@@ -601,7 +601,7 @@ Example:
 *)
 procedure TMufasaBitmap.drawText(txt: string; pnt: TPoint; color: TColor); overload;
 begin
-  self.drawText(txt, pnt, statchars, true, color);
+  self.drawText(txt, pnt, 'StatChars', true, color);
 end;
 
 (*
@@ -772,6 +772,7 @@ begin
   self.drawText(txt, pnt, sysFont, shadow, color);
 
   font.free();
+  freeFont(sysFont);
 end;
 
 (*

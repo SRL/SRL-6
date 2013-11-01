@@ -147,6 +147,16 @@ begin
 end;
 {$ENDIF}
 
+function TRSMainscreen.getPlayerPoint(offset: TPoint = [0, 0]): TPoint;
+var
+  wid, hei: integer;
+begin
+  getClientDimensions(wid, hei);
+
+  result := [wid div 2, hei div 2];
+  result.offset(offset);
+end;
+
 (*
 TRSMainscreen.setAngle
 ~~~~~~~~~~~~~~~~~~~~~~

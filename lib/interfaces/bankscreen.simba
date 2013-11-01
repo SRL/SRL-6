@@ -55,6 +55,9 @@ const
   WITHDRAW_AMOUNT_ALL = -1;
   WITHDRAW_AMOUNT_ALL_BUT_ONE = -2;
 
+const
+  BANK_NPC = 0;
+
 (*
 type TRSBankScreen
 ~~~~~~~~~~~~~~~~~~
@@ -1066,6 +1069,18 @@ begin
 
   if (slot <> -1) then
     result := self.withdraw(slot, amount, ['']);
+end;
+
+function TRSBankScreen.__openNPC(): boolean;
+begin
+
+end;
+
+function TRSBankScreen.open(bankType: integer): boolean;
+begin
+  case bankType of
+    BANK_NPC: result := self.__openNPC();
+  end;
 end;
 
 begin

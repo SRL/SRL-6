@@ -297,40 +297,6 @@ begin
 end;
 
 (*
-debugBitmap
-~~~~~~~~~~~
-
-.. code-block:: pascal
-
-    procedure debugBitmap(Bmp: Integer);
-
-Shows a bitmap in the debug image window.
-
-.. note::
-
-    - by Cazax
-    - Last Updated: 12 April 2013 by Coh3n
-
-Example:
-
-.. code-block:: pascal
-
-    debugBitmap(bmp);
-*)
-procedure debugBitmap(Bmp: Integer);
-var
-  W, H: Integer;
-begin
-  try
-    GetBitmapSize(Bmp, W, H);
-    DisplayDebugImgWindow(W, H);
-    DrawBitmapDebugImg(Bmp);
-  except
-    print('Error in DebugBitmap', TDebug.error);
-  end;
-end;
-
-(*
 debugATPA
 ~~~~~~~~~
 
@@ -476,6 +442,11 @@ procedure takeScreenshot(fileName: string);
 begin
   saveScreenshot(logPath + timeRunning() + '_' + fileName);
   print('Saving screenshot: '+fileName, TDebug.SUB);
+end;
+
+procedure debugBitmap(bmp: integer);
+begin
+  getMufasaBitmap(bmp).debug();
 end;
 
 begin

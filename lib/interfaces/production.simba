@@ -1,0 +1,110 @@
+(*
+Pinscreen
+=========
+
+The pinscreen file holds functions and procedures that are used in the
+Runescape pinscreen.
+
+The source for this file can be found `here <https://github.com/SRL/SRL-6/blob/master/lib/interfaces/pinscreen.simba>`_.
+
+*)
+
+{$f-}
+
+{$include_once interfaces.simba}
+
+type
+  TRSProductionScreen = type TRSInterface;
+
+var
+  productionScreen: TRSProductionScreen;
+
+procedure TRSProductionScreen.__init();
+begin
+  with (self) do
+  begin
+    name := 'RS Production Screen';
+    ID := ID_INTERFACE_PRODUCTION;
+    parentID := -1;
+    static := false;
+  end;
+end;
+
+function TRSProductionScreen.__find(): boolean;
+const
+  BOX_DIMENSION = 35;
+  COL_BACKGROUND = 921102;
+  COL_BORDER = 1064046;
+var
+  bw, bh, i, wid, hei: integer;
+  tpa: TPointArray;
+  atpa: T2DPointArray;
+  b: TBox;
+begin
+  result := false;
+
+  getClientDimensions(wid, hei);
+
+  if (findColors(tpa, COL_BORDER, 0, 0, wid-1, hei-1)) then // brown border
+  begin
+    atpa := tpa.cluster(10, 10);
+
+    for i := 0 to high(atpa) do
+    begin
+      b := atpa[i].getBounds();
+      b.getDimensions(bw, bh);
+
+      if (bw and bh = BOX_DIMENSION) then // so it's a square
+        if (getColor(b.x1 -4, b.y1) = COL_BACKGROUND) then // check b.x1 -4 is the backgound color
+          if (countColor(clWhite, b.x1, b.y1, min(b.x2 + 100, wid -1), b.y2) > 5) then // find some white text to the right
+          begin
+            b.edit(-240, -42, 230, 248);
+            self.setBounds(b);
+            exit(true);
+          end;
+    end;
+  end;
+end;
+
+function TRSProductionScreen.isOpen(waitTime: integer = 0): boolean;
+var
+  t: integer;
+begin
+  t := getSystemTime() + waitTime;
+
+  repeat
+    if (self.__find()) then
+    begin
+      result := true;
+      break;
+    end;
+
+    if (waitTime > 0) then
+      wait(25 + random(25));
+
+  until (getSystemTime() >= t);
+
+  print('TRSProductionScreen.isOpen(): result = '+lowercase(boolToStr(result))+' ('+intToStr(getSystemTime() + waitTime - t)+'ms)', TDebug.SUB);
+end;
+
+function TRSProductionScreen.clickBlueButton(): boolean;
+var
+  b: TBox;
+begin
+  result := false;
+
+  if (self.isOpen()) then
+  begin
+    b := [self.x +252, self.y + h - 30, self.x + w - 29, self.y + h-3];
+    mouseBox(b, MOUSE_LEFT);
+
+    result := true;
+    wait(150 + random(150));
+  end;
+
+  print('TRSProductionScreen.clickBlueButton(): result = ' + lowercase(boolToStr(result)), TDebug.SUB);
+end;
+
+begin
+  productionScreen.__init();
+end;
