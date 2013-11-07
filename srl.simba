@@ -37,6 +37,7 @@ SRL library isn't available to you.
 {$include_once lib/interfaces/chatbox.simba}
 {$include_once lib/interfaces/conversationbox.simba}
 {$include_once lib/interfaces/production.simba}
+{$include_once lib/interfaces/chooseoption.simba}
 
 {$include_once lib/misc/srlstats.simba}
 {$include_once lib/misc/antiban.simba}
