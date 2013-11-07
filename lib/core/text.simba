@@ -146,6 +146,21 @@ begin
   until(getSystemTime() > t);
 end;
 
+function extractTextFromTPA(tpa: TPointArray; minvspacing, maxvspacing, hspacing: integer; font: string): string;
+var
+  atpa: T2DPointArray;
+  b: TBox;
+begin
+  if (length(tpa) < 1) then
+    exit;
+
+  atpa := clusterTPAEx(tpa, minvspacing, hspacing);
+  b := getTPABounds(tpa);
+
+  sortATPAFromFirstPointX(atpa, point(b.x1, b.y1 + b.getHeight() div 2));
+  result := getTextATPA(atpa, maxvspacing, font);
+end;
+
 (*
 mouseText
 ~~~~~~~~~
@@ -288,6 +303,146 @@ begin
     TypeByte(VK_ENTER);
 end;
 
+var
+  tmpLoadedFont: boolean;
+
+procedure tmp_createFont();
+var
+  i, j, tmp, bmp: integer;
+  tpa: TPointArray;
+  atpa: T2DPointArray;
+  b: TBox;
+begin
+  writeln('making this font!');
+
+  forceDirectories(fontPath + 'tmpMouseoverChars/');
+
+  bmp := bitmapFromString(1450, 35, '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');
+
+  findColorsBitmap(bmp, tpa, clWhite);
+  atpa := tpa.cluster(1, 10);
+  sortaTPAFromFirstPointX(atpa, point(0, 0));
+
+  j := 33;
+
+  for i := 0 to high(atpa) do
+  begin
+    b := atpa[i].getBounds();
+
+    tmp := createBitmap(b.getWidth()+2, b.getHeight()+2);
+    fastDrawClear(tmp, clBlack);
+
+    offsetTPA(atpa[i], point(-b.x1 +1, -b.y1+1));
+
+    drawTPABitmap(tmp, atpa[i], clWhite);
+    saveBitmap(tmp, fontPath + 'tmpMouseoverChars/' + toStr(j)+'.bmp');
+    freeBitmap(tmp);
+
+    inc(j);
+  end;
+
+  tmp := createBitmap(3, 14);
+  fastDrawClear(tmp, clBlack);
+  saveBitmap(tmp, fontPath + 'tmpMouseoverChars/' + '32.bmp');
+
+  freeBitmap(tmp);
+  freeBitmap(bmp);
+end;
+
+procedure ff();
+begin
+  freeFont('tmpMouseoverChars');
+end;
+
+function tmp_ColorToGrayL(Color: Integer): Byte;
+begin
+  Result := Trunc((0.2126 * (Color and $FF)) +
+                  (0.7152 * ((Color shr 8) and $FF)) +
+                  (0.0722 * ((Color shr 16) and $FF)));
+end;
+
+type
+  tmp_TThreshMethod = (tmp_TM_Mean, tmp_TM_MinMax);
+
+
+{
+ temp in here until new simba version is released
+
+ Copyright (c) 2013, Jarl K. Holta || https://github.com/WarPie
+ All rights reserved.
+}
+procedure TMufasaBitmap.tmp_Threshold(Alpha, Beta: Integer; Method: tmp_TThreshMethod; C:Integer);
+var
+  x, y, i, Color, IMin, IMax, ww, hh, w, h: Integer;
+  CurThreshold, Counter: Integer;
+  Temp: array of TByteArray;
+  Tab: array[0..256] of Byte;
+begin
+  w := self.getWidth();
+  h := self.getHeight();
+
+  SetLength(Temp, (H + 2), (W + 2));
+
+  ww := w;;
+  hh := h;
+  Dec(ww);
+  Dec(hh);
+
+  CurThreshold := 0;
+
+  case Method of
+    tmp_TM_Mean:
+    begin
+      for y := 0 to hh do
+      begin
+        Counter := 0;
+        for x := 0 to ww do
+        begin
+          Color := tmp_ColorToGrayL(Self.GetPixel(x, y));
+          Temp[(y + 1)][(x + 1)] := Color;
+          Counter := (Counter + Color);
+        end;
+        CurThreshold := (CurThreshold + (Counter div W));
+      end;
+      if (C < 0) then
+        CurThreshold := ((CurThreshold div H) - Abs(C))
+      else
+        CurThreshold := ((CurThreshold div H) + C);
+    end;
+
+    tmp_TM_MinMax:
+    begin
+      IMin := tmp_ColorToGrayL(Self.GetPixel(0, 0));
+      IMax := IMin;
+      for y := 0 to hh do
+        for x := 0 to ww do
+        begin
+          Color := tmp_ColorToGrayL(Self.GetPixel(x, y));
+          Temp[(y + 1)][(x + 1)] := Color;
+          if (Color < IMin) then
+            IMin := Color
+          else
+            if (Color > IMax) then
+              IMax := Color;
+        end;
+      if (C < 0) then
+        CurThreshold := (((IMax + IMin) div 2) - Abs(C))
+      else
+        CurThreshold := (((IMax + IMin) div 2) + C);
+    end;
+  end;
+
+  CurThreshold := Max(0, Min(CurThreshold, 255));
+  for i := 0 to (CurThreshold - 1) do
+    Tab[i] := Alpha;
+  for i := CurThreshold to 255 do
+    Tab[i] := Beta;
+
+  for y := 1 to h do
+    for x := 1 to w do
+      Self.SetPixel((x - 1), (y - 1), Tab[Temp[y][x]]);
+end;
+
 {*
 __findMouseOverBox
 ~~~~~~~~~~~~~~~~~~
@@ -314,81 +469,53 @@ Example:
 {$IFNDEF CODEINSIGHT}
 function __findMouseOverBox(out box: TBox): boolean;
 const
-  BORDER_COLOR = 3024407;
-  BORDER_TOLERANCE = 6;
-  COLOR_CHECK = 7103059;
+  BORDER_COLOR = 4208424;
+  BORDER_TOLERANCE = 7;
+  COLOR_CHECK = 3616289;
 var
-  mousePnt: TPoint;
+  p: TPoint;
   clientArea, searchBox: TBox;
-  tpa: TPointArray;
+  tpaBorder, tpaColorCheck: TPointArray;
   atpa: T2DPointArray;
-  i: integer;
+  i, h: integer;
   b: TBox;
 begin
   result := false;
 
-  getMousePos(mousePnt.x, mousePnt.y);
+  getMousePos(p.x, p.y);
   getClientDimensions(clientArea.x2, clientArea.y2);
 
   dec(clientArea.x2); dec(clientArea.y2);
 
-  searchBox := [mousePnt.x - 200, mousePnt.y - 100, mousePnt.x + 350, mousePnt.y + 150];
+  searchBox := [p.x - 200, p.y - 100, p.x + 350, p.y + 150];
   searchBox.setLimit(clientArea);
 
-  if (not findColorsTolerance(tpa, BORDER_COLOR, searchBox, BORDER_TOLERANCE)) then
-    exit;
-
-  atpa := tpa.cluster(1, 1);
-  atpa.sortBySize(true);
-
-  for i := 0 to high(atpa) do
+  if (findColorsTolerance(tpaBorder, BORDER_COLOR, searchBox, BORDER_TOLERANCE)) then
   begin
-    b := atpa[i].getBounds();
+    atpa := clusterTPAEx(tpaBorder, 2, 2);
+    sortATPASize(atpa, true);
 
-    if (b.getWidth() < 20) or (b.getHeight() < 10) then
-      continue;
+    h := high(atpa);
 
-    if (getColor(b.x1, b.y1 -1) and getColor(b.x2, b.y2 +1) = COLOR_CHECK) then
+    for i := 0 to h do
     begin
-      box := [b.x1 + 3, b.y1 + 3, b.x2 - 3, b.y2 - 3];
-      result := true;
-      break;
+      b := getTPABounds(atpa[i]);
+
+      if (b.getWidth() < 20) or (b.getHeight() < 10) then // basic size check
+        continue;
+
+      if (findColors(tpaColorCheck, COLOR_CHECK, b)) then  // search for the 4 color check points
+      begin
+        if (length(tpaColorCheck) = 4) then  // should be only 4 corner pixels
+          result := (getColor(b.x1 +1, b.y1) and getColor(b.x2 -1, b.y2) = COLOR_CHECK); // check that two box points are the right color
+
+        box := [b.x1 +1, b.y1 +1, b.x2 -1, b.y2 -1];  // set the result (decrease bounds by 1)
+
+        if (result) then
+          break;
+      end;
     end;
   end;
-end;
-{$ENDIF}
-
-{*
-__createMouseOverFilter
-~~~~~~~~~~~~~~~~~~~~~~~
-
-.. code-block:: pascal
-
-    procedure __createMouseOverFilter(box: TBox; var cleanBitmap, filteredBitmap: integer);
-
-Creates a filtered bitmap to be used to read the mouse-over text.
-
-.. note::
-
-    - by euphemism
-    - Last Modified: 12 August 2013 by euphemism
-
-Example:
-
-.. code-block:: pascal
-
-    __createMouseOverFilter(tmpBox, bmpClean, bmpFiltered);
-*}
-{$IFNDEF CODEINSIGHT}
-procedure __createMouseOverFilter(box: TBox; var cleanBitmap, filteredBitmap: integer);
-begin
-  cleanBitmap := bitmapFromClient(box);
-  filteredBitmap := copyBitmap(cleanBitmap);
-
-  getMufasaBitmap(filteredBitmap).contrast(50);
-  getMufasaBitmap(filteredBitmap).desaturate();
-  getMufasaBitmap(filteredBitmap).contrast(255);
-  getMufasaBitmap(filteredBitmap).posterize(255);
 end;
 {$ENDIF}
 
@@ -420,137 +547,41 @@ Example:
     end;
 *}
 {$IFNDEF CODEINSIGHT}
-function __getMouseOverText(box: TBox; cleanBitmap, filteredBitmap: integer): string;
+function __getMouseOverText(box: TBox): string;
 var
-  numberOfLines, badCounter, colorCheck, i, j, len, w, h, startIndex: integer;
-  font: string;
-  p1, p2: TPoint;
-  firstLineCharactersYCords: TIntegerArray;
-  textColors: TIntegerArray;
-  tpa, midPoints: TPointArray;
-  atpa, tempATPA: T2DPointArray;
-  linesOfText: array of T2DPointArray;
+  tpa: TPointArray;
+  atpa: T2DPointArray;
+  bmp, wid, hei, i, h: integer;
 begin
-  textColors := [
-    4305653,      // Burnt Orange, thin text when you mouse over interface items.
-    12378347,     // Beige, generic mouse-over text color.
-    65535,        // Yellow NPC name when mousing over NPC.
-    16776960,     // Cyan color of object name when mousing over an object.
-    clWhite,      // White that shows up when numbers are displayed in the mouseover boxes that have burnt orange text.
-    13750712,     // Grey-ish blue of inventory items.
-    7067128,      // Gold of inventory items.
-    4231423,       // Orange of item name under equipment tab.
-    2070783       // Orange when mousing a item in bankscreen
-  ];
+  if (not directoryExists(fontPath + 'tmpMouseoverChars')) then
+    tmp_createFont();
 
-  getMufasaBitmap(filteredBitmap).findColors(tpa, clWhite);
-  getBitmapSize(cleanBitmap, w, h);
-
-  atpa := splitTPAEx(tpa, 1, 1);
-  len := length(atpa);
-  setLength(firstLineCharactersYCords, len);
-
-  for i := 0 to (len - 1) do
-    if (not textColors.isInArray(fastGetPixel(cleanBitmap, atpa[i][0].x, atpa[i][0].y))) then
-    begin
-      setLength(atpa[i], 0);
-      inc(badCounter);
-    end;
-
-  sortATPASize(atpa, true);
-  setLength(atpa, len - badCounter);
-
-  len := length(atpa);
-  setLength(midPoints, len);
-
-  sortATPAFromFirstPointX(atpa, point(0, h div 2));
-
-  for i := 0 to (len - 1) do
+  if (not tmpLoadedFont) then
   begin
-    p1 := atpa[i].getMiddle();
-
-    if (numberOfLines <> 0) then
-    begin
-      for j := 0 to (numberOfLines - 1) do
-      begin
-        p2 := atpa[j].getMiddle();
-
-        if (inRange(p1.y, p2.y - 4, p2.y + 4)) then
-          break(2);
-      end;
-
-      firstLineCharactersYCords[numberOfLines] := p1.y;
-      inc(numberOfLines);
-    end else
-    begin
-      firstLineCharactersYCords[numberOfLines] := p1.y;
-      inc(numberOfLines);
-    end;
+    loadFont('tmpMouseoverChars', false);
+    addOnTerminate('ff');
+    tmpLoadedFont := true;
   end;
 
-  setLength(linesOfText, numberOfLines);
+  result := '';
 
-  sortATPAFromFirstPointY(atpa, point(w div 2, 0));
+  bmp := bitmapFromClient(box);
+  getBitmapSize(bmp, wid, hei);
 
-  for i := 0 to (len - 1) do
-    midPoints[i] := atpa[i].getMiddle();
+  getMufasaBitmap(bmp).tmp_Threshold(0, 255, tmp_TM_Mean, 100);
 
-  startIndex := 0;
-
-  for i := 0 to (numberOfLines - 1) do
+  if (findColorsBitmap(bmp, tpa, clRed)) then
   begin
-    setLength(linesOfText[i], len);
+    atpa := tpa.cluster(wid, 2);  // reads : as .. but it will do for now. (split rows)
+    sortATPAFromFirstPointY(atpa, point(wid div 2, 0));
 
-    for j := startIndex to (len - 1) do
-    begin
-      linesOfText[i][j - startIndex] := atpa[j];
+    h := high(atpa);
 
-      if (not inRange(midPoints[j].y, firstLineCharactersYCords[i] - 6, firstLineCharactersYCords[i] + 6)) then
-      begin
-        setLength(linesOfText[i], j - startIndex);
-        startIndex := j;
-        break;
-      end;
-    end;
+    for i := 0 to h do
+      result := result + extractTextFromTPA(atpa[i], 1, 4, 5, {MouseoverCharsRS3}'tmpMouseoverChars') + ' ';
+   end;
 
-    linesOfText[i] := splitTPAEx(mergeATPA(linesOfText[i]), 1, 3);
-    sortATPAFromFirstPointX(linesOfText[i], point(0, h div 2));
-  end;
-
-  for i := 0 to (numberOfLines - 1) do
-  begin
-    if (length(linesOfText[i]) < 1) then
-    begin
-      print('__getMouseOverText(): Length linesOfText[i] = 0', TDebug.ERROR);
-      break;
-    end;
-
-    if (length(linesOfText[i][0]) < 1) then
-    begin
-      print('__getMouseOverText(): Length linesOfText[i][0] = 0', TDebug.ERROR);
-      break;
-    end;
-
-    colorCheck := fastGetPixel(cleanBitmap, linesOfText[i][0][0].x, linesOfText[i][0][0].y);
-
-    if (not textColors.isInArray(colorCheck)) then
-      continue;
-
-    tempATPA := splitTPAEx(atpa[i], 1, 5);
-    sortATPAFromFirstPointX(tempATPA, point(0, 0));
-
-    case (colorCheck) of
-      4305653, clWhite: font := 'SmallChars';
-      12378347, 65535, 16776960, 4231423: font := 'UpCharsEx';
-    else
-      continue;
-    end;
-
-    if (i = 0) then
-      result := result + linesOfText[i].getTextInATPA(5, font)
-    else
-      result := result + ' ' + linesOfText[i].getTextInATPA(5, font);
-  end;
+  freeBitmap(bmp);
 end;
 {$ENDIF}
 
@@ -578,18 +609,11 @@ Example:
 function getMouseOverText(): string;
 var
   box: TBox;
-  bmpClean, bmpFiltered: integer;
 begin
   result := '';
 
   if (__findMouseOverBox(box)) then
-  begin
-    __createMouseOverFilter(box, bmpClean, bmpFiltered);
-    result := __getMouseOverText(box, bmpClean, bmpFiltered);
-
-    freeBitmap(bmpClean);
-    freeBitmap(bmpFiltered);
-  end;
+    result := __getMouseOverText(box);
 end;
 
 (*
@@ -618,7 +642,7 @@ Example:
       mouse(point(x, y), MOUSE_LEFT);
     end;
 *)
-function isMouseOverText(txt: TStringArray; waitTime: integer = 100): boolean;
+function isMouseOverText(txt: TStringArray; waitTime: integer = 150): boolean;
 var
   i, t: integer;
   s: string;
@@ -680,609 +704,6 @@ begin
     wait(20 + random(20));
   end;
 
-end;
-
-function getMouseOverTextCount(): integer;
-var
-  bmpClean, bmpFiltered: integer;
-  tpa: TPointArray;
-  box: TBox;
-begin
-  result := -1;
-
-  if (__findMouseOverBox(box)) then
-  begin
-    __createMouseOverFilter(box, bmpClean, bmpFiltered);
-
-    if (findColorsBitmap(bmpFiltered, tpa, clWhite)) then
-      result := length(tpa);
-
-    freeBitmap(bmpClean);
-    freeBitmap(bmpFiltered);
-  end;
-end;
-
-function isMouseOverTextCount(count: integer; waitTime: integer = 100): boolean;
-var
-  t, c: integer;
-begin
-  print('isMouseOverTextCount()', TDebug.HEADER);
-  t := getSystemTime() + waitTime;
-
-  repeat
-    c := getMouseOverTextCount();
-    print('Current mouse-over text length: "'+ intToStr(c) +'"');
-
-    result := (c = count);
-
-    if (result) then
-      break;
-
-    wait(20 + random(20));
-  until (getSystemTime() > t);
-
-  print('isMouseOverTextCount(): '+ boolToStr(result), TDebug.FOOTER);
-end;
-
-(*
-type TRSChooseOption
-~~~~~~~~~~~~~~~~~~~~
-
-A type that stores the choose option interface properties.
-*)
-type
-  TRSChooseOption = record(TRSInterface)
-    __placeholder: byte;
-  end;
-
-{*
-type __TOption
-~~~~~~~~~~~~~~
-
-A type that stores specific option information.  Each line in the choose option
-menu is a __TOption.
-*}
-type
-  __TOption = record
-    bounds: TBox;
-    str: string;
-  end;
-
-  __TOptionArray = array of __TOption;
-
-(*
-var chooseOption
-~~~~~~~~~~~~~~~~
-
-Variable that stores functions and properties of the Runescape choose option menu.
-
-Example:
-
-.. code-block:: pascal
-
-    if (chooseOption.select(['Mine rock')) then
-      writeln('Mining a rock!');
-*)
-var
-  chooseOption: TRSChooseOption;
-
-(*
-TRSChooseOption.isOpen
-~~~~~~~~~~~~~~~~~~~~~~
-
-.. code-block:: pascal
-
-    function TRSChooseOption.isOpen(debug: boolean = true): boolean;
-
-Will return if the chooseoption menu is open or not.
-
-.. note::
-
-    - by Olly
-    - Last Modified: 12 September 2013 by Olly
-
-Example:
-
-.. code-block:: pascal
-
-    if (chooseOption.isOpen()) then
-      chooseOption.close();
-*)
-function TRSChooseOption.isOpen(debug: boolean = true): boolean;
-var
-  b, clientArea, tpaBounds: TBox;
-  colArr: array [0..2] of integer;
-  i, j, z, width, height: integer;
-  tpa: TPointArray;
-  atpa: T2DPointArray;
-begin
-  result := false;
-
-  getClientDimensions(b.x2, b.y2);
-  clientArea := [0, 0, b.x2 -1, b.y2 -1];
-
-  colArr := [197636 {black}, 3748386 {top blue}, 3618615 {grey}];
-
-  setLength(atpa, length(colArr));
-
-  for i := 0 to high(colArr) do
-    findColors(atpa[i], colArr[i], clientArea);
-
-  tpa := atpa.merge();
-
-  if (length(tpa) < 10) then
-    exit();
-
-  // we can re-use this.. :)
-  setLength(atpa, 0);
-
-  atpa := tpa.split(4, 4);
-  atpa.sortBySize();
-
-  for i := 0 to high(atpa) do
-  begin
-    tpaBounds := atpa[i].getBounds();
-    tpaBounds.getDimensions(width, height);
-
-    // too small
-    if (width < 15) or (height < 10) then
-      continue;
-
-    z := 0;
-
-    // lets see if there's more than 5 black pixels in a row above our bounds
-    for j := tpaBounds.x1 to tpaBounds.x2 do
-      if (getColor(j, tpaBounds.y1 - 1) = 263429) then
-      begin
-        inc(z);
-
-        // more than five black pixels in a row? we've found it
-        if (z > 5) then
-        begin
-          if (debug) then
-            print('chooseOption.isOpen(): result = true');
-
-          // we store the bounds in the chooseoption type.
-          self.setBounds(tpaBounds);
-          exit(true);
-        end;
-      end else
-        z := 0;
-  end;
-end;
-
-(*
-TRSChooseOption.isOpen; overload
-~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
-
-.. code-block:: pascal
-
-    function TRSChooseOption.isOpen(waitTime: integer; debug: boolean = true): boolean; overload;
-
-Overloaded function, reqiures a 'waitTime' parameter. Will wait up to 'waitTime'
-for the chooseoption menu to appear.
-
-.. note::
-
-    - by Olly
-    - Last Modified: 12 September 2013 by Olly
-
-Example:
-
-.. code-block:: pascal
-
-    if (chooseOption.isOpen(500)) then
-    begin
-      writeln('menu appeared!');
-      exit();
-    end;
-*)
-function TRSChooseOption.isOpen(waitTime: integer; debug: boolean = true): boolean; overload;
-var
-  timeOut: integer;
-begin
-  timeOut := (getSystemTime() + waitTime + random(25));
-
-  while (timeOut > getSystemTime()) do
-    if (self.isOpen()) then
-      exit(true)
-    else
-      wait(16 + random(30));
-
-  if (debug) then
-    print('chooseOption.isOpen(): result = false');
-end;
-
-(*
-TRSChooseOption.close
-~~~~~~~~~~~~~~~~~~~~~
-
-.. code-block:: pascal
-
-    function TRSChooseOption.close(): boolean;
-
-Closes the chooseoption menu by moving the mouse off the menu, returns true if succesfull.
-
-.. note::
-
-    - by Olly
-    - Last Modified: 12 September 2013 by Olly
-
-Example:
-
-.. code-block:: pascal
-
-    if (chooseOption.isOpen()) then
-      chooseOption.close();
-*)
-function TRSChooseOption.close(): boolean;
-var
-  b, mouseRange, clientArea: TBox;
-  p: TPoint;
-begin
-  if (not self.isOpen(false)) then
-    exit();
-
-  getClientDimensions(clientArea.x2, clientArea.y2);
-
-  b := self.getBounds();
-  b.edit(-10, -25, 10, 10);
-
-  mouseRange := [b.x1 -50, b.y1 -50, b.x2 +50, b.y2 +50];
-  mouseRange.setLimit([0, 0, clientArea.x2 -1, clientArea.y2 -1]);
-
-  // get a point that is in mouseRange but not in b (choose option bounds);
-  p := mouseRange.getRandomPoint([b]);
-
-  if (p.x <> -1) then
-  begin
-    mouse(p, MOUSE_MOVE);
-    print('chooseOption.close(): Succesfully closed the menu', TDebug.SUB);
-  end else
-    print('chooseOption.close(): Failed to close the menu', TDebug.ERROR);
-end;
-
-{*
-TRSChooseOption.__applyFilter
-~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
-
-.. code-block:: pascal
-
-    procedure TRSChooseOption.__applyFilter(var bmp: TMufasaBitmap);
-
-Filters the choose option bitmap so the only part left is the text.
-Exact same filter as mouseover text.
-
-.. note::
-
-    - by euphemism
-    - Last Updated: 05 October 2013 by Olly
-
-Example:
-
-.. code-block:: pascal
-
-    optionArr := choseOption.__getOptions();
-*}
-{$IFNDEF CODEINSIGHT}
-procedure TRSChooseOption.__applyFilter(var bmp: TMufasaBitmap);
-begin
-  bmp.contrast(50);
-  bmp.desaturate();
-  bmp.contrast(255);
-  bmp.posterize(255);
-end;
-{$ENDIF}
-
-{*
-TRSChooseOption.__getOptions
-~~~~~~~~~~~~~~~~~~~~~~~~~~~~
-
-.. code-block:: pascal
-
-    function TRSChooseOption.__getOptions(): __TOptionArray;
-
-Returns all text & bounds of the ChooseOption text in the TOptionArray.
-
-.. note::
-
-    - by Wizzup?, Narcle, Coh3n & Olly
-    - Last Updated: 05 October 2013 by Olly
-
-Example:
-
-.. code-block:: pascal
-
-    optionArr := choseOption.__getOptions();
-*}
-{$IFNDEF CODEINSIGHT}
-function TRSChooseOption.__getOptions(): __TOptionArray;
-var
-  tmb: TMufasaBitmap;
-  atpa, tmp: T2DPointArray;
-  i, t, hi, tmbW, tmbH, oldCTS, oldTarget: integer;
-  tpaShadow, tpaText: TPointArray;
-  b: TBox;
-begin
-  oldCTS := getToleranceSpeed();
-  oldTarget := getImageTarget();
-
-  //get a TMufasaBitmap of the chooseoption menu (without the border)
-  tmb.init(client.getMBitmaps());
-  tmb.copyClientToBitmap(client.getIOManager(), true, self.x+1, self.y+1, self.x+self.w-1, self.y+self.h-1);
-
-  tmbW := tmb.getWidth() - 1;
-  tmbH := tmb.getHeight() - 1;
-
-  // set the bitmap as our target
-  setTargetBitmap(tmb.getIndex());
-
-  // find the blue background, and the shadow
-  setColorToleranceSpeed(3);
-  findColorsTolerance(tpaShadow, 460291, 0, 0, tmbW, tmbH, 6);
-
-  setColorToleranceSpeed(1);
-
-  self.__applyFilter(tmb);
-
-  findColors(tpaText, clWhite, 0, 0, tmbW, tmbH);
-
-  if (length(tpaText) > 0) then
-  begin
-    setLength(atpa, tmb.getHeight() div 16);
-    setLength(result, length(atpa));
-
-    hi := high(atpa);
-
-    // now, lets gather all the text in lines
-    for i := 0 to hi do
-      findColors(atpa[i], clWhite, 0, (2 + i * 16), tmbW - 1, min((18 + i * 16) - 2, tmbH));
-
-    // restore, free created/old stuff
-    t := getImageTarget();
-    setImageTarget(oldTarget);
-    freeTarget(t);
-
-    setColorToleranceSpeed(oldCTS);
-    tmb.free();
-
-    // sort it in lines (high..low)
-    sortATPAFromFirstPointY(atpa, [tmbW div 2, 0]);
-
-    for i := 0 to hi do
-    begin
-      // split into single chars
-      tmp := atpa[i].split(1, 10);
-      b := atpa[i].getBounds();
-
-      // sort chars from (left..right) and then read the text
-      sortATPAFromFirstPointX(tmp, [b.x1, atpa[i][0].y]);
-      result[i].str := getTextATPA(tmp, 5, UpCharsEx);
-
-      //get the bounds for the option, and offset them so it's in the correct mainscreen postion.
-      result[i].bounds := [b.x1, b.y1, b.x2 + (self.w - b.x2) - 2, b.y2 + 2];
-      result[i].bounds.offset([self.x, self.y]);
-    end;
-
-    // we're done.
-    exit();
-  end;
-
-  // found no text? restore, free created/old stuff
-  t := getImageTarget();
-  setImageTarget(oldTarget);
-  freeTarget(t);
-
-  setColorToleranceSpeed(oldCTS);
-  tmb.free();
-end;
-{$ENDIF}
-
-(*
-TRSChooseOption.optionsExist
-~~~~~~~~~~~~~~~~~~~~~~~~~~~~
-
-.. code-block:: pascal
-
-    function TRSChooseOption.optionsExist(options: TStringArray; matchPercent: extended = 1.00): boolean;
-
-Returns true if any of the options exist, if matchPercent is different from 1.00
-it will use stringmatch, else wont.
-
-.. note::
-
-    - by Olly
-    - Last Modified: 12 September 2013 by Olly
-
-Example:
-
-.. code-block:: pascal
-
-    if chooseOption.optionsExist(['alk here']) then
-      writeln('the option walk here is there!');
-*)
-function TRSChooseOption.optionsExist(options: TStringArray; matchPercent: extended = 1.00): boolean;
-begin
-  if (not self.isOpen(false)) then
-    exit(false);
-
-  result := self._select(options, MOUSE_NONE, false, matchPercent, 0);
-end;
-
-(*
-TRSChooseOption.select
-~~~~~~~~~~~~~~~~~~~~~~
-
-.. code-block:: pascal
-
-function TRSChooseOption._select(txt: TStringArray; mouseAction: integer; aclose: boolean; matchPercent: extended; waitTime: integer): boolean;
-
-  * txt - An array of text you want to find in any of the options.
-  * mouseAction - What to do if we succesfully find a option (MOUSE_MOVE, MOUSE_LEFT, MOUSE_RIGHT, MOUSE_NONE).
-  * aclose - Will we close the menu after we're done with it?
-  * matchPercent - The min percentage that will we count as match (if using stringmatch) if not using stringmatch
-                   and want the old the method of finding txt anywhere in the string set it as 1.00.
-  * waitTime - how long will we wait for the chooseoptions menu to appear?.
-
-.. note::
-
-    - by Olly
-    - Last Modified: 06 September 2013 by Olly
-
-Example:
-
-.. code-block:: pascal
-
-    // to not use string match
-    chooseOption._select(['alk', 'lk To', 'Walk'], MOUSE_LEFT, true, 1.00, 150);
-
-    // to use string match
-    chooseOption._select(['Walk To'], MOUSE_LEFT, true, 0.85, 150);
-*)
-function TRSChooseOption._select(txt: TStringArray; mouseAction: integer; aclose: boolean; matchPercent: extended; waitTime: integer): boolean;
-var
-  optionArr: __TOptionArray;
-  l, i, j: integer;
-  s: TStringArray;
-  a: extended;
-begin
-  result := false;
-
-  print('chooseOption._select():', TDebug.HEADER);
-
-  if (not self.isOpen(waitTime)) then
-  begin
-    print('chooseOption menu never appeared', TDebug.ERROR);
-    print('chooseOption.select() result = false', TDebug.FOOTER);
-    exit();
-  end;
-
-  optionArr := self.__getOptions();
-
-  l := length(optionArr);
-
-  if (l < 1) then
-  begin
-    print('Failed to find any options', TDebug.ERROR);
-    print('chooseOption.select() result = false', TDebug.FOOTER);
-
-    if (aclose) then
-      close();
-
-    exit();
-  end else
-  begin
-    // format the matches so we don't spam the debug box
-    setLength(s, l);
-
-    for i := 0 to (l -1) do
-      s[i] := optionArr[i].str;
-
-    print('Options found: ' + toStr(s));
-  end;
-
-  for i := 0 to high(optionArr) do
-    for j := 0 to high(txt) do
-    begin
-      if (matchPercent = 1.00) then // not using stringmatch
-        if (pos(txt[j], optionArr[i].str) > 0) then
-        begin
-          print('Found option "' + txt[j] + '" in "' + optionArr[i].str + '"');
-          print('chooseOption.select() result = true', TDebug.FOOTER);
-
-          if (mouseAction <> MOUSE_NONE) then
-            mouseBox(optionArr[i].bounds, mouseAction)
-          else // if it's mouse none lets see if we need to close
-            if (aclose) then
-              close();
-
-          exit(true);
-        end else
-          continue;
-
-      // if we're here we are using string match
-      a := stringMatch(optionArr[i].str, txt[j]);
-
-      if (a >= matchPercent) then
-      begin
-        print('Found option "' + txt[j] + '" @ accuracy ' + floatToStr(a));
-        print('chooseOption.select() result = true', TDebug.FOOTER);
-
-        if (mouseAction <> MOUSE_NONE) then
-          mouseBox(optionArr[i].bounds, mouseAction)
-        else // if it's mouse none lets see if we need to close
-          if (aclose) then
-            close();
-
-        exit(true);
-      end;
-   end;
-
-  // close the menu since we found no matches
-  if (aclose) then
-    close();
-
-  print('Failed to find any text matches');
-  print('ChooseOption._select() result = false');
-end;
-
-(*
-TRSChooseOption.select; overload
-~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
-
-.. code-block:: pascal
-
-    function TRSChooseOption.select(txt: TStringArray; waitTime: integer = 150): boolean; overload;
-
-A overloaded function that will use the tradional method.
-
-  * txt: The text we will look for in any of the options.
-  * waitTime: How long we will wait for the chooseoption menu to appear, default set at 150ms.
-
-.. note::
-
-    - by Olly
-    - Last Modified: 12 September 2013 by Olly
-
-Example:
-
-.. code-block:: pascal
-
-    chooseOption.select(['Walk here', 'alk he']);
-*)
-function TRSChooseOption.select(txt: TStringArray; waitTime: integer = 150): boolean; overload;
-begin
-  result := self._select(txt, MOUSE_LEFT, true, 1.00, waitTime);
-end;
-
-(*
-TRSChooseOption.select; overload
-~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
-
-.. code-block:: pascal
-
-    function TRSChooseOption.select(txt: TStringArray; matchPercent: extended; waitTime: integer = 150): boolean; overload;
-
-A overloaded function that will use the "string matching" method.
-
-   * txt: The txt will try and match against in any of the options.
-   * matchPercent: The min percent that we will count a match.
-   * waitTime: How long we will wait for the chooseoption menu to appear, default set at 150ms.
-
-.. note::
-
-    - by Olly
-    - Last Modified: 12 September 2013 by Olly
-
-Example:
-
-.. code-block:: pascal
-
-    chooseOption.select(['Walk here'], 0.80);
-*)
-function TRSChooseOption.select(txt: TStringArray; matchPercent: extended; waitTime: integer = 150): boolean; overload;
-begin
-  result := self._select(txt, MOUSE_LEFT, true, matchPercent, waitTime);
 end;
 
 

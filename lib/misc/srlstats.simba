@@ -314,6 +314,6 @@ begin
       print('No POST return', TDebug.ERROR);
   end;
 
-  print('statsCommit(): '+toStr(result));
+  print('statsCommit(): '+toStr(result), TDebug.FOOTER);
 end;
 

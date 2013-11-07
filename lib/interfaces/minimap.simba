@@ -10,9 +10,10 @@ The source for this file can be found `here <https://github.com/SRL/SRL-6/blob/m
 *)
 
 {$include_once interfaces.simba}
+{$include_once chooseoption.simba}
 {$include_once ../utilities/color.simba}
 {$include_once ../utilities/pixelshift.simba}
-{$include_once ../core/text.simba}
+
 {$f-}
 
 (*
@@ -61,20 +62,6 @@ const
   MM_DOT_PLAYER = 1907997;
   MM_DOT_FRIEND = 5376;
   MM_DOT_TEAM   = 2171941;
-
-(*
-const PixelCount
-~~~~~~~~~~~~~~~~
-
-Stores the max pixel count of the minimap (the actual map area).
-
-Example:
-
-.. code-block:: pascal
-
-*)
-const
-  MM_PIXEL_COUNT = 35785;
 
 (*
 const Locations
@@ -392,7 +379,7 @@ end;
 
 {*
 __freeMinimapMask
-~~~~~~~~~~~~~~~~~~~~~
+~~~~~~~~~~~~~~~~~
 
 .. code-block:: pascal
 
@@ -434,7 +421,7 @@ print debug text if 'useDebug' is set to true.  Set to true by default.
 .. note::
 
     - by euphemism & Olly
-    - Last Updated: 15 October 2013 by Olly
+    - Last Updated: 07 November 2013 by Olly
 
 Example:
 
@@ -443,220 +430,96 @@ Example:
     minimap.__find();
 *}
 {$IFNDEF CODEINSIGHT}
-function TRSMinimap.__find(useDebug: boolean = true): boolean;
+function TRSMinimap.__find(debug: boolean = false): boolean;
 const
-  LODESTONE_H_COLOR = 16579321;
-  LODESTONE_H_WIDTH = 8;
-  LODESTONE_OFFSET_Y = 29;
+  LODESTONE_DATA = [16444894, 9];
+  LODESTONE_OFFSET_Y = 26;
   COMPASS_CENTER_COLOR = 8508157;
-  COMPASS_CENTER_OFFSET: TPoint = [- 23, - 22];
-  LOGOUT_BUTTON_COLOR = 8249;
-  LOGOUT_BUTTON_W = 5;
-  LOGOUT_BUTTON_H = 1;
-  LOGOUT_BUTTON_OFFSET_X = 8;
-  LOGOUT_BUTTON_COLOR_CHECK = 1469355;
+  COMPASS_CENTER_OFFSET: TPoint = [-23, -22];
+  COLOR_LOGOUT_BUTTON = 8249;
+  LOGOUT_BUTTON_OFFSET_X = 4;
 var
-  clientW, clientH, i, j, k: integer;
-  tpa: TPointArray;
-  atpaH, atpaCompass, atpaLogout: T2DPointArray;
-  midLodestone: TPoint;
-  b, res: TBox;
+  atpa, atpaLodestones: T2DPointArray;
+  tpa, compassPoints: TPointArray;
+  clientArea, b: TBox;
+  i, j, wid, hei: integer;
+  p, pp: TPoint;
 begin
   result := false;
+  clientArea := getClientBounds();
 
-  getClientDimensions(clientW, clientH);
+  if (debug) then
+    print('TRSMinimap.__find', TDebug.HEADER);
 
-  if (not findColors(tpa, LODESTONE_H_COLOR, 0, 0, clientW -1, clientH -1)) then
-    exit;
-
-  atpaH := clusterTPAEx(tpa, 5, 1);
-
-  for i := 0 to high(atpaH) do
+  if (findColorsTolerance(tpa, LODESTONE_DATA[0], clientArea, LODESTONE_DATA[1])) then  // collect possible lodestone buttons based on width hei and length.
   begin
-    b := getTPABounds(atpaH[i]);
+    atpa := clusterTPA(tpa, 8);
 
-    if (b.getWidth() = LODESTONE_H_WIDTH) then
+    for i := 0 to high(atpa) do
+      if (length(atpa[i]) = 20) then
+      begin
+        b := getTPABounds(atpa[i]);
+        b.getDimensions(wid, hei);
+
+        if (wid = 8) and (hei = 3) then
+          insert(atpa[i], atpaLodestones);
+      end;
+  end;
+
+  setLength(atpa, 0);
+  setLength(tpa, 0);
+
+  if (length(atpaLodestones) < 1) then // found no lodestone buttons
+  begin
+    if (debug) then
     begin
-      midLodestone := middleTPA(atpaH[i]);
+      print('Found no lodestone buttons..!', TDebug.ERROR);
+      print('TRSMinimap.__find(): result = false');
+    end;
 
-      if (not findColors(tpa, COMPASS_CENTER_COLOR, b.x1, 0, b.x2, b.y2)) then // find the compass color above where we may have found the lodestone 'h'
-        continue;
+    exit;
+  end;
 
-      atpaCompass := clusterTPAEx(tpa, 1, 1); // group found points
-      sortATPASize(atpaCompass, false);
+  if (debug) then
+    print('Found '+toStr(length(atpaLodestones))+' possible lodestone buttons');
 
-      for j := 0 to high(atpaCompass) do
-        if (length(atpaCompass[j]) = 1) and (atpaCompass[j][0].x = midLodestone.x) then  // check if it's a single point and if it's on the x axis of our lodestone 'h'
+  if (findColors(tpa, COMPASS_CENTER_COLOR, clientArea)) then  // search for the middle compass color
+  begin
+    atpa := clusterTPA(tpa, 8);
+    sortATPAFromFirstPointY(atpa, point(0, clientArea.x2 div 2));
+
+    for i := 0 to high(atpaLodestones) do
+      for j := 0 to high(atpa) do
+        if (length(atpa[j]) = 1) then         // if it's a single pixel
         begin
-          if (not findColors(tpa, LOGOUT_BUTTON_COLOR, atpaCompass[j][0].x, 0, clientW -1, atpaCompass[j][0].y)) then // search for the logout button, on the right and above the compass
-            continue;
+          p := atpaLodestones[i].getMiddle();
 
-          atpaLogout := clusterTPAEx(tpa, 1, 1);
+          if (atpa[j][0].x = p.x) and (distance(atpa[j][0], p) > 40) and (atpa[j][0].y < p.y) then  // check that it's on the same x axis, greater than 40 dist and higher than the lodestone button
+            if (findColors(tpa, COLOR_LOGOUT_BUTTON, intToBox(atpa[j][0].x +40, atpa[j][0].y -30, clientArea.x2, atpa[j][0].y - 25))) then  // find logout button color in the area we think it should be
+            begin
+              b := getTPABounds(tpa);                            // vaild logout button
+              result := (length(tpa) and b.getWidth() = 5);
 
-          for k := 0 to high(atpaLogout) do  // check the logout button(s) are the right height, length, and then do a simple color check to make sure
-          begin
-            b := getTPABounds(atpaLogout[k]);
-
-            if (b.getWidth() = LOGOUT_BUTTON_W) and (b.getHeight() = LOGOUT_BUTTON_H) then
-              if (getColor(atpaLogout[k][0].x, atpaLogout[k][0].y + 1) = LOGOUT_BUTTON_COLOR_CHECK) then
+              if (result) then
               begin
-                // set the bounds based on the three buttons we have found (lodestone, compass, logout).
-                res := [atpaCompass[j][0].x + COMPASS_CENTER_OFFSET.x, atpaCompass[j][0].y + COMPASS_CENTER_OFFSET.y,
-                        atpaLogout[k][0].x + LOGOUT_BUTTON_OFFSET_X, midLodestone.y + LODESTONE_OFFSET_Y];
+                self.setBounds([atpa[j][0].x + COMPASS_CENTER_OFFSET.x,                      // set the bounds on the three buttons we have found (compass, logout, lodestone)
+                                atpa[j][0].y + COMPASS_CENTER_OFFSET.y,
+                                b.x2 + LOGOUT_BUTTON_OFFSET_X, p.y + LODESTONE_OFFSET_Y]);
 
-                self.setBounds(res);
                 self.__createMask();
 
-                print('TRSMinimap.__find(): Sucesfully found and set minimap bounds at ' + toStr(self.getBounds()));
-
-                exit(true);
+                print('Succesfully found and set the minimap bounds @ ' + toStr(self.getBounds()));
+                break(2);
               end;
-          end;
+            end;
         end;
-    end;
-  end;
+  end else
+    if (debug) then
+      print('Found no center compass colors');
+
+  if (debug) then
+    print('TRSMinimap.__find(): result = '+boolToStr(result), TDebug.FOOTER);
 end;
-{function TRSMinimap.__find(useDebug: boolean = true): boolean;
-const
-  COMPASS_CENTER_POINT_COLOR  = 8508157;
-  ARBITRARY_UNIQUE_COLOR_ON_WORLD_MAP_BUTTON = 4615518;
-  COLORS: TIntegerArray = [COMPASS_CENTER_POINT_COLOR, ARBITRARY_UNIQUE_COLOR_ON_WORLD_MAP_BUTTON];
-
-  COMPASS_CENTER_POINT_OFFSET: TPoint = [- 23, - 22];
-  ARBITRARY_UNIQUE_COLOR_ON_WORLD_MAP_OFFSET: TPoint = [12, 28];
-  OFFSETS: TPointArray = [COMPASS_CENTER_POINT_OFFSET, ARBITRARY_UNIQUE_COLOR_ON_WORLD_MAP_OFFSET];
-var
-  hh, i, ii, len, ww: integer;
-  wasFound: boolean;
-  searchBox: TBox;
-  tpa: TPointArray;
-  atpa: T2DPointArray;
-  box: TBox;
-begin
-  if (useDebug) then
-    print('TRSMinimap.__find()', TDebug.HEADER);
-
-  result := false;
-  box := intToBox(-1, -1, -1, -1);
-  getClientDimensions(ww, hh);
-  searchBox := intToBox(0, 0, ww - 1, hh - 1);
-
-  for i := 0 to 1 do
-  begin
-
-    if (not findColorsTolerance(tpa, COLORS[i], searchBox, 1)) then //If we didn't find the color of the center of the compass
-    begin
-      if (useDebug) then
-      begin
-        print('Failed to find minimap color '+toStr(i)+' ('+toStr(COLORS[i])+')', TDebug.ERROR);
-        print('TRSMinimap.__find(): False', TDebug.FOOTER);
-      end;
-
-      exit(false);
-    end;
-
-    wasFound := false;
-    len := length(tpa);
-
-    if (not (len = 1)) then //If we found more than one point, then we need to try to find the one for which we are looking
-    begin
-      if (useDebug) then
-        print('Found too many points for color '+toStr(i)+' ('+toStr(COLORS[i])+'), filtering bad points...');
-
-      atpa := splitTPAEx(tpa, 1, 1); //Group found points
-      sortATPASize(atpa, false);
-
-      for ii := 0 to (len - 1) do
-        if (length(atpa[ii]) <> 1) then
-        begin
-
-          continue;
-        end else
-        begin
-
-          wasFound := true;
-          break;
-        end;
-
-      if (not wasFound) then
-      begin
-        if (useDebug) then
-        begin
-          print('Failed to find the proper length TPA for color '+toStr(i)+' ('+toStr(COLORS[i])+')', TDebug.ERROR);
-          print('TRSMinimap.__find(): False', TDebug.FOOTER);
-        end;
-
-        exit(false);
-      end;
-
-      if (i = 1) then
-        if (not ((atpa[ii][0].x > box.x1) and (atpa[ii][0].y > box.y1))) then
-        begin
-          if (useDebug) then
-          begin
-            print('Failed to find world map color right of compass color after filtering', TDebug.ERROR);
-            print('TRSMinimap.__find(): False', TDebug.FOOTER);
-          end;
-
-          exit(false);
-        end;
-
-      if (useDebug) then
-        print('Found color '+toStr(i)+' ('+toStr(COLORS[i])+') after filtering, setting minimap coordinates...');
-
-      if (i = 0) then
-      begin
-
-        box.x1 := tpa[ii].x + OFFSETS[i].x;
-        box.y1 := tpa[ii].y + OFFSETS[i].y;
-      end else
-      begin
-
-        box.x2 := tpa[ii].x + OFFSETS[i].x;
-        box.y2 := tpa[ii].y + OFFSETS[i].y;
-      end;
-    end else
-    begin
-
-      if (i = 1) then
-        if (not ((tpa[0].x > box.x1) and (tpa[0].y > box.y1))) then
-        begin
-          if (useDebug) then
-          begin
-            print('Failed to find world map color right of compass color', TDebug.ERROR);
-            print('TRSMinimap.__find(): False', TDebug.FOOTER);
-          end;
-
-          exit(false);
-        end;
-
-      if (useDebug) then
-        print('Found color '+toStr(i)+' ('+toStr(COLORS[i])+'), setting minimap coordinates...');
-
-      if (i = 0) then
-      begin
-
-        box.x1 := tpa[0].x + OFFSETS[i].x;
-        box.y1 := tpa[0].y + OFFSETS[i].y;
-      end else
-      begin
-
-        box.x2 := tpa[0].x + OFFSETS[i].x;
-        box.y2 := tpa[0].y + OFFSETS[i].y;
-      end;
-    end;
-  end;
-
-  result := true;
-
-  self.setBounds(box);
-  self.__createMask();
-
-  print('TRSMinimap.__find(): Sucesfully found and set minimap bounds at '+toStr(self.getBounds()));
-
-  if (useDebug) then
-    print('TRSMinimap.__find(): '+toStr(result), TDebug.FOOTER);
-end; }
 {$ENDIF}
 
 {*
@@ -1140,12 +1003,14 @@ Example:
 *)
 function TRSMinimap.getColorPercent(color, tolerance: integer): extended;
 var
-  tpa: TPointArray;
+  tpa, tpaMaxPixel: TPointArray;
 begin
+  findColorsBitmap(self.bmpMask, tpaMaxPixel, clWhite);
   findColorsTolerance(tpa, color, self.getBounds(), tolerance);
+
   self.filterPoints(tpa);
 
-  result := (length(tpa) / MM_PIXEL_COUNT * 100);
+  result := (length(tpa) / length(tpaMaxPixel) * 100);
 end;
 
 (*

@@ -172,101 +172,6 @@ begin
 end;
 
 (*
-findColorsTolerance: overload;
-~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
-
-.. code-block:: pascal
-
-    function findColorsTolerance(pnts: TPointArray; const color, xs, ys, xe, ye, tolerance, bitmap: integer): boolean; overload;
-
-Same as regular findColorsTolerance but searches the bitmap.
-
-.. note::
-
-    - by Ollybest
-
-Example:
-
-.. code-block:: pascal
-
-    findColorsTolerance(tpa, clRed, 10, 10, 20, 20, 50, myBitmap);
-
-*)
-function findColorsTolerance(pnts: TPointArray; const color, xs, ys, xe, ye, tolerance, bitmap: integer): boolean; overload;
-var
-  prevTarget, bmpTarget: integer;
-begin
-  if (not bitmapExists(bitmap)) then
-    exit(false);
-
-  prevTarget := getImageTarget();
-  setTargetBitmap(bitmap);
-
-  result := findColorsTolerance(pnts, color, xs, ys, xe, ye, tolerance);
-
-  bmpTarget := getImageTarget();
-  setImageTarget(prevTarget);
-  freeTarget(bmpTarget);
-end;
-
-(*
-findColorsTolerance: overload;
-~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
-
-.. code-block:: pascal
-
-    function findColorsTolerance(pnts: TPointArray; const color: integer; const searchArea: TBox; const tolerance, bitmap: integer): boolean; overload;
-
-Same as regular findColorsTolerance but searches the bitmap and takes a TBox
-variable instead of x1, y1, x2 and y2 variables.
-
-.. note::
-
-    - by Ollybest
-
-Example:
-
-.. code-block:: pascal
-
-    findColorsTolerance(tpa, clLime, area, 50, myBitmap);
-
-*)
-function findColorsTolerance(pnts: TPointArray; const color: integer; const searchArea: TBox; const tolerance, bitmap: integer): boolean; overload;
-begin
-  result := findColorsTolerance(pnts, color, searchArea.x1, searchArea.y1, searchArea.x2, searchArea.y2, tolerance, bitmap);
-end;
-
-(*
-findColorsTolerance: overload;
-~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
-
-.. code-block:: pascal
-
-    function findColorsTolerance(pnts: TPointArray; const color: integer; const searchArea: TBox; const tolerance, bitmap: integer): boolean; overload;
-
-Same as regular findColorsTolerance but searches the entire bitmap.
-
-.. note::
-
-    - by Ollybest
-
-Example:
-
-.. code-block:: pascal
-
-    findColorsTolerance(tpa, clLime, 50, myBitmap);
-
-*)
-function findColorsTolerance(pnts: TPointArray; const color, tolerance, bitmap: integer): boolean; overload;
-var
-  w, h: integer;
-begin
-  getBitmapSize(bitmap, w, h);
-
-  result := findColorsTolerance(pnts, color, 0, 0, w-1, h-1, tolerance, bitmap);
-end;
-
-(*
 findColorSpiral: overload;
 ~~~~~~~~~~~~~~~~~~~~~~~~~~
 
@@ -397,27 +302,26 @@ begin
 end;
 
 (*
-freeDTM
-~~~~~~~
+freeDTMs
+~~~~~~~~
 
 .. code-block:: pascal
 
-    procedure freeDTM(DTMs: TIntegerArray);
+    procedure freeDTMs(DTMs: TIntegerArray);
 
 Free's an array of DTMs.
 
 .. note::
 
-    - by Ollybest
+    - by Olly
 
 Example:
 
 .. code-block:: pascal
 
      freeDTMs([dtm1, dtm2]);
-
 *)
-procedure freeDTM(DTMs: TIntegerArray); overload;
+procedure freeDTMs(DTMs: TIntegerArray);
 var
   i: integer;
 begin
@@ -426,18 +330,18 @@ begin
 end;
 
 (*
-freeBitmap
-~~~~~~~~~~
+freeBitmaps
+~~~~~~~~~~~
 
 .. code-block:: pascal
 
-    procedure freeBitmap(bitmaps: TIntegerArray);
+    procedure freeBitmaps(bitmaps: TIntegerArray);
 
 Free's an array of bitmaps.
 
 .. note::
 
-    - by Ollybest
+    - by Olly
 
 Example:
 
@@ -446,7 +350,7 @@ Example:
      freeBitmaps([bmp1, bmp2]);
 
 *)
-procedure freeBitmap(bitmaps: TIntegerArray); overload;
+procedure freeBitmaps(bitmaps: TIntegerArray);
 var
   i: integer;
 begin
@@ -466,7 +370,7 @@ Returns the name of the bitmap stored in 'index'.
 
 .. note::
 
-    - by Ollybest
+    - by Olly
 
 Example:
 
@@ -491,13 +395,13 @@ Returns the name of the dtm stored in 'index'.
 
 .. note::
 
-    - by Ollybest
+    - by Olly
 
 Example:
 
 .. code-block:: pascal
 
-     n := getDTMName(bmpOre);
+     n := getDTMName(dtmOre);
 *)
 function getDTMName(index: integer): string;
 begin
@@ -1056,4 +960,33 @@ Example:
 function distance(pnt1, pnt2: TPoint): integer; overload;
 begin
   result := distance(pnt1.x, pnt1.y, pnt2.x, pnt2.y);
+end;
+
+(*
+getClientBounds
+~~~~~~~~~~~~~~~
+
+.. code-block:: pascal
+
+    function getClientBounds(): TBox;
+
+Returns the clients bounds.
+
+.. note::
+
+    - by Olly
+
+Example:
+
+.. code-block:: pascal
+
+   b := getClientBounds();
+*)
+function getClientBounds(): TBox;
+var
+  w, h: integer;
+begin
+  getClientDimensions(w, h);
+
+  result := [0, 0, w -1, h -1];
 end;

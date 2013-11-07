@@ -1,11 +1,11 @@
 (*
-Pinscreen
-=========
+Production
+==========
 
 The pinscreen file holds functions and procedures that are used in the
-Runescape pinscreen.
+Runescape production screen.
 
-The source for this file can be found `here <https://github.com/SRL/SRL-6/blob/master/lib/interfaces/pinscreen.simba>`_.
+The source for this file can be found `here <https://github.com/SRL/SRL-6/blob/master/lib/interfaces/production.simba>`_.
 
 *)
 
@@ -13,12 +13,53 @@ The source for this file can be found `here <https://github.com/SRL/SRL-6/blob/m
 
 {$include_once interfaces.simba}
 
+(*
+type TRSProductionScreen
+~~~~~~~~~~~~~~~~~~~~~~~~
+
+A type that stores the production interface properties.
+*)
 type
   TRSProductionScreen = type TRSInterface;
 
+(*
+var productionScreen
+~~~~~~~~~~~~~~~~~~~~
+
+Variable that stores functions and properties of the Runescape production interface.
+
+Example:
+
+.. code-block:: pascal
+
+    if (productionScreen.isOpen() then
+      writeln('Production screen is open!');
+*)
 var
   productionScreen: TRSProductionScreen;
 
+{*
+TRSProductionScreen.__init
+~~~~~~~~~~~~~~~~~~~~~~~~~~
+
+.. code-block:: pascal
+
+    procedure TRSProductionScreen.__init();
+
+Initializes the TRSProductionSceen.
+
+.. note::
+
+    - by Olly
+    - Last Updated: 06 November 2013 by Olly
+
+Example:
+
+.. code-block:: pascal
+
+    productionScreen.__init();
+*}
+{$IFNDEF CODEINSIGHT}
 procedure TRSProductionScreen.__init();
 begin
   with (self) do
@@ -29,7 +70,30 @@ begin
     static := false;
   end;
 end;
+{$ENDIF}
 
+{*
+TRSProductionScreen.__find
+~~~~~~~~~~~~~~~~~~~~~~~~~~
+
+.. code-block:: pascal
+
+    function TRSProductionScreen.__find(): boolean;
+
+Attempts to find the production screen, if found will set the bounds.
+
+.. note::
+
+    - by Olly
+    - Last Updated: 06 November 2013 by Olly
+
+Example:
+
+.. code-block:: pascal
+
+    productionScreen.__find();
+*}
+{$IFNDEF CODEINSIGHT}
 function TRSProductionScreen.__find(): boolean;
 const
   BOX_DIMENSION = 35;
@@ -65,7 +129,32 @@ begin
     end;
   end;
 end;
+{$ENDIF}
 
+(*
+TRSProductionScreen.isOpen
+~~~~~~~~~~~~~~~~~~~~~~~~~~
+
+.. code-block:: pascal
+
+    function TRSProductionScreen.isOpen(waitTime: integer = 0): boolean;
+
+Returns true if the production screen is open, includes a optional parameter
+'waitTime' (default 0) which will search for the production screen until
+'waitTime' is reached.
+
+.. note::
+
+    - by Olly
+    - Last Updated: 06 November 2013 by Olly
+
+Example:
+
+.. code-block:: pascal
+
+    if (productionScreen.isOpen()) then
+      writeln('it''s open!');
+*)
 function TRSProductionScreen.isOpen(waitTime: integer = 0): boolean;
 var
   t: integer;
@@ -87,7 +176,29 @@ begin
   print('TRSProductionScreen.isOpen(): result = '+lowercase(boolToStr(result))+' ('+intToStr(getSystemTime() + waitTime - t)+'ms)', TDebug.SUB);
 end;
 
-function TRSProductionScreen.clickBlueButton(): boolean;
+(*
+TRSProductionScreen.clickStart
+~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+
+.. code-block:: pascal
+
+    function TRSProductionScreen.clickStart(): boolean;
+
+Attempts to click the blue "start" button, returns if succesfull or not.
+
+.. note::
+
+    - by Olly
+    - Last Updated: 06 November 2013 by Olly
+
+Example:
+
+.. code-block:: pascal
+
+    if (productionScreen.clickStart()) then
+      writeln('We started making something!');
+*)
+function TRSProductionScreen.clickStart(): boolean;
 var
   b: TBox;
 begin
@@ -95,14 +206,14 @@ begin
 
   if (self.isOpen()) then
   begin
-    b := [self.x +252, self.y + h - 30, self.x + w - 29, self.y + h-3];
+    b := [self.x +252, self.y + h - 30, self.x + w - 29, self.y + h-3];  // set the bounds based on where the production screen was found
     mouseBox(b, MOUSE_LEFT);
 
     result := true;
     wait(150 + random(150));
   end;
 
-  print('TRSProductionScreen.clickBlueButton(): result = ' + lowercase(boolToStr(result)), TDebug.SUB);
+  print('TRSProductionScreen.clickStart(): result = ' + lowercase(boolToStr(result)), TDebug.SUB);
 end;
 
 begin
