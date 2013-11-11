@@ -10,6 +10,7 @@ The source for this file can be found `here <https://github.com/SRL/SRL-6/blob/m
 *)
 
 {$include_once interfaces.simba}
+{$include_once pinscreen.simba}
 {$include_once ../interfaces/gametabs/backpack.simba}
 {$include_once ../core/text.simba}
 {$include_once ../utilities/color.simba}
@@ -56,7 +57,7 @@ const
   WITHDRAW_AMOUNT_ALL_BUT_ONE = -2;
 
 const
-  BANK_NPC = 0;
+  BANK_NPC_BLUE = 0;
 
 (*
 type TRSBankScreen
@@ -1071,15 +1072,148 @@ begin
     result := self.withdraw(slot, amount, ['']);
 end;
 
-function TRSBankScreen.__openNPC(): boolean;
+function _waitBankOrPinScreen(waitTime: integer): boolean;
+var
+  t: integer;
 begin
+  t := (getSystemTime() + waitTime);
+  result := false;
 
+  while (t > getSystemTime()) do
+  begin
+    if (bankScreen.isOpen()) or (pinScreen.isOpen()) then
+      exit(true);
+
+    wait(25 + random(25));
+  end;
+end;
+
+function TRSBankScreen.__openNPC(): boolean;
+const
+  colorBlue: TColorData = [[5847106, 5188663], [8, 12], [[2, 0.31, 0.15], [2, 0.23, 0.51]]]; {light, dark}
+  colorHair: TColorData = [[1534114, 1918035], [14, 7], [[2, 0.13, 0.78], [2, 0.28, 1.03]]]; {orange, brown}
+var
+  i, j, hi, wid, hei, t, dist: integer;
+  atpa, atpaBody, atpaHair: T2DPointArray;
+  tpa: TPointArray;
+  b, searchArea, mainScreenBox: TBox;
+begin
+  t := getSystemTime();
+
+  result := false;
+  mainScreenBox := mainScreen.getBounds();
+
+  print('TRSBankscreen.__openNPC()', TDebug.HEADER);
+
+  if (colorBlue.gather(tpa, mainScreenBox) and (length(tpa) > 25)) then
+  begin
+    atpa := tpa.cluster(5, 5);
+    hi := high(atpa);
+
+    for i := 0 to hi do
+    begin
+      if (length(atpa[i]) < 20) or (atpa[i].getDensity() < 0.10) then
+        continue;
+
+      atpa[i].getBounds().getDimensions(wid, hei);
+
+      if (wid < 10) or (hei < 10) then
+        continue;
+
+      insert(atpa[i], atpaBody);
+    end;
+
+    print('Found '+intToStr(length(atpaBody))+' possible banker bodys');
+
+    for i := 0 to high(atpaBody) do
+    begin
+      b := getTPABounds(atpaBody[i]);
+
+      searchArea := [b.x1 - 20, b.y1 -20, b.x2 +20, b.y1 + 20];
+      searchArea.setLimit(mainScreenBox);
+
+      if (colorHair.gather(tpa, searchArea)) then
+      begin
+        atpa := tpa.cluster(3, 3);
+
+        for j := 0 to high(atpa) do
+        begin
+          if (length(atpa[j]) < 5) then
+            continue;
+
+          atpa[j].getBounds().getDimensions(wid, hei);
+
+          if (wid > 18) or (hei > 18) or (wid < 2) or (hei < 2) then
+            continue;
+
+          insert(atpa[j], atpaHair);
+        end;
+      end;
+    end;
+
+    print('Found '+intToStr(length(atpaHair))+' possible heads');
+
+    if (length(atpaHair) < 1) or (length(atpaBody) < 1) then
+    begin
+      print('Didn''t find enough hair or bodys');
+      print('TRSBankscreen.__openNPC(): result = '+boolToStr(result), TDebug.FOOTER);
+      exit;
+    end;
+
+    print('Finished gathering in '+intToStr(getSystemTime() - t)+' ms');
+
+    sortATPAFromMidPoint(atpaBody, mainScreen.getPlayerPoint());
+
+    for i := 0 to high(atpaBody) do
+    begin
+      sortTPAByY(atpaBody[i], true);
+
+      for j := 0 to high(atpaHair) do
+      begin
+       dist := (distance(atpaBody[i][0], atpaHair[j].getMiddle()));
+
+       if (dist <= 20) then
+       begin
+         print('Distance between body['+intToStr(i)+'] and hair['+intToStr(j)+'] is less than 20, going to check the mouse-over text');
+
+         mouse(atpaBody[i].getMiddle().randRange(-5, 5));
+
+         if (isMouseOverText(['Talk-to Banker', ' Banker', 'Bank ', 'nk booth'])) then
+         begin
+           print('We found correct mouse-over text');
+           fastClick(MOUSE_RIGHT);
+
+           if (chooseOption.select(['Bank Bank', 'ank Banker', 'ank Bank'])) then
+           begin
+             wait(50 + random(100));
+
+             if (minimap.isFlagPresent()) then
+               minimap.waitFlag(10);
+
+             result := _waitBankOrPinScreen(10000);
+
+             if (result) then
+               print('Bankscreen or pinscreen is open')
+             else
+               print('Bankscreen or pinscreen never opened..');
+
+             break(2);
+           end;
+         end else
+           print('Mouse-over text wasn''t correct..');
+       end;
+      end;
+    end;
+  end else
+    print('Didnt find enough banker blue');
+
+  print('TRSBankscreen.__openNPC(): result = '+boolToStr(result), TDebug.FOOTER);
 end;
 
 function TRSBankScreen.open(bankType: integer): boolean;
 begin
   case bankType of
-    BANK_NPC: result := self.__openNPC();
+    BANK_NPC_BLUE: result := self.__openNPC();
   end;
 end;
 

@@ -379,8 +379,7 @@ TRSChooseOption.optionsExist
 
     function TRSChooseOption.optionsExist(options: TStringArray; matchPercent: extended = 1.00): boolean;
 
-Returns true if any of the options exist, if matchPercent is different from 1.00
-it will use stringmatch, else wont.
+Returns true if any of the options exist.
 
 .. note::
 
@@ -395,11 +394,25 @@ Example:
       writeln('the option walk here is there!');
 *)
 function TRSChooseOption.optionsExist(options: TStringArray; matchPercent: extended = 1.00): boolean;
+var
+  opts: __TOptionArray;
+  i, j: integer;
 begin
-  if (not self.isOpen(false)) then
-    exit(false);
+  result := false;
 
-  result := self._select(options, MOUSE_NONE, false, matchPercent, 0);
+  if (not self.isOpen(false)) then
+    exit;
+
+  opts := self.__getOptions();
+
+  for i := 0 to high(opts) do
+    if (isArrInStr(options, opts[i].str)) then
+    begin
+      print('TRSChooseOptions.optionsExist(): result = true');
+      exit(true);
+    end;
+
+  print('TRSChooseOptions.optionsExist(): result = false');
 end;
 
 (*
@@ -578,4 +591,50 @@ begin
   result := self._select(txt, MOUSE_LEFT, true, matchPercent, waitTime);
 end;
 
+(*
+TRSChooseOption.debugOptions
+~~~~~~~~~~~~~~~~~~~~~~~~~~~~
 
+.. code-block:: pascal
+
+   procedure TRSChooseOption.debugOptions();
+
+Debugs all the found options.
+
+.. note::
+
+    - by Olly
+    - Last Modified: 11 Novemeber 2013 by Olly
+
+Example:
+
+.. code-block:: pascal
+
+    chooseOption.debugOptions();
+*)
+procedure TRSChooseOption.debugOptions();
+var
+  i: integer;
+  options: __TOptionArray;
+begin
+  print('TRSChooseOption.debugOptions()', TDebug.HEADER);
+
+  if (self.isOpen()) then
+  begin
+    options := self.__getOptions();
+
+    if (length(options) > 0) then
+    begin
+      print('Options:', TDebug.HEADER);
+
+      for i := 0 to high(options) do
+        print(toStr(i)+') '+options[i].str);
+
+      print('End of options:', TDebug.FOOTER);
+    end else
+      print('Found no options');
+  end else
+    print('Menu isn''t open');
+
+  print('TRSChooseOption.debugOptions()', TDebug.FOOTER);
+end;

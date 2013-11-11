@@ -618,7 +618,7 @@ TRSGameTabs.__findGameTabArea
     function TRSGameTabs.__findGameTabArea(): boolean;
 
 Locates the gametab area, will also set the area if it's not been set before.
-Works in both locked and non logged mode.
+Works in both locked and non locked mode.
 
 .. note::
 
