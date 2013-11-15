@@ -51,8 +51,8 @@ Variables that can be used in scripts.
 
 *)
 var
-  smartClientWidth: UInt32 := 960;
-  smartClientHeight: UInt32 := 640;
+  smartClientWidth: UInt32 := 800;
+  smartClientHeight: UInt32 := 600;
   smartGetJavaPath: boolean := true;
   smartShowConsole: boolean := true;
   smartForceNewClient: boolean := false;
