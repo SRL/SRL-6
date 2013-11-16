@@ -51,6 +51,7 @@ const
   ID_INTERFACE_CONVERSATION_BOX = 36;
   ID_INTERFACE_PINSCREEN = 37;
   ID_INTERFACE_PRODUCTION = 38;
+  ID_INTERFACE_LODESTONE = 39;
 
   // client - logged out
   ID_INTERFACE_LOBBY        = 40;
@@ -68,6 +69,7 @@ type
     ID, parentID: integer;
     static: boolean;
     x, y, w, h: integer;
+    x1, y1, x2, y2: integer;
   end;
 
 const
@@ -99,7 +101,7 @@ Example:
 *)
 function TRSInterface.getBounds(): TBox;
 begin
-  result := intToBox(self.x, self.y, self.x + self.w, self.y + self.h);
+  result := TBox([x1, y1, x2, y2]);
 end;
 
 (*
@@ -127,8 +129,13 @@ procedure TRSInterface.setBounds(newBounds: TBox);
 begin
   self.x := newBounds.x1;
   self.y := newBounds.y1;
-  self.w := newBounds.x2 - newBounds.x1;
-  self.h := newBounds.y2 - newBounds.y1;
+  self.w := newBounds.x2 - newBounds.x1 +1;
+  self.h := newBounds.y2 - newBounds.y1 +1;
+
+  self.x1 := newBounds.x1;
+  self.y1 := newBounds.y1;
+  self.x2 := newBounds.x2;
+  self.y2 := newBounds.y2;
 end;
 
 (*

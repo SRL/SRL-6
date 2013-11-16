@@ -64,43 +64,6 @@ const
   MM_DOT_TEAM   = 2171941;
 
 (*
-const Locations
-~~~~~~~~~~~~~~~
-
-All possible locations to teleport on the lodestone network.
-
-Example:
-
-.. code-block:: pascal
-
-*)
-const
-  LOCATION_LUNAR_ISLE      = 0;
-  LOCATION_EAGLES_PEAK     = 1;
-  LOCATION_TIRANNWN        = 2;
-  LOCATION_FREMENNIK       = 3;
-  LOCATION_SEERS_VILLAGE   = 4;
-  LOCATION_ARDOUGNE        = 5;
-  LOCATION_YANILLE         = 6;
-  LOCATION_OOGLOG          = 7;
-  LOCATION_BURTHORPE       = 8;
-  LOCATION_CATHERBY        = 9;
-  LOCATION_TRAVERLEY       = 10;
-  LOCATION_KARAMJA         = 11;
-  LOCATION_WILDERNESS      = 12;
-  LOCATION_EDGEVILLE       = 13;
-  LOCATION_FALADOR         = 14;
-  LOCATION_PORT_SARIM      = 15;
-  LOCATION_VARROCK         = 16;
-  LOCATION_DRAYNOR_VILLAGE = 17;
-  LOCATION_LUMBRIDGE       = 18;
-  LOCATION_BANDIT_CAMP     = 19;
-  LOCATION_AL_KHARID       = 20;
-  LOCATION_CANIFIS         = 21;
-  LOCATION_PREVIOUS        = 1337;
-
-
-(*
 const Symbols
 ~~~~~~~~~~~~~
 
@@ -241,6 +204,7 @@ type
   TRSMinimap = record(TRSInterface)
     symbolAccuracy: extended;
     bmpMask: integer;
+    button: array [0..3] of _TRSMMButton;
   end;
 
 (*
@@ -294,88 +258,18 @@ begin
     parentID := -1;
     static := true;
     symbolAccuracy := 0.65;
-    bmpMask := -1;
+    bmpMask := BitmapFromString(224, 189, 'meJzt0kFyAgcQBEH//9P23cEKgViqFzJfMDFd//wDAAAAAN/oX36hXulL1bNfSb3V16kHv556sS9ST31V9W5foR752ur1Plw97yeoN/xY9bCfo17ySuqtuKMOJFa/nzvqQGL1+7mjDqRXL8ChOo0J9QgcqtOYUI/AoTqNCfUIHKrTmFCPwKE6jQn1CByq05hQj8ChOo0J9QgcqtOYUI/AoTqNCfUIHKrTmFCPwKE6jQn1CByq05hQj8ChOo1evQB31IHE6vdzRx1IrH4/d9SBlOrf8yt1Jpn68fxKnUmj/joPqGN5t/rfPKxO5n3qT/OkOpx3qH/Mn9T5nKv+Li9QR3SW+q+8TJ3Si9Xv5BR1Vv/36GHh63ink/p5VPgBPok+WaZPlumTZfpkmT5Zpk+W6ZNl+mSZPlmmT5bpk2X6ZJk+GSdOxomTceJknDgZJ07GiZNx4mScPlmmT5bpk2X6ZJk+WaZPlumTZfpkmT5Zpk+W6ZNl+mSZPlmmT5bpk2X6ZJk+WaZPlumTZfpkmT5Zpk+W6ZNl+mSZPlmmT5bpk2X6ZJk+WaZPlumTZfpkmT5Zpk+W6ZNl+mSZPlmmT5bpk2X6ZJk+WaZPlumTZfpkmT5Zpk+W6ZNl+mSZPlmmT5bpk2X6ZJk+WaZPlumTZfpkmT5Zpk+W6ZNl+mTZ7/uUKG/2UJwS5Z2eiFOivMfTcUqUs/0xTolynpfEKVHO8MI4JcprvTxOifIqJ8WpT15CnyzTJ8v0yTJ9skyfLNMny/TJMn2yTJ8s0yfL9MmyN/SpZ552Xp9Pq1/CiR5t4NTS/iL8IS9X13SK+qm8QB3Ruerv8id1Pu9Q/5gn1eG8T/1pHlYn8271v3lAHUuj/jq/UmeSqR/PfXUjsfr93FEHEqvfz0/qOnr1AvykrmNCPQKH6jQm1CNwW93FinoHbqu7WFHvwG11FyvqHbit7mJFvQO31V2sqHfgtrqLFfUO3FZ3saLegdvqLlbUO3Bb3cWKegduq7tYUe/AbXUXK+oduK3uYkI9AofqNCbUI/CTuo5evQA/qeu4mHqur1MPfj31Yp+g3vDD1fNeW73eV6hHvqp6ty9ST3099WJfpx78SuqtvlQ9+zXUK321evx19T7frt5/Wj0OAAAAAJT+AzNg/o0=');
+    setBounds([576, 12, 799, 200]);
+                                          {bounds  center, radius}
+    button[MM_BUTTON_COMPASS]   := [[583, 18, 616, 52], [599, 35], 16];
+    button[MM_BUTTON_RUN]       := [[759, 18, 793, 52], [776, 35], 16];
+    button[MM_BUTTON_LODESTONE] := [[586, 161, 613, 188], [599, 174], 13];
+    button[MM_BUTTON_MAP]       := [[764, 162, 788, 187], [776, 174], 12];
   end;
+
+  addOnTerminate('__freeMinimapMask');
 end;
 {$ENDIF}
-
-{*
-TRSMinimap.__createMask
-~~~~~~~~~~~~~~~~~~~~~~~
-
-.. code-block:: pascal
-
-    procedure TRSMinimap.__createMask();
-
-Creates a bitmap mask of the minimap, saved as 'minimap.bmpMask' main use is to
-tell if a point is on actual map or not.
-
-.. note::
-
-    - by euphemism
-    - Last Updated: 09 October 2013 by Olly
-
-Example:
-
-.. code-block:: pascal
-
-    minimap.__createMaskTPA();
-*}
-{$IFNDEF CODEINSIGHT}
-procedure TRSMinimap.__createMask();
-var
-  bounds: TBox;
-  bmp, hh, i, tempBmp, ww: integer;
-  drawingPoints: array [0..3] of TPoint;
-begin
-  bounds := self.getBounds();
-
-  try
-
-    // bitmap of a corner of the minimap
-    bmp := bitmapFromString(63, 64, 'meJztztEKwjAAxdD9/09fQRCUzd' +
-          'muXWO35D1wlsXMzC5bEppwsDyjFUfKKxpSXd6iLXXlM5pTUVbRotL' +
-          'Wchy/SSpP/D3xjX7aLl68ePHixYsXfx18i1z8PfGNcvGUnMJ3kSP4' +
-          'XvLx+I7ywfi+8pH47vIx+DPYtfja5TxzC/5/Ek8lnko8lXgq8VTiq' +
-          'e6Ap5nbzStPAZ4G7jWvPLt4mva7eeX5gqdRpT0AxMo+2w==');
-
-    getBitmapSize(bmp, ww, hh);
-    bounds.offset(point(- bounds.x1, - bounds.y1));
-
-    drawingPoints[0] := point(bounds.x1, bounds.y1);
-    drawingPoints[1] := point(bounds.x2 - ww, bounds.y1);
-    drawingPoints[2] := point(bounds.x2 - ww, bounds.y2 - hh);
-    drawingPoints[3] := point(bounds.x1, bounds.y2 - hh);
-
-    if (bitmapExists(self.bmpMask)) then // if it's already created lets set the size, else lets create it.
-    begin
-      print('minimap.__createMask(): Bitmap mask is already created, going to set the size again', TDebug.SUB);
-      setBitmapSize(self.bmpMask, bounds.x2 - bounds.x1 +1, bounds.y2 - bounds.y1 +1)
-    end else begin
-      print('minimap.__createMask(): Creating the bitmap mask', TDebug.SUB);
-
-      self.bmpMask := createBitmap(bounds.x2 - bounds.x1 +1, bounds.y2 - bounds.y1 +1);
-      setBitmapName(self.bmpMask, 'Minimap mask');
-      addOnTerminate('__freeMinimapMask');
-    end;
-
-    fastDrawClear(self.bmpMask, clWhite);
-
-    rectangleBitmap(self.bmpMask, intToBox(7, 7, bounds.x2 - bounds.x1 - 7, bounds.y2 - bounds.y1 - 7), clBlack);
-    invertBitmap(self.bmpMask);
-
-    for i := 0 to 3 do
-    begin
-
-      tempBmp := rotateBitmap(bmp, (- PI / 2) * i);
-      getMufasaBitmap(tempBmp).drawTransparent(drawingPoints[i].x, drawingPoints[i].y, getMufasaBitmap(self.bmpMask));
-      freeBitmap(tempBmp);
-    end;
-  finally
-
-    freeBitmap(bmp);
-  end;
-end;
 
 {*
 __freeMinimapMask
@@ -402,182 +296,15 @@ procedure __freeMinimapMask();
 begin
   print('Freeing the minimap mask');
 
-  if (minimap.bmpMask <> -1) then
+  if (bitmapExists(minimap.bmpMask)) then
     freeBitmap(minimap.bmpMask);
 end;
-{$ENDIF}
 
-{*
-TRSMinimap.__find
-~~~~~~~~~~~~~~~~~
-
-.. code-block:: pascal
-
-    function TRSMinimap.__find(useDebug: boolean = true): boolean;
-
-Attempts to find the interface "minimap", will return if succesfull or not.  Will
-print debug text if 'useDebug' is set to true.  Set to true by default.
-
-.. note::
-
-    - by euphemism & Olly
-    - Last Updated: 07 November 2013 by Olly
-
-Example:
-
-.. code-block:: pascal
-
-    minimap.__find();
-*}
-{$IFNDEF CODEINSIGHT}
-function TRSMinimap.__find(debug: boolean = false): boolean;
-const
-  LODESTONE_DATA = [16444894, 9];
-  LODESTONE_OFFSET_Y = 26;
-  COMPASS_CENTER_COLOR = 8508157;
-  COMPASS_CENTER_OFFSET: TPoint = [-23, -22];
-  COLOR_LOGOUT_BUTTON = 8249;
-  LOGOUT_BUTTON_OFFSET_X = 4;
-var
-  atpa, atpaLodestones: T2DPointArray;
-  tpa, compassPoints: TPointArray;
-  clientArea, b: TBox;
-  i, j, wid, hei: integer;
-  p, pp: TPoint;
+procedure TRSMinimap.filterPointsButton(var tpa: TPointArray; buttonID: integer; minDistOffset: integer = 0);
 begin
-  result := false;
-  clientArea := getClientBounds();
-
-  if (debug) then
-    print('TRSMinimap.__find', TDebug.HEADER);
-
-  if (findColorsTolerance(tpa, LODESTONE_DATA[0], clientArea, LODESTONE_DATA[1])) then  // collect possible lodestone buttons based on width hei and length.
-  begin
-    atpa := clusterTPA(tpa, 8);
-
-    for i := 0 to high(atpa) do
-      if (length(atpa[i]) = 20) then
-      begin
-        b := getTPABounds(atpa[i]);
-        b.getDimensions(wid, hei);
-
-        if (wid = 8) and (hei = 3) then
-          insert(atpa[i], atpaLodestones);
-      end;
-  end;
-
-  setLength(atpa, 0);
-  setLength(tpa, 0);
-
-  if (length(atpaLodestones) < 1) then // found no lodestone buttons
-  begin
-    if (debug) then
-    begin
-      print('Found no lodestone buttons..!', TDebug.ERROR);
-      print('TRSMinimap.__find(): result = false');
-    end;
-
-    exit;
-  end;
-
-  if (debug) then
-    print('Found '+toStr(length(atpaLodestones))+' possible lodestone buttons');
-
-  if (findColors(tpa, COMPASS_CENTER_COLOR, clientArea)) then  // search for the middle compass color
-  begin
-    atpa := clusterTPA(tpa, 8);
-    sortATPAFromFirstPointY(atpa, point(0, clientArea.x2 div 2));
-
-    for i := 0 to high(atpaLodestones) do
-      for j := 0 to high(atpa) do
-        if (length(atpa[j]) = 1) then         // if it's a single pixel
-        begin
-          p := atpaLodestones[i].getMiddle();
-
-          if (atpa[j][0].x = p.x) and (distance(atpa[j][0], p) > 40) and (atpa[j][0].y < p.y) then  // check that it's on the same x axis, greater than 40 dist and higher than the lodestone button
-            if (findColors(tpa, COLOR_LOGOUT_BUTTON, intToBox(atpa[j][0].x +40, atpa[j][0].y -30, clientArea.x2, atpa[j][0].y - 25))) then  // find logout button color in the area we think it should be
-            begin
-              b := getTPABounds(tpa);                            // vaild logout button
-              result := (length(tpa) and b.getWidth() = 5);
-
-              if (result) then
-              begin
-                self.setBounds([atpa[j][0].x + COMPASS_CENTER_OFFSET.x,                      // set the bounds on the three buttons we have found (compass, logout, lodestone)
-                                atpa[j][0].y + COMPASS_CENTER_OFFSET.y,
-                                b.x2 + LOGOUT_BUTTON_OFFSET_X, p.y + LODESTONE_OFFSET_Y]);
-
-                self.__createMask();
-
-                print('Succesfully found and set the minimap bounds @ ' + toStr(self.getBounds()));
-                break(2);
-              end;
-            end;
-        end;
-  end else
-    if (debug) then
-      print('Found no center compass colors');
-
-  if (debug) then
-    print('TRSMinimap.__find(): result = '+boolToStr(result), TDebug.FOOTER);
-end;
-{$ENDIF}
-
-{*
-TRSMinimap._getButton
-~~~~~~~~~~~~~~~~~~~~~
-
-.. code-block:: pascal
-
-    function TRSMinimap._getButton(button: integer): _TRSMMButton;
-
-Returns the bounds, center, and radius of the minimap button in _TRSMMButton.
-
-.. note::
-
-    - by Olly
-    - Last Updated: 08 August 2013 by Olly
-
-Example:
-
-.. code-block:: pascal
-
-    button := minimap._getButton(MM_BUTTON_COMPASS);
-*}
-function TRSMinimap._getButton(button: integer): _TRSMMButton;
-begin
-  case button of
-    MM_BUTTON_COMPASS:
-      with result do
-      begin
-        bounds := [self.x + 6, self.y + 5, self.x + 40, self.y + 39];
-        center := bounds.getMiddle();
-        radius := 16;
-      end;
-
-    MM_BUTTON_RUN:
-      with result do
-      begin
-        bounds := [self.x+self.w -40, self.y + 5, self.x+self.w - 6, self.y + 40];
-        center := bounds.getMiddle();
-        radius := 16;
-      end;
-
-    MM_BUTTON_LODESTONE:
-      with result do
-      begin
-        bounds := [self.x + 10, self.y+self.h -37, self.x + 37, self.y+self.h-11];
-        center := bounds.getMiddle();
-        radius := 13;
-      end;
-
-    MM_BUTTON_MAP:
-      with result do
-      begin
-        bounds := [self.x+self.w-35, self.y+self.h-36, self.x+self.w-11, self.y+self.h-13];
-        center := bounds.getMiddle();
-        radius := 12;
-      end;
-  end;
+  filterPointsDist(tpa, 0 + minDistOffset,
+                   self.button[buttonID].radius, self.button[buttonID].center.x,
+                   self.button[buttonID].center.y);
 end;
 
 (*
@@ -603,49 +330,48 @@ Example:
 *)
 function TRSMinimap.getAngleRadians(): extended;
 var
-  tpa1, tpa2, tpa, tpaCircle: TPointArray;
+  tpa, tpaCircle: TPointArray;
   ref: TPoint;
-  i, j, hh, hhh, min, d, len: integer;
-  btn: _TRSMMButton;
+  i, j, hh, hhh, min, d: integer;
 begin
-  btn := self._getButton(MM_BUTTON_COMPASS);
+  result := 0.00;
 
-  tpaCircle := tpaFromCircle(btn.center.x, btn.center.y, btn.radius);
+  tpaCircle := tpaFromCircle(self.button[MM_BUTTON_COMPASS].center.x,
+                             self.button[MM_BUTTON_COMPASS].center.y,
+                             self.button[MM_BUTTON_COMPASS].radius);
 
-  // color of the red arrow
-  findColorsTolerance(tpa, 1646236, btn.bounds, 60);
-  filterPointsDist(tpa, btn.radius-3, btn.radius, btn.center.x, btn.center.y);
-
-  len := length(tpa);
-
-  if (len < 1) then
+  if (findColorsTolerance(tpa, 2109571, self.button[MM_BUTTON_COMPASS].bounds, 15, colorSetting(2, 0.20, 1.28))) then
   begin
-    print('TRSMinimap.getAngleRadians(): Didn''t find enough of the red arrow color', TDebug.SUB);
-    exit;
-  end;
+    self.filterPointsButton(tpa, MM_BUTTON_COMPASS, 12);
 
-  hhh := high(tpaCircle);
-  min := 500;
+    hh := high(tpa);
+    hhh := high(tpaCircle);
+    min := 500;
 
-  // get the reference point on the circle (point closest to the north arrow)
-  for i := 0 to (len - 1) do
-    for j := 0 to hhh do
-    begin
-      d := distance(tpa[i].x, tpa[i].y, tpaCircle[j].x, tpaCircle[j].y);
-
-      if (d < min) then
+    // get the reference point on the circle (point closest to the north arrow)
+    for i := 0 to hh do
+      for j := 0 to hhh do
       begin
-        min := d;
-        ref := tpaCircle[j];
+        d := distance(tpa[i].x, tpa[i].y, tpaCircle[j].x, tpaCircle[j].y);
+
+        if (d < min) then
+        begin
+          min := d;
+          ref := tpaCircle[j];
+
+          if (min < 2) then
+            break(2);
+        end;
       end;
-    end;
 
-  // calculate angle based on the endpoint (ref) of the north arrow and the compass's midpoint
-  result := arcTan2(ref.y - btn.center.y, ref.x - btn.center.x) + radians(90);
+    // calculate angle based on the endpoint (ref) of the north arrow and the compass's midpoint
+    result := arcTan2(ref.y - self.button[MM_BUTTON_COMPASS].center.y, ref.x - self.button[MM_BUTTON_COMPASS].center.x) + radians(90);
 
-  // to correct -ve answers for angles between 270 and 360
-  if (result < 0) then
-    result := (result + radians(360));
+    // to correct -ve answers for angles between 270 and 360
+    if (result < 0) then
+      result := (result + radians(360));
+  end else
+    print('TRSMinimap.getAngleRadians(): Found no compass dial color', TDebug.ERROR);
 end;
 
 (*
@@ -772,30 +498,23 @@ Example:
 .. code-block:: pascal
 
     minimap.clickCompass();
-    mainscreen.setAngle(MS_ANGLE_HIGH);
 *)
 procedure TRSMinimap.clickCompass();
-var
-  btn: _TRSMMButton;
-  p: TPoint;
 begin
-  btn := self._getButton(MM_BUTTON_COMPASS);
-
-  p := btn.center;
-
-  mouseCircle(p.x, p.y, btn.radius, MOUSE_MOVE);
+  mouseCircle(self.button[MM_BUTTON_COMPASS].center.x, self.button[MM_BUTTON_COMPASS].center.y,
+              self.button[MM_BUTTON_COMPASS].radius, MOUSE_MOVE);
 
   if (random(4) = 2) then
   begin
     fastClick(MOUSE_RIGHT);
-    if (not chooseOption.select(['Face North', 'Face', 'ace north', 'orth'], 500)) then
-      fastClick(MOUSE_LEFT); // failsafe (chooseoptions will close its self)
+    if (not chooseOption.select(['Face North', 'Face', 'ace north', 'orth'])) then
+      fastClick(MOUSE_LEFT); // failsafe
   end else
     fastClick(MOUSE_LEFT);
 
   wait(150 + random(300));
 
-  print('minimap.clickCompass(): Succesfully clicked compass', TDebug.SUB);
+  print('TRSMinimap.clickCompass(): Clicked compass', TDebug.SUB);
 end;
 
 (*
@@ -825,7 +544,7 @@ begin
   result := false;
 
   if (pointInBox(p, self.getBounds())) then
-    result := (fastGetPixel(self.bmpMask, p.x - self.x, p.y - self.y) = clWhite);
+    result := (fastGetPixel(self.bmpMask, p.x - self.x1, p.y - self.y1) = clWhite);
 end;
 
 (*
@@ -861,8 +580,10 @@ begin
 
   a := self.getAngleDegrees();
 
-  se := a - 8.00;
-  ea := a + 8.00;
+  se := a - (8.00);
+  ea := a + (8.00);
+
+  print('TRSMinimap.findDTM(): Searching for dtm between angles '+floatToStr(se)+'..'+floatToStr(ea), TDebug.SUB);
 
   for i := 0 to tries do
     if findDTMRotatedAlternating(dtm, x, y, self.getBounds(), se, ea, 0.5, e) then
@@ -871,11 +592,11 @@ begin
 
       if (result) then
       begin
-        print('minimap.findDTM(): Found dtm @ angle ' + floatToStr(e), TDebug.SUB);
+        print('TRSMinimap.findDTM(): Found dtm @ angle ' + floatToStr(e), TDebug.SUB);
         exit(true);
       end;
     end else
-      wait(100 + random(200));
+      wait(50 + random(200));
 end;
 
 {*
@@ -1150,7 +871,7 @@ begin
     exit();
   end;
 
-  for i := 0 to (l-1) do
+  for i := 0 to (l -1) do
     if ((fastGetPixel(bmp, tpa[i].x - 1, tpa[i].y - 1) - fastGetPixel(bmp, tpa[i].x, tpa[i].y - 1)) = 6381921) then
     begin
       result := true;
@@ -2647,16 +2368,12 @@ Example:
 function TRSMinimap.isResting(): boolean;
 var
   tpa: TPointArray;
-  button: _TRSMMButton;
 begin
-  button := self._getButton(MM_BUTTON_RUN);
   result := false;
 
   // blue color
-  if (not findColorsTolerance(tpa, 13345801, button.bounds, 50)) then
+  if (not findColorsTolerance(tpa, 13345801, self.button[MM_BUTTON_RUN].bounds, 50)) then
     exit();
-
-  filterPointsDist(tpa, 0, button.radius-1, button.center.x, button.center.y);
 
   result := inRange(length(tpa), 5, 25);
 end;
@@ -2713,16 +2430,11 @@ Example:
 function TRSMinimap.isRunEnabled(): boolean;
 var
   tpa: TPointArray;
-  button: _TRSMMButton;
 begin
-  button := self._getButton(MM_BUTTON_RUN);
   result := false;
 
-  // green color
-  if (not findColorsTolerance(tpa, 2805490, button.bounds, 20)) then
+  if (not findColorsTolerance(tpa, 2805490, self.button[MM_BUTTON_RUN].bounds, 20)) then
     exit();
-
-  filterPointsDist(tpa, 0, button.radius-1, button.center.x, button.center.y);
 
   result := (length(tpa) > 5);
 end;
@@ -2750,24 +2462,22 @@ Example:
 *)
 procedure TRSMinimap.toggleRun(enable: boolean);
 var
-  button: _TRSMMButton;
   p: TPoint;
 begin
-  button := self._getButton(MM_BUTTON_RUN);
-  p := button.center;
+  p := self.button[MM_BUTTON_RUN].center;
 
   case enable of
     true:
       if (not self.isRunEnabled()) then
       begin
-        mouseCircle(p.x, p.y, button.radius, MOUSE_LEFT);
+        mouseCircle(p.x, p.y, self.button[MM_BUTTON_RUN].radius, MOUSE_LEFT);
         print('minimap.toggleRun(): Enabled run', TDebug.SUB);
       end;
 
     false:
       if (self.isRunEnabled()) then
       begin
-        mouseCircle(p.x, p.y, button.radius, MOUSE_LEFT);
+        mouseCircle(p.x, p.y, self.button[MM_BUTTON_RUN].radius, MOUSE_LEFT);
         print('minimap.toggleRun(): Disabled run', TDebug.SUB);
       end;
   end;
@@ -2803,151 +2513,6 @@ begin
     if self.getRun() > minRunPercent then
       self.toggleRun(true);
 }
-end;
-
-(*
-TRSMinimap.isLodestoneOpen
-~~~~~~~~~~~~~~~~~~~~~~~~~~
-
-.. code-block:: pascal
-
-    function isLodestoneOpen(out bounds: TBox; waitTime: integer = 0): boolean;
-
-Returns true if the lodestone screen is visable, will also return the bounds of
-screen, and includes a optional parameter "waitTime".
-
-.. note::
-
-    - by Olly
-    - Last Updated: 11 October 2013 by Olly
-
-Example:
-
-.. code-block:: pascal
-
-    if minimap.isLodestoneOpen(b, 500 + random(100)) then
-      writeln('lodestone screen is open');
-*)
-function TRSMinimap.isLodestoneOpen(out bounds: TBox; waitTime: integer = 0): boolean;
-const
-  BWIDTH = 366; // width of the bounds of color '4273704' we are looking for
-  OFFSET: TPoint = [-248, - 14];
-  WIDTH = 499;
-  HEIGHT = 299;
-var
-  cw, ch, i, timeOut: integer;
-  tpa: TPointArray;
-  atpaRows: T2DPointArray;
-  b: TBox;
-  p: TPoint;
-begin
-  result := false;
-
-  getClientDimensions(cw, ch);
-  timeOut := (getSystemTime() + waitTime);
-
-  repeat
-    if (findColors(tpa, 4273704, 0, 0, cw -1, ch -1)) then
-    begin
-      atpaRows := findTPARows(tpa);
-      sortATPAFromFirstPointY(atpaRows, point(0, 0));
-
-      for i := 0 to high(atpaRows) do
-      begin
-        b := atpaRows[i].getBounds();
-
-        if (b.getWidth() <> BWIDTH) then
-          continue;
-
-        incEx(b.y2, 13);
-
-        findColors(tpa, 12378347, b);
-
-        result := (inRange(length(tpa), 540, 550));
-
-        if (result) then
-        begin
-          p := tpa.getMiddle();
-          bounds := [p.x + OFFSET.x, p.y + OFFSET.y, p.x + OFFSET.x + WIDTH, p.y + OFFSET.y + HEIGHT];
-          exit;
-        end;
-      end;
-    end;
-  until (getSystemTime() >= timeOut);
-end;
-
-(*
-TRSMinimap.lodestoneTeleportTo
-~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
-
-.. code-block:: pascal
-
-    function lodestoneTeleportTo(location: integer): boolean;
-
-Will click the lodestone teleport to "location".
-
-.. note::
-
-    - by Olly
-    - Last Updated: 04 October 2013 by euphemism
-
-Example:
-
-.. code-block:: pascal
-
-    minimap.lodeStoneTeleportTo(LOCATION_LUNAR_ISLE);
-*)
-function TRSMinimap.lodestoneTeleportTo(location: integer): boolean;
-var
-  tpa: TPointArray;
-  button: _TRSMMButton;
-  p: TPoint;
-  b: TBox;
-begin
-  result := false;
-
-  // all teleport location middle points (ugly.. meh)
-  tpa :=  [[34, 55], [91, 155], [86, 207], [190, 98], [181, 135], [156, 189],
-           [150, 235], [137, 274], [242, 121], [210, 157], [243, 155], [212, 236],
-           [303, 96], [282, 134], [268, 180], [265, 225], [335, 158], [298, 187],
-           [315, 219], [315, 273], [352, 206], [393, 150]];
-
-  button := minimap._getButton(MM_BUTTON_LODESTONE);
-  mouseCircle(button.center.x, button.center.y, button.radius, MOUSE_MOVE);
-
-  if (location = (LOCATION_PREVIOUS)) then
-  begin
-    fastClick(MOUSE_RIGHT);
-    result := chooseOption.select(['Previous dest', 'estination', 'evious'], 1.00, 250 + random(100));
-
-    if (result) then
-      print('minimap.lodestoneTeleportTo(): Succesfully teleported to previous destination', TDebug.SUB)
-    else
-      print('minimap.lodestoneTeleportTo(): Failed teleport to previous destination (chooseOption must have failed)', TDebug.SUB);
-
-    // regardless of the result, we don't need to go any futher
-    exit();
-  end;
-
-  if (inRange(location, LOCATION_LUNAR_ISLE, LOCATION_CANIFIS)) then
-  begin
-    if (not isLodeStoneOpen(b)) then
-      fastClick(MOUSE_LEFT);
-
-    if (isLodeStoneOpen(b, 4000 + random(500))) then
-    begin
-      wait(20 + random(500));
-
-      p := tpa[location];
-      p.offset([b.x1, b.y1]);
-      mouseBox([p.x - 8, p.y - 8, p.x + 8, p.y + 8], MOUSE_LEFT);
-
-      print('minimap.lodestoneTeleportTo(): Succesfully clicked teleport[' + intToStr(location) + ']');
-      result := true;
-    end else
-      print('minimap.lodestoneTeleportTo(): Lodestone screen never appeared', TDebug.ERROR);
-  end else
-    print('minimap.lodestoneTeleportTo(): The location you entered isn''t a vaild teleport', TDebug.ERROR);
 end;
 
 begin

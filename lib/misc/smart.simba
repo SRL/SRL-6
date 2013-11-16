@@ -42,7 +42,6 @@ var User Set
 
 Variables that can be used in scripts.
 
-  * smartClientWidth, smartClientHeight - The dimensions of the smart client
   * smartGetJavaPath - If enabled will attempt to find your java path
   * smartShowConole - If enabled will show the java console else wont.
   * smartForceNewClient - If enabled will skip attempting to pair to a previously spawned client
@@ -51,8 +50,6 @@ Variables that can be used in scripts.
 
 *)
 var
-  smartClientWidth: UInt32 := 800;
-  smartClientHeight: UInt32 := 600;
   smartGetJavaPath: boolean := true;
   smartShowConsole: boolean := true;
   smartForceNewClient: boolean := false;
@@ -69,12 +66,15 @@ Internal SMART variables used only in smart.simba.
     * __smartCurrentTarget: Keeps track of the current smart target.
     * __smartIsDrawingSetup: Keeps track if smart drawing is setup or not.
     * __smartNativeDebugButtonID: The id of the debug button (if not using a native button) set as -1.
+    * smartClientWidth, smartClientHeight - The dimensions of the smart client
     * smartImage: TMufasaBitmap that is displayed onto smart.
 *}
-  __smartCurrentPid: Int32 := 0;
-  __smartCurrentTarget: PtrUInt := 0;
+  __smartCurrentPid: integer := 0;
+  __smartCurrentTarget: integer := 0;
   __smartIsDrawingSetup: boolean := False;
   __smartNativeDebugButtonID: integer := 101;
+  __smartClientWidth: integer := 800;
+  __smartClientHeight: integer := 600;
   smartImage: TMufasaBitmap;
 
 (*
@@ -101,8 +101,8 @@ Example:
 *)
 procedure getClientDimensions(var w, h: integer); override;
 begin
-  w := smartClientWidth;
-  h := smartClientHeight;
+  w := __smartClientWidth;
+  h := __smartClientHeight;
 end;
 
 (*
@@ -552,7 +552,7 @@ begin
 
   print('Attempting to spawn a new client..');
 
-  smartCreateClient(smartClientWidth, smartClientHeight);
+  smartCreateClient(__smartClientWidth, __smartClientHeight);
 
   print('Succesfully initialized via spawning a new client');
 
@@ -622,7 +622,7 @@ begin
   try
     smartImage.init(Client.getMBitmaps());
     smartImage.setName('SMART Debug Image');
-    smartImage.setPersistentMemory(SmartDebugArray(__smartCurrentTarget), smartClientWidth, smartClientHeight);
+    smartImage.setPersistentMemory(SmartDebugArray(__smartCurrentTarget), __smartClientWidth, __smartClientHeight);
     smartImage.drawClear(0);
 
     print('smartSetupDrawing(): Succesfully setup SMART drawing', TDebug.SUB);
