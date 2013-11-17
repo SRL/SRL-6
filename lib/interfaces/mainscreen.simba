@@ -92,6 +92,7 @@ begin
     ID := ID_INTERFACE_MAINSCREEN;
     parentID := -1;
     static := true;
+    setBounds([0, 0, 575, 324]);
   end;
 end;
 {$ENDIF}
@@ -119,34 +120,6 @@ Example:
 
     mainscreen.__find();
 *}
-{$IFNDEF CODEINSIGHT}
-function TRSMainscreen.__find(): boolean;
-var
-  wid, hei: integer;
-  bds: TBox;
-begin
-  getClientDimensions(wid, hei);
-
-  wid := (wid - 1);
-  hei := (hei - 1);
-  bds.x1 := 0;
-  bds.y1 := 0;
-
-  bds.x2 := minimap.x;
-
-  bds.y2 := (actionbar.y);
-
-  if (actionbar.y = 0) then // if it's at the top
-    bds.y1 := actionbar.h
-  else
-    bds.y1 := 0;
-
-  self.setBounds(bds);
-
-  print('TRSMainscreen.__find(): Set mainscreen bounds based on the other visible interfaces', TDebug.SUB);
-end;
-{$ENDIF}
-
 function TRSMainscreen.getPlayerPoint(offset: TPoint = [0, 0]): TPoint;
 var
   wid, hei: integer;
@@ -324,16 +297,6 @@ begin
   result := self.findObject(ix, iy, [col], [tol], colSettings, sortFrom, objWidth, objHeight, minCount, mouseOverText, self.getBounds(), mouseAction);
 end;
 
-{$IFNDEF CODEINSIGHT}
-function __findMainscreen(): boolean;
-begin
-  result := mainscreen.__find();
-end;
-{$ENDIF}
-
-{$f+} // needed so mainscreen.__find isn't called when assigned
-
 begin
   mainscreen.__init();
-  __interfaceFindFunctions[mainscreen.ID] := @__findMainscreen;
 end;

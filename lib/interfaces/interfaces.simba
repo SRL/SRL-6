@@ -70,6 +70,7 @@ type
     static: boolean;
     x, y, w, h: integer;
     x1, y1, x2, y2: integer;
+    cx, cy: integer;
   end;
 
 const
@@ -101,7 +102,7 @@ Example:
 *)
 function TRSInterface.getBounds(): TBox;
 begin
-  result := TBox([x1, y1, x2, y2]);
+  result := intToBox(self.x, self.y, self.x + self.w, self.y + self.h);
 end;
 
 (*
@@ -136,6 +137,9 @@ begin
   self.y1 := newBounds.y1;
   self.x2 := newBounds.x2;
   self.y2 := newBounds.y2;
+
+  self.cx := middleBox(newBounds).x;
+  self.cy := middleBox(newBounds).y;
 end;
 
 (*
