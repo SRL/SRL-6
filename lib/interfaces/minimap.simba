@@ -191,6 +191,7 @@ const
   MM_SYMBOL_TRANSPORTATION  = 90;
   MM_SYMBOL_UNDERGROUND     = 91;
   MM_SYMBOL_WATER           = 92;
+  MM_SYMBOL_DIVINATION      = 93;
 
 (*
 const Buttons
@@ -2403,6 +2404,16 @@ begin
         color := 13934210;
       end;
 
+    MM_SYMBOL_DIVINATION:
+      with result do
+      begin
+        name := 'Divination';
+        bmp := BitmapFromString(11, 9, 'meJw7cAAFtLE4rOHP+P3nF5ABEQF' +
+        'y//gfMGWWYWRgAApCEJALRGgKgOL/+NZDELIaoCzQQCAbqBIo9S1s' +
+        'LlAEogyiAKISogAoC0QvLxyGqIHbgmwXUBZo4K+JFyC2YLofqAZoC' +
+        'JABcS3Q5chqgFyIdUAGsjMwAVAv0CigRUAFAPKplbk=');
+        color := 16649903;
+      end;
     else
       print('Invalid symbol constant: ' + toStr(sym), TDebug.ERROR);
   end;
@@ -2953,5 +2964,3 @@ end;
 begin
   minimap.__init();
 end;
-
-
