@@ -121,7 +121,7 @@ var
   tpa: TPointArray;
   b: TBox;
 begin
-  result := (gameTabs._isTabActive(self.tabIndex));
+ { result := (gameTabs._isTabActive(self.tabIndex));
 
   if (not result) then
     if (gameTabs.__findGameTabArea()) then
@@ -131,7 +131,7 @@ begin
     end;
 
   if (not result) then
-    print('TRSTabStats.isOpen() result = false', TDebug.WARNING);
+    print('TRSTabStats.isOpen() result = false', TDebug.WARNING); }
 end;
 
 (*
@@ -158,10 +158,10 @@ Example:
 *)
 function TRSTabStats.open(): boolean;
 begin
-  result := self.isOpen();
+ { result := self.isOpen();
 
   if (not result) then
-    result := gameTabs.openTab(self.tabIndex);
+    result := gameTabs.openTab(self.tabIndex);}
 end;
 
 (*
@@ -189,7 +189,7 @@ function TRSTabStats.getSkillBox(skill: integer): TBox;
 var
   offSetY: integer;
 begin
-  if (not self.open()) then
+  {if (not self.open()) then
     exit(intToBox(-1, -1, -1, -1));
 
   if (gameTabs.visibleTabArea.y1 = gameTabs.__visibleTabAreaSingle.y1) then
@@ -199,7 +199,7 @@ begin
 
   result := gridBox(skill, 3, 9, 55, 22, 71, 27,
                     point(gameTabs.__visibleTabAreaSingle.x1 + 40,
-                          gameTabs.__visibleTabAreaSingle.y1 + offsetY));
+                          gameTabs.__visibleTabAreaSingle.y1 + offsetY));  }
 end;
 
 (*
