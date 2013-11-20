@@ -115,23 +115,12 @@ Example:
 *)
 function TRSTabStats.isOpen(): boolean;
 const
-  BAR_COLOR = 7714304;
-var
-  p: TPoint;
-  tpa: TPointArray;
-  b: TBox;
+  BAR_COLOR = 7056896;
 begin
- { result := (gameTabs._isTabActive(self.tabIndex));
+  result := (gameTabs.isTabActive(self.tabIndex));
 
   if (not result) then
-    if (gameTabs.__findGameTabArea()) then
-    begin
-      findColors(tpa, BAR_COLOR, intToBox(gameTabs.visibleTabArea.x1, gameTabs.visibleTabArea.y2 - 35, gameTabs.visibleTabArea.x2, gameTabs.visibleTabArea.y2));
-      result := inRange(length(tpa), 6, 10);
-    end;
-
-  if (not result) then
-    print('TRSTabStats.isOpen() result = false', TDebug.WARNING); }
+    result := (getColor(gameTabs.tabArea.x1 + 95, gameTabs.tabArea.y2 -27) = 7056896);
 end;
 
 (*
@@ -158,10 +147,10 @@ Example:
 *)
 function TRSTabStats.open(): boolean;
 begin
- { result := self.isOpen();
+  result := self.isOpen();
 
   if (not result) then
-    result := gameTabs.openTab(self.tabIndex);}
+    result := gameTabs.openTab(self.tabIndex);
 end;
 
 (*
@@ -187,19 +176,14 @@ Example:
 *)
 function TRSTabStats.getSkillBox(skill: integer): TBox;
 var
-  offSetY: integer;
+  offSet: TPoint;
 begin
-  {if (not self.open()) then
-    exit(intToBox(-1, -1, -1, -1));
-
-  if (gameTabs.visibleTabArea.y1 = gameTabs.__visibleTabAreaSingle.y1) then
-    offsetY := 17
+  if (gameTabs.areMultiOpen()) then
+    offset := [0, 45]
   else
-    offsetY := 45;
+    offset := [3, 17];
 
-  result := gridBox(skill, 3, 9, 55, 22, 71, 27,
-                    point(gameTabs.__visibleTabAreaSingle.x1 + 40,
-                          gameTabs.__visibleTabAreaSingle.y1 + offsetY));  }
+  result := gridBox(skill, 3, 9, 55, 22, 71, 27, point(gameTabs.tabArea.x1 + 37 + offset.x, gameTabs.tabArea.y1 + offset.y));
 end;
 
 (*

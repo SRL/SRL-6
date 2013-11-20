@@ -169,7 +169,7 @@ Example:
 *)
 procedure TMufasaBitmap.drawBox(x1, y1, x2, y2: integer; fill: boolean; color: TColor); overload;
 begin
-  self.drawBox(intToBox(x1, y2, x2, y2), fill, color);
+  self.drawBox(intToBox(x1, y1, x2, y2), fill, color);
 end;
 
 (*
