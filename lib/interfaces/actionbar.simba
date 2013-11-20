@@ -100,13 +100,12 @@ begin
     openedBounds := [1, 287, 574, 360];
     closedBounds := [1, 324, 574, 360];
 
-    __slots := Grid(14, 1, 29, 29, 36, 0, Point(openedBounds.x1 + 61, openedBounds.y1 + 49));
+    __slots := Grid(14, 1, 29, 29, 36, 0, Point(openedBounds.x1 + 66, openedBounds.y1 + 48));
 
-    self.__slots[high(self.__slots) - 1] := intToBox(self.__slots[high(self.__slots) - 2].x1 + 54,
-    self.getBounds().y1 + 39, self.__slots[high(self.__slots) - 2].x1 + 83, self.getBounds().y1 + 68);
+    self.__slots[high(self.__slots)-1].offset([18, 0]);
+    self.__slots[high(self.__slots)].offset([18, 0]);
 
-    self.__slots[high(self.__slots)] := self.__slots[high(self.__slots) - 1].copy();
-    self.__slots[high(self.__slots)].offset(point(36, 0));
+    self.setBounds(openedBounds);
   end;
 end;
 {$ENDIF}
@@ -232,7 +231,7 @@ begin
   if (not open) and (not self.isOpen()) then
     exit(true);
 
- // mouseBox(self.__getMinimizeButton(), MOUSE_LEFT);
+  mouse(self.__getMinimizeButtonBounds(not open).getMiddle().randRange(-5, 5), MOUSE_LEFT);
   result := true;
 end;
 {$ENDIF}
@@ -262,6 +261,11 @@ Example:
 function TRSActionBar.isOpen(): boolean;
 begin
   result := (not self.__findButton(self.__getMinimizeButtonBounds(false))); // look for the button, in the closed postion
+
+  if (result) then
+    self.setBounds(self.openedBounds)
+  else
+    self.setBounds(self.closedBounds);
 end;
 
 (*
@@ -316,6 +320,9 @@ Example:
 *)
 function TRSActionBar.close(): boolean;
 begin
+  if (not self.isOpen()) then
+    exit(true);
+
   self.__toggleSelf(false);
   wait(150 + random(250));
   mouse(point(498, 286).rand(15, 6));
