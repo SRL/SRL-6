@@ -9,6 +9,7 @@ Runescape Backpack gametab.
 
 {$include_once gametab.simba}
 {$include_once ../../misc/items.simba}
+{$include_once ../chooseoption.simba}
 
 {$f-}
 

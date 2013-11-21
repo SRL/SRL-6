@@ -452,6 +452,28 @@ begin
   result := findBitmapToleranceIn(self.tabs[tab]._bmp, p.x, p.y, searchBox, 10);
 end;
 
+(*
+TRSGameTabs.isTabVisible
+~~~~~~~~~~~~~~~~~~~~~~~~
+
+.. code-block:: pascal
+
+    function TRSGameTabs.isTabVisible(tab: integer; out tabBounds: TBox): boolean;
+
+Searches for the gametab 'tab' to see if it's visible, if found will output the bounds
+in 'tabBounds'
+
+.. note::
+
+    - by Olly
+    - Last Updated: 21 November 2013 by Olly
+
+Example:
+
+.. code-block:: pascal
+
+    writeln(gameTabs.isTabVisable(TAB_BACKPACK, b));
+*)
 function TRSGameTabs.isTabVisible(tab: integer; out tabBounds: TBox): boolean;
 var
   b: TBoxArray;
@@ -470,6 +492,27 @@ begin
       end;
 end;
 
+(*
+TRSGameTabs.isTabActive
+~~~~~~~~~~~~~~~~~~~~~~~
+
+.. code-block:: pascal
+
+    function TRSGameTabs.isTabActive(tab: integer): boolean;
+
+Returns true if the gametab 'tab' is active
+
+.. note::
+
+    - by Olly
+    - Last Updated: 21 November 2013 by Olly
+
+Example:
+
+.. code-block:: pascal
+
+    writeln(gameTabs.isActiveTab(TAB_BACKPACK));
+*)
 function TRSGameTabs.isTabActive(tab: integer): boolean;
 var
   b: TBox;
@@ -483,7 +526,28 @@ begin
   result := self._findTab(p, tab, b);
 end;
 
-function TRSGameTabs.waitActiveTab(tab: integer; timeOut: integer): boolean;
+(*
+TRSGameTabs.waitTabActive
+~~~~~~~~~~~~~~~~~~~~~~~~~
+
+.. code-block:: pascal
+
+    function TRSGameTabs.waitTabActive(tab: integer; timeOut: integer): boolean;
+
+Waits up to 'timeOut' waiting for the gametab 'tab' to be the active tab
+
+.. note::
+
+    - by Olly
+    - Last Updated: 21 November 2013 by Olly
+
+Example:
+
+.. code-block:: pascal
+
+    writeln(gameTabs.waitTabActive(TAB_BACKPACK, 1000));
+*)
+function TRSGameTabs.waitTabActive(tab: integer; timeOut: integer): boolean;
 var
   t: integer;
 begin
@@ -500,8 +564,8 @@ begin
 end;
 
 {*
-__openViaNavBar
-~~~~~~~~~~~~~~~
+TRSGameTabs.__openViaNavBar
+~~~~~~~~~~~~~~~~~~~~~~~~~~~
 
 .. code-block:: pascal
 
@@ -512,8 +576,8 @@ and moves the mouse to close the mouse-over menu.
 
 .. note::
 
-    - by Coh3n
-    - Last Updated: 26 July 2013 by Coh3n
+    - by Olly
+    - Last Updated: 21 November 2013 by Olly
 
 Example:
 
@@ -544,7 +608,7 @@ end;
 {$ENDIF}
 
 (*
-TRSGameTabs.opemTab
+TRSGameTabs.openTab
 ~~~~~~~~~~~~~~~~~~~
 
 .. code-block:: pascal
@@ -597,7 +661,7 @@ begin
   print('Opening tab via gametab navigation bar');
   self.__openViaNavBar(tab);
 
-  result := self.waitActiveTab(tab, 4000 + random(1000));
+  result := self.waitTabActive(tab, 4000 + random(1000));
 
   print('TRSGameTabs.openTab('+toStr(tab)+'): result = '+toStr(result), TDebug.FOOTER);
 end;
@@ -645,7 +709,6 @@ begin
 
   print('TRSGametabs.getActiveTab(): Didn''t find any bitmap matches', TDebug.WARNING);
 end;
-
 
 begin
   gameTabs.__init();

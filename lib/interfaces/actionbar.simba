@@ -393,15 +393,7 @@ var
   timeMarker: TTimeMarker;
   keys: tIntegerArray;
 begin
-
   result := false;
-
-  if (length(players) > 0) then
-    if (not players[currentPlayer].isMember) then
-    begin
-      print('actionBar.switchToBar: F2P cannot switch to this bar.', TDebug.ERROR);
-      exit;
-    end;
 
   if (not inRange(barNumber, 1, 5)) then
   begin

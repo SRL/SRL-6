@@ -9,7 +9,6 @@ The source for this file can be found `here <https://github.com/SRL/SRL-6/blob/m
 
 *)
 
-{$include_once minimap.simba}
 {$include_once chatbox.simba}
 {$include_once gametabs/gametab.simba}
 {$include_once actionbar.simba}
@@ -42,9 +41,7 @@ type TRSMainscreen
 A type that stores functions and properties of the Runescape main screen.
 *)
 type
-  TRSMainscreen = record(TRSInterface)
-    __placeholder: byte;
-  end;
+  TRSMainscreen = type (TRSInterface)
 
 (*
 var mainscreen
@@ -92,10 +89,18 @@ begin
     ID := ID_INTERFACE_MAINSCREEN;
     parentID := -1;
     static := true;
-    setBounds([0, 0, 575, 324]);
+    setBounds([0, 0, 575, 282]);
   end;
 end;
 {$ENDIF}
+
+function TRSMainscreen.getBounds(): TBox; override;
+begin
+  if (not actionBar.isOpen()) then
+    result := [0, 0, 575, 320]
+  else
+    result := [0, 0, 575, 282];
+end;
 
 (*
 TRSMainscreen.getPlayerPoint
@@ -333,7 +338,7 @@ TRSMainscreen.findObject; overload;
 
     function TRSMainscreen.findObject(var ix, iy: integer; col, tol: integer; mouseOverText: TStringArray; mouseAction: integer = MOUSE_LEFT): boolean; overload;
 
-A extermely general object finding function.  Will find and mouse an object in the mainscreen.
+A very general object finding function.  Will find and mouse an object in the mainscreen.
 
     * ix, iy: The coordinates of the object if found.
     * col: The color to be found.

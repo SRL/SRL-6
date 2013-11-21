@@ -10,6 +10,7 @@ The source for this file can be found `here <https://github.com/SRL/SRL-6/blob/m
 *)
 
 {$include_once interfaces.simba}
+{$include_once mainscreen.simba}
 {$include_once chooseoption.simba}
 {$include_once ../utilities/color.simba}
 {$include_once ../utilities/pixelshift.simba}
@@ -259,7 +260,7 @@ begin
     static := true;
     symbolAccuracy := 0.65;
     bmpMask := BitmapFromString(224, 189, 'meJzt0kFyAgcQBEH//9P23cEKgViqFzJfMDFd//wDAAAAAN/oX36hXulL1bNfSb3V16kHv556sS9ST31V9W5foR752ur1Plw97yeoN/xY9bCfo17ySuqtuKMOJFa/nzvqQGL1+7mjDqRXL8ChOo0J9QgcqtOYUI/AoTqNCfUIHKrTmFCPwKE6jQn1CByq05hQj8ChOo0J9QgcqtOYUI/AoTqNCfUIHKrTmFCPwKE6jQn1CByq05hQj8ChOo1evQB31IHE6vdzRx1IrH4/d9SBlOrf8yt1Jpn68fxKnUmj/joPqGN5t/rfPKxO5n3qT/OkOpx3qH/Mn9T5nKv+Li9QR3SW+q+8TJ3Si9Xv5BR1Vv/36GHh63ink/p5VPgBPok+WaZPlumTZfpkmT5Zpk+W6ZNl+mSZPlmmT5bpk2X6ZJk+GSdOxomTceJknDgZJ07GiZNx4mScPlmmT5bpk2X6ZJk+WaZPlumTZfpkmT5Zpk+W6ZNl+mSZPlmmT5bpk2X6ZJk+WaZPlumTZfpkmT5Zpk+W6ZNl+mSZPlmmT5bpk2X6ZJk+WaZPlumTZfpkmT5Zpk+W6ZNl+mSZPlmmT5bpk2X6ZJk+WaZPlumTZfpkmT5Zpk+W6ZNl+mSZPlmmT5bpk2X6ZJk+WaZPlumTZfpkmT5Zpk+W6ZNl+mTZ7/uUKG/2UJwS5Z2eiFOivMfTcUqUs/0xTolynpfEKVHO8MI4JcprvTxOifIqJ8WpT15CnyzTJ8v0yTJ9skyfLNMny/TJMn2yTJ8s0yfL9MmyN/SpZ552Xp9Pq1/CiR5t4NTS/iL8IS9X13SK+qm8QB3Ruerv8id1Pu9Q/5gn1eG8T/1pHlYn8271v3lAHUuj/jq/UmeSqR/PfXUjsfr93FEHEqvfz0/qOnr1AvykrmNCPQKH6jQm1CNwW93FinoHbqu7WFHvwG11FyvqHbit7mJFvQO31V2sqHfgtrqLFfUO3FZ3saLegdvqLlbUO3Bb3cWKegduq7tYUe/AbXUXK+oduK3uYkI9AofqNCbUI/CTuo5evQA/qeu4mHqur1MPfj31Yp+g3vDD1fNeW73eV6hHvqp6ty9ST3099WJfpx78SuqtvlQ9+zXUK321evx19T7frt5/Wj0OAAAAAJT+AzNg/o0=');
-    setBounds([576, 12, 799, 200]);
+    setBounds([577, 12, 798, 200]);
                                           {bounds  center, radius}
     button[MM_BUTTON_COMPASS]   := [[583, 18, 616, 52], [599, 35], 16];
     button[MM_BUTTON_RUN]       := [[759, 18, 793, 52], [776, 35], 16];
@@ -2513,6 +2514,105 @@ begin
     if self.getRun() > minRunPercent then
       self.toggleRun(true);
 }
+end;
+
+(*
+__GridCoords16
+~~~~~~~~~~~~~~
+
+.. code-block:: pascal
+
+    function __GridCoords16(Grid16: TPoint): TPoint;
+
+Helper for MMToMs.
+
+.. note::
+
+    - by Narcle
+    - Last Updated: 08 August 2013 by Olly
+
+Example:
+
+.. code-block:: pascal
+
+    __GridCoords16(point(50, 50));
+*)
+function __GridCoords16(Grid16: TPoint): TPoint;
+var
+  Yh, yMod, ym, xmod: Extended;
+  x, y: extended;
+begin
+  X := Grid16.x+0.0;
+  y := Grid16.y+0.0;
+  yM := 45;
+  Yh := Abs(Y + yM);
+
+  result.x := round((290.5+Xmod) + (X*6.8/(12.8-(Yh/yM*3.15)))*9.75);
+  result.y := round((202.0+Ymod) + Y*(5.4 + ((Yh/yM)*0.75)));
+
+  if (not pointInBox(result, mainScreen.getBounds())) then
+    result := Point(-1, -1);
+end;
+
+(*
+TRSMinimap.pointToMainscreen
+~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+
+.. code-block:: pascal
+
+    function TRSMinimap.pointToMainscreen(const point: TPoint): TPoint;
+
+Converts a point on the minimap to a point on the mainscreen
+
+.. note::
+
+    - by Narcle
+    - Last Updated: 21 November 2013 by Olly
+
+Example:
+
+.. code-block:: pascal
+
+    p := minimap.pointToMainscreen(minimap.getCenterPoint());
+*)
+function TRSMinimap.pointToMainscreen(const point: TPoint): TPoint;
+begin
+  result := __GridCoords16([point.x-688, point.y-106]);
+end;
+
+(*
+TRSMinimap.pointsToMainscreen
+~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+
+.. code-block:: pascal
+
+    function TRSMinimap.pointsToMainscreen(points: TPointArray; sortFromPlayer: boolean = true): TPointArray;
+
+Converts a tpa of points on the minimap to mainscreen points.
+
+.. note::
+
+    - by Narcle
+    - Last Updated: 21 November 2013 by Olly
+
+Example:
+
+.. code-block:: pascal
+
+    tpa := minimap.pointsToMainscreen(mmDots);
+*)
+function TRSMinimap.pointsToMainscreen(points: TPointArray; sortFromPlayer: boolean = true): TPointArray;
+var
+  i: integer;
+  p: TPoint;
+begin
+  setLength(result, length(points));
+
+  for i := 0 to high(result) do
+    result[i] := self.pointToMainscreen(points[i]);
+
+  if (sortFromPlayer) then
+    sortTPAFrom(result, mainScreen.getPlayerPoint());
 end;
 
 begin
