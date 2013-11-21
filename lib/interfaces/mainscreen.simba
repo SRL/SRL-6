@@ -10,7 +10,6 @@ The source for this file can be found `here <https://github.com/SRL/SRL-6/blob/m
 *)
 
 {$include_once chatbox.simba}
-{$include_once gametabs/gametab.simba}
 {$include_once actionbar.simba}
 {$include_once ../utilities/pixelshift.simba}
 {$include_once ../utilities/color.simba}
@@ -41,7 +40,7 @@ type TRSMainscreen
 A type that stores functions and properties of the Runescape main screen.
 *)
 type
-  TRSMainscreen = type (TRSInterface)
+  TRSMainscreen = type TRSInterface;
 
 (*
 var mainscreen
@@ -94,13 +93,13 @@ begin
 end;
 {$ENDIF}
 
-function TRSMainscreen.getBounds(): TBox; override;
+{function TRSMainscreen.getBounds(): TBox; override;
 begin
   if (not actionBar.isOpen()) then
     result := [0, 0, 575, 320]
   else
     result := [0, 0, 575, 282];
-end;
+end;     }
 
 (*
 TRSMainscreen.getPlayerPoint
