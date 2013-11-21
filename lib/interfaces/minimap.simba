@@ -341,7 +341,7 @@ begin
                              self.button[MM_BUTTON_COMPASS].center.y,
                              self.button[MM_BUTTON_COMPASS].radius);
 
-  if (findColorsTolerance(tpa, 2109571, self.button[MM_BUTTON_COMPASS].bounds, 15, colorSetting(2, 0.20, 1.28))) then
+  if (findColorsTolerance(tpa, 2044556, self.button[MM_BUTTON_COMPASS].bounds, 17, colorSetting(2, 0.18, 1.25))) then
   begin
     self.filterPointsButton(tpa, MM_BUTTON_COMPASS, 12);
 

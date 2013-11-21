@@ -35,9 +35,7 @@ The interface type for the conversation box.  Stores attributes and functions
 of the conversation box interface.
 *)
 type
-  TRSConversationBox = record(TRSInterface)
-    __placeholder: byte;
-  end;
+  TRSConversationBox = type TRSInterface;
 
 (*
 var conversationBox
@@ -85,42 +83,8 @@ begin
     ID := ID_INTERFACE_CONVERSATION_BOX;
     parentID := -1;
     static := true;
+    setBounds([34, 430, 556, 576]);
   end;
-end;
-{$ENDIF}
-
-{*
-TRSConversationBox.__find
-~~~~~~~~~~~~~~~~~~~~~~~~~
-
-.. code-block:: pascal
-
-    function TRSConversationBox.__find(): boolean;
-
-Returns true of the conversation box interface is found and its bounds are set.
-Called in TRSConversationBox.getSpeaker().
-
-.. note::
-
-    - by Coh3n
-    - Last Updated: 17 August 2013 by Coh3n
-
-Example:
-
-.. code-block:: pascal
-
-    if (not self.__find()) then
-      exit();
-*}
-{$IFNDEF CODEINSIGHT}
-function TRSConversationBox.__find(): boolean;
-var
-  wid, hei: integer;
-begin
-  getClientDimensions(wid, hei);
-  result := true;
-
-  self.setBounds([0, hei - 146, 521, hei - 1]); // bottom left corner of the client
 end;
 {$ENDIF}
 
@@ -148,7 +112,7 @@ Example:
 *)
 function TRSConversationBox.getSpeaker(): string;
 begin
-  if (not self.__find()) then
+  if (not self.isOpen()) then
     exit();
 
   // gold color of the text
@@ -506,17 +470,7 @@ begin
   end;
 end;
 
-{$IFNDEF CODEINSIGHT}
-function __findConversationBox(): boolean;
-begin
-  result := ConversationBox.__find();
-end;
-{$ENDIF}
-
-{$f+}
-
 begin
   conversationBox.__init();
-  __interfaceFindFunctions[conversationBox.ID] := @__findConversationBox;
 end;
 

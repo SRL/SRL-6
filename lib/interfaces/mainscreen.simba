@@ -93,13 +93,35 @@ begin
 end;
 {$ENDIF}
 
-{function TRSMainscreen.getBounds(): TBox; override;
+(*
+TRSMainscreen.getBounds; override
+~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+
+.. code-block:: pascal
+
+    function TRSMainscreen.getBounds(): TBox; override;
+
+Override function that takes in account the actionbar status to give the bounds
+of the mainscreen.
+
+.. note::
+
+    - by Olly
+    - Last Updated: 19 Novemeber 2013 by Olly
+
+Example:
+
+.. code-block:: pascal
+
+    b := mainScreen.getBounds();
+*)
+function TRSMainscreen.getBounds(): TBox; override;
 begin
   if (not actionBar.isOpen()) then
     result := [0, 0, 575, 320]
   else
     result := [0, 0, 575, 282];
-end;     }
+end;
 
 (*
 TRSMainscreen.getPlayerPoint
@@ -124,7 +146,7 @@ Example:
 *)
 function TRSMainscreen.getPlayerPoint(): TPoint;
 begin
-  result := middleBox(self.getBounds());
+  result := middleBox([0, 0, 575, 282]);
   incEx(result.y, 28);
 end;
 

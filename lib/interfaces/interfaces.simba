@@ -73,12 +73,6 @@ type
     cx, cy: integer;
   end;
 
-const
-  __INTERFACE_HIGH = 41; // used for a global find function array
-
-var
-  __interfaceFindFunctions: array[0..__INTERFACE_HIGH] of function: boolean;
-
 (*
 TRSInterface.getBounds
 ~~~~~~~~~~~~~~~~~~~~~~
