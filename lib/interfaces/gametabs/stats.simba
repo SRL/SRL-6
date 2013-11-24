@@ -183,7 +183,7 @@ begin
   else
     offset := [3, 17];
 
-  result := gridBox(skill, 3, 9, 55, 22, 71, 27, point(gameTabs.tabArea.x1 + 37 + offset.x, gameTabs.tabArea.y1 + offset.y));
+  result := gridBox(skill, 3, 9, 58, 22, 65, 27, point(gameTabs.tabArea.x1 + 38 + offset.x, gameTabs.tabArea.y1 + offset.y));
 end;
 
 (*
@@ -195,8 +195,9 @@ TRSTabStats.getSkillLevel
     function TRSTabStats.getSkillLevel(skill: integer; skillType: integer = SKILL_STATIC): integer;
 
 Returns the skill level of the 'skill', will return -1 if unsuccesfull.
-  * skill - The skill level to get (skill constants can be found in core/players.simba.
-  * skillType - Which skill value to read, the static or dynamic (SKILL_STATIC, SKILL_DYNAMIC).
+
+    * skill - The skill level to get (skill constants can be found in core/players.simba.
+    * skillType - Which skill value to read, the static or dynamic (SKILL_STATIC, SKILL_DYNAMIC).
 
 .. note::
 
@@ -240,7 +241,7 @@ begin
     s := getTextAtEx(atpa[skillType].getBounds(), 0, 3, 3, __COLOR_STATS, 0, statChars, numbers);
     result := strToIntDef(s, -1);
 
-    print('tabStats.getSkillLevel(): result = ' + intToStr(result));
+    print('tabStats.getSkillLevel('+toStr(skill)+'): result = ' + intToStr(result));
   end else
     print('tabStats.getSkillLevel(): Was unable to get the skill box', TDebug.ERROR);
 end;
