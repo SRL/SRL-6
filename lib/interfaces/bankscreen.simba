@@ -36,9 +36,9 @@ Internal bankscreen constants.
 
 *}
 const
- _BANK_SLOTS_OFFSET: TPoint = [41, 108];
- _PACK_SLOTS_OFFSET: TPoint = [523, 111];
- _TAB_OFFSET: TPoint = [34, 65];
+  _BANK_SLOTS_OFFSET: TPoint = [41, 108];
+  _PACK_SLOTS_OFFSET: TPoint = [523, 111];
+  _TAB_OFFSET: TPoint = [34, 65];
 
 (*
 const Deposit Buttons
@@ -53,10 +53,35 @@ const
   QUICK_DEPOSIT_BOB         = 2;
   QUICK_DEPOSIT_MONEY_POUCH = 3;
 
+(*
+const Withdraw Options
+~~~~~~~~~~~~~~~~~~~~~~
+
+Integer constants that represent different withdraw options.  For an example,
+see TRSBankScreen.withdraw.
+
+Example:
+
+.. code-block:: pascal
+
+    bankscreen.withdraw(10, WITHDRAW_AMOUNT_ALL, ['Yew Log', 'Log']);
+*)
 const
   WITHDRAW_AMOUNT_ALL = -1;
   WITHDRAW_AMOUNT_ALL_BUT_ONE = -2;
 
+(*
+const Bank Open Options
+~~~~~~~~~~~~~~~~~~~~~~~
+
+Integer constants that represent different ways to open the bank.
+
+Example:
+
+.. code-block:: pascal
+
+    bankscreen.optn(BANK_NPC_BLUE);
+*)
 const
   BANK_NPC_BLUE = 0;
 
@@ -68,9 +93,7 @@ A type that stores all the attributes and functions of the Runescape bankscreen.
 
 *)
 type
-  TRSBankScreen = record(TRSInterface)
-    __tabSlots: TBoxArray;
-  end;
+  TRSBankScreen = type TRSInterface;
 
 (*
 var bankScreen
@@ -325,6 +348,7 @@ Example:
     if (bankscreen._isDepositButtonVaild(DEPOSIT_BUTTON_DEPOSIT_ALL)) then
       writeln('yey!');
 *)
+
 function TRSBankScreen._isDepositButtonVaild(depositType: integer): boolean;
 const
   DEPOSIT_BUTTON_LOW = 0;
@@ -1010,7 +1034,8 @@ TRSBankScreen.withdraw
 Withdraws the the amount 'amount' from the bank slot 'slot', if the mouse-over
 text is correct, mouse-over text can also be skipped.
 
- * extra vaild constants for 'amount' are:
+Extra vaild constants for 'amount' are:
+
    - WITHDRAW_AMOUNT_ALL = -1;
    - WITHDRAW_AMOUNT_ALL_BUT_ONE = -2;
 
@@ -1383,7 +1408,8 @@ TRSBankScreen.open
     function TRSBankScreen.open(bankType: integer): boolean;
 
 Opens the desired bank, current vaild 'bankType' constants are:
- * BANK_NPC_BLUE
+
+    * BANK_NPC_BLUE
 
 .. note::
 

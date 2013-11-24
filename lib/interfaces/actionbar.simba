@@ -29,7 +29,9 @@ Example
 *)
 type
   TRSActionBar = record(TRSInterface)
+    {$IFNDEF CODEINSIGHT}
     __slots: TBoxArray;
+    {$ENDIF}
     setSlots: boolean;
   end;
 
@@ -100,6 +102,29 @@ begin
 end;
 {$ENDIF}
 
+{*
+function TRSActionBar.__find()
+~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+
+.. code-block:: pascal
+
+    function TRSActionBar.__find(): boolean;
+
+Returns true if the action bar is found.  Sets its coordinates in the process.
+
+.. note::
+
+    - by Olly
+    - Last Updated: 24 November 2013 by Coh3n
+
+Example:
+
+.. code-block:: pascal
+
+    if (not actionbar.__find()) then
+      writeln('Failed to find the actionbar');
+*}
+{$IFNDEF CODEINSIGHT}
 function TRSActionBar.__find(): boolean;
 const
   TOP_HALF = 10328208;
@@ -169,6 +194,7 @@ begin
     result := true;
   end;
 end;
+{$ENDIF}
 
 {*
 TRSActionBar.__isSlotValid

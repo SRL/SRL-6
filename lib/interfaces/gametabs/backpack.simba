@@ -58,7 +58,9 @@ A type that stores functions and properties of the Runescape Backpack tab.
 type
   TRSTabBackpack = record(TRSInterface)
     tabIndex: integer;
+    {$IFNDEF CODEINSIGHT}
     __slots: array [0..1] of TBoxArray;
+    {$ENDIF}
   end;
 
 (*

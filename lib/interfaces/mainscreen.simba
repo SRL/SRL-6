@@ -95,7 +95,29 @@ begin
 end;
 {$ENDIF}
 
-procedure TRSMainScreen.__setup();
+{*
+TRSMainscreen.__setup
+~~~~~~~~~~~~~~~~~~~~~
+
+.. code-block:: pascal
+
+    procedure TRSMainscreen.__setup();
+
+Sets up the mainscreen's bounds based on where the actionbar is found.
+
+.. note::
+
+    - by Olly
+    - Last updated: 24 November 2013 by Olly
+
+Example:
+
+.. code-block:: pascal
+
+    mainscreen.__init();
+*}
+{$IFNDEF CODEINSIGHT}
+procedure TRSMainscreen.__setup();
 const
   PLAYER_BOX_WIDTH = 26;
   PLAYER_BOX_HEIGHT = 38;
@@ -105,6 +127,7 @@ begin
   self.playerBox := [self.playerPoint.x - PLAYER_BOX_WIDTH div 2, self.playerPoint.y - PLAYER_BOX_HEIGHT div 2,
                      self.playerPoint.x + PLAYER_BOX_WIDTH div 2, self.playerPoint.y + PLAYER_BOX_HEIGHT div 2];
 end;
+{$ENDIF}
 
 (*
 TRSMainscreen.setAngle

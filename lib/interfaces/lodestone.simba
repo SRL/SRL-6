@@ -23,6 +23,8 @@ Example:
 
 .. code-block:: pascal
 
+    lodestoneScreen.teleportTo(LOCATION_LUNAR_ISLE);
+
 *)
 const
   LOCATION_LUNAR_ISLE      = 0;
@@ -76,7 +78,7 @@ var
 
 {*
 TRSLodestoneScreen.__init
-~~~~~~~~~~~~~~~~~~~~~~~~~~
+~~~~~~~~~~~~~~~~~~~~~~~~~
 
 .. code-block:: pascal
 
@@ -208,9 +210,9 @@ begin
     print('TRSLodestoneScreen.close(): Failed to close lodestone screen', TDebug.WARNING);
 end;
 
-(*
-TRSLodestoneScreen._getTeleportBox
-~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+{*
+TRSLodestoneScreen._isLocationVaild
+~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
 
 .. code-block:: pascal
 
@@ -229,16 +231,16 @@ Example:
 
     if (lodestoneScreen._isLocationVaild(LOCATION_LUNAR_ISLE)) then
       writeln('vaild.');
-*)
+*}
 function TRSLodestoneScreen._isLocationVaild(location: integer): boolean;
 begin
   result := inRange(location, LOCATION_LUNAR_ISLE, LOCATION_CANIFIS);
 
   if (not result) then
-    print('TRSLodestoneScreen.isLocationVaild(): Location isn''t vaild!');
+    print('TRSLodestoneScreen._isLocationVaild(): Location isn''t vaild!');
 end;
 
-(*
+{*
 TRSLodestoneScreen._getTeleportBox
 ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
 
@@ -258,7 +260,7 @@ Example:
 .. code-block:: pascal
 
     b := lodestoneScreen._getTeleportBox(LOCATION_CANIFIS);
-*)
+*}
 function TRSLodestoneScreen._getTeleportBox(location: integer): TBox;
 const
   pnts: TPointArray = [[34, 55], [91, 155], [86, 207], [190, 98], [181, 135], [156, 189], [150, 235], [137, 274], [242, 121], [210, 157], [243, 155], [212, 236], [303, 96], [282, 134], [268, 180], [265, 225], [335, 158], [298, 187], [315, 219], [315, 273], [352, 206], [393, 150]];
@@ -336,7 +338,6 @@ begin
   end else
     print('TRSLodestoneScreen.teleportTo(): lodestone screen never appeared', TDebug.ERROR);
 end;
-
 
 begin
   lodestoneScreen.__init();

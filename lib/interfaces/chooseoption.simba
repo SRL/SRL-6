@@ -415,9 +415,9 @@ begin
   print('TRSChooseOptions.optionsExist(): result = false');
 end;
 
-(*
-TRSChooseOption.select
-~~~~~~~~~~~~~~~~~~~~~~
+{*
+TRSChooseOption._select
+~~~~~~~~~~~~~~~~~~~~~~~
 
 .. code-block:: pascal
 
@@ -444,7 +444,7 @@ Example:
 
     // to use string match
     chooseOption._select(['Walk To'], MOUSE_LEFT, true, 0.85, 150);
-*)
+*}
 function TRSChooseOption._select(txt: TStringArray; mouseAction: integer; aclose: boolean; matchPercent: extended; waitTime: integer): boolean;
 var
   optionArr: __TOptionArray;

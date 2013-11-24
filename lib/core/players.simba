@@ -31,32 +31,32 @@ Example:
 *)
 const
   SKILL_COUNT = 26;
-    SKILL_ATTACK        = 0;
-    SKILL_HITPOINTS     = 1;
-    SKILL_MINING        = 2;
-    SKILL_STRENGTH      = 3;
-    SKILL_AGILITY       = 4;
-    SKILL_SMITHING      = 5;
-    SKILL_DEFENCE       = 6;
-    SKILL_HERBLORE      = 7;
-    SKILL_FISHING       = 8;
-    SKILL_RANGE         = 9;
-    SKILL_THIEVING      = 10;
-    SKILL_COOKING       = 11;
-    SKILL_PRAYER        = 12;
-    SKILL_CRAFTING      = 13;
-    SKILL_FIREMAKING    = 14;
-    SKILL_MAGIC         = 15;
-    SKILL_FLETCHING     = 16;
-    SKILL_WOODCUTTING   = 17;
-    SKILL_RUNECRAFTING  = 18;
-    SKILL_SLAYER        = 19;
-    SKILL_FARMING       = 20;
-    SKILL_CONSTRUCTION  = 21;
-    SKILL_HUNTER        = 22;
-    SKILL_SUMMONING     = 23;
+    SKILL_ATTACK = 0;
+    SKILL_HITPOINTS = 1;
+    SKILL_MINING = 2;
+    SKILL_STRENGTH = 3;
+    SKILL_AGILITY = 4;
+    SKILL_SMITHING = 5;
+    SKILL_DEFENCE = 6;
+    SKILL_HERBLORE = 7;
+    SKILL_FISHING = 8;
+    SKILL_RANGE = 9;
+    SKILL_THIEVING = 10;
+    SKILL_COOKING = 11;
+    SKILL_PRAYER = 12;
+    SKILL_CRAFTING = 13;
+    SKILL_FIREMAKING = 14;
+    SKILL_MAGIC = 15;
+    SKILL_FLETCHING = 16;
+    SKILL_WOODCUTTING = 17;
+    SKILL_RUNECRAFTING = 18;
+    SKILL_SLAYER = 19;
+    SKILL_FARMING = 20;
+    SKILL_CONSTRUCTION = 21;
+    SKILL_HUNTER = 22;
+    SKILL_SUMMONING = 23;
     SKILL_DUNGEONEERING = 24;
-    SKILL_DIVINATION    = 25;
+    SKILL_DIVINATION = 25;
 
 {*
 const Internal
@@ -68,9 +68,11 @@ File's internal constants.
     * __LOGIN_COLOR_TEXT: The color of the login screen text.
 
 *}
+{$IFNDEF CODEINSIGHT}
 const
   __PATH_PLAYER = IncludePath + 'Players/';
   __LOGIN_COLOR_TEXT = 12378347;
+{$ENDIF}
 
 {*
 var Internal
@@ -80,12 +82,15 @@ File's internal variables.
 
     * _boxUsername: TBox of the username edit box.
     * _boxPassword: TBox of the password edit box.
-	  * __loggedInReference: The point used as reference to check if a player is logged in.
+	  * __areDynamicInterfacesSet: Used to set the bounds of dynamic interfaces.
 
 *}
 var
   _boxUsername: TBox = [-1, -1, -1, -1];
   _boxPassword: TBox = [-1, -1, -1, -1];
+  {$IFNDEF CODEINSIGHT}
+  __areDynamicInterfacesSet: boolean = false;
+  {$ENDIF}
 
 (*
 type TPlayer
@@ -105,7 +110,6 @@ Example:
       nickname := 'fighter1';
       password := 'thisismypassword12345';
     end;
-
 *)
 type
   TPlayer = record
@@ -148,7 +152,6 @@ var
   players: TPlayerArray;
   currentPlayer: integer;
   disableIPScreenshots: boolean;
-  areDynamicInterfacesSet: boolean = false;
 
 (*
 TPlayerArray.getActive
@@ -558,18 +561,41 @@ begin
   print('TPlayer.write()', TDebug.FOOTER);
 end;
 
-procedure setDynamicInterfaces();
+(*
+__setDynamicInterfaces
+~~~~~~~~~~~~~~~~~~~~~~
+
+.. code-block:: pascal
+
+    procedure __setDynamicInterfaces();
+
+Sets the dynamic interfaces upon login.
+
+.. note::
+
+    - by Coh3n
+    - Last updated: Dec. 22nd, 2012 by Zyt3x
+
+Example:
+
+.. code-block:: pascal
+
+    players[currentPlayer].write();
+*)
+{$IFNDEF CODEINSIGHT}
+procedure __setDynamicInterfaces();
 begin
   if (actionBar.__find()) then
   begin
     chatBox.__setup();
     mainScreen.__setup();
 
-    areDynamicInterfacesSet := true;
+    __areDynamicInterfacesSet := true;
 
     print('Dynamic interfaces have been set.', TDebug.SUB);
   end;
 end;
+{$ENDIF}
 
 (*
 isLoggedIn()
@@ -600,8 +626,8 @@ const
 begin
   result := (getColor(minimap.button[MM_BUTTON_COMPASS].center) = CENTER_COMPASS_COLOR);
 
-  if (result) and (not areDynamicInterfacesSet) then
-    setDynamicInterfaces();
+  if (result) and (not __areDynamicInterfacesSet) then
+    __setDynamicInterfaces();
 end;
 
 {*
@@ -626,6 +652,7 @@ Example:
 
     __setInputBoxes();
 *}
+{$IFNDEF CODEINSIGHT}
 const
   __BORDER_LENGTH = 524;
 function __setInputBoxes(): boolean;
@@ -658,6 +685,7 @@ begin
     end;
   end;
 end;
+{$ENDIF}
 
 {*
 __enterLoginInfo()
@@ -684,6 +712,7 @@ Example:
 
     __enterLoginInfo(self.loginName);
 *}
+{$IFNDEF CODEINSIGHT}
 function __enterLoginInfo(const inputBox: TBox; const info: string; clickBox: boolean = true; pressEnter: boolean = true): boolean;
 var
   tpa: TPointArray;
@@ -733,6 +762,7 @@ begin
   typeSend(info, pressEnter);
   result := true;
 end;
+{$ENDIF}
 
 {*
 __secureEnterInfo
@@ -757,6 +787,7 @@ Example:
 
     See __loginResponse();
 *}
+{$IFNDEF CODEINSIGHT}
 function __secureEnterInfo(user, pass: string): boolean;
 var
   i, j, uL, pL, uH, pH, uLen, pLen, tmp: integer;
@@ -837,6 +868,7 @@ begin
 
   mouseSpeed := tmp;
 end;
+{$ENDIF}
 
 {*
 __loginActions
@@ -860,6 +892,7 @@ Example:
 
     See __loginResponse();
 *}
+{$IFNDEF CODEINSIGHT}
 function __loginActions(const action: string): boolean;
 begin
   result := true;
@@ -887,6 +920,7 @@ begin
       end;
   end;
 end;
+{$ENDIF}
 
 {*
 __getLoginResponse
@@ -909,6 +943,7 @@ Example:
 
     See TPlayer.__loginResponse();
 *}
+{$IFNDEF CODEINSIGHT}
 const
   __RES_DEBUG  = 0;
   __RES_WAIT   = 1;
@@ -960,6 +995,7 @@ begin
       end;
   end;
 end;
+{$ENDIF}
 
 {*
 TPlayer.__loginResponse
@@ -987,6 +1023,7 @@ Example:
 
     See TPlayer.loginToLobby();
 *}
+{$IFNDEF CODEINSIGHT}
 const
   __RES_NOTHING   = -1;
   __RES_POPUP     = 0;
@@ -1046,6 +1083,7 @@ begin
     end;
   end;
 end;
+{$ENDIF}
 
 (*
 TPlayer.loginToLobby
@@ -1078,7 +1116,7 @@ begin
   if (isLoggedIn() or lobby.isOpen()) then
     exit(true);
 
-  areDynamicInterfacesSet := false;
+  __areDynamicInterfacesSet := false;
 
   if ((_boxUsername.x1 = -1) or (_boxPassword.x1 = -1)) then
     if (not __setInputBoxes()) then
