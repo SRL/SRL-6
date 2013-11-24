@@ -160,7 +160,7 @@ begin
 
   with self.tabs[TAB_STATS] do
   begin
-    _bmp := bitmapFromString(6, 8, 'meJwT5v0gDEZ8vIlmSfzJG9iEYSIiYqqBrSxwEU7ugwJ6IgnL2eEiArw92ppCSWsRIqJSnsaJvEBu2CQGIJed8zi/oGJgGxNQxDSPCyjCyzWBX0c4uJsRyIWI8HAnaWsKQ7hABADwIifh');
+    _bmp := bitmapFromString(6, 7, 'meJyzsXgszPtBXVU9fg1nwjoQsrF4zMU5V91UBMIFIqACfqF003QOZBE+Ad2sZEG4CDvnCVUToYS1UG5OqgAvT72KMUKBSTaboJi/STo7XETFRBAAw3ol8A==');
     _navBarId := NAV_BUTTON_HERO;
     _navBarBoxIndex := 1;
   end;
@@ -449,7 +449,7 @@ begin
   if (not self.isSetup) then
     self.__initTabs();
 
-  result := findBitmapToleranceIn(self.tabs[tab]._bmp, p.x, p.y, searchBox, 10);
+  result := findBitmapToleranceIn(self.tabs[tab]._bmp, p.x, p.y, searchBox, 50);
 end;
 
 (*
