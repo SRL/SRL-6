@@ -471,11 +471,11 @@ function __findMouseOverBox(out box: TBox): boolean;
 const
   BORDER_COLOR = 4208424;
   BORDER_TOLERANCE = 7;
-  COLOR_CHECK = 3616289;
+  CORNER_COLOR = 3616289;
 var
   p: TPoint;
   clientArea, searchBox: TBox;
-  tpaBorder, tpaColorCheck: TPointArray;
+  tpaBorder, tpaBorderPoints, tpa: TPointArray;
   atpa: T2DPointArray;
   i, h: integer;
   b: TBox;
@@ -491,31 +491,33 @@ begin
   searchBox.setLimit(clientArea);
 
   if (findColorsTolerance(tpaBorder, BORDER_COLOR, searchBox, BORDER_TOLERANCE)) then
-  begin
-    atpa := clusterTPAEx(tpaBorder, 2, 2);
-    sortATPASize(atpa, true);
-
-    h := high(atpa);
-
-    for i := 0 to h do
+    if (findColors(tpaBorderPoints, CORNER_COLOR, searchBox)) then
     begin
-      b := getTPABounds(atpa[i]);
+      tpa := combineTPA(tpaBorder, tpaBorderPoints);
+      atpa := clusterTPAEx(tpa, 1, 1);
+      sortATPASize(atpa, true);
 
-      if (b.getWidth() < 20) or (b.getHeight() < 10) then // basic size check
-        continue;
+      h := high(atpa);
 
-      if (findColors(tpaColorCheck, COLOR_CHECK, b)) then  // search for the 4 color check points
+      for i := 0 to h do
       begin
-        if (length(tpaColorCheck) = 4) then  // should be only 4 corner pixels
-          result := (getColor(b.x1 +1, b.y1) and getColor(b.x2 -1, b.y2) = COLOR_CHECK); // check that two box points are the right color
+        if (length(atpa[i]) < 15) then
+          continue;
 
-        box := [b.x1 +1, b.y1 +1, b.x2 -1, b.y2 -1];  // set the result (decrease bounds by 1)
+        b := atpa[i].getBounds();
+
+        if (b.getWidth() < 50) or (b.getHeight() < 15) then // basic size check
+          continue;
+
+        result := (getColor(b.x1+1, b.y1) = CORNER_COLOR);// check corner is a corner color
 
         if (result) then
+        begin
+          box := [b.x1 +1, b.y1 +1, b.x2 -1, b.y2 -1];  // set the result (decrease bounds by 1)
           break;
+        end;
       end;
     end;
-  end;
 end;
 {$ENDIF}
 

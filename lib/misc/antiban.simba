@@ -20,6 +20,7 @@ The source for this file can be found
 {$include_once ../interfaces/gametabs/backpack.simba}
 {$include_once ../interfaces/conversationbox.simba}
 {$include_once ../interfaces/mainscreen.simba}
+{$include_once ../interfaces/gametabs/stats.simba}
 
 (*
 randomRClickItem
@@ -45,41 +46,32 @@ Example:
 *)
 procedure randomRClickItem();
 var
-  I: array[BACKPACK_SLOT_LOW..BACKPACK_SLOT_HIGH] of Boolean;
-  II, M, R: Byte;
-  Inv: Boolean;
+  t, i: integer;
+  slots: TIntegerArray;
 begin
-  if (not isLoggedIn()) then
-    exit;
+  t := gameTabs.getActiveTab();
 
-  M := mouseSpeed;
-  mouseSpeed := 7 + Random(25);
+  if (t <> TAB_BACKPACK) then
+    gameTabs.openTab(TAB_BACKPACK);
 
-  if (tabBackpack.isFull()) then
+  if (tabBackpack.count() > 0) then
   begin
-    print('Backpack is full');
-    tabBackpack.mouseSlot(25{random(BACKPACK_SLOT_HIGH - 1) + 1}, MOUSE_RIGHT);
-  end else
-  begin
-    for II := Low(I) to High(I) do
-      I[II] := tabBackpack.isItemInSlot(II);
+    for i := BACKPACK_SLOT_LOW to BACKPACK_SLOT_HIGH do
+      if (tabBackpack.isItemInSlot(i)) then
+        insert(i, slots);
 
-    R := RandomRange(BACKPACK_SLOT_LOW, BACKPACK_SLOT_HIGH);
-    while (not I[R - 1]) do
-      R := RandomRange(BACKPACK_SLOT_LOW, BACKPACK_SLOT_HIGH);
+    tabBackpack.mouseSlot(slots[random(high(slots))], MOUSE_RIGHT);
 
-    tabBackpack.mouseSlot(R, MOUSE_RIGHT);
+    if (random(2) = 0) then
+     chooseOption.select(['xamine'])
+    else
+     chooseOption.select(['ancel']);
+
+    wait(50 + random(3000));
   end;
 
-  Inv := False;
-
-  if (Random(3) > 0) then
-    Inv := chooseOption.select(['xamine']);
-
-  if (not Inv) then
-    chooseOption.select(['ancel']);
-
-  MouseSpeed := M;
+  if (t <> TAB_BACKPACK) then
+    gameTabs.openTab(t);
 end;
 
 (*
@@ -468,7 +460,7 @@ begin
 
   repeat
     tab := random(high(gameTabs.tabs));
-  until (tab <> t); // make sure it's a different tab
+  until (tab <> t) and (tab <> TAB_TASK); // make sure it's a different tab
 
   gameTabs.openTab(tab);
   wait(randomRange(300, 1000));
@@ -535,11 +527,10 @@ mouseMovingObject
 
 .. code-block:: pascal
 
-    procedure mouseMovingObject(playerBox: TBox = [0, 0, 0, 0]);
+    procedure mouseMovingObject();
 
 Splits the screen up into boxes and hovers the one with the most pixel shifts.
-Will randomly right-click and examine the object.  Will exclude all points in
-'playerBox'.
+Will randomly right-click and examine the object.
 
 .. note::
 
@@ -552,7 +543,7 @@ Example:
 
     mouseMovingObject();
 *)
-procedure mouseMovingObject(playerBox: TBox = [-1, -1, -1, -1]);
+procedure mouseMovingObject();
 var
   boxes: TBoxArray;
   i, mostShift: integer;
@@ -568,7 +559,7 @@ begin
   mostShift := 0;
 
   for i := 0 to high(boxes) do
-    if (not boxes[i].overlap(playerBox)) then
+    if (not boxes[i].overlap(mainScreen.playerBox)) then
       if (tia[i] > mostShift) then
       begin
         mostShift := tia[i];
@@ -766,5 +757,102 @@ begin
   end;
 
   freeBitmap(bmpCross);
+end;
+
+(*
+hoverSkill
+~~~~~~~~~~
+
+.. code-block:: pascal
+
+    procedure hoverSkill(skill: integer);
+
+Hovers the skill 'skill'.
+
+.. note::
+
+    - by Olly
+    - Last Updated: 23 October 2013 by Olly
+
+Example:
+
+.. code-block:: pascal
+
+    hoverSkill(SKILL_ATTACK);
+*)
+procedure hoverSkill(skill: integer);
+var
+  t: integer;
+begin
+  t := gameTabs.getActiveTab();
+
+  if (t <> TAB_STATS) then
+    gameTabs.openTab(TAB_STATS);
+
+  mouseBox(tabStats.getSkillBox(skill), MOUSE_MOVE);
+
+  wait(50 + random(4500));
+
+  if (t <> TAB_STATS) then
+    gameTabs.openTab(t);
+end;
+
+(*
+hoverOnlineFriend
+~~~~~~~~~~~~~~~~~
+
+.. code-block:: pascal
+
+    procedure hoverOnlineFriend();
+
+Hovers an online friend.
+
+.. note::
+
+    - by Olly
+    - Last Updated: 23 October 2013 by Olly
+
+Example:
+
+.. code-block:: pascal
+
+    hoverOnlineFriend();
+*)
+procedure hoverOnlineFriend();
+var
+  tpa: TPointArray;
+  atpa: T2DPointArray;
+  r, t: integer;
+  b: TBox;
+begin
+  t := gameTabs.getActiveTab();
+
+  if (t <> TAB_FRIENDS) then
+    gameTabs.openTab(TAB_FRIENDS);
+
+  if (findColorsTolerance(tpa, 5301219, gameTabs.tabArea, 10, colorSetting(2, 0.02, 2.76))) then
+  begin
+    atpa := clusterTPAEx(tpa, 20, 3);
+    filterTPAsBetween(atpa, 0, 5);
+
+    if (high(atpa) > -1) then
+    begin
+      b := getTPABounds(atpa[random(high(atpa))]);
+      mouse(intToBox(gameTabs.tabArea.x1+10, b.y1, b.x2, b.y2).getRandomPoint());
+      wait(500 + random(2000));
+
+      if (random(2) = 0) then
+      begin
+        fastClick(MOUSE_RIGHT);
+        wait(400 + random(1500));
+
+        if (chooseOption.isOpen()) then
+          chooseOption.close();
+      end;
+    end;
+  end;
+
+  if (t <> TAB_FRIENDS) then
+    gameTabs.openTab(t);
 end;
 

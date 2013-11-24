@@ -78,34 +78,6 @@ Internal SMART variables used only in smart.simba.
   smartImage: TMufasaBitmap;
 
 (*
-getClientDimensions; override;
-~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
-
-.. code-block:: pascal
-
-     procedure getClientDimensions(var w, h: integer); override;
-
-Overrides GetClientDimensions and sets w and h to the SMART_CLIENT constants.
-
-.. note::
-
-    - By: Olly
-    - Last Updated: July 24, 2013 by Olly
-
-Example:
-
-.. code-block:: pascal
-
-    getClientDimensions(w, h);
-
-*)
-procedure getClientDimensions(var w, h: integer); override;
-begin
-  w := __smartClientWidth;
-  h := __smartClientHeight;
-end;
-
-(*
 findJavaPath
 ~~~~~~~~~~~~
 
