@@ -472,47 +472,96 @@ begin
 end;
 
 (*
-type TColorSettings
-~~~~~~~~~~~~~~~~~~~
+type TColorData
+~~~~~~~~~~~~~~~
 
-A record that stores the colors, tolerances, and modiferes of a object
+A record that stores the colors, tolerances, and modifiers of a color
 
   var
-    bankerColors: TObj;
+  col: TColorData;
 
   begin
-    with bankerColors do
-    begin
-      cols := [454534, 5656565];
-      tols := [15, 20];
-      // modifers for each color (cts, hue, sat)
-      mods := [[2, 0.44, 0.77], [2, 0.44, 0.44]];
-    end;
+    col.color := 1501044;
+    col.tolerance := 50;
+    col.modifier.cts := 2;
+    col.modifier.hue := 1.11;
+    col.modifier.sat := 0.05;
+
+   writeln(col);
   end;
 *)
+
 type
   TColorData = record
-    cols, tols: TIntegerArray;
-    mods: array of record cts: byte; hue, sat: extended;  end;
+    color, tolerance: integer;
+    modifier: record cts: byte; hue, sat: extended; end;
  end;
 
-function TColorData.gather(out tpa: TPointArray; searchArea: TBox): boolean;
-var
-  atpa: T2DPointArray;
-  i, h: integer;
-begin
-  h := high(self.cols);
+(*
+type T2DColorData
+~~~~~~~~~~~~~~~~~
 
-  setLength(atpa, h +1);
+A record that stores the colors, tolerances, and modifiers of an array of color
+
+  var
+  cols: T2DColorData;
+
+  begin
+    setLength(cols, 2);
+
+    cols[0].color := 1555;
+    cols[0].modifier.cts := 2;
+    cols[0].modifier.sat := 1.12;
+
+    cols[1].color := 144455;
+    cols[1].tolerance := 50;
+    cols[1].modifier.hue := 0.55;
+
+    writeln(cols);
+  end.
+*)
+type
+  T2DColorData = array of TColorData;
+
+(*
+T2DColorData.gatherIn
+~~~~~~~~~~~~~~~~~~~~~
+
+.. code-block:: pascal
+
+    function T2DColorData.gatherIn(var tpa: TPointArray; area: TBox): boolean;
+
+Gathers the colors in the T2DColorData.
+
+.. note::
+
+    - by Olly
+    - Last Updated: 22 November 2013 by Olly
+
+Example:
+
+.. code-block:: pascal
+
+     cols.gatherIn(tpa, myBox);
+*)
+function T2DColorData.gatherIn(var tpa: TPointArray; area: TBox): boolean;
+var
+  h, i: byte;
+  atpa: T2DPointArray;
+begin
+  h := high(self);
+
+  if (h < 0) then
+    exit(false);
+
+  setLength(atpa, h+1);
 
   for i := 0 to h do
-    findColorsTolerance(atpa[i], self.cols[i], searchArea, self.tols[i],
-                        colorSetting(self.mods[i].cts, self.mods[i].hue, self.mods[i].sat));
+    findColorsTolerance(atpa[i], self[i].color, area, self[i].tolerance,
+    colorSetting(self[i].modifier.cts, self[i].modifier.hue, self[i].modifier.sat));
 
   tpa := mergeATPA(atpa);
-
-  if (h > 0) then
-    clearDoubleTPA(tpa);
+  clearDoubleTPA(tpa);
 
   result := (length(tpa) > 0);
 end;

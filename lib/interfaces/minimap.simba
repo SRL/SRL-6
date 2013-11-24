@@ -2537,21 +2537,23 @@ Example:
 
     __GridCoords16(point(50, 50));
 *)
-function __GridCoords16(Grid16: TPoint): TPoint;
+Function __GridCoords16(Grid16: TPoint): TPoint;
 var
-  Yh, yMod, ym, xmod: Extended;
-  x, y: extended;
+  Yh, yM, x, y: Extended;
+  p: TPoint;
 begin
-  X := Grid16.x+0.0;
-  y := Grid16.y+0.0;
-  yM := 45;
+  p := mainScreen.playerPoint;
+
+  x := Grid16.x;
+  y := Grid16.y;
+  yM := 45.0;
   Yh := Abs(Y + yM);
 
-  result.x := round((290.5+Xmod) + (X*6.8/(12.8-(Yh/yM*3.15)))*9.75);
-  result.y := round((202.0+Ymod) + Y*(5.4 + ((Yh/yM)*0.75)));
+  result.x := round(p.x + (X*6.7/(12.8-(Yh/yM*3.10)))*9.75);
+  result.y := round(p.y + Y * (4.40 + ((Yh/yM)*1.40)));
 
   if (not pointInBox(result, mainScreen.getBounds())) then
-    result := Point(-1, -1);
+    result := [-1, -1];
 end;
 
 (*
@@ -2577,7 +2579,7 @@ Example:
 *)
 function TRSMinimap.pointToMainscreen(const point: TPoint): TPoint;
 begin
-  result := __GridCoords16([point.x-688, point.y-106]);
+  result := __GridCoords16([point.x-self.cx, point.y-self.cy]);
 end;
 
 (*
@@ -2588,7 +2590,8 @@ TRSMinimap.pointsToMainscreen
 
     function TRSMinimap.pointsToMainscreen(points: TPointArray; sortFromPlayer: boolean = true): TPointArray;
 
-Converts a tpa of points on the minimap to mainscreen points.
+Converts a tpa of points on the minimap to mainscreen points, will delete points
+that aren't on the mainscreen.
 
 .. note::
 
@@ -2603,16 +2606,24 @@ Example:
 *)
 function TRSMinimap.pointsToMainscreen(points: TPointArray; sortFromPlayer: boolean = true): TPointArray;
 var
-  i: integer;
-  p: TPoint;
+  i, hi: integer;
+  p, tmp: TPoint;
 begin
-  setLength(result, length(points));
+  hi := high(points);
 
-  for i := 0 to high(result) do
-    result[i] := self.pointToMainscreen(points[i]);
+  if (hi < 0) then
+    exit;
+
+  for i := 0 to hi do
+  begin
+    tmp := self.pointToMainscreen(points[i]);
+
+    if (not tmp.equals(point(-1, -1))) then
+      insert(tmp, result);
+  end;
 
   if (sortFromPlayer) then
-    sortTPAFrom(result, mainScreen.getPlayerPoint());
+    sortTPAFrom(result, mainScreen.playerPoint);
 end;
 
 begin

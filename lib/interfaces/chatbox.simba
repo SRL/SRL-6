@@ -11,6 +11,7 @@ The source for this file can be found
 *)
 
 {$include_once interfaces.simba}
+{$include_once actionbar.simba}
 {$include_once ../core/text.simba}
 
 {$f-}
@@ -23,8 +24,9 @@ A type that stores functions and properties of the Runescape chat box interface.
 *)
 type
   TRSChatbox = record(TRSInterface)
-    chatArea: TBox;
+    lineBoxes: TBoxArray;
   end;
+
 
 (*
 var chatbox
@@ -65,11 +67,40 @@ begin
     ID := ID_INTERFACE_CHAT_BOX;
     parentID := -1;
     static := false;
-    setBounds([1, 362, 573, 598]);
-    chatArea := [4, 429, 571, 577];
   end;
 end;
 {$ENDIF}
+
+procedure TRSChatbox.__setup();
+var
+  b, chatBounds: TBox;
+  wid, hei, i: integer;
+  p: TPoint;
+begin
+  setLength(self.lineBoxes, 0);
+  getClientDimensions(wid, hei);
+
+  self.setBounds([1, actionBar.y2, gameTabs.tabArea.x1, hei-2]);
+  setLength(lineBoxes, 0);
+
+  chatBounds := chatBox.getChatArea();
+
+  for i := 0 to 10 do
+  begin
+    p.y := 568 - (i * 14);
+    b := [chatBounds.x1, p.y-9, chatBounds.x2, p.y+9];
+
+    if (b.y1 < chatBox.getChatArea().y1) then
+      break();
+
+    insert(b, self.lineBoxes);
+  end;
+end;
+
+function TRSChatbox.getChatArea(): TBox;
+begin
+  result := intToBox(self.x1+3, self.y1 + 67, self.x2-20, self.y2-21);
+end;
 
 (*
 TRSChatbox.findAnyText
@@ -96,10 +127,27 @@ function TRSChatbox.findAnyText(txt: TStringArray): boolean;
 var
   p: TPoint;
 begin
-  result := findText(p, txt, [smallchars], chatArea);
+  result := findText(p, txt, [smallchars], self.getChatArea());
 
   if (result) then
     print('TRSChatbox.findAnyText(): Found "'+toStr(txt)+'"', TDebug.SUB);
+end;
+
+function TRSChatbox.findTextOnLines(txt: TStringArray; lines: TIntegerArray): boolean;
+var
+  i: integer;
+  p: TPoint;
+begin
+  for i := 0 to high(lines) do
+  begin
+    result := findText(p, txt, [SmallChars], self.lineBoxes[lines[i]]);
+
+    if (result) then
+    begin
+      print('TRSChatBox.findTextOnLines(): Found text '+toStr(txt)+' on line '+intToStr(i));
+      exit();
+    end;
+  end;
 end;
 
 begin

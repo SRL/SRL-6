@@ -40,7 +40,10 @@ type TRSMainscreen
 A type that stores functions and properties of the Runescape main screen.
 *)
 type
-  TRSMainscreen = type TRSInterface;
+  TRSMainscreen = record(TRSInterface)
+    playerPoint: TPoint;
+    playerBox: TBox;
+  end;
 
 (*
 var mainscreen
@@ -88,100 +91,19 @@ begin
     ID := ID_INTERFACE_MAINSCREEN;
     parentID := -1;
     static := true;
-    setBounds([0, 0, 575, 282]);
   end;
 end;
 {$ENDIF}
 
-(*
-TRSMainscreen.getBounds; override
-~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
-
-.. code-block:: pascal
-
-    function TRSMainscreen.getBounds(): TBox; override;
-
-Override function that takes in account the actionbar status to give the bounds
-of the mainscreen.
-
-.. note::
-
-    - by Olly
-    - Last Updated: 19 Novemeber 2013 by Olly
-
-Example:
-
-.. code-block:: pascal
-
-    b := mainScreen.getBounds();
-*)
-function TRSMainscreen.getBounds(): TBox; override;
-begin
-  if (not actionBar.isOpen()) then
-    result := [0, 0, 575, 320]
-  else
-    result := [0, 0, 575, 282];
-end;
-
-(*
-TRSMainscreen.getPlayerPoint
-~~~~~~~~~~~~~~~~~~~~~~~~~~~~
-
-.. code-block:: pascal
-
-    function TRSMainscreen.getPlayerPoint(): TPoint;
-
-Returns the players point on the mainsceen.
-
-.. note::
-
-    - by Olly
-    - Last Updated: 19 Novemeber 2013 by Olly
-
-Example:
-
-.. code-block:: pascal
-
-    p := mainScreen.getPlayerPoint();
-*)
-function TRSMainscreen.getPlayerPoint(): TPoint;
-begin
-  result := middleBox([0, 0, 575, 282]);
-  incEx(result.y, 28);
-end;
-
-(*
-TRSMainscreen.getPlayerBox
-~~~~~~~~~~~~~~~~~~~~~~~~~~
-
-.. code-block:: pascal
-
-    function TRSMainscreen.getPlayerBox(): TBox;
-
-Returns a TBox of the player on the mainscreen.
-
-.. note::
-
-    - by Olly
-    - Last Updated: 19 Novemeber 2013 by Olly
-
-Example:
-
-.. code-block:: pascal
-
-    b := mainScreen.getPlayerBox();
-*)
-function TRSMainscreen.getPlayerBox(): TBox;
+procedure TRSMainScreen.__setup();
 const
-  BOX_WIDTH = 26;
-  BOX_HEIGHT = 38;
-var
-  p: TPoint;
+  PLAYER_BOX_WIDTH = 26;
+  PLAYER_BOX_HEIGHT = 38;
 begin
-  p := self.getPlayerPoint();
-
-  result := [p.x - BOX_WIDTH div 2, p.y - BOX_HEIGHT div 2,
-             p.x + BOX_WIDTH div 2, p.y + BOX_HEIGHT div 2];
+  self.setBounds([1, 1, gameTabs.tabArea.x1, actionBar.y1]);
+  self.playerPoint := middleBox([1, 1, 574, 387]); // the whole 3d gamescreen
+  self.playerBox := [self.playerPoint.x - PLAYER_BOX_WIDTH div 2, self.playerPoint.y - PLAYER_BOX_HEIGHT div 2,
+                     self.playerPoint.x + PLAYER_BOX_WIDTH div 2, self.playerPoint.y + PLAYER_BOX_HEIGHT div 2];
 end;
 
 (*
@@ -381,7 +303,7 @@ Example:
 *)
 function TRSMainscreen.findObject(var ix, iy: integer; col, tol: integer; mouseOverText: TStringArray; mouseAction: integer = MOUSE_LEFT): boolean; overload;
 begin
-  result := self.findObject(ix, iy, col, tol, colorSetting(1), self.getPlayerPoint(), 15, 15, 2, mouseOverText, mouseAction);
+  result := self.findObject(ix, iy, col, tol, colorSetting(1), self.playerPoint, 15, 15, 2, mouseOverText, mouseAction);
 end;
 
 begin

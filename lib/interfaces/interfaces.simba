@@ -161,3 +161,4 @@ function TRSInterface.getCenterPoint(): TPoint;
 begin
   result := self.getBounds().getMiddle();
 end;
+

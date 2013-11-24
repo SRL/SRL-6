@@ -30,7 +30,7 @@ Example
 type
   TRSActionBar = record(TRSInterface)
     __slots: TBoxArray;
-    closedBounds, openedBounds: TBox;
+    setSlots: boolean;
   end;
 
 (*
@@ -94,20 +94,78 @@ begin
     name := 'RS Action Bar';
     ID := ID_INTERFACE_ACTION_BAR;
     parentID := ID_INTERFACE_MAINSCREEN;
-    static := true;
-
-    openedBounds := [1, 287, 574, 360];
-    closedBounds := [1, 324, 574, 360];
-
-    __slots := Grid(14, 1, 29, 29, 36, 0, Point(openedBounds.x1 + 66, openedBounds.y1 + 48));
-
-    self.__slots[high(self.__slots)-1].offset([18, 0]);
-    self.__slots[high(self.__slots)].offset([18, 0]);
-
-    self.setBounds(openedBounds);
+    static := false;
+    setSlots := false;
   end;
 end;
 {$ENDIF}
+
+function TRSActionBar.__find(): boolean;
+const
+  TOP_HALF = 10328208;
+  BOTTOM_HALF = 11052187;
+  BUTTON_LENGTH = 9;
+  BORDER_COLOR = 3945514;
+  OFFSET_Y = 10;
+var
+  i, c, j, topY, bottomY: integer;
+  tpa: TPointArray;
+  atpa: T2DPointArray;
+  p: TPoint;
+  b: TBox;
+begin
+  result := false;
+
+  if (not findColors(tpa, TOP_HALF, 0, 0, gameTabs.tabArea.x1, getClientBounds().y2)) then
+    exit();
+
+  topY := -1;
+  bottomY := -1;
+
+  atpa := clusterTPAEx(tpa, 3, 3);
+
+  for i := 0 to high(atpa) do
+    if (length(atpa[i]) = BUTTON_LENGTH) then
+    begin
+      c := 0;
+
+      for j := 0 to high(atpa[i]) do
+        if (getColor(atpa[i][j].x, atpa[i][j].y+1) = BOTTOM_HALF) then
+          inc(c);
+
+      if (c = BUTTON_LENGTH) then
+      begin
+        topY := (atpa[i][0].y - OFFSET_Y);
+        break();
+      end;
+    end;
+
+  if (topY > -1) then
+  begin
+    p := middleTPA(atpa[i]);
+
+    for i := p.y to (p.y + 100) do
+      if (getColor(p.x, i) = BORDER_COLOR) then
+      begin
+        bottomY := i;
+        break();
+      end;
+
+    self.setBounds([1, topY, gameTabs.tabArea.x1, bottomY]);
+
+    if (not self.setSlots) then
+    begin
+      __slots := grid(14, 1, 29, 29, 36, 0, point(self.x1 + 66, self.y1 + 53));
+
+      self.__slots[high(self.__slots)-1].offset([18, 0]);
+      self.__slots[high(self.__slots)].offset([18, 0]);
+      setSlots := true;
+    end;
+
+    print('Found and set actionbar bounds @ '+toStr(self.getBounds()), TDebug.SUB);
+    result := true;
+  end;
+end;
 
 {*
 TRSActionBar.__isSlotValid
@@ -174,162 +232,6 @@ begin
   exit(resultValue);
 end;
 {$ENDIF}
-
-function TRSActionBar.__getMinimizeButtonBounds(opened: boolean): TBox;
-begin
-  result := [self.closedBounds.x2-16, self.closedBounds.y1, self.closedBounds.x2, self.closedBounds.y1 + 16];
-
-  if (opened) then
-    result.offset([0, -38]);
-end;
-
-function TRSActionBar.__findButton(area: TBox): boolean;
-var
-  wid, hei: integer;
-  tpa: TPointArray;
-begin
-  if (findColorsTolerance(tpa, 10722966, area, 11)) then
-  begin
-    getTPABounds(tpa).getDimensions(wid, hei);
-    result := ((wid = 9) and (hei = 2));
-  end;
-end;
-
-{*
-TRSActionBar.__toggleSelf
-~~~~~~~~~~~~~~~~~~~~~~~~~
-
-.. code-block:: pascal
-
-    function TRSActionBar.__toggleSelf(open: boolean): boolean;
-
-Internal function used to toggle the Action Bar open and closed.
-
-.. note::
-
-    - by euphemism
-    - Last Updated: 18 April 2013 by euphemism
-
-Example:
-
-.. code-block:: pascal
-
-    if (actionBar.__toggleSelf(true)) then
-      writeln('Action Bar is open.');
-*}
-{$IFNDEF CODEINSIGHT}
-function TRSActionBar.__toggleSelf(open: boolean): boolean;
-var
-  b: TBox;
-  center: TPoint;
-  t: TTimeMarker;
-begin
-  if (open) and (self.isOpen()) then
-    exit(true);
-
-  if (not open) and (not self.isOpen()) then
-    exit(true);
-
-  mouse(self.__getMinimizeButtonBounds(not open).getMiddle().randRange(-5, 5), MOUSE_LEFT);
-  result := true;
-end;
-{$ENDIF}
-
-(*
-TRSActionBar.isOpen
-~~~~~~~~~~~~~~~~~~~
-
-.. code-block:: pascal
-
-    function TRSActionBar.isOpen(): boolean;
-
-Returns true if the Action Bar is open.
-
-.. note::
-
-    - by euphemism
-    - Last Updated: 18 April 2013 by euphemism
-
-Example:
-
-.. code-block:: pascal
-
-    if (actionBar.isOpen()) then
-      writeln('Action Bar open and ready to use!');
-*)
-function TRSActionBar.isOpen(): boolean;
-begin
-  result := (not self.__findButton(self.__getMinimizeButtonBounds(false))); // look for the button, in the closed postion
-
-  if (result) then
-    self.setBounds(self.openedBounds)
-  else
-    self.setBounds(self.closedBounds);
-end;
-
-(*
-TRSActionBar.open
-~~~~~~~~~~~~~~~~~
-
-.. code-block:: pascal
-
-    function TRSActionBar.open(): boolean;
-
-Opens the Action Bar if it is closed.
-
-.. note::
-
-    - by euphemism
-    - Last Updated: 18 April 2013 by euphemism
-
-Example:
-
-.. code-block:: pascal
-
-    if (actionBar.open()) then
-      writeln('Successfully opened the Action Bar.');
-*)
-function TRSActionBar.open(): boolean;
-begin
-
-  result := self.__toggleSelf(true);
-end;
-
-(*
-TRSActionBar.close
-~~~~~~~~~~~~~~~~~~
-
-.. code-block:: pascal
-
-    function TRSActionBar.close(): boolean;
-
-Closes the Action Bar if it is open.
-
-.. note::
-
-    - by euphemism
-    - Last Updated: 18 April 2013 by euphemism
-
-Example:
-
-.. code-block:: pascal
-
-    if (actionBar.close()) then
-      writeln('Successfully closed the Action Bar.');
-*)
-function TRSActionBar.close(): boolean;
-begin
-  if (not self.isOpen()) then
-    exit(true);
-
-  self.__toggleSelf(false);
-  wait(150 + random(250));
-  mouse(point(498, 286).rand(15, 6));
-  dragMouse(point(489, 326).rand(20, 15));
-
-  wait(150 + random(250));
-  result := (not self.isOpen());
-end;
 
 (*
 TRSActionBar.getCurrentBar

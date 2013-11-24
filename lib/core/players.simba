@@ -13,6 +13,7 @@ The source for this file can be found `here <https://github.com/SRL/SRL-6/blob/m
 {$include_once ../interfaces/options.simba}
 {$include_once ../interfaces/minimap.simba}
 {$include_once ../core/mouse.simba}
+{$include_once ../utilities/wrappers.simba}
 
 {$f-}
 
@@ -147,6 +148,7 @@ var
   players: TPlayerArray;
   currentPlayer: integer;
   disableIPScreenshots: boolean;
+  areDynamicInterfacesSet: boolean = false;
 
 (*
 TPlayerArray.getActive
@@ -556,6 +558,19 @@ begin
   print('TPlayer.write()', TDebug.FOOTER);
 end;
 
+procedure setDynamicInterfaces();
+begin
+  if (actionBar.__find()) then
+  begin
+    chatBox.__setup();
+    mainScreen.__setup();
+
+    areDynamicInterfacesSet := true;
+
+    print('Dynamic interfaces have been set.', TDebug.SUB);
+  end;
+end;
+
 (*
 isLoggedIn()
 ~~~~~~~~~~~~
@@ -584,6 +599,9 @@ const
   CENTER_COMPASS_COLOR = 8508157;
 begin
   result := (getColor(minimap.button[MM_BUTTON_COMPASS].center) = CENTER_COMPASS_COLOR);
+
+  if (result) and (not areDynamicInterfacesSet) then
+    setDynamicInterfaces();
 end;
 
 {*
@@ -1059,6 +1077,8 @@ var
 begin
   if (isLoggedIn() or lobby.isOpen()) then
     exit(true);
+
+  areDynamicInterfacesSet := false;
 
   if ((_boxUsername.x1 = -1) or (_boxPassword.x1 = -1)) then
     if (not __setInputBoxes()) then
