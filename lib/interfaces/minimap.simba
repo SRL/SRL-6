@@ -1401,11 +1401,9 @@ begin
       with result do
       begin
         name := 'Fishing Spot';
-        bmp := BitmapFromString(15, 5, 'z78DA8DCE410E80300844D12B4D5BA' +
-          '9BAA404EE7F2413675343AA6EFE82D217D061682636ACCCADA779' +
-          '045B641F117987CDAFB84D2479D67257B28A0EFD90B9C9F9BB3FD' +
-          'FF02EC337F347B39977D83F37AFFEA2D76EDEA4543DE870B2922F' +
-          'BB6B6878');
+        bmp := BitmapFromString(15, 5, 'meJxjZGA4AAOfdzkC0b8pegeQwEs' +
+          '/TgiDkYGBEaYYogwoBUTI6oHc+fPnoykGCgLZEMUQBDEBUzGyGkyE' +
+          '1WQ4OiXBAERANUASWTEAcqluOw==');
         color := 16743189;
       end;
 
