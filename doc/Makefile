@@ -2,15 +2,15 @@
 
 core = client debug globals mouse players text
 
-interfaces = actionbar bankscreen chatbox interfaces mainscreen minimap options pinscreen
+interfaces = actionbar bankscreen chatbox chooseoption conversationbox interfaces lodestone mainscreen minimap options pinscreen production
 
 gametabs = backpack gametab stats
 lobby = lobby worlds
 
-misc = items smart srlstats
+misc = antiban items smart srlstats
 
 utilities = color drawing math pixelshift time wrappers
-types = extendedarrays tbox tpointarrays integerarrays stringarrays tpoint types
+types = extendedarrays integerarrays stringarrays tbox tpoint tpointarrays types
 
 
 

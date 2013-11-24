@@ -8,11 +8,15 @@ SRL Interfaces Reference
     actionbar
     bankscreen    
     chatbox
+    chooseoption
+    conversationbox
     interfaces
+    lodestone
     mainscreen
     minimap
     options
     pinscreen
+    production
 
     backpack
     gametab
