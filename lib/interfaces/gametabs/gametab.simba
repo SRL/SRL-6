@@ -109,7 +109,7 @@ begin
     ID := ID_INTERFACE_GAMETABS;
     parentID := -1;
     static := false;
-    tabArea := [576, 292, 798, 599];
+    tabArea := [576, 292, 799, 599];
     __tabSelectionArea := [581, 296, 796, 319];
     isSetup := false;
 

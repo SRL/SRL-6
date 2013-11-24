@@ -96,7 +96,7 @@ Example:
 *)
 function TRSInterface.getBounds(): TBox;
 begin
-  result := intToBox(self.x, self.y, self.x + self.w, self.y + self.h);
+  result := intToBox(self.x1, self.y1, self.x2, self.y2);
 end;
 
 (*
