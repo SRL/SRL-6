@@ -13,6 +13,7 @@ The source for this file can be found `here <https://github.com/SRL/SRL-6/blob/m
 {$include_once pinscreen.simba}
 {$include_once ../interfaces/gametabs/backpack.simba}
 {$include_once ../core/text.simba}
+{$include_once minimap.simba}
 {$include_once ../utilities/color.simba}
 
 {$f-}
@@ -863,6 +864,142 @@ begin
 end;
 
 (*
+TRSBankScreen.deposit
+~~~~~~~~~~~~~~~~~~~~~
+
+.. code-block:: pascal
+
+    function TRSBankScreen.deposit(slots: TIntegerArray; amounts: TIntegerArray = []; oneByOne: boolean = false): boolean;
+
+Deposits items from the "bank pack" into the bank.  Has the capability of depositing
+all items, depositing a specific amount of items, and clicking each item one by one.
+
+    * slots: The slots you want to deposit.
+    * amounts: The amounts of the slots to deposit.  Set index to -1 to deposit all.  Deposits all of every item by default.
+    * oneByOne: Default false.  Will click items one by one to deposit.
+
+.. note::
+
+    - by Coh3n
+    - Last Updated: 20 November 2013 by Coh3n
+
+Examples:
+
+.. code-block:: pascal
+
+    bankScreen.deposit([2..28]);
+    bankScreen.deposit([1, 2, 3, 4], [-1, 10, 15, 14]);
+    bankScreen.deposit([1..28], , true); // one by one
+*)
+function TRSBankScreen.deposit(slots: TIntegerArray; amounts: TIntegerArray = []; oneByOne: boolean = false): boolean;
+var
+  b: TBox;
+  t, tt, i, _x, _y: integer;
+begin
+  result := false;
+
+  if (length(slots) < 1) then
+  begin
+    print('bankScreen.deposit(): No deposit slots specified', TDebug.WARNING);
+    exit(false);
+  end;
+
+  if (not self.isOpen()) then
+  begin
+    print('bankScreen.deposit(): Unable to deposit since bankscreen isn''t open', TDebug.ERROR);
+    exit(false);
+  end;
+
+  if ((length(amounts) > 0) and (length(amounts) <> length(slots))) then
+  begin
+    print('bankScreen.deposit(): Slot and amount arrays are of different length, they need to be the same!', TDebug.WARNING);
+    exit(false);
+  end;
+
+  // fill the amounts array to avoid errors
+  if (length(amounts) = 0) then
+  begin
+    setLength(amounts, length(slots));
+
+    for i := 0 to high(amounts) do
+      amounts[i] := -1;
+  end;
+
+  if ((slots[0] = 1) and (slots[high(slots)] = 28) and (oneByOne = false) and (length(amounts) = 0)) then
+    result := self.quickDeposit(QUICK_DEPOSIT_INVENTORY);
+
+  if (not result) then
+  begin
+    result := true; // will be set to false if it fails to deposit a slot
+
+    for i := 0 to high(slots) do
+    begin
+      b := self.getPackSlotBox(slots[i]);
+
+      if (isItemIn(b) = false) then
+        continue;
+
+      if (oneByOne = true) then
+      begin
+        mouseBox(b, MOUSE_LEFT);
+        wait(100 + random(200));
+      end else begin
+        mouseBox(b, MOUSE_RIGHT);
+
+        if (amounts[i] = -1) then
+        begin
+          if (chooseOption._select(['Deposit-All', 'sit-All', 'All'], MOUSE_LEFT, false, 1.0, 180) = false) then
+            chooseOption.select(['Deposit', 'osit']); // in case there's only one
+        end else begin
+          if (chooseOption._select([toStr(amounts[i])], MOUSE_LEFT, false, 1.0, 180) = false) then
+            if (chooseOption.select(['Deposit-X', '-X'])) then
+            begin
+              t := (getSystemTime() + 3000);
+
+              while (getSystemTime() < t) do
+              begin
+                if (findColor(_x, _y, 0, 241, 485, 286, 517)) then // box around the "Enter" text
+                begin
+                  wait(100 + random(50));
+                  typeSend(toStr(amounts[i]));
+
+                  tt := (getSystemTime() + 3000);
+                  while (self.isOpen() = false) and (getSystemTime() < tt) do
+                    wait(50);
+
+                  break;
+                end;
+
+                wait(50 + random(25));
+              end;
+            end;
+        end;
+      end;
+
+      // wait for the item to disappear
+      t := (getSystemTime() + 2000);
+      while (amounts[i] = -1) and (getSystemTime() < t) do
+      begin
+        if (isItemIn(b) = false) then
+          break;
+
+        wait(50 + random(25));
+      end;
+
+      // make sure the item is gone, return false if not
+      if (amounts[i] = -1) then
+        if (isItemIn(self.getPackSlotBox(slots[i]))) then
+        begin
+          print('bankScreen.deposit(): Failed to deposit item in slot '+toStr(i), TDebug.ERROR);
+          result := false;
+        end;
+    end;
+  end;
+
+  print('bankScreen.deposit(): '+toStr(result), TDebug.SUB);
+end;
+
+(*
 TRSBankScreen.withdraw
 ~~~~~~~~~~~~~~~~~~~~~~
 
@@ -1073,6 +1210,27 @@ begin
     result := self.withdraw(slot, amount, ['']);
 end;
 
+(*
+_waitBankOrPinScreen
+~~~~~~~~~~~~~~~~~~~~
+
+.. code-block:: pascal
+
+    function _waitBankOrPinScreen(waitTime: integer): boolean;
+
+Waits up to 'waitTime' for the bank or pinscreen to open.
+
+.. note::
+
+    - by Olly
+    - Last Updated: 22 November 2013 by Olly
+
+Example:
+
+.. code-block:: pascal
+
+    _waitBankOrPinscreen(5000);
+*)
 function _waitBankOrPinScreen(waitTime: integer): boolean;
 var
   t: integer;
@@ -1089,128 +1247,155 @@ begin
   end;
 end;
 
-function TRSBankScreen.__openNPC(): boolean;
-const
-  colorBlue: TColorData = [[5847106, 5188663], [8, 12], [[2, 0.31, 0.15], [2, 0.23, 0.51]]]; {light, dark}
-  colorHair: TColorData = [[1534114, 1918035], [14, 7], [[2, 0.13, 0.78], [2, 0.28, 1.03]]]; {orange, brown}
-var
-  i, j, hi, wid, hei, t, dist: integer;
-  atpa, atpaBody, atpaHair: T2DPointArray;
-  tpa: TPointArray;
-  b, searchArea, mainScreenBox: TBox;
-begin
-  t := getSystemTime();
+{*
+TRSBankScreen.__gatherBankerPoints
+~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
 
+.. code-block:: pascal
+
+    function TRSBankScreen.__gatherBankerPoints(out res: TPointArray): boolean;
+
+Helper function for TRSBankscreen.__OpenNPC(), gathers the blue banker points
+based from the minimap.
+
+.. note::
+
+    - by Olly
+    - Last Updated: 22 November 2013 by Olly
+
+Example:
+
+.. code-block:: pascal
+
+    bankScreen.__gatherBankerPoint(tpa);
+*}
+{$IFNDEF CODEINSIGHT}
+function TRSBankScreen.__gatherBankerPoints(out res: TPointArray): boolean;
+const
+  bodyColors: T2DColorData = [[5847106, 8, [2, 0.31, 0.15]], [5188663, 12, [2, 0.23, 0.51]]];
+var
+  tpa, tpaDots: TPointArray;
+  b, ms: TBox;
+  i: integer;
+begin
+  ms := mainScreen.getBounds();
+  tpaDots := minimap.pointsToMainscreen(minimap.getDots(MM_DOT_NPC, minimap.getBounds()));
+
+  if (length(tpaDots) > 0) then
+    for i := 0 to high(tpaDots) do
+    begin
+      b := [max(tpaDots[i].x-40, ms.x1), max(tpaDots[i].y-40, ms.y1),
+            min(tpaDots[i].x+40, ms.x2), min(tpaDots[i].y+40, ms.y2)];
+
+      if (bodyColors.gatherIn(tpa, b)) then
+        appendTPA(res, tpa);
+    end;
+  result := true;
+end;
+{$ENDIF}
+
+{*
+TRSBankScreen.__openNPC
+~~~~~~~~~~~~~~~~~~~~~~~
+
+.. code-block:: pascal
+
+    function TRSBankScreen.__openNPC(): boolean;
+
+Internal function that opens the blue npc banker
+
+.. note::
+
+    - by Olly
+    - Last Updated: 22 November 2013 by Olly
+
+Example:
+
+.. code-block:: pascal
+
+    bankScreen.__openNPC();
+*}
+{$IFNDEF CODEINSIGHT}
+function TRSBankScreen.__openNPC(): boolean;
+var
+  i, wid, hei: integer;
+  b: TBox;
+  tpa: TPointArray;
+  atpa: T2DPointArray;
+begin
   result := false;
-  mainScreenBox := mainScreen.getBounds();
 
   print('TRSBankscreen.__openNPC()', TDebug.HEADER);
 
-  if (colorBlue.gather(tpa, mainScreenBox) and (length(tpa) > 25)) then
+  if (self.__gatherBankerPoints(tpa)) then
   begin
-    atpa := tpa.cluster(5, 5);
-    hi := high(atpa);
+    atpa := tpa.cluster(4, 4);
+    sortATPAFromMidPoint(atpa, mainScreen.playerPoint);
 
-    for i := 0 to hi do
+    for i := 0 to high(atpa) do
     begin
       if (length(atpa[i]) < 20) or (atpa[i].getDensity() < 0.10) then
         continue;
 
-      atpa[i].getBounds().getDimensions(wid, hei);
+      b := atpa[i].getBounds();
 
-      if (wid < 10) or (hei < 10) then
+      if (b.getWidth() < 10) or (b.getHeight() < 10) then
         continue;
 
-      insert(atpa[i], atpaBody);
-    end;
+      mouse(atpa[i].getMiddle().randRange(-5, 5));
 
-    print('Found '+intToStr(length(atpaBody))+' possible banker bodys');
-
-    for i := 0 to high(atpaBody) do
-    begin
-      b := getTPABounds(atpaBody[i]);
-
-      searchArea := [b.x1 - 20, b.y1 -20, b.x2 +20, b.y1 + 20];
-      searchArea.setLimit(mainScreenBox);
-
-      if (colorHair.gather(tpa, searchArea)) then
+      if (isMouseOverText(['Talk-to Banker', ' Banker', 'Bank ', 'nk booth'])) then
       begin
-        atpa := tpa.cluster(3, 3);
+        print('We found correct mouse-over text');
+        fastClick(MOUSE_RIGHT);
 
-        for j := 0 to high(atpa) do
+        if (chooseOption.select(['Bank Bank', 'ank Banker', 'ank Bank'])) then
         begin
-          if (length(atpa[j]) < 5) then
-            continue;
+          wait(50 + random(100));
 
-          atpa[j].getBounds().getDimensions(wid, hei);
+          if (minimap.isFlagPresent()) then
+            minimap.waitFlag(10);
 
-          if (wid > 18) or (hei > 18) or (wid < 2) or (hei < 2) then
-            continue;
+           result := _waitBankOrPinScreen(10000);
 
-          insert(atpa[j], atpaHair);
-        end;
-      end;
-    end;
-
-    print('Found '+intToStr(length(atpaHair))+' possible heads');
-
-    if (length(atpaHair) < 1) or (length(atpaBody) < 1) then
-    begin
-      print('Didn''t find enough hair or bodys');
-      print('TRSBankscreen.__openNPC(): result = '+boolToStr(result), TDebug.FOOTER);
-      exit;
-    end;
-
-    print('Finished gathering in '+intToStr(getSystemTime() - t)+' ms');
-
-    sortATPAFromMidPoint(atpaBody, mainScreen.getPlayerPoint());
-
-    for i := 0 to high(atpaBody) do
-    begin
-      sortTPAByY(atpaBody[i], true);
-
-      for j := 0 to high(atpaHair) do
-      begin
-       dist := (distance(atpaBody[i][0], atpaHair[j].getMiddle()));
-
-       if (dist <= 20) then
-       begin
-         print('Distance between body['+intToStr(i)+'] and hair['+intToStr(j)+'] is less than 20, going to check the mouse-over text');
-
-         mouse(atpaBody[i].getMiddle().randRange(-5, 5));
-
-         if (isMouseOverText(['Talk-to Banker', ' Banker', 'Bank ', 'nk booth'])) then
-         begin
-           print('We found correct mouse-over text');
-           fastClick(MOUSE_RIGHT);
-
-           if (chooseOption.select(['Bank Bank', 'ank Banker', 'ank Bank'])) then
+           if (result) then
            begin
-             wait(50 + random(100));
-
-             if (minimap.isFlagPresent()) then
-               minimap.waitFlag(10);
-
-             result := _waitBankOrPinScreen(10000);
-
-             if (result) then
-               print('Bankscreen or pinscreen is open')
-             else
-               print('Bankscreen or pinscreen never opened..');
-
-             break(2);
-           end;
-         end else
-           print('Mouse-over text wasn''t correct..');
-       end;
-      end;
+             print('Bankscreen or pinscreen is open');
+             break();
+           end else
+             print('Bankscreen or pinscreen never opened');
+        end;
+      end else
+        print('Mouse-over text wasn''t correct');
     end;
-  end else
-    print('Didnt find enough banker blue');
+  end;
 
   print('TRSBankscreen.__openNPC(): result = '+boolToStr(result), TDebug.FOOTER);
 end;
+{$ENDIF}
 
+(*
+TRSBankScreen.open
+~~~~~~~~~~~~~~~~~~
+
+.. code-block:: pascal
+
+    function TRSBankScreen.open(bankType: integer): boolean;
+
+Opens the desired bank, current vaild 'bankType' constants are:
+ * BANK_NPC_BLUE
+
+.. note::
+
+    - by Olly
+    - Last Updated: 22 November 2013 by Olly
+
+Example:
+
+.. code-block:: pascal
+
+    bankScreen.open(BANK_NPC_BLUE);
+*)
 function TRSBankScreen.open(bankType: integer): boolean;
 begin
   case bankType of

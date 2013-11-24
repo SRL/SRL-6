@@ -11,6 +11,8 @@ The source for this file can be found
 *)
 
 {$include_once interfaces.simba}
+{$include_once actionbar.simba}
+{$include_once ../core/text.simba}
 
 {$f-}
 
@@ -22,8 +24,9 @@ A type that stores functions and properties of the Runescape chat box interface.
 *)
 type
   TRSChatbox = record(TRSInterface)
-    __placeholder: byte;
+    lineBoxes: TBoxArray;
   end;
+
 
 (*
 var chatbox
@@ -68,317 +71,85 @@ begin
 end;
 {$ENDIF}
 
-{*
-TRSChatbox._findTextBorder
-~~~~~~~~~~~~~~~~~~~~~~~~~~
-
-.. code-block:: pascal
-
-    function TRSChatbox._findTextBorder(var res: TBox; searchBox: TBox): boolean;
-
-Returns true if a border is found around the text char area.  Works for any
-of the chatting tabs.  Returns the border's coordinates in 'res'.  Looks for
-the interface in 'searchBox'.  Used in TRSChatbox.find() to locate the chat box.
-
-.. note::
-
-    - by Coh3n
-    - Last Updated: 08 August 2013  by Coh3n
-
-Example:
-
-.. code-block:: pascal
-
-    if (chatbox._findTextBorder(res, [0, 0, 500, 500])) then
-      writeln('Found chat text border');
-*}
-function TRSChatbox._findTextBorder(var res: TBox; searchBox: TBox): boolean;
+procedure TRSChatbox.__setup();
 var
-  tpaBorder: TPointArray;
-  atpaBorder: T2DPointArray;
-begin
-  res := [-1, -1, -1, -1];
-  result := false;
-
-  // light blue of the top/bottom border UNDER chat settings buttons
-  findColorsTolerance(tpaBorder, 7171436, searchBox, 1);
-  //smartImage.drawTPA(tpaBorder, clRed);
-
-  if (length(tpaBorder) > 0) then
-  begin
-    // filter out unwanted points
-    atpaBorder := splitTPAEx(tpaBorder, 10, 1);
-    filterTPAsBetween(atpaBorder, 1, 100);
-
-    if (length(atpaBorder) = 2) then
-    begin
-      tpaBorder := mergeATPA(atpaBorder);
-      res := atpaBorder.getBounds();
-    end else
-      print('TRSChatbox._findTextBorder(): No chat tab is open', TDebug.SUB);
-  end;
-
-  result := (res.x1 <> -1);
-end;
-
-{*
-TRSChatbox._findEmoteBorder
-~~~~~~~~~~~~~~~~~~~~~~~~~~~
-
-.. code-block:: pascal
-
-    function TRSChatbox._findEmoteBorder(var res: TBox; searchBox: TBox): boolean;
-
-Returns true if the emote border is found (i.e. the emote tab is open in the chat
-box.  Returns the border's coordinates in 'res'.  Looks for the interface in
-'searchBox'.  Used in TRSChatbox.find() to locate the chat box.
-
-.. note::
-
-    - by Coh3n
-    - Last Updated: 08 August 2013  by Coh3n
-
-Example:
-
-.. code-block:: pascal
-
-    if (chatbox._findEmoteBorder(tmp, [0, 0, 500, 500])) then
-      writeln('Found emote tab interface');
-*}
-function TRSChatbox._findEmoteBorder(var res: TBox; searchBox: TBox): boolean;
-var
-  i: integer;
-  tpaBack, tpaScroll: TPointArray;
-  atpaBack, atpaScroll: T2DPointArray;
-  refBtmRight: TPoint;
-  refTop, refLeft: integer;
-  b: TBox;
-begin
-  result := false;
-  res := [-1, -1];
-  refTop := -1;
-  refLeft := -1;
-  refBtmRight := [-1, -1];
-
-  // look for the Yes check mark
-  findColors(tpaBack, 2700606, searchBox); // brown color behind the "All" text
-  //smartImage.debugTPA(tpaBack);
-
-  atpaBack := splitTPAEx(tpaBack, 1, 1);
-
-  // to filter out unwanted colors
-  for i := 0 to high(atpaBack) do
-    if (length(atpaBack[i]) > 1200) then
-    begin
-      sortTPAFrom(atpaBack[i], [searchBox.x1, searchBox.y1]);
-      refLeft := atpaBack[i][0].x;
-      break;
-    end;
-
-  if (refLeft = -1) then
-  begin
-    print('TRSChatbox._findEmoteBorder(): Didn''t find text background color', TDebug.SUB);
-    exit();
-  end;
-
-  // look for the scroll bar border
-  findColorsTolerance(tpaScroll, 3615245, searchBox, 2); // color of the side borders of the scroll bar
-  //smartImage.drawTPA(tpaScroll, clRed);
-
-  if (length(tpaScroll) > 0) then
-  begin
-    // filter out unwanted colors
-    atpaScroll := splitTPAEx(tpaScroll, 1, 5);
-    filterTPAsBetween(atpaScroll, 1, 22);
-
-    if (length(atpaScroll) = 2) then
-    begin
-      tpaScroll := mergeATPA(atpaScroll);
-      b := atpaScroll.getBounds();
-
-      refTop := b.y1;
-      refBtmRight := [b.x2, b.y2];
-    end else
-      print('TRSChatbox._findEmoteBorder(): Emote tab isn''t open', TDebug.SUB);
-  end;
-
-  if (refBtmRight.x = -1) then
-  begin
-    print('TRSChatbox._findEmoteBorder(): Didn''t find emote scroll bar', TDebug.SUB);
-    exit();
-  end;
-
-  result := true;
-  res := [refLeft - 7, refTop - 19, refBtmRight.x + 3, refBtmRight.y + 51];
-
-  //smartImage.drawBox(res, false, clLime);
-end;
-
-{*
-TRSChatbox._findQuickChatBorder
-~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
-
-.. code-block:: pascal
-
-    function TRSChatbox._findQuickChatBorder(var res: TBox; searchBox: TBox): boolean;
-
-Returns true if the quick-chat border is found (i.e. the quick-chat interface is
-open).  Returns the border's coordinates in 'res'.  Looks for the interface in
-'searchBox'.  Used in TRSChatbox.find() to locate the chat box.
-
-.. note::
-
-    - by Coh3n
-    - Last Updated: 08 August 2013  by Coh3n
-
-Example:
-
-.. code-block:: pascal
-
-    if (chatbox._findQuickChatBorder(tmp, [0, 0, 500, 500])) then
-      writeln('Found quick chat interface');
-*}
-function TRSChatbox._findQuickChatBorder(var res: TBox; searchBox: TBox): boolean;
-var
-  i: integer;
-  tpaBorder: TPointArray;
-  atpaBorder: T2DPointArray;
-begin
-  res := [-1, -1, -1, -1];
-  result := false;
-
-  findColors(tpaBorder, 16777215, searchBox);
-  //smartImage.drawTPA(tpaBorder, clRed);
-
-  if (length(tpaBorder) > 0) then
-  begin
-    // filter out unwanted colors
-    atpaBorder := splitTPAEx(tpaBorder, 1, 1);
-    filterTPAsBetween(atpaBorder, 1, 800);
-
-    if (length(atpaBorder) = 1) then
-    begin
-      res := atpaBorder[0].getBounds();
-      result := true;
-    end else
-      print('Didn''t find quick chat border', TDebug.SUB);
-  end else
-    print('Didn''t fine quick chat border color');
-end;
-
-{*
-TRSChatbox.__find
-~~~~~~~~~~~~~~~~~
-
-.. code-block:: pascal
-
-    function TRSChatbox.__find(): boolean;
-
-Returns true if the chatbox is found.  Will reset the chatbox's bounds based on
-where it is found.  Calls a series of internal SRL functions to properly identify
-the chatbox on the client.
-
-.. note::
-
-    - by Coh3n
-    - Last Updated: 08 August 2013  by Coh3n
-
-Example:
-
-.. code-block:: pascal
-
-    if (chatbox.__find()) then
-      writeln('Found the chat box!');
-*}
-{$IFNDEF CODEINSIGHT}
-function TRSChatBox.__find(): boolean;
-var
+  b, chatBounds: TBox;
   wid, hei, i: integer;
-  tmp: TBox;
+  p: TPoint;
 begin
-  print('TRSChatbox.__find()', TDebug.HEADER);
-
+  setLength(self.lineBoxes, 0);
   getClientDimensions(wid, hei);
-  wid := (wid - 1);
-  hei := (hei - 1);
 
-  print('Looking for chat text border...');
+  self.setBounds([1, actionBar.y2, gameTabs.tabArea.x1, hei-2]);
+  setLength(lineBoxes, 0);
 
-  // if any of the chat tabs are open
-  if (chatbox._findTextBorder(tmp, [0, 0, wid, hei])) then
+  chatBounds := chatBox.getChatArea();
+
+  for i := 0 to 10 do
   begin
-    print('Found a text tab border');
-    result := true;
-    chatbox.setBounds([tmp.x1 - 4, tmp.y1 - 62, tmp.x2 + 4, tmp.y2 + 21]);
+    p.y := 568 - (i * 14);
+    b := [chatBounds.x1, p.y-9, chatBounds.x2, p.y+9];
+
+    if (b.y1 < chatBox.getChatArea().y1) then
+      break();
+
+    insert(b, self.lineBoxes);
   end;
-
-  // if the emotes tab is open
-  if (not result) then
-  begin
-    print('Looking for the emote tab...');
-
-    if (chatbox._findEmoteBorder(tmp, [0, 0, wid, hei])) then
-    begin
-      print('Found emote tab border');
-      result := true;
-      chatbox.setBounds([tmp.x1 - 4, tmp.y1 - 40, tmp.x2 + 4, tmp.y2 + 3]);
-    end;
-  end;
-
-  // if the quick chat interface is open
-  if (not result) then
-  begin
-    print('Looking for the quick chat interface...');
-
-    if (chatbox._findQuickChatBorder(tmp, [0, 0, wid, hei])) then
-    begin
-      print('Found quick chat border');
-      result := true;
-      chatbox.setBounds([tmp.x1 - 4, tmp.y1 - 40, tmp.x2 + 4, tmp.y2 + 4]);
-    end;
-  end;
-
-  print('TRSChatbox.__find(): '+toStr(result), TDebug.FOOTER);
 end;
-{$ENDIF}
+
+function TRSChatbox.getChatArea(): TBox;
+begin
+  result := intToBox(self.x1+3, self.y1 + 67, self.x2-20, self.y2-21);
+end;
 
 (*
-TRSChatbox.isOpen
-~~~~~~~~~~~~~~~~~
+TRSChatbox.findAnyText
+~~~~~~~~~~~~~~~~~~~~~~
 
 .. code-block:: pascal
 
-    function TRSChatbox.isOpen(): boolean;
+    function TRSChatbox.findAnyText(txt: TStringArray): boolean;
 
-Returns true if the chatbox interface is open.
+Initiates the chatbox variable.
 
 .. note::
 
-    - by Coh3n
-    - Last Updated: 08 August 2013 by Coh3n
+    - by Olly
+    - Last Updated: 17 October 2013 by Olly
 
 Example:
 
 .. code-block:: pascal
 
-    if (chatbox.isOpen()) then
-      writeln('The chatbox is open');
+    chatbox.findAnyText(['Hello']);
 *)
-function TRSChatbox.isOpen(): boolean;
+function TRSChatbox.findAnyText(txt: TStringArray): boolean;
+var
+  p: TPoint;
 begin
-  result := self.__find();
+  result := findText(p, txt, [smallchars], self.getChatArea());
+
+  if (result) then
+    print('TRSChatbox.findAnyText(): Found "'+toStr(txt)+'"', TDebug.SUB);
 end;
 
-{$IFNDEF CODEINSIGHT}
-function __findChatbox(): boolean;
+function TRSChatbox.findTextOnLines(txt: TStringArray; lines: TIntegerArray): boolean;
+var
+  i: integer;
+  p: TPoint;
 begin
-  result := chatbox.__find();
-end;
-{$ENDIF}
+  for i := 0 to high(lines) do
+  begin
+    result := findText(p, txt, [SmallChars], self.lineBoxes[lines[i]]);
 
-{$f+} // needed so chatbox.__find isn't called when assigned
+    if (result) then
+    begin
+      print('TRSChatBox.findTextOnLines(): Found text '+toStr(txt)+' on line '+intToStr(i));
+      exit();
+    end;
+  end;
+end;
 
 begin
   chatbox.__init();
-  __interfaceFindFunctions[chatbox.ID] := @__findChatbox;
 end;

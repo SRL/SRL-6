@@ -302,7 +302,7 @@ begin
 
   //get a TMufasaBitmap of the chooseoption menu (without the border)
   tmb.init(client.getMBitmaps());
-  tmb.copyClientToBitmap(client.getIOManager(), true, self.x+1, self.y+1, self.x+self.w-1, self.y+self.h-1);
+  tmb.copyClientToBitmap(client.getIOManager(), true, self.x1+1, self.y1+1, self.x2-1, self.y2-1);
 
   tmbW := tmb.getWidth() - 1;
   tmbH := tmb.getHeight() - 1;
@@ -353,8 +353,8 @@ begin
       result[i].str := getTextATPA(tmp, 5, UpCharsEx);
 
       //get the bounds for the option, and offset them so it's in the correct mainscreen postion.
-      result[i].bounds := [b.x1, b.y1, b.x2 + (self.w - b.x2) - 2, b.y2 + 2];
-      result[i].bounds.offset([self.x, self.y]);
+      result[i].bounds := [b.x1, b.y1, b.x2 + (self.getBounds().getWidth() - b.x2) - 2, b.y2 + 2];
+      result[i].bounds.offset([self.x1, self.y1]);
     end;
 
     // we're done.

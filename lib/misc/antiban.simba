@@ -127,7 +127,7 @@ begin
   T := GetTickCount();
 
   repeat
-    Sleep(10);
+    Sleep(1+random(9));
 
     if (Moving) then
     begin
@@ -443,14 +443,13 @@ randomGameTab
 
     procedure randomGameTab(returnToOriginal: boolean = false);
 
-Switches to a random gametab, more of a 50% chance of switching to a more
-used tab. Will return to the original tab if 'returnToOriginal' is set to true
-(set to false by default).
+Switches to a random gametab, Will return to the original tab if 'returnToOriginal'
+ is set to true (set to false by default).
 
 .. note::
 
-    - by Ollybest
-    - Last Updated: 23 August 2013 by Coh3n
+    - by Olly
+    - Last Updated: 19 Novemeber 2013 by Olly
 
 Example:
 
@@ -460,31 +459,19 @@ Example:
 *)
 procedure randomGameTab(returnToOriginal: boolean = false);
 var
-  allTabs, commonTabs, t: Integer;
-  TIA: TIntegerArray;
+  tab, t: Integer;
 begin
-  if not (isLoggedIn()) then
+  if (not isLoggedIn()) then
     exit();
 
   t := gameTabs.getActiveTab();
-  TIA := [TAB_STATS, TAB_BACKPACK, TAB_EQUIPMENT, TAB_FRIENDS, TAB_MAGIC];
 
-  // every tab
   repeat
-    allTabs := gameTabs.tabs[random(length(gameTabs.tabs))].id;
-  until((allTabs <> t) and (gameTabs._isTabValid(allTabs)));
+    tab := random(high(gameTabs.tabs));
+  until (tab <> t); // make sure it's a different tab
 
-  // more commanly used tabs
-  repeat
-    commonTabs := TIA[random(length(TIA))];
-  until(commonTabs <> t);
-
-  if (random(2) = 0) then
-    gameTabs.openTab(allTabs)
-  else
-    gameTabs.openTab(commonTabs);
-
-  wait(randomRange(300, 600));
+  gameTabs.openTab(tab);
+  wait(randomRange(300, 1000));
 
   if (returnToOriginal) then
     gameTabs.openTab(t);

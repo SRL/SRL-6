@@ -13,6 +13,14 @@ The source for this file can be found `here <https://github.com/SRL/SRL-6/blob/m
 
 {$f-}
 
+
+const
+  NAV_BUTTON_HERO = 0;
+  NAV_BUTTON_GEAR = 1;
+  NAV_BUTTON_POWERS = 2;
+  NAV_BUTTON_SOCIAL = 3;
+  NAV_BUTTON_OTHER = 4;
+
 (*
 Constant: Tabs
 ~~~~~~~~~~~~~~
@@ -29,45 +37,24 @@ Example:
     gameTabs.openTab(TAB_FRIENDS);
 *)
 const
-  TAB_HERO = 40;
-    TAB_TASK  = 32;
-    TAB_STATS = 24;
+  TAB_TASK = 0;
+  TAB_STATS = 1;
 
-  TAB_GEAR = 41;
-    TAB_EQUIPMENT = 33;
-    TAB_BACKPACK  = 25;
+  TAB_BACKPACK = 2;
+  TAB_EQUIPMENT = 3;
 
-  TAB_ADVENTURES = 42;
-    TAB_COMPASS_TASK = 34;
+  TAB_PRAYER = 4;
+  TAB_MAGIC = 5;
+  TAB_MELEE = 6;
+  TAB_RANGED = 7;
+  TAB_DEFENSIVE = 8;
 
-  TAB_POWERS = 43;
-    TAB_DEFENSIVE = 35;
-    TAB_RANGED    = 27;
-    TAB_MELEE     = 19;
-    TAB_MAGIC     = 11;
-    TAB_PRAYER    = 3;
+  TAB_FRIENDS = 9;
+  TAB_FRIENDS_CHAT = 10;
+  TAB_CLAN_CHAT = 11;
 
-  TAB_SOCIAL = 44;
-    TAB_CLAN_CHAT    = 36;
-    TAB_FRIENDS_CHAT = 28;
-    TAB_FRIENDS      = 20;
-
-  TAB_EXTRAS = 45;
-
-  TAB_HELP = 46;
-
-  TAB_OTHER = 47;
-    TAB_MUSIC = 39;
-    TAB_NOTES = 31;
-
-{*
-const Color
-~~~~~~~~~~~
-
-Internal color constants used in the gametabs functions.
-*}
-const
-  __COLOR_ACTIVE_TAB = 7037012;
+  TAB_NOTES = 12;
+  TAB_MUSIC = 13;
 
 {*
 type TRSGameTab
@@ -77,11 +64,9 @@ Represents an individual gametab.
 *}
 type
   _TRSGameTab = record
-    id,              // the constant representing the tab
-    parent: integer; // the constant of the tab that needs to be hovered to show this tab
-    bounds: TBox;    // the bounds in a grid of the gametab navigation bar
     _bmp: integer;    // bitmap of the tab (used for switching between tabs)
-    _bmpLoaded: boolean;
+    _navBarID: integer; // the constant representing the nav bar
+    _navBarBoxIndex: integer; // the index of the box of the nav bar (when it's moused over)
   end;
 
 (*
@@ -93,13 +78,10 @@ A single type for manipulating the entire gametab system.
 type
   TRSGameTabs = record(TRSInterface)
     tabs: array of _TRSGameTab;
-    __tabArea: TBox;
-    visibleTabArea: TBox;        // the current (set in TRSGameTabs.openTab)
-    __visibleTabAreaSingle: TBox; // when there's only a single tab open (excludes title bar)
-    __visibleTabAreaMulti: TBox; // when there are multiple tabs open
-    __tabSelectionArea: TBox;    // the area where different tabs are clicked to become visible
-    navigationGrid: TBoxArray;
-    setAreas: boolean;
+    isSetup: boolean;
+    tabArea: TBox;
+    __tabSelectionArea: TBox;
+    navButtons: array [0..7] of TBoxArray;
   end;
 
 (*
@@ -118,27 +100,6 @@ Example:
 var
   gameTabs: TRSGameTabs;
 
-{*
-TRSGameTabs.__init
-~~~~~~~~~~~~~~~~~~
-
-.. code-block:: pascal
-
-    procedure TRSGameTabs.__init();
-
-Initiates the TRSGameTabs variable for use.
-
-.. note::
-
-    - by Coh3n
-    - Last Updated: 26 July 2013 by Coh3n
-
-Example:
-
-.. code-block:: pascal
-
-    gameTabs.__init();
-*}
 {$IFNDEF CODEINSIGHT}
 procedure TRSGameTabs.__init();
 begin
@@ -148,21 +109,29 @@ begin
     ID := ID_INTERFACE_GAMETABS;
     parentID := -1;
     static := false;
-  end;
+    tabArea := [576, 292, 799, 599];
+    __tabSelectionArea := [581, 296, 796, 319];
+    isSetup := false;
 
-  addOnTerminate('__freeGameTabs');
+    // TBox[0] is the actual button, the the next are the tab buttons when it's mouse-over'd
+    self.navButtons[NAV_BUTTON_HERO] := grid(1, 3, 27, 27, 50, 36, point(612, 220));
+    self.navButtons[NAV_BUTTON_GEAR] := grid(1, 3, 27, 27, 50, 36, point(662, 220));
+    self.navButtons[NAV_BUTTON_POWERS] := grid(1, 6, 27, 27, 50, 36, point(762, 220));
+    self.navButtons[NAV_BUTTON_SOCIAL] := grid(1, 4, 27, 27, 50, 36, point(612, 258));
+    self.navButtons[NAV_BUTTON_OTHER] := grid(1, 3, 27, 27, 50, 36, point(762, 258));
+  end;
 end;
 {$ENDIF}
 
 {*
-TRSGameTabs.__loadBitmap
-~~~~~~~~~~~~~~~~~~~~~~~~
+TRSGameTabs.__initTabs
+~~~~~~~~~~~~~~~~~~~~~~
 
 .. code-block:: pascal
 
-    procedure TRSGameTabs.__loadBitmap(tab: integer);
+    procedure TRSGameTabs.__initTabs();
 
-Loads the specified tab's bitmap into the global TRSGameTabs variable.
+Inits the gametabs, loads the bitmap, nav button ID and finally the nav box index.
 
 .. note::
 
@@ -173,35 +142,120 @@ Example:
 
 .. code-block:: pascal
 
-    gameTabs.__loadBitmap(TAB_BACKBACK);
+    addOnTerminate('__freeGameTabs');
 *}
 {$IFNDEF CODEINSIGHT}
-procedure TRSGameTabs.__loadBitmap(tab: integer);
-begin                               {done: stats, backpack}
-  case tab of
-    TAB_STATS:        self.tabs[tab]._bmp := bitmapFromString(6, 8, 'meJwT5v0gDEZ8vIlmSfzJG9iEYSIiYqqBrSxwEU7ugwJ6IgnL2eEiArw92ppCSWsRIqJSnsaJvEBu2CQGIJed8zi/oGJgGxNQxDSPCyjCyzWBX0c4uJsRyIWI8HAnaWsKQ7hABADwIifh');
-    TAB_TASK,
-    TAB_COMPASS_TASK: self.tabs[tab]._bmp := bitmapFromString(8, 8, 'meJzjmbiTB4z41t1hv/rV6uN7ILI++xEuyLfuNs+E7axpzbIJnUAEE7zDFxLHL6TCahfMyafGo2wJEee29ePmZOWU4eGMTOe2ywaq57VJBTLYpcRYpLiYJDnZ9IWAWtijrXm42HiVLYAagSJwxOkkysMnwK9sBjLWSRSIuMKVgEi7345XXplPSBUiDhFkK3QEigMAYQ4yxQ==');
-    TAB_EQUIPMENT:    self.tabs[tab]._bmp := bitmapFromString(3, 12, 'meJzrbKrpbKpJTEnuhDG6+ycvXjIbIrJoYmdRRTWQDWQABYFsIMNSVw8oAmQrKagBGRA2BEG4QI1wE4CM+EhvIANoLADLWjI8');
-    TAB_BACKPACK:     self.tabs[tab]._bmp := bitmapFromString(9, 9, 'meJxTss1RgiEeZUs5qyAgA0IqoUrJq1oAGfxiQUDEyM4HFIGoBHI5eayAbNPeLRBBoCwfFz9EC1DKOqk5f8/TpM7VBvaTgQioHigFVCBvZaVfOx2o3iJ3PUQjsnVAXUCVwjK5QEOAtsCdxMmnBpQC2gU0EOJgiBvgJrhWTknYcBgiBbERbi9QL5AEAAYAO0M=');
-    TAB_DEFENSIVE:    self.tabs[tab]._bmp := bitmapFromString(9, 4, 'meJxLTEkuqqh2dbBkZc2zsXg8YeKtXafufv75G0gmpiR3908GSvGLBRnYT87IuwKXBUotXjIbSAKlgBqBskmdq+umrQYqAApCEEQKiIRlcoEKgIYDAA/lL/8=');
-    TAB_RANGED:       self.tabs[tab]._bmp := bitmapFromString(2, 8, 'meJyzyFmrpaEpm9CpbBrEbZfNY+HGLxYkoGgAZCuaugFJUUlXYZlcISEDJdscfn4+ABAACfE=');
-    TAB_MELEE:        self.tabs[tab]._bmp := bitmapFromString(4, 4, 'meJwTF+ScPnnKlz9/Fzz/PmfdFiBjz4mbSanJSbfeZfz4BWS42RtbrzzFNXW3S1SqmCAnANE4Gm4=');
-    TAB_MAGIC:        self.tabs[tab]._bmp := bitmapFromString(4, 10, 'meJxb6CS4EIxqbXmvpIsCyYVIIsgkEDlqcEHYsSY8QNI6qVlTnAvITnHVM+3dIiyTa2A/OalztWxCJ79YEJCdkXdFziqIj4tfXtXCUlcPYghQPRABAE1GIYc=');
-    TAB_PRAYER:       self.tabs[tab]._bmp := bitmapFromString(6, 6, 'meJx7dWHxqwuLP15d8fHayudnF947Ovv52UVfPr6EoM8fXjw+NR8oC+L++QtEQBGgyg+oIu+vLAcq+/T+OZAN0fjszIJbB6c/Ojnv47UVH64uf3p6ARABALyyXGE=');
-    TAB_CLAN_CHAT:    self.tabs[tab]._bmp := bitmapFromString(7, 9, 'meJyzPvtRv3a6bEIn+9WvQMQzcSdz9STrladS3/+zTmrmiMrgW3cHKMJubmy5+SlQnJGdj9UuGCgCRKzmxkARoBogG6IMJJjWLFM1GcgFmgYXBCKgFUAuBEFsASKgSiAJ5MJFQCbAzIeYBkRAKyD2AhnICADvyUfz');
-    TAB_FRIENDS_CHAT: self.tabs[tab]._bmp := bitmapFromString(10, 6, 'meJyzXnmKV9mCi1dALq/R6uN7y81Prc9+5BcLYmRgYI+2BkoJ8HIqyoio6hlbn3oLlNWvnc5sbsJW6MjaFsOnZCoiyKMsI6gZnAzUJVM1mSMqAyjOtLUeqMCkfbW4s5tmeIbV4SdAjXApIAlEQPVA64AkEAFlZRM6gdZBpIAIKAJxCQitPMWjbAmRBRoLRABydEFj');
-    TAB_FRIENDS:      self.tabs[tab]._bmp := bitmapFromString(8, 8, 'meJyrm7a6btrqaftuAVF5x0QLjzTWthimrfVwwajKydUrjwK58lZWQCkgA8KFKJi69wazJCd7tHVS52oIgsg6ufiyeOqwFToC2UATQKi4Rs4qCGI4UNy1cgpEPVwQSALFtcIzlGxzrJOageJALlAQgoB2zVm7FaieR9kSaB1EMRABAFrsUf8=');
-    TAB_MUSIC:        self.tabs[tab]._bmp := bitmapFromString(6, 8, 'meJyb/+Jb3bTVTi6+LlGpUZWTkzpXT9t3C8gWExOSV7UAknxc/NUrjwJFgCRQCiILVAkk57/4tu81CEUV1wBVAgWBIkAFQAOBsvJWVkA2UJeSghojAwNQDcQEiAhQPZABQfl7nkIYQO0ANDdHLQ==');
-    TAB_NOTES:        self.tabs[tab]._bmp := BitmapFromString(8, 6, 'meJxziUr9/PM3BD25cwNI7nv9rXrlUUYGBicXXyAbIgJBQHZ5x0SglLyV1a5Td4Ei818gpOqmrYbomrbvFlwLRAHQQCXbnNRpp5DFIQioOGHDYbg5AP/SZ+c=');
+procedure TRSGameTabs.__initTabs();
+var
+  i: integer;
+begin
+  setLength(self.tabs, 14);
+
+  with self.tabs[TAB_TASK] do
+  begin
+    _bmp := bitmapFromString(10, 4, 'meJyz+vje6uN7hdhGNWU5RwtNIHKx1bczVQciNzsDK7Cs9dmPfOFJUlKSElZO4kEREoEROhYOJnoqQHGIAr51d1jtgmWqJsNFZLx9gYJwLs/EnUAFIJGVJ8X8Q7W15QE4lDKB');
+    _navBarId := NAV_BUTTON_HERO;
+    _navBarBoxIndex := 2;
   end;
 
-  if (self.tabs[tab]._bmp <> -1) then
+  with self.tabs[TAB_STATS] do
   begin
-    print('TRSGameTabs.__loadBitmap(): Loaded tab '+toStr(tab)+' bitmap', TDebug.SUB);
-    self.tabs[tab]._bmpLoaded := true
-  end else
-    print('TRSGameTabs.__loadBitmap(): Invalid tab '+toStr(tab), TDebug.WARNING);
+    _bmp := bitmapFromString(6, 8, 'meJwT5v0gDEZ8vIlmSfzJG9iEYSIiYqqBrSxwEU7ugwJ6IgnL2eEiArw92ppCSWsRIqJSnsaJvEBu2CQGIJed8zi/oGJgGxNQxDSPCyjCyzWBX0c4uJsRyIWI8HAnaWsKQ7hABADwIifh');
+    _navBarId := NAV_BUTTON_HERO;
+    _navBarBoxIndex := 1;
+  end;
+
+  with self.tabs[TAB_BACKPACK] do
+  begin
+    _bmp := bitmapFromString(3, 8, 'meJxTss0x7d3Co2xpndScv+dpUudq/drpSrY5FrnrgSL8YkHCMrlABlANUAoo7lo5JWHDYaA4J58akARqBCIgAwC+OReT');
+    _navBarId := NAV_BUTTON_GEAR;
+    _navBarBoxIndex := 1;
+  end;
+
+  with self.tabs[TAB_EQUIPMENT] do
+  begin
+    _bmp := bitmapFromString(3, 12, 'meJzrbKrpbKpJTEnuhDG6+ycvXjIbIrJoYmdRRTWQDWQABYFsIMNSVw8oAmQrKagBGRA2BEG4QI1wE4CM+EhvIANoLADLWjI8');
+    _navBarId := NAV_BUTTON_GEAR;
+    _navBarBoxIndex := 2;
+  end;
+
+  with self.tabs[TAB_PRAYER] do
+  begin
+    _bmp := bitmapFromString(6, 6, 'meJx7dWHxqwuLP15d8fHayudnF947Ovv52UVfPr6EoM8fXjw+NR8oC+L++QtEQBGgyg+oIu+vLAcq+/T+OZAN0fjszIJbB6c/Ojnv47UVH64uf3p6ARABALyyXGE=');
+    _navBarId := NAV_BUTTON_POWERS;
+    _navBarBoxIndex := 1;
+  end;
+
+  with self.tabs[TAB_MAGIC] do
+  begin
+    _bmp := bitmapFromString(4, 10, 'meJxb6CS4EIxqbXmvpIsCyYVIIsgkEDlqcEHYsSY8QNI6qVlTnAvITnHVM+3dIiyTa2A/OalztWxCJ79YEJCdkXdFziqIj4tfXtXCUlcPYghQPRABAE1GIYc=');
+    _navBarId := NAV_BUTTON_POWERS;
+    _navBarBoxIndex := 2;
+  end;
+
+   with self.tabs[TAB_MELEE] do
+  begin
+    _bmp := bitmapFromString(4, 4, 'meJwTF+ScPnnKlz9/Fzz/PmfdFiBjz4mbSanJSbfeZfz4BWS42RtbrzzFNXW3S1SqmCAnANE4Gm4=');
+    _navBarId := NAV_BUTTON_POWERS;
+    _navBarBoxIndex := 3;
+  end;
+
+  with self.tabs[TAB_RANGED] do
+  begin
+    _bmp := bitmapFromString(2, 8, 'meJyzyFmrpaEpm9CpbBrEbZfNY+HGLxYkoGgAZCuaugFJUUlXYZlcISEDJdscfn4+ABAACfE=');
+    _navBarId := NAV_BUTTON_POWERS;
+    _navBarBoxIndex := 4;
+  end;
+
+  with self.tabs[TAB_DEFENSIVE] do
+  begin
+    _bmp := bitmapFromString(9, 4, 'meJxLTEkuqqh2dbBkZc2zsXg8YeKtXafufv75G0gmpiR3908GSvGLBRnYT87IuwKXBUotXjIbSAKlgBqBskmdq+umrQYqAApCEEQKiIRlcoEKgIYDAA/lL/8=');
+    _navBarId := NAV_BUTTON_POWERS;
+    _navBarBoxIndex := 5;
+  end;
+
+  with self.tabs[TAB_FRIENDS] do
+  begin
+    _bmp := bitmapFromString(8, 8, 'meJyrm7a6btrqaftuAVF5x0QLjzTWthimrfVwwajKydUrjwK58lZWQCkgA8KFKJi69wazJCd7tHVS52oIgsg6ufiyeOqwFToC2UATQKi4Rs4qCGI4UNy1cgpEPVwQSALFtcIzlGxzrJOageJALlAQgoB2zVm7FaieR9kSaB1EMRABAFrsUf8=');
+    _navBarId := NAV_BUTTON_SOCIAL;
+    _navBarBoxIndex := 1;
+  end;
+
+  with self.tabs[TAB_FRIENDS_CHAT] do
+  begin
+    _bmp := bitmapFromString(6, 8, 'meJwzmnLCaMqJ1Pf/THu3sEiKsbbFWH18b7n5qfXZj/xiQYwMDOzR1tan3gJF9GunM5ubsBU6AtUAZWWqJnNEZQDZTFvrgYJABXAukAQioIhsQidQO4QL0rXyFI+yJUQEqAWIgGYCrQAaCxSEIADzcDIO');
+    _navBarId := NAV_BUTTON_SOCIAL;
+    _navBarBoxIndex := 2;
+  end;
+
+  with self.tabs[TAB_CLAN_CHAT] do
+  begin
+    _bmp := bitmapFromString(7, 9, 'meJyzPvtRv3a6bEIn+9WvQMQzcSdz9STrladS3/+zTmrmiMrgW3cHKMJubmy5+SlQnJGdj9UuGCgCRKzmxkARoBogG6IMJJjWLFM1GcgFmgYXBCKgFUAuBEFsASKgSiAJ5MJFQCbAzIeYBkRAKyD2AhnICADvyUfz');
+    _navBarId := NAV_BUTTON_SOCIAL;
+    _navBarBoxIndex := 3;
+  end;
+
+  with self.tabs[TAB_NOTES] do
+  begin
+    _bmp := bitmapFromString(8, 6, 'meJxziUr9/PM3BD25cwNI7nv9rXrlUUYGBicXXyAbIgJBQHZ5x0SglLyV1a5Td4Ei818gpOqmrYbomrbvFlwLRAHQQCXbnNRpp5DFIQioOGHDYbg5AP/SZ+c=');
+    _navBarId := NAV_BUTTON_OTHER;
+    _navBarBoxIndex := 1;
+  end;
+
+  with self.tabs[TAB_MUSIC] do
+  begin
+    _bmp := bitmapFromString(6, 8, 'meJyb/+Jb3bTVTi6+LlGpUZWTkzpXT9t3C8gWExOSV7UAknxc/NUrjwJFgCRQCiILVAkk57/4tu81CEUV1wBVAgWBIkAFQAOBsvJWVkA2UJeSghojAwNQDcQEiAhQPZABQfl7nkIYQO0ANDdHLQ==');
+    _navBarId := NAV_BUTTON_OTHER;
+    _navBarBoxIndex := 2;
+  end;
+
+  self.isSetup := true;
+  addOnTerminate('__freeGameTabs');
+
+  for i := 0 to high(self.tabs) do
+    setBitmapName(self.tabs[i]._bmp, 'Gametab Bitmap['+toStr(i)+']');
+
+  print('TRSGameTab.__initTabs(): Setup gametab properties', TDebug.SUB);
 end;
 {$ENDIF}
 
@@ -234,45 +288,9 @@ begin
   print('Freeing gametabs bitmaps...');
 
   for i := 0 to high(gameTabs.tabs) do
-    if (gameTabs.tabs[i]._bmpLoaded) then
-      freeBitmap(gameTabs.tabs[i]._bmp);
+    freeBitmap(gameTabs.tabs[i]._bmp);
 end;
 {$ENDIF}
-
-{*
-TRSGameTabs._isTabValid
-~~~~~~~~~~~~~~~~~~~~~~~
-
-.. code-block:: pascal
-
-    function TRSGameTabs._isTabValid(tab: integer): boolean;
-
-Returns true if the 'tab' is valid.
-
-.. note::
-
-    - by Coh3n
-    - Last Updated: 27 July 2013 by Coh3n
-
-Example:
-
-.. code-block:: pascal
-
-    if (not gameTabs._isTabValid(TAB_BACKPACK)) then
-      exit;
-*}
-function TRSGameTabs._isTabValid(tab: integer): boolean;
-var
-  i: integer;
-begin
-  for i := 0 to high(self.tabs) do
-    if (self.tabs[i].id <> -1) then
-      if (self.tabs[i].id = tab) then
-        exit(true);
-
-  if (not result) then
-    print('TRSGameTabs._isTabValid(): Tab '+toStr(tab)+' is invalid', TDebug.WARNING);
-end;
 
 (*
 TRSGameTabs.areMultiOpen
@@ -297,32 +315,19 @@ Example:
       writeln('Multiple tabs are open');
 *)
 function TRSGameTabs.areMultiOpen(): boolean;
-var
-  i: integer;
-  atpa: T2DPointArray;
-  tpa: TPointArray;
 begin
-  if (not self.__findGameTabArea()) then
-    exit(false);
-
-  if (findColors(tpa, 3288098, self.__tabSelectionArea)) then // color of a tab
-  begin
-     atpa := tpa.cluster(5, 5);
-     atpa.filterBetween(0, 10);
-
-     result := (length(atpa) > 0);
-  end;
+  result := (getColor(self.tabArea.x1, self.tabArea.y1+28) = 6707526);
 end;
 
 (*
-TRSGameTabs.areAnyOpen
-~~~~~~~~~~~~~~~~~~~~~~
+TRSGameTabs.getActiveTabArea
+~~~~~~~~~~~~~~~~~~~~~~~~~~~~
 
 .. code-block:: pascal
 
-    function TRSGameTabs.areAnyOpen(): boolean;
+    function TRSGameTabs.getActiveTabArea(): TBox;
 
-Returns true if any number of tabs are open.
+Returns the TBox of the active tab, will return a nil box if no tabs are active.
 
 .. note::
 
@@ -333,20 +338,87 @@ Example:
 
 .. code-block:: pascal
 
-    if (gameTabs.areAnyOpen()) then
-      writeln('Some undetermined number of tabs are open');
+    if (gameTabs.areMultiOpen()) then
+      writeln('Multiple tabs are open');
 *)
-function TRSGameTabs.areAnyOpen(): boolean;
+function TRSGameTabs.getActiveTabArea(): TBox;
+const
+  COLOR_ACTIVE_TAB = 7037012;
 var
-  p: TPoint;
+  b: TBox;
+  tpa: TPointArray;
 begin
-  result := self.__findGameTabArea();
+  if (not self.isSetup) then
+    self.__initTabs();
 
-  if (not result) then
-    print('TRSGameTabs.areAnyOpen(): No gametabs are open', TDebug.WARNING);
+  b := [gameTabs.__tabSelectionArea.x1, gameTabs.__tabSelectionArea.y1, // top of each gametab area
+        gameTabs.__tabSelectionArea.x2, gameTabs.__tabSelectionArea.y1 + 5];
+
+  result := [-1, -1, -1, -1];
+
+  if (findColors(tpa, COLOR_ACTIVE_TAB, b)) then
+  begin
+    result := tpa.getBounds();
+    incEx(result.y2, 20);
+  end;
 end;
 
-{*
+(*
+TRSGameTabs.getTabAreas
+~~~~~~~~~~~~~~~~~~~~~~~
+
+.. code-block:: pascal
+
+    function TRSGameTabs.getTabAreas(): TBoxArray;
+
+Returns a TBoxArray of all the gametab tab boxes.
+
+.. note::
+
+    - by Coh3n
+    - Last Updated: 26 July 2013 by Coh3n
+
+Example:
+
+.. code-block:: pascal
+
+    if (gameTabs.areMultiOpen()) then
+      writeln('Multiple tabs are open');
+*)
+function TRSGameTabs.getTabAreas(): TBoxArray;
+const
+  COLOR_NON_ACTIVE_TAB = 5458491;
+var
+  i: integer;
+  b, bounds: TBox;
+  atpa: T2DPointArray;
+  tpa: TPointArray;
+begin
+  b := [gameTabs.__tabSelectionArea.x1, gameTabs.__tabSelectionArea.y1, // top of each gametab area
+        gameTabs.__tabSelectionArea.x2, gameTabs.__tabSelectionArea.y1 + 5];
+
+  if (findColors(tpa, COLOR_NON_ACTIVE_TAB, b)) then
+  begin
+    atpa := clusterTPAEx(tpa, 3, 1);
+    filterTPAsBetween(atpa, 0, 5);
+
+    if (length(atpa) > 0) then
+      for i := 0 to high(atpa) do
+      begin
+        bounds := atpa[i].getBounds();
+        incEx(bounds.y2, 20);
+
+        insert(bounds, result);
+      end;
+  end;
+
+  b := self.getActiveTabArea();
+
+  if (b.x1 <> -1) then
+    insert(b, result);
+end;
+
+(*
 TRSGameTabs._findTab
 ~~~~~~~~~~~~~~~~~~~~
 
@@ -366,33 +438,184 @@ Example:
 
 .. code-block:: pascal
 
-    if (gameTabs._findTab(p, TAB_BACKPACK, gameTabs.__navigationTabArea)) then
+    if (gameTabs._findTab(p, TAB_BACKPACK, b)) then
     begin
       writeln('Opening the backpack tab');
       mouse(p.rand(5), MOUSE_LEFT);
     end;
-*}
+*)
 function TRSGameTabs._findTab(var p: TPoint; tab: integer; searchBox: TBox): boolean;
 begin
-  if (not self._isTabValid(tab)) then
-    exit(false);
+  if (not self.isSetup) then
+    self.__initTabs();
 
-  // load tab bitmap if it hasn't already been loaded
-  if (not self.tabs[tab]._bmpLoaded) then
-    self.__loadBitmap(tab);
-
-  result := findBitmapToleranceIn(self.tabs[tab]._bmp, p.x, p.y, searchBox, 15);
+  result := findBitmapToleranceIn(self.tabs[tab]._bmp, p.x, p.y, searchBox, 10);
 end;
 
-{*
-TRSGameTabs._getActiveTabBox
-~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+(*
+TRSGameTabs.isTabVisible
+~~~~~~~~~~~~~~~~~~~~~~~~
 
 .. code-block:: pascal
 
-    function TRSGameTabs._getActiveTabBox(): TBox;
+    function TRSGameTabs.isTabVisible(tab: integer; out tabBounds: TBox): boolean;
 
-Returns a box around the active tab.
+Searches for the gametab 'tab' to see if it's visible, if found will output the bounds
+in 'tabBounds'
+
+.. note::
+
+    - by Olly
+    - Last Updated: 21 November 2013 by Olly
+
+Example:
+
+.. code-block:: pascal
+
+    writeln(gameTabs.isTabVisable(TAB_BACKPACK, b));
+*)
+function TRSGameTabs.isTabVisible(tab: integer; out tabBounds: TBox): boolean;
+var
+  b: TBoxArray;
+  p: TPoint;
+  l, i: integer;
+begin
+  b := self.getTabAreas();
+  l := length(b);
+
+  if (length(b) > 0) then
+    for i := 0 to (l -1) do
+      if (self._findTab(p, tab, b[i])) then
+      begin
+        tabBounds := b[i];
+        exit(true);
+      end;
+end;
+
+(*
+TRSGameTabs.isTabActive
+~~~~~~~~~~~~~~~~~~~~~~~
+
+.. code-block:: pascal
+
+    function TRSGameTabs.isTabActive(tab: integer): boolean;
+
+Returns true if the gametab 'tab' is active
+
+.. note::
+
+    - by Olly
+    - Last Updated: 21 November 2013 by Olly
+
+Example:
+
+.. code-block:: pascal
+
+    writeln(gameTabs.isActiveTab(TAB_BACKPACK));
+*)
+function TRSGameTabs.isTabActive(tab: integer): boolean;
+var
+  b: TBox;
+  p: TPoint;
+begin
+  b := self.getActiveTabArea();
+
+  if (b.x1 = -1) then
+    exit(false);
+
+  result := self._findTab(p, tab, b);
+end;
+
+(*
+TRSGameTabs.waitTabActive
+~~~~~~~~~~~~~~~~~~~~~~~~~
+
+.. code-block:: pascal
+
+    function TRSGameTabs.waitTabActive(tab: integer; timeOut: integer): boolean;
+
+Waits up to 'timeOut' waiting for the gametab 'tab' to be the active tab
+
+.. note::
+
+    - by Olly
+    - Last Updated: 21 November 2013 by Olly
+
+Example:
+
+.. code-block:: pascal
+
+    writeln(gameTabs.waitTabActive(TAB_BACKPACK, 1000));
+*)
+function TRSGameTabs.waitTabActive(tab: integer; timeOut: integer): boolean;
+var
+  t: integer;
+begin
+  result := false;
+  t := (getSystemTime() + timeOut);
+
+  while (t > getSystemTime()) do
+  begin
+    if (self.isTabActive(tab)) then
+      exit(true);
+
+    wait(20 + random(20));
+  end;
+end;
+
+{*
+TRSGameTabs.__openViaNavBar
+~~~~~~~~~~~~~~~~~~~~~~~~~~~
+
+.. code-block:: pascal
+
+    function TRSGameTabs.__openViaNavBar(tab: integer): boolean;
+
+Helper function for TRSGametabs.openTab(), Opens the tab via the navigation bar
+and moves the mouse to close the mouse-over menu.
+
+.. note::
+
+    - by Olly
+    - Last Updated: 21 November 2013 by Olly
+
+Example:
+
+.. code-block:: pascal
+
+    gameTabs.__openViaNavbar(TAB_BACKPACK);
+*}
+{$IFNDEF CODEINSIGHT}
+function TRSGameTabs.__openViaNavBar(tab: integer): boolean;
+var
+  p: TPoint;
+  b: TBox;
+begin
+  mouseBox(self.navButtons[self.tabs[tab]._navBarID][0], MOUSE_MOVE); // hover over the nav button
+  wait(250 + random(250));
+  mouseBox(self.navButtons[self.tabs[tab]._navBarID][self.tabs[tab]._navBarBoxIndex], MOUSE_LEFT, MOUSE_ACCURATE);
+  wait(20 + random(200));
+
+  b := self.navButtons[self.tabs[tab]._navBarID][0];
+
+  if (random(2) = 1) then // move the mouse to the side so the menu closes
+    p := point(b.x1 - 8 - random(5), b.y1 + randomRange(-10, 50))
+  else
+    p := point(b.x2 + 8 + random(5), b.y1 + randomRange(-10, 50));
+
+  mouse(p);
+end;
+{$ENDIF}
+
+(*
+TRSGameTabs.openTab
+~~~~~~~~~~~~~~~~~~~
+
+.. code-block:: pascal
+
+    function TRSGameTabs.openTab(tab: integer): boolean;
+
+Will attempt to open the gametab 'tab'.
 
 .. note::
 
@@ -403,25 +626,44 @@ Example:
 
 .. code-block:: pascal
 
-    gameTabs._findTab(p, TAB_BACKPACK, gameTabs._getActiveTabBox());
-*}
-function TRSGameTabs._getActiveTabBox(out b: TBox): boolean;
+    if (gameTabs._findTab(p, TAB_BACKPACK, b)) then
+    begin
+      writeln('Opening the backpack tab');
+      mouse(p.rand(5), MOUSE_LEFT);
+    end;
+*)
+function TRSGameTabs.openTab(tab: integer): boolean;
 var
-  tpa: TPointArray;
+  b: TBox;
 begin
-  result := true;
+  print('TRSGameTabs.openTab('+toStr(tab)+')', TDebug.HEADER);
 
-  if (not self.areMultiOpen()) then // only there is a active tab is multiple are open
-    exit(false);
-
-  if (not findColors(tpa, __COLOR_ACTIVE_TAB, self.__tabSelectionArea)) then
+  if (self.isTabActive(tab)) then
   begin
-    print('TRSGameTabs._getActiveTabBox(): Multiple tabs are open but failed to find active tab color', TDebug.ERROR);
-    exit(false);
+    print('Tab is already open, exiting');
+    result := true;
+    print('TRSGameTabs.openTab('+toStr(tab)+'): = '+toStr(result), TDebug.FOOTER);
+    exit;
   end;
 
-  b := tpa.getBounds();
-  incEx(b.y2, 25);
+  if (self.areMultiOpen) then
+    if (self.isTabVisible(tab, b)) then
+    begin
+      print('Tab is already visible, bringing to front');
+      mouseBox(b, MOUSE_LEFT);
+
+      wait(50 + random(100));
+      result := true;
+      print('TRSGameTabs.openTab('+toStr(tab)+'): = '+toStr(result), TDebug.FOOTER);
+      exit;
+    end;
+
+  print('Opening tab via gametab navigation bar');
+  self.__openViaNavBar(tab);
+
+  result := self.waitTabActive(tab, 4000 + random(1000));
+
+  print('TRSGameTabs.openTab('+toStr(tab)+'): result = '+toStr(result), TDebug.FOOTER);
 end;
 
 (*
@@ -432,15 +674,7 @@ TRSGameTabs.getActiveTab
 
     function TRSGameTabs.getActiveTab(): integer;
 
-Returns the currently active tab.  If possible, use TRSGameTabs._isTabActive for
-an increase in speed, or the tab's isOpen() function for better reliability (i.e.
-tabBackpack.isOpen()).
-
-.. warning::
-
-    Does NOT currently work if there is only one tab open.  Instead, use the tab's
-    own isOpen() function!
-
+Returns the active tab, returns the id of the constant
 
 .. note::
 
@@ -452,343 +686,30 @@ Example:
 .. code-block:: pascal
 
     if (gameTabs.getActiveTab() = TAB_BACKPACK) then
-      writeln('Backpack tab is open');
+      writeln('Backpack is open');
 *)
 function TRSGameTabs.getActiveTab(): integer;
 var
+  b: TBox;
   i: integer;
   p: TPoint;
-  tpa: TPointArray;
-  tabBox, bds: TBox;
 begin
   result := -1;
+  b := self.getActiveTabArea();
 
-  if (not self._getActiveTabBox(tabBox)) then
+  if (b.x1 = -1) then
+  begin
+    print('TRSGametabs.getActiveTab(): There isn''t an active tab currently', TDebug.WARNING);
     exit;
+  end;
 
-  // loop through each tab, checking for the bitmap in the active tab slot
   for i := 0 to high(self.tabs) do
-    if (self.tabs[i].id <> -1) then
-      if (self._findTab(p, self.tabs[i].id, tabBox)) then
-      begin
-        result := i;
-        break;
-      end;
+    if (self._findTab(p, i, b)) then
+      exit(i);
 
-  print('TRSGameTabs.getActiveTab(): result ID = ' + intToStr(i));
+  print('TRSGametabs.getActiveTab(): Didn''t find any bitmap matches', TDebug.WARNING);
 end;
-
-(*
-TRSGameTabs._isTabActive
-~~~~~~~~~~~~~~~~~~~~~~~~
-
-.. code-block:: pascal
-
-    function TRSGameTabs._isTabActive(tab: integer): boolean;
-
-Returns true if the 'tab' is active. An internal function. If possible, use
-the tab's interface isOpen() function (i.e. tabBackpack.isOpen()).
-
-.. note::
-
-    - by Coh3n
-    - Last Updated: 26 July 2013 by Coh3n
-
-Example:
-
-.. code-block:: pascal
-
-    if (gameTabs._isTabActive(TAB_BACKPACK)) then
-      writeln('Backpack tab is open');
-*)
-function TRSGameTabs._isTabActive(tab: integer): boolean;
-var
-  p: TPoint;
-  tabBox: TBox;
-begin
-  if (not self._isTabValid(tab)) then
-    exit(false);
-
-  if (self._getActiveTabBox(tabBox)) then
-    result := self._findTab(p, tab, tabBox);
-
-  if (self.areMultiOpen()) then
-    self.visibleTabArea := self.__visibleTabAreaMulti
-  else
-    self.visibleTabArea := self.__visibleTabAreaSingle;
-end;
-
-{*
-TRSGameTabs.openTab
-~~~~~~~~~~~~~~~~~~~
-
-.. code-block:: pascal
-
-    function TRSGameTabs.openTab(tab: integer): boolean;
-
-Returns true if the 'tab' is opened (or is already open). If possible, use the
-tab's open() function (i.e. tabBackpack.open()).
-
-.. note::
-
-    - by Coh3n
-    - Last Updated: 26 July 2013 by Coh3n
-
-Example:
-
-.. code-block:: pascal
-
-    if (gameTabs.openTab(TAB_BACKPACK)) then
-      writeln('Backpack tab is open');
-*}
-function TRSGameTabs.openTab(tab: integer): boolean;
-var
-  t: integer;
-  p: TPoint;
-  anyTabOpen: boolean;
-begin
-  if (not self._isTabValid(tab)) then
-    exit(false);
-
-  anyTabOpen := self.areAnyOpen();
-
-  print('TRSGameTabs.openTab('+toStr(tab)+')', TDebug.HEADER);
-
-  if (anyTabOpen) then
-  begin
-    // see if it's already active
-    if (self._isTabActive(tab)) then
-    begin
-      print('Tab already active');
-      result := true;
-      print('TRSGameTabs.openTab('+toStr(tab)+'): '+toStr(result), TDebug.FOOTER);
-      exit;
-    end;
-
-    // see if it's opened, just not the active tab, make it the active tab
-    if (self._findTab(p, tab, self.__tabSelectionArea)) then
-    begin
-      print('Found tab already open, bringing to front');
-
-      // still need more randomness on this IMO.
-      mouse(p.rand(5, 5), MOUSE_LEFT);
-
-      wait(50 + random(100));
-      result := true;
-      print('TRSGameTabs.openTab('+toStr(tab)+'): '+toStr(result), TDebug.FOOTER);
-      exit;
-    end;
-  end;
-
-  print('Opening tab via gametab navigation bar');
-
-  // move mouse over the parent tab (nav bar) so sub tabs appear
-  if (self.tabs[tab].parent <> -1) then
-  begin
-    mouseBox(self.tabs[self.tabs[tab].parent].bounds, MOUSE_MOVE, MOUSE_ACCURATE);
-    wait(200 + random(300));
-  end;
-
-  mouseBox(self.tabs[tab].bounds, MOUSE_LEFT);
-
-  t := (getSystemTime() + 3000);
-  while ((getSystemTime() < t) and (not result)) do
-  begin
-    if (self.__findGameTabArea()) then
-      result := self._isTabActive(tab);
-
-    wait(50 + random(50));
-  end;
-
-  if (result) then
-    if (self.areMultiOpen()) then
-      self.visibleTabArea := self.__visibleTabAreaMulti
-    else
-      self.visibleTabArea := self.__visibleTabAreaSingle;
-
-  print('TRSGameTabs.openTab('+toStr(tab)+'): '+toStr(result), TDebug.FOOTER);
-end;
-
-{*
-TRSGameTabs.__findGameTabArea
-~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
-
-.. code-block:: pascal
-
-    function TRSGameTabs.__findGameTabArea(): boolean;
-
-Locates the gametab area, will also set the area if it's not been set before.
-Works in both locked and non locked mode.
-
-.. note::
-
-    - by Olly
-    - Last Updated: 29 October 2013 by Olly
-
-Example:
-
-.. code-block:: pascal
-
-   gameTabs.__findGameTabArea();
-*}
-function TRSGameTabs.__findGameTabArea(): boolean;
-var
-  tpa: TPointArray;
-  atpa: T2DPointArray;
-  searchBox, b: TBox;
-  i, wid, hei, j, hi, res: integer;
-  cols, tols, widths, checks: array [0..1] of integer;
-begin
-  result := false;
-  getClientDimensions(wid, hei);
-
-  if (not self.setAreas) then
-  begin
-    searchBox := gameTabs.navigationGrid.getBounds();
-
-    dec(searchBox.y1, searchBox.y1 - 1);
-    inc(searchBox.x2, wid - searchBox.x2 - 1);
-  end else
-    searchBox := self.__tabArea;
-
-  widths := [207, 214];
-  cols := [2572908, 4668975];
-  tols := [13, 7];
-  checks := [1913172, 3879459];
-
-  for i := 0 to high(cols) do
-  begin
-    if (not findColorsTolerance(tpa, cols[i], searchBox, tols[i])) then
-      continue;
-
-    atpa := tpa.cluster(1);
-    hi := high(atpa);
-
-    for j := 0 to hi do
-    begin
-      if (length(atpa[j]) < 150) then
-        continue;
-
-      b := atpa[j].getBounds();
-      b.getDimensions(wid, hei);
-
-      if (wid = widths[i]) and (hei = 1) then
-        if (getColor(max(0, b.x1-1), b.y1) = checks[i]) then
-          if (getColor(b.x2 + 2, b.y2) <> 867950) then // check it's not the minimap
-          begin
-            res := (b.y1 - 10);
-            result := true;
-            break(2);
-          end;
-    end;
-  end;
-
-  if (result) and (not self.setAreas) then
-  with self do
-  begin
-    print('TRSGametabs.__findGameTabArea(): Setting the gametab areas..', TDebug.SUB);
-
-    __tabArea := [x + 127, res, x + w, y];
-    __visibleTabAreaSingle := [__tabArea.x1, __tabArea.y1 + 12, __tabArea.x2, __tabArea.y2];
-    __visibleTabAreaMulti := [__tabArea.x1, __tabArea.y1 + 44, __tabArea.x2, __tabArea.y2];
-    __tabSelectionArea := [__tabArea.x1, __tabArea.y1 + 12, __tabArea.x2, __visibleTabAreaMulti.y1];
-    visibleTabArea := __visibleTabAreaMulti;
-
-    setAreas := true;
-  end;
-end;
-
-{*
-TRSGameTabs.__find
-~~~~~~~~~~~~~~~~~~
-
-.. code-block:: pascal
-
-    function TRSGameTabs.__find(): boolean;
-
-Finds the gametabs area based on the client's size.
-
-.. note::
-
-    - by Coh3n
-    - Last Updated: 10 August 2013 by Coh3n
-
-Example:
-
-.. code-block:: pascal
-
-    gameTabs.__find();
-*}
-{$IFNDEF CODEINSIGHT}
-function TRSGameTabs.__find(): boolean;
-var
-  i, wid, hei: integer;
-begin
-  getClientDimensions(wid, hei);
-  result := true;
-
-  with self do
-  begin
-    setBounds([wid - 352, hei - 48, wid - 1, hei - 1]);
-
-    // tabs are indexed from left to right, then bottom to top (see constants)
-    navigationGrid := grid(8, 6, 31, 31, 42, 36, point(wid - 324, hei - 205));
-
-    setLength(tabs, length(navigationGrid));
-
-    for i := 0 to high(tabs) do
-    begin
-      tabs[i].id := i;
-      tabs[i].parent := -1;
-      tabs[i].bounds := navigationGrid[i];
-
-      if (not tabs[i]._bmpLoaded) then
-        tabs[i]._bmp := -1;
-
-      case tabs[i].id of
-        TAB_TASK,
-        TAB_STATS:
-          tabs[i].parent := TAB_HERO;
-
-        TAB_EQUIPMENT,
-        TAB_BACKPACK:
-          tabs[i].parent := TAB_GEAR;
-
-        TAB_COMPASS_TASK:
-          tabs[i].parent := TAB_ADVENTURES;
-
-        TAB_DEFENSIVE,
-        TAB_RANGED,
-        TAB_MELEE,
-        TAB_MAGIC,
-        TAB_PRAYER:
-          tabs[i].parent := TAB_POWERS;
-
-        TAB_CLAN_CHAT,
-        TAB_FRIENDS_CHAT,
-        TAB_FRIENDS:
-          tabs[i].parent := TAB_SOCIAL;
-
-        TAB_MUSIC,
-        TAB_NOTES:
-          tabs[i].parent := TAB_OTHER;
-
-        else
-          tabs[i].id := -1;
-      end;
-    end;
-  end;
-end;
-{$ENDIF}
-
-function __findGameTabs(): boolean;
-begin
-  result := gametabs.__find();
-end;
-
-{$f+} // needed so __findGametabs isn't called when assigned
 
 begin
   gameTabs.__init();
-  __interfaceFindFunctions[gameTabs.ID] := @__findGameTabs;
 end;

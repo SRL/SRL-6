@@ -243,7 +243,7 @@ var
   t: integer;
 begin
   t := (getSystemTime() + waitTime);
-  result := (not self.isOpen);
+  result := (not self.isOpen());
 
   if (result) then
     exit(true);
@@ -314,7 +314,7 @@ var
 begin
   result := false;
 
-  if (not self.isOpen) then
+  if (not self.isOpen()) then
   begin
     print('pinScreen.findNumber(): Unable to find the number because the pinscreen isn''t open', TDebug.ERROR);
     exit();
@@ -441,7 +441,7 @@ begin
     // wait upto 4 seconds for the pinscreen not to be open
     if (self.waitNotOpen(4000)) then
     begin
-      if (not conversationBox.isOpen) then  // no convo box? = entered pin succesfully
+      if (not conversationBox.isOpen()) then  // no convo box? = entered pin succesfully
         exit(self.__exit('Succesfully entered pin', TDebug.DEBUG, true));
 
       if (not conversationBox.findChat(['Please try again', 'ease try aga'])) then // didnt find bad

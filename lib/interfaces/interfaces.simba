@@ -51,6 +51,7 @@ const
   ID_INTERFACE_CONVERSATION_BOX = 36;
   ID_INTERFACE_PINSCREEN = 37;
   ID_INTERFACE_PRODUCTION = 38;
+  ID_INTERFACE_LODESTONE = 39;
 
   // client - logged out
   ID_INTERFACE_LOBBY        = 40;
@@ -68,13 +69,9 @@ type
     ID, parentID: integer;
     static: boolean;
     x, y, w, h: integer;
+    x1, y1, x2, y2: integer;
+    cx, cy: integer;
   end;
-
-const
-  __INTERFACE_HIGH = 41; // used for a global find function array
-
-var
-  __interfaceFindFunctions: array[0..__INTERFACE_HIGH] of function: boolean;
 
 (*
 TRSInterface.getBounds
@@ -127,8 +124,16 @@ procedure TRSInterface.setBounds(newBounds: TBox);
 begin
   self.x := newBounds.x1;
   self.y := newBounds.y1;
-  self.w := newBounds.x2 - newBounds.x1;
-  self.h := newBounds.y2 - newBounds.y1;
+  self.w := newBounds.x2 - newBounds.x1 +1;
+  self.h := newBounds.y2 - newBounds.y1 +1;
+
+  self.x1 := newBounds.x1;
+  self.y1 := newBounds.y1;
+  self.x2 := newBounds.x2;
+  self.y2 := newBounds.y2;
+
+  self.cx := middleBox(newBounds).x;
+  self.cy := middleBox(newBounds).y;
 end;
 
 (*
@@ -156,3 +161,4 @@ function TRSInterface.getCenterPoint(): TPoint;
 begin
   result := self.getBounds().getMiddle();
 end;
+

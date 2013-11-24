@@ -13,6 +13,7 @@ The source for this file can be found `here <https://github.com/SRL/SRL-6/blob/m
 {$include_once ../interfaces/options.simba}
 {$include_once ../interfaces/minimap.simba}
 {$include_once ../core/mouse.simba}
+{$include_once ../utilities/wrappers.simba}
 
 {$f-}
 
@@ -85,7 +86,6 @@ File's internal variables.
 var
   _boxUsername: TBox = [-1, -1, -1, -1];
   _boxPassword: TBox = [-1, -1, -1, -1];
-  __loggedInReference: TPoint = [-1, -1];
 
 (*
 type TPlayer
@@ -148,6 +148,7 @@ var
   players: TPlayerArray;
   currentPlayer: integer;
   disableIPScreenshots: boolean;
+  areDynamicInterfacesSet: boolean = false;
 
 (*
 TPlayerArray.getActive
@@ -557,16 +558,29 @@ begin
   print('TPlayer.write()', TDebug.FOOTER);
 end;
 
+procedure setDynamicInterfaces();
+begin
+  if (actionBar.__find()) then
+  begin
+    chatBox.__setup();
+    mainScreen.__setup();
+
+    areDynamicInterfacesSet := true;
+
+    print('Dynamic interfaces have been set.', TDebug.SUB);
+  end;
+end;
+
 (*
 isLoggedIn()
 ~~~~~~~~~~~~
 
 .. code-block:: pascal
 
-    function isLoggedIn(findInterfaces: boolean = false): boolean;
+    function isLoggedIn(): boolean;
 
-Returns true if a player is logged in.  If 'findInterfaces' is set to true,
-it will find and set the bounds of the open interfaces.
+Returns true if a player is logged in, uses the center of the compass work out
+the result.
 
 .. note::
 
@@ -580,28 +594,14 @@ Example:
     if (isLoggedIn()) then
       writeln('We are logged in!');
 *)
-function isLoggedIn(findInterfaces: boolean = false): boolean;
-var
-  i: integer;
+function isLoggedIn(): boolean;
+const
+  CENTER_COMPASS_COLOR = 8508157;
 begin
-  if (findInterfaces) then
-  begin
-    result := minimap.__find(false);
+  result := (getColor(minimap.button[MM_BUTTON_COMPASS].center) = CENTER_COMPASS_COLOR);
 
-    // if the minimap isn't visible, we're not logged in
-    if (not result) then
-      exit();
-
-    // call all interface find functions that need to be called
-	  for i := 0 to high(__interfaceFindFunctions) do
-	    if (__interfaceFindFunctions[i] <> nil) then
-	      __interfaceFindFunctions[i]();
-
-    __loggedInReference := [minimap.x+minimap.w - 3, minimap.y - 3]; // so interface find functions aren't unnecessarily called
-  end;
-
-  if (not result) then
-    result := (getColor(__loggedInReference) = 677526); // gold color in the logout button
+  if (result) and (not areDynamicInterfacesSet) then
+    setDynamicInterfaces();
 end;
 
 {*
@@ -1078,6 +1078,8 @@ begin
   if (isLoggedIn() or lobby.isOpen()) then
     exit(true);
 
+  areDynamicInterfacesSet := false;
+
   if ((_boxUsername.x1 = -1) or (_boxPassword.x1 = -1)) then
     if (not __setInputBoxes()) then
     begin
@@ -1173,7 +1175,7 @@ begin
   print('TPlayer.login()', TDebug.HEADER);
 
   repeat
-    if (isLoggedIn(true)) then
+    if (isLoggedIn()) then
     begin
       print('Already logged in');
       result := true;
@@ -1212,7 +1214,7 @@ begin
             break;
 
         wait(500 + random(500));
-        result := (isLoggedIn(true));
+        result := (isLoggedIn());
 
       until(result or (getSystemTime() > (t + 5000)));
     end;

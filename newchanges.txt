@@ -1,0 +1,12 @@
+moved lodestone to own interface (lodestoneScreen)
+  - isOpen()
+  - teleportTo();
+  - isTeleportUnlocked();
+
+added x1, y1, x2, y2, cx, cy back to TRSInterface.
+
+add mainScreen.getPlayerBox
+add mainScreen.getPlayerPoint
+
+add minimap.pointToMainscreen
+add minimap.pointsToMainscreen

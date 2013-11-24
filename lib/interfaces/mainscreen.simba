@@ -9,9 +9,7 @@ The source for this file can be found `here <https://github.com/SRL/SRL-6/blob/m
 
 *)
 
-{$include_once minimap.simba}
 {$include_once chatbox.simba}
-{$include_once gametabs/gametab.simba}
 {$include_once actionbar.simba}
 {$include_once ../utilities/pixelshift.simba}
 {$include_once ../utilities/color.simba}
@@ -43,7 +41,8 @@ A type that stores functions and properties of the Runescape main screen.
 *)
 type
   TRSMainscreen = record(TRSInterface)
-    __placeholder: byte;
+    playerPoint: TPoint;
+    playerBox: TBox;
   end;
 
 (*
@@ -96,65 +95,15 @@ begin
 end;
 {$ENDIF}
 
-{*
-TRSMainscreen.__find
-~~~~~~~~~~~~~~~~~~~~
-
-.. code-block:: pascal
-
-    function TRSMainscreen.__find(): boolean;
-
-Sets the mainscreen's bounds to the size of the RS client.  This is because the 
-mainscreen take up the entire client, and the other interfaces are rendered on
-top.
-
-.. note::
-
-    - by Coh3n
-    - Last Updated: 10 August 2013 by Coh3n
-
-Example:
-
-.. code-block:: pascal
-
-    mainscreen.__find();
-*}
-{$IFNDEF CODEINSIGHT}
-function TRSMainscreen.__find(): boolean;
-var
-  wid, hei: integer;
-  bds: TBox;
+procedure TRSMainScreen.__setup();
+const
+  PLAYER_BOX_WIDTH = 26;
+  PLAYER_BOX_HEIGHT = 38;
 begin
-  getClientDimensions(wid, hei);
-
-  wid := (wid - 1);
-  hei := (hei - 1);
-  bds.x1 := 0;
-  bds.y1 := 0;
-
-  bds.x2 := minimap.x;
-
-  bds.y2 := (actionbar.y);
-
-  if (actionbar.y = 0) then // if it's at the top
-    bds.y1 := actionbar.h
-  else
-    bds.y1 := 0;
-
-  self.setBounds(bds);
-
-  print('TRSMainscreen.__find(): Set mainscreen bounds based on the other visible interfaces', TDebug.SUB);
-end;
-{$ENDIF}
-
-function TRSMainscreen.getPlayerPoint(offset: TPoint = [0, 0]): TPoint;
-var
-  wid, hei: integer;
-begin
-  getClientDimensions(wid, hei);
-
-  result := [wid div 2, hei div 2];
-  result.offset(offset);
+  self.setBounds([1, 1, gameTabs.tabArea.x1, actionBar.y1]);
+  self.playerPoint := middleBox([1, 1, 574, 387]); // the whole 3d gamescreen
+  self.playerBox := [self.playerPoint.x - PLAYER_BOX_WIDTH div 2, self.playerPoint.y - PLAYER_BOX_HEIGHT div 2,
+                     self.playerPoint.x + PLAYER_BOX_WIDTH div 2, self.playerPoint.y + PLAYER_BOX_HEIGHT div 2];
 end;
 
 (*
@@ -185,9 +134,9 @@ begin
     exit;
 
   keyDown((angle * 2) + 38);
-  sleep(1000 + random(300));
+  wait(1000 + random(300));
   keyUp((angle * 2) + 38);
-  wait(500 + random(100));
+  wait(300 + random(300));
 end;
 
 (*
@@ -227,7 +176,7 @@ Example:
     if (mainscreen.findObject(x, y, [123457, 897637], [5, 10], colorSetting(2, 0.02, 0.13), mainscreen.getCenterPoint(), 50, 25, 40, ['Tree'], mainscreen.getBounds(), MOUSE_RIGHT)) then
       writeln('Right-clicked object!');
 *)
-function TRSMainscreen.findObject(var ix, iy: integer; cols, tols: TIntegerArray; colSettings: TColorSettings; sortFrom: TPoint; objWidth, objHeight, minCount: integer; mouseOverText: TStringArray; searchBox: TBox; mouseAction: integer = MOUSE_NONE): boolean;
+function TRSMainscreen.findObject(var ix, iy: integer; cols, tols: TIntegerArray; colSettings: TColorSettings; sortFrom: TPoint; objWidth, objHeight, minCount: integer; mouseOverText: TStringArray; searchBox: TBox; mouseAction: integer = MOUSE_LEFT): boolean;
 var
   i, l: integer;
   myPoint: TPoint;
@@ -319,21 +268,44 @@ Example:
     if (mainscreen.findObject(x, y, 123457, 10, colorSetting(2, 0.02, 0.13), mainscreen.getCenterPoint(), 50, 25, 40, ['ake'])) then
       writeln('Clicked object!');
 *)
-function TRSMainscreen.findObject(var ix, iy: integer; col, tol: integer; colSettings: TColorSettings; sortFrom: TPoint; objWidth, objHeight, minCount: integer; mouseOverText: TStringArray; mouseAction: integer = MOUSE_NONE): boolean; overload;
+function TRSMainscreen.findObject(var ix, iy: integer; col, tol: integer; colSettings: TColorSettings; sortFrom: TPoint; objWidth, objHeight, minCount: integer; mouseOverText: TStringArray; mouseAction: integer = MOUSE_LEFT): boolean; overload;
 begin
   result := self.findObject(ix, iy, [col], [tol], colSettings, sortFrom, objWidth, objHeight, minCount, mouseOverText, self.getBounds(), mouseAction);
 end;
 
-{$IFNDEF CODEINSIGHT}
-function __findMainscreen(): boolean;
-begin
-  result := mainscreen.__find();
-end;
-{$ENDIF}
+(*
+TRSMainscreen.findObject; overload;
+~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
 
-{$f+} // needed so mainscreen.__find isn't called when assigned
+.. code-block:: pascal
+
+    function TRSMainscreen.findObject(var ix, iy: integer; col, tol: integer; mouseOverText: TStringArray; mouseAction: integer = MOUSE_LEFT): boolean; overload;
+
+A very general object finding function.  Will find and mouse an object in the mainscreen.
+
+    * ix, iy: The coordinates of the object if found.
+    * col: The color to be found.
+    * tol: The tolerance on 'col'.
+    * mouseOverText: The uptext of the object.
+    * mouseAction: The action of the mouse. Default MOUSE_LEFT.
+
+.. note::
+
+    - by Olly
+    - Last Updated: 20 November by Olly
+
+Example:
+
+.. code-block:: pascal
+
+    if (mainscreen.findObject(x, y, 123457, 10, ['ake'])) then
+      writeln('Clicked object!');
+*)
+function TRSMainscreen.findObject(var ix, iy: integer; col, tol: integer; mouseOverText: TStringArray; mouseAction: integer = MOUSE_LEFT): boolean; overload;
+begin
+  result := self.findObject(ix, iy, col, tol, colorSetting(1), self.playerPoint, 15, 15, 2, mouseOverText, mouseAction);
+end;
 
 begin
   mainscreen.__init();
-  __interfaceFindFunctions[mainscreen.ID] := @__findMainscreen;
 end;

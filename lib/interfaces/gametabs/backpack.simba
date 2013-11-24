@@ -9,6 +9,7 @@ Runescape Backpack gametab.
 
 {$include_once gametab.simba}
 {$include_once ../../misc/items.simba}
+{$include_once ../chooseoption.simba}
 
 {$f-}
 
@@ -58,7 +59,6 @@ type
   TRSTabBackpack = record(TRSInterface)
     tabIndex: integer;
     __slots: array [0..1] of TBoxArray;
-    areSlotsLoaded: boolean;
   end;
 
 (*
@@ -103,48 +103,13 @@ begin
     tabIndex := TAB_BACKPACK;
     parentID := -1;
     static := true;
-    areSlotsLoaded := false;
+    setBounds(gameTabs.tabArea);
+
+    __slots[0] := grid(5, 6, 33, 31, 42, 36, point(gameTabs.tabArea.x1 + 28, gameTabs.tabArea.y1 + 22));
+    __slots[1] := grid(5, 6, 33, 31, 42, 36, point(gameTabs.tabArea.x1 + 28, gameTabs.tabArea.y1 + 50));
   end;
 end;
 {$ENDIF}
-
-(*
-TRSTabBackpack.initSlots
-~~~~~~~~~~~~~~~~~~~~~~~~
-
-.. code-block:: pascal
-
-    procedure TRSTabBackpack.initSlots();
-
-Initiates the tabBackpack slots.
-
-.. note::
-
-    - by Olly
-    - Last Updated: 29 October 2013 by Olly
-
-Example:
-
-.. code-block:: pascal
-
-    tabBackpack.initSlots();
-*)
-procedure TRSTabBackpack.initSlots();
-begin
-  self.setBounds(gameTabs.__tabArea);
-
-  __slots[0] := grid(5, 6, 34, 31, 43, 36, point(gameTabs.__visibleTabAreaMulti.x1 + 27,
-                                                 gameTabs.__visibleTabAreaMulti.y1 + 18));
-
-  __slots[1] := grid(5, 6, 34, 31, 43, 36, point(gameTabs.__visibleTabAreaSingle.x1 + 27,
-                                                 gameTabs.__visibleTabAreaSingle.y1 + 22));
-
-  setLength(__slots[0], 28);
-  setLength(__slots[1], 28);
-
-  self.areSlotsLoaded := true;
-  print('TRSTabBackpack.initSlots(): Loaded slot arrays', TDebug.SUB);
-end;
 
 (*
 TRSTabBackpack.isOpen
@@ -171,23 +136,12 @@ Example:
 *)
 function TRSTabBackpack.isOpen(): boolean;
 const
-  COIN_COLOR = 9624571;
-var
-  p: TPoint;
-  tpa: TPointArray;
-  b: TBox;
+  COIN_COLOR = 9033204;
 begin
-  result := (gameTabs._isTabActive(self.tabIndex));
+  result := (gameTabs.isTabActive(self.tabIndex));
 
   if (not result) then
-    if (gameTabs.__findGameTabArea()) then
-    begin
-      findColors(tpa, COIN_COLOR, intToBox(gameTabs.visibleTabArea.x1, gameTabs.visibleTabArea.y2 - 35, gameTabs.visibleTabArea.x2, gameTabs.visibleTabArea.y2));
-      result := inRange(length(tpa), 8, 12);
-    end;
-
-  if (not result) then
-    print('TRSTabBackpack.isOpen() result = false', TDebug.WARNING);
+    result := (getColor(gameTabs.tabArea.x1 + 92, gameTabs.tabArea.y2 -27) = COIN_COLOR);
 end;
 
 (*
@@ -277,19 +231,10 @@ Example:
 *)
 function TRSTabBackpack.getSlotBoxes(): TBoxArray;
 begin
-  if (not self.isOpen()) then
-  begin
-    print('Unable to return slot boxes since the gametab is''nt open');
-    exit;
-  end;
-
-  if (not self.areSlotsLoaded) then
-    self.initSlots();
-
-  if (gameTabs.visibleTabArea.y1 = gameTabs.__visibleTabAreaMulti.y1) then
-    result := __slots[0]
+  if (gameTabs.areMultiOpen()) then
+    result := self.__slots[1]
   else
-    result := __slots[1];
+    result := self.__slots[0];
 end;
 
 (*
@@ -318,19 +263,10 @@ Example:
 *)
 function TRSTabBackpack.getSlotBox(slot: integer): TBox;
 begin
-  if (not self.isOpen()) then
-  begin
-    print('Unable to return slot box since the gametab is''nt open');
-    exit(intToBox(-1, -1, -1, -1));
-  end;
-
-  if (not self.areSlotsLoaded) then
-    self.initSlots();
-
-  if (gameTabs.visibleTabArea.y1 = gameTabs.__visibleTabAreaMulti.y1) then
-    result := __slots[0][slot -1]
+  if (gameTabs.areMultiOpen()) then
+    result := self.__slots[1][slot -1]
   else
-    result := __slots[1][slot -1];
+    result := self.__slots[0][slot -1];
 end;
 
 (*
@@ -1007,7 +943,7 @@ begin
   if (not self.open()) then
     exit();
 
-  b := intToBox(gameTabs.visibleTabArea.x1, gameTabs.visibleTabArea.y2 - 35, gameTabs.visibleTabArea.x2, gameTabs.visibleTabArea.y2);
+  b := intToBox(gameTabs.TabArea.x1, gameTabs.TabArea.y2 - 35, gameTabs.TabArea.x2, gameTabs.TabArea.y2);
 
   for i := 0 to 1 do
     if (findColors(tpa, colArr[i], b)) then

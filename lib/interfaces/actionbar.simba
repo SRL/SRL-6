@@ -11,7 +11,6 @@ The source for this file can be found `here <https://github.com/SRL/SRL-6/blob/m
 
 {$include_once interfaces.simba}
 {$include_once ../core/text.simba}
-{$include_once ../core/players.simba}
 {$include_once gametabs/backpack.simba}
 
 {$f-}
@@ -31,6 +30,7 @@ Example
 type
   TRSActionBar = record(TRSInterface)
     __slots: TBoxArray;
+    setSlots: boolean;
   end;
 
 (*
@@ -65,121 +65,6 @@ const
   ACTION_BAR_SLOT_HIGH = 14;
 
 {*
-TRSActionBar._findMinimizeButton
-~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
-
-.. code-block:: pascal
-
-    function TRSActionBar._findMinimizeButton(out center: TPoint): boolean;
-
-Returns true if the action bar's minimize button is found.  Returns it's
-coordinates in 'center'.
-
-.. note::
-
-    - by euphemism
-    - Last Updated: 15 September 2013 by euphemism
-
-Example:
-
-.. code-block:: pascal
-
-    if (actionBar._findMinimizeButton()) then
-      print('Found minimize button');
-*}
-function TRSActionBar._findMinimizeButton(out center: TPoint): boolean;
-const
-
-  TOP_HALF_OF_MINIMIZE_BUTTON_LINE_SYMBOL_COLOR = 10394257;
-var
-
-  hh, ww: integer;
-  tpa: TPointArray;
-begin
-
-  getClientDimensions(ww, hh);
-
-  if (not findColors(tpa, TOP_HALF_OF_MINIMIZE_BUTTON_LINE_SYMBOL_COLOR, 0, 0,
-   ww - 1, hh - 1)) then
-    exit(false);
-
-  if (length(tpa) <> 9) then
-  begin
-
-    center := point(0, 0);
-
-    print('TRSActionBar._findMinimizeButton: Failed to find the button, the ' +
-    'length of the color search''s tpa was ' + toStr(length(self.__slots)) +
-     '.', TDebug.ERROR);
-    exit(false);
-  end;
-
-  center := tpa.getMiddle();
-
-  result := true;
-end;
-
-{*
-TRSActionBar.__find
-~~~~~~~~~~~~~~~~~~~
-
-.. code-block:: pascal
-
-    function TRSActionBar.__find(): boolean;
-
-Returns true if the action bar is found.
-
-.. note::
-
-    - by euphemism
-    - Last Updated: 15 September 2013 by euphemism
-
-Example:
-
-.. code-block:: pascal
-
-    actionBar.__find();
-*}
-{$IFNDEF CODEINSIGHT}
-function TRSActionBar.__find(): boolean;
-var
-  center: TPoint;
-  offset: TBox;
-begin
-  print('TRSActionBar.__find()', TDebug.HEADER);
-
-  if (not self._findMinimizeButton(center)) then
-  begin
-    print('Failed to find action bar minimize button', TDebug.ERROR);
-    print('TRSActionBar.__find(): '+toStr(result), TDebug.FOOTER);
-    exit(false);
-  end;
-
-  if (getColor(center.x - 543, center.y + 47) = 950986) then // gold color around the action bar number
-    offset := [-566, -10, 9, 65]
-  else
-    offset := [-566, -10, 9, 27];
-
-  self.x := center.x + offset.x1;
-  self.y := center.y + offset.y1;
-  self.w := center.x + offset.x2 - self.x;
-  self.h := center.y + offset.y2 - self.y;
-
-  self.__slots := grid(14, 1, 29, 29, 36, 0, point(self.getBounds().x1 + 67, self.getBounds().y1 + 53));
-
-  self.__slots[high(self.__slots) - 1] := intToBox(self.__slots[high(self.__slots) - 2].x1 + 54, self.getBounds().y1 + 39, self.__slots[high(self.__slots) - 2].x1 + 83, self.getBounds().y1 + 68);
-
-  self.__slots[high(self.__slots)] := self.__slots[high(self.__slots) - 1].copy();
-  self.__slots[high(self.__slots)].offset(point(36, 0));
-
-  result := true;
-
-  print('Found and set actionBar properties');
-  print('TRSActionBar.__find(): '+toStr(result), TDebug.FOOTER);
-end;
-{$ENDIF}
-
-{*
 TRSActionBar.__init
 ~~~~~~~~~~~~~~~~~~~
 
@@ -206,29 +91,81 @@ begin
 
   with (self) do
   begin
-
     name := 'RS Action Bar';
-
     ID := ID_INTERFACE_ACTION_BAR;
     parentID := ID_INTERFACE_MAINSCREEN;
-
-    static := true;
-
-    x := 0;
-    y := 407;
-    w := 575;
-    h := 75;
-
-    __slots := Grid(14, 1, 29, 29, 36, 0, Point(x + 61, y + 49));
-
-    self.__slots[high(self.__slots) - 1] := intToBox(self.__slots[high(self.__slots) - 2].x1 + 54,
-     self.getBounds().y1 + 39, self.__slots[high(self.__slots) - 2].x1 + 83, self.getBounds().y1 + 68);
-
-    self.__slots[high(self.__slots)] := self.__slots[high(self.__slots) - 1].copy();
-    self.__slots[high(self.__slots)].offset(point(36, 0));
+    static := false;
+    setSlots := false;
   end;
 end;
 {$ENDIF}
+
+function TRSActionBar.__find(): boolean;
+const
+  TOP_HALF = 10328208;
+  BOTTOM_HALF = 11052187;
+  BUTTON_LENGTH = 9;
+  BORDER_COLOR = 3945514;
+  OFFSET_Y = 10;
+var
+  i, c, j, topY, bottomY: integer;
+  tpa: TPointArray;
+  atpa: T2DPointArray;
+  p: TPoint;
+  b: TBox;
+begin
+  result := false;
+
+  if (not findColors(tpa, TOP_HALF, 0, 0, gameTabs.tabArea.x1, getClientBounds().y2)) then
+    exit();
+
+  topY := -1;
+  bottomY := -1;
+
+  atpa := clusterTPAEx(tpa, 3, 3);
+
+  for i := 0 to high(atpa) do
+    if (length(atpa[i]) = BUTTON_LENGTH) then
+    begin
+      c := 0;
+
+      for j := 0 to high(atpa[i]) do
+        if (getColor(atpa[i][j].x, atpa[i][j].y+1) = BOTTOM_HALF) then
+          inc(c);
+
+      if (c = BUTTON_LENGTH) then
+      begin
+        topY := (atpa[i][0].y - OFFSET_Y);
+        break();
+      end;
+    end;
+
+  if (topY > -1) then
+  begin
+    p := middleTPA(atpa[i]);
+
+    for i := p.y to (p.y + 100) do
+      if (getColor(p.x, i) = BORDER_COLOR) then
+      begin
+        bottomY := i;
+        break();
+      end;
+
+    self.setBounds([1, topY, gameTabs.tabArea.x1, bottomY]);
+
+    if (not self.setSlots) then
+    begin
+      __slots := grid(14, 1, 29, 29, 36, 0, point(self.x1 + 66, self.y1 + 53));
+
+      self.__slots[high(self.__slots)-1].offset([18, 0]);
+      self.__slots[high(self.__slots)].offset([18, 0]);
+      setSlots := true;
+    end;
+
+    print('Found and set actionbar bounds @ '+toStr(self.getBounds()), TDebug.SUB);
+    result := true;
+  end;
+end;
 
 {*
 TRSActionBar.__isSlotValid
@@ -296,146 +233,6 @@ begin
 end;
 {$ENDIF}
 
-{*
-TRSActionBar.__toggleSelf
-~~~~~~~~~~~~~~~~~~~~~~~~~
-
-.. code-block:: pascal
-
-    function TRSActionBar.__toggleSelf(open: boolean): boolean;
-
-Internal function used to toggle the Action Bar open and closed.
-
-.. note::
-
-    - by euphemism
-    - Last Updated: 18 April 2013 by euphemism
-
-Example:
-
-.. code-block:: pascal
-
-    if (actionBar.__toggleSelf(true)) then
-      writeln('Action Bar is open.');
-*}
-{$IFNDEF CODEINSIGHT}
-function TRSActionBar.__toggleSelf(open: boolean): boolean;
-var
-
-  center: TPoint;
-  t: TTimeMarker;
-begin
-
-  if (((open) and (not self.isOpen())) or ((not open) and (self.isOpen()))) then // Lape currently does weird things with xor
-  begin
-
-    if (not self._findMinimizeButton(center)) then
-      exit(false);
-
-    intToBox(center.x - 6, center.y - 6, center.x + 6, center.y + 6).mouse(MOUSE_LEFT);
-
-    t.start();
-    repeat
-
-      wait(randomRange(10, 30));
-      result := (open = self.isOpen());
-    until ((result) or (t.getTime() > 950 + random(100)));
-  end else
-    result := true;
-end;
-{$ENDIF}
-
-(*
-TRSActionBar.isOpen
-~~~~~~~~~~~~~~~~~~~
-
-.. code-block:: pascal
-
-    function TRSActionBar.isOpen(): boolean;
-
-Returns true if the Action Bar is open.
-
-.. note::
-
-    - by euphemism
-    - Last Updated: 18 April 2013 by euphemism
-
-Example:
-
-.. code-block:: pascal
-
-    if (actionBar.isOpen()) then
-      writeln('Action Bar open and ready to use!');
-*)
-function TRSActionBar.isOpen(): boolean;
-var
-
-  color: integer;
-begin
-
-  color := getColor(self.getBounds().x2 - 1, self.__slots[0].y1 - 2);
-  result := (not (color = 4866877));
-
-  print('actionBar.isOpen() returned ' + toStr(result) + ' and found the color ' +
-   toStr(color) + '. We were looking for the silver border of the Action Bar, if it was open.', TDebug.LOG);
-end;
-
-(*
-TRSActionBar.open
-~~~~~~~~~~~~~~~~~
-
-.. code-block:: pascal
-
-    function TRSActionBar.open(): boolean;
-
-Opens the Action Bar if it is closed.
-
-.. note::
-
-    - by euphemism
-    - Last Updated: 18 April 2013 by euphemism
-
-Example:
-
-.. code-block:: pascal
-
-    if (actionBar.open()) then
-      writeln('Successfully opened the Action Bar.');
-*)
-function TRSActionBar.open(): boolean;
-begin
-
-  result := self.__toggleSelf(true);
-end;
-
-(*
-TRSActionBar.close
-~~~~~~~~~~~~~~~~~~
-
-.. code-block:: pascal
-
-    function TRSActionBar.close(): boolean;
-
-Closes the Action Bar if it is open.
-
-.. note::
-
-    - by euphemism
-    - Last Updated: 18 April 2013 by euphemism
-
-Example:
-
-.. code-block:: pascal
-
-    if (actionBar.close()) then
-      writeln('Successfully closed the Action Bar.');
-*)
-function TRSActionBar.close(): boolean;
-begin
-
-  result := self.__toggleSelf(false);
-end;
-
 (*
 TRSActionBar.getCurrentBar
 ~~~~~~~~~~~~~~~~~~~~~~~~~~
@@ -497,15 +294,7 @@ var
   timeMarker: TTimeMarker;
   keys: tIntegerArray;
 begin
-
   result := false;
-
-  if (length(players) > 0) then
-    if (not players[currentPlayer].isMember) then
-    begin
-      print('actionBar.switchToBar: F2P cannot switch to this bar.', TDebug.ERROR);
-      exit;
-    end;
 
   if (not inRange(barNumber, 1, 5)) then
   begin
@@ -670,6 +459,28 @@ begin
   result := self.__slots[slot - 1];
 end;
 
+(*
+TRSActionBar.pointToSlot
+~~~~~~~~~~~~~~~~~~~~~~~~
+
+.. code-block:: pascal
+
+    function TRSActionBar.pointToSlot(const p: TPoint): integer;
+
+Returns the actionbar slot where the TPoint 'p' falls within, if fails to fall
+within any will return -1
+
+.. note::
+
+    - by Olly
+    - Last Updated: 20 November 2013 by Olly
+
+Example:
+
+.. code-block:: pascal
+
+    b := actionBar.getSlotBox(1);
+*)
 function TRSActionBar.pointToSlot(const p: TPoint): integer;
 var
   i: byte;
@@ -1133,18 +944,6 @@ begin
   print('actionBar.getAbilityCooldown() checked slot ' + toStr(slot) + 'and got ' + toStr(result), TDebug.LOG);
 end;
 
-{$IFNDEF CODEINSIGHT}
-function __findActionBar(): boolean;
 begin
-  result := actionBar.__find();
-end;
-{$ENDIF}
-
-{$f+} // needed so actionBar.__find isn't called when assigned
-
-begin
-
   actionBar.__init();
-
-  __interfaceFindFunctions[actionBar.ID] := @__findActionBar;
 end;
