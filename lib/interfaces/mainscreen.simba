@@ -100,7 +100,7 @@ const
   PLAYER_BOX_WIDTH = 26;
   PLAYER_BOX_HEIGHT = 38;
 begin
-  self.setBounds([1, 1, gameTabs.tabArea.x1, actionBar.y1]);
+  self.setBounds([0, 0, gameTabs.tabArea.x1-1, actionBar.y1-1]);
   self.playerPoint := middleBox([1, 1, 574, 387]); // the whole 3d gamescreen
   self.playerBox := [self.playerPoint.x - PLAYER_BOX_WIDTH div 2, self.playerPoint.y - PLAYER_BOX_HEIGHT div 2,
                      self.playerPoint.x + PLAYER_BOX_WIDTH div 2, self.playerPoint.y + PLAYER_BOX_HEIGHT div 2];

@@ -116,8 +116,11 @@ var
 begin
   result := false;
 
-  if (not findColors(tpa, TOP_HALF, 0, 0, gameTabs.tabArea.x1, getClientBounds().y2)) then
+  if (not findColorsTolerance(tpa, TOP_HALF, 0, 0, gameTabs.tabArea.x1, getClientBounds().y2, 10)) then
+  begin
+    print('TRSActionBar.__find(): Failed to find action bar color', TDebug.ERROR);
     exit();
+  end;
 
   topY := -1;
   bottomY := -1;
