@@ -103,8 +103,87 @@ end;
 {$ENDIF}
 
 {*
-function TRSActionBar.__find()
-~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+TRSActionBar.__findButton
+~~~~~~~~~~~~~~~~~~~~~~~~~
+
+.. code-block:: pascal
+
+    function TRSActionBar.__findButton(out pnt: TPoint): boolean;
+
+Attempts to find the minimize button on the actionbar
+
+.. note::
+
+    - by Olly
+    - Last Updated: 24 November 2013 by Olly
+
+Example:
+
+.. code-block:: pascal
+
+    actionBar.__findButton(p);
+*}
+function TRSActionBar.__findButton(out pnt: TPoint): boolean;
+const
+  LINE_COLOR = 10328208;
+  BACKGROUND_COLOR = 1774600;
+  TOLERANCE = 15;
+  BORDER_LINE_COLOR = 11509631;
+  BORDER_LINE_MODS = [0.10, 0.69];
+var
+  tpaBackground, tpaBorder: TPointArray;
+   possibleBounds: TBoxArray;
+  atpa: T2DPointArray;
+  i: integer;
+  b: TBox;
+  p: TPoint;
+begin
+  result := false;
+
+  if (not findColorsTolerance(tpaBorder, BORDER_LINE_COLOR, intToBox(0, 0, gameTabs.tabArea.x1, getClientBounds().y2), TOLERANCE, colorSetting(2, BORDER_LINE_MODS[0], BORDER_LINE_MODS[1]))) then
+  begin
+    print('TRSActionBar.__findButton(): Found no border color', TDebug.WARNING);
+    exit(false);
+  end;
+
+  atpa := clusterTPAEx(tpaBorder, 1, 1);
+
+  for i := 0 to high(atpa) do
+    if (length(atpa[i]) = 56) then
+    begin
+      b := getTPABounds(atpa[i]);
+
+      if (b.getWidth() = 15) and (b.getHeight() = 15) then
+        insert(b, possibleBounds);
+    end;
+
+  if (length(possibleBounds) < 1) then
+  begin
+    print('TRSActionBar.__findButton(): Failed to find any vaild bounds', TDebug.WARNING);
+    exit(false);
+  end;
+
+  for i := 0 to high(possibleBounds) do
+    if (findColorsTolerance(tpaBackground, BACKGROUND_COLOR, possibleBounds[i], TOLERANCE)) then
+     begin
+       if (inRange(length(tpaBackground), 100, 200)) then
+       begin
+         p := middleBox(possibleBounds[i]);
+         if (similarColors(getColor(p.x, p.y+1), LINE_COLOR, 50)) then
+         begin
+           print('TRSActionBar.__findButton(): Found the actionbar button @ '+toStr(p), TDebug.SUB);
+           pnt := p;
+           exit(true);
+         end;
+       end;
+     end;
+
+  print('TRSActionBar.__findButton(): Failed to find any button matches', TDebug.WARNING);
+end;
+
+{*
+TRSActionBar.__find
+~~~~~~~~~~~~~~~~~~~
 
 .. code-block:: pascal
 
@@ -115,7 +194,73 @@ Returns true if the action bar is found.  Sets its coordinates in the process.
 .. note::
 
     - by Olly
-    - Last Updated: 24 November 2013 by Coh3n
+    - Last Updated: 24 November 2013 by Olly
+
+Example:
+
+.. code-block:: pascal
+
+    if (not actionbar.__find(h)) then
+      writeln('Failed to find the actionbar');
+*}
+{$IFNDEF CODEINSIGHT}
+function TRSActionBar.__find(out height: integer): boolean;
+const
+  BORDER_COLOR = 3945514;
+var
+  topY, bottomY, i: integer;
+  p: TPoint;
+begin
+  result := false;
+  bottomY := -1;
+
+  if (self.__findButton(p)) then
+  begin
+    topY := (p.y - 9);
+
+    for i := p.y to (p.y + 100) do
+      if (getColor(p.x, i) = BORDER_COLOR) then
+      begin
+        bottomY := i;
+        break();
+      end;
+
+    height := (abs(topY - bottomY));
+
+    if (bottomY = -1) then
+      print('TRSActionBar.__find(): Failed to find the bottom Y of the actionbar, most scripts should still function though', TDebug.WARNING)
+    else
+      print('TRSActionBar.__find(): Height of actionbar is '+toStr(height), TDebug.SUB);
+
+    self.setBounds([0, topY, gameTabs.tabArea.x1-1, topY + 75]);
+    result := true;
+
+    if (not self.setSlots) then
+    begin
+      __slots := grid(14, 1, 29, 29, 36, 0, point(self.x1 + 67, self.y1 + 53));
+
+      self.__slots[high(self.__slots)-1].offset([18, 0]);
+      self.__slots[high(self.__slots)].offset([18, 0]);
+      setSlots := true;
+    end;
+  end;
+end;
+{$ENDIF}
+
+{*
+TRSActionBar.__find; overload
+~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+
+.. code-block:: pascal
+
+    function TRSActionBar.__find(): boolean; overload;
+
+Overloaded method without the height parameter.
+
+.. note::
+
+    - by Olly
+    - Last Updated: 24 November 2013 by Olly
 
 Example:
 
@@ -125,74 +270,11 @@ Example:
       writeln('Failed to find the actionbar');
 *}
 {$IFNDEF CODEINSIGHT}
-function TRSActionBar.__find(): boolean;
-const
-  TOP_HALF = 10328208;
-  BOTTOM_HALF = 11052187;
-  BUTTON_LENGTH = 9;
-  BORDER_COLOR = 3945514;
-  OFFSET_Y = 10;
+function TRSActionBar.__find(): boolean; overload;
 var
-  i, c, j, topY, bottomY: integer;
-  tpa: TPointArray;
-  atpa: T2DPointArray;
-  p: TPoint;
-  b: TBox;
+  foo: integer;
 begin
-  result := false;
-
-  if (not findColorsTolerance(tpa, TOP_HALF, 0, 0, gameTabs.tabArea.x1, getClientBounds().y2, 10)) then
-  begin
-    print('TRSActionBar.__find(): Failed to find action bar color', TDebug.ERROR);
-    exit();
-  end;
-
-  topY := -1;
-  bottomY := -1;
-
-  atpa := clusterTPAEx(tpa, 3, 3);
-
-  for i := 0 to high(atpa) do
-    if (length(atpa[i]) = BUTTON_LENGTH) then
-    begin
-      c := 0;
-
-      for j := 0 to high(atpa[i]) do
-        if (getColor(atpa[i][j].x, atpa[i][j].y+1) = BOTTOM_HALF) then
-          inc(c);
-
-      if (c = BUTTON_LENGTH) then
-      begin
-        topY := (atpa[i][0].y - OFFSET_Y);
-        break();
-      end;
-    end;
-
-  if (topY > -1) then
-  begin
-    p := middleTPA(atpa[i]);
-
-    for i := p.y to (p.y + 100) do
-      if (getColor(p.x, i) = BORDER_COLOR) then
-      begin
-        bottomY := i;
-        break();
-      end;
-
-    self.setBounds([1, topY, gameTabs.tabArea.x1, bottomY]);
-
-    if (not self.setSlots) then
-    begin
-      __slots := grid(14, 1, 29, 29, 36, 0, point(self.x1 + 66, self.y1 + 53));
-
-      self.__slots[high(self.__slots)-1].offset([18, 0]);
-      self.__slots[high(self.__slots)].offset([18, 0]);
-      setSlots := true;
-    end;
-
-    print('Found and set actionbar bounds @ '+toStr(self.getBounds()), TDebug.SUB);
-    result := true;
-  end;
+  result := self.__find(foo);
 end;
 {$ENDIF}
 
