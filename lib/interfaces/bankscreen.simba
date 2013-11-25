@@ -539,6 +539,41 @@ begin
   result := gridBox(slot -1, 4, 7, 35, 31, 42, 36, point(self.x + _PACK_SLOTS_OFFSET.x, self.y + _PACK_SLOTS_OFFSET.y));
 end;
 
+(*
+TRSBankScreen.getPackCount
+~~~~~~~~~~~~~~~~~~~~~~~~~~
+
+.. code-block:: pascal
+
+    function TRSBankScreen.getPackCount(): integer;
+
+Returns the number of items in the bankscreen's pack.
+
+.. note::
+
+    - by Coh3n
+    - Last Updated: 24 November 2013 by Coh3n
+
+Example:
+
+.. code-block:: pascal
+
+    var
+      c: integer;
+    begin
+      c := bankscreen.getPackCount();
+
+*)
+function TRSBankScreen.getPackCount(): integer;
+var
+  b: TBoxArray := bankscreen.getPackSlotBoxes();
+  i: integer;
+begin
+  for i := 0 to high(b) do
+    if (isItemIn(b[i])) then
+      inc(result);
+end;
+
 {*
 TRSBankScreen._getTabBounds
 ~~~~~~~~~~~~~~~~~~~~~~~~~~~
@@ -1066,10 +1101,16 @@ begin
   b := self.getBankSlotBox(slot);
 
   if (b.x1 = -1) then // invaild slot
+  begin
+    print('bankscreen.withdraw(): Invalid slot '+toStr(slot), TDebug.WARNING);
     exit;
+  end;
 
   if (not isItemIn(b)) then // no item in the slot?
+  begin
+    print('bankscreen.withdraw(): No item in slot '+toStr(slot), TDebug.WARNING);
     exit;
+  end;
 
   mouseBox(b, MOUSE_MOVE);
 
