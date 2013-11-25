@@ -448,7 +448,7 @@ Example:
     mouse(100, 100, 5, 5, MOUSE_LEFT);
     mouse(100, 100, 5, 5);
 *)
-procedure mouse(x, y, randX, randY, button: integer = MOUSE_MOVE);
+procedure mouse(x, y, randX, randY, button: integer = MOUSE_MOVE); overload;
 begin
   mouse(point(x+randX, y+randY), button);
 end;
