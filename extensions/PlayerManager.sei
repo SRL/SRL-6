@@ -515,8 +515,7 @@ var
 begin
   with TOpenDialog.Create(mainForm) do
   begin
-    //InitialDir := IncludePath + 'Rafiki\';
-    FileName := IncludePath + 'Rafiki\';      //Support for windows 7(since initial dir is no longer used)
+    FileName := IncludePath + 'Players\';      //Support for windows 7(since initial dir is no longer used)
     //Note to myself: Filename is reset after Execute, even if no file was sellected.
     Filter := '|Armies(*.xml; *.raf)|*.xml; *.raf|All files (*.*)|*.*|';
     Options := Options + [ofPathMustExist, ofFileMustExist, ofHideReadOnly];
