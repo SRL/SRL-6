@@ -419,11 +419,38 @@ Example:
 
 .. code-block:: pascal
 
-    mouse(point);
+    mouse(point(50, 50));
 *)
 procedure mouse(pnt: TPoint); overload;
 begin
   mouse(pnt, MOUSE_MOVE);
+end;
+
+(*
+mouse overload
+~~~~~~~~~~~~~~
+
+.. code-block:: pascal
+
+    procedure mouse(x, y, randX, randY, button: integer = MOUSE_MOVE);
+
+Moves the mouse to x, y, coords adding random randX, and randY onto x and y,
+button is a default parameter and by default is set to MOUSE_MOVE.
+
+.. note::
+
+    - by Olly
+
+Example:
+
+.. code-block:: pascal
+
+    mouse(100, 100, 5, 5, MOUSE_LEFT);
+    mouse(100, 100, 5, 5);
+*)
+procedure mouse(x, y, randX, randY, button: integer = MOUSE_MOVE);
+begin
+  mouse(point(x+randX, y+randY), button);
 end;
 
 (*
