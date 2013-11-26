@@ -638,15 +638,20 @@ var
   i, l, wo: integer;
   wArray: TIntegerArray;
 begin
-  writeln(members);
   setLength(wArray, length(self.worlds));
 
   for i := 0 to high(self.worlds) do
-    if (self.worlds[i].members = members) then
+    if (not self.worlds[i].members = not members) then // the not's are required; don't even ask me why
     begin
       wArray[l] := self.worlds[i].world;
       inc(l);
     end;
+
+  if (l <= 0) then
+  begin
+    print('TRSLobbyWorlds.selectRandomWorld(): Failed to initiate wArray', TDebug.ERROR);
+    exit();
+  end;
 
   setLength(wArray, l);
   wo := random(l);
