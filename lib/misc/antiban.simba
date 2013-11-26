@@ -737,12 +737,14 @@ var
 begin
   getClientDimensions(wid, hei);
 
-  bmpCross := BitmapFromString(10, 9, 'meJzT1jbX0HDWzp6jYxipqOwNRDI' +
-             'yXkoq3lKRfSIiKjo6FiCpDX+0pj/QMshQUgqVVE4AsoEikpG9ioqW' +
-             'QF0QLpBUMKvRmgFiq02+yyHiJCVlLy3tpaiSDhGEILUpd3nEAtnYj' +
-             'GVkDYEKpKSCRLVL4LJi2iU8PE4cnMYiIlpCwpbCUpFA9Zh6ublVOE' +
-             'WdIFJAEqgLygbaK2zNzCwlGdkHVS8eCDQQSEIUAN3MyMgNUcApYg0' +
-             '0CoKAbKAUE5MQAMPoVvw=');
+  bmpCross := BitmapFromString(15, 15, 'meJxjYMACuIW7sQljATyik/kk5w' +
+             'BJIlXySy4gqB5oO1ABj/BsoEpB6UVAEpd7ZFSmBM+57dRyBqJFTG4' +
+             'ekB04+xqXYDOmmRqG8wMnXcu69A+iHkgC2fZNp4BsZPOBeoFcGeXZ' +
+             'ptYL3fuuhh7/67b8OZA0qT0FsQVIQszn4M2GKAapV5kCVG81/6X9r' +
+             'r+mc55yCVTBpYAMoEqgek7eUoigiFS3Yv4pjbW/Vac8A5LSWYc5eC' +
+             'u5+JvBKivhLgGqB6qUzTklsvCXcPJRedV+xaKzQDZ/wl6gFBCh+VF' +
+             'RtUm07Bp3LMg0Eck2I9Mp4hknOLPPsXFmYw09adlaoEp2HhCSlG4C' +
+             'aoe4ExcAmsPOVQRBuMxEBqxsyUBlQJKgSghgZgnGKg4Aa3dqTg==');
 
   if (findBitmapToleranceIn(bmpCross, x, y, 0, 0, wid - 1, hei - 1, 5)) then
   begin
@@ -854,5 +856,17 @@ begin
 
   if (t <> TAB_FRIENDS) then
     gameTabs.openTab(t);
+end;
+
+function claimSpinTicket(): boolean;
+var
+  dtm, x, y: integer;
+begin
+  dtm := DTMFromString('mbQAAAHicY2VgYFjLxMBwEIpB7K1A/BmIXwDxVyB+BWV3J9qi4KUL5zGwAvWjY0YsGAwANaYO8w==');
+
+  if (findDTM(dtm, x, y, tabBackpack.getBounds())) then
+    result := tabBackpack.mouseSlot(tabBackpack.pointToSlot(point(x, y)), MOUSE_LEFT);
+
+  wait(200 + random(400));
 end;
 

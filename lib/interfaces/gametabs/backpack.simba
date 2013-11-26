@@ -1077,6 +1077,24 @@ begin
   result := chooseOption.select(['Set quick-inventory '+ s, 'ventory ' + s], 300);
 end;
 
+procedure TRSTabBackpack.waitWhileLocked();
+
+  function islocked(): boolean;
+  begin
+    result := (getColor(gameTabs.tabArea.x1 + 92, gameTabs.tabArea.y2 -35) = 1906963);
+  end;
+
+var
+  t: integer;
+begin
+  t := (getSystemTime() + 10000);
+
+  while (isLocked()) and (t > getSystemTime()) do
+    wait(50 + random(50));
+
+  print('TRSBackpack.waitUnlocked(): Backpack is now unlocked');
+end;
+
 begin
   tabBackpack.__init();
 end;

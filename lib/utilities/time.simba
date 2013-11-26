@@ -208,6 +208,45 @@ begin
   end;
 end;
 
+(*
+waitFunc
+~~~~~~~~
+
+.. code-block:: pascal
+
+    function waitFunc(Func: Function: Boolean; WaitPerLoop, MaxTime: Integer): Boolean;
+
+Waits for function Func to be true. WaitPerLoop is how often you
+want to call "Func" function.
+Example: "WaitFunc(@BankScreen, 10 + Random(15), 750);" will check if BankScreen
+is open every 10-25th millisecond, for a maximum of 750 milliseconds.
+Notice the '@'.
+
+.. note::
+
+  by Rasta Magician, small edit by EvilChicken!
+
+Example:
+
+.. code-block:: pascal
+
+*)
+function waitFunc(Func: function: Boolean; WaitPerLoop, MaxTime: Integer): Boolean;
+var
+  T: Integer;
+begin
+  T := GetSystemTime() + MaxTime;
+  while (GetSystemTime() < T) do
+  begin
+    if (Func()) then
+    begin
+      Result := True;
+      Exit;
+    end;
+    Wait(WaitPerLoop);
+  end;
+end;
+
 (* 
 TTimeMarker
 ~~~~~~~~~~~
