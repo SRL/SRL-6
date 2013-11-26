@@ -858,6 +858,27 @@ begin
     gameTabs.openTab(t);
 end;
 
+(*
+claimSpinTicket
+~~~~~~~~~~~~~~~
+
+.. code-block:: pascal
+
+    function claimSpinTicket(): boolean;
+
+Claims a spin tick if found in the backpack.
+
+.. note::
+
+    - by Olly
+    - Last Updated: 26 November 2013 by Olly
+
+Example:
+
+.. code-block:: pascal
+
+    claimSpinTicket();
+*)
 function claimSpinTicket(): boolean;
 var
   dtm, x, y: integer;
@@ -867,6 +888,9 @@ begin
   if (findDTM(dtm, x, y, tabBackpack.getBounds())) then
     result := tabBackpack.mouseSlot(tabBackpack.pointToSlot(point(x, y)), MOUSE_LEFT);
 
-  wait(200 + random(400));
+  freeDTM(dtm);
+
+  if (result) then
+    wait(200 + random(400));
 end;
 

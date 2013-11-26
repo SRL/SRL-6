@@ -323,7 +323,7 @@ Returns the compass angle in radians.
 .. note::
 
     - by Coh3n
-    - Last Updated: 23 May 2013 by Coh3n
+    - Last Updated: 26 November 2013 by Olly
 
 Example:
 
@@ -333,48 +333,36 @@ Example:
 *)
 function TRSMinimap.getAngleRadians(): extended;
 var
-  tpa, tpaCircle: TPointArray;
-  ref: TPoint;
-  i, j, hh, hhh, min, d: integer;
+  bmp, wid, hei: integer;
+  tpa: TPointArray;
+  mid: TPoint;
 begin
-  result := 0.00;
+  bmp := bitmapFromClient(minimap.button[MM_BUTTON_COMPASS].bounds);
+  getBitmapSize(bmp, wid, hei);
 
-  tpaCircle := tpaFromCircle(self.button[MM_BUTTON_COMPASS].center.x,
-                             self.button[MM_BUTTON_COMPASS].center.y,
-                             self.button[MM_BUTTON_COMPASS].radius);
+  mid := [wid div 2-1, hei div 2];
 
-  if (findColorsTolerance(tpa, 2044556, self.button[MM_BUTTON_COMPASS].bounds, 17, colorSetting(2, 0.18, 1.25))) then
+  getMufasaBitmap(bmp).tmp_Threshold(0, 255, tmp_TM_mean, 20);
+  findColorsBitmap(bmp, tpa, 255);
+  freeBitmap(bmp);
+
+  filterPointsDist(tpa, 0, 14, mid.x, mid.y);
+
+  if (length(tpa) < 1) then
   begin
-    self.filterPointsButton(tpa, MM_BUTTON_COMPASS, 12);
+    print('TRSMinimap.getAngleRadians(): Found no compass dial colors', TDebug.ERROR);
+    exit();
+  end;
 
-    hh := high(tpa);
-    hhh := high(tpaCircle);
-    min := 500;
+  // sort from the mid, so we can get the furthest point
+  sortTPAFrom(tpa, mid);
 
-    // get the reference point on the circle (point closest to the north arrow)
-    for i := 0 to hh do
-      for j := 0 to hhh do
-      begin
-        d := distance(tpa[i].x, tpa[i].y, tpaCircle[j].x, tpaCircle[j].y);
+  result := arcTan2(tpa[high(tpa)].y - mid.y, tpa[high(tpa)].x - mid.x) + radians(90);
+  result := (result - radians(180)); // we're using the silver compass dial, which is 180 degrees behind the red dial
 
-        if (d < min) then
-        begin
-          min := d;
-          ref := tpaCircle[j];
-
-          if (min < 2) then
-            break(2);
-        end;
-      end;
-
-    // calculate angle based on the endpoint (ref) of the north arrow and the compass's midpoint
-    result := arcTan2(ref.y - self.button[MM_BUTTON_COMPASS].center.y, ref.x - self.button[MM_BUTTON_COMPASS].center.x) + radians(90);
-
-    // to correct -ve answers for angles between 270 and 360
-    if (result < 0) then
-      result := (result + radians(360));
-  end else
-    print('TRSMinimap.getAngleRadians(): Found no compass dial color', TDebug.ERROR);
+  // to correct -ve answers for angles between 270 and 360
+  if (result < 0) then
+    result := (result + radians(360));
 end;
 
 (*

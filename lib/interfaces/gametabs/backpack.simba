@@ -1081,9 +1081,30 @@ begin
   result := chooseOption.select(['Set quick-inventory '+ s, 'ventory ' + s], 300);
 end;
 
+(*
+TRSTabBackpack.waitWhileLocked
+~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+
+.. code-block:: pascal
+
+    procedure TRSTabBackpack.waitWhileLocked();
+
+Waits while the backpack tab is locked
+
+.. note::
+
+    - by Olly
+    - Last Updated: 26 November 2013 by Olly
+
+Example:
+
+.. code-block:: pascal
+
+   tabBackpack.waitWhileLocked();
+*)
 procedure TRSTabBackpack.waitWhileLocked();
 
-  function islocked(): boolean;
+  function isLocked(): boolean;
   begin
     result := (getColor(gameTabs.tabArea.x1 + 92, gameTabs.tabArea.y2 -35) = 1906963);
   end;
@@ -1092,6 +1113,9 @@ var
   t: integer;
 begin
   t := (getSystemTime() + 10000);
+
+  if (not isLocked()) then
+    exit();
 
   while (isLocked()) and (t > getSystemTime()) do
     wait(50 + random(50));
