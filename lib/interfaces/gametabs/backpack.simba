@@ -817,19 +817,20 @@ TRSTabBackpack.clickDTM
 
 .. code-block:: pascal
 
-    function TRSTabBackpack.clickDTM(dtm: integer; clickType: integer; option: string; waitFor: integer = 300): integer;
+    function TRSTabBackpack.clickDTM(dtm: integer; clickType: integer; option: string; waitFor: integer = 300; clickAll: boolean = true): integer;
 
 Searches for the dtm if succesful will perform what action is it set.
 Will return how many items were clicked.
-  * clicktype - (MOUSE_MOVE, MOUSE_LEFT, MOUSE_RIGHT)
-  * option    - What option to choose. If not using MOUSE_RIGHT can be left blank('').
-  * waitFor   - This is how long we will wait after interacting with the item, for
-                different things you may need different speeds.
+
+  * clicktype - MOUSE_MOVE, MOUSE_LEFT, MOUSE_RIGHT
+  * option - What option to choose. If not using MOUSE_RIGHT can be left blank('').
+  * waitFor - This is how long we will wait after interacting with the item, for different things you may need different speeds.
+  * clickAll - If set to true will click all instances of the DTMs found, otherwise will only click one.
 
 .. note::
 
     - by Olly
-    - Last Updated: July. 29, 2013
+    - Last Updated: 26 November 2013 by Coh3n
 
 Example:
 
@@ -842,7 +843,7 @@ Example:
     tabBackpack.clickDTM(dtm, MOUSE_RIGHT, 'bury', 1000);
 
 *)
-function TRSTabBackpack.clickDTM(dtm: integer; clickType: integer; option: string; waitFor: integer = 300): integer;
+function TRSTabBackpack.clickDTM(dtm: integer; clickType: integer; option: string; waitFor: integer = 300; clickAll: boolean = true): integer;
 var
   i, l: integer;
   arr: TIntegerArray;
@@ -869,6 +870,9 @@ begin
 
     inc(result);
     wait(waitFor + random(50));
+
+    if (not clickAll) then
+      break;
   end;
 
   print('clickItemsDTM: clicked ' + intToStr(result) + ' items.');

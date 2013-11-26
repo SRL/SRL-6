@@ -261,6 +261,7 @@ begin
     static := true;
     symbolAccuracy := 0.70;
     bmpMask := BitmapFromString(224, 189, 'meJzt0kFyAgcQBEH//9P23cEKgViqFzJfMDFd//wDAAAAAN/oX36hXulL1bNfSb3V16kHv556sS9ST31V9W5foR752ur1Plw97yeoN/xY9bCfo17ySuqtuKMOJFa/nzvqQGL1+7mjDqRXL8ChOo0J9QgcqtOYUI/AoTqNCfUIHKrTmFCPwKE6jQn1CByq05hQj8ChOo0J9QgcqtOYUI/AoTqNCfUIHKrTmFCPwKE6jQn1CByq05hQj8ChOo1evQB31IHE6vdzRx1IrH4/d9SBlOrf8yt1Jpn68fxKnUmj/joPqGN5t/rfPKxO5n3qT/OkOpx3qH/Mn9T5nKv+Li9QR3SW+q+8TJ3Si9Xv5BR1Vv/36GHh63ink/p5VPgBPok+WaZPlumTZfpkmT5Zpk+W6ZNl+mSZPlmmT5bpk2X6ZJk+GSdOxomTceJknDgZJ07GiZNx4mScPlmmT5bpk2X6ZJk+WaZPlumTZfpkmT5Zpk+W6ZNl+mSZPlmmT5bpk2X6ZJk+WaZPlumTZfpkmT5Zpk+W6ZNl+mSZPlmmT5bpk2X6ZJk+WaZPlumTZfpkmT5Zpk+W6ZNl+mSZPlmmT5bpk2X6ZJk+WaZPlumTZfpkmT5Zpk+W6ZNl+mSZPlmmT5bpk2X6ZJk+WaZPlumTZfpkmT5Zpk+W6ZNl+mTZ7/uUKG/2UJwS5Z2eiFOivMfTcUqUs/0xTolynpfEKVHO8MI4JcprvTxOifIqJ8WpT15CnyzTJ8v0yTJ9skyfLNMny/TJMn2yTJ8s0yfL9MmyN/SpZ552Xp9Pq1/CiR5t4NTS/iL8IS9X13SK+qm8QB3Ruerv8id1Pu9Q/5gn1eG8T/1pHlYn8271v3lAHUuj/jq/UmeSqR/PfXUjsfr93FEHEqvfz0/qOnr1AvykrmNCPQKH6jQm1CNwW93FinoHbqu7WFHvwG11FyvqHbit7mJFvQO31V2sqHfgtrqLFfUO3FZ3saLegdvqLlbUO3Bb3cWKegduq7tYUe/AbXUXK+oduK3uYkI9AofqNCbUI/CTuo5evQA/qeu4mHqur1MPfj31Yp+g3vDD1fNeW73eV6hHvqp6ty9ST3099WJfpx78SuqtvlQ9+zXUK321evx19T7frt5/Wj0OAAAAAJT+AzNg/o0=');
+    setBitmapName(bmpMask, 'Minimap Mask');
     setBounds([577, 12, 798, 200]);
                                           {bounds  center, radius}
     button[MM_BUTTON_COMPASS]   := [[583, 18, 616, 52], [599, 35], 16];
@@ -873,7 +874,15 @@ begin
     exit();
   end;
 
-  for i := 0 to (l -1) do
+  for i := 0 to (l - 1) do
+  begin
+    // to avoid out of range errors
+    if (tpa[i].x < 1) then
+      tpa[i].x := 1;
+
+    if (tpa[i].y < 1) then
+      tpa[i].y := 1;
+
     if ((fastGetPixel(bmp, tpa[i].x - 1, tpa[i].y - 1) - fastGetPixel(bmp, tpa[i].x, tpa[i].y - 1)) = 6381921) then
     begin
       result := true;
@@ -881,6 +890,7 @@ begin
       p.y := tpa[i].y + self.y;
       break;
     end;
+  end;
 
   freeBitmap(bmp);
 end;

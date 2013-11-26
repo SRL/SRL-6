@@ -1,6 +1,11 @@
+// if running as a script, but run in Pascal Script
+
 {$ifndef PS_EXTENSION}
 Program RafikiPlayerManager;
 {$endif}
+
+const
+  SETTINGS_PATH = IncludePath + 'Players/settings.xml';
 
 type
   TCustomButton = record     //A button with custom images
@@ -34,6 +39,9 @@ var
   Lbl_ArmyName: TLabel;
   ArmyNameField: TEdit;
 
+  lblMakeDefault: TLabel;
+  chkMakeDefault: TCheckBox;
+
   Gb_Encryption: TGroupBox;
   Cb_UseEnc: TCheckBox;
   PassField, Pass2Field: TEdit;
@@ -54,6 +62,52 @@ var
 
   CButtons: Array of TCustomButton;
   EditID: Integer; //the index of the player in the playerlist we are currently editing (-1 otherwise)    TODO: -1 is magic, something else!
+
+procedure addSetting(sTag, eTag, s: string; tabs: integer);
+var
+  TSL: TStringList;
+begin
+  TSL := TStringList.create();
+
+  if (fileExists(SETTINGS_PATH)) then
+    TSL.loadFromFile(SETTINGS_PATH);
+
+  TSL.text := TSL.text + sTag + s + eTag + #10;
+
+  TSL.saveToFile(SETTINGS_PATH);
+  TSL.free();
+end;
+
+procedure deleteSetting(sTag, eTag: string);
+var
+  TSL: TStringList;
+begin
+  if (not fileExists(SETTINGS_PATH)) then
+    exit;
+
+  TSL := TStringList.create();
+  TSL.loadFromFile(SETTINGS_PATH);
+
+  TSL.text := between('', sTag, TSL.text) + between(eTag, '', TSL.text);
+
+  TSL.saveToFile(SETTINGS_PATH);
+  TSL.free();
+end;
+
+function getSetting(sTag, eTag: string): string;
+var
+  TSL: TStringList;
+begin
+  if (not fileExists(SETTINGS_PATH)) then
+    exit;
+
+  TSL := TStringList.create();
+  TSL.loadFromFile(SETTINGS_PATH);
+
+  result := between(sTag, eTag, TSL.text);
+
+  TSL.free();
+end;
 
 procedure DeleteFromList(var list: TListBox; element: integer);
 begin
@@ -238,6 +292,14 @@ end;
 procedure ClickList(o: TObject);
 begin
   EditPlayer(Lb_PlayerList.Items[Lb_PlayerList.ItemIndex]);
+end;
+
+procedure onDefaultCheck(o: TObject);
+begin
+  deleteSetting('<defaultFile>', '</defaultFile>');
+
+  if (chkMakeDefault.checked) then
+    addSetting('<defaultFile>', '</defaultFile>', ArmyNameField.text, 0)
 end;
 
 function StringToBitmapTS(const w, h: Integer; str: String): TBitmap;
@@ -484,9 +546,13 @@ var
   data: String;
   fileTSL: TStringList;
 begin
+  if (path = '') then
+    exit;
+
   fileTSL := TStringList.Create;
   fileTSL.LoadFromFile(path);
   Data := fileTSL.Text;
+
   if (Data = '') then
     writeln('Rafiki: couldn''t open file.')
   else
@@ -515,8 +581,7 @@ var
 begin
   with TOpenDialog.Create(mainForm) do
   begin
-    //InitialDir := IncludePath + 'Rafiki\';
-    FileName := IncludePath + 'Rafiki\';      //Support for windows 7(since initial dir is no longer used)
+    FileName := IncludePath + 'Players\';      //Support for windows 7(since initial dir is no longer used)
     //Note to myself: Filename is reset after Execute, even if no file was sellected.
     Filter := '|Armies(*.xml; *.raf)|*.xml; *.raf|All files (*.*)|*.*|';
     Options := Options + [ofPathMustExist, ofFileMustExist, ofHideReadOnly];
@@ -524,7 +589,9 @@ begin
     begin
       NewArmy(nil);
       path := FileName;
+      writeln(path);
       LoadArmy(path);
+      chkMakeDefault.onClick(nil);
     end;
     Free;
   end;
@@ -556,6 +623,14 @@ begin
   end;
   path := IncludePath + 'Players/' + ArmyName + extension;
 
+  {$ifndef PS_EXTENSION}
+  if (path <> '') and (FileExists(path)) then
+    case MessageBox('The file already exists. Do you want to overwrite?', 'Save Players', 4) of
+      mrYes: ;
+      mrNo: exit;
+    end;
+  {$endif}
+
   fileTSL := TStringList.Create;
   //writeln(FileExists(path));
 
@@ -579,6 +654,8 @@ begin
   writeln('Player Manager: Saved player list');
 
   fileTSL.Free;
+
+  chkMakeDefault.onClick(nil);
 end;
 
 procedure Help(Sender: TObject);
@@ -596,7 +673,33 @@ end;
 
 procedure FormClosed(Sender: TObject; var CloseAction:TCloseAction);
 begin
+  {$ifndef PS_EXTENSION}
+  case MessageBox('Do you want to save?', 'Save Players', 4) of
+    mrYes: SaveArmy(nil);
+    mrNo: ;
+  end;
+  {$else}
   SaveArmy(nil);
+  {$endif}
+end;
+
+procedure FormLoad(Sender: TObject);
+var
+  s: string;
+  TSL: TStringList;
+begin
+  s := getSetting('<defaultFile>', '</defaultFile>');
+
+  if (s <> '') then
+  begin
+    NewArmy(nil);
+
+    if (fileExists(IncludePath + 'Players\' + s + '.raf')) then // tries to open the encrypted file first
+      LoadArmy(IncludePath + 'Players\' + s + '.raf')
+    else
+      if (fileExists(IncludePath + 'Players\' + s + '.xml')) then
+        LoadArmy(IncludePath + 'Players\' + s + '.xml');
+  end;
 end;
 
 procedure InitForm;
@@ -607,10 +710,11 @@ begin
   with mainForm do
   begin
     Width := 392;
-    Height := 423;
+    Height := 433;
     Caption := 'Rafiki Player Manager';
     Position := poScreenCenter;
     onClose := @FormClosed;
+    onShow := @FormLoad;
   end;
 
   {*
@@ -680,7 +784,7 @@ begin
   Lb_PlayerList.Left := 10;
   Lb_PlayerList.Top := 30;
   Lb_PlayerList.Width := 160;
-  Lb_PlayerList.Height := 329;
+  Lb_PlayerList.Height := 339;
 
   //TODO: Remove this example
   {Lb_PlayerList.Items.Add('Zezima');
@@ -717,6 +821,23 @@ begin
   ArmyNameField.TEXT := 'default';
   ArmyNameField.parent := mainForm;
 
+  lblMakeDefault := TLabel.create(mainForm);
+  lblMakeDefault.parent := mainForm;
+  lblMakeDefault.top := Lbl_ArmyName.top + 25;
+  lblMakeDefault.left := Lbl_ArmyName.left;
+  lblMakeDefault.caption := 'Make Default';
+
+  chkMakeDefault := TCheckBox.create(mainForm);
+  chkMakeDefault.parent := mainForm;
+  chkMakeDefault.top := lblMakeDefault.top - 2;
+  chkMakeDefault.left := lblMakeDefault.left + lblMakeDefault.width + 20;
+  chkMakeDefault.checked := true;
+  chkMakeDefault.onClick := @onDefaultCheck;
+  chkMakeDefault.showHint := true;
+  chkMakeDefault.hint := 'Check this box if you want the current players'+#10+#13+
+                         'to load when you open the player manager';
+
+
 
   {*
   *     Formatting the player setup box
@@ -725,7 +846,7 @@ begin
 //  PlayerBox.Caption := 'Edit player';
   PlayerBox.Width := 200;
   PlayerBox.Height := 200;
-  PlayerBox.Top := 45;
+  PlayerBox.Top := 58;
   PlayerBox.Left := 180;
   PlayerBox.Parent := mainForm;
   PlayerBox.Enabled := false;
@@ -804,7 +925,7 @@ begin
   *
   *}
   Cb_UseEnc := TCHECKBOX.Create(mainForm);
-  Cb_UseEnc.top := 260;
+  Cb_UseEnc.top := 270;
   Cb_UseEnc.Left := 201;
   Cb_UseEnc.CAPTION := ' Encrypt Player Infomation';
   Cb_UseEnc.ONCLICK := @SetEncryption;
@@ -813,7 +934,7 @@ begin
   Gb_Encryption := TGROUPBOX.Create(mainForm);
   Gb_Encryption.Width := 200;
   Gb_Encryption.Height := 80;
-  Gb_Encryption.Top := 280;
+  Gb_Encryption.Top := Cb_UseEnc.top + 20;
   Gb_Encryption.left := 180;
   Gb_Encryption.Enabled := false;
   Gb_Encryption.Parent := mainForm;
@@ -835,12 +956,14 @@ begin
   PassField.Left := 85;
   PassField.Width := 100;
   PassField.Parent := Gb_Encryption;
+  PassField.PasswordChar := '*';
 
   Pass2Field := TEdit.Create(mainForm);
   Pass2Field.Top := 5;
   Pass2Field.Left := 85;
   Pass2Field.Width := 100;
   Pass2Field.Parent := Gb_Encryption;
+  Pass2Field.PasswordChar := '*';
 
   Btn_SavePlayerList := TButton.Create(mainForm);
   Btn_SavePlayerList.Caption := 'Save Player List';
