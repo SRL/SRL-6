@@ -126,7 +126,7 @@ type
     reincarnate: boolean;
     secureLogin: boolean;
     worked: TTimeMarker; // automatically calculated if SRL's login methods are used
-    world: integer;
+    world: integer; // -1 just click play button; 0 for random world
     skillLevel: array[0..(SKILL_COUNT - 1)] of integer;
     booleans: array[0..99] of boolean;
     integers: array[0..99] of integer;
@@ -978,7 +978,7 @@ begin
      694: result := [__LOGIN_EXPIRE,         0,         0,  'update' ];
       -1: result := [__LOGIN_EXCEED_LIMIT,   20000,     10, ''       ];
       -1: result := [__LOGIN_SKILL_LEVEL,    0,         9,  'true'   ];
-      -1: result := [__LOGIN_MEMBER_ONLY,    0,         1,  'false'  ];
+     472: result := [__LOGIN_MEMBER_ONLY,    0,         1,  'false'  ];
       -1: result := [__LOGIN_CANNOT_CONNECT, 2000,      5,  'true'   ];
       -1: typeByte(VK_ESCAPE); // the "Your saved game has been updated" popup
 
