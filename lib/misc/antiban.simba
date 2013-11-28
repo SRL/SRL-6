@@ -644,17 +644,11 @@ begin
 
       if (isMouseOverMenuOpen(mouseOverBox, 2500 + random(500))) then
       begin
-        findColors(tpa, 4305653, mouseOverBox); // color of the orange text
-
-        if (length(tpa) > 500) then
-        begin
-          fastClick(MOUSE_LEFT);
-
-          print('Successfully exited the Squeal Of Fortune');
-          wait(500 + random(250));
-          result := true;
-          break();
-        end;
+        fastClick(MOUSE_LEFT);
+        print('Successfully exited the Squeal Of Fortune');
+        wait(500 + random(250));
+        result := true;
+        break();
       end;
     end else
       print('Failed to find the DTM, we may have found a false area of color');
