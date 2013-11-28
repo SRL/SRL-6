@@ -521,7 +521,7 @@ Function is internal.  Use TRSLobbyWorlds.selectWorld instead.
 .. note::
 
     - by Coh3n
-    - Last Updated: 24 July 2013 by Coh3n
+    - Last Updated: 28 November 2013 by Coh3n
 
 Example:
 
@@ -531,6 +531,8 @@ Example:
       mouse(p, MOUSE_LEFT);
 *}
 function TRSLobbyWorlds._scrollToWorld(var res: TPoint; wo: integer): boolean;
+const
+  __COLOR_SCROLL_BAR = 4114167;
 var
   p, tmp: TPoint;
   t: integer;
@@ -539,7 +541,7 @@ begin
   if (not self.isOpen()) then
     exit(false);
 
-  p := self.getCenterPoint().rand(randomRange(-200, 200));
+  p := self.getCenterPoint().rand(randomRange(-200, 200), randomRange(-50, 50));
   t := (getSystemTime() + 15000);
 
   repeat
@@ -549,10 +551,10 @@ begin
       break;
     end;
 
-    if (self._findWorldNumber(tmp, 1)) then
+    if (getColor(self.x2 - 20, self.y1 + 204) = __COLOR_SCROLL_BAR) then
       down := true;
 
-    if (self._findWorldNumber(tmp, _WORLD_HIGH)) then
+    if (getColor(self.x2 - 20, self.y2 - 71) = __COLOR_SCROLL_BAR) then
       down := false;
 
     mouseScroll(p, 3 + random(5), down);
