@@ -556,7 +556,7 @@ Example:
 
     chooseOption.select(['Walk here', 'alk he']);
 *)
-function TRSChooseOption.select(txt: TStringArray; waitTime: integer = 150): boolean; overload;
+function TRSChooseOption.select(txt: TStringArray; waitTime: integer = 250): boolean; overload;
 begin
   result := self._select(txt, MOUSE_LEFT, true, 1.00, waitTime);
 end;
@@ -586,7 +586,7 @@ Example:
 
     chooseOption.select(['Walk here'], 0.80);
 *)
-function TRSChooseOption.select(txt: TStringArray; matchPercent: extended; waitTime: integer = 150): boolean; overload;
+function TRSChooseOption.select(txt: TStringArray; matchPercent: extended; waitTime: integer = 250): boolean; overload;
 begin
   result := self._select(txt, MOUSE_LEFT, true, matchPercent, waitTime);
 end;

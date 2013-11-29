@@ -1115,7 +1115,7 @@ begin
   mouseBox(b, MOUSE_MOVE);
 
   if (length(mouseOverText[0]) > 0) then
-    if (not isMouseOverText(mouseOverText, 130 + random(20))) then
+    if (not isMouseOverText(mouseOverText, 250)) then
     begin
       print('bankscreen.withdraw(): Incorrect Mouse-over text, result = false', TDebug.SUB);
       exit(false);
@@ -1138,12 +1138,12 @@ begin
 
     // check if the number is already availble, else let's withdraw X it
     else
-      if (not chooseOption.optionsExist(['Withdraw-' + intToStr(amount) + ' ', '-' + intToStr(amount) + ' '])) then
+      if (not chooseOption.optionsExist(['Withdraw-' + intToStr(amount), '-' + intToStr(amount)])) then
       begin
         if (chooseOption.select(['Withdraw-X', '-X'])) then
           result := (self._enterAmount(amount, 6000))
       end else
-        result := chooseOption.select(['Withdraw-' + intToStr(amount) + ' ', '-' + intToStr(amount) + ' '])
+        result := chooseOption.select(['Withdraw-' + intToStr(amount), '-' + intToStr(amount)])
    end;
 
    if (result) then

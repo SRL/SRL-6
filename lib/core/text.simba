@@ -644,7 +644,7 @@ Example:
       mouse(point(x, y), MOUSE_LEFT);
     end;
 *)
-function isMouseOverText(txt: TStringArray; waitTime: integer = 150): boolean;
+function isMouseOverText(txt: TStringArray; waitTime: integer = 250): boolean;
 var
   i, t: integer;
   s: string;
