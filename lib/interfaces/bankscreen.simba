@@ -1007,10 +1007,10 @@ begin
 
         if (amounts[i] = -1) then
         begin
-          if (chooseOption._select(['Deposit-All', 'sit-All', 'All'], MOUSE_LEFT, false, 1.0, 180) = false) then
+          if (chooseOption._select(['Deposit-All', 'sit-All', 'All'], MOUSE_LEFT, false, 1.0, 300) = false) then
             chooseOption.select(['Deposit', 'osit']); // in case there's only one
         end else begin
-          if (chooseOption._select([toStr(amounts[i])], MOUSE_LEFT, false, 1.0, 180) = false) then
+          if (chooseOption._select([toStr(amounts[i])], MOUSE_LEFT, false, 1.0, 300) = false) then
             if (chooseOption.select(['Deposit-X', '-X'])) then
             begin
               t := (getSystemTime() + 3000);
