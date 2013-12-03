@@ -565,3 +565,9 @@ begin
 
   result := (length(tpa) > 0);
 end;
+
+function TColorData.gatherIn(var tpa: TPointArray; area: TBox): boolean;
+begin
+   result := findColorsTolerance(tpa, self.color, area, self.tolerance,
+   colorSetting(self.modifier.cts, self.modifier.hue, self.modifier.sat));
+end;

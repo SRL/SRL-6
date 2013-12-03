@@ -84,6 +84,7 @@ Example:
 *)
 const
   BANK_NPC_BLUE = 0;
+  BANK_BOOTH = 1;
 
 (*
 type TRSBankScreen
@@ -1440,6 +1441,98 @@ begin
 end;
 {$ENDIF}
 
+{*
+TRSBankScreen.__openBankBooth
+~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+
+.. code-block:: pascal
+
+    function TRSBankscreen.__openBankBooth(): boolean;
+
+Internal function that attemps to open a bank booth.
+
+.. note::
+
+    - by Olly
+    - Last Updated: 02 December 2013 by Olly
+
+Example:
+
+.. code-block:: pascal
+
+    bankScreen.__openBankBooth();
+*}
+{$IFNDEF CODEINSIGHT}
+function TRSBankScreen.__openBankBooth(): boolean;
+const
+  boothColors: TColorData = [3237496, 6, [2, 0.18, 0.68]];
+var
+  tpa: TPointArray;
+  atpa: T2DPointArray;
+  i, wid, hei, diff, hi: integer;
+begin
+  result := false;
+
+  print('TRSBankscreen.__openBankBooth()', TDebug.HEADER);
+
+  if (boothColors.gatherIn(tpa, mainScreen.getBounds())) then
+  begin
+    atpa := clusterTPAEx(tpa, 3, 3);
+    sortATPAFromMidPoint(atpa, mainScreen.playerPoint);
+
+    hi := high(atpa);
+
+    for i := 0 to hi do
+    begin
+      if (length(atpa[i]) < 20 or (atpa[i].getDensity() < 0.10)) then
+        continue;
+
+      getTPABounds(atpa[i]).getDimensions(wid, hei);
+
+      if (not inRange(wid, 5, 50)) or (not inRange(hei, 5, 50)) then
+        continue;
+
+      diff := abs(wid + hei);
+
+      if (not inRange(diff, 10, 60)) then
+        continue;
+
+      if (random(4) = 0) then
+        mouse(atpa[i][random(high(atpa[i]))], MOUSE_MOVE)
+      else
+        mouse(atpa[i].getMiddle().randRange(-3, 3));
+
+      if (isMouseOverText(['Bank Bank booth', 'Banker', 'Bank booth'])) then
+      begin
+        print('Found correct mouse-over text');
+        fastClick(MOUSE_RIGHT);
+
+        if (chooseOption.select(['Bank Bank booth', 'Bank Bank', 'ank Banker', 'ank Bank'])) then
+        begin
+          wait(50 + random(100));
+
+          if (minimap.isFlagPresent()) then
+            minimap.waitFlag(5);
+
+           result := _waitBankOrPinScreen(randomRange(6000, 8000));
+
+           if (result) then
+           begin
+             print('Bankscreen or pinscreen is open');
+             break();
+           end else
+             print('Bankscreen or pinscreen never opened');
+        end;
+      end else
+        print('Found wrong mouse-over text');
+    end;
+  end else
+    print('Failed to find any bank booth colors');
+
+  print('TRSBankscreen.__openBankBooth() result = '+boolToStr(result), TDebug.FOOTER);
+end;
+{$ENDIF}
+
 (*
 TRSBankScreen.open
 ~~~~~~~~~~~~~~~~~~
@@ -1467,6 +1560,7 @@ function TRSBankScreen.open(bankType: integer): boolean;
 begin
   case bankType of
     BANK_NPC_BLUE: result := self.__openNPC();
+    BANK_BOOTH: result := self.__openBankBooth();
   end;
 end;
 
