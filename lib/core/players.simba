@@ -923,6 +923,45 @@ end;
 {$ENDIF}
 
 {*
+__getLoginResponseTextCount
+~~~~~~~~~~~~~~~~~~~~~~~~~~~
+
+.. code-block:: pascal
+
+    function __getLoginResponseTextCount(): integer;
+
+Returns the text color count.
+
+.. note::
+
+    - by Olly
+    - Last updated: December 04, 2013 by Olly
+
+Example:
+
+.. code-block:: pascal
+
+    __getLoginResponseTextCount();
+*}
+function __getLoginResponseTextCount(): integer;
+var
+  w, h: integer;
+  b: TBox;
+  tpa: TPointArray;
+begin
+  result := 0;
+
+  getClientDimensions(w, h);
+
+  if (not findColorsTolerance(tpa, 2760196, intToBox(0, 0, w-1, h-1), 2, colorSetting(2, 0.07, 4.04))) then
+    exit();
+
+  b := getTPABounds(tpa);
+
+  result := countColor(16777215, b);
+end;
+
+{*
 __getLoginResponse
 ~~~~~~~~~~~~~~~~~~
 
@@ -967,15 +1006,15 @@ function __getLoginResponse(colorCount, timer: integer): TVariantArray;
 begin
   case (colorCount) of
     //               debug message     | wait time | tries | action
-     889: result := [__LOGIN_INVALID_INFO,   0,         2,  'false'  ];
+     549: result := [__LOGIN_INVALID_INFO,   0,         2,  'false'  ];
       -1: result := [__LOGIN_DISABLED,       0,         0,  'false'  ];
       -1: result := [__LOGIN_LOGGED_IN,      5000,      5,  'true'   ];
       -1: result := [__LOGIN_NOT_MEMBER,     0,         1,  'true'   ];
       -1: result := [__LOGIN_ERROR_CONNECT,  20000,     9,  'halt'   ];
       -1: result := [__LOGIN_TOO_MANY,       5 * 60000, 2,  'false'  ];
-     316: result := [__LOGIN_UPDATE,         0,         0,  'update' ];
+     217: result := [__LOGIN_UPDATE,         0,         0,  'update' ];
       -1: result := [__LOGIN_TOKEN,          0,         0,  'update' ];
-     694: result := [__LOGIN_EXPIRE,         0,         0,  'update' ];
+     416: result := [__LOGIN_EXPIRE,         0,         0,  'update' ];
       -1: result := [__LOGIN_EXCEED_LIMIT,   20000,     10, ''       ];
       -1: result := [__LOGIN_SKILL_LEVEL,    0,         9,  'true'   ];
      472: result := [__LOGIN_MEMBER_ONLY,    0,         1,  'false'  ];
@@ -1032,14 +1071,13 @@ const
 
 function TPlayer.__loginResponse(const tries: integer; const timer: integer): integer;
 var
-  c, w, h: integer;
+  c: integer;
   arr: TVariantArray;
 begin
   result := __RES_NOTHING;
 
   // counts the colors in the lobby pop up screen
-  getClientDimensions(w, h);
-  c := countColor(__LOGIN_RESPONSE_TEXT, 0, 0, w-1, h-1);
+  c := __getLoginResponseTextCount();
   arr := __getLoginResponse(c, timer);
 
   if (length(arr) > 0) then // if there was an error logging in
