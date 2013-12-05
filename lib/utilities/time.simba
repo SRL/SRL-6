@@ -31,6 +31,7 @@ const
   TIME_ABBREV = 2;
   TIME_BARE   = 3;
   TIME_FSTOP  = 4;
+  TIME_FORMAL_LONG = 5;
 
   DATE_FORMAL = 1;
   DATE_MONTH  = 2;
@@ -53,10 +54,12 @@ Str Type:
     -  TIME_ABBREV: 2 hr, 47 min, 28 sec
     -  TIME_BARE: 02:47:28
     -  TIME_FSTOP: 12.04.40
+    -  TIME_FORMAL_LONG: 1 Years, 3 Months, 2 Weeks, 4 Days, 13 Hours, 3 Minutes, and 20 Seconds
 
 .. note::
 
     - by Zephyrsfury, Nava2 and Rasta Magician.
+    - Last updated: 4/12/2013 by Ashaman88
 
 Example:
 
@@ -67,26 +70,39 @@ Example:
 *)
 function msToTime(MS, TheType: Integer): string;
 var
-  STA: array [0..4] of TVariantArray;
-  Time: array [0..2] of Integer;
-  i: Integer;
+  STA: array [0..5] of TVariantArray;
+  Time: array of Integer;
+  i, t, tl: Integer;
 begin
   Result := '';
 
   if (not(InRange(TheType, 0, High(STA)))) then
     TheType := TIME_BARE;
 
+  if TheType = TIME_FORMAL_LONG then
+  begin
+    tl := 7;
+    t := 6;
+    SetLength(Time,tl);
+    ConvertTime64(MS, Time[0], Time[1], Time[2], Time[3], Time[4], Time[5], Time[6]);
+  end else
+  begin
+    tl := 3;
+    t := 2;
+    SetLength(Time,tl);
+    ConvertTime(MS, Time[0], Time[1], Time[2]);
+  end;
+
   STA[TIME_FORMAL] := [' Hours, ', ' Minutes and ', ' Seconds', False, 0];
   STA[TIME_SHORT] := ['h ', 'm ', 's', False, 2];
   STA[TIME_ABBREV] := [' hr ', ' min ', ' sec', False, 0];
   STA[TIME_BARE] := [':', ':', '', True, 2];
   STA[TIME_FSTOP] := ['.', '.', '', True, 2];
+  STA[TIME_FORMAL_LONG] := [' Years, ', ' Months, ', ' Weeks, ', ' Days, ', ' Hours, ', ' Minutes and ', ' Seconds', False, 0];
 
-  ConvertTime(MS, Time[0], Time[1], Time[2]);
-
-  for i := 0 to 2 do
-    if (Time[i] > 0) or (STA[TheType][3]) or (i = 2) then
-      Result := Result + PadZ(IntToStr(Time[i]), STA[TheType][4]) + STA[TheType][i];
+  for i := 0 to t do
+    if (Time[i] > 0) or (STA[TheType][tl]) or (i = t) then
+      Result := Result + PadZ(IntToStr(Time[i]), STA[TheType][tl+1]) + STA[TheType][i];
 end;
 
 (*
@@ -102,6 +118,7 @@ Returns Time since the script was started (GetTimeRunning).
 .. note::
 
     - by Rasta Magician.
+    - Last updated: 4/12/2013 by Ashaman88
 
 Example:
 
@@ -110,9 +127,9 @@ Example:
     writeln('Script time: '+timeRunning);
 
 *)
-function timeRunning: string;
+function timeRunning(TheType: Integer = TIME_FORMAL_LONG): string;
 begin
-  Result := msToTime(GetTimeRunning(), TIME_FORMAL);
+  Result := msToTime(GetTimeRunning(), TheType);
 end;
 
 (*
@@ -417,4 +434,4 @@ function TTimeMarker.getTotalTime(): LongWord;
 begin
   if (Self.startTime > 0) then
     Result := GetSystemTime() - Self.startTime;
-end; 
+end;                       
