@@ -145,79 +145,7 @@ begin
     ID := ID_INTERFACE_BANKSCREEN;
     parentID := -1;
     static := true;
-  end;
-end;
-{$ENDIF}
-
-{*
-TRSBankScreen.__find
-~~~~~~~~~~~~~~~~~~~~
-
-.. code-block:: pascal
-
-    function TRSBankScreen.__find(): boolean;
-
-Finds the TRSBankScreen by finding the text 'bank' in a button.
-
-.. note::
-
-    - by Olly
-    - Last Updated: 04 October 2013 by Olly
-
-Example:
-
-.. code-block:: pascal
-
-    bankScreen.__find();
-*}
-{$IFNDEF CODEINSIGHT}
-function TRSBankScreen.__find(): boolean;
-const
-  TOP_BORDER_COLOR = 9998984;
-  BOTTOM_BORDER_COLOR = 4932919;
-  TEXT_COLOR = 13618403;
-  BUTTON_WIDTH = 107;
-var
-  clientBox, b: TBox;
-  tpa: TPointArray;
-  atpa: T2DPointArray;
-  i: integer;
-  p: TPoint;
-begin
-  result := false;
-
-  getClientDimensions(clientBox.x2, clientBox.y2);
-
-  dec(clientBox.x2);
-  dec(clientBox.y2);
-
-  if (not findColors(tpa, TOP_BORDER_COLOR, 0, 0, clientBox.x2, clientBox.y2)) then
-    exit();
-
-  atpa := clusterTPAEx(tpa, 1, 1);
-
-  for i := 0 to high(atpa) do
-  begin
-    b := atpa[i].getBounds();
-
-    // wrong width?
-    if (b.getWidth() <> BUTTON_WIDTH) then
-      continue;
-
-    incEx(b.y2, 24);
-
-    // prevent out of bounds errors
-    b.setLimit(clientBox);
-
-    // if the bottom corners of the box are the bottom border colors there a button
-    if (getColor(b.x1, b.y2) and getColor(b.x2, b.y2) = BOTTOM_BORDER_COLOR) then
-      if (findText(p, TEXT_COLOR, 0, ['Bank'], [UpChars], b)) then
-      begin
-        // set the bounds based on where we found the text point.
-        self.setBounds([p.x-114, p.y-572, p.x+573, p.y+27]);
-        result := true;
-        break();
-      end;
+    setBounds([56, 0, 742, 599]);
   end;
 end;
 {$ENDIF}
@@ -236,32 +164,41 @@ x amount of ms for the bankscreen to be open.
 .. note::
 
     - by Olly
-    - Last Updated: 04 October 2013 by Olly
+    - Last Updated: 08 December 2013 by Olly
 
 Example:
 
 .. code-block:: pascal
 
     if (bankScreen.isOpen()) then
-      writeln('bankscreen is open! lets start banking items...');
+      writeln('Bankscreen is open! lets start banking items...');
 *)
 function TRSBankScreen.isOpen(waitTime: integer = 0): boolean;
+const
+  TEXT_COLOR = 13618403;
+  OFFSET: TPoint = [114, -27];
 var
   t: integer;
   b: TBox;
+  p: TPoint;
 begin
-  t := getSystemTime() + waitTime;
+  t := (getSystemTime() + waitTime);
   result := false;
 
   repeat
-    if (self.__find()) then
+    if (getColor(self.x1 + OFFSET.x, self.y2 + OFFSET.y) = TEXT_COLOR) then // Top left color of the B of 'Bank'.
     begin
-      result := true;
-      break();
+      b := [self.x1 + OFFSET.x-30, self.y2 + OFFSET.y-25, self.x1 + OFFSET.x+30, self.y2 + OFFSET.y+25]; // Box around the 'Bank' text.
+
+      if (findText(p, TEXT_COLOR, 0, ['Bank'], [UpChars], b)) then
+      begin
+        result := true;
+        break();
+      end;
     end;
 
     if (waitTime > 0) then
-      wait(20 + random(30));
+      wait(15 + random(25));
 
   until (getSystemTime() >= t);
 end;
@@ -291,16 +228,15 @@ Example:
 *)
 function TRSBankScreen.close(): boolean;
 var
-  timeOut, t: integer;
+  timeOut: integer;
 begin
   result := false;
-  timeOut := (getSystemTime() + 10000);
-  t := 0;
+  timeOut := (getSystemTime() + randomRange(5000, 6000));
 
   if (not self.isOpen()) then
     exit(true);
 
-  typeByteWait(VK_ESCAPE, 150 + random(100));
+  mouseBox(intToBox(self.x1+465, self.y1+15, self.x2-207, self.y1+30), MOUSE_LEFT);
   wait(50 + random(50));
 
   while (timeOut > getSystemTime()) do
@@ -311,20 +247,10 @@ begin
       break;
     end;
 
-    inc(t);
-
-    wait(150 + random(100));
-
-    // more than 9 loops, let's press the escape key again
-    if (t > 9) then
-    begin
-      typeByteWait(VK_ESCAPE, 50 + random(100));
-      wait(50 + random(50));
-      t := 0;
-    end;
+    wait(50 + random(50));
   end;
 
-  print('bankScreen.close(): result = ' + boolToStr(result), TDebug.SUB);
+  print('bankScreen.close(): result = '+boolToStr(result), TDebug.SUB);
 end;
 
 (*
@@ -1484,7 +1410,7 @@ begin
 
     for i := 0 to hi do
     begin
-      if (length(atpa[i]) < 20 or (atpa[i].getDensity() < 0.10)) then
+      if (length(atpa[i]) < 20) or (atpa[i].getDensity() < 0.10) then
         continue;
 
       getTPABounds(atpa[i]).getDimensions(wid, hei);

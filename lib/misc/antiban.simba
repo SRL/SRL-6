@@ -281,7 +281,7 @@ var
   x, y, rx, ry, fs: Integer;
 begin
   fs := MouseSpeed;
-  mouseSpeed := randomRange(7, 12);
+  mouseSpeed := randomRange(10, 20);
   randSpeed := (random(MouseSpeed) / 2.0 + MouseSpeed) / 10.0;
   getMousePos(x, y);
 
@@ -742,14 +742,8 @@ begin
 
   if (findBitmapToleranceIn(bmpCross, x, y, 0, 0, wid - 1, hei - 1, 5)) then
   begin
-    mouse(point(x, y).rand(2), MOUSE_MOVE);
-
-    if (isMouseOverText(['lose'], 300)) then
-    begin
-      fastClick(MOUSE_LEFT);
-      wait(randomRange(100, 200));
-      result := true;
-    end;
+    mouse(point(x, y).rand(2), MOUSE_LEFT);
+    result := true;
   end;
 
   freeBitmap(bmpCross);
@@ -786,6 +780,44 @@ begin
     gameTabs.openTab(TAB_STATS);
 
   mouseBox(tabStats.getSkillBox(skill), MOUSE_MOVE);
+
+  wait(50 + random(4500));
+
+  if (t <> TAB_STATS) then
+    gameTabs.openTab(t);
+end;
+
+(*
+hoverRandomSkill
+~~~~~~~~~~~~~~~~
+
+.. code-block:: pascal
+
+    procedure hoverRandomSkill();
+
+Hovers a random skill.
+
+.. note::
+
+    - by Olly
+    - Last Updated: 08 December 2013 by Olly
+
+Example:
+
+.. code-block:: pascal
+
+    hoverSkill(SKILL_ATTACK);
+*)
+procedure hoverRandomSkill();
+var
+  t: integer;
+begin
+  t := gameTabs.getActiveTab();
+
+  if (t <> TAB_STATS) then
+    gameTabs.openTab(TAB_STATS);
+
+  mouseBox(tabStats.getSkillBox(randomRange(SKILL_ATTACK, SKILL_COUNT-1)), MOUSE_MOVE);
 
   wait(50 + random(4500));
 
@@ -875,16 +907,81 @@ Example:
 *)
 function claimSpinTicket(): boolean;
 var
-  dtm, x, y: integer;
+  p: TPoint;
 begin
-  dtm := DTMFromString('mbQAAAHicY2VgYFjLxMBwEIpB7K1A/BmIXwDxVyB+BWV3J9qi4KUL5zGwAvWjY0YsGAwANaYO8w==');
-
-  if (findDTM(dtm, x, y, tabBackpack.getBounds())) then
-    result := tabBackpack.mouseSlot(tabBackpack.pointToSlot(point(x, y)), MOUSE_LEFT);
-
-  freeDTM(dtm);
+  if (findSpinTicket(p)) then
+    result := tabBackpack.mouseSlot(tabBackpack.pointToSlot(p), MOUSE_LEFT);
 
   if (result) then
     wait(200 + random(400));
+end;
+
+(*
+boredHuman
+~~~~~~~~~~
+
+.. code-block:: pascal
+
+    procedure boredHuman(returnToStartAngle: boolean = true);
+
+Performs 3-11 times:
+    * Rotates the cam,
+    * Moves the mouse around MainScreen,
+    * If it finds mouse-over text it will randomly interact with chooseoption menu.
+
+.. note::
+
+    - by WT-Fakawi
+    - Last Updated: 08 December 2013 by Olly
+
+Example:
+
+.. code-block:: pascal
+
+    boredHuman();
+*)
+procedure boredHuman(returnToStartAngle: boolean = true);
+var
+  startAngle: extended;
+  i, r: integer;
+  b: TBox;
+begin
+  startAngle := minimap.getAngleDegrees();
+  r := randomRange(3, 11);
+
+  for i := 0 to r do
+  begin
+    mouse(mainScreen.getBounds().getRandomPoint());
+
+    case random(2) of
+      0: typeByteWait(VK_LEFT, 35 + random(1155));
+      1: typeByteWait(VK_RIGHT, 35 + random(1155));
+    end;
+
+    if (random(15) = 5) then
+    begin
+      fastClick(MOUSE_RIGHT);
+      wait(random(600));
+
+      if (chooseOption.isOpen()) then
+        chooseOption.close();
+
+      continue;
+    end;
+
+    if (isMouseOverMenuOpen(b, random(50))) then
+    begin
+      fastClick(MOUSE_RIGHT);
+      wait(random(500));
+
+      if (random(2) = 0) then
+        chooseOption.select(['xamine'])
+      else
+        chooseOption.close();
+    end;
+  end;
+
+  if (returnToStartAngle) then
+    minimap.setAngle(round(startAngle));
 end;
 
