@@ -1006,19 +1006,20 @@ function __getLoginResponse(colorCount, timer: integer): TVariantArray;
 begin
   case (colorCount) of
     //               debug message     | wait time | tries | action
-     549: result := [__LOGIN_INVALID_INFO,   0,         2,  'false'  ];
-      -1: result := [__LOGIN_DISABLED,       0,         0,  'false'  ];
-      -1: result := [__LOGIN_LOGGED_IN,      5000,      5,  'true'   ];
-      -1: result := [__LOGIN_NOT_MEMBER,     0,         1,  'true'   ];
-      -1: result := [__LOGIN_ERROR_CONNECT,  20000,     9,  'halt'   ];
-      -1: result := [__LOGIN_TOO_MANY,       5 * 60000, 2,  'false'  ];
-     217: result := [__LOGIN_UPDATE,         0,         0,  'update' ];
-      -1: result := [__LOGIN_TOKEN,          0,         0,  'update' ];
-     416: result := [__LOGIN_EXPIRE,         0,         0,  'update' ];
-      -1: result := [__LOGIN_EXCEED_LIMIT,   20000,     10, ''       ];
-      -1: result := [__LOGIN_SKILL_LEVEL,    0,         9,  'true'   ];
-     472: result := [__LOGIN_MEMBER_ONLY,    0,         1,  'false'  ];
-      -1: result := [__LOGIN_CANNOT_CONNECT, 2000,      5,  'true'   ];
+     549: result := [__LOGIN_INVALID_INFO,   0,         2,  'false' ];
+      -1: result := [__LOGIN_DISABLED,       0,         0,  'false' ];
+      -1: result := [__LOGIN_LOGGED_IN,      5000,      5,  'true'  ];
+      -1: result := [__LOGIN_NOT_MEMBER,     0,         1,  'true'  ];
+      -1: result := [__LOGIN_ERROR_CONNECT,  20000,     9,  'halt'  ];
+      -1: result := [__LOGIN_TOO_MANY,       5 * 60000, 2,  'false' ];
+     217: result := [__LOGIN_UPDATE,         0,         0,  'update'];
+      -1: result := [__LOGIN_TOKEN,          0,         0,  'update'];
+     416,
+     433: result := [__LOGIN_EXPIRE,         0,         0,  'update'];
+      -1: result := [__LOGIN_EXCEED_LIMIT,   20000,     10, ''      ];
+      -1: result := [__LOGIN_SKILL_LEVEL,    0,         9,  'true'  ];
+     472: result := [__LOGIN_MEMBER_ONLY,    0,         1,  'false' ];
+      -1: result := [__LOGIN_CANNOT_CONNECT, 2000,      5,  'true'  ];
       -1: typeByte(VK_ESCAPE); // the "Your saved game has been updated" popup
 
     else

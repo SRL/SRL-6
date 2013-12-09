@@ -640,7 +640,7 @@ begin
     if (findDTM(dtmSqueal, x, y, dtmSearchBox)) then
     begin
       print('Found DTM, attempting to exit...');
-      mouse(point(x, y).rand(6), MOUSE_MOVE);
+      mouse(point(x, y).rand(3), MOUSE_MOVE);
 
       if (isMouseOverMenuOpen(mouseOverBox, 2500 + random(500))) then
       begin
@@ -727,11 +727,16 @@ Example:
 *)
 function closeAdWindow(): boolean;
 var
-  bmpCross, x, y, wid, hei: Integer;
+  x, y, wid, hei, i: integer;
+  bmps: array [0..1] of integer;
 begin
   getClientDimensions(wid, hei);
 
-  bmpCross := BitmapFromString(15, 15, 'meJxjYMACuIW7sQljATyik/kk5w' +
+  // red cross color
+  if (not findColorTolerance(x, y, 725899, 0, 0, wid - 1, hei - 1, 25)) then
+    exit(false);
+
+  bmps[0] := BitmapFromString(15, 15, 'meJxjYMACuIW7sQljATyik/kk5w' +
              'BJIlXySy4gqB5oO1ABj/BsoEpB6UVAEpd7ZFSmBM+57dRyBqJFTG4' +
              'ekB04+xqXYDOmmRqG8wMnXcu69A+iHkgC2fZNp4BsZPOBeoFcGeXZ' +
              'ptYL3fuuhh7/67b8OZA0qT0FsQVIQszn4M2GKAapV5kCVG81/6X9r' +
@@ -740,13 +745,18 @@ begin
              'RtUm07Bp3LMg0Eck2I9Mp4hknOLPPsXFmYw09adlaoEp2HhCSlG4C' +
              'aoe4ExcAmsPOVQRBuMxEBqxsyUBlQJKgSghgZgnGKg4Aa3dqTg==');
 
-  if (findBitmapToleranceIn(bmpCross, x, y, 0, 0, wid - 1, hei - 1, 5)) then
-  begin
-    mouse(point(x, y).rand(2), MOUSE_LEFT);
-    result := true;
-  end;
+  bmps[1] := BitmapFromString(8, 8, 'meJzj5Ing4K9FR9zhQDLl6i+runMQ' +
+        'ESADyEVmA0k4A64RyLY++heIkAWBSDzrOEQcyEAWlFz/B0jCGUBBH' +
+        'vMlcDZcDVCQS6AYSCKbCRLkLwQApS1D+w==');
 
-  freeBitmap(bmpCross);
+  for i := 0 to high(bmps) do
+    if (findBitmapToleranceIn(bmps[i], x, y, 0, 0, wid - 1, hei - 1, 5)) then
+    begin
+      mouse(point(x, y).rand(3), MOUSE_LEFT);
+      result := true;
+    end;
+
+  freeBitmaps(bmps);
 end;
 
 (*
