@@ -260,7 +260,7 @@ begin
     parentID := -1;
     static := true;
     symbolAccuracy := 0.70;
-    bmpMask := BitmapFromString(224, 189, 'meJzt0kFyAgcQBEH//9P23cEKgViqFzJfMDFd//wDAAAAAN/oX36hXulL1bNfSb3V16kHv556sS9ST31V9W5foR752ur1Plw97yeoN/xY9bCfo17ySuqtuKMOJFa/nzvqQGL1+7mjDqRXL8ChOo0J9QgcqtOYUI/AoTqNCfUIHKrTmFCPwKE6jQn1CByq05hQj8ChOo0J9QgcqtOYUI/AoTqNCfUIHKrTmFCPwKE6jQn1CByq05hQj8ChOo1evQB31IHE6vdzRx1IrH4/d9SBlOrf8yt1Jpn68fxKnUmj/joPqGN5t/rfPKxO5n3qT/OkOpx3qH/Mn9T5nKv+Li9QR3SW+q+8TJ3Si9Xv5BR1Vv/36GHh63ink/p5VPgBPok+WaZPlumTZfpkmT5Zpk+W6ZNl+mSZPlmmT5bpk2X6ZJk+GSdOxomTceJknDgZJ07GiZNx4mScPlmmT5bpk2X6ZJk+WaZPlumTZfpkmT5Zpk+W6ZNl+mSZPlmmT5bpk2X6ZJk+WaZPlumTZfpkmT5Zpk+W6ZNl+mSZPlmmT5bpk2X6ZJk+WaZPlumTZfpkmT5Zpk+W6ZNl+mSZPlmmT5bpk2X6ZJk+WaZPlumTZfpkmT5Zpk+W6ZNl+mSZPlmmT5bpk2X6ZJk+WaZPlumTZfpkmT5Zpk+W6ZNl+mTZ7/uUKG/2UJwS5Z2eiFOivMfTcUqUs/0xTolynpfEKVHO8MI4JcprvTxOifIqJ8WpT15CnyzTJ8v0yTJ9skyfLNMny/TJMn2yTJ8s0yfL9MmyN/SpZ552Xp9Pq1/CiR5t4NTS/iL8IS9X13SK+qm8QB3Ruerv8id1Pu9Q/5gn1eG8T/1pHlYn8271v3lAHUuj/jq/UmeSqR/PfXUjsfr93FEHEqvfz0/qOnr1AvykrmNCPQKH6jQm1CNwW93FinoHbqu7WFHvwG11FyvqHbit7mJFvQO31V2sqHfgtrqLFfUO3FZ3saLegdvqLlbUO3Bb3cWKegduq7tYUe/AbXUXK+oduK3uYkI9AofqNCbUI/CTuo5evQA/qeu4mHqur1MPfj31Yp+g3vDD1fNeW73eV6hHvqp6ty9ST3099WJfpx78SuqtvlQ9+zXUK321evx19T7frt5/Wj0OAAAAAJT+AzNg/o0=');
+    bmpMask := BitmapFromString(224, 189, 'meJzt0olhpAAAw8D03/RdA+TbwEoYTQmWPz6SJEmSJEmSJ/qXH6ArPRSd/U7oVo9DB78futiD0Knviu72CHTke6PrjaPzLqAbzqLD7qBLbqKr7qBLbqKr7qBLbqKr7qBLbqKr7qBLbqKr7qBLbqKr7qBLbqKr7qBLbqKr7qBLbqKr7qBLbqKr7qBLbqKr7qBLbqKr7qBLbqKr7qBLbqKr7qBLbqKr7qBLbqKr7qBLbqKr7qBLbqKr7qBLbqKr7qBLbqKr7qBLbqKr7qBLbqKr7qBLbqKr7qBLbqKr7qBLbqKr7qBLbqKr7qBLbqKr7qBLbqKr7qBLbqKr7qBLbqKr7qBLbqKr7qBLbqKr7qBLbqKr7qBLbqKr7qBLbqKr7qBLbqKr7qBLbqKr7qBLbqKr7qBLbqKr7qBLbqKr7qBLbqKr7qBLbqKr5jT0lS5Bj5ozdY/Idc7Idc7Idc7Idc7Idc7Idc7I9c+Y9c+Y9c+Y9c+Y9c+Y9c+Y9c+Y9c+Y9c+Y9c+Y9c+Y9c+Y9c+Y9c+Y9c+Y9c+Y9c+Y9c+Y9c+Y9c+Y9c+Y9c+Y9c+Y9c+Y9c+Y9c+Y9c+Y9c+Y9c+Y9c+Y9c+Y9c+Y9c+Y9c+Y9c+Y9c+Y9c+Y9c+Y9c+Y9c+Y9c+Y9c+Y9c+Y9c+Y9c+Y9c+Y9c+Y9c+Y9c+Y9c+Y9c+Y9c+Y9c+Y9c+Y9c+Y9c+Y9c+Y9c+Y9c+Y9c+Y/fyfXTRv9qtzdtG80wvn7KJ5j5fP2UVztT+es4vmOqecs4vmCiees4vmXKefs4vmLBeds3/mFP0zZv0zZv0zZv0zZv0zZv0zZv0zZv0zZv0zZv0zZv0zZm/4Z3/Oy67758voSXKh337g0qf9BbhhTke/6RL0qDkBfaJr0evmT+j7vAO9cV5EH+d96KXza/Rl3o3eO79An4VBr54foW+CoYfP9+iPwOj58w36IDB6/nyFfgePLpCv0O9QoCPkU/Q1FOgIOUb/woLukGP0LyzoDjlG/8KC7pBj9C8s6A45Rv/Cgu6QY/QvLOgOOUb/woLukGP0LyzoDjlG/8KC7pBj9C8s6A45Rv/Cgu6QY/QvFOgI+RR9DQU6Qr5Cv4NHF8hX6HfcDJ3rcejg90MXW0A3HEfnvTe63iPQke+K7vYgdOr7oYs9Dh38TuhWD0Vnvwe60qPR8e3oPk9H91ej4yRJkiRJkiSk/xotWe8=');
     setBitmapName(bmpMask, 'Minimap Mask');
     setBounds([577, 12, 798, 200]);
                                           {bounds  center, radius}
@@ -571,8 +571,8 @@ begin
 
   a := self.getAngleDegrees();
 
-  se := a - (8.00);
-  ea := a + (8.00);
+  se := (a - 8.00);
+  ea := (a + 8.00);
 
   print('TRSMinimap.findDTM(): Searching for dtm between angles '+floatToStr(se)+'..'+floatToStr(ea), TDebug.SUB);
 

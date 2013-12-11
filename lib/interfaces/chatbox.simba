@@ -93,7 +93,7 @@ begin
     if (b.y1 < chatBox.getChatArea().y1) then
       break();
 
-    insert(b, self.lineBoxes);
+    insert(b, self.lineBoxes, high(self.lineBoxes)+1);
   end;
 end;
 
@@ -144,7 +144,7 @@ begin
 
     if (result) then
     begin
-      print('TRSChatBox.findTextOnLines(): Found text '+toStr(txt)+' on line '+intToStr(i));
+      print('TRSChatBox.findTextOnLines(): Found text '+toStr(txt)+' on line '+intToStr(lines[i]));
       exit();
     end;
   end;
