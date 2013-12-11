@@ -173,26 +173,24 @@ begin
 
   typeByte(VK_ESCAPE);
 
-  t := (getSystemTime() + (3000));
+  repeat
+    t := (getSystemTime() + (2000));
 
-  while (getSystemTime() < t) do
-  begin
-    if (self.isOpen()) then
+    while (getSystemTime() < t) do
     begin
-      result := true;
-      break;
+      if (self.isOpen()) then
+      begin
+        result := true;
+        break(2);
+      end;
+
+      wait(50 + random(50));
     end;
 
-    wait(300 + random(200));
-    c := c + 1;
+    inc(c);
+    typeByte(VK_ESCAPE);
 
-    // failsafe in case the first ESC hit didn't work
-    if (c >= 5) then
-    begin
-      c := 0;
-      typeByte(VK_ESCAPE);
-    end;
-  end;
+  until(c > 3);
 end;
 
 begin

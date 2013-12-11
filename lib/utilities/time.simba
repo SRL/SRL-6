@@ -266,6 +266,7 @@ Timer type which is usefull for loops, timing and writing progress reports.
 *)
 type
   TTimeMarker = record
+    name: string;
     time, startTime, __prevMark: LongWord;
     paused: Boolean;
   end; 
@@ -295,7 +296,7 @@ begin
   Self.__prevMark := GetSystemTime(); // used for adding time after a pause
 
   // if it hasn't been started yet
-  if not Self.paused then
+  if (not Self.paused) then
   begin
     Self.startTime := GetSystemTime();
     Self.time := 0;
