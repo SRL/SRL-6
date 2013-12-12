@@ -225,13 +225,21 @@ var
 begin
   setLength(self, length(self) + 1);
   self[high(self)] := info;
+end;
 
-  h := high(self);
-  self[h] := info;
-  self[h].isActive := true;
-  self[h].findMod := true;
-  self[h].worked.paused := true;
-  self[h].world := -1;
+procedure TPlayerArray.setDefaults();
+var
+  i: integer;
+begin
+  for i := 0 to high(self) do
+  begin
+    self[i].isActive := true;
+    self[i].findMod := true;
+    self[i].worked.name := 'Player '+toStr(i);
+    self[i].worked.start();
+    self[i].worked.pause();
+    self[i].world := -1;
+  end;
 end;
 
 (*
@@ -395,6 +403,7 @@ begin
         print('Invalid player name: '+names[i], TDebug.WARNING);
     end;
 
+  self.setDefaults();
   print('TPlayerArray.setup(): Success', TDebug.FOOTER);
 end;
 
@@ -1302,7 +1311,9 @@ begin
   if (result) then
   begin
     print('Logged in: '+self.nickname);
-    self.worked.start();
+
+    if (self.worked.paused) then
+      self.worked.start();
 
     if (SRL_Events[EVENT_LOGIN] <> nil) then
       SRL_Events[EVENT_LOGIN]();
@@ -1469,4 +1480,6 @@ begin
       result := self.login();
   end;
 end;
+
+{$f+}
 
