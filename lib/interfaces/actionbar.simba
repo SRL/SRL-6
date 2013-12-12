@@ -12,6 +12,7 @@ The source for this file can be found `here <https://github.com/SRL/SRL-6/blob/m
 {$include_once interfaces.simba}
 {$include_once ../core/text.simba}
 {$include_once gametabs/backpack.simba}
+{$include_once ../utilities/color.simba}
 
 {$f-}
 
@@ -123,6 +124,7 @@ Example:
 
     actionBar.__findButton(p);
 *}
+{$IFNDEF CODEINSIGHT}
 function TRSActionBar.__findButton(out pnt: TPoint): boolean;
 const
   LINE_COLOR = 10328208;
@@ -132,8 +134,8 @@ const
   BORDER_LINE_MODS = [0.10, 0.69];
 var
   tpaBackground, tpaBorder: TPointArray;
-   possibleBounds: TBoxArray;
   atpa: T2DPointArray;
+  possibleBounds: TBoxArray;
   i: integer;
   b: TBox;
   p: TPoint;
@@ -180,6 +182,7 @@ begin
 
   print('TRSActionBar.__findButton(): Failed to find any button matches', TDebug.WARNING);
 end;
+{$ENDIF}
 
 {*
 TRSActionBar.__find
@@ -228,11 +231,9 @@ begin
     height := (abs(topY - bottomY));
 
     if (bottomY = -1) then
-      print('TRSActionBar.__find(): Failed to find the bottom Y of the actionbar, most scripts should still function though', TDebug.WARNING)
-    else
-      print('TRSActionBar.__find(): Height of actionbar is '+toStr(height), TDebug.SUB);
+      print('TRSActionBar.__find(): Failed to find the bottom Y of the actionbar, most scripts should still function though', TDebug.WARNING);
 
-    self.setBounds([0, topY, gameTabs.tabArea.x1-1, topY + 75]);
+    self.setBounds([0, topY, gameTabs.tabArea.x1-1, topY + height]);
     result := true;
 
     if (not self.setSlots) then
@@ -244,6 +245,11 @@ begin
       setSlots := true;
     end;
   end;
+
+  if (result) then
+    print('TRSActionBar.__find(): result = true (height = '+intToStr(height)+')', TDebug.SUB)
+  else
+    print('TRSActionBar.__find(): result = false', TDebug.SUB);
 end;
 {$ENDIF}
 
@@ -315,6 +321,40 @@ end;
 {$ENDIF}
 
 {*
+TRSActionBar.__clickButton
+~~~~~~~~~~~~~~~~~~~~~~~~~~
+
+.. code-block:: pascal
+
+    function TRSActionBar.__clickButton(): boolean;
+
+Clicks the minimize/maximise button.
+
+.. note::
+
+    - by Olly
+    - Last Updated: 12 December 2013 by Olly
+
+Example:
+
+.. code-block:: pascal
+
+    if (actionBar.__clickButton()) then
+      writeln('clicked!');
+*}
+function TRSActionBar.__clickButton(): boolean;
+var
+  b: TBox;
+begin
+  b := [self.x2-15, self.y1+3, self.x2-3, self.y1+15];
+
+  result := pointInBox(middleBox(b), self.getBounds());
+
+  if (result) then
+    mouseBox(b, MOUSE_LEFT);
+end;
+
+{*
 TRSActionBar.__printWarning
 ~~~~~~~~~~~~~~~~~~~~~~~~~~~
 
@@ -343,6 +383,46 @@ begin
   exit(resultValue);
 end;
 {$ENDIF}
+
+(*
+TRSActionBar.open
+~~~~~~~~~~~~~~~~~
+
+.. code-block:: pascal
+
+    function TRSActionBar.open(): boolean;
+
+Opens the actionbar if it's closed.
+
+.. note::
+
+    - by Olly
+    - Last Updated: 12 December 2013 by Olly
+
+Example:
+
+.. code-block:: pascal
+
+     actionBar.open();
+*)
+function TRSActionBar.open(): boolean;
+var
+  hei: integer;
+begin
+  result := false;
+
+  if (not self.__find(hei)) then
+    print('Cannot close the actionbar, since we can''t find it!', TDebug.ERROR);
+
+  result := true;
+
+  if (hei < 40) then
+    result := self.__clickButton()
+  else
+    print('TRSActionBar.open(): Actionbar is already open');
+
+  print('TRSActionBar.open(): result = '+boolToStr(result));
+end;
 
 (*
 TRSActionBar.getCurrentBar
@@ -1053,6 +1133,134 @@ begin
   result := self.__getAbilityCooldown(self.__slots[slot - 1], true);
 
   print('actionBar.getAbilityCooldown() checked slot ' + toStr(slot) + 'and got ' + toStr(result), TDebug.LOG);
+end;
+
+(*
+TRSActionBar.getHPPercent
+~~~~~~~~~~~~~~~~~~~~~~~~~
+
+.. code-block:: pascal
+
+    function TRSActionBar.getHPPercent: integer;
+
+Returns the players hitpoints percentage.
+
+.. note::
+
+    - by Turpinator
+    - Last Updated: 12 December 2013 by Turpinator
+
+Example:
+
+.. code-block:: pascal
+
+     writeln(actionBar.getHPPercent());
+*)
+function TRSActionBar.getHPPercent: integer;
+var
+  xx, yy: Integer;
+begin
+  xx := self.X1 + 46;
+  yy := self.Y1 + 23;
+  for result := 100 downto 0 do
+    if (getColor(xx + result, yy) <> 2894115) then
+      break;
+end;
+
+(*
+TRSActionBar.getAdrenalinePercent
+~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+
+.. code-block:: pascal
+
+    function TRSActionBar.getAdrenalinePercent: integer;
+
+Returns the players adrenaline percent.
+
+.. note::
+
+    - by Turpinator
+    - Last Updated: 12 December 2013 by Turpinator
+
+Example:
+
+.. code-block:: pascal
+
+     writeln(actionBar.getAdrenalinePercent());
+*)
+function TRSActionBar.getAdrenalinePercent: integer;
+var
+  xx, yy: Integer;
+begin
+  xx := self.X1 + 185;
+  yy := self.Y1 + 23;
+  for result := 100 downto 0 do
+    if (getColor(xx + result, yy) <> 2894115) then
+      break;
+end;
+
+(*
+TRSActionBar.getPrayerPercent
+~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+
+.. code-block:: pascal
+
+    function TRSActionBar.getPrayerPercent: integer;
+
+Returns the players prayer percentage.
+
+.. note::
+
+    - by Turpinator
+    - Last Updated: 12 December 2013 by Turpinator
+
+Example:
+
+.. code-block:: pascal
+
+     writeln(actionBar.getPrayerPercent());
+*)
+function TRSActionBar.getPrayerPercent: integer;
+var
+  xx, yy: Integer;
+begin
+  xx := self.X1 + 324;
+  yy := self.Y1 + 23;
+  for result := 100 downto 0 do
+    if (getColor(xx + result, yy) <> 2894115) then
+      break;
+end;
+
+(*
+TRSActionBar.getSummoningPercent
+~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+
+.. code-block:: pascal
+
+    function TRSActionBar.getSummoningPercent: integer;
+
+Returns the players summoning percent
+
+.. note::
+
+    - by Turpinator
+    - Last Updated: 12 December 2013 by Turpinator
+
+Example:
+
+.. code-block:: pascal
+
+     writeln(actionBar.getSummoningPercent());
+*)
+function TRSActionBar.getSummoningPercent: integer;
+var
+  xx, yy: Integer;
+begin
+  xx := self.X1 + 463;
+  yy := self.Y1 + 23;
+  for result := 100 downto 0 do
+    if (getColor(xx + result, yy) <> 2894115) then
+      break;
 end;
 
 begin
