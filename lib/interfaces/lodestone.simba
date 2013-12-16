@@ -311,6 +311,7 @@ begin
 
   if (location = LOCATION_PREVIOUS) then
   begin
+    fastclick(MOUSE_RIGHT);
     result := chooseOption.select(['Previous dest', 'estination', 'evious']);
 
     if (result) then

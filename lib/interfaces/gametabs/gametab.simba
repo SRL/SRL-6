@@ -636,6 +636,12 @@ function TRSGameTabs.openTab(tab: integer): boolean;
 var
   b: TBox;
 begin
+  if (not inRange(tab, TAB_TASK, TAB_MUSIC)) then // check tab is vaild
+  begin
+    print('TRSGameTabs.openTab('+toStr(tab)+'): The tab isnt vaild!, result = '+toStr(result), TDebug.ERROR);
+    exit(false);
+  end;
+
   print('TRSGameTabs.openTab('+toStr(tab)+')', TDebug.HEADER);
 
   if (self.isTabActive(tab)) then

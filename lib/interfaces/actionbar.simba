@@ -942,7 +942,7 @@ begin
   if (self.isEmpty()) then
     exit(true);
 
-  intToBox(10, 360, 34, 383).mouse(MOUSE_RIGHT);
+  intToBox(self.x2-89, self.y2-36, self.x2-80, self.y2-26).mouse(MOUSE_RIGHT);
 
   timeMarker := getSystemTime() + randomRange(1504, 2306);
 
@@ -957,7 +957,7 @@ begin
   if (not result) then
     exit(false);
 
-  timeMarker:= getSystemTime() + randomRange(1507, 2030);
+  timeMarker := getSystemTime() + randomRange(1507, 2030);
 
   repeat
 
