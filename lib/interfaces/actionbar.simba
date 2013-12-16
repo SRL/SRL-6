@@ -68,6 +68,27 @@ const
   ACTION_BAR_SLOT_HIGH = 14;
 
 {*
+const Action Bar Stat Bars
+~~~~~~~~~~~~~~~~~~~~~~~~~~
+
+Constants that store the x values of the bars on the actionbar.
+Used in TRSActionBar.__getPercent();
+
+Example
+
+.. code-block:: pascal
+
+    actionBar.__getPercent(__AB_BAR_HP);
+*}
+{$IFNDEF CODEINSIGHT}
+const
+  __AB_BAR_HP = 46;
+  __AB_BAR_ADRENALINE = 185;
+  __AB_BAR_PRAYER = 324;
+  __AB_BAR_SUMMONING = 463;
+{$ENDIF}
+
+{*
 TRSActionBar.__init
 ~~~~~~~~~~~~~~~~~~~
 
@@ -342,6 +363,7 @@ Example:
     if (actionBar.__clickButton()) then
       writeln('clicked!');
 *}
+{$IFNDEF CODEINSIGHT}
 function TRSActionBar.__clickButton(): boolean;
 var
   b: TBox;
@@ -353,6 +375,7 @@ begin
   if (result) then
     mouseBox(b, MOUSE_LEFT);
 end;
+{$ENDIF}
 
 {*
 TRSActionBar.__printWarning
@@ -1135,6 +1158,44 @@ begin
   print('actionBar.getAbilityCooldown() checked slot ' + toStr(slot) + 'and got ' + toStr(result), TDebug.LOG);
 end;
 
+{*
+TRSActionBar.__getPercent
+~~~~~~~~~~~~~~~~~~~~~~~~~
+
+.. code-block:: pascal
+
+    function TRSActionBar.__getPercent(bar: integer): byte;
+
+Returns the percentage of the given actionbar bar.
+
+.. note::
+
+    - by Turpinator
+    - Last Updated: 12 December 2013 by Turpinator
+
+Example:
+
+.. code-block:: pascal
+
+    actionBar.__getPercent(AB_BAR_HP);
+*}
+{$IFNDEF CODEINSIGHT}
+function TRSActionBar.__getPercent(bar: integer): byte;
+const
+  BACKGROUND_COLOR = 2894115;
+var
+  xx, yy: integer;
+begin
+  xx := (self.x1 + bar);
+  yy := (self.y1 + 23);
+
+  for result := 100 downto 0 do
+    if (getColor(xx + result, yy) <> BACKGROUND_COLOR) then
+      break();
+end;
+{$ENDIF}
+
+
 (*
 TRSActionBar.getHPPercent
 ~~~~~~~~~~~~~~~~~~~~~~~~~
@@ -1157,14 +1218,8 @@ Example:
      writeln(actionBar.getHPPercent());
 *)
 function TRSActionBar.getHPPercent: integer;
-var
-  xx, yy: Integer;
 begin
-  xx := self.X1 + 46;
-  yy := self.Y1 + 23;
-  for result := 100 downto 0 do
-    if (getColor(xx + result, yy) <> 2894115) then
-      break;
+  result := self.__getPercent(__AB_BAR_HP);
 end;
 
 (*
@@ -1189,14 +1244,8 @@ Example:
      writeln(actionBar.getAdrenalinePercent());
 *)
 function TRSActionBar.getAdrenalinePercent: integer;
-var
-  xx, yy: Integer;
 begin
-  xx := self.X1 + 185;
-  yy := self.Y1 + 23;
-  for result := 100 downto 0 do
-    if (getColor(xx + result, yy) <> 2894115) then
-      break;
+  result := self.__getPercent(__AB_BAR_ADRENALINE);
 end;
 
 (*
@@ -1221,14 +1270,8 @@ Example:
      writeln(actionBar.getPrayerPercent());
 *)
 function TRSActionBar.getPrayerPercent: integer;
-var
-  xx, yy: Integer;
 begin
-  xx := self.X1 + 324;
-  yy := self.Y1 + 23;
-  for result := 100 downto 0 do
-    if (getColor(xx + result, yy) <> 2894115) then
-      break;
+  result := self.__getPercent(__AB_BAR_PRAYER);
 end;
 
 (*
@@ -1253,14 +1296,8 @@ Example:
      writeln(actionBar.getSummoningPercent());
 *)
 function TRSActionBar.getSummoningPercent: integer;
-var
-  xx, yy: Integer;
 begin
-  xx := self.X1 + 463;
-  yy := self.Y1 + 23;
-  for result := 100 downto 0 do
-    if (getColor(xx + result, yy) <> 2894115) then
-      break;
+  result := self.__getPercent(__AB_BAR_SUMMONING);
 end;
 
 begin

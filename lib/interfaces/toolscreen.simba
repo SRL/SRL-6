@@ -1,0 +1,176 @@
+(*
+ToolScreen
+==========
+
+The toolscreen file holds functions and procedures that are used in the
+Runescape toolscreen screen.
+
+The source for this file can be found `here <https://github.com/SRL/SRL-6/blob/master/lib/interfaces/toolscreen.simba>`_.
+
+*)
+
+{$f-}
+
+{$include_once interfaces.simba}
+
+(*
+type TRSToolScreen
+~~~~~~~~~~~~~~~~~~
+
+A type that stores the tool interface properties.
+*)
+type
+  TRSToolScreen = type TRSInterface;
+
+(*
+var toolScreen
+~~~~~~~~~~~~~~
+
+Variable that stores functions and properties of the Runescape production interface.
+
+Example:
+
+.. code-block:: pascal
+
+    if (toolScreen.isOpen() then
+      writeln('Tool screen is open!');
+*)
+var
+  toolScreen: TRSToolScreen;
+
+{*
+TRSToolScreen.__init
+~~~~~~~~~~~~~~~~~~~~
+
+.. code-block:: pascal
+
+    procedure TRSToolScreen.__init();
+
+Initializes the TRSToolScreen.
+
+.. note::
+
+    - by footballjds
+    - Last Updated: 14 December 2013 by footballjds
+
+Example:
+
+.. code-block:: pascal
+
+    toolScreen.__init();
+*}
+{$IFNDEF CODEINSIGHT}
+procedure TRSToolScreen.__init();
+begin
+  with (self) do
+  begin
+    name := 'RS Choose Tool Screen';
+    ID := ID_INTERFACE_TOOL;
+    parentID := -1;
+    static := true;
+    setBounds([92, 93, 483, 298]);
+  end;
+end;
+{$ENDIF}
+
+(*
+TRSToolScreen.isOpen
+~~~~~~~~~~~~~~~~~~~~
+
+.. code-block:: pascal
+
+    function TRSProductionScreen.isOpen(waitTime: integer = 0): boolean;
+
+Returns true if the production screen is open, includes a optional parameter
+'waitTime' (default 0) which will search for the production screen until
+'waitTime' is reached.
+
+.. note::
+
+    - by footballjds
+    - Last Updated: 14 December 2013 by footballjds
+
+Example:
+
+.. code-block:: pascal
+
+    if (productionScreen.isOpen()) then
+      writeln('it''s open!');
+*)
+function TRSToolScreen.isOpen(waitTime: integer = 0): boolean;
+const
+  BORDER_COLOR = 1388125;
+var
+  t: integer;
+  borderTPA: TPointArray;
+  borders: TIntegerArray;
+begin
+  t := (getSystemTime() + waitTime);
+
+  borderTPA := tpaFromBox(intToBox(self.x1 + 31, self.y1 + 55, self.x1 + 361, self.y1 + 55));
+
+  repeat
+    borders := getColors(borderTPA, true);
+
+    if (length(borders) = 1) then
+      if (borders[0] = BORDER_COLOR) then
+        exit(true);
+
+    wait(20 + random(20));
+  until (getSystemTime() >= t);
+end;
+
+(*
+TRSToolScreen.select
+~~~~~~~~~~~~~~~~~~~~
+
+.. code-block:: pascal
+
+    function TRSToolScreen.select(tool: string): boolean;
+
+Attempts to select the tool, returns if succesfull or not.
+
+.. note::
+
+    - by footballjds
+    - Last Updated: 14 December 2013 by footballjds
+
+Example:
+
+.. code-block:: pascal
+
+    if (toolScreen.select('Knife')) then
+      writeln('We started making something!');
+*)
+function TRSToolScreen.select(tool: String): boolean;
+const
+  TEXT_COLOR = 2070783;
+var
+  b, txtB: TBox;
+  i: integer;
+begin
+  result := false;
+
+  b := [self.x1+65, self.y1+84, self.x1 + 121, self.y1 + 140];
+  txtB := [b.x1 - 15, self.y1 + 62, b.x2 + 15, self.y1 + 75];
+
+  if (self.isOpen()) then
+  begin
+    for i := 0 to 2 do
+    begin
+      if pos(tool, getTextAtEx(txtB, 0, 50, 30 , TEXT_COLOR, 0, 'StatChars')) > 0 then
+      begin
+        mouseBox(b, MOUSE_LEFT);
+        exit(true);
+      end;
+      txtB.edit(102, 0, 102, 0);
+      b.edit(102, 0, 102, 0);
+    end;
+  end;
+
+  print('TRSToolScreen.select(): result = ' + lowercase(boolToStr(result)), TDebug.SUB);
+end;
+
+begin
+  toolScreen.__init();
+end;
