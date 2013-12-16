@@ -1189,7 +1189,7 @@ begin
   xx := (self.x1 + bar);
   yy := (self.y1 + 23);
 
-  for result := 100 downto 0 do
+  for result := 100 downto 1 do
     if (getColor(xx + result, yy) <> BACKGROUND_COLOR) then
       break();
 end;
