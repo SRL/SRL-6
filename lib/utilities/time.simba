@@ -247,8 +247,49 @@ Example:
 
 .. code-block:: pascal
 
+     waitFunc(@funcName, 50, 5000);
 *)
 function waitFunc(Func: function: Boolean; WaitPerLoop, MaxTime: Integer): Boolean;
+var
+  T: Integer;
+begin
+  T := GetSystemTime() + MaxTime;
+  while (GetSystemTime() < T) do
+  begin
+    if (Func()) then
+    begin
+      Result := True;
+      Exit;
+    end;
+    Wait(WaitPerLoop);
+  end;
+end;
+
+(*
+waitTypeFunc
+~~~~~~~~~~~~
+
+.. code-block:: pascal
+
+    function waitTypeFunc(Func: function: boolean of object; WaitPerLoop, MaxTime: Integer): Boolean;
+
+Waits for a type function Func to be true. WaitPerLoop is how often you
+want to call "Func" function.
+Example: "WaitFunc(@BankScreen, 10 + Random(15), 750);" will check if BankScreen
+is open every 10-25th millisecond, for a maximum of 750 milliseconds.
+Notice the '@'.
+
+.. note::
+
+   by Olly
+
+Example:
+
+.. code-block:: pascal
+
+     waitTypeFunc(@minimap.isResting, 50, 5000);
+*)
+function waitTypeFunc(Func: function: boolean of object; WaitPerLoop, MaxTime: Integer): Boolean;
 var
   T: Integer;
 begin
