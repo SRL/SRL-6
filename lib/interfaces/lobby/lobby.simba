@@ -514,7 +514,8 @@ var
   tpa: TPointArray;
   atpa: T2DPointArray;
 begin
-  if (not self.isOpen()) then
+  result := false;
+ { if (not self.isOpen()) then
     exit(false);
 
   // because the quick-select buttons don't appear in the options tab
@@ -547,7 +548,7 @@ begin
       result := true;
       break;
     end;
-  end;
+  end;  }
 end;
 
 begin
