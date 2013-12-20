@@ -100,19 +100,18 @@ Example:
 *)
 function findJavaPath(out res: string): boolean;
 
-   function GetDirectoryName(Directory, Path: String): String;
-   var
+  function GetDirectoryName(Directory, Path: String): String;
+  var
     I: Integer;
     Directories: TStringArray;
-   begin
-     Directories := GetDirectories(Path);
-     for I := 0 To High(Directories) Do
-       if ExecRegExpr(Directory, Directories[I]) then
-       begin
-         Result := Directories[I];
-         Exit;
-       end;
-   end;
+  begin
+    Directories := GetDirectories(Path);
+
+    for I := 0 To High(Directories) Do
+      if ExecRegExpr(Directory, Directories[I]) then
+        if (Directories[I] > Result) then
+          Result := Directories[I];
+  end;
 
   function FindDirectory(Directory, Path: String): Boolean;
   begin
