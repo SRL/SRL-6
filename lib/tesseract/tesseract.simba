@@ -1,0 +1,144 @@
+{$loadlib libtesseract}
+
+var
+  savePath, imgPath: string;
+
+type
+  tesseractFilter = (TF_SMALL_CHARS, TF_CHAT_CHARS);
+
+{*
+__initTesseractPaths
+~~~~~~~~~~~~~~~~~~~~
+
+.. code-block:: pascal
+
+     procedure __initTesseractPaths();
+
+Loads the paths needed for tesseract to function.
+
+.. note::
+
+    - By: Olly
+    - Last Updated: December 13, 2013 by Olly
+
+Example:
+
+.. code-block:: pascal
+
+     __initTesseractPaths();
+*}
+procedure __initTesseractPaths();
+
+  function bracketReplace(s: string): string;
+  begin
+    result := replace(s, '\', '/', [rfReplaceAll]);
+  end;
+
+const
+  basePath = includePath + 'srl-6/lib/tesseract/';
+begin
+  savePath := bracketReplace(basePath + 'temp/tmp-'+toStr(client));
+  imgPath := bracketReplace(basePath + 'temp/img-'+toStr(client)+'.bmp');
+
+  tesseractSetPaths(bracketReplace(basePath + 'tesseract.exe'), imgPath, savePath);
+
+  addOnTerminate('__deleteTesseractFiles');
+end;
+
+{*
+__deleteTesseractFiles
+~~~~~~~~~~~~~~~~~~~~~~
+
+.. code-block:: pascal
+
+     procedure __deleteTesseractFiles();
+
+Deletes files created by the tesseract.
+
+.. note::
+
+    - By: Olly
+    - Last Updated: December 13, 2013 by Olly
+
+Example:
+
+.. code-block:: pascal
+
+     __deleteTesseractFiles();
+*}
+procedure __deleteTesseractFiles();
+begin
+  if (fileExists(savePath + '.txt')) then
+    deleteFile(savePath + '.txt');
+
+  if (fileExists(imgPath)) then
+    deleteFile(imgPath);
+end;
+
+procedure _filterSmallChars(const bmp: integer);
+var
+  matrix: array of array of integer;
+begin
+  matrix := BitmapToMatrix(bmp);
+  ResizeBilinearMatrix(matrix, length(matrix[0]) * 3, length(matrix) * 3);
+  ThresholdAdaptiveMatrix(matrix, 0, 255, true, TM_Mean, 30);
+  DrawMatrixBitmap(bmp, matrix);
+end;
+
+procedure _filterChatChars(const bmp: integer);
+var
+  matrix: array of array of integer;
+begin
+  matrix := BitmapToMatrix(bmp);
+  ResizeBilinearMatrix(matrix, length(matrix[0])*3, length(matrix)*3);
+  ThresholdAdaptiveMatrix(matrix, 0, 255, true, TM_Mean, -40);
+  DrawMatrixbitmap(bmp, matrix);
+end;
+
+(*
+tesseractGetText; overload
+~~~~~~~~~~~~~~~~~~~~~~~~~~
+
+.. code-block:: pascal
+
+     function tesseractGetText(const bmp: integer; const config: string): string; overload;
+
+Overloaded method, reads the text from a bitmap, rather than a file.
+reqiures paths to be setup.
+
+.. note::
+
+    - By: Olly
+    - Last Updated: December 13, 2013 by Olly
+
+Example:
+
+.. code-block:: pascal
+
+     tesseractGetText(bmp, '');
+*)
+function tesseractGetText(const bmp: integer; const config: string = ''): string; overload;
+begin
+  saveBitmap(bmp, imgPath);
+  result := tesseractGetText(config);
+end;
+
+function tesseractGetText(const x1, y1, x2, y2: integer; const filter: tesseractFilter; const config: string = ''): string; overload;
+var
+  bmp: integer;
+begin
+  bmp := bitmapFromClient(x1, y1, x2, y2);
+
+  case filter of
+    TF_CHAT_CHARS: _filterChatChars(bmp);
+    TF_SMALL_CHARS: _filterSmallChars(bmp);
+  end;
+
+  result := tesseractGetText(bmp, config);
+
+  freeBitmap(bmp);
+end;
+
+begin
+  __initTesseractPaths();
+end;
