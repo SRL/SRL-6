@@ -45,7 +45,7 @@ SRL library isn't available to you.
 {$include_once lib/misc/antiban.simba}
 {$include_once lib/misc/items.simba}
 
-{$include_once tesseract/tesseract.simba}
+{$include_once lib/tesseract/tesseract.simba}
 
 {$IFDEF SMART}
   {$include_once lib/misc/smart.simba}
