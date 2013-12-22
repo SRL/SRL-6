@@ -3,8 +3,9 @@
 var
   savePath, imgPath: string;
 
-type
-  tesseractFilter = (TF_SMALL_CHARS, TF_CHAT_CHARS);
+const                                            {resize, invert? threshold amount}
+  FILTER_SMALL_CHARS: array [0..2] of variant = [3, false, 50];
+  FILTER_NPC_CHAT_CHARS: array [0..2] of variant = [3, true, -50];
 
 {*
 __initTesseractPaths
@@ -75,26 +76,6 @@ begin
     deleteFile(imgPath);
 end;
 
-procedure _filterSmallChars(const bmp: integer);
-var
-  matrix: array of array of integer;
-begin
-  matrix := BitmapToMatrix(bmp);
-  ResizeBilinearMatrix(matrix, length(matrix[0]) * 3, length(matrix) * 3);
-  ThresholdAdaptiveMatrix(matrix, 0, 255, true, TM_Mean, 30);
-  DrawMatrixBitmap(bmp, matrix);
-end;
-
-procedure _filterChatChars(const bmp: integer);
-var
-  matrix: array of array of integer;
-begin
-  matrix := BitmapToMatrix(bmp);
-  ResizeBilinearMatrix(matrix, length(matrix[0])*3, length(matrix)*3);
-  ThresholdAdaptiveMatrix(matrix, 0, 255, true, TM_Mean, -40);
-  DrawMatrixbitmap(bmp, matrix);
-end;
-
 (*
 tesseractGetText; overload
 ~~~~~~~~~~~~~~~~~~~~~~~~~~
@@ -104,7 +85,6 @@ tesseractGetText; overload
      function tesseractGetText(const bmp: integer; const config: string): string; overload;
 
 Overloaded method, reads the text from a bitmap, rather than a file.
-reqiures paths to be setup.
 
 .. note::
 
@@ -115,28 +95,101 @@ Example:
 
 .. code-block:: pascal
 
-     tesseractGetText(bmp, '');
+     writeln(tesseractGetText(bmp));
 *)
-function tesseractGetText(const bmp: integer; const config: string = ''): string; overload;
+function tesseractGetText(const bmp: integer; config: string = ''): string; overload;
 begin
   saveBitmap(bmp, imgPath);
   result := tesseractGetText(config);
 end;
 
-function tesseractGetText(const x1, y1, x2, y2: integer; const filter: tesseractFilter; const config: string = ''): string; overload;
+(*
+tesseractGetText; overload
+~~~~~~~~~~~~~~~~~~~~~~~~~~
+
+.. code-block:: pascal
+
+     function tesseractGetText(const x1, y1, x2, y2, resizeMultipler: integer; threshInvert: boolean; threshAmount: integer; config: string = ''): string; overload;
+
+Overloaded method, reads text in area x1, y1, x2, y2 on the client
+
+  - resizeMultipler - How much to enlarge the image (2 = double etc..).
+  - threshInvert - Invert the threshold? (if text background is brighter than text, invert should be true).
+  - threshAmount - Amount to add/subtract to the threshold.
+  - config - What chars to only extract (currently only supports 'digits') - defualt set as ''.
+
+.. note::
+
+    - By: Olly
+    - Last Updated: December 22, 2013 by Olly
+
+Example:
+
+.. code-block:: pascal
+
+     writeln(tesseractGetText(woBoxes[i].x1, woBoxes[i].y1, woBoxes[i].x2, woBoxes[i].y2, 3, 50, false));
+*)
+function tesseractGetText(const x1, y1, x2, y2, resizeMultipler: integer; threshInvert: boolean; threshAmount: integer; config: string = ''): string; overload;
 var
-  bmp: integer;
+  matrix: T2DIntegerArray;
+  bmp, w, h, rw, rh: integer;
+  {$IFDEF TESSERACT_DEBUG} t: integer := getSystemTime(); {$ENDIF}
 begin
   bmp := bitmapFromClient(x1, y1, x2, y2);
 
-  case filter of
-    TF_CHAT_CHARS: _filterChatChars(bmp);
-    TF_SMALL_CHARS: _filterSmallChars(bmp);
+  try
+    getBitmapSize(bmp, w, h);
+
+    if (w > 1) and (h > 1) then
+    begin
+      matrix := bitmapToMatrix(bmp);
+
+      if (resizeMultipler > 0) then
+        resizeBilinearMatrix(matrix, resizeMultipler * w, resizeMultipler * h);
+
+      thresholdAdaptiveMatrix(matrix, 0, 255, threshInvert, TM_Mean, threshAmount);
+      drawMatrixBitmap(bmp, matrix);
+
+      result := tesseractGetText(bmp, config);
+    end else
+      writeln(format('tesseractGetText(): Bitmap is is too small (d%, d%)', [w, h]));
+
+    {$IFDEF TESSERACT_DEBUG}
+      writeln(format('tesseractGetText(): Resized (%d > %d, %d > %d), took %d ms. output = " %s "', [w, length(matrix[0]), h, length(matrix), getSystemTime() - t, result]));
+      displayDebugImgWindow(length(matrix[0]), length(matrix));
+      drawBitmapDebugImg(bmp);
+    {$ENDIF}
+
+  finally
+    freeBitmap(bmp);
   end;
+end;
 
-  result := tesseractGetText(bmp, config);
+(*
+tesseractGetText; overload
+~~~~~~~~~~~~~~~~~~~~~~~~~~
 
-  freeBitmap(bmp);
+.. code-block:: pascal
+
+     function tesseractGetText(const x1, y1, x2, y2: integer; filterMethod: array [0..2] of variant; config: string = ''): string; overload;
+
+Overloaded method, reads text in area x1, y1, x2, y2 on the client with a default filter.
+Use one of the filter constants found at the top of this file.
+
+.. note::
+
+    - By: Olly
+    - Last Updated: December 22, 2013 by Olly
+
+Example:
+
+.. code-block:: pascal
+
+     writeln(tesseractGetText(100, 100, 200, 200, FILTER_SMALL_CHARS));
+*)
+function tesseractGetText(const x1, y1, x2, y2: integer; filterMethod: array [0..2] of variant; config: string = ''): string; overload;
+begin
+  result := tesseractGetText(x1, y1, x2, y2, filterMethod[0], filterMethod[1], filterMethod[2], config);
 end;
 
 begin

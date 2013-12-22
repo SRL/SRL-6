@@ -11,6 +11,7 @@ The source for this file can be found `here <https://github.com/SRL/SRL-6/blob/m
 
 {$include_once ../interfaces.simba}
 {$include_once ../options.simba}
+{$include_once ../../tesseract/tesseract.simba}
 
 {$f-}
 
@@ -246,7 +247,6 @@ begin
           // need a loop because the lobby screen fades in to view
           while ((not result) and (getSystemTime() < t)) do
           begin
-            print('Waiting for lobby screen...');
 
             if (self.__find()) then
             begin
@@ -254,6 +254,7 @@ begin
               break(2);
             end;
 
+            print('Waiting for lobby screen...');
             wait(300 + random(400));
           end;
         end;
@@ -510,45 +511,35 @@ Example:
 function TRSLobby.quickSelectWorld(wo: integer): boolean;
 var
   woBoxes: TBoxArray;
-  i, bmp: integer;
+  i, bmp, foundWo: integer;
   tpa: TPointArray;
   atpa: T2DPointArray;
 begin
   result := false;
- { if (not self.isOpen()) then
-    exit(false);
+
+  if (not self.isOpen()) then
+    exit();
 
   // because the quick-select buttons don't appear in the options tab
   if (self.getCurrentTab() = LOBBY_OPTIONS) then
     if (not self.openTab(LOBBY_PLAYER)) then
-      exit(false);
+      exit();
 
   // a box around each of the quick select world boxes
   woBoxes := grid(2, 1, 25, 15, 44, 0, point(self.x + self.w - 125, self.y + self.h - 27));
 
   for i := 0 to high(woBoxes) do
   begin
-    bmp := bitmapFromClient(woBoxes[i]);
+    foundWo := strToIntDef(trim(tesseractGetText(woBoxes[i].x1, woBoxes[i].y1, woBoxes[i].x2, woBoxes[i].y2, FILTER_SMALL_CHARS, 'digits')), -1);
+    print('TRSLobby.quickSelectWorld(): Tesseract found world '+intToStr(foundWo));
 
-    getMufasaBitmap(bmp).posterize(222);
-    getMufasaBitmap(bmp).findColors(tpa, 14606046);
-
-    freeBitmap(bmp);
-
-    if (length(tpa) < 1) then
-      continue();
-
-    atpa := tpa.split(1, 10);
-    sortATPAFromFirstPointX(atpa, [0, 0]);
-
-    if (getTextATPA(atpa, 3, 'NumberCharsSmooth', numbers) = intToStr(wo)) then
+    if (foundWo = wo) then
     begin
-      print('TRSLobby.quickSelectWorld(): Found quick-select world '+toStr(wo), TDebug.SUB);
       mouseBox(woBoxes[i], MOUSE_LEFT);
-      result := true;
-      break;
+      print('TRSLobby.quickSelectWorld(): Clicked quick-select world '+toStr(wo), TDebug.SUB);
+      exit(true);
     end;
-  end;  }
+  end;
 end;
 
 begin

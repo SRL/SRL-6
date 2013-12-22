@@ -15,6 +15,7 @@ The source for this file can be found
 {$include_once interfaces.simba}
 {$include_once ../utilities/color.simba}
 {$include_once ../core/text.simba}
+{$include_once ../tesseract/tesseract.simba}
 
 {*
 const Internal
@@ -83,7 +84,7 @@ begin
     ID := ID_INTERFACE_CONVERSATION_BOX;
     parentID := -1;
     static := true;
-    setBounds([34, 430, 556, 576]);
+    setBounds([41, 438, 546, 567]);
   end;
 end;
 {$ENDIF}
@@ -115,8 +116,7 @@ begin
   if (not self.isOpen()) then
     exit();
 
-  // gold color of the text
-  result := getTextAtEx(self.x + 120, self.y + 8, self.x+self.w - 8, self.y + 34, 0, 50, 30, _COLOR_SPEAKER, 15, CharsNPC);
+  result := replace(tesseractGetText(self.x + 120, self.y, self.x + self.w - 8, self.y + 25, FILTER_SMALL_CHARS), ' ', '', [rfReplaceAll]);
 end;
 
 (*
@@ -169,82 +169,45 @@ Example:
       exit();
 *)
 function TRSConversationBox.isOpen(): boolean;
-var
-  tpaBorder, tpaPaper: TPointArray;
-  i, j, hi: integer;
-  b: TBox;
 begin
-  b := self.getBounds();
-
-  if (findColors(tpaBorder, 5919042, b)) then
-    if (findColorsTolerance(tpaPaper, 9942987, tpaBorder.getBounds(), 6)) then
-    begin
-      hi := high(tpaBorder);
-      j := 0;
-
-      // if tpa[i].y -1 is in the paper tpa, and then if tpa[i].y -138 is in the border tpa, it's for sure bart of the chatbox.
-      for i := 0 to hi do
-        if (pointInTPA([tpaBorder[i].x, tpaBorder[i].y -1], tpaPaper)) then
-          if (pointInTPA([tpaBorder[i].x, tpaBorder[i].y -138], tpaBorder)) then
-          begin
-            inc(j);
-
-            result := (j > 10);
-
-            if (result) then
-              break();
-          end;
-    end;
+  result := (countColorTolerance(9021887, self.getBounds(), 35) > 5000);  // color of the paper like background.
 end;
 
 (*
-TRSConversationBox.getChatArea
-~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+TRSConversationBox.getChatBounds
+~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
 
 .. code-block:: pascal
 
-    function TRSConversationBox.getChatArea(): TBox;
+    function TRSConversationBox.getChatBounds(): TBox;
 
-Returns a TBox of the area where chat is located in the conversation box.
+Returns a TBox of where the black NPC chat is
 
 .. note::
 
     - by Olly
-    - Last Updated: 11 September 2013 by Olly
+    - Last Updated: December 22, 2013 by Olly
 
 Example:
 
 .. code-block:: pascal
 
-    b := conversationBox.getChatArea();
+     b := conversationBox.getChatBounds();
 *)
-function TRSConversationBox.getChatArea(): TBox;
+function TRSConversationBox.getChatBounds(): TBox;
 var
-  b: TBox;
-  left: boolean;
-  tpaBrown, tpaGrey: TPointArray;
+  atpa: T2DPointArray;
+  tpa: TPointArray;
 begin
-  if (not conversationBox.isOpen()) then
-    exit();
+  if (self.isOpen()) then
+    if (findColorsTolerance(tpa, 1645599, self.getBounds(), 12, colorSetting(2, 0.70, 0.90))) then
+    begin
+      atpa := clusterTPAEx(tpa, 10, 15);
+      sortATPAFromMidPoint(atpa, self.getBounds().getMiddle());
 
-  findColorsTolerance(tpaBrown, 7116210, conversationBox.getBounds(), 20, colorSetting(2, 0.05, 0.28));
-  result := tpaBrown.getBounds();
-
-  findColorsTolerance(tpaGrey, 9934999, result, 12, colorSetting(2, 3.48, 0.06));
-
-  // no head in the area? nothing to filter it out then.
-  if (length(tpaGrey) < 200) then
-    exit();
-
-  b := tpaGrey.getBounds();
-  b.expand(15);
-
-  left := (b.x1 < result.getMiddle().x);
-
-  if (left) then
-    result := [b.x2, result.y1, result.x2, result.y2]
-  else
-    result := [result.x1, result.y1, b.x1, result.y2];
+      result := atpa[low(atpa)].getBounds();
+      result.expand(10);
+    end;
 end;
 
 (*
@@ -260,7 +223,7 @@ Returns player or NPC chat.
 .. note::
 
     - by Olly
-    - Last Updated: 11 September 2013 by Olly
+    - Last Updated: December 22, 2013 by Olly
 
 Example:
 
@@ -270,48 +233,18 @@ Example:
 *)
 function TRSConversationBox.getChat(): string;
 var
-  tpa: TPointArray;
-  atpa, atpaLines: T2DPointArray;
-  modifers: array [0..1] of array [0..1] of extended;
-  cols: array [0..1] of array [0..1] of integer;
-  i: integer;
   b: TBox;
 begin
   result := '';
 
-  if (not conversationBox.isOpen()) then
+  if (not self.isOpen()) then
   begin
     print('conversationBox.getChat(): Unable to read any text because we aren''t in a conversation', TDebug.ERROR);
     exit();
   end;
 
-  b := getChatArea();
-  b.edit(+5, +15, -5, -5);
-
-  modifers := [[0.31, 0.58], [0.11, 0.46]];
-  cols := [[3225152, 23], [7243671 , 6]];
-
-  setLength(atpa, 2);
-
-  for i := 0 to high(cols) do
-    findColorsTolerance(atpa[i], cols[i][0], b, cols[i][1], colorSetting(2, modifers[i][0], modifers[i][1]));
-
-  tpa := atpa.merge();
-
-  atpaLines := tpa.split(b.getWidth(), 3);
-  sortATPAFromFirstPointY(atpaLines, [b.x1 + (b.getWidth() div 2), b.y1]);
-
-  for i := 0 to high(atpaLines) do
-  begin
-    setLength(atpa, 0);
-    atpa := atpaLines[i].split(1, 10);
-
-    if (length(atpa) > 10) then
-    begin
-      sortATPAFromFirstPointX(atpa, [b.x1, b.y1]);
-      result := result + getTextATPA(atpa, 3, 'NPCCharsSmooth') + ' ';
-    end;
-  end;
+  b := self.getChatBounds();
+  result := trim(tesseractGetText(b.x1, b.y1, b.x2, b.y2, FILTER_NPC_CHAT_CHARS));
 
   print('conversationBox.getChat(): Text found: ' + result, TDebug.SUB);
 end;
@@ -374,12 +307,10 @@ var
   atpa: T2DPointArray;
   b: TBox;
 begin
-  b := self.getChatArea();
-
-  if (not findColorsTolerance(tpa, 1972239, b, 2, colorSetting(2, 0.40, 2.84))) then
+  if (not findColorsTolerance(tpa, 1972239, self.getBounds(), 2, colorSetting(2, 0.40, 2.84))) then
     exit();
 
-  atpa := tpa.split(100, 4);
+  atpa := clusterTPAEx(tpa, 50, 5);
   atpa.filterBetween(0, 50);
 
   sortATPAFromFirstPointY(atpa, [b.x1, b.y1]);
