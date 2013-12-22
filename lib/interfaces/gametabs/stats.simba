@@ -8,6 +8,7 @@ Runescape Stats gametab.
 *)
 
 {$include_once gametab.simba}
+{$include_once ../../tesseract/tesseract.simba}
 
 {$f-}
 
@@ -26,13 +27,24 @@ const
 
 {*
 Constant: Skill color
-~~~~~~~~~~~~~~~~~~~~~~
+~~~~~~~~~~~~~~~~~~~~~
 
 Integer constants that represent the color of the skill text.
 
 *}
 const
   __COLOR_STATS = 36095;
+
+{*
+Constant: Skill info type
+~~~~~~~~~~~~~~~~~~~~~~~~~
+
+String constants that represent the different skill info types.
+
+*}
+const
+  INFO_CURRENT_XP = 'Current XP:';
+  INFO_REMAINDER = 'Remainder';
 
 (*
 type TRSTabStats
@@ -244,6 +256,66 @@ begin
     print('tabStats.getSkillLevel('+toStr(skill)+'): result = ' + intToStr(result));
   end else
     print('tabStats.getSkillLevel(): Was unable to get the skill box', TDebug.ERROR);
+end;
+
+(*
+TRSTabStats.getSkillInfo
+~~~~~~~~~~~~~~~~~~~~~~~~
+
+.. code-block:: pascal
+
+    function TRSTabStats.getSkillInfo(skill: integer; infoType: string): integer;
+
+Returns the skill's info.
+
+  * skill - what skill? constants found in players.simba
+  * infoType - what infomation to grab? constants found at top of file
+
+.. note::
+
+    - by Olly
+    - Last Updated: December 23, 2013 by Olly
+
+Example:
+
+.. code-block:: pascal
+
+    writeln(tabStats.getSkillInfo(SKILL_ATTACK, INFO_CURRENT_XP));
+*)
+function TRSTabStats.getSkillInfo(skill: integer; infoType: string): integer;
+var
+  b: TBox;
+  i, p: integer;
+  s: string;
+  boxArr: TBoxArray;
+begin
+  result := -1;
+
+  if (not self.open()) then
+    exit();
+
+  mouseBox(tabStats.getSkillBox(skill), MOUSE_MOVE);
+
+  if (isMouseOverMenuOpen(b, 1000 + random(100))) then
+  begin
+    boxArr := b.split(b.getWidth(), 14);
+
+    for i := 0 to high(boxArr) do
+    begin
+      with boxArr[i] do
+        s := tesseractGetText(x1, y1, x2, y2, FILTER_SMALL_CHARS);
+
+      p := pos(infoType, s);
+
+      if (p > 0) then
+      begin
+        result := strToIntDef(extractFromStr(s, numbers), -1);
+        break();
+      end;
+    end;
+  end;
+
+  print('TRSTabStats.getSkillInfo(): result = '+intToStr(result), TDebug.SUB);
 end;
 
 begin

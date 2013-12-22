@@ -932,45 +932,6 @@ end;
 {$ENDIF}
 
 {*
-__getLoginResponseTextCount
-~~~~~~~~~~~~~~~~~~~~~~~~~~~
-
-.. code-block:: pascal
-
-    function __getLoginResponseTextCount(): integer;
-
-Returns the text color count.
-
-.. note::
-
-    - by Olly
-    - Last updated: December 04, 2013 by Olly
-
-Example:
-
-.. code-block:: pascal
-
-    __getLoginResponseTextCount();
-*}
-function __getLoginResponseTextCount(): integer;
-var
-  w, h: integer;
-  b: TBox;
-  tpa: TPointArray;
-begin
-  result := 0;
-
-  getClientDimensions(w, h);
-
-  if (not findColorsTolerance(tpa, 2760196, intToBox(0, 0, w-1, h-1), 2, colorSetting(2, 0.07, 4.04))) then
-    exit();
-
-  b := getTPABounds(tpa);
-
-  result := countColor(16777215, b);
-end;
-
-{*
 __getLoginResponse
 ~~~~~~~~~~~~~~~~~~
 
@@ -997,7 +958,7 @@ const
   __RES_WAIT   = 1;
   __RES_TRIES  = 2;
   __RES_ACTION = 3;
-  __LOGIN_INVALID_INFO   = 'Invalid username/password';
+  __LOGIN_INVALID_INFO   = 'Invalid username or password';
   __LOGIN_DISABLED       = 'Account has been disabled';
   __LOGIN_LOGGED_IN      = 'Already logged in';
   __LOGIN_NOT_MEMBER     = 'Not a RS member';
@@ -1005,45 +966,51 @@ const
   __LOGIN_TOO_MANY       = 'Too many incorrect logins';
   __LOGIN_UPDATE         = 'Runescape has been updated';
   __LOGIN_TOKEN          = 'Client token changed';
-  __LOGIN_EXPIRE         = 'Game session expired';
+  __LOGIN_EXPIRE         = 'Game session has now expired';
   __LOGIN_EXCEED_LIMIT   = 'Login limit exceeded';
   __LOGIN_SKILL_LEVEL    = 'Skill level 1000+ required';
   __LOGIN_MEMBER_ONLY    = 'Player in member-only area';
   __LOGIN_CANNOT_CONNECT = 'Cannot connect to world';
 
-function __getLoginResponse(colorCount, timer: integer): TVariantArray;
+function __getLoginResponse(txt: string; timer: integer): TVariantArray;
+var
+  msg: string;
+  responses: array [0..12] of TVariantArray;
+  i: integer;
 begin
-  case (colorCount) of
-    //               debug message     | wait time | tries | action
-     549: result := [__LOGIN_INVALID_INFO,   0,         2,  'false' ];
-      -1: result := [__LOGIN_DISABLED,       0,         0,  'false' ];
-      -1: result := [__LOGIN_LOGGED_IN,      5000,      5,  'true'  ];
-      -1: result := [__LOGIN_NOT_MEMBER,     0,         1,  'true'  ];
-      -1: result := [__LOGIN_ERROR_CONNECT,  20000,     9,  'halt'  ];
-      -1: result := [__LOGIN_TOO_MANY,       5 * 60000, 2,  'false' ];
-     217: result := [__LOGIN_UPDATE,         0,         0,  'update'];
-      -1: result := [__LOGIN_TOKEN,          0,         0,  'update'];
-     416,
-     433: result := [__LOGIN_EXPIRE,         0,         0,  'update'];
-      -1: result := [__LOGIN_EXCEED_LIMIT,   20000,     10, ''      ];
-      -1: result := [__LOGIN_SKILL_LEVEL,    0,         9,  'true'  ];
-     472: result := [__LOGIN_MEMBER_ONLY,    0,         1,  'false' ];
-      -1: result := [__LOGIN_CANNOT_CONNECT, 2000,      5,  'true'  ];
-      -1: typeByte(VK_ESCAPE); // the "Your saved game has been updated" popup
+  result := [];
 
-    else
-      if ((getSystemTime() > timer) and (timer > 0)) then
-      begin
-        result :=   ['One minute as passed...',    0,         0,  'false',  'Login failed'];
-        print('Unknown color count: '+toStr(colorCount), TDebug.WARNING);
-        print('Please report this issue in the SRL bugs section of the forum', TDebug.HINT);
-        takeScreenshot('unknown_login_count.png');
+  if (players.getActive() < 1) then
+    print('No other active players, terminating', TDebug.FATAL);
 
-        if (players.getActive() < 1) then
-          print('No other players left, terminating', TDebug.FATAL);
-      end;
+  responses := [[__LOGIN_INVALID_INFO,   0,         2,  'false' ],
+                [__LOGIN_DISABLED,       0,         0,  'false' ],
+                [__LOGIN_LOGGED_IN,      5000,      5,  'true'  ],
+                [__LOGIN_NOT_MEMBER,     0,         1,  'true'  ],
+                [__LOGIN_ERROR_CONNECT,  20000,     9,  'halt'  ],
+                [__LOGIN_TOO_MANY,       5 * 60000, 2,  'false' ],
+                [__LOGIN_UPDATE,         0,         0,  'update'],
+                [__LOGIN_TOKEN,          0,         0,  'update'],
+                [__LOGIN_EXPIRE,         0,         0,  'update'],
+                [__LOGIN_EXCEED_LIMIT,   20000,     10, ''      ],
+                [__LOGIN_SKILL_LEVEL,    0,         9,  'true'  ],
+                [__LOGIN_MEMBER_ONLY,    0,         1,  'false' ],
+                [__LOGIN_CANNOT_CONNECT, 2000,      5,  'true'  ]];
+
+  for i := 0 to high(responses) do
+    if (pos(responses[i][0], txt) > 0) then
+      result := responses[i];
+
+  if (length(result) = 0) then
+    if ((getSystemTime() > timer) and (timer > 0)) then
+    begin
+      result :=   ['One minute as passed...',    0,         0,  'false',  'Login failed'];
+      print('Unknown login string: "'+txt+'"', TDebug.WARNING);
+      print('Please report this issue in the SRL bugs section of the forum', TDebug.HINT);
+
+      takeScreenshot('unknown_login_count.png');
+    end;
   end;
-end;
 {$ENDIF}
 
 {*
@@ -1077,7 +1044,35 @@ const
   __RES_NOTHING   = -1;
   __RES_POPUP     = 0;
   __RES_TERMINATE = 1;
-  __LOGIN_RESPONSE_TEXT = 16777215;
+
+function getLoginResponseText(): string;
+var
+  wid, hei: integer;
+  tpa: TPointArray;
+  atpa: T2DPointArray;
+  b: TBox;
+  getText: boolean;
+begin
+  result := '';
+  getText := false;
+
+  getClientDimensions(wid, hei);
+
+  if (findColorsTolerance(tpa, 3023110, 0, 0, wid-1, hei-1, 6)) then
+    if (length(tpa) > 1000) then
+    begin
+      atpa := clusterTPAEx(tpa, 20, 20);
+      sortATPASize(atpa, true);
+
+      b := getTPABounds(atpa[low(atpa)]);
+
+      if (b.x2 - b.x1 > 50) and (b.y2 - b.y1 > 50) then
+        getText := true;
+    end;
+
+  if (getText) then
+    result := tesseractGetText(b.x1, b.y1, b.x2, b.y2, FILTER_SMALL_CHARS);
+end;
 
 function TPlayer.__loginResponse(const tries: integer; const timer: integer): integer;
 var
@@ -1086,9 +1081,8 @@ var
 begin
   result := __RES_NOTHING;
 
-  // counts the colors in the lobby pop up screen
-  c := __getLoginResponseTextCount();
-  arr := __getLoginResponse(c, timer);
+  // get the text on the login error message
+  arr := __getLoginResponse(getLoginResponseText(), timer);
 
   if (length(arr) > 0) then // if there was an error logging in
   begin
@@ -1306,7 +1300,7 @@ begin
     end;
 
     inc(tries);
-  until(result);
+  until (result) or (not self.isActive);
 
   if (result) then
   begin

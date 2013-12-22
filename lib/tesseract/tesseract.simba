@@ -152,7 +152,7 @@ begin
 
       result := tesseractGetText(bmp, config);
     end else
-      writeln(format('tesseractGetText(): Bitmap is is too small (d%, d%)', [w, h]));
+      writeln(format('tesseractGetText(): Bitmap is is too small (%d, %d)', [w, h]));
 
     {$IFDEF TESSERACT_DEBUG}
       writeln(format('tesseractGetText(): Resized (%d > %d, %d > %d), took %d ms. output = " %s "', [w, length(matrix[0]), h, length(matrix), getSystemTime() - t, result]));
