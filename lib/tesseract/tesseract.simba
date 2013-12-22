@@ -3,9 +3,9 @@
 var
   savePath, imgPath: string;
 
-const                                            {resize, invert? threshold amount}
-  FILTER_SMALL_CHARS: array [0..2] of variant = [3, false, 50];
-  FILTER_NPC_CHAT_CHARS: array [0..2] of variant = [3, true, -50];
+const                    {resize multipler w, resize multipler h, invert? threshold amount}
+  FILTER_SMALL_CHARS: array [0..3] of variant = [3, 3, false, 50];
+  FILTER_NPC_CHAT_CHARS: array [0..3] of variant = [3, 3, true, -50];
 
 {*
 __initTesseractPaths
@@ -113,7 +113,8 @@ tesseractGetText; overload
 
 Overloaded method, reads text in area x1, y1, x2, y2 on the client
 
-  - resizeMultipler - How much to enlarge the image (2 = double etc..).
+  - resizeMultiW - How much to enlarge the width of the image (2 = double etc..).
+  - resizeMultiH - How much to enlarge the height of the image (2 = double etc..).
   - threshInvert - Invert the threshold? (if text background is brighter than text, invert should be true).
   - threshAmount - Amount to add/subtract to the threshold.
   - config - What chars to only extract (currently only supports 'digits') - defualt set as ''.
@@ -127,9 +128,9 @@ Example:
 
 .. code-block:: pascal
 
-     writeln(tesseractGetText(woBoxes[i].x1, woBoxes[i].y1, woBoxes[i].x2, woBoxes[i].y2, 3, 50, false));
+     writeln(tesseractGetText(woBoxes[i].x1, woBoxes[i].y1, woBoxes[i].x2, woBoxes[i].y2, 3, 3, 50, false));
 *)
-function tesseractGetText(const x1, y1, x2, y2, resizeMultipler: integer; threshInvert: boolean; threshAmount: integer; config: string = ''): string; overload;
+function tesseractGetText(const x1, y1, x2, y2, resizeMultiW, resizeMultiH: integer; threshInvert: boolean; threshAmount: integer; config: string = ''): string; overload;
 var
   matrix: T2DIntegerArray;
   bmp, w, h, rw, rh: integer;
@@ -144,8 +145,8 @@ begin
     begin
       matrix := bitmapToMatrix(bmp);
 
-      if (resizeMultipler > 0) then
-        resizeBilinearMatrix(matrix, resizeMultipler * w, resizeMultipler * h);
+      if (resizeMultiW > 0) and (resizeMultiH > 0)  then
+        resizeBilinearMatrix(matrix, resizeMultiW * w, resizeMultiH * h);
 
       thresholdAdaptiveMatrix(matrix, 0, 255, threshInvert, TM_Mean, threshAmount);
       drawMatrixBitmap(bmp, matrix);
@@ -187,9 +188,9 @@ Example:
 
      writeln(tesseractGetText(100, 100, 200, 200, FILTER_SMALL_CHARS));
 *)
-function tesseractGetText(const x1, y1, x2, y2: integer; filterMethod: array [0..2] of variant; config: string = ''): string; overload;
+function tesseractGetText(const x1, y1, x2, y2: integer; filterMethod: array [0..3] of variant; config: string = ''): string; overload;
 begin
-  result := tesseractGetText(x1, y1, x2, y2, filterMethod[0], filterMethod[1], filterMethod[2], config);
+  result := tesseractGetText(x1, y1, x2, y2, filterMethod[0], filterMethod[1], filterMethod[2], filterMethod[3], config);
 end;
 
 begin
