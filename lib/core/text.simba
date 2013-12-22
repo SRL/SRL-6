@@ -302,147 +302,6 @@ begin
   if (pressEnter) then
     TypeByte(VK_ENTER);
 end;
-
-var
-  tmpLoadedFont: boolean;
-
-procedure tmp_createFont();
-var
-  i, j, tmp, bmp: integer;
-  tpa: TPointArray;
-  atpa: T2DPointArray;
-  b: TBox;
-begin
-  writeln('making this font!');
-
-  forceDirectories(fontPath + 'tmpMouseoverChars/');
-
-  bmp := bitmapFromString(1450, 35, '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');
-
-  findColorsBitmap(bmp, tpa, clWhite);
-  atpa := tpa.cluster(1, 10);
-  sortaTPAFromFirstPointX(atpa, point(0, 0));
-
-  j := 33;
-
-  for i := 0 to high(atpa) do
-  begin
-    b := atpa[i].getBounds();
-
-    tmp := createBitmap(b.getWidth()+2, b.getHeight()+2);
-    fastDrawClear(tmp, clBlack);
-
-    offsetTPA(atpa[i], point(-b.x1 +1, -b.y1+1));
-
-    drawTPABitmap(tmp, atpa[i], clWhite);
-    saveBitmap(tmp, fontPath + 'tmpMouseoverChars/' + toStr(j)+'.bmp');
-    freeBitmap(tmp);
-
-    inc(j);
-  end;
-
-  tmp := createBitmap(3, 14);
-  fastDrawClear(tmp, clBlack);
-  saveBitmap(tmp, fontPath + 'tmpMouseoverChars/' + '32.bmp');
-
-  freeBitmap(tmp);
-  freeBitmap(bmp);
-end;
-
-procedure ff();
-begin
-  freeFont('tmpMouseoverChars');
-end;
-
-function tmp_ColorToGrayL(Color: Integer): Byte;
-begin
-  Result := Trunc((0.2126 * (Color and $FF)) +
-                  (0.7152 * ((Color shr 8) and $FF)) +
-                  (0.0722 * ((Color shr 16) and $FF)));
-end;
-
-type
-  tmp_TThreshMethod = (tmp_TM_Mean, tmp_TM_MinMax);
-
-
-{
- temp in here until new simba version is released
-
- Copyright (c) 2013, Jarl K. Holta || https://github.com/WarPie
- All rights reserved.
-}
-procedure TMufasaBitmap.tmp_Threshold(Alpha, Beta: Integer; Method: tmp_TThreshMethod; C:Integer);
-var
-  x, y, i, Color, IMin, IMax, ww, hh, w, h: Integer;
-  CurThreshold, Counter: Integer;
-  Temp: array of TByteArray;
-  Tab: array[0..256] of Byte;
-begin
-  w := self.getWidth();
-  h := self.getHeight();
-
-  SetLength(Temp, (H + 2), (W + 2));
-
-  ww := w;;
-  hh := h;
-  Dec(ww);
-  Dec(hh);
-
-  CurThreshold := 0;
-
-  case Method of
-    tmp_TM_Mean:
-    begin
-      for y := 0 to hh do
-      begin
-        Counter := 0;
-        for x := 0 to ww do
-        begin
-          Color := tmp_ColorToGrayL(Self.GetPixel(x, y));
-          Temp[(y + 1)][(x + 1)] := Color;
-          Counter := (Counter + Color);
-        end;
-        CurThreshold := (CurThreshold + (Counter div W));
-      end;
-      if (C < 0) then
-        CurThreshold := ((CurThreshold div H) - Abs(C))
-      else
-        CurThreshold := ((CurThreshold div H) + C);
-    end;
-
-    tmp_TM_MinMax:
-    begin
-      IMin := tmp_ColorToGrayL(Self.GetPixel(0, 0));
-      IMax := IMin;
-      for y := 0 to hh do
-        for x := 0 to ww do
-        begin
-          Color := tmp_ColorToGrayL(Self.GetPixel(x, y));
-          Temp[(y + 1)][(x + 1)] := Color;
-          if (Color < IMin) then
-            IMin := Color
-          else
-            if (Color > IMax) then
-              IMax := Color;
-        end;
-      if (C < 0) then
-        CurThreshold := (((IMax + IMin) div 2) - Abs(C))
-      else
-        CurThreshold := (((IMax + IMin) div 2) + C);
-    end;
-  end;
-
-  CurThreshold := Max(0, Min(CurThreshold, 255));
-  for i := 0 to (CurThreshold - 1) do
-    Tab[i] := Alpha;
-  for i := CurThreshold to 255 do
-    Tab[i] := Beta;
-
-  for y := 1 to h do
-    for x := 1 to w do
-      Self.SetPixel((x - 1), (y - 1), Tab[Temp[y][x]]);
-end;
-
 {*
 __findMouseOverBox
 ~~~~~~~~~~~~~~~~~~
@@ -553,35 +412,34 @@ function __getMouseOverText(box: TBox): string;
 var
   tpa: TPointArray;
   atpa: T2DPointArray;
-  bmp, wid, hei, i, h: integer;
+  bmp, wid, hei, i, h, l: integer;
+  s: TStringArray;
 begin
-  if (not directoryExists(fontPath + 'tmpMouseoverChars')) then
-    tmp_createFont();
-
-  if (not tmpLoadedFont) then
-  begin
-    loadFont('tmpMouseoverChars', false);
-    addOnTerminate('ff');
-    tmpLoadedFont := true;
-  end;
-
   result := '';
 
   bmp := bitmapFromClient(box);
   getBitmapSize(bmp, wid, hei);
 
-  getMufasaBitmap(bmp).tmp_Threshold(0, 255, tmp_TM_Mean, 100);
+  thresholdAdaptiveBitmap(bmp, 0, 255, false, TM_Mean, 100);
 
-  if (findColorsBitmap(bmp, tpa, clRed)) then
+  if (not findColorsBitmap(bmp, tpa, clRed)) then
+    exit();
+
+  atpa := clusterTPAEx(tpa, wid, 2);
+  l := length(atpa);
+
+  sortATPAFromFirstPointY(atpa, point(wid div 2, 0));
+  setLength(s, l);
+
+  for i := 0 to (l - 1) do
   begin
-    atpa := tpa.cluster(wid, 2);  // reads : as .. but it will do for now. (split rows)
-    sortATPAFromFirstPointY(atpa, point(wid div 2, 0));
+    s[i] := extractTextFromTPA(atpa[i], 1, 4, 5, MouseOverChars);
 
-    h := high(atpa);
+    if ((i + 1) <= (l - 1)) then
+      s[i] := s[i] + ' ';
+  end;
 
-    for i := 0 to h do
-      result := result + extractTextFromTPA(atpa[i], 1, 4, 5, {MouseoverCharsRS3}'tmpMouseoverChars') + ' ';
-   end;
+  result := implode('', s);
 
   freeBitmap(bmp);
 end;

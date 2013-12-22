@@ -342,7 +342,8 @@ begin
 
   mid := [wid div 2-1, hei div 2];
 
-  getMufasaBitmap(bmp).tmp_Threshold(0, 255, tmp_TM_mean, 20);
+  thresholdAdaptiveBitmap(bmp, 0, 255, false, TM_Mean, 20);
+
   findColorsBitmap(bmp, tpa, 255);
   freeBitmap(bmp);
 
