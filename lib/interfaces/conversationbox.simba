@@ -281,7 +281,7 @@ end;
 
 (*
 TRSConversationBox.getOptions
-~~~~~~~~~~~~~~~~~~~~~~~~~~
+~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
 
 .. code-block:: pascal
 
@@ -345,7 +345,7 @@ end;
 
 (*
 TRSConversationBox.findOption
-~~~~~~~~~~~~~~~~~~~~~~~~~~
+~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
 
 .. code-block:: pascal
 
@@ -386,7 +386,7 @@ end;
 
 (*
 TRSConversationBox.selectOption
-~~~~~~~~~~~~~~~~~~~~~~~~~~
+~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
 
 .. code-block:: pascal
 
@@ -450,7 +450,7 @@ Example:
      if (conversationBox.selectOption(2)) then
        writeln('Selected option two');
 *)
-function TRSConversationBox.selectOption(number: integer): boolean;    overload;
+function TRSConversationBox.selectOption(number: integer): boolean; overload;
 var
   tpa: TPointArray;
   atpa: T2DPointArray;
