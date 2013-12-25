@@ -280,6 +280,155 @@ begin
 end;
 
 (*
+TRSConversationBox.getOptions
+~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+
+.. code-block:: pascal
+
+    function TRSConversationBox.getOptions(): TStringArray;
+
+Returns the selectable options from NPC chat.
+
+.. note::
+
+    - by Ashaman88
+    - Last Updated: December 22, 2013 by Ashaman88
+
+Example:
+
+.. code-block:: pascal
+
+    s := conversationBox.getOptions();
+*)
+function TRSConversationBox.getOptions: TStringArray;
+var
+  b: TBox;
+  bb: TBoxArray;
+  tpa : TPointArray;
+  atpa : T2DPointArray;
+  i: Integer;
+begin
+  b := self.getBounds();
+  b.edit(+5, +5, -5, 0);
+
+
+  findColorsTolerance(tpa, 2301204, b, 17);
+
+  if length(tpa) < 2 then
+  begin
+    print('conversationBox.getOptions(): No Options found', TDebug.SUB);
+    Exit;
+  end;
+
+  atpa := tpa.cluster(1);
+
+  for i := 0 to High(atpa) do
+  begin
+    b := gettpaBounds(atpa[i]);
+    if ((b.x2-b.x1) > 19) and ((b.y2-b.y1) > 4) then
+    begin
+      setLength(bb,length(bb)+1);
+      b.edit(+14, +1, -5, -1);
+      bb[high(bb)] := b;
+    end;
+  end;
+
+  setLength(result,length(bb));
+
+  for i := 0 to High(bb) do
+  begin
+    result[i]:=tesseractgettext(bb[i].x1,bb[i].y1,bb[i].x2,bb[i].y2, FILTER_SMALL_CHARS);
+  end;
+
+  print('conversationBox.getOptions(): Options found: ' + tostr(result), TDebug.SUB);
+end;
+
+(*
+TRSConversationBox.findOption
+~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+
+.. code-block:: pascal
+
+    function TRSConversationBox.findOption(txt: TStringArray): boolean;
+
+Returns true if 'txt' is found in the selectable options from NPC chat.
+
+.. note::
+
+    - by Ashaman88
+    - Last Updated: December 22, 2013 by Ashaman88
+
+Example:
+
+.. code-block:: pascal
+
+    if (conversationBox.findOption(['One'])) then
+       writeln('Found option for One!');
+*)
+function TRSConversationBox.findOption(txt: TStringArray): boolean;
+var
+  i,j: Integer;
+  text: TStringArray;
+begin
+  if (not self.isOpen()) then
+    exit();
+
+  text:= self.getOptions();
+
+  for i:= 0 to high(text) do
+    for j := 0 to high(txt) do
+    begin
+      result:= (pos(txt[j], text[i]) > 0);
+      if result then
+        exit;
+    end;
+end;
+
+(*
+TRSConversationBox.selectOption
+~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+
+.. code-block:: pascal
+
+    function TRSConversationBox.findOption(txt: TStringArray): boolean;
+
+Returns true if 'txt' is found in the selectable options from NPC chat, and if said option is selected via typesend.
+
+.. note::
+
+    - by Ashaman88
+    - Last Updated: December 22, 2013 by Ashaman88
+
+Example:
+
+.. code-block:: pascal
+
+    if (conversationBox.selectOption(['One'])) then
+       writeln('Selected option One!');
+*)
+function TRSConversationBox.selectOption(txt: TStringArray): boolean;
+var
+  i,j: Integer;
+  text: TStringArray;
+begin
+  if (not self.isOpen()) then
+    exit();
+
+  text:= self.getOptions();
+
+  for i:= 0 to high(text) do
+    for j := 0 to high(txt) do
+    begin
+      if (pos(txt[j], text[i]) > 0) then
+      begin
+        typesend(tostr(i+1),false);
+        result:=true;
+        exit;
+      end;
+    end;
+end;
+
+(*
 TRSConversationBox.selectOption
 ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
 
@@ -301,7 +450,7 @@ Example:
      if (conversationBox.selectOption(2)) then
        writeln('Selected option two');
 *)
-function TRSConversationBox.selectOption(number: integer): boolean;
+function TRSConversationBox.selectOption(number: integer): boolean; overload;
 var
   tpa: TPointArray;
   atpa: T2DPointArray;
@@ -404,4 +553,3 @@ end;
 begin
   conversationBox.__init();
 end;
-
