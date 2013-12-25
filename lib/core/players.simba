@@ -966,7 +966,7 @@ const
   __LOGIN_TOO_MANY       = 'Too many incorrect logins';
   __LOGIN_UPDATE         = 'Runescape has been updated';
   __LOGIN_TOKEN          = 'Client token changed';
-  __LOGIN_EXPIRE         = 'Game session has now expired';
+  __LOGIN_EXPIRE         = 'Your game session has now ended';
   __LOGIN_EXCEED_LIMIT   = 'Login limit exceeded';
   __LOGIN_SKILL_LEVEL    = 'Skill level 1000+ required';
   __LOGIN_MEMBER_ONLY    = 'Player in member-only area';
