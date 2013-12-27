@@ -335,46 +335,19 @@ Example:
 *)
 function TRSLobbyWorlds.getCurrentWorld(): integer;
 var
-  atpa, atpaDigits: T2DPointArray;
-  tpa: TPointArray;
-  bmp, n, i: integer;
+  n: integer;
+  s: string;
 begin
   result := -1;
 
   if (not self.isOpen()) then
     exit();
 
-  bmp := bitmapFromClient(self.x + 550, self.y + 60, self.x+self.w - 15, self.y + 80); // box around the current world
+  s := tesseractGetText(self.x + 550, self.y + 62, self.x+self.w - 15, self.y + 80, FILTER_SMALL_CHARS_2);
+  n := strToIntDef(extractFromStr(s, numbers), -1);
 
-  getMufasaBitmap(bmp).posterize(222);
-  getMufasaBitmap(bmp).findColors(tpa, 14606046); // color on posterized bmp
-
-  freeBitmap(bmp);
-
-  if (length(tpa) > 0) then
-  begin
-    atpa := tpa.split(1, 10);
-
-    if (length(atpa) > 6) then // elements 0-5 is the star and "World" text; 6-length is number
-    begin
-      sortATPAFromFirstPointX(atpa, [0, 0]);
-
-      // remove the star and "World" text to improve accuracy
-      for i := 6 to high(atpa) do
-      begin
-        setLength(atpaDigits, length(atpaDigits) + 1);
-        atpaDigits[high(atpaDigits)] := atpa[i];
-      end;
-
-      n := strToInt(getTextATPA(atpaDigits, 3, 'NumberCharsSmooth', numbers));
-      if (self._isWorldValid(n)) then
-        result := n;
-
-    end else
-      print('TRSLobbyWorlds.getCurrentWorld(): Not enough text characters', TDebug.ERROR);
-
-  end else
-    print('TRSLobbyWorlds.getCurrentWorld(): Failed to find text color', TDebug.ERROR);
+  if (self._isWorldValid(n)) then
+    result := n;
 
   print('TRSLobbyWorlds.getCurrentWorld(): Current world is '+toStr(result), TDebug.SUB);
 end;

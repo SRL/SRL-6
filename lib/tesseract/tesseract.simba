@@ -6,6 +6,7 @@ var
 const                    {resize multipler w, resize multipler h, invert? threshold amount}
   FILTER_SMALL_CHARS: array [0..3] of variant = [3, 3, false, 50];
   FILTER_NPC_CHAT_CHARS: array [0..3] of variant = [3, 3, true, -50];
+  FILTER_SMALL_CHARS_2: array [0..3] of variant = [5, 5, false, 55];
 
 {*
 __initTesseractPaths

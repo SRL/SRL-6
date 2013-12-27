@@ -74,8 +74,8 @@ Internal lobby constants.
 const
   // used in getCurrentTab and openTab calulations
   __LOBBY_TAB_WIDTH    = 102;
-  __LOBBY_TAB_OFFSET_X = 7;  // x/y is the midpoint of the left border of the first tab
-  __LOBBY_TAB_OFFSET_Y = 21;
+  __LOBBY_TAB_OFFSET_X = 8;  // x/y is the midpoint of the left border of the first tab
+  __LOBBY_TAB_OFFSET_Y = 22;
 
 {*
 TRSLobby.__init()
@@ -107,6 +107,7 @@ begin
     ID := ID_INTERFACE_LOBBY;
     parentID := -1;
     static := true;
+    setBounds([72, 62, 726, 538]);
   end;
 end;
 {$ENDIF}
@@ -159,48 +160,6 @@ begin
 end;
 {$ENDIF}
 
-{*
-TRSLobby.__find()
-~~~~~~~~~~~~~~~~~
-
-.. code-block:: pascal
-
-    function TRSLobby.__find(): boolean;
-
-Finds and sets the bounds on the lobby interface. This allows the lobby to be
-anywhere on the screen.  This function is called whenever TRSLobby.isOpen() is
-called.
-
-.. note::
-
-    - by Coh3n
-    - Last Updated: 23 July 2013 by Coh3n
-
-Example:
-
-.. code-block:: pascal
-
-    lobby.__find();
-*}
-{$IFNDEF CODEINSIGHT}
-function TRSLobby.__find(): boolean;
-var
-  wid, hei: integer;
-  tpa: TPointArray;
-begin
-  getClientDimensions(wid, hei);
-
-  findColors(tpa, 11119274, 0, 0, wid-1, hei-1); // white border of the lobby
-
-  if (length(tpa) > 0) then
-  begin
-    result := true;
-    self.setBounds(tpa.getBounds());
-    //smartImage.drawBox(self.getBounds(), false);
-  end;
-end;
-{$ENDIF}
-
 (*
 TRSLobby.isOpen()
 ~~~~~~~~~~~~~~~~~
@@ -225,40 +184,24 @@ Example:
       wait(100 + Random(400));
 *)
 function TRSLobby.isOpen(): boolean;
+const
+  COLOR = 4104543;
 var
-  wid, hei, t, i, hi: integer;
-  dummy: TPoint;
-  tpa: TPointArray;
+  t: integer;
 begin
+  t := (getSystemTime() + randomRange(7500, 8500));
+  result := false;
+
   self.__skipEmailScreen(); // just in case
-  getClientDimensions(wid, hei);
 
-  // on the globe we check if there is 3 colors in a vertical line (going up)
-  if (findColors(tpa, 4960879, intToBox(4, 4, wid-4, hei-4))) then
+  while (t > getSystemTime()) do
   begin
-    hi := high(tpa);
+    if (getColor(lobby.x1 + 333, lobby.y1 + 20) = COLOR) then // color of the green person on the friends chat
+      exit(true);
 
-    for i := 0 to hi do
-      if (getColor(tpa[i].x, tpa[i].y-1) = 9010006) then
-        if (getColor(tpa[i].x, tpa[i].y-2) = 8352334) then
-        begin
-          t := (getSystemTime() + 10000);
-
-          // need a loop because the lobby screen fades in to view
-          while ((not result) and (getSystemTime() < t)) do
-          begin
-
-            if (self.__find()) then
-            begin
-              result := true;
-              break(2);
-            end;
-
-            print('Waiting for lobby screen...');
-            wait(300 + random(400));
-          end;
-        end;
-    end;
+    wait(20 + random(30));
+    print('Waiting for lobby screen...');
+  end;
 end;
 
 (*
@@ -338,12 +281,15 @@ begin
     exit(-1);
 
   for result := 0 to (LOBBY_COUNT - 1) do
+  begin
     // color of an active tab's border
-    if (getColor((self.x + __LOBBY_TAB_OFFSET_X) + (result * __LOBBY_TAB_WIDTH), (self.y + __LOBBY_TAB_OFFSET_Y)) = 7831173) then
+
+    if (getColor((self.x + __LOBBY_TAB_OFFSET_X) + (result * __LOBBY_TAB_WIDTH), (self.y + __LOBBY_TAB_OFFSET_Y)) = 7765636) then
     begin
       print('TRSLobby.getCurrentTab(): Current tab: '+toStr(result), TDebug.SUB);
       exit;
     end;
+  end;
 
   Result := -1;
 end;
