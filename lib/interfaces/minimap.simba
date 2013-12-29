@@ -445,7 +445,7 @@ begin
   repeat
     wait(16);
     angle := self.getAngleDegrees();
-  until (__setCompassAngle_minCheck(angle, directionDeg) < 12.00);
+  until (__setCompassAngle_minCheck(angle, directionDeg) < 14.00) or (getSystemTime() - mark > 14000);
 
   if (left) then
     keyUp(VK_LEFT)
