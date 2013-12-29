@@ -200,7 +200,6 @@ begin
       exit(true);
 
     wait(20 + random(30));
-    print('Waiting for lobby screen...');
   end;
 end;
 
