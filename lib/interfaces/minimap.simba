@@ -264,7 +264,7 @@ begin
     setBitmapName(bmpMask, 'Minimap Mask');
     setBounds([577, 12, 798, 200]);
                                           {bounds  center, radius}
-    button[MM_BUTTON_COMPASS]   := [[583, 18, 616, 52], [599, 35], 16];
+    button[MM_BUTTON_COMPASS]   := [[583, 19, 615, 51], [599, 35], 16];
     button[MM_BUTTON_RUN]       := [[759, 18, 793, 52], [776, 35], 16];
     button[MM_BUTTON_LODESTONE] := [[586, 161, 613, 188], [599, 174], 13];
     button[MM_BUTTON_MAP]       := [[764, 162, 788, 187], [776, 174], 12];
@@ -333,37 +333,35 @@ Example:
 *)
 function TRSMinimap.getAngleRadians(): extended;
 var
-  bmp, wid, hei: integer;
   tpa: TPointArray;
-  mid: TPoint;
+  bmp, wid, hei: integer;
+  middle: TPoint;
 begin
   bmp := bitmapFromClient(minimap.button[MM_BUTTON_COMPASS].bounds);
   getBitmapSize(bmp, wid, hei);
 
-  mid := [wid div 2-1, hei div 2];
+  tpa := tpaFromBox([0, 0, wid-1, hei-1]);
+  middle := [wid div 2, hei div 2];
 
-  thresholdAdaptiveBitmap(bmp, 0, 255, false, TM_Mean, 20);
+  try
+    filterPointsDist(tpa, 14, 50, middle.x, middle.y); // get rid of outside noise
+    drawTPABitmap(bmp, tpa, clBlack);
 
-  findColorsBitmap(bmp, tpa, 255);
-  freeBitmap(bmp);
+    thresholdAdaptiveBitmap(bmp, 0, 255, false, TM_MinMax, 0); // threshold, so we are only left with dial points
+    findColorsBitmap(bmp, tpa, clRed); // gather dial points, and sort from mid point
+    sortTPAFrom(tpa, middle);
 
-  filterPointsDist(tpa, 0, 14, mid.x, mid.y);
+    if (length(tpa) > 0) then
+    begin
+      result := arcTan2(tpa[high(tpa)].y - middle.y, tpa[high(tpa)].x - middle.x) + radians(90);
+      result := (result - radians(180)); // we're using the silver compass dial, which is 180 degrees behind the red dial
 
-  if (length(tpa) < 1) then
-  begin
-    print('TRSMinimap.getAngleRadians(): Found no compass dial colors', TDebug.ERROR);
-    exit();
+      if (result < 0) then // to correct -ve answers for angles between 270 and 360
+        result := (result + radians(360));
+    end;
+  finally
+    freeBitmap(bmp);
   end;
-
-  // sort from the mid, so we can get the furthest point
-  sortTPAFrom(tpa, mid);
-
-  result := arcTan2(tpa[high(tpa)].y - mid.y, tpa[high(tpa)].x - mid.x) + radians(90);
-  result := (result - radians(180)); // we're using the silver compass dial, which is 180 degrees behind the red dial
-
-  // to correct -ve answers for angles between 270 and 360
-  if (result < 0) then
-    result := (result + radians(360));
 end;
 
 (*
@@ -438,24 +436,16 @@ begin
   if (__setCompassAngle_minCheck(startAngle, directionDeg) <= 8.0) then
     exit(true);
 
-  left := (round((360 - startAngle) + directionDeg) mod 360 <= round((startAngle + 360) - directionDeg) mod 360);
+  left := (not (round((360 - startAngle) + directionDeg) mod 360 <= round((startAngle + 360) - directionDeg) mod 360));
   keyDown((ord(not left) * 2) + 37);
   wait(15 + random(50));
   mark := getSystemTime();
-  i := 0.0;
+
 
   repeat
-    wait(10);
+    wait(16);
     angle := self.getAngleDegrees();
-    if (((getSystemTime() - mark > 6000)  and (i < 1.0)) or
-        ((getSystemTime() - mark > 10000) and (i < 2.0)) or
-        ((getSystemTime() - mark > 14000) and (i < 3.0))) then
-    begin
-      i := i + 1.0;
-    end;
-  until ((angle < 0) or
-         (getSystemTime() - mark > 14000) or
-         (__setCompassAngle_minCheck(angle, directionDeg) <= (7.0 + i)));
+  until (__setCompassAngle_minCheck(angle, directionDeg) < 12.00);
 
   if (left) then
     keyUp(VK_LEFT)
