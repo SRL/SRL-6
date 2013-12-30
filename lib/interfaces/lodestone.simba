@@ -148,7 +148,7 @@ begin
   setColorToleranceSpeed(1);
 
   repeat
-    if (getColor(self.x1 +8, self.y1 +33) = TEXT_COLOR) then
+    if (getColor(self.x1 +168, self.y1 +10) = TEXT_COLOR) then
       if (countColorTolerance(BACKGROUND_COLOR, self.getBounds(), BACKGROUND_TOLERANCE) > 20000) then
       begin
         result := true;

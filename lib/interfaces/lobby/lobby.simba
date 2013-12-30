@@ -194,13 +194,7 @@ begin
 
   self.__skipEmailScreen(); // just in case
 
-  while (t > getSystemTime()) do
-  begin
-    if (getColor(lobby.x1 + 333, lobby.y1 + 20) = COLOR) then // color of the green person on the friends chat
-      exit(true);
-
-    wait(20 + random(30));
-  end;
+  result := (getColor(lobby.x1 + 333, lobby.y1 + 20) = COLOR); // color of the green person on the friends chat
 end;
 
 (*
