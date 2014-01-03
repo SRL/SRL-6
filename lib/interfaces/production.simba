@@ -12,6 +12,7 @@ The source for this file can be found `here <https://github.com/SRL/SRL-6/blob/m
 {$f-}
 
 {$include_once interfaces.simba}
+{$include_once ../core/players.simba}
 {$include_once actionbar.simba}
 {$include_once ../tesseract/tesseract.simba}
 
@@ -174,12 +175,12 @@ begin
 end;
 
 (*
-TRSProductionScreen.getType
-~~~~~~~~~~~~~~~~~~~~~~~~~~~
+TRSProductionScreen.getSkill
+~~~~~~~~~~~~~~~~~~~~~~~~~~~~
 
 .. code-block:: pascal
 
-    function TRSProductionScreen.getType(): string;
+    function TRSProductionScreen.getSkill(): string;
 
 Returns the type of skill the open production screen is for.
 
@@ -192,12 +193,13 @@ Example:
 
 .. code-block:: pascal
 
-    if (productionScreen.getType()= 'Smithing') then
+    if (productionScreen.getSkill()= SKILL_SMITHING) then
       writeln('The smithing production screen is open!');
 *)
-function TRSProductionScreen.getType(): String;
+function TRSProductionScreen.getSkill(): Integer;
 var
   i: Integer;
+  intskillarray: TIntegerArray;
   b: TBox;
   s: String;
   skillarray: TStringArray;
@@ -213,6 +215,7 @@ begin
       Exit;
 
     skillarray := ['Crafting','Smithing','Herblore','Cooking','Fletching'];
+    intskillarray := [SKILL_CRAFTING, SKILL_SMITHING, SKILL_HERBLORE, SKILL_COOKING, SKILL_FLETCHING];
 
     atpa := tpa.cluster(5);
 
@@ -226,13 +229,13 @@ begin
     begin
       if (pos(lowercase(skillarray[i]), lowercase(s)) > 0) then
       begin
-        result:= skillarray[i];
+        result:= intskillarray[i];
         break;
       end;
     end;
   end;
 
-  print('TRSProductionScreen.getType(): result = ' + (result), TDebug.SUB);
+  print('TRSProductionScreen.getType(): result = ' + toStr(result), TDebug.SUB);
 end;
 
 {*
