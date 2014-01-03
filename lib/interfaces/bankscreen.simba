@@ -39,7 +39,8 @@ const
   _BANK_SLOTS_OFFSET: TPoint = [41, 108];
   _PACK_SLOTS_OFFSET: TPoint = [523, 111];
   _TAB_OFFSET: TPoint = [34, 65];
-
+  BANK_SLOT_LOW = 1;
+  BANK_SLOT_HIGH = 28;
 (*
 const Deposit Buttons
 ~~~~~~~~~~~~~~~~~~~~~
@@ -501,6 +502,232 @@ begin
   for i := 0 to high(b) do
     if (isItemIn(b[i])) then
       inc(result);
+end;
+
+(*
+TRSBankScreen._isPackSlotVaild
+~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+
+.. code-block:: pascal
+
+    function TRSBankScreen._isPackSlotVaild(slot: integer): boolean;
+
+Returns true if the vaild (within the range of 1..28).
+
+.. note::
+
+    - by Olly
+    - Last Updated: 02 January 2013 by Ashaman88
+
+Example:
+
+.. code-block:: pascal
+
+    if (bankScreen._isPackSlotVaild(25) then
+      writeln('Slot 25 is a vaild bankscreen pack slot!');
+
+*)
+function TRSBankScreen._isPackSlotVaild(slot: integer): boolean;
+begin
+  result := inRange(slot, BANK_SLOT_LOW, BANK_SLOT_HIGH);
+
+  if (not result) then
+    print('bankScreen._isPackSlotVaild(): Slot '+toStr(slot)+' is invalid', TDebug.WARNING);
+end;
+
+
+(*
+TRSBankScreen.isItemInPackSlot
+~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+
+.. code-block:: pascal
+
+    function TRSBankScreen.isItemInPackSlot(slot: integer): boolean;
+
+Returns true if an item is in the desired Bankscreen pack slot, works by looking for
+the black outline color in the slot.
+
+.. note::
+
+    - by Olly
+    - Last Updated: 02 January 2013 by Ashaman88
+
+Example:
+
+.. code-block:: pascal
+
+   if (bankScreen.isItemInPackSlot(1)) then
+     writeln('We have an item in bank pack slot number 1');
+*)
+function TRSBankScreen.isItemInPackSlot(slot: integer): boolean;
+begin
+  if (not self.isOpen()) or (not self._isPackSlotVaild(slot))then
+    exit(false);
+
+  result := isItemIn(self.getPackSlotBox(slot));
+end;
+
+(*
+TRSBankScreen.isPackFull
+~~~~~~~~~~~~~~~~~~~~~~~~
+
+.. code-block:: pascal
+
+    function TRSBankScreen.isPackFull: boolean;
+
+Returns true if our bankscreen pack is full.
+
+.. note::
+
+    - by Olly
+    - Last Updated: 02 January 2013 by Ashaman88
+
+Example:
+
+.. code-block:: pascal
+
+   if (bankScreen.isPackFull) then
+     writeln('our bankscreen pack is full!');
+
+*)
+function TRSBankScreen.isPackFull: boolean;
+var
+  i: integer;
+begin
+  if (not self.isOpen()) then
+    exit(false);
+
+  for i := BANK_SLOT_LOW to BANK_SLOT_HIGH do
+    if (not (self.isItemInPackSlot(i))) then
+      exit(false);
+
+  result := true;
+end;
+
+(*
+TRSBankScreen.isPackEmpty
+~~~~~~~~~~~~~~~~~~~~~~~~~
+
+.. code-block:: pascal
+
+    function TRSBankScreen.isPackEmpty: boolean;
+
+Returns true if our bankscreen pack is empty.
+
+.. note::
+
+    - by Olly
+    - Last Updated: 02 January 2013 by Ashaman88
+
+Example:
+
+.. code-block:: pascal
+
+   if (bankScreen.isPackEmpty) then
+     writeln('our bankscreen pack is empty!');
+
+*)
+function TRSBankScreen.isPackEmpty: boolean;
+begin
+  if (not self.isOpen()) then
+    exit(false);
+
+  result := (not (self.getBounds().colorExists(ITEM_OUTLINE_BLACK)));
+end;
+
+(*
+TRSBankScreen.getPackCountDTM
+~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+
+.. code-block:: pascal
+
+    function TRSBankScreen.getPackCountDTM(dtm: integer): integer;
+
+Searches for the dtm in each bankscreen pack slot and will return how many matches it finds.
+
+.. note::
+
+    - by Olly
+    - Last Updated: 02 January 2013 by Ashaman88
+
+Example:
+
+.. code-block:: pascal
+
+    var
+      dtm: integer;
+      i: integer;
+    begin
+      dtm := dtmFromString('lotsofstuffhere');
+      i := bankScreen.getPackCountDTM(dtm);
+      writeln('We counted ' + intToStr(i) + ' items in our bankScreen pack.');
+    end;
+*)
+function TRSBankScreen.getPackCountDTM(dtm: integer): integer;
+var
+  i, l: integer;
+begin
+  result := 0;
+
+  if (not self.isOpen()) then
+    exit();
+
+  result := findItem(dtm, self.getPackSlotBoxes());
+
+  if (result = 0) then
+  begin
+    print('bankScreen.packCountDTM(): Found no DTM matches', TDebug.SUB);
+    exit();
+  end;
+
+  print('bankScreen.packCountDTM(): Counted ' + intToStr(result) + ' items');
+end;
+
+
+(*
+TRSBankScreen.getPackCountBitmap
+~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+
+.. code-block:: pascal
+
+    function TRSBankScreen.getPackCountBitmap(bmp, tolerance: integer): integer;
+
+Searches for the bitmap in each bankscreen pack slot and will return how many matches it finds.
+
+.. note::
+
+    - by Olly
+    - Last Updated: 02 January 2013 by Ashaman88
+
+Example:
+
+.. code-block:: pascal
+
+    var
+      bmp: integer;
+      i: integer;
+    begin
+      bmp := bitmapFromString('lotsofstuffhere');
+      i := bankScreen.getPackCountBitmap(dtm);
+      writeln('We counted ' + intToStr(i) + ' items in our bankSlots.');
+    end;
+*)
+function TRSBankScreen.getPackCountBitmap(bmp, tolerance: integer): integer;
+begin
+  result := 0;
+
+  if (not self.isOpen()) then
+    exit();
+
+  result := findItem(bmp, tolerance, self.getPackSlotBoxes());
+
+  if (result = 0) then
+  begin
+    print('bankScreen.packCountBitmap(): Found no bitmap matches', TDebug.SUB);
+    exit();
+  end;
+
+  print('bankScreen.packCountBitmap(): Counted ' + intToStr(result) + ' items');
 end;
 
 {*
@@ -1495,4 +1722,3 @@ end;
 begin
   bankscreen.__init();
 end;
-
