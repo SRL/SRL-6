@@ -13,6 +13,7 @@ The source for this file can be found
 {$include_once interfaces.simba}
 {$include_once actionbar.simba}
 {$include_once ../core/text.simba}
+{$include_once ../tesseract/tesseract.simba}
 
 {$f-}
 
@@ -148,6 +149,63 @@ begin
       exit();
     end;
   end;
+end;
+
+(*
+TRSChatbox.getXP
+~~~~~~~~~~~~~~~~~~~~~~
+
+.. code-block:: pascal
+
+    function TRSChatbox.getXP(): integer;
+
+Initiates the chatbox variable.
+
+.. note::
+
+    - by Ashaman88
+    - Last Updated: 01 January 2013 by Ashaman88
+
+Example:
+
+.. code-block:: pascal
+
+    xp:= chatbox.getXP;
+    writeln('Starting with ' + toStr(xp) + ' XP.');
+*)
+function TRSChatBox.getXP(): integer;
+var
+  b: TBox;
+  s: String;
+  tpa : TPointArray;
+  atpa : T2DPointArray;
+  i,p: Integer;
+begin
+  b := self.getBounds();
+  b.edit(+(b.x2-b.x1)-140, +10, -5, -94);
+
+  findColorsTolerance(tpa, 14013909, b, 4,colorSetting(2, 0.00, 0.00));
+
+  if length(tpa) < 2 then
+  begin
+    print('chatBox.getXP(): No XP found', TDebug.SUB);
+    Exit;
+  end;
+
+  atpa := tpa.cluster(5);
+
+  b:= atpa.getbounds();
+  b.edit(-2,-2,+2,+3);
+
+  s:=Replace(tesseractgettext(b.x1,b.y1,b.x2,b.y2, FILTER_SMALL_CHARS), ' ', '', [rfReplaceAll]);
+
+  p := Pos('x', S);
+  if p > 0 then
+    Result := StrToIntDef(ExtractFromStr(Copy(s, p, Length(S)), Numbers), 0)
+  else
+    Result := StrToIntDef(ExtractFromStr(s, Numbers), 0);
+
+  print('chatBox.getXP(): XP found: ' + tostr(result), TDebug.SUB);
 end;
 
 begin
