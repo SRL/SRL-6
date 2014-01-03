@@ -212,7 +212,10 @@ begin
     findColorsTolerance(tpa, 697806, b, 63,colorSetting(0));
 
     if length(tpa) < 100 then
-      Exit;
+    begin
+      print('productionScreen.getSkill(): Unable to find enough text colors for production screen skill type', TDebug.ERROR);
+      exit;
+    end;
 
     skillarray := ['Crafting','Smithing','Herblore','Cooking','Fletching'];
     intskillarray := [SKILL_CRAFTING, SKILL_SMITHING, SKILL_HERBLORE, SKILL_COOKING, SKILL_FLETCHING];
