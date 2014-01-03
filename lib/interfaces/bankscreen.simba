@@ -568,12 +568,12 @@ begin
 end;
 
 (*
-TRSBankScreen.packIsFull
+TRSBankScreen.isPackFull
 ~~~~~~~~~~~~~~~~~~~~~~~~
 
 .. code-block:: pascal
 
-    function TRSBankScreen.packIsFull: boolean;
+    function TRSBankScreen.isPackFull: boolean;
 
 Returns true if our bankscreen pack is full.
 
@@ -586,11 +586,11 @@ Example:
 
 .. code-block:: pascal
 
-   if (bankScreen.packIsFull) then
+   if (bankScreen.isPackFull) then
      writeln('our bankscreen pack is full!');
 
 *)
-function TRSBankScreen.packIsFull: boolean;
+function TRSBankScreen.isPackFull: boolean;
 var
   i: integer;
 begin
@@ -605,12 +605,12 @@ begin
 end;
 
 (*
-TRSBankScreen.packIsEmpty
+TRSBankScreen.isPackEmpty
 ~~~~~~~~~~~~~~~~~~~~~~~~~
 
 .. code-block:: pascal
 
-    function TRSBankScreen.packIsEmpty: boolean;
+    function TRSBankScreen.isPackEmpty: boolean;
 
 Returns true if our bankscreen pack is empty.
 
@@ -623,11 +623,11 @@ Example:
 
 .. code-block:: pascal
 
-   if (bankScreen.packIsEmpty) then
+   if (bankScreen.isPackEmpty) then
      writeln('our bankscreen pack is empty!');
 
 *)
-function TRSBankScreen.packIsEmpty: boolean;
+function TRSBankScreen.isPackEmpty: boolean;
 begin
   if (not self.isOpen()) then
     exit(false);
@@ -636,12 +636,12 @@ begin
 end;
 
 (*
-TRSBankScreen.packCountDTM
-~~~~~~~~~~~~~~~~~~~~~~~~~~
+TRSBankScreen.getPackCountDTM
+~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
 
 .. code-block:: pascal
 
-    function TRSBankScreen.packCountDTM(dtm: integer): integer;
+    function TRSBankScreen.getPackCountDTM(dtm: integer): integer;
 
 Searches for the dtm in each bankscreen pack slot and will return how many matches it finds.
 
@@ -659,11 +659,11 @@ Example:
       i: integer;
     begin
       dtm := dtmFromString('lotsofstuffhere');
-      i := bankScreen.packCountDTM(dtm);
+      i := bankScreen.getPackCountDTM(dtm);
       writeln('We counted ' + intToStr(i) + ' items in our bankScreen pack.');
     end;
 *)
-function TRSBankScreen.packCountDTM(dtm: integer): integer;
+function TRSBankScreen.getPackCountDTM(dtm: integer): integer;
 var
   i, l: integer;
 begin
@@ -685,12 +685,12 @@ end;
 
 
 (*
-TRSBankScreen.packCountBitmap
-~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+TRSBankScreen.getPackCountBitmap
+~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
 
 .. code-block:: pascal
 
-    function TRSBankScreen.packCountBitmap(bmp, tolerance: integer): integer;
+    function TRSBankScreen.getPackCountBitmap(bmp, tolerance: integer): integer;
 
 Searches for the bitmap in each bankscreen pack slot and will return how many matches it finds.
 
@@ -708,11 +708,11 @@ Example:
       i: integer;
     begin
       bmp := bitmapFromString('lotsofstuffhere');
-      i := bankScreen.packCountBitmap(dtm);
+      i := bankScreen.getPackCountBitmap(dtm);
       writeln('We counted ' + intToStr(i) + ' items in our bankSlots.');
     end;
 *)
-function TRSBankScreen.packCountBitmap(bmp, tolerance: integer): integer;
+function TRSBankScreen.getPackCountBitmap(bmp, tolerance: integer): integer;
 begin
   result := 0;
 
