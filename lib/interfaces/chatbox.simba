@@ -159,7 +159,7 @@ TRSChatbox.getXP
 
     function TRSChatbox.getXP(): integer;
 
-Initiates the chatbox variable.
+Returns the amount of xp per the xp tracker in the top right corner of chatbox.
 
 .. note::
 
