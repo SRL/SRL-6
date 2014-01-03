@@ -232,9 +232,13 @@ procedure mouseOffClient(Direction: Integer);
 var
   B: TBoxArray;
   P: TPoint;
-  i, W, H: Integer;
+  i, W, H, X, Y: Integer;
 begin
   GetClientDimensions(W, H);
+  GetMousePos(X,Y);
+
+  if (X < 0) or (X > W) or (Y < 0) or (Y > H) then
+    exit;
 
   SetLength(B, 4);
 
