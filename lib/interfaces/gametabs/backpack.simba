@@ -517,6 +517,61 @@ begin
 end;
 
 (*
+TRSTabBackpack.waitSlotPixelChange
+~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+
+.. code-block:: pascal
+
+    function TRSTabBackPack.waitSlotPixelChange(waitTime: integer): boolean;
+
+Waits up to waitTime for the Backpack slot to change. (Ex. cooked a fish)
+
+.. note::
+
+    - by Olly & Ashaman
+    - Last Updated: 03 January 2013 by Ashaman88 & Olly
+
+Example:
+
+.. code-block:: pascal
+
+   if tabBackpack.waitSlotPixelChange(28,5000) then
+     writeln('Last backpack slot has changed, we''re done!');
+
+*)
+function TRSTabBackpack.waitSlotPixelChange(slot, waitTime: integer): boolean;
+var
+  b: Tbox;
+  bmp, bmp1: Integer;
+  t: integer;
+begin
+  if (not self.open()) or (not self.isSlotVaild(slot))then
+    exit(false);
+
+  b := self.getSlotBox(slot);
+  t := (getSystemTime() + waitTime);
+
+  bmp := bitmapFromClient(b);
+  bmp1 := createBitmap(b.getWidth(), b.getHeight());
+
+  while (not result) and (t > getSystemTime()) do
+  begin
+    copyClientToBitmap(bmp1, b.x1, b.y1, b.x2, b.y2);
+    result := (calculatePixelShift(bmp, bmp1, [0, 0, (b.getWidth() - 1), (b.getHeight() - 1)]) > 0);
+
+    if (SRL_Events[EVENT_ANTIBAN] <> nil) then
+      SRL_Events[EVENT_ANTIBAN]();
+
+    if (not self.open()) then
+      break;
+
+    wait(50 + random(50));
+  end;
+
+  freeBitmaps([bmp, bmp1]);
+end;
+
+(*
 TRSTabBackpack.mouseSlot
 ~~~~~~~~~~~~~~~~~~~~~~~~
 
