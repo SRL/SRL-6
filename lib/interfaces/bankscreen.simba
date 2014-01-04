@@ -85,6 +85,7 @@ Example:
 const
   BANK_NPC_BLUE = 0;
   BANK_BOOTH = 1;
+  BANK_CHEST_SW = 2;
 
 (*
 type TRSBankScreen
@@ -1472,6 +1473,7 @@ TRSBankScreen.open
 Opens the desired bank, current vaild 'bankType' constants are:
 
     * BANK_NPC_BLUE
+    * BANK_BOOTH
 
 .. note::
 
@@ -1486,6 +1488,9 @@ Example:
 *)
 function TRSBankScreen.open(bankType: integer): boolean;
 begin
+  if (bankScreen.isOpen()) or (pinScreen.isOpen()) then
+    exit(true);
+
   case bankType of
     BANK_NPC_BLUE: result := self.__openNPC();
     BANK_BOOTH: result := self.__openBankBooth();

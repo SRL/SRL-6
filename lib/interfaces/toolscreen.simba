@@ -12,6 +12,7 @@ The source for this file can be found `here <https://github.com/SRL/SRL-6/blob/m
 {$f-}
 
 {$include_once interfaces.simba}
+{$include_once ../core/text.simba}
 
 (*
 type TRSToolScreen
@@ -146,27 +147,25 @@ function TRSToolScreen.select(tool: String): boolean;
 const
   TEXT_COLOR = 2070783;
 var
-  b, txtB: TBox;
+  textArea: TBox;
+  boxArr: TBoxArray;
   i: integer;
+  p: TPoint;
 begin
   result := false;
 
-  b := [self.x1+65, self.y1+84, self.x1 + 121, self.y1 + 140];
-  txtB := [b.x1 - 15, self.y1 + 62, b.x2 + 15, self.y1 + 75];
+  if (not self.isOpen()) then
+    exit();
 
-  if (self.isOpen()) then
-  begin
-    for i := 0 to 2 do
-    begin
-      if pos(tool, getTextAtEx(txtB, 0, 50, 30 , TEXT_COLOR, 0, 'StatChars')) > 0 then
-      begin
-        mouseBox(b, MOUSE_LEFT);
-        exit(true);
-      end;
-      txtB.edit(102, 0, 102, 0);
-      b.edit(102, 0, 102, 0);
-    end;
-  end;
+  textArea := [self.x1, self.y1 + 55, self.x2, self.y2 - 125];
+  boxArr := grid(3, 1, 50, 50, 102, 0, [self.x1 + 93, self.y1 + 113]);
+
+  result := (findText(p, TEXT_COLOR, 5, [string(tool)], [StatChars], textArea));
+
+  if (result) then
+    for i := 0 to high(boxArr) do
+      if (pointInBox([p.x + 20, p.y + 50], boxArr[i])) then
+        mouseBox(boxArr[i], MOUSE_LEFT);
 
   print('TRSToolScreen.select(): result = ' + lowercase(boolToStr(result)), TDebug.SUB);
 end;

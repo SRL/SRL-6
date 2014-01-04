@@ -163,6 +163,30 @@ begin
 end;
 
 (*
+TRSMainscreen.filterPointsPlayer
+~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+
+.. code-block:: pascal
+
+    procedure TRSMainscreen.filterPointsPlayer(var tpa: TPointArray);
+
+Clears all the points in the TPointArray 'tpa' that fall within the players box.
+
+Example:
+
+.. code-block:: pascal
+
+    mainScreen.filterPointsPlayer(tpa);
+*)
+procedure TRSMainscreen.filterPointsPlayer(var tpa: TPointArray);
+var
+  tmp: TPointArray;
+begin
+  tmp := TPAFromBox(self.playerBox);
+  tpa := clearTPAFromTPA(tpa, tmp);
+end;
+
+(*
 TRSMainscreen.findObject
 ~~~~~~~~~~~~~~~~~~~~~~~~
 
