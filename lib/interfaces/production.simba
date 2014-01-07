@@ -485,7 +485,7 @@ begin
     b.edit(-2,-2,+2,+2);
     b.setlimit(self.getbounds());
 
-    result:=tesseractgettext(b.x1,b.y1,b.x2,b.y2, FILTER_SMALL_CHARS);
+    result:=trim(tesseractgettext(b.x1,b.y1,b.x2,b.y2, FILTER_SMALL_CHARS));
   end;
 
   print('TRSProductionScreen.getSelectedBoxText(): result = ' + (result), TDebug.SUB);
