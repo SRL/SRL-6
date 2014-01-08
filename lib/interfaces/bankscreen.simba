@@ -235,14 +235,26 @@ var
   timeOut: integer;
 begin
   result := false;
-  timeOut := (getSystemTime() + randomRange(5000, 6000));
 
   if (not self.isOpen()) then
     exit(true);
 
+  // try ESC key first
+  timeOut := (getSystemTime() + randomRange(300, 600));
+  repeat
+    typeByte(VK_ESCAPE);
+    wait(100 + random(50));
+    result := (not self.isOpen());
+  until((getSystemTime() > timeOut) or result);
+
+  if (result) then
+    exit();
+
+  // click the X as a failsafe
   mouseBox(intToBox(self.x1+465, self.y1+15, self.x2-207, self.y1+30), MOUSE_LEFT);
   wait(50 + random(50));
 
+  timeOut := (getSystemTime() + randomRange(5000, 6000));
   while (timeOut > getSystemTime()) do
   begin
     if (not self.isOpen()) then
