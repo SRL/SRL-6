@@ -56,8 +56,8 @@ const
   ID_INTERFACE_PROGRESS = 41;
 
   // client - logged out
-  ID_INTERFACE_LOBBY        = 43;
-  ID_INTERFACE_LOBBY_WORLDS = 44;
+  ID_INTERFACE_LOBBY        = 42;
+  ID_INTERFACE_LOBBY_WORLDS = 43;
 
 (*
 type TRSInterface
