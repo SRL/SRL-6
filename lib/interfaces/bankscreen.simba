@@ -90,6 +90,8 @@ const
   BANK_CHEST_SHANTAY = 3;
   BANK_CHEST_DUEL = 4;
   BANK_CHEST_CW = 5;
+  BANK_CHEST_GROTTO = 6;
+  BANK_CHEST_BURTHORPE = 7;
 (*
 type TRSBankScreen
 ~~~~~~~~~~~~~~~~~~
@@ -1728,6 +1730,8 @@ begin
     BANK_CHEST_SHANTAY: begin col1:= [6324637, 5, [2, 0.08, 0.57]]; col2:= [3618876, 4, [2, 0.84, 0.47]]; avelen:= 90; end;
     BANK_CHEST_DUEL: begin col1:= [8088922, 16, [2, 0.06, 0.17]]; col2:= [4808312, 17, [2, 0.03, 0.17]]; avelen:= 90; end;
     BANK_CHEST_CW: begin col1:= [8088922, 16, [2, 0.06, 0.17]]; col2:= [4808312, 17, [2, 0.03, 0.17]]; avelen:= 90; end;
+    BANK_CHEST_GROTTO: begin col1:= [6842481, 6, [2, 0.00, 0.08]]; col2:= [2570316, 4, [2, 0.15, 1.35]]; avelen:= 90; end;
+    BANK_CHEST_BURTHORPE: begin col1:= [8946555, 15, [2, 0.18, 0.18]]; col2:= [5863053, 10, [2, 0.13, 0.10]]; avelen:= 90; end;
   end;
 
   print('TRSBankscreen.__openChest()', TDebug.HEADER);
@@ -1842,6 +1846,8 @@ Opens the desired bank, current vaild 'bankType' constants are:
     * BANK_CHEST_SHANTAY
     * BANK_CHEST_DUEL
     * BANK_CHEST_CW
+    * BANK_CHEST_GROTTO
+    * BANK_CHEST_BURTHORPE
 
 .. note::
 
@@ -1866,6 +1872,8 @@ begin
     BANK_CHEST_SHANTAY: result := self.__openChest(BANK_CHEST_SHANTAY);
     BANK_CHEST_DUEL: result := self.__openChest(BANK_CHEST_DUEL);
     BANK_CHEST_CW: result := self.__openChest(BANK_CHEST_CW);
+    BANK_CHEST_GROTTO: result := self.__openChest(BANK_CHEST_GROTTO);
+    BANK_CHEST_BURTHORPE: result := self.__openChest(BANK_CHEST_BURTHORPE);
   end;
 end;
 
