@@ -1,6 +1,6 @@
 (*
 ProgressScreen
-==========
+==============
 
 The progressscreen file holds functions and procedures that are used in the
 Runescape progress screen.
@@ -25,15 +25,15 @@ Example:
 
 .. code-block:: pascal
 
-    progressScreen.findButton(DONE_BUTTON);
+    progressScreen.findButton(PROGRESS_BUTTON_CANCEL);
 *)
 const
-  DONE_BUTTON = 0;
-  CANCEL_BUTTON = 1;
+  PROGRESS_BUTTON_DONE = 0;
+  PROGRESS_BUTTON_CANCEL = 1;
 
 (*
 type TRSProgressScreen
-~~~~~~~~~~~~~~~~~~
+~~~~~~~~~~~~~~~~~~~~~~
 
 A type that stores the progress interface properties.
 *)
@@ -42,7 +42,7 @@ type
 
 (*
 var progressScreen
-~~~~~~~~~~~~~~
+~~~~~~~~~~~~~~~~~~
 
 Variable that stores functions and properties of the Runescape progress interface.
 
@@ -58,7 +58,7 @@ var
 
 {*
 TRSProgressScreen.__init
-~~~~~~~~~~~~~~~~~~~~
+~~~~~~~~~~~~~~~~~~~~~~~~
 
 .. code-block:: pascal
 
@@ -93,7 +93,7 @@ end;
 
 (*
 TRSProgressScreen.isOpen
-~~~~~~~~~~~~~~~~~~~~
+~~~~~~~~~~~~~~~~~~~~~~~~
 
 .. code-block:: pascal
 
@@ -224,7 +224,7 @@ Example:
 
 .. code-block:: pascal
 
-    if (progressScreen.getButton()= DONE_BUTTON) then
+    if (progressScreen.getButton()= PROGRESS_BUTTON_DONE) then
       writeln('The done button is present!');
 *)
 function TRSProgressScreen.getButton(): integer;
@@ -256,8 +256,8 @@ begin
     s:=trim(tesseractgettext(b.x1, b.y1, b.x2, b.y2, FILTER_SMALL_CHARS));
 
     case lowercase(s) of
-      'done': result:= DONE_BUTTON;
-      'cancel': result:= CANCEL_BUTTON;
+      'done': result:= PROGRESS_BUTTON_DONE;
+      'cancel': result:= PROGRESS_BUTTON_CANCEL;
     end;
   end;
 
@@ -284,7 +284,7 @@ Example:
 
 .. code-block:: pascal
 
-    if (progressScreen.findButton(DONE_BUTTON, 7000, True)) then
+    if (progressScreen.findButton(PROGRESS_BUTTON_CANCEL, 7000, True)) then
       writeln('We clicked the done button!');
 *)
 function TRSProgressScreen.findButton(buttonType: integer = -1; waitTime: integer = 0; lClick: boolean = false): boolean;
