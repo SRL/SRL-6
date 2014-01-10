@@ -53,10 +53,11 @@ const
   ID_INTERFACE_PRODUCTION = 38;
   ID_INTERFACE_LODESTONE = 39;
   ID_INTERFACE_TOOL = 40;
+  ID_INTERFACE_PROGRESS = 41;
 
   // client - logged out
-  ID_INTERFACE_LOBBY        = 40;
-  ID_INTERFACE_LOBBY_WORLDS = 41;
+  ID_INTERFACE_LOBBY        = 42;
+  ID_INTERFACE_LOBBY_WORLDS = 43;
 
 (*
 type TRSInterface
@@ -162,4 +163,3 @@ function TRSInterface.getCenterPoint(): TPoint;
 begin
   result := self.getBounds().getMiddle();
 end;
-
