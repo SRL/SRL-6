@@ -429,6 +429,8 @@ Example:
       writeln('We are making 25 items!');
 *)
 function TRSProgressScreen.getTotalToMake: integer;
+const
+  PROGRESS_FILTER_SMALL_CHARS: array [0..3] of variant = [10, 10, false, 50];
 var
   b: TBox;
   tpa : TPointArray;
@@ -452,7 +454,7 @@ begin
     b.edit(-2, -2, +2, +2);
     b.setlimit(self.getbounds());
 
-    s:=trim(tesseractgettext(b.x1,b.y1,b.x2,b.y2, FILTER_SMALL_CHARS));
+    s:=trim(tesseractgettext(b.x1,b.y1,b.x2,b.y2, PROGRESS_FILTER_SMALL_CHARS));
 
     p := pos('x', lowercase(s));
     if p > 0 then
