@@ -17,6 +17,8 @@ SRL Interfaces Reference
     options
     pinscreen
     production
+    progressscreen
+    toolscreen
 
     backpack
     gametab
