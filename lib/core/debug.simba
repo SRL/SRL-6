@@ -77,7 +77,6 @@ var
   logPath = includePath + 'SRL-6/logs/';
   disableSRLLog = false;
   disableSRLDebug = false;
-  addTimeStamp = false;
 
 {*
 __openLogFile
@@ -448,9 +447,4 @@ procedure debugBitmap(bmp: integer);
 begin
   getMufasaBitmap(bmp).debug();
 end;
-
-begin
-  setScriptProp(SP_WriteTimeStamp, [addTimeStamp]);
-end;
-
 

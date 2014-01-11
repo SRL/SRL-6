@@ -194,7 +194,7 @@ begin
 
       if (findText(p, TEXT_COLOR, 0, ['Bank'], [UpChars], b)) then
       begin
-        waitColorCountRange(ITEM_OUTLINE_BLACK, 0, intToBox(self.x1+10, self.y1+90, self.x2-200, self.y2-50), 2500 + random(500), 1);
+        waitColorCountRange(ITEM_OUTLINE_BLACK, 0, intToBox(self.x1+10, self.y1+90, self.x2-200, self.y2-50), 2500 + random(500), 10);
 
         result := true;
         break();

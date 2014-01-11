@@ -450,7 +450,7 @@ Example:
 *)
 procedure mouse(x, y, randX, randY, button: integer = MOUSE_MOVE); overload;
 begin
-  mouse(point(x+randX, y+randY), button);
+  mouse(point(x+random(randX), y+random(randY)), button);
 end;
 
 (*
@@ -459,9 +459,10 @@ missMouse
 
 .. code-block:: pascal
 
-    procedure missMouse(pnt: TPoint);
+    procedure missMouse(pnt: TPoint; correct: boolean = true);
 
-Moves the mouse, but initially misses the target point (miss area determined by dist & speed) then corrects itself.
+Moves the mouse, but initially misses the target point (miss area determined by dist & speed)
+then if correct = true will corrects itself.
 
 .. note::
 
@@ -474,7 +475,7 @@ Example:
     missMouse(point);
 
 *)
-procedure missMouse(pnt: TPoint);
+procedure missMouse(pnt: TPoint; correct: boolean = true);
 var
   randSpeed: extended;
   x,y,x2,y2,a,dist,mp: integer;
@@ -491,7 +492,10 @@ begin
   y2 := randomRange(Pnt.y-(a*mp), Pnt.y+(a*mp));
   _humanWindMouse(x, y, x2, y2, MOUSE_HUMAN, 5, 10.0/randSpeed, 15.0/randSpeed, 10.0*randSpeed);
   getMousePos(x, y);
-  mouse(pnt);
+
+  if (correct) then
+    mouse(pnt);
+
   mouseSpeed := a;
 end;
 
