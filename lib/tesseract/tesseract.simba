@@ -1,3 +1,14 @@
+(*
+Tesseract
+=========
+
+The tesseract file holds functions that use the tesseract plugin.  These
+functions are used to recognize text on the client.
+
+The source for this file can be found `here <https://github.com/SRL/SRL-6/blob/master/lib/tesseract/tesseract.simba>`_.
+
+*)
+
 {$loadlib libtesseract}
 
 var

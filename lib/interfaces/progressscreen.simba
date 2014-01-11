@@ -1,0 +1,475 @@
+(*
+ProgressScreen
+==============
+
+The progressscreen file holds functions and procedures that are used in the
+Runescape progress screen.
+
+The source for this file can be found `here <https://github.com/SRL/SRL-6/blob/master/lib/interfaces/progressscreen.simba>`_.
+
+*)
+
+{$include_once ../tesseract/tesseract.simba}
+{$include_once ../core/players.simba}
+
+
+{$f-}
+
+(*
+const Find Button Options
+~~~~~~~~~~~~~~~~~~~~~~~~~
+
+Integer constants that represent different types of progress screen buttons.
+
+Example:
+
+.. code-block:: pascal
+
+    progressScreen.findButton(PROGRESS_BUTTON_CANCEL);
+*)
+const
+  PROGRESS_BUTTON_DONE = 0;
+  PROGRESS_BUTTON_CANCEL = 1;
+
+(*
+type TRSProgressScreen
+~~~~~~~~~~~~~~~~~~~~~~
+
+A type that stores the progress interface properties.
+*)
+type
+  TRSProgressScreen = type TRSInterface;
+
+(*
+var progressScreen
+~~~~~~~~~~~~~~~~~~
+
+Variable that stores functions and properties of the Runescape progress interface.
+
+Example:
+
+.. code-block:: pascal
+
+    if (progressScreen.isOpen() then
+      writeln('Progress screen is open!');
+*)
+var
+  progressScreen: TRSProgressScreen;
+
+{*
+TRSProgressScreen.__init
+~~~~~~~~~~~~~~~~~~~~~~~~
+
+.. code-block:: pascal
+
+    procedure TRSProgressScreen.__init();
+
+Initializes the TRSProgressScreen.
+
+.. note::
+
+    - by Ashaman88
+    - Last Updated: 08 January 2013 by Ashaman88
+
+Example:
+
+.. code-block:: pascal
+
+    progressScreen.__init();
+*}
+{$IFNDEF CODEINSIGHT}
+procedure TRSProgressScreen.__init();
+begin
+  with (self) do
+  begin
+    name := 'RS Progress Screen';
+    ID := ID_INTERFACE_PROGRESS;
+    parentID := -1;
+    static := true;
+    setBounds([120, 78, 457, 224]);
+  end;
+end;
+{$ENDIF}
+
+(*
+TRSProgressScreen.isOpen
+~~~~~~~~~~~~~~~~~~~~~~~~
+
+.. code-block:: pascal
+
+    function TRSProgressScreen.isOpen(waitTime: integer = 0): boolean;
+
+Returns true if the progress screen is open, includes a optional parameter
+'waitTime' (default 0) which will search for the progress screen until
+'waitTime' is reached.
+
+.. note::
+
+    - by Ashaman88
+    - Last Updated: 08 January 2013 by Ashaman88
+
+Example:
+
+.. code-block:: pascal
+
+    if (progressScreen.isOpen()) then
+      writeln('it''s open!');
+*)
+function TRSProgressScreen.isOpen(waitTime: integer = 0): boolean;
+const
+  BORDER_COLOR = 5327681;
+var
+  t: integer;
+  borderTPA: TPointArray;
+  borders: TIntegerArray;
+begin
+  t := (getSystemTime() + waitTime);
+
+  borderTPA := tpaFromBox(intToBox(self.x1 + 59, self.y1 + 23, self.x2 - 171, self.y1 + 23));
+
+  repeat
+    borders := getColors(borderTPA, true);
+
+    if (length(borders) = 1) then
+      if (borders[0] = BORDER_COLOR) then
+        exit(true);
+
+    wait(20 + random(20));
+  until (getSystemTime() >= t);
+end;
+
+(*
+TRSProgressScreen.getSkill
+~~~~~~~~~~~~~~~~~~~~~~~~~~
+
+.. code-block:: pascal
+
+    function TRSProgressScreen.getSkill(): integer;
+
+Returns the type of skill the open progress screen is for.
+
+.. note::
+
+    - by Ashaman88
+    - Last Updated: 08 January 2013 by Ashaman88
+
+Example:
+
+.. code-block:: pascal
+
+    if (progressScreen.getSkill()= SKILL_SMITHING) then
+      writeln('The smithing progress screen is open!');
+*)
+function TRSProgressScreen.getSkill(): integer;
+var
+  i: Integer;
+  intskillarray: TIntegerArray;
+  b: TBox;
+  s: String;
+  skillarray: TStringArray;
+  tpa : TPointArray;
+  atpa : T2DPointArray;
+begin
+  if (self.isOpen()) then
+  begin
+    b := [self.x1 + 109, self.y1 + 1, self.x2 - 79, self.y1 + 21];
+    findColorsTolerance(tpa, 697806, b, 63,colorSetting(0));
+
+    if length(tpa) < 100 then
+    begin
+      print('progressScreen.getSkill(): Unable to find enough text colors for production screen skill type', TDebug.ERROR);
+      exit;
+    end;
+
+    skillarray := ['Crafting','Smithing','Herblore','Cooking','Fletching'];
+    intskillarray := [SKILL_CRAFTING, SKILL_SMITHING, SKILL_HERBLORE, SKILL_COOKING, SKILL_FLETCHING];
+
+    atpa := tpa.cluster(5);
+
+    b:= atpa.getbounds();
+    b.edit(-2, -2, +2, +2);
+    b.setlimit(self.getbounds());
+
+    s:= Replace(tesseractgettext(b.x1, b.y1, b.x2, b.y2, FILTER_SMALL_CHARS), ' ', '', [rfReplaceAll]);
+
+    for i:=0 to high(skillarray) do
+    begin
+      if (pos(lowercase(skillarray[i]), lowercase(s)) > 0) then
+      begin
+        result:= intskillarray[i];
+        break;
+      end;
+    end;
+  end;
+
+  print('TRSProductionScreen.getSkill(): result = ' + toStr(result), TDebug.SUB);
+end;
+
+(*
+TRSProgressScreen.getButton
+~~~~~~~~~~~~~~~~~~~~~~~~~~~
+
+.. code-block:: pascal
+
+    function TRSProgressScreen.getButton(): integer;
+
+Returns the type of button present for the open progress screen.
+
+.. note::
+
+    - by Ashaman88
+    - Last Updated: 08 January 2013 by Ashaman88
+
+Example:
+
+.. code-block:: pascal
+
+    if (progressScreen.getButton()= PROGRESS_BUTTON_DONE) then
+      writeln('The done button is present!');
+*)
+function TRSProgressScreen.getButton(): integer;
+var
+  b: TBox;
+  s: String;
+  tpa : TPointArray;
+  atpa : T2DPointArray;
+begin
+  result:= -1;
+  if (self.isOpen()) then
+  begin
+    b := [self.x1 + 137, self.y1 + 123, self.x2 - 127, self.y2 - 5];
+
+    findColorsTolerance(tpa, 13618403, b, 0, colorSetting(0));
+
+    if length(tpa) < 50 then
+    begin
+      print('progressScreen.getButton(): Unable to find enough text colors for progress screen button type', TDebug.ERROR);
+      exit;
+    end;
+
+    atpa := tpa.cluster(5);
+
+    b:= atpa.getbounds();
+    b.edit(-2, -2, +2, +2);
+    b.setlimit(self.getbounds());
+
+    s:=trim(tesseractgettext(b.x1, b.y1, b.x2, b.y2, FILTER_SMALL_CHARS));
+
+    case lowercase(s) of
+      'done': result:= PROGRESS_BUTTON_DONE;
+      'cancel': result:= PROGRESS_BUTTON_CANCEL;
+    end;
+  end;
+
+  print('TRSProgressScreen.getButton(): result = ' + toStr(result), TDebug.SUB);
+end;
+
+(*
+TRSProgressScreen.findButton
+~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+
+.. code-block:: pascal
+
+    function TRSProgressScreen.findButton(): boolean;
+
+Searches for buttonType (default is any button) for waitTime.
+Will click the button as indicated by lClick (default is false).
+
+.. note::
+
+    - by Ashaman88
+    - Last Updated: 08 January 2013 by Ashaman88
+
+Example:
+
+.. code-block:: pascal
+
+    if (progressScreen.findButton(PROGRESS_BUTTON_CANCEL, 7000, True)) then
+      writeln('We clicked the done button!');
+*)
+function TRSProgressScreen.findButton(buttonType: integer = -1; waitTime: integer = 0; lClick: boolean = false): boolean;
+var
+  t: Integer;
+begin
+  t := (getSystemTime() + waitTime);
+
+  repeat
+    if (self.isOpen()) then
+    begin
+      if (buttonType = -1) or (buttonType = self.getButton()) then
+      begin
+        if lClick then
+          mouseBox([self.x1 + 137, self.y1 + 123, self.x2 - 127, self.y2 - 5], MOUSE_LEFT);
+        result:= true;
+        break;
+      end;
+    end else
+      exit(false);
+
+    wait(20 + random(20));
+
+    if (SRL_Events[EVENT_ANTIBAN] <> nil) then
+      SRL_Events[EVENT_ANTIBAN]();
+  until (getSystemTime() >= t);
+
+  print('TRSProgressScreen.findButton(): result = ' + toStr(result), TDebug.SUB);
+end;
+
+(*
+TRSProgressScreen.getItem
+~~~~~~~~~~~~~~~~~~~~~~~~~
+
+.. code-block:: pascal
+
+    function TRSProgressScreen.getItem(): string;
+
+Returns the type of item being made as displayed in the open progress screen.
+
+.. note::
+
+    - by Ashaman88
+    - Last Updated: 08 January 2013 by Ashaman88
+
+Example:
+
+.. code-block:: pascal
+
+    if (progressScreen.getItem()= 'hatchet') then
+      writeln('The hatchet is begin made!');
+*)
+function TRSProgressScreen.getItem: string;
+var
+  b: TBox;
+  tpa : TPointArray;
+  atpa : T2DPointArray;
+begin
+  if (self.isOpen()) then
+  begin
+    b:= self.getBounds();
+    b.edit(+58, +33, -179, -94);
+
+    findColorsTolerance(tpa, 16777215, b, 0,colorSetting(0));
+
+    if length(tpa) < 5 then
+      exit;
+
+    atpa := tpa.cluster(5);
+
+    b:= atpa.getbounds();
+    b.edit(-2, -2, +2, +2);
+    b.setlimit(self.getbounds());
+
+    result:=trim(tesseractgettext(b.x1,b.y1,b.x2,b.y2, FILTER_SMALL_CHARS));
+  end;
+
+  print('TRSProgressScreen.getItem(): result = ' + (result), TDebug.SUB);
+end;
+
+(*
+TRSProgressScreen.getPercentDone
+~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+
+.. code-block:: pascal
+
+    function TRSProgressScreen.getPercentDone(): integer;
+
+Returns the percent complete of the open progress screen.
+
+.. note::
+
+    - by Ashaman88
+    - Last Updated: 08 January 2013 by Ashaman88
+
+Example:
+
+.. code-block:: pascal
+
+    if (progressScreen.getPercentDone()= 50) then
+      writeln('We are 50% done!');
+*)
+function TRSProgressScreen.getPercentDone: integer;
+const
+  FULL_COUNT = 4260;
+var
+  b: TBox;
+begin
+  if (self.isOpen()) then
+  begin
+    b:= self.getBounds();
+    b.edit(+15, +84, -15, -39);
+
+    result:= round((countColorTolerance(4755551, b, 22, colorSetting(2, 0.09, 0.23)) / FULL_COUNT) * 100);
+    if result > 100 then
+      result:= 100;
+  end;
+
+  print('TRSProgressScreen.getPercentDone(): result = ' + toStr(result), TDebug.SUB);
+end;
+
+(*
+TRSProgressScreen.getTotalToMake
+~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+
+.. code-block:: pascal
+
+    function TRSProgressScreen.getTotalToMake(): integer;
+
+Returns the number of items to be made in the open progress screen.
+
+.. note::
+
+    - by Ashaman88
+    - Last Updated: 08 January 2013 by Ashaman88
+
+Example:
+
+.. code-block:: pascal
+
+    if (progressScreen.getTotalToMake()= 25) then
+      writeln('We are making 25 items!');
+*)
+function TRSProgressScreen.getTotalToMake: integer;
+const
+  PROGRESS_FILTER_SMALL_CHARS: array [0..3] of variant = [10, 10, false, 50];
+var
+  b: TBox;
+  tpa : TPointArray;
+  atpa : T2DPointArray;
+  s: string;
+  p: integer;
+begin
+  if (self.isOpen()) then
+  begin
+    b:= self.getBounds();
+    b.edit(+129, +86, -132, -45);
+
+    findColorsTolerance(tpa, 15330538, b, 36, colorSetting(0));
+
+    if length(tpa) < 2 then
+      exit;
+
+    atpa := tpa.cluster(5);
+
+    b:= atpa.getbounds();
+    b.edit(-2, -2, +2, +2);
+    b.setlimit(self.getbounds());
+
+    s:=trim(tesseractgettext(b.x1,b.y1,b.x2,b.y2, PROGRESS_FILTER_SMALL_CHARS));
+
+    p := pos('x', lowercase(s));
+    if p > 0 then
+      result := StrToIntDef(ExtractFromStr(Copy(s, p, Length(s)), Numbers), 0)
+    else
+    begin
+      p := pos('/', s);
+      if p > 0 then
+        result := StrToIntDef(ExtractFromStr(Copy(s, p, Length(s)), Numbers), 0);
+    end;
+  end;
+
+  print('TRSProgressScreen.getTotalToMake(): result = ' + toStr(result), TDebug.SUB);
+end;
+
+begin
+  progressScreen.__init();
+end;

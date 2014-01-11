@@ -85,8 +85,15 @@ Example:
 *)
 const
   BANK_NPC_BLUE = 0;
-  BANK_BOOTH = 1;
-  BANK_CHEST_SW = 2;
+  BANK_NPC_GREY = 1;
+  BANK_NPC_GREEN = 2;
+  BANK_BOOTH = 3;
+  BANK_CHEST_SW = 4;
+  BANK_CHEST_SHANTAY = 5;
+  BANK_CHEST_DUEL = 6;
+  BANK_CHEST_CW = 7;
+  BANK_CHEST_GROTTO = 8;
+  BANK_CHEST_BURTHORPE = 9;
 
 (*
 type TRSBankScreen
@@ -235,14 +242,26 @@ var
   timeOut: integer;
 begin
   result := false;
-  timeOut := (getSystemTime() + randomRange(5000, 6000));
 
   if (not self.isOpen()) then
     exit(true);
 
+  // try ESC key first
+  timeOut := (getSystemTime() + randomRange(300, 600));
+  repeat
+    typeByte(VK_ESCAPE);
+    wait(100 + random(50));
+    result := (not self.isOpen());
+  until((getSystemTime() > timeOut) or result);
+
+  if (result) then
+    exit();
+
+  // click the X as a failsafe
   mouseBox(intToBox(self.x1+465, self.y1+15, self.x2-207, self.y1+30), MOUSE_LEFT);
   wait(50 + random(50));
 
+  timeOut := (getSystemTime() + randomRange(5000, 6000));
   while (timeOut > getSystemTime()) do
   begin
     if (not self.isOpen()) then
@@ -1476,31 +1495,36 @@ TRSBankScreen.__gatherBankerPoints
 
 .. code-block:: pascal
 
-    function TRSBankScreen.__gatherBankerPoints(out res: TPointArray): boolean;
+    function TRSBankScreen.__gatherBankerPoints(out res: TPointArray, bankType: integer): boolean;
 
-Helper function for TRSBankscreen.__OpenNPC(), gathers the blue banker points
-based from the minimap.
+Helper function for TRSBankscreen.__OpenNPC(), gathers the banker points
+for bankType based from the minimap.
 
 .. note::
 
     - by Olly
-    - Last Updated: 22 November 2013 by Olly
+    - Last Updated: 08 January 2013 by Ashaman88
 
 Example:
 
 .. code-block:: pascal
 
-    bankScreen.__gatherBankerPoint(tpa);
+    bankScreen.__gatherBankerPoint(tpa, BANK_NPC_GREY);
 *}
 {$IFNDEF CODEINSIGHT}
-function TRSBankScreen.__gatherBankerPoints(out res: TPointArray): boolean;
-const
-  bodyColors: T2DColorData = [[5847106, 8, [2, 0.31, 0.15]], [5188663, 12, [2, 0.23, 0.51]]];
+function TRSBankScreen.__gatherBankerPoints(out res: TPointArray; bankType: integer): boolean;
 var
   tpa, tpaDots: TPointArray;
+  bodyColors: T2DColorData;
   b, ms: TBox;
   i: integer;
 begin
+  case bankType of
+    BANK_NPC_BLUE: bodyColors:= [[5847106, 8, [2, 0.31, 0.15]], [5188663, 12, [2, 0.23, 0.51]]];
+    BANK_NPC_GREY: bodyColors:= [[7040116, 5, [2, 0.38, 0.10]], [4803408, 5, [2, 0.48, 0.16]]];
+    BANK_NPC_GREEN: bodyColors:= [[3632759, 9, [2, 0.09, 0.64]], [3035164, 7, [2, 0.08, 1.03]]];
+  end;
+
   ms := mainScreen.getBounds();
   tpaDots := minimap.pointsToMainscreen(minimap.getDots(MM_DOT_NPC, minimap.getBounds()));
 
@@ -1530,7 +1554,7 @@ Internal function that opens the blue npc banker
 .. note::
 
     - by Olly
-    - Last Updated: 22 November 2013 by Olly
+    - Last Updated: 08 January 2013 by Ashaman88
 
 Example:
 
@@ -1539,7 +1563,7 @@ Example:
     bankScreen.__openNPC();
 *}
 {$IFNDEF CODEINSIGHT}
-function TRSBankScreen.__openNPC(): boolean;
+function TRSBankScreen.__openNPC(bankType: integer): boolean;
 var
   i, wid, hei: integer;
   b: TBox;
@@ -1550,7 +1574,7 @@ begin
 
   print('TRSBankscreen.__openNPC()', TDebug.HEADER);
 
-  if (self.__gatherBankerPoints(tpa)) then
+  if (self.__gatherBankerPoints(tpa, bankType)) then
   begin
     atpa := tpa.cluster(4, 4);
     sortATPAFromMidPoint(atpa, mainScreen.playerPoint);
@@ -1690,63 +1714,70 @@ end;
 {$ENDIF}
 
 {*
-TRSBankScreen.__openSWChest
-~~~~~~~~~~~~~~~~~~~~~~~~~~~
+TRSBankScreen.__openChest
+~~~~~~~~~~~~~~~~~~~~~~~~~
 
 .. code-block:: pascal
 
-    function TRSBankScreen.__openSWChest(): boolean;
+    function TRSBankScreen.__openChest(bankType: integer): boolean;
 
-Internal function that attemps to open the bank chest at soulwars.
+Internal function that attemps to open the bank chest at bankType.
 
 .. note::
 
     - by Olly
-    - Last Updated: 02 December 2013 by Olly
+    - Last Updated: 08 January 2013 by Ashaman88
 
 Example:
 
 .. code-block:: pascal
 
-    bankScreen.__openSWChest();
+    bankScreen.__openChest();
 *}
 {$IFNDEF CODEINSIGHT}
-function TRSBankScreen.__openSWChest(): boolean;
-const
-  colBlue: TColorData = [8946555, 15, [2, 0.18, 0.18]];
-  colBrown: TColorData = [5863053, 10, [2, 0.13, 0.10]];
-  AVERAGE_LENGTH = 90;
+function TRSBankScreen.__openChest(bankType: integer): boolean;
 var
-  blueEdges, brownEdges, goodEdge, tpa: TPointArray;
+  col1Edges, col2Edges, goodEdge, tpa: TPointArray;
   atpa, atpaFiltered: T2DPointArray;
-  i, j, len, wid, hei: integer;
+  i, j, len, wid, hei, avelen: integer;
+  col1: TColorData;
+  col2: TColorData;
 begin
   result := false;
 
-  print('TRSBankscreen.__openSWChest()', TDebug.HEADER);
+  case bankType of
+    BANK_CHEST_SW: begin col1:= [8946555, 15, [2, 0.18, 0.18]]; col2:= [5863053, 10, [2, 0.13, 0.10]]; avelen:= 90; end;
+    BANK_CHEST_SHANTAY: begin col1:= [6324637, 5, [2, 0.08, 0.57]]; col2:= [3618876, 4, [2, 0.84, 0.47]]; avelen:= 90; end;
+    BANK_CHEST_DUEL: begin col1:= [8088922, 16, [2, 0.06, 0.17]]; col2:= [4808312, 17, [2, 0.03, 0.17]]; avelen:= 90; end;
+    BANK_CHEST_CW: begin col1:= [8088922, 16, [2, 0.06, 0.17]]; col2:= [4808312, 17, [2, 0.03, 0.17]]; avelen:= 90; end;
+    BANK_CHEST_GROTTO: begin col1:= [6842481, 6, [2, 0.00, 0.08]]; col2:= [2570316, 4, [2, 0.15, 1.35]]; avelen:= 90; end;
+    BANK_CHEST_BURTHORPE: begin col1:= [8946555, 15, [2, 0.18, 0.18]]; col2:= [5863053, 10, [2, 0.13, 0.10]]; avelen:= 90; end;
+  end;
 
-  if (colBlue.gatherIn(tpa, mainScreen.getBounds())) then
-    blueEdges := findTPAEdges(tpa);
+  print('TRSBankscreen.__openChest()', TDebug.HEADER);
 
-  if (colBrown.gatherIn(tpa, mainScreen.getBounds())) then
-    brownEdges := findTPAEdges(tpa);
+  if (col1.gatherIn(tpa, mainScreen.getBounds())) then
+    col1Edges := findTPAEdges(tpa);
 
-  len := length(blueEdges);
+  if (col2.gatherIn(tpa, mainScreen.getBounds())) then
+    col2Edges := findTPAEdges(tpa);
 
-  if (len < 5) or (length(brownEdges) < 5) then
+  len := length(col1Edges);
+
+  if (len < 5) or (length(col2Edges) < 5) then
   begin
-    print('Failed to find enough chest colors [blue '+toStr(len)+', brown '+toStr(length(brownEdges))+' ]', TDebug.ERROR);
-    print('TRSBankscreen.__openSWChest(): result = false', TDebug.FOOTER);
+    print('Failed to find enough chest colors [1 '+toStr(len)+', 2 '+toStr(length(col2Edges))+' ]', TDebug.ERROR);
+    print('TRSBankscreen.__openChest(): result = false', TDebug.FOOTER);
     exit(false);
   end;
 
-  setLength(goodEdge, len * length(brownEdges));
+  setLength(goodEdge, len * length(col2Edges));
   j := 0;
 
   for i := 0 to (len - 1) do
-    if (nearbyPointInArrayEx(blueEdges[i], 1, 1, brownEdges)) then
+    if (nearbyPointInArrayEx(col1Edges[i], 1, 1, col2Edges)) then
     begin
-      goodEdge[j] := blueEdges[i];
+      goodEdge[j] := col1Edges[i];
       inc(j);
     end;
 
@@ -1755,11 +1786,11 @@ begin
   if (j < 5) then
   begin
     print('Failed to find enough good bank chest edges', TDebug.ERROR);
-    print('TRSBankscreen.__openSWChest(): result = false', TDebug.FOOTER);
+    print('TRSBankscreen.__openChest(): result = false', TDebug.FOOTER);
     exit(false);
   end;
 
-  atpa := clusterTPAEx(goodEdge, 2, 2);
+  atpa := clusterTPAEx(goodEdge, 5, 5);
 
   for i := 0 to high(atpa) do
     if (length(atpa[i]) > 5) then
@@ -1773,14 +1804,14 @@ begin
   if (length(atpaFiltered) < 1) then
   begin
     print('Failed to find enough good vaild bank chest edges', TDebug.ERROR);
-    print('TRSBankscreen.__openSWChest(): result = false', TDebug.FOOTER);
+    print('TRSBankscreen.__openChest(): result = false', TDebug.FOOTER);
     exit(false);
   end;
 
   tpa := mergeATPA(atpaFiltered);
   atpa := clusterTPAEx(tpa, 10, 10);
 
-  sortATPAFromSize(atpa, AVERAGE_LENGTH, true);
+  sortATPAFromSize(atpa, avelen, true);
 
   for i := 0 to high(atpa) do
   begin
@@ -1789,13 +1820,13 @@ begin
     else
       mouse(atpa[i].getMiddle().randRange(-6, 6));
 
-    if (isMouseOverText(['Bank Bank', 'ank Banker', 'ank Bank', 'Use Bank', 'Bank chest'])) then
+    if (isMouseOverText(['Open Shantay chest', 'Open S', 'pen Shant', 'n Shantay','Bank Bank', 'ank Banker', 'ank Bank', 'Use Bank', 'Bank chest'])) then
     begin
       if (random(3) = 1) then
       begin
         fastClick(MOUSE_RIGHT);
 
-        if (not chooseOption.select(['Bank Bank', 'ank Banker', 'ank Bank', 'Use Bank', 'Bank chest'])) then
+        if (not chooseOption.select(['Open Shantay chest', 'Open S', 'pen Shant', 'n Shantay','Bank Bank', 'ank Banker', 'ank Bank', 'Use Bank', 'Bank chest'])) then
           continue;
       end else
         fastClick(MOUSE_LEFT);
@@ -1815,7 +1846,7 @@ begin
     end;
   end;
 
-  print('TRSBankscreen.__openSWChest() result = '+lowercase(boolToStr(result)), TDebug.FOOTER);
+  print('TRSBankscreen.__openChest() result = '+lowercase(boolToStr(result)), TDebug.FOOTER);
 end;
 {$ENDIF}
 
@@ -1830,13 +1861,20 @@ TRSBankScreen.open
 Opens the desired bank, current vaild 'bankType' constants are:
 
     * BANK_NPC_BLUE
+    * BANK_NPC_GREY
+    * BANK_NPC_GREEN
     * BANK_BOOTH
     * BANK_CHEST_SW
+    * BANK_CHEST_SHANTAY
+    * BANK_CHEST_DUEL
+    * BANK_CHEST_CW
+    * BANK_CHEST_GROTTO
+    * BANK_CHEST_BURTHORPE
 
 .. note::
 
     - by Olly
-    - Last Updated: 22 November 2013 by Olly
+    - Last Updated: 08 January 2013 by Ashaman88
 
 Example:
 
@@ -1850,12 +1888,12 @@ begin
     exit(true);
 
   case bankType of
-    BANK_NPC_BLUE: result := self.__openNPC();
+    BANK_NPC_BLUE..BANK_NPC_GREEN: result := self.__openNPC(bankType);
     BANK_BOOTH: result := self.__openBankBooth();
-    BANK_CHEST_SW: result := self.__openSWChest();
+    BANK_CHEST_SW..BANK_CHEST_BURTHORPE: result := self.__openChest(bankType);
   end;
 end;
 
 begin
   bankscreen.__init();
-end;
+end;   

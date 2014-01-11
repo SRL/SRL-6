@@ -2,12 +2,14 @@
 
 core = client debug globals mouse players text
 
-interfaces = actionbar bankscreen chatbox chooseoption conversationbox interfaces lodestone mainscreen minimap options pinscreen production
+interfaces = actionbar bankscreen chatbox chooseoption conversationbox interfaces lodestone mainscreen minimap options pinscreen production progressscreen toolscreen
 
 gametabs = backpack gametab stats
 lobby = lobby worlds
 
 misc = antiban items smart srlstats
+
+tesseract = tesseract
 
 utilities = color drawing math pixelshift time wrappers
 types = extendedarrays integerarrays stringarrays tbox tpoint tpointarrays types
@@ -25,6 +27,8 @@ all:
 		's/(\w+)/..\/lib\/interfaces\/lobby\/\1.simba/g'` > /dev/null
 	@python docgen.py `echo $(misc) | sed -r \
 		's/(\w+)/..\/lib\/misc\/\1.simba/g'` > /dev/null
+	@python docgen.py `echo $(tesseract) | sed -r \
+		's/(\w+)/..\/lib\/tesseract\/\1.simba/g'` > /dev/null
 	@python docgen.py `echo $(utilities) | sed -r \
 		's/(\w+)/..\/lib\/utilities\/\1.simba/g'` > /dev/null
 	@python docgen.py `echo $(types) | sed -r \

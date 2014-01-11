@@ -559,6 +559,9 @@ begin
     copyClientToBitmap(bmp1, b.x1, b.y1, b.x2, b.y2);
     result := (calculatePixelShift(bmp, bmp1, [0, 0, (b.getWidth() - 1), (b.getHeight() - 1)]) > 0);
 
+    if result then
+      break;
+
     if (SRL_Events[EVENT_ANTIBAN] <> nil) then
       SRL_Events[EVENT_ANTIBAN]();
 
