@@ -8,8 +8,8 @@ to setup the script.
 
 The source for this file can be found
 `here <https://github.com/SRL/SRL-6/blob/master/lib/misc/srlplayerform.simba>`_.
-*)
 
+*)
 
 {*
 type __TFormPlayer
@@ -339,8 +339,10 @@ begin
   begin
     __writeln('ERROR: You must select a player file use!');
     exit();
-  end else
+  end else begin
     tsl.add(__cboPlayerFile.getText()); // player file
+    playerForm.playerFile := copy(__cboPlayerFile.getText(), 0, length(__cboPlayerFile.getText()) - 4);
+  end;
 
   // player names
   if (__lstPlayerList.getCount() <= 0) then
