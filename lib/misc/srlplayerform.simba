@@ -408,6 +408,12 @@ begin
   playerForm.playerFile := copy(tsl.getStrings(0), 0, length(tsl.getStrings(0)) - 4);
   __cboPlayerFile.setText(tsl.getStrings(0));
 
+  if (tsl.getCount() - 1 mod settingLength <> 0) then
+  begin
+    __writeln('Components have changed, can''t load previous settings');
+    exit();
+  end;
+
   setLength(playerForm.players, tsl.getCount()); // temporarily set the length to avoid errors
   setLength(playerForm.playerNames, length(playerForm.players));
 
