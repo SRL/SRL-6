@@ -1503,7 +1503,7 @@ for bankType based from the minimap.
 .. note::
 
     - by Olly
-    - Last Updated: 08 January 2013 by Ashaman88
+    - Last Updated: 13 January 2013 by Ashaman88
 
 Example:
 
@@ -1520,7 +1520,7 @@ var
   i: integer;
 begin
   case bankType of
-    BANK_NPC_BLUE: bodyColors:= [[5847106, 8, [2, 0.31, 0.15]], [5188663, 12, [2, 0.23, 0.51]]];
+    BANK_NPC_BLUE: bodyColors:= [[5906724, 14, [2, 0.18, 0.70]], [5188663, 12, [2, 0.23, 0.51]]];
     BANK_NPC_GREY: bodyColors:= [[7040116, 5, [2, 0.38, 0.10]], [4803408, 5, [2, 0.48, 0.16]]];
     BANK_NPC_GREEN: bodyColors:= [[3632759, 9, [2, 0.09, 0.64]], [3035164, 7, [2, 0.08, 1.03]]];
   end;
