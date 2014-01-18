@@ -300,7 +300,7 @@ Example:
 
 .. code-block:: pascal
 
-    s := conversationBox.getOptions(onlyLength: boolean=false);
+    s := conversationBox.getOptions();
 *)
 function TRSConversationBox.getOptions(onlyLength: boolean=false): TStringArray;
 var
