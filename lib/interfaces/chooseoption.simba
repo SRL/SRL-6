@@ -384,7 +384,7 @@ Returns true if any of the options exist.
 .. note::
 
     - by Olly
-    - Last Modified: 12 September 2013 by Olly
+    - Last Modified: 19 January 2014 by Ashaman88
 
 Example:
 
@@ -405,12 +405,13 @@ begin
 
   opts := self.__getOptions();
 
-  for i := 0 to high(opts) do
-    if (isArrInStr(options, opts[i].str)) then
-    begin
-      print('TRSChooseOptions.optionsExist(): result = true');
-      exit(true);
-    end;
+  if (length(opts) > 0) then
+    for i := 0 to high(opts) do
+      if (isArrInStr(options, opts[i].str)) then
+      begin
+        print('TRSChooseOptions.optionsExist(): result = true');
+        exit(true);
+      end;
 
   print('TRSChooseOptions.optionsExist(): result = false');
 end;
