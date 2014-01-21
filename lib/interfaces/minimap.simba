@@ -535,11 +535,10 @@ TRSMinimap.findDTM
 
 .. code-block:: pascal
 
-    function TRSMinimap.findDTM(dtm: integer; var x, y: integer; tries: integer = 1): boolean;
+    function TRSMinimap.findDTM(dtm: integer; var x, y: integer): boolean;
 
-Attempts to find on the minimap, will search for the dtm +/- 6 degrees of the
-current minimap angle. Includes an optional paramter 'tries' how many tries we
-will search for the dtm, on default it's set to 1.
+Attempts to find on the minimap, will search for the dtm +/- 8 degrees of the
+current minimap angle.
 
 .. note::
 
@@ -553,32 +552,35 @@ Example:
     if (minimap.findDTM(dtm, x, y)) then
       writeln('found the dtm');
 *)
-function TRSMinimap.findDTM(dtm: integer; var x, y: integer; tries: integer = 1): boolean;
+function TRSMinimap.findDTM(dtm: integer; var fx, fy: integer): boolean;
 var
+  a, s, e: extended;
+  searches: T2DExtendedArray;
   i: integer;
-  se, ea, a, e: extended;
 begin
   result := false;
 
   a := self.getAngleDegrees();
 
-  se := (a - 8.00);
-  ea := (a + 8.00);
+  s := (a - 8.00);
+  e := (a + 8.00);
 
-  print('TRSMinimap.findDTM(): Searching for dtm between angles '+floatToStr(se)+'..'+floatToStr(ea), TDebug.SUB);
+  if (s < 0) or (e > 360) then // why? ie if angle = 0 need to search 352..360 and 0..8.
+  begin
+    insert([360 + s, 360.00], searches);
+    insert([0, 0 + e], searches);
+  end else
+    insert([s, e], searches);
 
-  for i := 0 to tries do
-    if findDTMRotatedAlternating(dtm, x, y, self.getBounds(), se, ea, 0.5, e) then
+  for i := 0 to high(searches) do
+    if (findDTMRotatedSE(dtm, fx, fy, self.getBounds(), searches[i][0], searches[i][1], 1.00, a)) then
     begin
-      result := (self.isPointOn([x, y]));
+      result := (self.isPointOn(point(fx, fy)));
+      break();
+    end;
 
-      if (result) then
-      begin
-        print('TRSMinimap.findDTM(): Found dtm @ angle ' + floatToStr(e), TDebug.SUB);
-        exit(true);
-      end;
-    end else
-      wait(50 + random(200));
+  if (result) then
+    print('TRSMinimap.findDTM(): Succesfully found dtm at angle '+copy(floatToStr(a), 0, 4));
 end;
 
 {*

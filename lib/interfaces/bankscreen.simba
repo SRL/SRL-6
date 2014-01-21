@@ -187,9 +187,11 @@ const
   TEXT_COLOR = 13618403;
   OFFSET: TPoint = [114, -27];
 var
-  t: integer;
-  b: TBox;
+  t, tt: integer;
+  b, bb: TBox;
   p: TPoint;
+  foundItem: boolean;
+  tpa: TPointArray;
 begin
   t := (getSystemTime() + waitTime);
   result := false;
@@ -201,7 +203,14 @@ begin
 
       if (findText(p, TEXT_COLOR, 0, ['Bank'], [UpChars], b)) then
       begin
-        waitColorCountRange(ITEM_OUTLINE_BLACK, 0, intToBox(self.x1+10, self.y1+90, self.x2-200, self.y2-50), 2500 + random(500), 10);
+        tt := (getSystemTime() + randomRange(2500, 3200));
+        bb := self.getBankSlotBox(1);
+
+        while (tt > getSystemTime()) and (not result) do
+        begin
+          findColors(tpa, ITEM_OUTLINE_BLACK, bb);
+          result := (length(tpa) > 5);
+        end;
 
         result := true;
         break();
@@ -366,12 +375,6 @@ Example:
 *)
 function TRSBankScreen.getBankSlotBoxes(): TBoxArray;
 begin
-  if (not self.isOpen()) then
-  begin
-    print('bankScreen.getBankSlotBoxes(): Unable to return bank slots since the bank isn''t open', TDebug.ERROR);
-    exit();
-  end;
-
   result := grid(10, 10, 35, 31, 44, 44, point(self.x + _BANK_SLOTS_OFFSET.x, self.y + _BANK_SLOTS_OFFSET.y));
 end;
 
@@ -403,12 +406,6 @@ begin
   if (not self._isBankSlotVaild(slot)) then
     exit();
 
-  if (not self.isOpen()) then
-  begin
-    print('bankScreen.getBankSlotBox(): Unable to return bank slots since the bank isn''t open', TDebug.ERROR);
-    exit();
-  end;
-
   // - 1 because the grid (array) starts at 0.
   result := gridBox(slot -1, 10, 10, 35, 31, 44, 44, point(self.x + _BANK_SLOTS_OFFSET.x, self.y + _BANK_SLOTS_OFFSET.y));
 end;
@@ -436,12 +433,6 @@ Example:
 *)
 function TRSBankScreen.getPackSlotBoxes: TBoxArray;
 begin
-  if (not self.isOpen()) then
-  begin
-    print('bankScreen.getpackSlotBoxes(): Unable to return backpack slots since the bank isn''t open', TDebug.ERROR);
-    exit();
-  end;
-
   result := grid(4, 7, 35, 31, 42, 36, point(self.x + _PACK_SLOTS_OFFSET.x, self.y + _PACK_SLOTS_OFFSET.y));
 end;
 
@@ -477,12 +468,6 @@ begin
   begin
     print('bankScreen.getPackSlotBox(): Slot '+toStr(slot)+' is invalid', TDebug.WARNING);
     exit(intToBox(-1, -1, -1, -1));
-  end;
-
-  if (not self.isOpen()) then
-  begin
-    print('bankScreen.getPackSlotBox(): Unable to return pack slots since the bank isn''t open', TDebug.ERROR);
-    exit();
   end;
 
   // - 1 because the grid (array) starts at 0.
