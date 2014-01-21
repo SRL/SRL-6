@@ -285,14 +285,16 @@ TRSConversationBox.getOptions
 
 .. code-block:: pascal
 
-    function TRSConversationBox.getOptions(): TStringArray;
+    function TRSConversationBox.getOptions(onlyLength: boolean=false): TStringArray;
 
-Returns the selectable options from NPC chat.
+Returns the selectable options from NPC chat. If 'onlyLength' is set to true, it will
+only gather the number of options available (length of TStringArray), otherwise and by
+default, it will use the text finding.
 
 .. note::
 
     - by Ashaman88
-    - Last Updated: December 22, 2013 by Ashaman88
+    - Last Updated: 17 January 2014 by Ashaman88
 
 Example:
 
@@ -300,7 +302,7 @@ Example:
 
     s := conversationBox.getOptions();
 *)
-function TRSConversationBox.getOptions: TStringArray;
+function TRSConversationBox.getOptions(onlyLength: boolean=false): TStringArray;
 var
   b: TBox;
   bb: TBoxArray;
@@ -308,6 +310,12 @@ var
   atpa : T2DPointArray;
   i: Integer;
 begin
+  if not self.isOpen() then
+    exit;
+
+  if self.continue(false,false,false) then
+    exit;
+
   b := self.getBounds();
   b.edit(+5, +5, -5, 0);
 
@@ -337,7 +345,8 @@ begin
 
   for i := 0 to High(bb) do
   begin
-    result[i]:=tesseractgettext(bb[i].x1,bb[i].y1,bb[i].x2,bb[i].y2, FILTER_SMALL_CHARS);
+    if not onlyLength then
+      result[i]:=tesseractgettext(bb[i].x1,bb[i].y1,bb[i].x2,bb[i].y2, FILTER_SMALL_CHARS);
   end;
 
   print('conversationBox.getOptions(): Options found: ' + tostr(result), TDebug.SUB);
@@ -441,7 +450,7 @@ Will select the option number if its available, will return if succesful or not.
 .. note::
 
     - by Olly
-    - Last Updated: 11 September 2013 by Olly
+    - Last Updated: 17 January 2014 by Ashaman88
 
 Example:
 
@@ -451,25 +460,16 @@ Example:
        writeln('Selected option two');
 *)
 function TRSConversationBox.selectOption(number: integer): boolean; overload;
-var
-  tpa: TPointArray;
-  atpa: T2DPointArray;
-  b: TBox;
 begin
-  if (not findColorsTolerance(tpa, 1972239, self.getBounds(), 2, colorSetting(2, 0.40, 2.84))) then
+  if (not self.isOpen()) then
     exit();
 
-  atpa := clusterTPAEx(tpa, 50, 5);
-  atpa.filterBetween(0, 50);
-
-  sortATPAFromFirstPointY(atpa, [b.x1, b.y1]);
-
-  result := (number <= length(atpa));
+  result := (number <= length(self.getOptions(true)));
 
   if (result) then
   begin
     print('conversationBox.selectOption(): Selected option ' + intToStr(number), TDebug.SUB);
-    mouseBox(atpa[number -1].getBounds(), MOUSE_LEFT);
+    typesend(toStr(number), false);
     wait(100 + random(250));
   end;
 end;
@@ -480,17 +480,19 @@ TRSConversationBox.continue
 
 .. code-block:: pascal
 
-    function TRSConversationBox.continue(spaceBar, doWait: boolean): boolean;
+    function TRSConversationBox.continue(spaceBar, doWait: boolean; advance: boolean = true): boolean;
 
 Interacts with the "click to continue" button at the bottom of the conversation
 dialog.  If 'spaceBar' is set to true, it will continue via the space bar, otherwise
 it will click the button.  If 'doWait' is set to true it will wait until new text
-appears, otherwise return true as soon as it continues.
+appears, otherwise return true as soon as it continues. If 'advance' is set to true
+it will perform action spacebar, otherwise return true if "click to continue" button
+is present.
 
 .. note::
 
     - by Coh3n
-    - Last Updated: 17 August 2013 by Coh3n
+    - Last Updated: 17 January 2014 by Ashaman88
 
 Example:
 
@@ -500,7 +502,7 @@ Example:
       conversationBox.continue(true, true);
     until(not conversationBox.isOpen());
 *)
-function TRSConversationBox.continue(spaceBar, doWait: boolean): boolean;
+function TRSConversationBox.continue(spaceBar, doWait: boolean; advance: boolean = true): boolean;
 var
   tpaButton: TPointArray;
   atpaButton: T2DPointArray;
@@ -531,18 +533,22 @@ begin
       begin
         c := countColor(_COLOR_SPOKEN_TEXT, self.getBounds());
 
-        if (spaceBar) then
-          typeByte(VK_SPACE)
-        else
-          mouseBox([b.x1, b.y1, b.x2, b.y2 + 10], MOUSE_LEFT);
-
         result := true;
 
         t := (getSystemTime() + 10000);
 
-        if (doWait) then
-          while (c = countColor(_COLOR_SPOKEN_TEXT, self.getBounds())) and (getSystemTime() < t) do
-            wait(50 + random(50));
+        if (advance) then
+        begin
+          if (spaceBar) then
+            typeByte(VK_SPACE)
+          else
+            mouseBox([b.x1, b.y1, b.x2, b.y2 + 10], MOUSE_LEFT);
+
+
+          if (doWait) then
+            while (c = countColor(_COLOR_SPOKEN_TEXT, self.getBounds())) and (getSystemTime() < t) do
+              wait(50 + random(50));
+        end;
 
         exit();
       end else
