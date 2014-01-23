@@ -75,70 +75,7 @@ begin
     ID := ID_INTERFACE_PINSCREEN;
     parentID := -1;
     static := false;
-  end;
-end;
-
-{*
-TRSPinScreen.__find
-~~~~~~~~~~~~~~~~~~~
-
-.. code-block:: pascal
-
-    function TRSPinScreen.__find(): boolean;
-
-Attempts to find the pinscreen, will return if succesfull or not.
-
-.. note::
-
-    - by Olly
-    - Last Updated: 22 September 2013 by Olly
-
-Example:
-
-.. code-block:: pascal
-
-    pinScreen.__find();
-*}
-function TRSPinScreen.__find(): boolean;
-const
-  BORDER_COLOR = 9998984;
-  BUTTON_WIDTH = 156;
-  TEXT_COLOR = 13618403;
-  OFFSET: TPoint = [-396, -290];
-  WIDTH = 512;
-  HEIGHT = 335;
-var
-  clientW, clientH, i: integer;
-  tpa: TPointArray;
-  atpa: T2DPointArray;
-  b: TBox;
-  p: TPoint;
-begin
-  getClientDimensions(clientW, clientH);
-
-  // top border of the two buttons
-  if (not findColors(tpa, 9998984, 0, 0, clientW -1, clientH -1)) then
-    exit(false);
-
-  atpa := tpa.cluster(1, 1);
-
-  for i := 0 to high(atpa) do
-  begin
-    b := atpa[i].getBounds();
-
-    if ((b.getWidth()) <> BUTTON_WIDTH) then
-      continue;
-
-    incEx(b.y2, 20);
-
-    result := findText(p, TEXT_COLOR, 0, ['Exit'], [UpChars], b);
-
-    if (result) then
-    begin
-      //set the bounds around the text point we found
-      self.setBounds([p.x + OFFSET.x, p.y + OFFSET.y, p.x + OFFSET.x + WIDTH, p.y + OFFSET.y + HEIGHT]);
-      break();
-    end;
+    setBounds([32, 29, 544, 362]);
   end;
 end;
 {$ENDIF}
@@ -152,7 +89,7 @@ TRSPinScreen.isOpen
     function TRSPinScreen.isOpen(waitTime: integer = 0): boolean;
 
 Returns if the pinscreen is open or not, parameter 'waitTime' is optional and
-is default set at 0, increaseing it will wait x ms for the pinscreen to open.
+is default set at 0, increasing will wait x ms for the pinscreen to open.
 
 .. note::
 
@@ -167,13 +104,16 @@ Example:
       writeln('Pinscreen is open!');
 *)
 function TRSPinScreen.isOpen(waitTime: integer = 0): boolean;
+const
+  TEXT_COLOR = 13618403;
 var
   t: integer;
+  p: TPoint;
 begin
-  t := getSystemTime() + waitTime;
+  t := (getSystemTime() + waitTime);
 
   repeat
-    result := self.__find();
+    result := findText(p, TEXT_COLOR, 0, ['Exit'], [UpChars], TBox([self.x2 - 200, self.y2 - 100, self.x2, self.y2]));
 
     if (result) then
       break();
@@ -407,6 +347,13 @@ var
 begin
   result := false;
   print('pinScreen.enter()', TDebug.HEADER);
+
+  if (not self.isPinVaild(pin)) then
+  begin
+    print('Cannot enter pin because the pin isnt vaild!', TDebug.ERROR);
+    print('pinScreen.enter(): result = false', TDebug.FOOTER);
+    exit();
+  end;
 
   if (not self.isOpen()) then
   begin

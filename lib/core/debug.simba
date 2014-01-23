@@ -323,17 +323,26 @@ Example:
 *)
 procedure debugATPA(const atpa: T2DPointArray);
 var
-  tmb: TMufasaBitmap;
+  bmp: TMufasaBitmap;
+  copy: T2DPointArray;
   b: TBox;
+  w, h: integer;
 begin
-  b := getATPABounds(atpa);
+  getClientDimensions(w, h);
 
-  tmb.init(client.getMBitmaps());
-  tmb.setSize(b.x2+1, b.y2+1);
-  tmb.drawATPA(atpa);
+  b := getTPABounds(mergeATPA(atpa));
+  copy := copyATPA(atpa);
+  offsetATPA(copy, point(0 - b.x1, 0 - b.y1));
 
-  tmb.debug();
-  tmb.free();
+  bmp.init(client.getMBitmaps());
+
+  try
+    bmp.copyClientToBitmap(client.getIOManager(), true, b.x1, b.y1, min(b.x2 + 10, w - 1), min(b.y2 + 10, h - 1));
+    bmp.debugATPA(copy);
+    bmp.debug();
+  finally
+    bmp.free();
+  end;
 end;
 
 (*

@@ -537,7 +537,7 @@ TRSMinimap.findDTM
 
     function TRSMinimap.findDTM(dtm: integer; var x, y: integer): boolean;
 
-Attempts to find on the minimap, will search for the dtm +/- 8 degrees of the
+Attempts to find on the minimap, will search for the dtm +/- 30 degrees of the
 current minimap angle.
 
 .. note::
@@ -562,8 +562,8 @@ begin
 
   a := self.getAngleDegrees();
 
-  s := (a - 8.00);
-  e := (a + 8.00);
+  s := (a - 30.00);
+  e := (a + 30.00);
 
   if (s < 0) or (e > 360) then // why? ie if angle = 0 need to search 352..360 and 0..8.
   begin
@@ -580,7 +580,7 @@ begin
     end;
 
   if (result) then
-    print('TRSMinimap.findDTM(): Succesfully found dtm at angle '+copy(floatToStr(a), 0, 4));
+    print('TRSMinimap.findDTM(): Succesfully found dtm at '+copy(floatToStr(a), 0, 5)+' degrees');
 end;
 
 {*
@@ -984,13 +984,9 @@ begin
   m := getSystemTime();
   t := (m + 20000);
 
-  print('TRSMinimap.waitFlag()', TDebug.HEADER);
-  print('Waiting until flag distance equals '+toStr(dist)+'...');
-
   repeat
     if (not self.isFlagPresent(p)) then
     begin
-      print('Flag is not present, resulting true');
       result := true;
       break;
     end;
@@ -1000,7 +996,6 @@ begin
 
     if (d1 <= dist) then
     begin
-      print('Flag distance is less than or equal to '+toStr(dist));
       result := true;
       break;
     end;
@@ -1014,10 +1009,8 @@ begin
       if (getSystemTime() - m > 5000) then
       begin
         if (d1 = d2) then
-        begin
-          print('RS took too long to load, exiting');
-          break;
-        end;
+          break();
+
 
         d2 := d1;
         m := getSystemTime();
@@ -1026,9 +1019,7 @@ begin
     if (SRL_Events[EVENT_ANTIBAN] <> nil) then
       SRL_Events[EVENT_ANTIBAN]();
 
-  until(getSystemTime() > t);
-
-  print('TRSMinimap.waitFlag(): '+toStr(result), TDebug.FOOTER);
+  until (getSystemTime() > t);
 end;
 
 (*

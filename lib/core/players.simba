@@ -614,8 +614,8 @@ isLoggedIn()
 
     function isLoggedIn(): boolean;
 
-Returns true if a player is logged in, uses the center of the compass work out
-the result.
+Returns true if a player is logged in, uses the top left of the logout button to
+return the result.
 
 .. note::
 
@@ -631,9 +631,9 @@ Example:
 *)
 function isLoggedIn(): boolean;
 const
-  CENTER_COMPASS_COLOR = 8508157;
+  LOGOUT_BUTTON_COLOUR = 3446209;
 begin
-  result := (getColor(minimap.button[MM_BUTTON_COMPASS].center) = CENTER_COMPASS_COLOR);
+  result := (getColor(796, 3) = LOGOUT_BUTTON_COLOUR);
 
   if (result) and (not __areDynamicInterfacesSet) then
     __setDynamicInterfaces();

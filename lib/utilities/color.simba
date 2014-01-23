@@ -483,18 +483,18 @@ A record that stores the colors, tolerances, and modifiers of a color
   begin
     col.color := 1501044;
     col.tolerance := 50;
-    col.modifier.cts := 2;
-    col.modifier.hue := 1.11;
-    col.modifier.sat := 0.05;
+    col.settings.cts := 2;
+    col.settings.modifier.hue := 1.11;
+    col.settings.modifier.sat := 0.05;
 
-   writeln(col);
+    writeln(col);
   end;
 *)
 
 type
   TColorData = record
     color, tolerance: integer;
-    modifier: record cts: byte; hue, sat: extended; end;
+    settings: TColorSettings;
  end;
 
 (*
@@ -509,13 +509,13 @@ A record that stores the colors, tolerances, and modifiers of an array of color
   begin
     setLength(cols, 2);
 
-    cols[0].color := 1555;
-    cols[0].modifier.cts := 2;
-    cols[0].modifier.sat := 1.12;
+    cols[0].color := 255;
+    cols[0].settings.modifier.hue := 0.00;
+    cols[0].settings.modifier.sat := 1.12;
 
     cols[1].color := 144455;
     cols[1].tolerance := 50;
-    cols[1].modifier.hue := 0.55;
+    cols[1].settings.cts := 1;
 
     writeln(cols);
   end.
@@ -529,24 +529,26 @@ T2DColorData.gatherIn
 
 .. code-block:: pascal
 
-    function T2DColorData.gatherIn(var tpa: TPointArray; area: TBox): boolean;
+    function T2DColorData.gatherIn(var tpa: TPointArray; xs, ys, xe, ye: integer): boolean;
 
-Gathers the colors in the T2DColorData.
+Gathers the colors in the T2DColorData in the area xs, ys, xe, ye and merges
+all into the TPointArray 'tpa'.
 
 .. note::
 
     - by Olly
-    - Last Updated: 22 November 2013 by Olly
+    - Last Updated: 22 January 2014 by Olly
 
 Example:
 
 .. code-block:: pascal
 
-     cols.gatherIn(tpa, myBox);
+     if (cols.gatherIn(tpa, 100, 100, 200, 200)) then
+       writeln('woo');
 *)
-function T2DColorData.gatherIn(var tpa: TPointArray; area: TBox): boolean;
+function T2DColorData.gatherIn(var tpa: TPointArray; xs, ys, xe, ye: integer): boolean;
 var
-  h, i: byte;
+  h, i: integer;
   atpa: T2DPointArray;
 begin
   h := high(self);
@@ -554,11 +556,10 @@ begin
   if (h < 0) then
     exit(false);
 
-  setLength(atpa, h+1);
+  setLength(atpa, h + 1);
 
   for i := 0 to h do
-    findColorsTolerance(atpa[i], self[i].color, area, self[i].tolerance,
-    colorSetting(self[i].modifier.cts, self[i].modifier.hue, self[i].modifier.sat));
+    findColorsTolerance(atpa[i], self[i].color, intToBox(xs, ys, xe, ye), self[i].tolerance, self[i].settings);
 
   tpa := mergeATPA(atpa);
   clearDoubleTPA(tpa);
@@ -566,8 +567,84 @@ begin
   result := (length(tpa) > 0);
 end;
 
-function TColorData.gatherIn(var tpa: TPointArray; area: TBox): boolean;
+(*
+T2DColorData.gatherIn; overload
+~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+
+.. code-block:: pascal
+
+    function T2DColorData.gatherIn(var tpa: TPointArray; searchArea: TBox): boolean; overload;
+
+Overloaded function, accepts a TBox parameter rather than xs, ys, xe, ye paramters.
+
+.. note::
+
+    - by Olly
+    - Last Updated: 22 January 2014 by Olly
+
+Example:
+
+.. code-block:: pascal
+
+     if (cols.gatherIn(tpa, mainScreen.getBounds())) then
+       writeln('woo');
+*)
+function T2DColorData.gatherIn(var tpa: TPointArray; searchArea: TBox): boolean; overload;
 begin
-   result := findColorsTolerance(tpa, self.color, area, self.tolerance,
-   colorSetting(self.modifier.cts, self.modifier.hue, self.modifier.sat));
+  result := self.gatherIn(tpa, searchArea.x1, searchArea.y1, searchArea.x2, searchArea.y2);
 end;
+
+(*
+TColorData.gatherIn
+~~~~~~~~~~~~~~~~~~~
+
+.. code-block:: pascal
+
+    function TColorData.gatherIn(var tpa: TPointArray; xs, ys, xe, ye: integer): boolean;
+
+Gathers the TColorData in the area xs, ys, xe, ye.
+
+.. note::
+
+    - by Olly
+    - Last Updated: 22 January 2014 by Olly
+
+Example:
+
+.. code-block:: pascal
+
+     if (cols.gatherIn(tpa, 100, 100, 200, 200)) then
+       writeln('woo');
+*)
+function TColorData.gatherIn(var tpa: TPointArray; xs, ys, xe, ye: integer): boolean;
+begin
+  result := findColorsTolerance(tpa, self.color, intToBox(xs, ys, xe, ye), self.tolerance, self.settings);
+end;
+
+(*
+TColorData.gatherIn; overload
+~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+
+.. code-block:: pascal
+
+    function TColorData.gatherIn(var tpa: TPointArray; area: TBox): boolean; overload;
+
+Overloaded function accepts a TBox parameter rather than xs, ys, xe, ye parameters.
+
+.. note::
+
+    - by Olly
+    - Last Updated: 22 January 2014 by Olly
+
+Example:
+
+.. code-block:: pascal
+
+     if (cols.gatherIn(tpa, 100, 100, 200, 200)) then
+       writeln('woo');
+*)
+function TColorData.gatherIn(var tpa: TPointArray; area: TBox): boolean; overload;
+begin
+  result := self.gatherIn(tpa, area.x1, area.y1, area.x2, area.y2);
+end;
+

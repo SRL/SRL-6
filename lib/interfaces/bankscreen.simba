@@ -1505,9 +1505,9 @@ var
   i: integer;
 begin
   case bankType of
-    BANK_NPC_BLUE: bodyColors:= [[5906724, 14, [2, 0.18, 0.70]], [5188663, 12, [2, 0.23, 0.51]]];
-    BANK_NPC_GREY: bodyColors:= [[7040116, 5, [2, 0.38, 0.10]], [4803408, 5, [2, 0.48, 0.16]]];
-    BANK_NPC_GREEN: bodyColors:= [[3632759, 9, [2, 0.09, 0.64]], [3035164, 7, [2, 0.08, 1.03]]];
+    BANK_NPC_BLUE: bodyColors := [[5906724, 14, [2, [0.18, 0.70, 0.00]]], [5188663, 12, [2, [0.23, 0.51, 0.00]]]];
+    BANK_NPC_GREY: bodyColors := [[7040116, 5, [2, [0.38, 0.10, 0.00]]], [4803408, 5, [2, [0.48, 0.16, 0.00]]]];
+    BANK_NPC_GREEN: bodyColors := [[3632759, 9, [2, [0.09, 0.64, 0.00]]], [3035164, 7, [2, [0.08, 1.03, 0.00]]]];
   end;
 
   ms := mainScreen.getBounds();
@@ -1629,9 +1629,8 @@ Example:
 *}
 {$IFNDEF CODEINSIGHT}
 function TRSBankScreen.__openBankBooth(): boolean;
-const
-  boothColors: TColorData = [3237496, 6, [2, 0.18, 0.68]];
 var
+  boothColors: TColorData := [3237496, 6, [2, [0.18, 0.68, 0.00]]];
   tpa: TPointArray;
   atpa: T2DPointArray;
   i, wid, hei, diff, hi: integer;
@@ -1731,12 +1730,12 @@ begin
   result := false;
 
   case bankType of
-    BANK_CHEST_SW: begin col1:= [8946555, 15, [2, 0.18, 0.18]]; col2:= [5863053, 10, [2, 0.13, 0.10]]; avelen:= 90; end;
-    BANK_CHEST_SHANTAY: begin col1:= [6324637, 5, [2, 0.08, 0.57]]; col2:= [3618876, 4, [2, 0.84, 0.47]]; avelen:= 90; end;
-    BANK_CHEST_DUEL: begin col1:= [8088922, 16, [2, 0.06, 0.17]]; col2:= [4808312, 17, [2, 0.03, 0.17]]; avelen:= 90; end;
-    BANK_CHEST_CW: begin col1:= [8088922, 16, [2, 0.06, 0.17]]; col2:= [4808312, 17, [2, 0.03, 0.17]]; avelen:= 90; end;
-    BANK_CHEST_GROTTO: begin col1:= [6842481, 6, [2, 0.00, 0.08]]; col2:= [2570316, 4, [2, 0.15, 1.35]]; avelen:= 90; end;
-    BANK_CHEST_BURTHORPE: begin col1:= [8946555, 15, [2, 0.18, 0.18]]; col2:= [5863053, 10, [2, 0.13, 0.10]]; avelen:= 90; end;
+    BANK_CHEST_SW: begin col1:= [8946555, 15, [2, [0.18, 0.18, 0.00]]]; col2:= [5863053, 10, [2, [0.13, 0.10, 0.00]]]; avelen:= 90; end;
+    BANK_CHEST_SHANTAY: begin col1:= [6324637, 5, [2, [0.08, 0.57, 0.00]]]; col2:= [3618876, 4, [2, [0.84, 0.47, 0.00]]]; avelen:= 90; end;
+    BANK_CHEST_DUEL: begin col1:= [8088922, 16, [2, [0.06, 0.17, 0.00]]]; col2:= [4808312, 17, [2, [0.03, 0.17, 0.00]]]; avelen:= 90; end;
+    BANK_CHEST_CW: begin col1:= [8088922, 16, [2, [0.06, 0.17, 0.00]]]; col2:= [4808312, 17, [2, [0.03, 0.17, 0.00]]]; avelen:= 90; end;
+    BANK_CHEST_GROTTO: begin col1:= [6842481, 6, [2, [0.00, 0.08, 0.00]]]; col2:= [2570316, 4, [2, [0.15, 1.35, 0.00]]]; avelen:= 90; end;
+    BANK_CHEST_BURTHORPE: begin col1:= [8946555, 15, [2, [0.18, 0.18, 0.00]]]; col2:= [5863053, 10, [2, [0.13, 0.10, 0.00]]]; avelen:= 90; end;
   end;
 
   print('TRSBankscreen.__openChest()', TDebug.HEADER);

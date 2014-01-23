@@ -162,13 +162,15 @@ var
 begin
   result := false;
 
-  if (self.isOpen()) then
-  begin
-    b := [self.x1 +252, self.y2 -30, self.x2 -29, self.y2 -3];
-    mouseBox(b, MOUSE_LEFT);
+  b := [self.x1 +252, self.y2 -30, self.x2 -29, self.y2 -3];
 
-    result := true;
-    wait(150 + random(150));
+  if (self.isOpen()) then
+    if (countColorTolerance(10647049, b, 20) > 100) then
+    begin
+      mouseBox(b, MOUSE_LEFT);
+      result := true;
+
+      wait(150 + random(150));
   end;
 
   print('TRSProductionScreen.clickStart(): result = ' + lowercase(boolToStr(result)), TDebug.SUB);
@@ -332,12 +334,6 @@ function TRSProductionScreen._getProductionBoxes(slot: integer): TBoxArray;
 var
   offset: Integer;
 begin
-   if (not self.isOpen()) then
-  begin
-    print('productionScreen._getProductionBoxes(): Unable to return production slots since the production screen isn''t open', TDebug.ERROR);
-    exit();
-  end;
-
   if not (self._scrollToItem(slot)) then
     exit;
 
