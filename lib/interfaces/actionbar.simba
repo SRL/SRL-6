@@ -745,6 +745,39 @@ begin
 end;
 
 (*
+TRSActionBar.isSlotActive
+~~~~~~~~~~~~~~~~~~~~~~~~~
+
+.. code-block:: pascal
+
+    function TRSActionBar.isSlotActive(slot: integer): boolean;
+
+Returns true if the specified Action Bar slot is activated (i.e. has been clicked on/has the
+white border).
+
+.. note::
+
+    - by Ashaman88
+    - Last Updated: 21 January 2014 by Ashaman88
+
+Example:
+
+.. code-block:: pascal
+
+    if (actionBar.isSlotActive(1)) then
+      writeln('The first Action Bar slot is activated.');
+*)
+function TRSActionBar.isSlotActive(slot: integer): boolean;
+begin
+
+  if (not (self.__isSlotValid(slot))) then
+    exit(self.__printWarning('actionBar.isSlotActive()', false));
+
+  result := (getColor(self.__slots[slot - 1].x1-1,
+   self.__slots[slot - 1].y2-1) = 13158600); //Color is of the white box present outside of an active slot.
+end;
+
+(*
 TRSActionBar.isLocked
 ~~~~~~~~~~~~~~~~~~~~~
 
