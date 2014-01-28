@@ -277,7 +277,7 @@ begin
   begin
     // color of an active tab's border
 
-    if (getColor((self.x + __LOBBY_TAB_OFFSET_X) + (result * __LOBBY_TAB_WIDTH), (self.y + __LOBBY_TAB_OFFSET_Y)) = 7765636) then
+    if (getColor((self.x + __LOBBY_TAB_OFFSET_X) + (result * __LOBBY_TAB_WIDTH), (self.y + __LOBBY_TAB_OFFSET_Y)) = 7831173) then
     begin
       print('TRSLobby.getCurrentTab(): Current tab: '+toStr(result), TDebug.SUB);
       exit;
@@ -469,7 +469,7 @@ begin
 
   for i := 0 to high(woBoxes) do
   begin
-    foundWo := strToIntDef(trim(tesseractGetText(woBoxes[i].x1, woBoxes[i].y1, woBoxes[i].x2, woBoxes[i].y2, FILTER_SMALL_CHARS, 'digits')), -1);
+    foundWo := strToIntDef(trim(tesseractGetText(woBoxes[i].x1, woBoxes[i].y1, woBoxes[i].x2, woBoxes[i].y2, FILTER_SMALL_CHARS_2, 'digits')), -1);
     print('TRSLobby.quickSelectWorld(): Tesseract found world '+intToStr(foundWo));
 
     if (foundWo = wo) then
