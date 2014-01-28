@@ -140,6 +140,44 @@ begin
 end;
 
 (*
+groupDigits
+~~~~~~~~~~~
+
+.. code-block:: pascal
+
+    function groupDigits(n: extended; token: string): string;
+
+Nicely formats the number passed by placing *token* in between groups of three
+numbers. Uses extended format instead of integer
+
+.. note::
+
+    - by PriSoner and Nava2
+
+Example:
+
+.. code-block:: pascal
+
+    foo := groupDigits(1000, ','); // foo -> '1,000'
+    bar := groupDigits(1500423, ' '); // bar -> '1 500 423'
+
+*)
+function groupDigits(n: extended; token: string): string;    overload;
+var
+  b: integer;
+begin
+  result := toStr(n);
+
+  b := length(result) + 1;
+  if (b > 3) then
+  repeat
+    b := b - 3;
+    if (b > 1) then
+      insert(token, Result, b);
+  until (b < 3);
+end;
+
+(*
 TPABetweenPoints
 ~~~~~~~~~~~~~~~~
 
