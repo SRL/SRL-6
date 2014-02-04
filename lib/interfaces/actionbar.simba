@@ -790,7 +790,7 @@ Returns true if the Action Bar is locked.
 .. note::
 
     - by euphemism
-    - Last Updated: 18 April 2013 by euphemism
+    - Last Updated: 4 February 2014 by Ashaman88
 
 Example:
 
@@ -802,7 +802,7 @@ Example:
 function TRSActionBar.isLocked(): boolean;
 const
 
-  SPECIFIC_BLACK_COLOR = 1906964; //Specific point in the space between the shackle/shank of the lock and the lock's body.
+  SPECIFIC_BLACK_COLOR = 1840913; //Specific point in the space between the shackle/shank of the lock and the lock's body.
 var
 
   color: integer;
