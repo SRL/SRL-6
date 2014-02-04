@@ -78,15 +78,32 @@ Example
 
 .. code-block:: pascal
 
-    actionBar.__getPercent(__AB_BAR_HP);
+    actionBar.__getPercent(_AB_BAR_HP_OFFSET);
 *}
-{$IFNDEF CODEINSIGHT}
 const
-  __AB_BAR_HP = 46;
-  __AB_BAR_ADRENALINE = 185;
-  __AB_BAR_PRAYER = 324;
-  __AB_BAR_SUMMONING = 463;
-{$ENDIF}
+  _AB_BAR_HP_OFFSET = 46;
+  _AB_BAR_ADRENALINE_OFFSET = 185;
+  _AB_BAR_PRAYER_OFFSET = 324;
+  _AB_BAR_SUMMONING_OFFSET = 463;
+
+{*
+const Action Bar Stat Bars
+~~~~~~~~~~~~~~~~~~~~~~~~~~
+
+Constants that store the slot values of the bars on the actionbar.
+Used in TRSActionBar.mouseIcon();
+
+Example
+
+.. code-block:: pascal
+
+    actionBar.mouseIcon(AB_BAR_HP);
+*}
+const
+  AB_BAR_HP = 1;
+  AB_BAR_ADRENALINE = 2;
+  AB_BAR_PRAYER = 3;
+  AB_BAR_SUMMONING = 4;
 
 {*
 TRSActionBar.__init
@@ -1252,7 +1269,7 @@ Example:
 *)
 function TRSActionBar.getHPPercent: integer;
 begin
-  result := self.__getPercent(__AB_BAR_HP);
+  result := self.__getPercent(_AB_BAR_HP_OFFSET);
 end;
 
 (*
@@ -1278,7 +1295,7 @@ Example:
 *)
 function TRSActionBar.getAdrenalinePercent: integer;
 begin
-  result := self.__getPercent(__AB_BAR_ADRENALINE);
+  result := self.__getPercent(_AB_BAR_ADRENALINE_OFFSET);
 end;
 
 (*
@@ -1304,7 +1321,7 @@ Example:
 *)
 function TRSActionBar.getPrayerPercent: integer;
 begin
-  result := self.__getPercent(__AB_BAR_PRAYER);
+  result := self.__getPercent(_AB_BAR_PRAYER_OFFSET);
 end;
 
 (*
@@ -1330,7 +1347,35 @@ Example:
 *)
 function TRSActionBar.getSummoningPercent: integer;
 begin
-  result := self.__getPercent(__AB_BAR_SUMMONING);
+  result := self.__getPercent(_AB_BAR_SUMMONING_OFFSET);
+end;
+
+(*
+TRSActionBar.mouseIcon
+~~~~~~~~~~~~~~~~~~~~~~
+
+.. code-block:: pascal
+
+    procedure TRSActionBar.mouseIcon(icon, button: integer= MOUSE_MOVE);
+
+Returns the players summoning percent
+
+.. note::
+
+    - by Ashaman88
+    - Last Updated: 4 February 2014 by Ashaman88
+
+Example:
+
+.. code-block:: pascal
+
+     mouseIcon(AB_Bar_HP, MOUSE_LEFT);
+*)
+procedure TRSActionBar.mouseIcon(icon, button: integer= MOUSE_MOVE);
+begin
+  if not inRange(icon, 1, 4) then
+    exit;
+  mouseCircle((self.getbounds().x1+26)+(icon-1)*140, self.getbounds().y1+18, 10, button);
 end;
 
 begin
