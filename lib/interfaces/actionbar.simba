@@ -1378,6 +1378,33 @@ begin
   mouseCircle((self.getbounds().x1+26)+(icon-1)*140, self.getbounds().y1+18, 10, button);
 end;
 
+(*
+TRSActionBar.mouseIcon
+~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+
+.. code-block:: pascal
+
+    function TRSActionBar.mouseIcon(icon, button: integer; mmType: integer = MOUSE_HUMAN);
+
+Clicks the designated icon on the actionbar
+
+.. note::
+
+    - by footballjds
+    - Last Updated: 12 December 2013 by footballjds
+
+Example:
+
+.. code-block:: pascal
+
+     actionBar.mouseIcon(1, MOUSE_LEFT);
+*)
+procedure TRSActionBar.mouseIcon(icon, button: integer);
+begin
+  if not inRange(icon, 1, 4) then exit;
+  mouseCircle(29+((icon-1)*139), 325, 10, button);
+end;
+
 begin
   actionBar.__init();
 end;
