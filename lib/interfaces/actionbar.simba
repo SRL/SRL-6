@@ -1378,6 +1378,87 @@ begin
   mouseCircle((self.getbounds().x1+26)+(icon-1)*140, self.getbounds().y1+18, 10, button);
 end;
 
+(*
+TRSActionBar._isRetaliateEnabled
+~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+
+.. code-block:: pascal
+
+    function TRSActionBar._isRetaliateEnabled: boolean;
+
+Returns the whether autoretaliate is on or not
+
+.. note::
+
+    - by Ashaman88
+    - Last Updated: 5 February 2014 by Ashaman88
+
+Example:
+
+.. code-block:: pascal
+
+     if actionBar._isRetaliateEnabled then
+        writeln('AutoRetaliate is enabled!');
+*)
+function TRSActionBar._isRetaliateEnabled: boolean;
+const
+  RETALIATE_COLOR = 11842224;
+begin
+  result := getColor(self.getbounds().x1+170,self.getbounds().y1+16) = RETALIATE_COLOR;
+  print('actionBar._isRetaliateEnabled(): result = '+boolToStr(result), TDebug.SUB);
+end;
+
+
+(*
+TRSActionBar.setRetaliate
+~~~~~~~~~~~~~~~~~~~~~~~~~
+
+.. code-block:: pascal
+
+    function TRSActionBar.setRetaliate(enabled: boolean): boolean;
+
+Enables or disables autoretaliate. Returns true if successfully disables/enabled
+
+.. note::
+
+    - by Ashaman88
+    - Last Updated: 4 February 2014 by Ashaman88
+
+Example:
+
+.. code-block:: pascal
+
+     mouseIcon(AB_Bar_HP, MOUSE_LEFT);
+*)
+function TRSActionBar.setRetaliate(enabled: boolean): boolean;
+var
+  t: Integer;
+begin
+  if enabled then
+    result := (self._isRetaliateEnabled()) else
+    result := not (self._isRetaliateEnabled());
+
+  print('actionBar.setRetaliate(): result = '+boolToStr(result), TDebug.SUB);
+
+  if result then
+    exit;
+
+  self.mouseIcon(AB_Bar_ADRENALINE, MOUSE_LEFT);
+
+  t := getSystemTime() + randomRange(2000, 3000);
+
+  while (t > getSystemTime()) and (not result) do
+  begin
+    if enabled then
+      result := (self._isRetaliateEnabled()) else
+      result := not (self._isRetaliateEnabled());
+
+    wait(100 + random(50));
+  end;
+
+  print('actionBar.setRetaliate(): result = '+boolToStr(result), TDebug.SUB);
+end;
+
 begin
   actionBar.__init();
 end;
