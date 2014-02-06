@@ -749,6 +749,32 @@ begin
 end;
 
 (*
+findSpinTicket
+~~~~~~~~~~~~~~
+
+.. code-block:: pascal
+
+    function findSpinTicket(var p: TPoint): boolean;
+
+Depreciated.  Use findTicket().
+
+.. note::
+
+    - by Coh3n
+    - Last Updated: 06 February 2014 by Coh3n
+
+Example:
+
+.. code-block:: pascal
+
+    findSpinTicket(p);
+*)
+function findSpinTicket(var p: TPoint): boolean;
+begin
+  result := findTicket(p);
+end;
+
+(*
 closeAdWindow
 ~~~~~~~~~~~~~
 
