@@ -1447,7 +1447,7 @@ begin
 
   t := getSystemTime() + randomRange(2000, 3000);
 
-  while (t > getSystemTime()) or (not result) do
+  while (t > getSystemTime()) and (not result) do
   begin
     if enabled then
       result := (self._isRetaliateEnabled()) else
