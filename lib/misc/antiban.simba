@@ -621,7 +621,7 @@ begin
   clientArea := [0, 0, w-1, h-1];
 
   // gold color of chest
-  if (not findColorsTolerance(tpa, 741517, clientArea, 1, colorSetting(1))) then
+  if (not findColorsTolerance(tpa, 741517, clientArea, 2, colorSetting(1))) then
     exit(false);
 
   print('exitTreasure()', TDebug.HEADER);
@@ -649,7 +649,7 @@ begin
       t := (getSystemTime() + randomRange(2500, 3200));
       while (t > getSystemTime()) do
       begin
-        if countColor(clBlack,x-30,y-65,x+20,y-40) > 200 then
+        if countColor(clBlack,x-30,y-65,x+20,y+40) > 200 then
         begin
           print('Found black popup, count color: ' + toStr(countColor(clBlack,x-30,y-65,x+20,y-40)));
           break();
