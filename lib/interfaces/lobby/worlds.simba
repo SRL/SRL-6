@@ -505,7 +505,7 @@ Example:
 *}
 function TRSLobbyWorlds._scrollToWorld(var res: TPoint; wo: integer): boolean;
 const
-  __COLOR_SCROLL_BAR = 4114167;
+  __COLOR_SCROLL_BAR = 3455991;
 var
   p, tmp: TPoint;
   t: integer;

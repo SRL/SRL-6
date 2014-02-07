@@ -163,6 +163,39 @@ begin
 end;
 
 (*
+TRSMainscreen.setZoom
+~~~~~~~~~~~~~~~~~~~~~
+
+.. code-block:: pascal
+
+    procedure TRSMainscreen.setZoom(zoomout: boolean; scrolls: integer = 40);
+
+Sets the mainscreen zoom in or out, dependant on boolean passed. Option to do it only
+partial with scrolls integer
+
+.. note::
+
+    - by Ashaman88
+    - Last Updated: 5 February 2014 by Ashaman88
+
+Example:
+
+.. code-block:: pascal
+
+    mainscreen.setZoom(true);
+*)
+procedure TRSMainscreen.setZoom(zoomout: boolean; scrolls: integer = 40);
+var
+  b: TBox;
+  p: TPoint;
+begin
+  b := self.getBounds();
+  p := b.getRandomPoint();
+
+  mouseScroll(p, scrolls + random(5), zoomout);
+end;
+
+(*
 TRSMainscreen.filterPointsPlayer
 ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
 

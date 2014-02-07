@@ -42,6 +42,7 @@ SRL library isn't available to you.
 {$include_once lib/interfaces/lodestone.simba}
 {$include_once lib/interfaces/toolscreen.simba}
 {$include_once lib/interfaces/progressscreen.simba}
+{$include_once lib/interfaces/powerscreen.simba}
 
 {$include_once lib/misc/srlstats.simba}
 {$include_once lib/misc/antiban.simba}

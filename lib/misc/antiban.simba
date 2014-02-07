@@ -586,30 +586,30 @@ begin
 end;
 
 (*
-exitSquealOfFortune
-~~~~~~~~~~~~~~~~~~~
+exitTreasure
+~~~~~~~~~~~~
 
 .. code-block:: pascal
 
-    function exitSquealOfFortune(): boolean;
+    function exitTreasure(): boolean;
 
-Finds and exits the annoying Squeal of Fortune pop up that can be dragged
+Finds and exits the annoying Treasure Chest pop up that can be dragged
 anywhere on the screen.
 
 .. note::
 
     - by Coh3n & Ashaman88
-    - Last Updated: 14 September 2013 by Olly
+    - Last Updated: 4 February 2014 by Ashaman88
 
 Example:
 
 .. code-block:: pascal
 
-    exitSquealOfFortune();
+    exitTreasure();
 *)
-function exitSquealOfFortune(): boolean;
+function exitTreasure(): boolean;
 var
-  w, h, i, x, y, dtmSqueal: integer;
+  w, h, i, x, y, dtmTreasure, t: integer;
   dtmSearchBox, mouseOverBox, clientArea: TBox;
   p: TPoint;
   tpa: TPointArray;
@@ -620,36 +620,48 @@ begin
   getClientDimensions(w, h);
   clientArea := [0, 0, w-1, h-1];
 
-  // green color of the goblin thing
-  if (not findColorsTolerance(tpa, 7457955, clientArea, 15, colorSetting(1))) then
+  // gold color of chest
+  if (not findColorsTolerance(tpa, 741517, clientArea, 2, colorSetting(1))) then
     exit(false);
 
-  print('exitSquealOfFortune()', TDebug.HEADER);
+  print('exitTreasure()', TDebug.HEADER);
 
   // dtm of the X
-  dtmSqueal := DTMFromString('mbQAAAHicY2VgYFBghmBVKFYG4jhGBoZkKAax04D43+VKhpcbrBjWNGozfNobxWDJysHACtSPjhmxYDAAAKZdCpE=');
-  setDTMName(dtmSqueal, 'SRL - DTM Squeal');
+  dtmTreasure := DTMFromString('mggAAAHicY2NgYPjCCCSYGBjOA+n9QPwbiN8B8Wogng3ES4F4GRDvBOJdQPz/lCcDr6I2wzQfG4bJXtYM3NLKDMy8QgxcQGOwYUYcGAIA5gwN0Q==');
+  setDTMName(dtmTreasure, 'SRL - DTM Treasure');
 
-  atpa := tpa.split(10, 10);
+  atpa := tpa.cluster(5);
 
   for i := 0 to high(atpa) do
   begin
     p := atpa[i].getMiddle();
 
-    dtmSearchBox := [p.x - 70, p.y - 70, p.x + 130, p.y + 70];
+    dtmSearchBox := [p.x - 32, p.y - 28, p.x + 85, p.y + 13];
     dtmSearchBox.setLimit(clientArea);
 
-    print('Found goblin color around ' + toStr(p) + ' looking for the dtm of the X..');
+    print('Found gold chest color around ' + toStr(p) + ' looking for the dtm of the X..');
 
-    if (findDTM(dtmSqueal, x, y, dtmSearchBox)) then
+    if (findDTM(dtmTreasure, x, y, dtmSearchBox)) then
     begin
       print('Found DTM, attempting to exit...');
       mouse(point(x, y).rand(3), MOUSE_MOVE);
 
-      if (isMouseOverMenuOpen(mouseOverBox, 2500 + random(500))) then
+      t := (getSystemTime() + randomRange(2500, 3200));
+      while (t > getSystemTime()) do
+      begin
+        if countColor(clBlack,x-30,y-65,x+20,y+40) > 200 then
+        begin
+          print('Found black popup, count color: ' + toStr(countColor(clBlack,x-30,y-65,x+20,y-40)));
+          break();
+        end;
+        wait(10 + random(30));
+      end;
+
+
+      if (t > getSystemTime()) then
       begin
         fastClick(MOUSE_LEFT);
-        print('Successfully exited the Squeal Of Fortune');
+        print('Successfully exited the Treasure Chest');
         wait(500 + random(250));
         result := true;
         break();
@@ -658,8 +670,82 @@ begin
       print('Failed to find the DTM, we may have found a false area of color');
   end;
 
-  freeDTM(dtmSqueal);
-  print('exitSquealOfFortune(): result = ' + toStr(result), TDebug.FOOTER);
+  freeDTM(dtmTreasure);
+  print('exitTreasure(): result = ' + toStr(result), TDebug.FOOTER);
+end;
+
+
+(*
+exitSquealOfFortune
+~~~~~~~~~~~~~~~~~~~
+
+.. code-block:: pascal
+
+    function exitSquealOfFortune(): boolean;
+
+Finds and exits the annoying Treasure Chest pop up that can be dragged
+anywhere on the screen. This version kept for legacy. To be removed
+
+.. note::
+
+    - by Coh3n & Ashaman88
+    - Last Updated: 4 February 2014 by Ashaman88
+
+Example:
+
+.. code-block:: pascal
+
+    exitSquealOfFortune();
+*)
+function exitSquealOfFortune(): boolean;
+begin
+  result := exitTreasure();
+end;
+
+(*
+findTicket
+~~~~~~~~~~
+
+.. code-block:: pascal
+
+    function findTicket(var p: TPoint): boolean;
+
+Returns true if the Treasure spin ticket it found. Returns its
+coordinates in a TPoint 'p'.
+
+.. note::
+
+    - by Kyle Undefined
+    - Last Updated: 4 February 2014 by Ashaman88
+
+Example:
+
+.. code-block:: pascal
+
+    findTicket(p);
+*)
+function findTicket(var p: TPoint): boolean;
+var
+  oneFreeSpin: integer;
+begin
+  result := false;
+
+  if (not tabBackpack.isOpen()) then
+  begin
+    print('findTicket(): Backpack is not open, consider calling tabBackpack.open() first', TDebug.HINT);
+    exit();
+  end;
+
+  oneFreeSpin := DTMFromString('m1gAAAHic42JgYDjJyMBwGIj3AvEZIL4AxOeB+BgQX4FikHwyUG0qEGcDcRYDhJ8AxPFAnAnEeVC8Y7Elw64lVgx9KfZgPKfLEIV/f3MyGHMB1RKDGYnECAAA26sbNQ==');
+
+  if (findDTM(oneFreeSpin, p.x, p.y, tabBackpack.getBounds())) then
+  begin
+    tabBackpack.mouseSlot(tabBackpack.pointToSlot(p), MOUSE_MOVE);
+
+    result := (isMouseOverText(['Claim', 'laim', 'Key', 'key', 'token'], 300));
+  end;
+
+  freeDTM(oneFreeSpin);
 end;
 
 (*
@@ -670,13 +756,12 @@ findSpinTicket
 
     function findSpinTicket(var p: TPoint): boolean;
 
-Returns true if the Squeal Of Fortune spin ticket it found. Returns its
-coordinates in a TPoint 'p'.
+Depreciated.  Use findTicket().
 
 .. note::
 
-    - by Kyle Undefined
-    - Last Updated: 10 September 2013 by Olly
+    - by Coh3n
+    - Last Updated: 06 February 2014 by Coh3n
 
 Example:
 
@@ -685,27 +770,8 @@ Example:
     findSpinTicket(p);
 *)
 function findSpinTicket(var p: TPoint): boolean;
-var
-  oneFreeSpin: integer;
 begin
-  result := false;
-
-  if (not tabBackpack.isOpen()) then
-  begin
-    print('findSpinTicket(): Backpack is not open, consider calling tabBackpack.open() first', TDebug.HINT);
-    exit();
-  end;
-
-  oneFreeSpin := DTMFromString('mrAAAAHic42BgYHjHzMDwFojvQfEDIP4ExL+B+A8Q32ZkYDgPxBeA+D4QP4Hie0B8BYi3RkoCTWHCibmAJD7MSADDAABVYQ/p');
-
-  if (findDTM(oneFreeSpin, p.x, p.y, tabBackpack.getBounds())) then
-  begin
-    tabBackpack.mouseSlot(tabBackpack.pointToSlot(p), MOUSE_MOVE);
-
-    result := (isMouseOverText(['Claim', 'laim'], 300));
-  end;
-
-  freeDTM(oneFreeSpin);
+  result := findTicket(p);
 end;
 
 (*
@@ -899,6 +965,38 @@ begin
 end;
 
 (*
+claimTicket
+~~~~~~~~~~~
+
+.. code-block:: pascal
+
+    function claimTicket(): boolean;
+
+Claims a spin tick if found in the backpack.
+
+.. note::
+
+    - by Olly
+    - Last Updated: 4 February 2014 by Ashaman88
+
+Example:
+
+.. code-block:: pascal
+
+    claimTicket();
+*)
+function claimTicket(): boolean;
+var
+  p: TPoint;
+begin
+  if (findTicket(p)) then
+    result := tabBackpack.mouseSlot(tabBackpack.pointToSlot(p), MOUSE_LEFT);
+
+  if (result) then
+    wait(200 + random(400));
+end;
+
+(*
 claimSpinTicket
 ~~~~~~~~~~~~~~~
 
@@ -907,11 +1005,12 @@ claimSpinTicket
     function claimSpinTicket(): boolean;
 
 Claims a spin tick if found in the backpack.
+Temporary to be replaced with claimTicket.
 
 .. note::
 
     - by Olly
-    - Last Updated: 26 November 2013 by Olly
+    - Last Updated: 4 February 2014 by Ashaman88
 
 Example:
 
@@ -920,14 +1019,8 @@ Example:
     claimSpinTicket();
 *)
 function claimSpinTicket(): boolean;
-var
-  p: TPoint;
 begin
-  if (findSpinTicket(p)) then
-    result := tabBackpack.mouseSlot(tabBackpack.pointToSlot(p), MOUSE_LEFT);
-
-  if (result) then
-    wait(200 + random(400));
+  result := claimTicket();
 end;
 
 (*
