@@ -295,8 +295,8 @@ var
 begin
   for i := 1 to Length(Text) do
   begin
-    SendKeys(Text[i], 1, 1);
-    Wait(2 + Random(5));
+    SendKeys(Text[i], 30 + Random(30), 30 + Random(30));
+    Wait(40 + Random(40));
   end;
 
   if (pressEnter) then
