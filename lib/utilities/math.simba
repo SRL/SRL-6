@@ -194,6 +194,104 @@ begin
   Result[High(Result)] := P2;
 end;
 
+(*
+quickTBASort
+~~~~~~~~~~~~
+
+.. code-block:: pascal
+
+    procedure quickTBASort(var A: TIntegerArray; var B: TBoxArray; iLo, iHi: Integer; SortUp: Boolean);
+
+Sorts a given TBoxArray
+
+.. note::
+
+      Author: Simba source
+      Last Modified: 1st February 2014 by Olly
+
+Example:
+
+.. code-block:: pascal
+
+    quickTBASort(DistArr, BoxArray, 0, l, True);
+*)
+procedure quickTBASort(var A: TIntegerArray; var B: TBoxArray; iLo, iHi: Integer; SortUp: Boolean);
+var
+  Lo, Hi, Mid, T: Integer;
+  TP: TBox;
+begin
+  if (Length(A) <> Length(B)) then Exit;
+  Lo := iLo;
+  Hi := iHi;
+  Mid := A[(Lo + Hi) shr 1];
+  repeat
+    if SortUp then
+    begin
+      while (A[Lo] < Mid) do Inc(Lo);
+      while (A[Hi] > Mid) do Dec(Hi);
+    end else
+    begin
+      while (A[Lo] > Mid) do Inc(Lo);
+      while (A[Hi] < Mid) do Dec(Hi);
+    end;
+    if (Lo <= Hi) then
+    begin
+      T := A[Lo];
+      A[Lo] := A[Hi];
+      A[Hi] := T;
+      TP := B[Lo];
+      B[Lo] := B[Hi];
+      B[Hi] := TP;
+      Inc(Lo);
+      Dec(Hi);
+    end;
+  until Lo > Hi;
+  if (Hi > iLo) then QuickTBASort(A, B, iLo, Hi, SortUp);
+  if (Lo < iHi) then QuickTBASort(A, B, Lo, iHi, SortUp);
+end;
+
+(*
+sortBoxesFromMidPoint
+~~~~~~~~~~~~~~~~~~~~~
+
+.. code-block:: pascal
+
+    procedure sortBoxesFromMidPoint(var BoxArray: TBoxArray; const From: TPoint);
+
+Sorts a TBoxArray from the TPoint 'from' based from the middle of each box.
+
+.. note::
+
+      Author: Simba source
+      Last Modified: 1st February 2014 by Olly
+
+Example:
+
+.. code-block:: pascal
+
+    sortBoxesFromMidPoint(tba, mainScreen.playerPoint);
+*)
+procedure sortBoxesFromMidPoint(var BoxArray: TBoxArray; const From: TPoint);
+Var
+  I,L: Integer;
+  mid: TPoint;
+  distArr: TIntegerArray;
+Begin
+  l := high(BoxArray);
+  if (l < 0) then
+    exit();
+
+  setLength(DistArr, L + 1);
+
+  for i := 0 To l do
+  begin
+    mid := middleBox(BoxArray[i]);
+    distArr[i] := round(Sqr(From.X - mid.X) + Sqr(From.Y - mid.Y));
+  end;
+
+  quickTBASort(DistArr, BoxArray, 0, l, True);
+end;
+
 {*
 var Gauss Internal
 ~~~~~~~~~~~~~~~~~~
@@ -373,7 +471,6 @@ begin
   { get normal pt about zero, where 68% lie within .5*maxRad }
   radius := gaussRand(maxRad,maxRad*__gaussPoint) - maxRad;
 
-
   { the shifting distance based on the radius and angle (both rand) }
   xShift := round(radius * Cos(angle));
   yShift := round(radius * Sin(angle));
@@ -507,7 +604,7 @@ begin
   p.y := gaussRangeInt(box.y1, box.y2);
 
   if (not PointInBox(p, box)) then
-    writeln('gaussBox',Format('Point invalid (%d, %d)', [p.x, p.y]));
+    writeln('gaussBox', Format('Point invalid (%d, %d)', [p.x, p.y]));
 end;
 
 begin

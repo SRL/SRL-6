@@ -297,17 +297,8 @@ Example:
 *}
 procedure __freeMinimapMask();
 begin
-  print('Freeing the minimap mask');
-
   if (bitmapExists(minimap.bmpMask)) then
     freeBitmap(minimap.bmpMask);
-end;
-
-procedure TRSMinimap.filterPointsButton(var tpa: TPointArray; buttonID: integer; minDistOffset: integer = 0);
-begin
-  filterPointsDist(tpa, 0 + minDistOffset,
-                   self.button[buttonID].radius, self.button[buttonID].center.x,
-                   self.button[buttonID].center.y);
 end;
 
 (*
@@ -473,7 +464,7 @@ to low, and the minimap compass angle set to north.
 .. note::
 
     - by Olly
-    - Last Updated: 08 August 2013 by Olly
+    - Last Modified: 1st February 2014 by Olly
 
 Example:
 
@@ -497,6 +488,54 @@ begin
   wait(150 + random(300));
 
   print('TRSMinimap.clickCompass(): Clicked compass', TDebug.SUB);
+end;
+
+(*
+__createSearchAngles
+~~~~~~~~~~~~~~~~~~~~
+
+.. code-block:: pascal
+
+    function __createSearchAngles(angle, range: extended): T2DExtendedArray;
+
+Creates start and end search angles for minmap.findDTM/DTMs. Used because we
+will need multiple searches if the range is greater than 360 or less than 0
+
+Example:
+  if angle is 0.00 and range is 30 will need to search (345..360) and (0..15).
+
+.. note::
+
+    - by Olly
+    - Last Modified: 1st February 2014 by Olly
+
+Example:
+
+.. code-block:: pascal
+
+    searches := __createSearchAngles(90.0, 25.0);
+*)
+function __createSearchAngles(angle, range: extended): T2DExtendedArray;
+var
+  startA, endA: extended;
+begin
+  startA := (angle - range);
+  endA := (angle + range);
+
+  if (startA < 0) then
+  begin
+    insert(TExtendedArray([360 + startA, 360]), result);
+    insert(TExtendedArray([0, 0 + endA]), result);
+  end;
+
+  if (endA > 360) then
+  begin
+    insert(TExtendedArray([startA, 360]), result);
+    insert(TExtendedArray([0, 0 + abs(endA - 360)]), result);
+  end;
+
+  if (length(result) < 1) then
+    insert(TExtendedArray([startA, endA]), result);
 end;
 
 (*
@@ -537,7 +576,7 @@ TRSMinimap.findDTM
 
     function TRSMinimap.findDTM(dtm: integer; var x, y: integer): boolean;
 
-Attempts to find on the minimap, will search for the dtm +/- 30 degrees of the
+Attempts to find a dtm on the minimap, will search for the dtm +/- 15 degrees of the
 current minimap angle.
 
 .. note::
@@ -554,33 +593,71 @@ Example:
 *)
 function TRSMinimap.findDTM(dtm: integer; var fx, fy: integer): boolean;
 var
-  a, s, e: extended;
-  searches: T2DExtendedArray;
+  a: extended;
   i: integer;
+  searches: T2DExtendedArray;
 begin
   result := false;
 
-  a := self.getAngleDegrees();
-
-  s := (a - 30.00);
-  e := (a + 30.00);
-
-  if (s < 0) or (e > 360) then // why? ie if angle = 0 need to search 352..360 and 0..8.
-  begin
-    insert([360 + s, 360.00], searches);
-    insert([0, 0 + e], searches);
-  end else
-    insert([s, e], searches);
+  searches := __createSearchAngles(self.getAngleDegrees(), 15);
 
   for i := 0 to high(searches) do
     if (findDTMRotatedSE(dtm, fx, fy, self.getBounds(), searches[i][0], searches[i][1], 1.00, a)) then
     begin
       result := (self.isPointOn(point(fx, fy)));
-      break();
+
+      if (result) then
+        break();
     end;
 
   if (result) then
     print('TRSMinimap.findDTM(): Succesfully found dtm at '+copy(floatToStr(a), 0, 5)+' degrees');
+end;
+
+(*
+TRSMinimap.findDTMs
+~~~~~~~~~~~~~~~~~~~
+
+.. code-block:: pascal
+
+    function TRSMinimap.findDTMs(dtm: integer; out points: TPointArray): boolean;
+
+Attempts to find dtm matches on the minimap, will search for the dtm +/- 15 degrees of the
+current minimap angle.
+
+.. note::
+
+    - by Olly
+    - Last Updated: 15 August 2013 by Olly
+
+Example:
+
+.. code-block:: pascal
+
+    if (minimap.findDTMs(dtm, tpa)) then
+      writeln('Found DTM Matches!);
+*)
+function TRSMinimap.findDTMs(dtm: integer; out points: TPointArray): boolean;
+var
+  searches, angles: T2DExtendedArray;
+  i, hi: integer;
+  tpa: TPointArray;
+begin
+  searches := __createSearchAngles(self.getAngleDegrees(), 15);
+  hi := high(searches);
+
+  if (hi = -1) then
+    exit(false);
+
+  for i := 0 to hi do
+    if (findDTMsRotatedSE(dtm, tpa, self.x1, self.y1, self.x2, self.y2, searches[i][0], searches[i][1], 1.00, angles)) then
+      appendTPA(points, tpa);
+
+  self.filterPoints(points); // remove points off minimap
+  result := (length(points) > 0);
+
+  if (result) then
+    print('TRSMinimap.findDTMs(): Succesfully found '+intToStr(length(points))+' DTMs', TDebug.SUB);
 end;
 
 {*
@@ -2184,8 +2261,6 @@ begin
         print('Failed to find bitmap symbol '+toStr(symbol), TDebug.ERROR);
   end;
 
-  print('Failed to find '+sym.name+' symbol', TDebug.ERROR);
-  print('Report this bug here: http://villavu.com/forum/project.php?projectid=6', TDebug.HINT);
   print('TRSMinimap._getSymbolColor(): '+toStr(result), TDebug.FOOTER);
   freeBitmap(sym.bmp);
 
