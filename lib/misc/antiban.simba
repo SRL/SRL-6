@@ -965,6 +965,48 @@ begin
 end;
 
 (*
+destroyTicket
+~~~~~~~~~~~~~
+
+.. code-block:: pascal
+
+    function destroyTicket(slot: integer): boolean;
+
+Destroys a ticket if found in the backpack.
+
+.. note::
+
+    - by Ashaman88
+    - Last Updated: 12 February 2014 by Ashaman88
+
+Example:
+
+.. code-block:: pascal
+
+    destroyTicket(slot: integer);
+*)
+function destroyTicket(slot: integer): boolean;
+var
+  p: TPoint;
+  tpa: TPointArray;
+  atpa: T2DPointArray;
+begin
+  tabBackpack.mouseSlot(slot, MOUSE_RIGHT);
+  if chooseOption.select(['Destroy', 'estr', 'stro']) then
+    if conversationBox.isOpen(randomRange(2000,3000)) then
+    begin
+      findColorsTolerance(tpa, 1137455, conversationBox.getBounds(), 33, colorSetting(1));
+      atpa := tpa.cluster(10);
+      atpa.sortBySize;
+      if length(atpa) > 0 then
+      begin
+        mouseBox(atpa[0].getBounds(), MOUSE_LEFT);
+        result := tabBackpack.waitForShift(randomRange(3000,4000));
+      end;
+    end;
+end;
+
+(*
 claimTicket
 ~~~~~~~~~~~
 
@@ -988,12 +1030,31 @@ Example:
 function claimTicket(): boolean;
 var
   p: TPoint;
+  t, oneFreeSpin: integer;
 begin
   if (findTicket(p)) then
-    result := tabBackpack.mouseSlot(tabBackpack.pointToSlot(p), MOUSE_LEFT);
+  begin
+    tabBackpack.mouseSlot(tabBackpack.pointToSlot(p), MOUSE_LEFT);
+    oneFreeSpin := DTMFromString('m1gAAAHic42JgYDjJyMBwGIj3AvEZIL4AxOeB+BgQX4FikHwyUG0qEGcDcRYDhJ8AxPFAnAnEeVC8Y7Elw64lVgx9KfZgPKfLEIV/f3MyGHMB1RKDGYnECAAA26sbNQ==');
+    t := (getSystemTime() + randomRange(2000, 3000));
+    repeat
+      if not (findDTM(oneFreeSpin, p.x, p.y, tabBackpack.getBounds())) then
+        result := true;
+
+      if conversationBox.continue(true, true) then
+        break;
+
+      wait(20 + random(20));
+    until (getSystemTime() >= t) or (result);
+  end;
 
   if (result) then
-    wait(200 + random(400));
+    wait(200 + random(400)) else
+    destroyTicket(tabBackpack.pointToSlot(p));
+
+  freeDTM(oneFreeSpin);
+
+  print('claimTicket result: '+tostr(result));
 end;
 
 (*

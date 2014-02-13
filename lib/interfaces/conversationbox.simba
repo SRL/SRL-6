@@ -168,9 +168,17 @@ Example:
     if (not conversationBox.isOpen()) then
       exit();
 *)
-function TRSConversationBox.isOpen(): boolean;
+function TRSConversationBox.isOpen(waitTime: integer = 200): boolean;
+var
+  t: integer;
 begin
-  result := (countColorTolerance(9021887, self.getBounds(), 35) > 5000);  // color of the paper like background.
+  t := (getSystemTime() + waitTime);
+  repeat
+    if (countColorTolerance(9021887, self.getBounds(), 35) > 5000) then  // color of the paper like background.
+      exit(true);
+
+    wait(20 + random(20));
+  until (getSystemTime() >= t);
 end;
 
 (*
