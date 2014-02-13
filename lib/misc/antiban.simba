@@ -1036,6 +1036,7 @@ begin
   begin
     tabBackpack.mouseSlot(tabBackpack.pointToSlot(p), MOUSE_LEFT);
     oneFreeSpin := DTMFromString('m1gAAAHic42JgYDjJyMBwGIj3AvEZIL4AxOeB+BgQX4FikHwyUG0qEGcDcRYDhJ8AxPFAnAnEeVC8Y7Elw64lVgx9KfZgPKfLEIV/f3MyGHMB1RKDGYnECAAA26sbNQ==');
+
     t := (getSystemTime() + randomRange(2000, 3000));
     repeat
       if not (findDTM(oneFreeSpin, p.x, p.y, tabBackpack.getBounds())) then
@@ -1046,13 +1047,13 @@ begin
 
       wait(20 + random(20));
     until (getSystemTime() >= t) or (result);
+    freeDTM(oneFreeSpin);
   end;
 
   if (result) then
-    wait(200 + random(400)) else
+    wait(200 + random(400))
+  else
     destroyTicket(tabBackpack.pointToSlot(p));
-
-  freeDTM(oneFreeSpin);
 
   print('claimTicket result: '+tostr(result));
 end;
