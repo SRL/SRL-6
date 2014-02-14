@@ -71,6 +71,27 @@ begin
 end;
 {$ENDIF}
 
+{*
+TRSChatbox.__setup
+~~~~~~~~~~~~~~~~~~
+
+.. code-block:: pascal
+
+    procedure TRSChatbox.__setup();
+
+Sets up the chat box variables.
+
+.. note::
+
+    - by Olly
+    - Last Updated: 17 October 2013 by Olly
+
+Example:
+
+.. code-block:: pascal
+
+    chatbox.__setup();
+*}
 procedure TRSChatbox.__setup();
 var
   b, chatBounds: TBox;
@@ -97,6 +118,27 @@ begin
   end;
 end;
 
+(*
+TRSChatbox.getChatArea
+~~~~~~~~~~~~~~~~~~~~~~
+
+.. code-block:: pascal
+
+    function TRSChatbox.getChatArea(): TBox;
+
+Returns a TBox of the chat box area.
+
+.. note::
+
+    - by Olly
+    - Last Updated: 17 October 2013 by Olly
+
+Example:
+
+.. code-block:: pascal
+
+    area := chatbox.getCharArea();
+*)
 function TRSChatbox.getChatArea(): TBox;
 begin
   result := intToBox(self.x1+3, self.y1 + 67, self.x2-20, self.y2-21);
@@ -133,6 +175,29 @@ begin
     print('TRSChatbox.findAnyText(): Found "'+toStr(txt)+'"', TDebug.SUB);
 end;
 
+(*
+TRSChatbox.findTextOnLines
+~~~~~~~~~~~~~~~~~~~~~~~~~~
+
+.. code-block:: pascal
+
+    function TRSChatbox.findTextOnLines(txt: TStringArray; lines: TIntegerArray): boolean;
+
+Returns true if the text in 'txt' is found on the 'lines' of the chatbox.  The
+lines start with 0 being the bottom chat line.
+
+.. note::
+
+    - by Olly
+    - Last Updated: 17 October 2013 by Olly
+
+Example:
+
+.. code-block:: pascal
+
+    // returns true if "Hello" is found on the first 4 lines
+    chatbox.findTextOnLines(['Hello'], [0..3]);
+*)
 function TRSChatbox.findTextOnLines(txt: TStringArray; lines: TIntegerArray): boolean;
 var
   i: integer;
