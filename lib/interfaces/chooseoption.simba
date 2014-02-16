@@ -14,34 +14,26 @@ The source for this file can be found `here <https://github.com/SRL/SRL-6/blob/m
 {$include_once ../interfaces/interfaces.simba}
 
 (*
+type TOption
+~~~~~~~~~~~~
+
+A type that stores the bounds, and string of a option.
+*)
+type
+  TOption = record
+    bounds: TBox;
+    str: string;
+  end;
+
+(*
 type TRSChooseOption
 ~~~~~~~~~~~~~~~~~~~~
 
 A type that stores the choose option interface properties.
 *)
 type
+  TOptionArray = array of TOption;
   TRSChooseOption = type TRSInterface;
-
-{*
-type __TOption
-~~~~~~~~~~~~~~
-
-A type that stores specific option information.  Each line in the choose option
-menu is a __TOption.
-*}
-{$IFNDEF CODEINSIGHT}
-type
-  __TOption = record
-    bounds: TBox;
-    str: string;
-  end;
-
-{*
-type __TOptionArray
-~~~~~~~~~~~~~~~~~~~
-*}
-  __TOptionArray = array of __TOption;
-{$ENDIF}
 
 (*
 var chooseOption
@@ -65,14 +57,15 @@ TRSChooseOption.isOpen
 
 .. code-block:: pascal
 
-    function TRSChooseOption.isOpen(debug: boolean = true): boolean;
+    function TRSChooseOption.isOpen(): boolean;
 
-Will return if the chooseoption menu is open or not.
+Returns true if the ChooseOption menu is open, if open will also set the type's
+bounds.
 
 .. note::
 
     - by Olly
-    - Last Modified: 12 September 2013 by Olly
+    - Last Modified: 16 February 2014 by Olly
 
 Example:
 
@@ -81,66 +74,45 @@ Example:
     if (chooseOption.isOpen()) then
       chooseOption.close();
 *)
-function TRSChooseOption.isOpen(debug: boolean = true): boolean;
+function TRSChooseOption.isOpen(): boolean;
+const
+  BORDER_COLORS = [197636, 3618615];
+  CORNER_COLOR = 2368548;
 var
-  b, clientArea, tpaBounds: TBox;
-  colArr: array [0..2] of integer;
-  i, j, z, width, height: integer;
-  tpa: TPointArray;
-  atpa: T2DPointArray;
+  tpa, tpaBorder: TPointArray;
+  atpaBorder: T2DPointArray;
+  i, len: integer;
+  bounds: TBox;
 begin
   result := false;
 
-  getClientDimensions(b.x2, b.y2);
-  clientArea := [0, 0, b.x2 -1, b.y2 -1];
+  freeze();
 
-  colArr := [197636 {black}, 3748386 {top blue}, 3618615 {grey}];
+  for i := 0 to high(BORDER_COLORS) do
+    if (findColors(tpa, BORDER_COLORS[i], getClientBounds())) then
+      appendTPA(tpaBorder, tpa);
 
-  setLength(atpa, length(colArr));
+  unfreeze();
 
-  for i := 0 to high(colArr) do
-    findColors(atpa[i], colArr[i], clientArea);
-
-  tpa := atpa.merge();
-
-  if (length(tpa) < 10) then
+  if (length(tpaBorder) < 1) then
     exit();
 
-  // we can re-use this.. :)
-  setLength(atpa, 0);
+  atpaBorder := clusterTPAEx(tpaBorder, 2, 2);
+  sortATPASize(atpaBorder, true);
+  len := length(atpaBorder);
 
-  atpa := tpa.split(4, 4);
-  atpa.sortBySize();
-
-  for i := 0 to high(atpa) do
+  for i := 0 to (len - 1) do
   begin
-    tpaBounds := atpa[i].getBounds();
-    tpaBounds.getDimensions(width, height);
+    bounds := getTPABounds(atpaBorder[i]);
 
-    // too small
-    if (width < 15) or (height < 10) then
-      continue;
+    if (distance(bounds.x1, bounds.y1, bounds.x2, bounds.y2) < 100) then
+      continue();
 
-    z := 0;
-
-    // lets see if there's more than 5 black pixels in a row above our bounds
-    for j := tpaBounds.x1 to tpaBounds.x2 do
-      if (getColor(j, tpaBounds.y1 - 1) = 263429) then
-      begin
-        inc(z);
-
-        // more than five black pixels in a row? we've found it
-        if (z > 5) then
-        begin
-          if (debug) then
-            print('chooseOption.isOpen(): result = true');
-
-          // we store the bounds in the chooseoption type.
-          self.setBounds(tpaBounds);
-          exit(true);
-        end;
-      end else
-        z := 0;
+    if (getColor(bounds.x1, bounds.y1 - 1) = CORNER_COLOR) and (getColor(bounds.x2, bounds.y1 - 1) = CORNER_COLOR) then
+    begin
+      self.setBounds([bounds.x1 + 1, bounds.y1 + 1, bounds.x2 - 1, bounds.y2 - 1]); // decrease size to remove borders
+      exit(true);
+    end;
   end;
 end;
 
@@ -150,40 +122,35 @@ TRSChooseOption.isOpen; overload
 
 .. code-block:: pascal
 
-    function TRSChooseOption.isOpen(waitTime: integer; debug: boolean = true): boolean; overload;
+    function TRSChooseOption.isOpen(waitTime: integer): boolean; overload;
 
-Overloaded function, reqiures a 'waitTime' parameter. Will wait up to 'waitTime'
-for the chooseoption menu to appear.
+Overloaded function. Accepts a extra parameter 'waitTime' which will wait upto
+waitTime (in ms) for the menu to appear.
 
 .. note::
 
     - by Olly
-    - Last Modified: 12 September 2013 by Olly
+    - Last Modified: 16 February 2014 by Olly
 
 Example:
 
 .. code-block:: pascal
 
-    if (chooseOption.isOpen(500)) then
-    begin
-      writeln('menu appeared!');
-      exit();
-    end;
+    if (chooseOption.isOpen()) then
+      chooseOption.close();
 *)
-function TRSChooseOption.isOpen(waitTime: integer; debug: boolean = true): boolean; overload;
+function TRSChooseOption.isOpen(waitTime: integer): boolean; overload;
 var
-  timeOut: integer;
+  t: longWord;
 begin
-  timeOut := (getSystemTime() + waitTime + random(25));
+  t := (getSystemTime() + waitTime);
+  result := false;
 
-  while (timeOut > getSystemTime()) do
-    if (self.isOpen()) then
-      exit(true)
-    else
-      wait(16 + random(30));
-
-  if (debug) then
-    print('chooseOption.isOpen(): result = false');
+  while (not result) and (t >= getSystemTime()) do
+  begin
+    result := self.isOpen();
+    wait(20 + random(50));
+  end;
 end;
 
 (*
@@ -199,7 +166,7 @@ Closes the chooseoption menu by moving the mouse off the menu, returns true if s
 .. note::
 
     - by Olly
-    - Last Modified: 12 September 2013 by Olly
+    - Last Modified: 16 February 2014 by Olly
 
 Example:
 
@@ -210,166 +177,99 @@ Example:
 *)
 function TRSChooseOption.close(): boolean;
 var
-  b, mouseRange, clientArea: TBox;
+  left: boolean;
+  wid, hei: integer;
   p: TPoint;
+  t: longWord;
 begin
-  if (not self.isOpen(false)) then
+  result := false;
+
+  if (not self.isOpen()) then
+    exit(true);
+
+  getClientDimensions(wid, hei);
+
+  left := (self.x1 > abs(self.x2 - wid));
+
+  if (left) then
+    p.x := (self.x1 - randomRange(15, 65))
+  else
+    p.x := (self.x2 + randomRange(15, 65));
+
+  p.y := (self.y1 + random((self.y2 - self.y1) + random(10)));
+
+  mouse(p);
+
+  t := (getSystemTime() + randomRange(2500, 3000));
+
+  while (not result) and (t > getSystemTime()) do
+  begin
+    wait(20 + random(50));
+    result := (not self.isOpen());
+  end;
+
+  print('TRSChooseOption.close(): result = '+lowercase(boolToStr(result)), TDebug.SUB);
+end;
+
+(*
+TRSChooseOption.getOptions
+~~~~~~~~~~~~~~~~~~~~~~~~~~
+
+.. code-block:: pascal
+
+    function TRSChooseOption.getOptions(): TOptionArray;
+
+Returns a TOptionArray of all the options
+
+.. note::
+
+    - by Olly
+    - Last Modified: 16 February 2014 by Olly
+
+Example:
+
+.. code-block:: pascal
+
+    if (chooseOption.isOpen()) then
+      chooseOption.close();
+*)
+function TRSChooseOption.getOptions(): TOptionArray;
+var
+  bmp, wid, hei, i, oldTarget, t: integer;
+  tpa: TPointArray;
+begin
+  if (not self.isOpen()) then
     exit();
 
-  getClientDimensions(clientArea.x2, clientArea.y2);
-
-  b := self.getBounds();
-  b.edit(-10, -25, 10, 10);
-
-  mouseRange := [b.x1 -50, b.y1 -50, b.x2 +50, b.y2 +50];
-  mouseRange.setLimit([0, 0, clientArea.x2 -1, clientArea.y2 -1]);
-
-  // get a point that is in mouseRange but not in b (choose option bounds);
-  p := mouseRange.getRandomPoint([b]);
-
-  if (p.x <> -1) then
-  begin
-    mouse(p, MOUSE_MOVE);
-    print('chooseOption.close(): Succesfully closed the menu', TDebug.SUB);
-  end else
-    print('chooseOption.close(): Failed to close the menu', TDebug.ERROR);
-end;
-
-{*
-TRSChooseOption.__applyFilter
-~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
-
-.. code-block:: pascal
-
-    procedure TRSChooseOption.__applyFilter(var bmp: TMufasaBitmap);
-
-Filters the choose option bitmap so the only part left is the text.
-Exact same filter as mouseover text.
-
-.. note::
-
-    - by euphemism
-    - Last Updated: 05 October 2013 by Olly
-
-Example:
-
-.. code-block:: pascal
-
-    optionArr := choseOption.__getOptions();
-*}
-{$IFNDEF CODEINSIGHT}
-procedure TRSChooseOption.__applyFilter(var bmp: TMufasaBitmap);
-begin
-  bmp.contrast(50);
-  bmp.desaturate();
-  bmp.contrast(255);
-  bmp.posterize(255);
-end;
-{$ENDIF}
-
-{*
-TRSChooseOption.__getOptions
-~~~~~~~~~~~~~~~~~~~~~~~~~~~~
-
-.. code-block:: pascal
-
-    function TRSChooseOption.__getOptions(): __TOptionArray;
-
-Returns all text & bounds of the ChooseOption text in the TOptionArray.
-
-.. note::
-
-    - by Wizzup?, Narcle, Coh3n & Olly
-    - Last Updated: 05 October 2013 by Olly
-
-Example:
-
-.. code-block:: pascal
-
-    optionArr := choseOption.__getOptions();
-*}
-{$IFNDEF CODEINSIGHT}
-function TRSChooseOption.__getOptions(): __TOptionArray;
-var
-  tmb: TMufasaBitmap;
-  atpa, tmp: T2DPointArray;
-  i, t, hi, tmbW, tmbH, oldCTS, oldTarget: integer;
-  tpaShadow, tpaText: TPointArray;
-  b: TBox;
-begin
-  oldCTS := getToleranceSpeed();
   oldTarget := getImageTarget();
+  bmp := bitmapFromClient(self.getBounds());
 
-  //get a TMufasaBitmap of the chooseoption menu (without the border)
-  tmb.init(client.getMBitmaps());
-  tmb.copyClientToBitmap(client.getIOManager(), true, self.x1+1, self.y1+1, self.x2-1, self.y2-1);
+  thresholdAdaptiveBitmap(bmp, 0, 255, false, TM_MinMax, 0);
 
-  tmbW := tmb.getWidth() - 1;
-  tmbH := tmb.getHeight() - 1;
+  getBitmapSize(bmp, wid, hei);
+  setLength(result, (hei div 16));
 
-  // set the bitmap as our target
-  setTargetBitmap(tmb.getIndex());
+  if (length(result) < 1) then
+    exit();
 
-  // find the blue background, and the shadow
-  setColorToleranceSpeed(3);
-  findColorsTolerance(tpaShadow, 460291, 0, 0, tmbW, tmbH, 6);
+  try
+    setTargetBitmap(bmp);
 
-  setColorToleranceSpeed(1);
-
-  self.__applyFilter(tmb);
-
-  findColors(tpaText, clWhite, 0, 0, tmbW, tmbH);
-
-  if (length(tpaText) > 0) then
-  begin
-    setLength(atpa, tmb.getHeight() div 16);
-    setLength(result, length(atpa));
-
-    hi := high(atpa);
-
-    // now, lets gather all the text in lines
-    for i := 0 to hi do
-      findColors(atpa[i], clWhite, 0, (2 + i * 16), tmbW - 1, min((18 + i * 16) - 2, tmbH));
-
-    // restore, free created/old stuff
+    for i := 0 to high(result) do
+    begin
+      result[i].bounds := [0, (i * 16), wid - 1, min((i * 16) + 16, hei -1)];
+      result[i].str := getTextAtEx(result[i].bounds, 0, 5, 5, clRed, 0, UpCharsEx);
+      result[i].bounds.offset(point(self.x1, self.y1));  // offset so its back on the mainscreen
+    end;
+  except
+    print('TRSChooseOption.getOptions(): Exception encountered', TDebug.ERROR);
+  finally
     t := getImageTarget();
     setImageTarget(oldTarget);
     freeTarget(t);
-
-    setColorToleranceSpeed(oldCTS);
-    tmb.free();
-
-    // sort it in lines (high..low)
-    sortATPAFromFirstPointY(atpa, [tmbW div 2, 0]);
-
-    for i := 0 to hi do
-    begin
-      // split into single chars
-      tmp := atpa[i].split(1, 10);
-      b := atpa[i].getBounds();
-
-      // sort chars from (left..right) and then read the text
-      sortATPAFromFirstPointX(tmp, [b.x1, atpa[i][0].y]);
-      result[i].str := getTextATPA(tmp, 5, UpCharsEx);
-
-      //get the bounds for the option, and offset them so it's in the correct mainscreen postion.
-      result[i].bounds := [b.x1, b.y1, b.x2 + (self.getBounds().getWidth() - b.x2) - 2, b.y2 + 2];
-      result[i].bounds.offset([self.x1, self.y1]);
-    end;
-
-    // we're done.
-    exit();
+    freeBitmap(bmp);
   end;
-
-  // found no text? restore, free created/old stuff
-  t := getImageTarget();
-  setImageTarget(oldTarget);
-  freeTarget(t);
-
-  setColorToleranceSpeed(oldCTS);
-  tmb.free();
 end;
-{$ENDIF}
 
 (*
 TRSChooseOption.optionsExist
@@ -384,7 +284,7 @@ Returns true if any of the options exist.
 .. note::
 
     - by Olly
-    - Last Modified: 19 January 2014 by Ashaman88
+    - Last Modified: 16 February 2014 by Olly
 
 Example:
 
@@ -395,25 +295,23 @@ Example:
 *)
 function TRSChooseOption.optionsExist(options: TStringArray; matchPercent: extended = 1.00): boolean;
 var
-  opts: __TOptionArray;
+  optionArr: TOptionArray;
   i, j: integer;
 begin
   result := false;
 
-  if (not self.isOpen(false)) then
-    exit;
+  if (not self.isOpen()) then
+    exit();
 
-  opts := self.__getOptions();
+  optionArr := self.getOptions();
 
-  if (length(opts) > 0) then
-    for i := 0 to high(opts) do
-      if (isArrInStr(options, opts[i].str)) then
+  for i := 0 to high(optionArr) do
+    for j := 0 to high(options) do
+      if (pos(options[j], optionArr[i].str) > 0) then
       begin
-        print('TRSChooseOptions.optionsExist(): result = true');
+        print('TRSChooseOption.optionsExist(): Succesfully found option "'+options[j]+'" in "'+optionArr[i].str+'"', TDebug.SUB);
         exit(true);
       end;
-
-  print('TRSChooseOptions.optionsExist(): result = false');
 end;
 
 {*
@@ -448,30 +346,30 @@ Example:
 *}
 function TRSChooseOption._select(txt: TStringArray; mouseAction: integer; aclose: boolean; matchPercent: extended; waitTime: integer): boolean;
 var
-  optionArr: __TOptionArray;
+  optionArr: TOptionArray;
   l, i, j: integer;
   s: TStringArray;
   a: extended;
 begin
   result := false;
 
-  print('chooseOption._select():', TDebug.HEADER);
+  print('TRSChooseOption._select():', TDebug.HEADER);
 
   if (not self.isOpen(waitTime)) then
   begin
-    print('chooseOption menu never appeared', TDebug.ERROR);
-    print('chooseOption.select() result = false', TDebug.FOOTER);
+    print('ChooseOption menu never appeared', TDebug.ERROR);
+    print('TRSChooseOption.select() result = false', TDebug.FOOTER);
     exit();
   end;
 
-  optionArr := self.__getOptions();
+  optionArr := self.getOptions();
 
   l := length(optionArr);
 
   if (l < 1) then
   begin
     print('Failed to find any options', TDebug.ERROR);
-    print('chooseOption.select() result = false', TDebug.FOOTER);
+    print('TRSChooseOption.select() result = false', TDebug.FOOTER);
 
     if (aclose) then
       close();
@@ -495,13 +393,13 @@ begin
         if (pos(txt[j], optionArr[i].str) > 0) then
         begin
           print('Found option "' + txt[j] + '" in "' + optionArr[i].str + '"');
-          print('chooseOption.select() result = true', TDebug.FOOTER);
+          print('TRSChooseOption.select() result = true', TDebug.FOOTER);
 
           if (mouseAction <> MOUSE_NONE) then
             mouseBox(optionArr[i].bounds, mouseAction)
           else // if it's mouse none lets see if we need to close
             if (aclose) then
-              close();
+              self.close();
 
           exit(true);
         end else
@@ -513,13 +411,13 @@ begin
       if (a >= matchPercent) then
       begin
         print('Found option "' + txt[j] + '" @ accuracy ' + floatToStr(a));
-        print('chooseOption.select() result = true', TDebug.FOOTER);
+        print('TRSChooseOption.select() result = true', TDebug.FOOTER);
 
         if (mouseAction <> MOUSE_NONE) then
           mouseBox(optionArr[i].bounds, mouseAction)
         else // if it's mouse none lets see if we need to close
           if (aclose) then
-            close();
+            self.close();
 
         exit(true);
       end;
@@ -530,7 +428,7 @@ begin
     close();
 
   print('Failed to find any text matches');
-  print('ChooseOption._select() result = false', TDebug.FOOTER);
+  print('TRSChooseOption._select() result = false', TDebug.FOOTER);
 end;
 
 (*
@@ -616,26 +514,40 @@ Example:
 procedure TRSChooseOption.debugOptions();
 var
   i: integer;
-  options: __TOptionArray;
+  options: TOptionArray;
 begin
   print('TRSChooseOption.debugOptions()', TDebug.HEADER);
 
   if (self.isOpen()) then
   begin
-    options := self.__getOptions();
+    options := self.getOptions();
 
-    if (length(options) > 0) then
-    begin
-      print('Options:', TDebug.HEADER);
-
-      for i := 0 to high(options) do
-        print(toStr(i)+') '+options[i].str);
-
-      print('End of options:', TDebug.FOOTER);
-    end else
-      print('Found no options');
+    for i := 0 to high(options) do
+      print(intToStr(i)+') '+options[i].str);
   end else
-    print('Menu isn''t open');
+    print('Menu isn''t open, unable to debug options', TDebug.ERROR);
 
   print('TRSChooseOption.debugOptions()', TDebug.FOOTER);
 end;
+
+{*
+Depreciated
+~~~~~~~~~~~
+  Depreciated type / function.
+  Use TOption (type) and TRSChooseOption.getOptions().
+*}
+
+{$IFNDEF CODEINSIGHT}
+type
+  __TOption = record
+    bounds: TBox;
+    str: string;
+  end;
+
+  __TOptionArray = array of __TOption;
+
+function TRSChooseOption.__getOptions(): __TOptionArray;
+begin
+  result := __TOptionArray(self.getOptions());
+end;
+{$ENDIF}
