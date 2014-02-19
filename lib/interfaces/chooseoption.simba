@@ -76,7 +76,7 @@ Example:
 *)
 function TRSChooseOption.isOpen(): boolean;
 const
-  BORDER_COLORS = [197636, 3618615];
+  BORDER_COLORS = [197636, 3618615, 3748386];
   CORNER_COLOR = 2368548;
 var
   tpa, tpaBorder: TPointArray;
