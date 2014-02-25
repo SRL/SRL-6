@@ -87,13 +87,14 @@ const
   BANK_NPC_BLUE = 0;
   BANK_NPC_GREY = 1;
   BANK_NPC_GREEN = 2;
-  BANK_BOOTH = 3;
-  BANK_CHEST_SW = 4;
-  BANK_CHEST_SHANTAY = 5;
-  BANK_CHEST_DUEL = 6;
-  BANK_CHEST_CW = 7;
-  BANK_CHEST_GROTTO = 8;
-  BANK_CHEST_BURTHORPE = 9;
+  BANK_NPC_DRAYNOR = 3;
+  BANK_BOOTH = 4;
+  BANK_CHEST_SW = 5;
+  BANK_CHEST_SHANTAY = 6;
+  BANK_CHEST_DUEL = 7;
+  BANK_CHEST_CW = 8;
+  BANK_CHEST_GROTTO = 9;
+  BANK_CHEST_BURTHORPE = 10;
 
 (*
 type TRSBankScreen
@@ -1508,6 +1509,7 @@ begin
     BANK_NPC_BLUE: bodyColors := [[5906724, 14, [2, [0.18, 0.70, 0.00]]], [5188663, 12, [2, [0.23, 0.51, 0.00]]]];
     BANK_NPC_GREY: bodyColors := [[7040116, 5, [2, [0.38, 0.10, 0.00]]], [4803408, 5, [2, [0.48, 0.16, 0.00]]]];
     BANK_NPC_GREEN: bodyColors := [[3632759, 9, [2, [0.09, 0.64, 0.00]]], [3035164, 7, [2, [0.08, 1.03, 0.00]]]];
+    BANK_NPC_DRAYNOR: bodyColors := [[6539487, 9, [2, [0.23, 1.01, 0.00]]], [6968421, 9, [2, [0.27, 0.26, 0.00]]]];
   end;
 
   ms := mainScreen.getBounds();
@@ -1576,27 +1578,24 @@ begin
 
       mouse(atpa[i].getMiddle().randRange(-5, 5));
 
-      if (isMouseOverText(['Talk-to Banker', ' Banker', 'Bank ', 'nk booth'])) then
+      if (isMouseOverText(['Bank', 'ank'])) then
       begin
         print('We found correct mouse-over text');
-        fastClick(MOUSE_RIGHT);
+        fastClick(MOUSE_LEFT);
+        wait(50 + random(100));
 
-        if (chooseOption.select(['Bank Bank', 'ank Banker', 'ank Bank'])) then
-        begin
-          wait(50 + random(100));
+        if (minimap.isFlagPresent()) then
+          minimap.waitFlag(10);
 
-          if (minimap.isFlagPresent()) then
-            minimap.waitFlag(10);
+         result := _waitBankOrPinScreen(10000);
 
-           result := _waitBankOrPinScreen(10000);
+         if (result) then
+         begin
+           print('Bankscreen or pinscreen is open');
+           break();
+         end else
+           print('Bankscreen or pinscreen never opened');
 
-           if (result) then
-           begin
-             print('Bankscreen or pinscreen is open');
-             break();
-           end else
-             print('Bankscreen or pinscreen never opened');
-        end;
       end else
         print('Mouse-over text wasn''t correct');
     end;
@@ -1847,6 +1846,7 @@ Opens the desired bank, current vaild 'bankType' constants are:
     * BANK_NPC_BLUE
     * BANK_NPC_GREY
     * BANK_NPC_GREEN
+    * BANK_NPC_DRAYNOR
     * BANK_BOOTH
     * BANK_CHEST_SW
     * BANK_CHEST_SHANTAY
@@ -1872,7 +1872,7 @@ begin
     exit(true);
 
   case bankType of
-    BANK_NPC_BLUE..BANK_NPC_GREEN: result := self.__openNPC(bankType);
+    BANK_NPC_BLUE..BANK_NPC_DRAYNOR: result := self.__openNPC(bankType);
     BANK_BOOTH: result := self.__openBankBooth();
     BANK_CHEST_SW..BANK_CHEST_BURTHORPE: result := self.__openChest(bankType);
   end;
@@ -1880,4 +1880,4 @@ end;
 
 begin
   bankscreen.__init();
-end;   
+end;
