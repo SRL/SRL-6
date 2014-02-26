@@ -11,6 +11,8 @@ The source for this file can be found `here <https://github.com/SRL/SRL-6/blob/m
 
 {$include_once interfaces.simba}
 {$include_once ../core/text.simba}
+{$include_once ../tesseract/tesseract.simba}
+{$include_once ../utilities/color.simba}
 
 {$f-}
 
@@ -191,6 +193,50 @@ begin
     typeByte(VK_ESCAPE);
 
   until(c > 3);
+end;
+
+function TRSOptions._getOptions(var button: TBoxArray; var text: TStringArray): boolean;
+var
+  tpa : TPointArray;
+  atpa : T2DPointArray;
+  i: Integer;
+begin
+  if not self.isOpen() then
+    exit(false);
+
+  findColorsTolerance(tpa, 5927515, self.getBounds(), 17, colorSetting(2, 1.42, 0.39));
+
+  atpa := tpa.cluster(3);
+  atpa.filterBetween(0, 175);
+  atpa.sortBySize;
+
+  for i := 0 to high(atpa) do
+  begin
+    setLength(button, length(button) + 1);
+    button[high(button)] := atpa[i].getBounds();
+    setLength(text, length(text) + 1);
+    text[high(text)] := (trim(tesseractgettext(button[high(button)], FILTER_SMALL_CHARS)));
+  end;
+end;
+
+function TRSOptions.selectOption(txt: TStringArray): boolean;
+var
+  texts: TStringArray;
+  i, j: Integer;
+  b: TBoxArray;
+begin
+  if not self.Open() then
+    exit(false);
+
+  self._getOptions(b, texts);
+
+  for i := 0 to high(txt) do
+    for j := 0 to high(texts) do
+      if (pos(txt[i], texts[j]) > 0) then
+      begin
+        mouseBox(b[j], MOUSE_LEFT);
+        exit(true);
+      end;
 end;
 
 begin
