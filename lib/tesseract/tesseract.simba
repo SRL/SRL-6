@@ -205,6 +205,33 @@ begin
   result := tesseractGetText(x1, y1, x2, y2, filterMethod[0], filterMethod[1], filterMethod[2], filterMethod[3], config);
 end;
 
+(*
+tesseractGetText; overload
+~~~~~~~~~~~~~~~~~~~~~~~~~~
+
+.. code-block:: pascal
+
+     function tesseractGetText(const searchBox: tbox; filterMethod: array [0..3] of variant; config: string = ''): string; overload;
+
+Overloaded method, reads text in area searchBox on the client with a default filter.
+Use one of the filter constants found at the top of this file.
+
+.. note::
+
+    - By: Ashaman88
+    - Last Updated: February 25, 2014 by Ashaman88
+
+Example:
+
+.. code-block:: pascal
+
+     writeln(tesseractGetText(tabBackpack.getBounds, FILTER_SMALL_CHARS));
+*)
+function tesseractGetText(const searchBox: tbox; filterMethod: array [0..3] of variant; config: string = ''): string; overload;
+begin
+  result := tesseractGetText(searchBox.x1, searchBox.y1, searchBox.x2, searchBox.y2, filterMethod[0], filterMethod[1], filterMethod[2], filterMethod[3], config);
+end;
+
 begin
   __initTesseractPaths();
 end;

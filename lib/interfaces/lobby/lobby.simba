@@ -321,8 +321,7 @@ begin
 
   if (options.open()) then
   begin
-    p := point(options.x + round(options.w / 2), options.y+options.h - 45); // the exit to lobby button
-    mouse(p.rand(randomRange(-50, 50), 5), MOUSE_LEFT);
+    options.selectOption(['Lobby','xit to', 'obby']);
 
     t := (getSystemTime() + (7000));
 
