@@ -8,4 +8,5 @@ SRL Misc Reference
     antiban
     items
     smart
+    srlplayerform
     srlstats

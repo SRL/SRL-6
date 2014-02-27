@@ -6,6 +6,9 @@ The SRL Player Form is an optional script feature.  It allows scripters to
 integrate a user interface into their scripts, making it easier for their users
 to setup the script.
 
+For a tutorial on how to add the SRL player form to any script, see
+`this <http://villavu.com/forum/showthread.php?t=107572>`_ thread.
+
 The source for this file can be found
 `here <https://github.com/SRL/SRL-6/blob/master/lib/misc/srlplayerform.simba>`_.
 
@@ -27,7 +30,8 @@ type
 type TPlayerForm
 ~~~~~~~~~~~~~~~~
 
-Stores all information pertaining to a TPlayerForm.
+Stores all information pertaining to a TPlayerForm.  View the source file for
+a full list of customizable options.
 *)
 type
   TPlayerForm = record
@@ -49,6 +53,12 @@ var playerForm
 ~~~~~~~~~~~~~~
 
 The variable used by scripters to enable the SRL Player Form.
+
+Example:
+
+.. code-block:: pascal
+
+    playerForm.scriptSettingsPath := 'C:/settings.txt';
 *)
 var
   playerForm: TPlayerForm;
