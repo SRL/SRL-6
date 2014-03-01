@@ -75,10 +75,71 @@ begin
     ID := ID_INTERFACE_PINSCREEN;
     parentID := -1;
     static := false;
-    setBounds([32, 29, 544, 362]);
   end;
 end;
 {$ENDIF}
+
+(*
+TRSPinScreen.__find
+~~~~~~~~~~~~~~~~~~~
+
+.. code-block:: pascal
+
+    function TRSPinScreen.__find(): boolean;
+
+Returns true if the pin screen is detected, and sets the bounds
+
+.. note::
+
+    - by Olly
+    - Last Updated: 27 February 2014 by Ashaman88
+
+Example:
+
+.. code-block:: pascal
+
+    if (pinScreen.__find()) then
+      writeln('bounds are set!');
+*)
+function TRSPinScreen.__find(): boolean;
+const
+  TEXT_COLOR = 13618403;
+  TOP_BUTTON_COLOR = 9998984;
+  BOTTOM_BUTTON_COLOR = 4932919;
+  BUTTON_LENGTH = 156;
+var
+  tpa: TPointArray;
+  atpa: T2DPointArray;
+  i, hh: integer;
+  b: TBox;
+  p: TPoint;
+begin
+  result := false;
+
+  if (not findColors(tpa, TOP_BUTTON_COLOR, getClientBounds())) then
+    exit();
+
+  atpa := clusterTPAEx(tpa, 1, 20);
+  hh := high(atpa);
+
+  for i := 0 to hh do
+    if (length(atpa[i]) = BUTTON_LENGTH) then
+    begin
+      b := getTPABounds(atpa[i]);
+
+      if (((b.x2 - b.x1) + 1) = (BUTTON_LENGTH)) then
+      begin
+        incEx(b.y2, 24);
+
+        if (getColor(b.x1, b.y2) = BOTTOM_BUTTON_COLOR) and (getColor(b.x2, b.y2) = BOTTOM_BUTTON_COLOR) then
+          if (findText(p, TEXT_COLOR, 0, ['know'], [UpChars], b)) then // i don't know it button
+          begin
+            self.setBounds([b.x1 - 329, b.y1 - 252, b.x2 + 28, b.y2 + 57]);
+            exit(true);
+          end;
+      end;
+    end;
+end;
 
 (*
 TRSPinScreen.isOpen
@@ -113,7 +174,9 @@ begin
   t := (getSystemTime() + waitTime);
 
   repeat
-    result := findText(p, TEXT_COLOR, 0, ['Exit'], [UpChars], TBox([self.x2 - 200, self.y2 - 100, self.x2, self.y2]));
+    if (self.x1 - self.x2 = 0) then
+      result := self.__find() else
+      result := findText(p, TEXT_COLOR, 0, ['Exit'], [UpChars], TBox([self.x2 - 200, self.y2 - 100, self.x2, self.y2]));
 
     if (result) then
       break();

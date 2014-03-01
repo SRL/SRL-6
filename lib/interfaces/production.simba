@@ -85,8 +85,29 @@ begin
 end;
 {$ENDIF}
 
+(*
+TRSProductionScreen.__find
+~~~~~~~~~~~~~~~~~~~~~~~~~~
 
-function TRSProductionScreen.__findBounds(): boolean;
+.. code-block:: pascal
+
+    function TRSProductionScreen.__find(): boolean;
+
+Returns true if the production screen is detected, and sets the bounds
+
+.. note::
+
+    - by Ashaman88
+    - Last Updated: 27 February 2014 by Ashaman88
+
+Example:
+
+.. code-block:: pascal
+
+    if (productionScreen.__find()) then
+      writeln('bounds are set!');
+*)
+function TRSProductionScreen.__find(): boolean;
 const
   BORDER_COLOR = 11645361;
   BUTTON_COLOR = 11238410;
@@ -167,7 +188,7 @@ begin
 
   repeat
     if (self.x1 - self.x2 = 0) then
-      result := self.__findBounds() else
+      result := self.__find() else
       if (getColor(self.x1 + 8, self.y1 + 33) = BORDER_COLOR) or (getColor(self.x1 + 8, self.y1 + 34) = BORDER_COLOR) then
         if (countColor(BACKGROUND_COLOR, intToBox(self.x1 +250, self.y1 +40, self.x2 -20, self.y2 -250)) > 2000) then
           result := true;
