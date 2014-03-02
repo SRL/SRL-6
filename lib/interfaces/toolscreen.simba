@@ -68,11 +68,63 @@ begin
     name := 'RS Choose Tool Screen';
     ID := ID_INTERFACE_TOOL;
     parentID := -1;
-    static := true;
-    setBounds([92, 93, 483, 298]);
+    static := false;
   end;
 end;
 {$ENDIF}
+
+(*
+TRSToolScreen.__find
+~~~~~~~~~~~~~~~~~~~~
+
+.. code-block:: pascal
+
+    function TRSToolScreen.__find(): boolean;
+
+Returns true if the tools screen is detected, and sets the bounds
+
+.. note::
+
+    - by Ashaman88
+    - Last Updated: 28 February 2014 by Ashaman88
+
+Example:
+
+.. code-block:: pascal
+
+    if (toolScreen.__find()) then
+      writeln('bounds are set!');
+*)
+function TRSToolScreen.__find(): boolean;
+const
+  TEXT_COLOR = 2070783;
+  BUTTON_LENGTH = 54;
+var
+  tpa: TPointArray;
+  atpa: T2DPointArray;
+  i, hh: integer;
+  b: TBox;
+  p: TPoint;
+begin
+  result := false;
+
+  if (not findColors(tpa, TEXT_COLOR, getClientBounds())) then
+    exit();
+
+  atpa := tpa.cluster(5);
+  hh := high(atpa);
+
+  for i := 0 to hh do
+    if (length(atpa[i]) = BUTTON_LENGTH) then
+    begin
+      b := atpa[i].getBounds();
+      if (findText(p, TEXT_COLOR, 0, ['Knife'], [StatChars], b)) then
+      begin
+        self.setBounds([b.x1 - 184, b.y1 - 64, b.x2 + 184, b.y2 + 131]);
+        exit(true);
+      end;
+    end;
+end;
 
 (*
 TRSToolScreen.isOpen
@@ -111,14 +163,18 @@ begin
   borderTPA := tpaFromBox(intToBox(self.x1 + 31, self.y1 + 55, self.x1 + 361, self.y1 + 55));
 
   repeat
-    borders := getColors(borderTPA, true);
+    if (self.x1 - self.x2 = 0) then
+      result := self.__find() else
+      begin
+        borders := getColors(borderTPA, true);
 
-    if (length(borders) = 1) then
-      if (borders[0] = BORDER_COLOR) then
-        exit(true);
+        if (length(borders) = 1) then
+          if (borders[0] = BORDER_COLOR) then
+            exit(true);
+      end;
 
     wait(20 + random(20));
-  until (getSystemTime() >= t);
+  until (getSystemTime() >= t) or (result);
 end;
 
 (*
