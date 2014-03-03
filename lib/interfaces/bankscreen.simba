@@ -154,11 +154,73 @@ begin
     name := 'RS Bank Screen';
     ID := ID_INTERFACE_BANKSCREEN;
     parentID := -1;
-    static := true;
-    setBounds([56, 0, 742, 599]);
+    static := false;
   end;
 end;
 {$ENDIF}
+
+(*
+TRSBankScreen.__find
+~~~~~~~~~~~~~~~~~~~~
+
+.. code-block:: pascal
+
+    function TRSBankScreen.__find(): boolean;
+
+Returns true if the pin screen is detected, and sets the bounds
+
+.. note::
+
+    - by Olly
+    - Last Updated: 27 February 2014 by Ashaman88
+
+Example:
+
+.. code-block:: pascal
+
+    if (bankScreen.__find()) then
+      writeln('bounds are set!');
+*)
+function TRSBankScreen.__find(): boolean;
+const
+  TEXT_COLOR = 13618403;
+  TOP_BUTTON_COLOR = 9998984;
+  BOTTOM_BUTTON_COLOR = 4932919;
+  BUTTON_LENGTH = 107;
+var
+  tpa: TPointArray;
+  atpa: T2DPointArray;
+  i, hh: integer;
+  b: TBox;
+  p: TPoint;
+begin
+  result := false;
+
+  if (not findColors(tpa, TOP_BUTTON_COLOR, getClientBounds())) then
+    exit();
+
+  atpa := clusterTPAEx(tpa, 1, 20);
+  hh := high(atpa);
+
+  for i := 0 to hh do
+    if (length(atpa[i]) = BUTTON_LENGTH) then
+    begin
+      b := getTPABounds(atpa[i]);
+
+      if (((b.x2 - b.x1) + 1) = (BUTTON_LENGTH)) then
+      begin
+        incEx(b.y2, 24);
+
+        if (getColor(b.x1, b.y2) = BOTTOM_BUTTON_COLOR) and (getColor(b.x2, b.y2) = BOTTOM_BUTTON_COLOR) then
+          if (findText(p, TEXT_COLOR, 0, ['Bank'], [UpChars], b)) then // bank pin button
+          begin
+            if (self.x1 - self.x2 = 0) then
+              self.setBounds([b.x1 - 87, 0, b.x2 + 493, b.y2 + 12]);
+            exit(true);
+          end;
+      end;
+    end;
+end;
 
 (*
 TRSBankScreen.isOpen
@@ -184,44 +246,33 @@ Example:
       writeln('Bankscreen is open! lets start banking items...');
 *)
 function TRSBankScreen.isOpen(waitTime: integer = 0): boolean;
-const
-  TEXT_COLOR = 13618403;
-  OFFSET: TPoint = [114, -27];
 var
   t, tt: integer;
-  b, bb: TBox;
-  p: TPoint;
-  foundItem: boolean;
+  bb: TBox;
   tpa: TPointArray;
 begin
   t := (getSystemTime() + waitTime);
   result := false;
 
   repeat
-    if (getColor(self.x1 + OFFSET.x, self.y2 + OFFSET.y) = TEXT_COLOR) then // Top left color of the B of 'Bank'.
+    result := self.__find();
+
+    if result then
     begin
-      b := [self.x1 + OFFSET.x-30, self.y2 + OFFSET.y-25, self.x1 + OFFSET.x+30, self.y2 + OFFSET.y+25]; // Box around the 'Bank' text.
+      tt := (getSystemTime() + randomRange(2500, 3200));
+      bb := self.getBankSlotBox(1);
 
-      if (findText(p, TEXT_COLOR, 0, ['Bank'], [UpChars], b)) then
+      while (tt > getSystemTime()) and (not result) do
       begin
-        tt := (getSystemTime() + randomRange(2500, 3200));
-        bb := self.getBankSlotBox(1);
-
-        while (tt > getSystemTime()) and (not result) do
-        begin
-          findColors(tpa, ITEM_OUTLINE_BLACK, bb);
-          result := (length(tpa) > 5);
-        end;
-
-        result := true;
-        break();
+        findColors(tpa, ITEM_OUTLINE_BLACK, bb);
+        result := (length(tpa) > 5);
       end;
     end;
 
     if (waitTime > 0) then
       wait(15 + random(25));
 
-  until (getSystemTime() >= t);
+  until (getSystemTime() >= t) or (result);
 end;
 
 (*
