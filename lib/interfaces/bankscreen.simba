@@ -87,13 +87,14 @@ const
   BANK_NPC_BLUE = 0;
   BANK_NPC_GREY = 1;
   BANK_NPC_GREEN = 2;
-  BANK_BOOTH = 3;
-  BANK_CHEST_SW = 4;
-  BANK_CHEST_SHANTAY = 5;
-  BANK_CHEST_DUEL = 6;
-  BANK_CHEST_CW = 7;
-  BANK_CHEST_GROTTO = 8;
-  BANK_CHEST_BURTHORPE = 9;
+  BANK_NPC_DRAYNOR = 3;
+  BANK_BOOTH = 4;
+  BANK_CHEST_SW = 5;
+  BANK_CHEST_SHANTAY = 6;
+  BANK_CHEST_DUEL = 7;
+  BANK_CHEST_CW = 8;
+  BANK_CHEST_GROTTO = 9;
+  BANK_CHEST_BURTHORPE = 10;
 
 (*
 type TRSBankScreen
@@ -153,11 +154,73 @@ begin
     name := 'RS Bank Screen';
     ID := ID_INTERFACE_BANKSCREEN;
     parentID := -1;
-    static := true;
-    setBounds([56, 0, 742, 599]);
+    static := false;
   end;
 end;
 {$ENDIF}
+
+(*
+TRSBankScreen.__find
+~~~~~~~~~~~~~~~~~~~~
+
+.. code-block:: pascal
+
+    function TRSBankScreen.__find(): boolean;
+
+Returns true if the pin screen is detected, and sets the bounds
+
+.. note::
+
+    - by Olly
+    - Last Updated: 27 February 2014 by Ashaman88
+
+Example:
+
+.. code-block:: pascal
+
+    if (bankScreen.__find()) then
+      writeln('bounds are set!');
+*)
+function TRSBankScreen.__find(): boolean;
+const
+  TEXT_COLOR = 13618403;
+  TOP_BUTTON_COLOR = 9998984;
+  BOTTOM_BUTTON_COLOR = 4932919;
+  BUTTON_LENGTH = 107;
+var
+  tpa: TPointArray;
+  atpa: T2DPointArray;
+  i, hh: integer;
+  b: TBox;
+  p: TPoint;
+begin
+  result := false;
+
+  if (not findColors(tpa, TOP_BUTTON_COLOR, getClientBounds())) then
+    exit();
+
+  atpa := clusterTPAEx(tpa, 1, 20);
+  hh := high(atpa);
+
+  for i := 0 to hh do
+    if (length(atpa[i]) = BUTTON_LENGTH) then
+    begin
+      b := getTPABounds(atpa[i]);
+
+      if (((b.x2 - b.x1) + 1) = (BUTTON_LENGTH)) then
+      begin
+        incEx(b.y2, 24);
+
+        if (getColor(b.x1, b.y2) = BOTTOM_BUTTON_COLOR) and (getColor(b.x2, b.y2) = BOTTOM_BUTTON_COLOR) then
+          if (findText(p, TEXT_COLOR, 0, ['Bank'], [UpChars], b)) then // bank pin button
+          begin
+            if (self.x1 - self.x2 = 0) then
+              self.setBounds([b.x1 - 87, 0, b.x2 + 493, b.y2 + 12]);
+            exit(true);
+          end;
+      end;
+    end;
+end;
 
 (*
 TRSBankScreen.isOpen
@@ -183,44 +246,33 @@ Example:
       writeln('Bankscreen is open! lets start banking items...');
 *)
 function TRSBankScreen.isOpen(waitTime: integer = 0): boolean;
-const
-  TEXT_COLOR = 13618403;
-  OFFSET: TPoint = [114, -27];
 var
   t, tt: integer;
-  b, bb: TBox;
-  p: TPoint;
-  foundItem: boolean;
+  bb: TBox;
   tpa: TPointArray;
 begin
   t := (getSystemTime() + waitTime);
   result := false;
 
   repeat
-    if (getColor(self.x1 + OFFSET.x, self.y2 + OFFSET.y) = TEXT_COLOR) then // Top left color of the B of 'Bank'.
+    result := self.__find();
+
+    if result then
     begin
-      b := [self.x1 + OFFSET.x-30, self.y2 + OFFSET.y-25, self.x1 + OFFSET.x+30, self.y2 + OFFSET.y+25]; // Box around the 'Bank' text.
+      tt := (getSystemTime() + randomRange(2500, 3200));
+      bb := self.getBankSlotBox(1);
 
-      if (findText(p, TEXT_COLOR, 0, ['Bank'], [UpChars], b)) then
+      while (tt > getSystemTime()) and (not result) do
       begin
-        tt := (getSystemTime() + randomRange(2500, 3200));
-        bb := self.getBankSlotBox(1);
-
-        while (tt > getSystemTime()) and (not result) do
-        begin
-          findColors(tpa, ITEM_OUTLINE_BLACK, bb);
-          result := (length(tpa) > 5);
-        end;
-
-        result := true;
-        break();
+        findColors(tpa, ITEM_OUTLINE_BLACK, bb);
+        result := (length(tpa) > 5);
       end;
     end;
 
     if (waitTime > 0) then
       wait(15 + random(25));
 
-  until (getSystemTime() >= t);
+  until (getSystemTime() >= t) or (result);
 end;
 
 (*
@@ -1505,9 +1557,11 @@ var
   i: integer;
 begin
   case bankType of
-    BANK_NPC_BLUE: bodyColors := [[5906724, 14, [2, [0.18, 0.70, 0.00]]], [5188663, 12, [2, [0.23, 0.51, 0.00]]]];
-    BANK_NPC_GREY: bodyColors := [[7040116, 5, [2, [0.38, 0.10, 0.00]]], [4803408, 5, [2, [0.48, 0.16, 0.00]]]];
-    BANK_NPC_GREEN: bodyColors := [[3632759, 9, [2, [0.09, 0.64, 0.00]]], [3035164, 7, [2, [0.08, 1.03, 0.00]]]];
+    BANK_NPC_BLUE: bodyColors := [[5710887, 14, [2, [0.19, 1.04, 0.00]]], [5188663, 12, [2, [0.23, 0.51, 0.00]]]];
+                                    //human color                                 greencuffs                       lightgrey                                   bluish ones
+    BANK_NPC_GREY: bodyColors := [[6459339, 7, [2, [0.26, 1.86, 0.00]]], [2248002, 3, [2, [1.05, 4.01, 0.00]]], [7435136, 5, [2, [0.67, 0.52, 0.00]]], [9733762, 2, [2, [1.28, 0.44, 0.00]]]];
+    BANK_NPC_GREEN: bodyColors := [[3836826, 16, [2, [0.11, 0.91, 0.00]]], [3693340, 9, [2, [0.28, 1.30, 0.00]]]];
+    BANK_NPC_DRAYNOR: bodyColors := [[6539487, 9, [2, [0.23, 1.01, 0.00]]], [6968421, 9, [2, [0.27, 0.26, 0.00]]]];
   end;
 
   ms := mainScreen.getBounds();
@@ -1576,27 +1630,24 @@ begin
 
       mouse(atpa[i].getMiddle().randRange(-5, 5));
 
-      if (isMouseOverText(['Talk-to Banker', ' Banker', 'Bank ', 'nk booth'])) then
+      if (isMouseOverText(['Bank', 'ank'])) then
       begin
         print('We found correct mouse-over text');
-        fastClick(MOUSE_RIGHT);
+        fastClick(MOUSE_LEFT);
+        wait(50 + random(100));
 
-        if (chooseOption.select(['Bank Bank', 'ank Banker', 'ank Bank'])) then
-        begin
-          wait(50 + random(100));
+        if (minimap.isFlagPresent()) then
+          minimap.waitFlag(10);
 
-          if (minimap.isFlagPresent()) then
-            minimap.waitFlag(10);
+         result := _waitBankOrPinScreen(10000);
 
-           result := _waitBankOrPinScreen(10000);
+         if (result) then
+         begin
+           print('Bankscreen or pinscreen is open');
+           break();
+         end else
+           print('Bankscreen or pinscreen never opened');
 
-           if (result) then
-           begin
-             print('Bankscreen or pinscreen is open');
-             break();
-           end else
-             print('Bankscreen or pinscreen never opened');
-        end;
       end else
         print('Mouse-over text wasn''t correct');
     end;
@@ -1731,11 +1782,11 @@ begin
 
   case bankType of
     BANK_CHEST_SW: begin col1:= [8946555, 15, [2, [0.18, 0.18, 0.00]]]; col2:= [5863053, 10, [2, [0.13, 0.10, 0.00]]]; avelen:= 90; end;
-    BANK_CHEST_SHANTAY: begin col1:= [6324637, 5, [2, [0.08, 0.57, 0.00]]]; col2:= [3618876, 4, [2, [0.84, 0.47, 0.00]]]; avelen:= 90; end;
+    BANK_CHEST_SHANTAY: begin col1:= [4400442, 6, [2, [0.36, 1.18, 0.00]]]; col2:= [7312584, 3, [2, [0.17, 2.13, 0.00]]]; avelen:= 90; end;
     BANK_CHEST_DUEL: begin col1:= [8088922, 16, [2, [0.06, 0.17, 0.00]]]; col2:= [4808312, 17, [2, [0.03, 0.17, 0.00]]]; avelen:= 90; end;
     BANK_CHEST_CW: begin col1:= [8088922, 16, [2, [0.06, 0.17, 0.00]]]; col2:= [4808312, 17, [2, [0.03, 0.17, 0.00]]]; avelen:= 90; end;
     BANK_CHEST_GROTTO: begin col1:= [6842481, 6, [2, [0.00, 0.08, 0.00]]]; col2:= [2570316, 4, [2, [0.15, 1.35, 0.00]]]; avelen:= 90; end;
-    BANK_CHEST_BURTHORPE: begin col1:= [8946555, 15, [2, [0.18, 0.18, 0.00]]]; col2:= [5863053, 10, [2, [0.13, 0.10, 0.00]]]; avelen:= 90; end;
+    BANK_CHEST_BURTHORPE: begin col1:= [14481896, 8, [2, [1.23, 3.66, 0.00]]]; col2:= [6460329, 11, [2, [0.11, 1.29, 0.00]]]; avelen:= 90; end;
   end;
 
   print('TRSBankscreen.__openChest()', TDebug.HEADER);
@@ -1847,6 +1898,7 @@ Opens the desired bank, current vaild 'bankType' constants are:
     * BANK_NPC_BLUE
     * BANK_NPC_GREY
     * BANK_NPC_GREEN
+    * BANK_NPC_DRAYNOR
     * BANK_BOOTH
     * BANK_CHEST_SW
     * BANK_CHEST_SHANTAY
@@ -1872,7 +1924,7 @@ begin
     exit(true);
 
   case bankType of
-    BANK_NPC_BLUE..BANK_NPC_GREEN: result := self.__openNPC(bankType);
+    BANK_NPC_BLUE..BANK_NPC_DRAYNOR: result := self.__openNPC(bankType);
     BANK_BOOTH: result := self.__openBankBooth();
     BANK_CHEST_SW..BANK_CHEST_BURTHORPE: result := self.__openChest(bankType);
   end;
@@ -1880,4 +1932,4 @@ end;
 
 begin
   bankscreen.__init();
-end;   
+end;

@@ -81,10 +81,74 @@ begin
     ID := ID_INTERFACE_PRODUCTION;
     parentID := -1;
     static := false;
-    setBounds([36, 33, 539, 358]);
   end;
 end;
 {$ENDIF}
+
+(*
+TRSProductionScreen.__find
+~~~~~~~~~~~~~~~~~~~~~~~~~~
+
+.. code-block:: pascal
+
+    function TRSProductionScreen.__find(): boolean;
+
+Returns true if the production screen is detected, and sets the bounds
+
+.. note::
+
+    - by Ashaman88
+    - Last Updated: 27 February 2014 by Ashaman88
+
+Example:
+
+.. code-block:: pascal
+
+    if (productionScreen.__find()) then
+      writeln('bounds are set!');
+*)
+function TRSProductionScreen.__find(): boolean;
+const
+  BORDER_COLOR = 11645361;
+  BUTTON_COLOR = 11238410;
+var
+  j, i, wid, hei: integer;
+  b: TBox;
+  lowP, hiP: TPoint;
+  tpa, tpa2: TPointArray;
+begin
+  getClientDimensions(wid, hei);
+  b := [1, 1, wid -1, hei - 1];
+
+  findColorsTolerance(tpa, BORDER_COLOR, b, 0,colorSetting(1));
+  tpa.sortByXValue(true);
+
+  tpa2 := tpa;
+  tpa2.invert;
+
+  for i := 0 to high(tpa) do
+  begin
+    for j := 0 to high(tpa2) do
+      if (tpa2[j].x - tpa[i].x = 250) then
+      begin
+        lowP := tpa[i];
+        hiP := tpa2[j];
+        break;
+      end;
+    if (hiP.x - lowP.x = 250) then
+      break;
+  end;
+
+  if (hiP.x - lowP.x <> 250) then
+    exit(false);
+
+  if (hiP.x - lowP.x = 250) then
+    if countColorTolerance(BUTTON_COLOR, intToBox(lowP.x, lowP.y - 10, hiP.x, lowP.y + 10), 50) > 250 then
+    begin
+      self.setBounds(intToBox(lowP.x - 238, lowP.y - 311, hiP.x + 15, lowP.y + 14));
+      result := true;
+    end;
+end;
 
 (*
 TRSProductionScreen.isOpen
@@ -123,13 +187,14 @@ begin
   setColorToleranceSpeed(1);
 
   repeat
-    if (getColor(self.x1 + 8, self.y1 + 33) = BORDER_COLOR) then
-      if (countColor(BACKGROUND_COLOR, intToBox(self.x1 +250, self.y1 +40, self.x2 -20, self.y2 -250)) > 2000) then
-      begin
-        result := true;
-        break;
-      end;
-  until (getSystemTime() >= t);
+    if (self.x1 - self.x2 = 0) then
+      result := self.__find() else
+      if (getColor(self.x1 + 8, self.y1 + 33) = BORDER_COLOR) or (getColor(self.x1 + 8, self.y1 + 34) = BORDER_COLOR) then
+        if (countColor(BACKGROUND_COLOR, intToBox(self.x1 +250, self.y1 +40, self.x2 -20, self.y2 -250)) > 2000) then
+          result := true;
+
+    wait(20 + random(50));
+  until (getSystemTime() >= t) or (result);
 
   setColorToleranceSpeed(cts);
 end;
@@ -280,13 +345,13 @@ begin
   t := (getSystemTime() + 3000);
 
   repeat
-    if (slot>20) and (getColor(self.x1 + 223, self.y1 + 285) = __COLOR_SCROLL_BAR) then
+    if (slot>20) and ((getColor(self.x1 + 223, self.y1 + 285) = __COLOR_SCROLL_BAR) or (getColor(self.x1 + 223, self.y1 + 286) = __COLOR_SCROLL_BAR)) then
     begin
       result := true;
       break;
     end;
 
-    if (slot<21) and (getColor(self.x1 + 223, self.y1 + 76) = __COLOR_SCROLL_BAR) then
+    if (slot<21) and ((getColor(self.x1 + 223, self.y1 + 76) = __COLOR_SCROLL_BAR) or (getColor(self.x1 + 223, self.y1 + 77) = __COLOR_SCROLL_BAR)) then
     begin
       result := true;
       break;
@@ -340,7 +405,7 @@ begin
   if (slot>20) then
     offset:= 13;
 
-  result := grid(4, 5, 43, 43, 41+9, 41+9, point(self.x1 + _PRODUCTION_SLOTS_OFFSET.x, self.y1 + _PRODUCTION_SLOTS_OFFSET.y - offset));
+  result := grid(4, 5, 43, 43, 50, 50, point(self.x1 + _PRODUCTION_SLOTS_OFFSET.x, self.y1 + _PRODUCTION_SLOTS_OFFSET.y - offset));
 end;
 
 (*

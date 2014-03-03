@@ -7,7 +7,7 @@ interfaces = actionbar bankscreen chatbox chooseoption conversationbox interface
 gametabs = backpack gametab stats
 lobby = lobby worlds
 
-misc = antiban items smart srlstats
+misc = antiban items smart srlplayerform srlstats
 
 tesseract = tesseract
 

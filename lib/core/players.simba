@@ -958,6 +958,8 @@ const
   __RES_WAIT   = 1;
   __RES_TRIES  = 2;
   __RES_ACTION = 3;
+  // compares this string to what's read on the screen
+  // make sure string value (or part of it) is in the actual Runescape message
   __LOGIN_INVALID_INFO   = 'Invalid username or password';
   __LOGIN_DISABLED       = 'Account has been disabled';
   __LOGIN_LOGGED_IN      = 'Already logged in';
@@ -971,11 +973,14 @@ const
   __LOGIN_SKILL_LEVEL    = 'Skill level 1000+ required';
   __LOGIN_MEMBER_ONLY    = 'Player in member-only area';
   __LOGIN_CANNOT_CONNECT = 'Cannot connect to world';
+  __LOGIN_UNAVAILABLE    = 'RS systems unavailable';
+
+  __LOGIN_ERROR_COUNT    = 14;
 
 function __getLoginResponse(txt: string; timer: integer): TVariantArray;
 var
   msg: string;
-  responses: array [0..12] of TVariantArray;
+  responses: array [0..(__LOGIN_ERROR_COUNT - 1)] of TVariantArray;
   i: integer;
 begin
   result := [];
@@ -983,6 +988,7 @@ begin
   if (players.getActive() < 1) then
     print('No other active players, terminating', TDebug.FATAL);
 
+  //                  const          wait time    tries  action
   responses := [[__LOGIN_INVALID_INFO,   0,         2,  'false' ],
                 [__LOGIN_DISABLED,       0,         0,  'false' ],
                 [__LOGIN_LOGGED_IN,      5000,      5,  'true'  ],
@@ -995,7 +1001,8 @@ begin
                 [__LOGIN_EXCEED_LIMIT,   20000,     10, ''      ],
                 [__LOGIN_SKILL_LEVEL,    0,         9,  'true'  ],
                 [__LOGIN_MEMBER_ONLY,    0,         1,  'false' ],
-                [__LOGIN_CANNOT_CONNECT, 2000,      5,  'true'  ]];
+                [__LOGIN_CANNOT_CONNECT, 2000,      5,  'true'  ],
+                [__LOGIN_UNAVAILABLE,    3 * 60000, 10, 'halt'  ]];
 
   for i := 0 to high(responses) do
     if (pos(responses[i][0], txt) > 0) then
@@ -1360,8 +1367,7 @@ begin
 
   if (options.open()) then
   begin
-    p := point(options.x + round(options.w / 2), options.y + options.h - 25);
-    mouse(p.rand(randomRange(-75, 75), randomRange(-5, 5)), MOUSE_LEFT);
+    options.selectOption(['Logout', 'ogout', 'gout']);
 
     t := (getSystemTime() + (7000));
 

@@ -223,10 +223,10 @@ Example:
     mouseOffClient(OFF_CLIENT_RANDOM);
 *)
 const
-  OFF_CLIENT_TOP    = 0;
+  OFF_CLIENT_TOP = 0;
   OFF_CLIENT_BOTTOM = 1;
-  OFF_CLIENT_LEFT   = 2;
-  OFF_CLIENT_RIGHT  = 3;
+  OFF_CLIENT_LEFT = 2;
+  OFF_CLIENT_RIGHT = 3;
   OFF_CLIENT_RANDOM = 4;
 procedure mouseOffClient(Direction: Integer);
 var
@@ -741,9 +741,11 @@ begin
   if (findDTM(oneFreeSpin, p.x, p.y, tabBackpack.getBounds())) then
   begin
     tabBackpack.mouseSlot(tabBackpack.pointToSlot(p), MOUSE_MOVE);
-
     result := (isMouseOverText(['Claim', 'laim', 'Key', 'key', 'token'], 300));
   end;
+
+  if not (result) then
+    p := [-1, -1];
 
   freeDTM(oneFreeSpin);
 end;
@@ -998,18 +1000,23 @@ begin
   end;
 
   tabBackpack.mouseSlot(slot, MOUSE_RIGHT);
+
   if chooseOption.select(['Destroy', 'estr', 'stro']) then
-    if conversationBox.isOpen(randomRange(2000,3000)) then
+    if conversationBox.isOpen(randomRange(2000, 3000)) then
     begin
       findColorsTolerance(tpa, 1137455, conversationBox.getBounds(), 33, colorSetting(1));
       atpa := tpa.cluster(10);
       atpa.sortBySize;
+
       if length(atpa) > 0 then
       begin
         mouseBox(atpa[0].getBounds(), MOUSE_LEFT);
-        result := tabBackpack.waitForShift(randomRange(3000,4000));
+        result := tabBackpack.waitForShift(randomRange(3000, 4000));
       end;
     end;
+
+  if (result) then
+    print('destroyTicket(): Successfully destroyed spin ticket', TDebug.SUB);
 end;
 
 (*
@@ -1036,16 +1043,15 @@ Example:
 function claimTicket(): boolean;
 var
   p: TPoint;
-  t, oneFreeSpin: integer;
+  t: integer;
 begin
   if (findTicket(p)) then
   begin
     tabBackpack.mouseSlot(tabBackpack.pointToSlot(p), MOUSE_LEFT);
-    oneFreeSpin := DTMFromString('m1gAAAHic42JgYDjJyMBwGIj3AvEZIL4AxOeB+BgQX4FikHwyUG0qEGcDcRYDhJ8AxPFAnAnEeVC8Y7Elw64lVgx9KfZgPKfLEIV/f3MyGHMB1RKDGYnECAAA26sbNQ==');
 
     t := (getSystemTime() + randomRange(2000, 3000));
     repeat
-      if not (findDTM(oneFreeSpin, p.x, p.y, tabBackpack.getBounds())) then
+      if not (tabBackpack.isItemInSlot(tabBackpack.pointToSlot(p))) then
         result := true;
 
       if conversationBox.continue(true, true) then
@@ -1053,16 +1059,15 @@ begin
 
       wait(20 + random(20));
     until (getSystemTime() >= t) or (result);
-    freeDTM(oneFreeSpin);
   end;
 
   if (result) then
+  begin
+    print('claimTicket(): Successfully claimed spin ticket', TDebug.SUB);
     wait(200 + random(400))
-  else
-    if (p.x <> 0) then
+  end
+    if (p.x <> -1) then
       destroyTicket(tabBackpack.pointToSlot(p));
-
-  print('claimTicket result: '+tostr(result));
 end;
 
 (*
