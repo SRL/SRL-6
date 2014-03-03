@@ -1,0 +1,20 @@
+{$include_once rafiki.simba}
+
+(*
+Rafiki Player Manager
+=====================
+
+  This script will run the rafiki player manager, feel free to close this script
+  tab when you are finished. NOTE: Can only be run in the lape interpreter (Script > Interpreter > Lape);
+
+  * If you need help with rafiki you can use this guide:
+     to-do
+
+  * If you have found a bug regarding the player manager, please report it here:
+     http://villavu.com/forum/project.php?projectid=10
+*)
+
+begin
+  runRafikiPlayerManager();
+end;
+
