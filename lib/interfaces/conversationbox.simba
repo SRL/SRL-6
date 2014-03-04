@@ -83,11 +83,139 @@ begin
     name := 'RS Conversation Box';
     ID := ID_INTERFACE_CONVERSATION_BOX;
     parentID := -1;
-    static := true;
-    setBounds([41, 438, 546, 567]);
+    static := false;
   end;
 end;
 {$ENDIF}
+
+(*
+TRSConversationBox.__find
+~~~~~~~~~~~~~~~~~~~~~~~~~
+
+.. code-block:: pascal
+
+    function TRSConversationBox.__find(): boolean;
+
+Returns true if the conversationbox is detected, and sets the bounds
+
+.. note::
+
+    - by Ashaman88
+    - Last Updated: 27 February 2014 by Ashaman88
+
+Example:
+
+.. code-block:: pascal
+
+    if (conversationBox.__find()) then
+      writeln('bounds are set!');
+*)
+function TRSConversationBox.__find(): boolean;
+const
+  TOP_COLOR = 4284025;
+  MENU_LENGTH = 243;
+  MENU_LENGTH_2 = 209;
+  MENU_BUTTON_COLOR = 2760716;
+var
+  tpa : TPointArray;
+  atpa : T2DPointArray;
+  i, hh: integer;
+  b: TBox;
+begin
+  result := false;
+
+  if (not findColors(tpa, TOP_COLOR, getClientBounds())) then
+    exit();
+
+  atpa := clusterTPAEx(tpa, 10, 1);
+  hh := high(atpa);
+
+  for i := 0 to hh do
+    if (length(atpa[i]) = MENU_LENGTH) or (length(atpa[i]) = MENU_LENGTH_2) then
+    begin
+      b := getTPABounds(atpa[i]);
+
+      if (getColor(b.x2, b.y1 - 5) = MENU_BUTTON_COLOR) then
+      begin
+        self.setBounds([b.x2 - 505, b.y1 - 33, b.x2, b.y2 + 87]);
+        exit(true);
+      end;
+    end;
+end;
+
+(*
+TRSConversationBox.isOpen
+~~~~~~~~~~~~~~~~~~~~~~~~~
+
+.. code-block:: pascal
+
+    function TRSConversationBox.isOpen(): boolean;
+
+Returns true if the conversation box is open.
+
+.. note::
+
+    - by Olly
+    - Last Updated: 21 September 2013 by Olly
+
+Example:
+
+.. code-block:: pascal
+
+    if (not conversationBox.isOpen()) then
+      exit();
+*)
+function TRSConversationBox.isOpen(waitTime: integer = 200): boolean;
+var
+  t: integer;
+begin
+  t := (getSystemTime() + waitTime);
+  repeat
+    if (self.x1 - self.x2 = 0) then
+      result := self.__find() else
+      if (countColorTolerance(9021887, self.getBounds(), 35) > 5000) then  // color of the paper like background.
+        exit(true);
+
+    wait(20 + random(20));
+  until (getSystemTime() >= t) or (result);
+end;
+
+(*
+TRSConversationBox.getChatBounds
+~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+
+.. code-block:: pascal
+
+    function TRSConversationBox.getChatBounds(): TBox;
+
+Returns a TBox of where the black NPC chat is
+
+.. note::
+
+    - by Olly
+    - Last Updated: December 22, 2013 by Olly
+
+Example:
+
+.. code-block:: pascal
+
+     b := conversationBox.getChatBounds();
+*)
+function TRSConversationBox.getChatBounds(): TBox;
+var
+  atpa: T2DPointArray;
+  tpa: TPointArray;
+begin
+  if (self.isOpen()) then
+    if (findColorsTolerance(tpa, 1645599, self.getBounds(), 12, colorSetting(2, 0.70, 0.90))) then
+    begin
+      atpa := clusterTPAEx(tpa, 10, 15);
+      sortATPAFromMidPoint(atpa, self.getBounds().getMiddle());
+
+      result := atpa[low(atpa)].getBounds();
+      result.expand(10);
+    end;
+end;
 
 (*
 TRSConversationBox.getSpeaker
@@ -144,78 +272,6 @@ Example:
 function TRSConversationBox.areTalking(): boolean;
 begin
   result := (self.getSpeaker() <> '');
-end;
-
-(*
-TRSConversationBox.isOpen
-~~~~~~~~~~~~~~~~~~~~~~~~~
-
-.. code-block:: pascal
-
-    function TRSConversationBox.isOpen(): boolean;
-
-Returns true if the conversation box is open.
-
-.. note::
-
-    - by Olly
-    - Last Updated: 21 September 2013 by Olly
-
-Example:
-
-.. code-block:: pascal
-
-    if (not conversationBox.isOpen()) then
-      exit();
-*)
-function TRSConversationBox.isOpen(waitTime: integer = 200): boolean;
-var
-  t: integer;
-begin
-  t := (getSystemTime() + waitTime);
-  repeat
-    if (countColorTolerance(9021887, self.getBounds(), 35) > 5000) then  // color of the paper like background.
-      exit(true);
-
-    wait(20 + random(20));
-  until (getSystemTime() >= t);
-end;
-
-(*
-TRSConversationBox.getChatBounds
-~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
-
-.. code-block:: pascal
-
-    function TRSConversationBox.getChatBounds(): TBox;
-
-Returns a TBox of where the black NPC chat is
-
-.. note::
-
-    - by Olly
-    - Last Updated: December 22, 2013 by Olly
-
-Example:
-
-.. code-block:: pascal
-
-     b := conversationBox.getChatBounds();
-*)
-function TRSConversationBox.getChatBounds(): TBox;
-var
-  atpa: T2DPointArray;
-  tpa: TPointArray;
-begin
-  if (self.isOpen()) then
-    if (findColorsTolerance(tpa, 1645599, self.getBounds(), 12, colorSetting(2, 0.70, 0.90))) then
-    begin
-      atpa := clusterTPAEx(tpa, 10, 15);
-      sortATPAFromMidPoint(atpa, self.getBounds().getMiddle());
-
-      result := atpa[low(atpa)].getBounds();
-      result.expand(10);
-    end;
 end;
 
 (*
