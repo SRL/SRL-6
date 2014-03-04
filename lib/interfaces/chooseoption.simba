@@ -332,7 +332,7 @@ function TRSChooseOption._select(txt: TStringArray; mouseAction: integer; aclose
 .. note::
 
     - by Olly
-    - Last Modified: 06 September 2013 by Olly
+    - Last Modified: 04 March 2014 by Coh3n
 
 Example:
 
@@ -350,6 +350,7 @@ var
   l, i, j: integer;
   s: TStringArray;
   a: extended;
+  b: TBox;
 begin
   result := false;
 
@@ -414,8 +415,11 @@ begin
         print('TRSChooseOption.select() result = true', TDebug.FOOTER);
 
         if (mouseAction <> MOUSE_NONE) then
-          mouseBox(optionArr[i].bounds, mouseAction)
-        else // if it's mouse none lets see if we need to close
+        begin
+          b := optionArr[i].bounds;
+          b.edit(2, 2, -2, -2); // shrink the box so there's no chance of clicking the wrong option
+          mouseBox(b, mouseAction)
+        end else // if it's mouse none lets see if we need to close
           if (aclose) then
             self.close();
 
