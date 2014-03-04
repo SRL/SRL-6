@@ -12,6 +12,7 @@ The source for this file can be found `here <https://github.com/SRL/SRL-6/blob/m
 {$f-}
 
 {$include_once interfaces.simba}
+{$include_once minimap.simba}
 
 (*
 const Locations
@@ -106,10 +107,63 @@ begin
     ID := ID_INTERFACE_LODESTONE;
     parentID := -1;
     static := false;
-    setBounds([38, 45, 537, 345]);
   end;
 end;
 {$ENDIF}
+
+(*
+TRSLodestoneScreen.__find
+~~~~~~~~~~~~~~~~~~~~~~~~~
+
+.. code-block:: pascal
+
+    function TRSLodestoneScreen.__find(): boolean;
+
+Returns true if the lodestone screen is detected, and sets the bounds
+
+.. note::
+
+    - by Ashaman88
+    - Last Updated: 27 February 2014 by Ashaman88
+
+Example:
+
+.. code-block:: pascal
+
+    if (LodestoneScreen.__find()) then
+      writeln('bounds are set!');
+*)
+function TRSLodestoneScreen.__find(): boolean;
+const
+  TOP_COLOR = 1118779;
+  MENU_LENGTH = 768;
+  MENU_OFFSET_COLOR = 1189179;
+var
+  tpa : TPointArray;
+  atpa : T2DPointArray;
+  i, hh: integer;
+  b: TBox;
+begin
+  result := false;
+
+  if (not findColors(tpa, TOP_COLOR, getClientBounds())) then
+    exit();
+
+  atpa := tpa.cluster(5);
+  hh := high(atpa);
+
+  for i := 0 to hh do
+    if (length(atpa[i]) = MENU_LENGTH) then
+    begin
+      b := getTPABounds(atpa[i]);
+
+      if (getColor(b.x2, b.y2 + 5) = MENU_OFFSET_COLOR) then
+      begin
+        self.setBounds([b.x1 - 15, b.y1 - 2, b.x2 + 305, b.y2 + 276]);
+        exit(true);
+      end;
+    end;
+end;
 
 (*
 TRSLodestoneScreen.isOpen
@@ -136,7 +190,7 @@ Example:
 *)
 function TRSLodestoneScreen.isOpen(waitTime: integer = 0): boolean;
 const
-  TEXT_COLOR = 12378347;
+  TEXT_COLOR = 379903;
   BACKGROUND_COLOR = 13164271;
   BACKGROUND_TOLERANCE = 25;
 var
@@ -148,13 +202,13 @@ begin
   setColorToleranceSpeed(1);
 
   repeat
-    if (getColor(self.x1 +168, self.y1 +10) = TEXT_COLOR) then
-      if (countColorTolerance(BACKGROUND_COLOR, self.getBounds(), BACKGROUND_TOLERANCE) > 20000) then
-      begin
-        result := true;
-        break;
-      end;
-  until (getSystemTime() >= t);
+    if (self.x1 - self.x2 = 0) then
+      result := self.__find() else
+      if (getColor(self.x1 + 168, self.y1 + 10) = TEXT_COLOR) then
+        result := (countColorTolerance(BACKGROUND_COLOR, self.getBounds(), BACKGROUND_TOLERANCE) > 20000);
+
+    wait(20 + random(20));
+  until (getSystemTime() >= t) or (result);
 
   setColorToleranceSpeed(cts);
 end;
@@ -189,7 +243,7 @@ begin
 
   if (self.isOpen()) then
   begin
-    mouse(point(self.x2 -12, self.y1 +13).randRange(-4, 4), MOUSE_LEFT);
+    mouseCircle(self.x2 - 9, self.y1 + 7, 3, MOUSE_LEFT);
 
     while (t > getSystemTime()) do
     begin
@@ -306,20 +360,23 @@ var
 begin
   result := false;
 
-  mouseCircle(minimap.button[MM_BUTTON_LODESTONE].center.x, minimap.button[MM_BUTTON_LODESTONE].center.y,
-              minimap.button[MM_BUTTON_LODESTONE].radius, MOUSE_MOVE);
-
-  if (location = LOCATION_PREVIOUS) then
+  if (not self.isOpen()) then
   begin
-    fastclick(MOUSE_RIGHT);
-    result := chooseOption.select(['Previous dest', 'estination', 'evious']);
+    mouseCircle(minimap.button[MM_BUTTON_LODESTONE].center.x, minimap.button[MM_BUTTON_LODESTONE].center.y,
+                minimap.button[MM_BUTTON_LODESTONE].radius, MOUSE_MOVE);
 
-    if (result) then
-      print('TRSLodestoneScreen.teleportTo(): Succesfully teleported to previous destination', TDebug.SUB)
-    else
-      print('TRSLodestoneScreen.teleportTo(): Failed teleport to previous destination (ChooseOption must have failed)', TDebug.SUB);
+    if (location = LOCATION_PREVIOUS) then
+    begin
+      fastclick(MOUSE_RIGHT);
+      result := chooseOption.select(['Previous dest', 'estination', 'evious']);
 
-    exit();
+      if (result) then
+        print('TRSLodestoneScreen.teleportTo(): Succesfully teleported to previous destination', TDebug.SUB)
+      else
+        print('TRSLodestoneScreen.teleportTo(): Failed teleport to previous destination (ChooseOption must have failed)', TDebug.SUB);
+
+      exit();
+    end;
   end;
 
   if (not self.isOpen()) then
