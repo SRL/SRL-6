@@ -113,9 +113,8 @@ Example:
 function TRSConversationBox.__find(): boolean;
 const
   TOP_COLOR = 4284025;
-  MENU_LENGTH = 243;
-  MENU_LENGTH_2 = 209;
-  MENU_BUTTON_COLOR = 2760716;
+  MENU_LENGTH = 87;
+  MENU_BUTTON_COLOR = 4481660;
 var
   tpa : TPointArray;
   atpa : T2DPointArray;
@@ -127,17 +126,17 @@ begin
   if (not findColors(tpa, TOP_COLOR, getClientBounds())) then
     exit();
 
-  atpa := clusterTPAEx(tpa, 10, 1);
+  atpa := clusterTPAEx(tpa, 4, 2);
   hh := high(atpa);
 
   for i := 0 to hh do
-    if (length(atpa[i]) = MENU_LENGTH) or (length(atpa[i]) = MENU_LENGTH_2) then
+    if (length(atpa[i]) = MENU_LENGTH) then
     begin
       b := getTPABounds(atpa[i]);
 
-      if (getColor(b.x2, b.y1 - 5) = MENU_BUTTON_COLOR) then
+      if (getColor(b.x2, b.y1) = MENU_BUTTON_COLOR) then
       begin
-        self.setBounds([b.x2 - 505, b.y1 - 33, b.x2, b.y2 + 87]);
+        self.setBounds([b.x2 - 505, b.y1 - 34, b.x2, b.y1 + 124]);
         exit(true);
       end;
     end;
