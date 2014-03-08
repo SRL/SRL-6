@@ -842,6 +842,32 @@ begin
 end;
 
 (*
+TBox.shrink
+~~~~~~~~~~~
+
+.. code-block:: pascal
+
+    procedure TBox.shrink(const size: integer);
+
+Shrinks the size of the box by 'size'.
+
+.. note::
+
+    - by Olly
+    - Last Updated: 08 March 2014 by Olly
+
+Example:
+
+.. code-block:: pascal
+
+    box.shrink(10);
+*)
+procedure TBox.shrink(const size: integer);
+begin
+  self.edit(+size, +size, -size, -size);
+end;
+
+(*
 TBoxArray.getBounds
 ~~~~~~~~~~~~~~~~~~~
 

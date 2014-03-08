@@ -257,9 +257,10 @@ begin
 
     for i := 0 to high(result) do
     begin
-      result[i].bounds := [0, (i * 16), wid - 1, min((i * 16) + 16, hei -1)];
+      result[i].bounds := [0, (i * 16) + 1, wid - 1, min((i * 16) + 16, hei -1)];
       result[i].str := getTextAtEx(result[i].bounds, 0, 5, 5, clRed, 0, UpCharsEx);
       result[i].bounds.offset(point(self.x1, self.y1));  // offset so its back on the mainscreen
+      result[i].bounds.shrink(1);
     end;
   except
     print('TRSChooseOption.getOptions(): Exception encountered', TDebug.ERROR);
