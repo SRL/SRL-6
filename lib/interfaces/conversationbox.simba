@@ -113,11 +113,13 @@ Example:
 function TRSConversationBox.__find(): boolean;
 const
   TOP_COLOR = 4284025;
+  TOP_COLOR_2 = 3230309;
   MENU_LENGTH = 87;
-  MENU_BUTTON_COLOR = 4481660;
+  MENU_LENGTH_2 = 4;
+  MENU_BORDER_COLOR = 4481660;
 var
-  tpa : TPointArray;
-  atpa : T2DPointArray;
+  tpa, tpa2: TPointArray;
+  atpa, atpa2: T2DPointArray;
   i, hh: integer;
   b: TBox;
 begin
@@ -126,7 +128,10 @@ begin
   if (not findColors(tpa, TOP_COLOR, getClientBounds())) then
     exit();
 
-  atpa := clusterTPAEx(tpa, 4, 2);
+  if (not findColors(tpa2, TOP_COLOR_2, getClientBounds())) then
+    exit();
+
+  atpa := tpa.cluster(4, 2);
   hh := high(atpa);
 
   for i := 0 to hh do
@@ -134,9 +139,24 @@ begin
     begin
       b := getTPABounds(atpa[i]);
 
-      if (getColor(b.x2, b.y1) = MENU_BUTTON_COLOR) then
+      if (getColor(b.x2, b.y1) = MENU_BORDER_COLOR) then
       begin
-        self.setBounds([b.x2 - 505, b.y1 - 34, b.x2, b.y1 + 124]);
+        self.setBounds([b.x2 - 505, b.y1 - 34, b.x2, b.y1 + 95]);
+        exit(true);
+      end;
+    end;
+
+  atpa2 := tpa2.cluster(5);
+  hh := high(atpa2);
+
+  for i := 0 to hh do
+    if (length(atpa2[i]) = MENU_LENGTH_2) then
+    begin
+      b := getTPABounds(atpa2[i]);
+
+      if (getColor(b.x2 + 1, b.y1 + 2) = MENU_BORDER_COLOR) then
+      begin
+        self.setBounds([b.x2 - 504, b.y1 - 32, b.x2 + 1, b.y1 + 97]);
         exit(true);
       end;
     end;
