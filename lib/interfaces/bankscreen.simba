@@ -308,7 +308,7 @@ begin
     exit(true);
 
   // try ESC key first
-  timeOut := (getSystemTime() + randomRange(300, 600));
+  timeOut := (getSystemTime() + randomRange(600, 900));
   repeat
     typeByte(VK_ESCAPE);
     wait(100 + random(50));
