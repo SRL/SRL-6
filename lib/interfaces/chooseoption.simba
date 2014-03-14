@@ -177,7 +177,7 @@ Example:
 *)
 function TRSChooseOption.close(): boolean;
 var
-  left: boolean;
+  left, wide: boolean;
   wid, hei: integer;
   p: TPoint;
   t: longWord;
@@ -190,11 +190,15 @@ begin
   getClientDimensions(wid, hei);
 
   left := (self.x1 > abs(self.x2 - wid));
+  wide := ((self.y2 - self.y1) > 450);
 
   if (left) then
     p.x := (self.x1 - randomRange(15, 65))
   else
-    p.x := (self.x2 + randomRange(15, 65));
+    if (wide) then
+      p.x := (self.x2 + 300 + randomRange(15, 65))
+      else
+        p.x := (self.x2 + randomRange(15, 65));
 
   p.y := (self.y1 + random((self.y2 - self.y1) + random(10)));
 
