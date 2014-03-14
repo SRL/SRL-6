@@ -736,7 +736,7 @@ begin
     exit();
   end;
 
-  oneFreeSpin := DTMFromString('m1gAAAHic42JgYDjJyMBwGIj3AvEZIL4AxOeB+BgQX4FikHwyUG0qEGcDcRYDhJ8AxPFAnAnEeVC8Y7Elw64lVgx9KfZgPKfLEIV/f3MyGHMB1RKDGYnECAAA26sbNQ==');
+  oneFreeSpin := DTMFromString('m1gAAAHic42JgYOABYjYgFodiTiAWAmJhIOZngACQPAuUD8JcUHFGqDg3kjk7Flsy3N+cDMZ9KfZgvGuJFcOcLkMUPg9UDyHMSCRGAAA8PBAn');
 
   if (findDTM(oneFreeSpin, p.x, p.y, tabBackpack.getBounds())) then
   begin
