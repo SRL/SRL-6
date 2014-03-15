@@ -28,6 +28,7 @@ Example:
 *)
 const
   ITEM_OUTLINE_BLACK = 131072;
+  ITEM_OUTLINE_BLACK_SECONDARY = 65536;
   ITEM_OUTLINE_WHITE = 16777215;
   ITEM_TEXT_YELLOW   = 65535;
   ITEM_TEXT_WHITE = ITEM_OUTLINE_WHITE;
@@ -198,6 +199,7 @@ var
   p: TPoint;
 begin
   result := (findColor(p.x, p.y, ITEM_OUTLINE_BLACK, area) or
+             findColor(p.x, p.y, ITEM_OUTLINE_BLACK_SECONDARY, area) or
              findColor(p.x, p.y, ITEM_OUTLINE_WHITE, area));
 end;
 
