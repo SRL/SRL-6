@@ -14,30 +14,6 @@ const
   VK_ENTER = {$IFDEF LINUX}10{$ELSE}VK_RETURN{$ENDIF};
 
 (*
-var MessageBox
-~~~~~~~~~~~~~~
-
-Variables that store Simba's MessageBox function parameters.  Makes it easier to
-use rather than just remembering values.
-
-Example:
-
-.. code-block:: pascal
-
-    MessageBox('Test!', 'Test', mbOkCancel);
-*)
-var
-  mbOk = 0;
-  mbOkCancel = 1;
-  mbAbortRetryIgnore = 2;
-  mbYesNoCancel = 3;
-  mbYesNo = 4;
-  mbCancelRetry = 5;
-
-  mrYes = 6;
-  mrNo = 7;
-
-(*
 var Colors
 ~~~~~~~~~~
 

@@ -198,8 +198,7 @@ function isItemIn(area: TBox): boolean;
 var
   p: TPoint;
 begin
-  result := (findColor(p.x, p.y, ITEM_OUTLINE_BLACK, area) or
-             findColor(p.x, p.y, ITEM_OUTLINE_BLACK_SECONDARY, area) or
+  result := (findColorTolerance(p.x, p.y, ITEM_OUTLINE_BLACK, area, 1) or
              findColor(p.x, p.y, ITEM_OUTLINE_WHITE, area));
 end;
 
