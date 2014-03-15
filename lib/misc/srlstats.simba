@@ -94,12 +94,12 @@ begin
 
   if ((statsUsername = '') and (statsPassword = '')) and (strToBoolDef(getSettingValue(__STATS_SETTING), true)) then
     case MessageBox('No Stats account entered, would you like to set one up?', 'SRL Stats', 3) of
-      mrYes:
+      6:
         openWebPage('');
 
-      mrNo:
-        case MessageBox('Would you want to disable this dialog from showing again in the future? (Not Recommended)', 'Disable this dialog?', mbYesNoCancel) of
-          mrYes: SetSettingValue(__STATS_SETTING, 'FALSE');
+      7:
+        case MessageBox('Would you want to disable this dialog from showing again in the future? (Not Recommended)', 'Disable this dialog?', 3) of
+          6: SetSettingValue(__STATS_SETTING, 'FALSE');
         end;
     end;
 

@@ -1,5 +1,3 @@
-{$include_once rafiki.simba}
-
 (*
 Rafiki Player Manager
 =====================
@@ -14,7 +12,15 @@ Rafiki Player Manager
      http://villavu.com/forum/project.php?projectid=10
 *)
 
+{$IFDEF LAPE}
+{$include_once rafiki.simba}
+
 begin
   runRafikiPlayerManager();
-end;
+end.
 
+{$ELSE}
+begin
+  messageDlg('Rafiki Player Manager', 'Cannot run the player manager since your interpeter isn''t set to Lape, to fix this go-to: (Script > Interepeter > Lape)', mtError, [mbOk]);
+end.
+{$ENDIF}

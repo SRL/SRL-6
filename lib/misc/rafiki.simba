@@ -1,5 +1,3 @@
-program new;
-
 const
   RAFIKI_VERSION = '2.00';
 
@@ -54,17 +52,6 @@ type
     selectedArmy: string;
  end;
 
- type
-   TEncryptionForm = packed record
-     frm: TForm;
-     edits: array [0..1] of TEdit;
-     btn: TButton;
-     cb: TCheckBox;
-     gb: TGroupBox;
-     newLabel: TLabel;
-     pass: string;
-   end;
-
 type
   TPasswordForm = packed record
     frm: TForm;
@@ -73,12 +60,12 @@ type
     newLabel: TLabel;
     result: string;
     canceled: boolean;
+    caption, msg: string;
   end;
 
 var
   openArmyForm: TOpenArmyForm;
   rafikiForm: TRafikiForm;
-  encryptionForm: TEncryptionForm;
   passwordForm: TPasswordForm;
   army: TArmy;
   loadedBitmaps: array of TBitmap;
@@ -198,140 +185,10 @@ begin
   end;
 end;
 
-procedure encryptForm_OnClick(sender: TObject); {$IFNDEF CODEINSIGHT} native; {$ENDIF}
-
-  function vaildPassword(): boolean;
-  begin
-    with encryptionForm do
-    begin
-      if (length(edits[0].getCaption()) < 1) or (length(edits[1].getCaption()) < 1) or (edits[0].getCaption() <> edits[1].getCaption()) then
-        exit(false)
-      else
-        exit(true);
-    end;
-  end;
-
+procedure passwordForm_SetVars(const caption, msg: string);
 begin
-  with encryptionForm do
-  begin
-    case sender of
-      cb: if (cb.getState() = cbChecked) then
-            gb.setEnabled(true)
-          else
-            gb.setEnabled(false);
-
-      btn: begin
-             army.encrpyted := vaildPassword();
-
-             if (army.encrpyted) then
-             begin
-               writeln('encrpytion succesfully set');
-               pass := edits[0].getCaption();
-               frm.close();
-             end else
-               writeln('Failed to set encrpytion, invaild password');
-           end;
-    end;
-  end;
-end;
-
-procedure encryptForm_Init(); {$IFNDEF CODEINSIGHT} native; {$ENDIF}
-var
-  i: integer;
-begin
-  with encryptionForm do
-  begin
-    frm.init(nil);
-
-    with frm do
-    begin
-      setCaption('Encrpytion Settings');
-      setPosition(poScreenCenter);
-      setBorderStyle(bsDialog);
-      setWidth(185);
-      setHeight(140);
-    end;
-
-    cb.init(frm);
-
-    with cb do
-    begin
-      setParent(frm);
-      setLeft(5);
-      setTop(6);
-      setCaption('Use encrpytion');
-      setOnClick(encryptForm_OnClick);
-    end;
-
-    gb.init(frm);
-
-    with gb do
-    begin
-      setParent(frm);
-      setCaption('Settings');
-      setBounds(5, 28, 175, 106);
-    end;
-
-    newLabel.init(gb);
-
-    with newLabel do
-    begin
-      setParent(gb);
-      setLeft(5);
-      setTop(5);
-      setCaption('Password');
-    end;
-
-    newLabel.init(gb);
-    with newLabel do
-    begin
-      setParent(gb);
-      setLeft(5);
-      setTop(32);
-      setCaption('Repeat');
-    end;
-
-    for i := 0 to 1 do
-    begin
-      edits[i].init(gb);
-
-      with edits[i] do
-      begin
-        setParent(gb);
-        setWidth(100);
-        setLeft(62);
-        setTop(i * 28 + 2);
-        setCaption(passwordForm.result);
-      end;
-    end;
-
-    btn.init(gb);
-
-    with btn do
-    begin
-      setParent(gb);
-      setCaption('Confirm');
-      setBounds(5, 58, 160, 25);
-      setOnClick(encryptForm_OnClick);
-    end;
-
-    if (army.encrpyted) then
-      cb.setState(cbChecked)
-    else
-      gb.setEnabled(false);
-
-    frm.showModal();
-    frm.free();
-  end;
-end;
-
-procedure encryptForm_Show(sender: TObject); {$IFNDEF CODEINSIGHT} native; {$ENDIF}
-begin
-  try
-    sync(encryptForm_Init);
-  except
-    writeln('ERROR: Unable to encpytion form');
-  end;
+  passwordForm.caption := caption;
+  passwordForm.msg := msg;
 end;
 
 procedure passwordForm_OnClick(sender: TObject); {$IFNDEF CODEINSIGHT} native; {$ENDIF}
@@ -358,10 +215,10 @@ begin
 
     with frm do
     begin
-      setCaption('Encryption Password');
+      setCaption(caption);
       setPosition(poScreenCenter);
       setBorderStyle(bsDialog);
-      setWidth(285);
+      setWidth(350);
       setHeight(85);
     end;
 
@@ -370,7 +227,7 @@ begin
     with newLabel do
     begin
       setParent(frm);
-      setCaption('Please enter your encrpytion password:');
+      setCaption(msg);
       setLeft(5);
       setTop(5);
     end;
@@ -380,7 +237,7 @@ begin
     with edit do
     begin
       setParent(frm);
-      setBounds(5, 25, 275, 25);
+      setBounds(5, 25, 335, 25);
     end;
 
     for i := 0 to high(buttons) do
@@ -391,7 +248,7 @@ begin
       begin
         setParent(frm);
         setTop(55);
-        setLeft(i * 80 + 126);
+        setLeft(i * 80 + 186);
         if (i = 0) then
           setCaption('OK')
         else
@@ -509,6 +366,9 @@ procedure newArmy(sender: TObject);  {$IFNDEF CODEINSIGHT} native; {$ENDIF}
 begin
   setLength(army.players, 0);
 
+  army.encrpyted := false;
+  army.name := 'default';
+
   with rafikiForm do
   begin
     playerList.clear();
@@ -517,10 +377,33 @@ begin
   end;
 
   disablePlayerBox();
+
+  writeln('New army created');
 end;
 
 // deletes the current loaded army
 procedure deleteArmy(sender: TObject); {$IFNDEF CODEINSIGHT} native; {$ENDIF}
+
+  // can't use the native version
+  procedure newArmy();
+  begin
+    setLength(army.players, 0);
+
+    army.encrpyted := false;
+    army.name := 'default';
+
+    with rafikiForm do
+    begin
+      playerList.clear();
+      editArmyName.setCaption('default');
+      updatePlayerCount();
+    end;
+
+    disablePlayerBox();
+
+    writeln('New army created');
+  end;
+
 var
   armyName: string;
 begin
@@ -544,7 +427,7 @@ begin
           editArmyName.clear();
         end;
 
-        disablePlayerBox();
+        newArmy();
       end;
   end;
 end;
@@ -627,9 +510,21 @@ begin
     end;
 
   if (army.encrpyted) then
-    rc2_encrypt(encryptionForm.pass, htSHA512, str);
+  begin
+    writeln('Army is encrpyted, we need the password to encrpyt with with');
+
+    passwordForm_SetVars('Rafiki Player Manager', 'Please enter the password you want to encrpyt your army with:');
+    passwordForm_Show();
+
+    if (not passwordForm.canceled) then
+      rc2_encrypt(passwordForm.result, htSHA512, str)
+    else
+      writeln('Password was canceled, not using encrpytion!');
+  end;
 
   result := base64Encode(compressString(str));
+
+  writeln(format('Converted army into a string of %d', [length(result)]));
 end;
 
 // saves the current army
@@ -639,8 +534,6 @@ begin
 
   if (length(army.players) > 0) then
   begin
-    writeln('Succesfully saved army "'+army.name+'"');
-
     with settings do
     begin
       setPrefix('Rafiki/');
@@ -650,6 +543,8 @@ begin
       setKeyValue('Encrpyted', boolToStr(army.encrpyted)); // added encrpytion boolean
       setKeyValue('Player_Data', armyToString()); // finally add player data
     end;
+
+    writeln('Succesfully saved army "'+army.name+'"');
   end else
     writeln('Unable to save army - no players to save!');
 end;
@@ -659,6 +554,7 @@ function loadArmy(const armyName: string): boolean;
 
   function decrypt(var s: string): boolean;
   begin
+    passwordForm_SetVars('Rafiki Player Manager', 'Enter your encrpytion password:');
     passwordForm_Show();
 
     if (not passwordForm.canceled) then
@@ -680,12 +576,13 @@ begin
     army.encrpyted := strToBoolDef(settings.getKeyValue('Encrpyted'), false);
 
     src := base64decode(settings.getKeyValue('Player_Data'));
-    armyData := decompressstring(src);
+    armyData := decompressString(src);
 
     if (army.encrpyted) then
       if (not decrypt(armyData)) then
       begin
-        writeln('ERROR: Failed to decrypt army - Wrong password');
+        writeln('ERROR: Failed to decrypt army - Wrong password, will create a new army');
+        rafikiForm.fileMenu_Items[0].click(); // new army
         exit();
       end;
 
@@ -789,6 +686,7 @@ begin
   end;
 end;
 
+// getBitmap: Returns a TBitmap of the desired image.
 function getBitmap(name: string): TBitmap;
 begin
   result.init();
@@ -804,27 +702,47 @@ begin
     'open': result.loadFromString(16, 16, 16777215, 'FFFFFFFFFFFFFFFFFFFFFFFFFFFFFF59C2E03CB5DB41B4DC40AEDC39ADDB3BA8DB3BA3DB3C9DDB3B97DB3690DA529CDFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFF61C3E2FDFEFEF7FCFEF1FAFDE8F6FBFEFFFFF6FCFEF2FAFDEFFAFEDCF0FA348CD9FFFFFFFFFFFFFFFFFFFFFFFFFFFFFF63C4E3FEFFFF8EE4F894DEF570BCE7F8FDFF94E5F894E6F893E5F898E1F6348BD9FFFFFFFFFFFFFFFFFFFFFFFFFFFFFF63C4E3FEFEFF91DEF593DCF455AAE2F6FDFF93E5F892E5F88FE4F895E0F6348CD9FFFFFFFFFFFFFFFFFFFFFFFFFFFFFF63C4E3FDFEFF9FE0F564BCE94DA5E0F5FCFF93E5F890E5F889E3F892DFF6348CD9FFFFFFFFFFFFFFFFFFFFFFFFFFFFFF62C4E3FEFFFFACE1F63594DA91C9EBF3FCFE91E5F88BE3F882E1F78EDEF5348CD9EAC39DE5BE96E4BB93E4BB92E4BB92E4BB91E4BA91CA84523594DAFAF3EF9AE4F493DBE986E2F77ADFF789DCF5348CD9E6BF96FFFFFEFEF5EDFEF6F0FEF7F1FFF7F2FFF7F0FFF7F13594DAFDFEFD9AE6F793D7E37FE1F771DEF685DAF4348CD9E4BB92FDF3E9FCDEC5FCE2CDFCE5D2FEE7D5FFE7D5FFE9D93594DAFFFDFC9BE6F693D2DC77DEF667DBF580D9F4348CD9E4BB92FDF3EAFBE0C7FCE3CDFCE4D1FEE7D5FDE7D6FFEADB3594DAFFFDFC9DE5F590CED76CDCF65BD8F47AD7F3348CD9D3A472FCF2E8F9DCC2FADFC8FBE2CCFDE5D1FDE6D4FFE9D93594DAFEFDFC9EE5F58CC8CF5ED9F44DD4F374D5F3348CD9D2A172FAEFE3F5D3B4F7D9BCF9DDC4FAE0CAFCE4D0FFE7D73594DAFEFCFB9FE5F486C1C64FD5F340D1F270D3F2348BD9D3A576FAF2E7FEF9F3F5E9DDF6D7BBF9DEC4FBE3CBFFE5D23594DAFEFEFDDAF3F8C9D8D6CCF2FBCAF2FBC2EAF8348CD9E2BDA2EABB88FAE2C4FAF3EBF3D1AFF7D9BCFADCC2FFE2CB3594DA3594DA3594DA3594DA3594DA3594DA3594DA529CDFFCFAF8DDA988ECC193FBF8F3FAEFE4FDF2E7FEF3E8FFF7F1FBF6EFEFF2E8FDF4EECA8155FFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFBF8F6DCB496CA8354CC8759CC8758CC8657CB8556CC8356CE8156CB8358CD865CFFFFFFFFFFFFFFFFFFFFFFFF');
     'delete': result.loadFromString(16, 16, 16777215, 'FFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFEFEFFB9B9E1FFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFB9B9F0FEFEFFFFFFFFFFFFFFFFFFFFFEFEFF6969BC0000938787CFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFF8787E20000C86969E2FEFEFFFFFFFFFFFFFFB9B9DE00008D0000930000998787D2FFFFFFFFFFFFFFFFFFFFFFFF8787E00000C30000C80000CEB9B9F3FFFFFFFFFFFFFFFFFF8787CA00009300009900009F8787D5FFFFFFFFFFFF8787DD0000BD0000C30000C98787E8FFFFFFFFFFFFFFFFFFFFFFFFFFFFFF8787CD00009900009F0000A58787D78787DA0000B70000BD0000C38787E6FFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFF8787CF00009F0000A50000AB0000B10000B70000BD8787E3FFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFF8787D20000A50000AB0000B10000B78787E0FFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFF8787D20000A60000AB0000B10000B78787E0FFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFF8787CF0000A00000A60000AC0000B10000B70000BD8787E3FFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFF8787CD00009A0000A00000A68787D88787DB0000B70000BD0000C38787E6FFFFFFFFFFFFFFFFFFFFFFFFFFFFFF8787CA00009400009A0000A08787D5FFFFFFFFFFFF8787DD0000BD0000C30000C98787E8FFFFFFFFFFFFFFFFFFB9B9DE00008E00009400009A8787D2FFFFFFFFFFFFFFFFFFFFFFFF8787E00000C30000C90000CFB9B9F3FFFFFFFFFFFFFEFEFF6969BD0000948787CFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFF8787E30000C96969E3FEFEFFFFFFFFFFFFFFFFFFFFFEFEFFB9B9E2FFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFB9B9F0FEFEFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFF');
     'new': result.loadFromString(16, 16, 16777215, 'FFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFE8CEB9D2A274CA925AC88D52C88D51C88D51C88C50C88C4FC8884DC7864BC78448C68046C37C42C27740C57C4DE2C0AAD7AA7CF8F3EDFAF6F2F9F5F1F9F5F1F9F4F0F9F4EFF9F4EDF9F3ECF8F2EBF8F1E8F7F0E6F7EDE3F5EBDFF8F2EBCC8D66CC945BF8F4EEFAE0C7FCE3CDFCE3CFFCE6D3FEE7D7FEE8D8FEE8D6FEE7D6FEE5D5F8B455FDC26EFDBF68F7ECDFC07140CA9055F8F4EDFBE1C9FBE3CEFBE4D0FCE6D4FDE7D6FEE8D8FEE8D7FDE7D6FDE5D3F7B456FFD8A0FCBD67F6EBDEBC6B36CA9055F8F3EDFBE2C9FBE3CDFCE4CFFDE7D3FDE7D5FEE8D7FDE7D6FDE7D6FDE5D3F7B554FFD79EFBBE65F6EADEBC6B36CA9055F8F3EDFBE0C8FBE2CBFCE3CDFCE4D1FDE6D4FEE7D6FDE7D6FDE7D6FCE5D3F8B453FFD69BFCBE64F6EADCBC6B36CA9155F8F3EDF9DFC5F9E0C8FAE1CAFBE3CDFCE6D2FDE5D3FDE7D5FDE6D5FCE5D3F8B253FFD798FCBE64F6EADCBC6A36CB9055F8F2ECF8DBC1F8DCC2F9DDC4FAE0C8FBE1CCFCE4D1FDE5D3FDE5D3FCE4D1F7B352FFD696FCBD62FAF3EBBC6A36C98F55F7F2ECF4D6B8F5D6BAF6D9BCF8DCC2FADFC7FBE1CCFBE4D0FCE4D1FCE2CEF7B352FFD695FBBD63FAF3EBBB6A35CF9D69F2E6D7FFFBF8FDFBF8F4E9DFF5D6BBF8DCC2FAE0C7FBE3CCFCE2CDFCE2CCF7B251FFD594FBBC61FAF2EABB6A35DDB190E2B27DF6D8B4FCE6CDF7F2ECF3D4B5F6DABDF9DDC3FADFC7FBE1CBFBE0C9F7B24FFFD493FCBE60FCF7F3BB6935FDFBFADC986BE1B07DFAE5C9FBF7F3F1D2B3F6D8BBF8DCC2FADFC6FBE1C9FBE1C8F7B24FFBBE65FCBC62FCF8F4BD6E3BFFFFFFFDFBFADC9669E2B684F5EFE9F8F4F0FAF4EFFAF4EDFAF2EAFBF7F2FDFAF7FCF9F5FBF7F4FDFBF8FEFEFDCA8B63FFFFFFFFFFFFFDFBFAD5A884C38048C6864CC8874CC8864BC88448C78045C37A41C1743CBD6C37BC6B37C37A4DE3C2AEFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFF');
-
-    'lock': result.loadFromString(16, 16, 16777215, 'FFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFF1CB6DC1CB6DC1CB6DC1CB6DC1CB6DC1CB6DC1CB6DC1AADD817A5D4FFFFFFFFFFFFFFFFFFFFFFFFADADADADADADADADADADADADFFFFFFE2F9FDE2F9FDDBF7FDD2F5FCD2F5FC91E1FA159DD1FFFFFFFFFFFFFFFFFFADADADFFFFFFEFEFEFEFEFEFEBEBEBEDFBFDA8ECF9A8ECF9A8ECF9A8ECF9A8ECF976DAF91292CCFFFFFFFFFFFFADADADFFFFFFEFEFEFADADADADADADADADADE2F9FD92E7F792E7F792E7F792E7F792E7F776DAF9118CC9FFFFFFFFFFFFADADADD5D5D5ADADADFFFFFFFFFFFF21B4D8DBF7FD92E7F792E7F792E7F792E7F792E7F776DAF90E82C4FFFFFFFFFFFFADADADD5D5D5ADADADFFFFFFFFFFFF1CB6DCD2F5FC80DDF380DDF380DDF380DDF380DDF376DAF90D7FC3FFFFFFFFFFFFADADADD5D5D5ADADADFFFFFFFFFFFF1CB6DCD2F5FC6ED3EF6ED3EF6ED3EF6ED3EF6ED3EF76DAF90D7FC3FFFFFFFFFFFFADADADC7C7C7ADADADFFFFFFFFFFFF21B4D8C7F3FB5DC9EB5DC9EB5DC9EB5DC9EB5DC9EB76DAF90D7FC3FFFFFFFFFFFFADADADC5C5C5ADADADADADADADADADADADADB9F0FA4ABEE74ABEE74ABEE74ABEE74ABEE776DAF90D7FC3FFFFFFFFFFFFFFFFFFADADADC7C7C7C5C5C5C5C5C5C5C5C5A8ECF938B4E338B4E338B4E338B4E338B4E376DAF90D7FC3FFFFFFFFFFFFFFFFFFFFFFFFADADADADADADADADADADADAD91E1FA91E1FA91E1FA76DAF976DAF976DAF976DAF90D7FC3FFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFF1AADD8159DD1118CC90E82C40D7FC30D7FC30D7FC30D7FC30D7FC3FFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFF');
-  else
-    writeln('Idiot...');
   end;
 end;
 
-procedure onFormClose(sender: TObject); {$IFNDEF CODEINSIGHT} native; {$ENDIF}
+// toggleEncyption: Called when encrpytion is clicked.
+procedure toggleEncyption(const sender: TObject); {$IFNDEF CODEINSIGHT} native; {$ENDIF}
 begin
-  writeln('Rafiki player manager has been closed');
+  army.encrpyted := (not army.encrpyted);
+  rafikiForm.encyrptionMenu_Item.setChecked(army.encrpyted);
+
+  writeln(Format('Encrpytion has been toggled! [%s]', [lowercase(boolToStr(army.encrpyted))]));
+
+  if (army.encrpyted) then
+    writeln('You will be asked for your encrpytion password when you save your army');
 end;
 
+// loadFormSettings: Called to load settings into the forms (previous army. etc).
+procedure loadFormSettings();
+var
+  armyName: string;
+begin
+  armyName := settings.getKeyValueDef('Recent_Army', '');
+
+  if (armyName <> '') then
+    loadArmy(armyName)
+  else
+    writeln('Unable to load previously loaded army');
+
+  rafikiForm.encyrptionMenu_Item.setChecked(army.encrpyted);
+end;
+
+// initForm: initializes the form.
 procedure initForm(); {$IFNDEF CODEINSIGHT} native; {$ENDIF}
 var
   i: integer;
   strings: TStringArray;
   boxes: TBoxArray;
 begin
-  with RafikiForm do
+  with rafikiForm do
   begin
     frm.init(nil);
+
     with frm do
     begin
       setCaption('Rafiki Player Manager - Version ' + RAFIKI_VERSION);
@@ -832,7 +750,6 @@ begin
       setBorderStyle(bsSingle);
       setWidth(500);
       setHeight(300);
-      setOnClose(onFormClose);
     end;
 
     playerList.init(frm);
@@ -940,6 +857,8 @@ begin
       setTop(6);
     end;
 
+    {Save buttons}
+
     strings := ['Save Player', 'Save Army'];
 
     setLength(boxes, 0);
@@ -968,10 +887,7 @@ begin
     btnAddPlayer.add(frm, getBitmap('plus'), getBitmap('plus_hover'), intToBox(236, 14, 15, 15), 'Add Player');
     btnDeletePlayer.add(frm, getBitmap('del'), getBitmap('del_hover'), intTobox(252, 15, 15, 15), 'Delete Player');
 
-    {Adding the menus and menu items}
-
     mainMenu.init(frm);
-
 
     {File menu}
 
@@ -998,32 +914,36 @@ begin
     {Encrpytion menu}
 
     encyrptionMenu := mainMenu.addMenu('Encryption');
+    encyrptionMenu_Item := encyrptionMenu.addMenu('Enable (Click to activate)');
+    encyrptionMenu_Item.setOnClick(toggleEncyption);
 
-    encyrptionMenu_Item := encyrptionMenu.addMenu('Settings');
-    encyrptionMenu_Item.setBitmap(getBitmap('lock'));
-    encyrptionMenu_Item.setOnClick(encryptForm_Show);
-
-    loadArmy(settings.getKeyValue('Recent_Army'));
+    loadFormSettings();
 
     frm.showModal();
     frm.free();
   end;
 end;
 
+// runRafikiPlayerManager: Launches everything!
 procedure runRafikiPlayerManager();
 var
   i: byte;
 begin
+  clearDebug();
   settings.setPrefix('Rafiki/');
 
+  writeln('Showing Rafiki player manager');
+
   try
-    writeln('Showing rafiki player manager');
     sync(initForm);
   except
     writeln('ERROR: Unable to show Rafiki player manager');
   finally
     for i := 0 to high(loadedBitmaps) do
       loadedBitmaps[i].free();
+
+    settings.setPrefix('Scripts/');
   end;
 end;
+
 
