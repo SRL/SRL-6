@@ -40,6 +40,7 @@ type
     saveButtons: array [0..1] of TButton;
     fileMenu_Items: array [0..2] of TMenuItem;
     encyrptionMenu_Item: TMenuItem;
+    memo_DebugBox: TListBox;
   end;
 
 type
@@ -74,7 +75,13 @@ var
 procedure _writeln(); override; begin end;
 procedure _write(s: string); override;
 begin
-  client.writeln(s);
+  if (assigned(rafikiForm.frm)) then
+  begin
+    rafikiForm.memo_DebugBox.getItems().append(s);
+    rafikiForm.memo_DebugBox.setItemIndex(rafikiForm.memo_DebugBox.getItems().getCount() - 1);  // trick to get listbox to scroll to bottom
+    rafikiForm.memo_DebugBox.setItemIndex(-1); // :)
+  end else
+    client.writeln(s);
 end;
 
 // returns a TStringArray of all army names.
@@ -274,7 +281,7 @@ end;
 
 procedure updatePlayerCount();
 begin
-  rafikiForm.labelPlayerCount.setCaption('Players('+intToStr(rafikiForm.playerList.getCount())+')');
+  rafikiForm.labelPlayerCount.setCaption('Players ('+intToStr(rafikiForm.playerList.getCount())+')');
 end;
 
 (*
@@ -305,6 +312,7 @@ begin
 
   if (index > -1) then
   begin
+    writeln(format('Editing player "%s"', [rafikiForm.playerList.getSelectedText()]));
     rafikiForm.playerEdits[0].setCaption(army.players[index].loginName);
     rafikiForm.playerEdits[1].setCaption(army.players[index].password);
     rafikiForm.playerEdits[2].setCaption(army.players[index].nickname);
@@ -366,6 +374,7 @@ procedure newArmy(sender: TObject);  {$IFNDEF CODEINSIGHT} native; {$ENDIF}
 begin
   setLength(army.players, 0);
 
+  rafikiForm.encyrptionMenu_Item.setChecked(false);
   army.encrpyted := false;
   army.name := 'default';
 
@@ -605,8 +614,9 @@ begin
 
       rafikiForm.editArmyName.setCaption(armyName);
       updatePlayerCount();
+      writeln(format('Succesfully loaded army "%s"', [armyName]));
     end else
-      writeln('loadArmy(): No data to fill form with!');
+      writeln('No data to fill form with!');
   end;
 end;
 
@@ -714,7 +724,7 @@ begin
   writeln(Format('Encrpytion has been toggled! [%s]', [lowercase(boolToStr(army.encrpyted))]));
 
   if (army.encrpyted) then
-    writeln('You will be asked for your encrpytion password when you save your army');
+    writeln('** You will be asked for your encrpytion password when you save your army');
 end;
 
 // loadFormSettings: Called to load settings into the forms (previous army. etc).
@@ -727,9 +737,9 @@ begin
   if (armyName <> '') then
     loadArmy(armyName)
   else
-    writeln('Unable to load previously loaded army');
+    writeln('No previously loaded army to load!');
 
-  rafikiForm.encyrptionMenu_Item.setChecked(army.encrpyted);
+  rafikiForm.encyrptionMenu_Item.setChecked(false);
 end;
 
 // initForm: initializes the form.
@@ -749,7 +759,7 @@ begin
       setPosition(poScreenCenter);
       setBorderStyle(bsSingle);
       setWidth(500);
-      setHeight(300);
+      setHeight(383);
     end;
 
     playerList.init(frm);
@@ -819,7 +829,7 @@ begin
 
     {Misc Static Labels}
 
-    strings := ['Username', 'Password', 'NickName', 'Bank Pin', 'Members'];
+    strings := ['Username', 'Password', 'Nickname', 'Bank Pin', 'Members'];
 
     for i := 0 to high(strings) do
     begin
@@ -917,6 +927,16 @@ begin
     encyrptionMenu_Item := encyrptionMenu.addMenu('Enable (Click to activate)');
     encyrptionMenu_Item.setOnClick(toggleEncyption);
 
+
+    memo_DebugBox.init(frm);
+
+    with memo_DebugBox do
+    begin
+      setParent(frm);
+      setBounds(10, 282, 478, 70);
+    end;
+
+    writeln('Welcome to Rafiki player manager');
     loadFormSettings();
 
     frm.showModal();

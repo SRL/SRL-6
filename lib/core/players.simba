@@ -407,6 +407,91 @@ begin
   print('TPlayerArray.setup(): Success', TDebug.FOOTER);
 end;
 
+{tmp - for new rafiki untested
+
+procedure TPlayerArray.setup(names: TStringArray; const armyName: string = 'default'); override;
+
+  function decrypt(var dataString: string): boolean;
+  var
+    pass: string;
+  begin
+    result := false;
+
+    if (InputQuery('Player Manager', 'Please enter your army password for decryption', pass)) then
+    begin
+       rc2_decrypt(pass, htSHA512, dataString);
+       result := ExecRegExpr('<player>', dataString);
+    end else
+      print('TPlayerArray.setup(): User Canceled', TDebug.FATAL);
+  end;
+
+var
+  prefix, armyData: string;
+  armys, playersTSA: TStringArray;
+  i, j, k: integer;
+  tmp: TPlayerArray;
+begin
+  print('TPlayerArray.setup()', TDebug.HEADER);
+
+  if (listSettings('Rafiki/Armys/', armys)) then
+  begin
+    print(format('Army''s found: %s', [toString(armys)]));
+
+    for i := 0 to high(armys) do
+    begin
+      if (lowercase(armys[i]) = lowercase(armyName)) then
+      begin
+        print(format('Succesfully found the army "%s"', [armyName]));
+
+        armyData := decompressString(base64decode(getSettingValue('Rafiki/Armys/' + armys[i] + '/Player_Data')));
+
+        if (getSettingValue('Rafiki/Armys/' + armys[i] + '/Encrpyted') = 'True') then
+        begin
+          print('Army is encrpyted, we reqiure the password to decrpyt!');
+
+          if (not decrypt(armyData)) then
+            print('TPlayerArray.Setup(): Encrpytion pass wasn''t correct', TDebug.FATAL)
+          else
+            print('Password accepted! Succesfully decrpyted');
+        end;
+
+        playersTSA := multiBetween(armyData, '<player>', '</player>');
+
+        setLength(tmp, length(playersTSA));
+        for j := 0 to high(playersTSA) do
+        begin
+          tmp[i].LoginName := between('<loginName>', '</loginName>', PlayersTSA[i]);
+          tmp[i].NickName := between('<nickName>', '</nickName>', PlayersTSA[i]);
+          tmp[i].Password := between('<password>', '</password>', PlayersTSA[i]);
+          tmp[i].BankPin := between('<bankPin>', '</bankPin>', PlayersTSA[i]);
+          tmp[i].isMember := strToBoolDef(between('<isMember>', '</isMember>', playersTSA[i]), false);
+        end;
+
+        for j := 0 to high(names) do
+          for k := 0 to high(tmp) do
+          begin
+            if (names[j] = tmp[k].loginName) or (names[j] = tmp[k].displayName) or (names[j] = tmp[k].nickname) then
+            begin
+              print('Loaded player: '+names[j]);
+              self._add(tmp[k]);
+              break;
+            end;
+
+            if (j = high(tmp)) then
+              print('Invalid player name: '+names[j], TDebug.WARNING);
+          end;
+
+        break();
+      end;
+
+      print('Failed to find army...');
+    end;
+  end;
+
+  print('TPlayerArray.setup(): Success', TDebug.FOOTER);
+end;
+}
+
 (*
 TPlayerArray.switchTo
 ~~~~~~~~~~~~~~~~~~~~~
