@@ -293,33 +293,6 @@ end;
 {$ENDIF}
 
 (*
-TRSGameTabs.areMultiOpen
-~~~~~~~~~~~~~~~~~~~~~~~~
-
-.. code-block:: pascal
-
-    function TRSGameTabs.areMultiOpen(): boolean;
-
-Returns true if more than one tab is open.
-
-.. note::
-
-    - by Coh3n
-    - Last Updated: 26 July 2013 by Coh3n
-
-Example:
-
-.. code-block:: pascal
-
-    if (gameTabs.areMultiOpen()) then
-      writeln('Multiple tabs are open');
-*)
-function TRSGameTabs.areMultiOpen(): boolean;
-begin
-  result := (getColor(self.tabArea.x1, self.tabArea.y1+28) = 6707526);
-end;
-
-(*
 TRSGameTabs.getActiveTabArea
 ~~~~~~~~~~~~~~~~~~~~~~~~~~~~
 
@@ -361,6 +334,36 @@ begin
     result := tpa.getBounds();
     incEx(result.y2, 20);
   end;
+end;
+
+(*
+TRSGameTabs.areMultiOpen
+~~~~~~~~~~~~~~~~~~~~~~~~
+
+.. code-block:: pascal
+
+    function TRSGameTabs.areMultiOpen(): boolean;
+
+Returns true if more than one tab is open.
+
+.. note::
+
+    - by Coh3n
+    - Last Updated: 26 July 2013 by Coh3n
+
+Example:
+
+.. code-block:: pascal
+
+    if (gameTabs.areMultiOpen()) then
+      writeln('Multiple tabs are open');
+*)
+function TRSGameTabs.areMultiOpen(): boolean;
+var
+  b: TBox;
+begin
+  b := self.getActiveTabArea();
+  result := (b.x1 > -1) and (b.y1 > -1) and (b.x2 > -1) and (b.y2 > -1);
 end;
 
 (*
