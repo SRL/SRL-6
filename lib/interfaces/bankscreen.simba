@@ -257,10 +257,10 @@ begin
   repeat
     result := self.__find();
 
-    if result then
+    if (result) then
     begin
       tt := (getSystemTime() + randomRange(2500, 3200));
-      bb := self.getBankSlotBox(1);
+      bb := gridBox(0, 10, 10, 35, 31, 44, 44, point(self.x + _BANK_SLOTS_OFFSET.x, self.y + _BANK_SLOTS_OFFSET.y));
 
       while (tt > getSystemTime()) and (not result) do
       begin
@@ -427,6 +427,9 @@ Example:
 *)
 function TRSBankScreen.getBankSlotBoxes(): TBoxArray;
 begin
+  if (not self.isOpen()) then
+    exit();
+
   result := grid(10, 10, 35, 31, 44, 44, point(self.x + _BANK_SLOTS_OFFSET.x, self.y + _BANK_SLOTS_OFFSET.y));
 end;
 
@@ -458,6 +461,9 @@ begin
   if (not self._isBankSlotVaild(slot)) then
     exit();
 
+  if (not self.isOpen()) then
+    exit();
+
   // - 1 because the grid (array) starts at 0.
   result := gridBox(slot -1, 10, 10, 35, 31, 44, 44, point(self.x + _BANK_SLOTS_OFFSET.x, self.y + _BANK_SLOTS_OFFSET.y));
 end;
@@ -485,6 +491,9 @@ Example:
 *)
 function TRSBankScreen.getPackSlotBoxes: TBoxArray;
 begin
+  if (not self.isOpen()) then
+    exit();
+
   result := grid(4, 7, 35, 31, 42, 36, point(self.x + _PACK_SLOTS_OFFSET.x, self.y + _PACK_SLOTS_OFFSET.y));
 end;
 
@@ -516,6 +525,9 @@ Example:
 *)
 function TRSBankScreen.getPackSlotBox(slot: integer): TBox;
 begin
+  if (not self.isOpen()) then
+    exit();
+
   if (not inRange(slot, BACKPACK_SLOT_LOW, BACKPACK_SLOT_HIGH)) then
   begin
     print('bankScreen.getPackSlotBox(): Slot '+toStr(slot)+' is invalid', TDebug.WARNING);
@@ -1104,7 +1116,7 @@ function TRSBankScreen._enterAmount(amount, waitTime: integer): boolean;
 var
   tpa: TPointArray;
   atpa: T2DPointArray;
-  b: TBox;
+  b, bb: TBox;
   i, timeOut: integer;
 begin
   result := false;
@@ -1118,15 +1130,20 @@ begin
   repeat
     if (findColors(tpa, 0, b)) then
     begin
-      atpa := tpa.cluster(10, 10);
+      atpa := splitTPAEx(tpa, 30, 30);
 
       for i := 0 to high(atpa) do
-        if (findText(tpa[0], 0, 0, ['Enter'], [UpCharsEx], atpa[i].getBounds())) then
+      begin
+        bb := getTPABounds(atpa[i]);
+        bb.expand(10);
+
+        if (findText(tpa[0], 0, 20, ['Enter'], [UpChars], bb)) then
         begin
           result := true;
           typeSend(toStr(amount), true);
           break(2);
         end;
+      end;
     end;
 
     wait(200 + random(200));

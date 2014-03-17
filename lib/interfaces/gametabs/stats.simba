@@ -45,6 +45,7 @@ String constants that represent the different skill info types.
 const
   INFO_CURRENT_XP = 'Current XP:';
   INFO_REMAINDER = 'Remainder';
+  INFO_NEXT_LEVEL = 'Next level';
 
 (*
 type TRSTabStats
