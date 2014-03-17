@@ -343,7 +343,7 @@ Example:
 *)
 function TRSGameTabs.getActiveTabArea(): TBox;
 const
-  COLOR_ACTIVE_TAB = 7037012;
+  COLOR_ACTIVE_TAB = 7037013;
 var
   b: TBox;
   tpa: TPointArray;

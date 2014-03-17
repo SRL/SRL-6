@@ -138,12 +138,12 @@ Example:
 *)
 function TRSTabBackpack.isOpen(): boolean;
 const
-  COIN_COLOR = 9033204;
+  COIN_COLOR = 9624571;
 begin
   result := (gameTabs.isTabActive(self.tabIndex));
 
   if (not result) then
-    result := (getColor(gameTabs.tabArea.x1 + 92, gameTabs.tabArea.y2 -27) = COIN_COLOR);
+    result := (getColor(gameTabs.tabArea.x1 + 115, gameTabs.tabArea.y2 -27) = COIN_COLOR);
 end;
 
 (*
