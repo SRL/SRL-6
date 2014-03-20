@@ -1377,10 +1377,7 @@ begin
         if (not chooseOption.optionsExist(['Withdraw-' + intToStr(amount), '-' + intToStr(amount), toStr(amount)])) then
         begin
           if (chooseOption.select(['Withdraw-X', '-X'])) then
-          begin
-            inc(countWithdrawX);
             result := (self._enterAmount(amount, 6000));
-          end;
         end else
           result := chooseOption.select(['Withdraw-' + intToStr(amount), '-' + intToStr(amount), toStr(amount)])
      end;
