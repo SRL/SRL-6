@@ -289,7 +289,7 @@ key.
 .. note::
 
     - by Olly
-    - Last Updated: 19 October 2013 by Olly
+    - Last Updated: 19 March 2014 by Coh3n
 
 Example:
 
@@ -319,9 +319,17 @@ begin
     exit();
 
   // click the X as a failsafe
-  mouseBox(intToBox(self.x1+465, self.y1+15, self.x2-207, self.y1+30), MOUSE_LEFT);
-  wait(50 + random(50));
+  mouseBox(intToBox(self.x1 + 465, self.y1 + 15, self.x2 - 207, self.y1 + 30), MOUSE_MOVE);
 
+  // this is a failsafe in case the bankscreen closes (from the ESC key) while moving the mouse
+  if (self.isOpen()) then
+  begin
+    fastClick(MOUSE_LEFT);
+    wait(50 + random(50));
+  end else
+    exit(true);
+
+  // wait for the bankscreen to close
   timeOut := (getSystemTime() + randomRange(5000, 6000));
   while (timeOut > getSystemTime()) do
   begin
@@ -1358,26 +1366,28 @@ begin
   end else
     fastClick(MOUSE_RIGHT);  // more than 1 item? open choose options
 
-  wait(20 + random(50));
+  if (chooseOption.isOpen(2000)) then
+  begin
+    case (amount) of
+      WITHDRAW_AMOUNT_ALL: result := chooseOption.select(['Withdraw-All', '-All']);
+      WITHDRAW_AMOUNT_ALL_BUT_ONE: result := chooseOption.select(['Withdraw-All but one', 'All but one']);
 
-  case (amount) of
-    WITHDRAW_AMOUNT_ALL: result := chooseOption.select(['Withdraw-All', '-All']);
-    WITHDRAW_AMOUNT_ALL_BUT_ONE: result := chooseOption.select(['Withdraw-All but one', 'All but one']);
+      // check if the number is already availble, else let's withdraw X it
+      else
+        if (not chooseOption.optionsExist(['Withdraw-' + intToStr(amount), '-' + intToStr(amount), toStr(amount)])) then
+        begin
+          if (chooseOption.select(['Withdraw-X', '-X'])) then
+          begin
+            inc(countWithdrawX);
+            result := (self._enterAmount(amount, 6000));
+          end;
+        end else
+          result := chooseOption.select(['Withdraw-' + intToStr(amount), '-' + intToStr(amount), toStr(amount)])
+     end;
+  end else
+    print('bankscreen.withdraw(): chooseOption menu failed to open', TDebug.SUB);
 
-    // check if the number is already availble, else let's withdraw X it
-    else
-      if (not chooseOption.optionsExist(['Withdraw-' + intToStr(amount), '-' + intToStr(amount)])) then
-      begin
-        if (chooseOption.select(['Withdraw-X', '-X'])) then
-          result := (self._enterAmount(amount, 6000))
-      end else
-        result := chooseOption.select(['Withdraw-' + intToStr(amount), '-' + intToStr(amount)])
-   end;
-
-   if (result) then
-     wait(400 + random(300));
-
-   print('bankscreen.withdraw(): result = ' + boolToStr(result), TDebug.SUB);
+  print('bankscreen.withdraw(): result = ' + boolToStr(result), TDebug.SUB);
 end;
 
 (*
