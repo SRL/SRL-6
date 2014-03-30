@@ -255,9 +255,7 @@ begin
   result := false;
 
   repeat
-    result := self.__find();
-
-    if (result) then
+    if (self.__find()) then
     begin
       tt := (getSystemTime() + randomRange(2500, 3200));
       bb := gridBox(0, 10, 10, 35, 31, 44, 44, point(self.x + _BANK_SLOTS_OFFSET.x, self.y + _BANK_SLOTS_OFFSET.y));
