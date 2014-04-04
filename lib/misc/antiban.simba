@@ -1002,9 +1002,9 @@ begin
   tabBackpack.mouseSlot(slot, MOUSE_RIGHT);
 
   if chooseOption.select(['Destroy', 'estr', 'stro']) then
-    if conversationBox.isOpen(randomRange(2000, 3000)) then
+    if waitColorCountRange(379903, 0, intToBox(110, 440, 475, 460), 5000, 304, 304) then
     begin
-      findColorsTolerance(tpa, 1137455, conversationBox.getBounds(), 33, colorSetting(1));
+      findColorsTolerance(tpa, 1137455, intToBox(360, 482, 445, 510), 33, colorSetting(1)); // color of the green "Yes" button and a box around the button
       atpa := tpa.cluster(10);
       atpa.sortBySize;
 
