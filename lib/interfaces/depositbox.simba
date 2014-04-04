@@ -127,11 +127,11 @@ Example:
 *)
 function TRSDepositBox.isOpen(waitTime: integer = 0): boolean;
 const
-  TEXT_COLOR = 379903;
+  TEXT_COLOR = 300475;
   BACKGROUND_COLOR = 2366479;
   BACKGROUND_TOLERANCE = 19;
 var
-  t, CTS: integer;
+  t: integer;
 begin
   t := (getSystemTime() + waitTime);
 
@@ -143,8 +143,6 @@ begin
         break;
       end;
   until (getSystemTime() >= t);
-
-  setColorToleranceSpeed(cts);
 end;
 
 (*
