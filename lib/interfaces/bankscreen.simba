@@ -26,19 +26,9 @@ Internal bankscreen constants.
 
 *}
 const
-  _COLOR_BANK_TAB_ACTIVE = 4407350; // light color of an active bank tab
-
-{*
-const Internal
-~~~~~~~~~~~~~~
-
-Internal bankscreen constants.
-
-*}
-const
   _BANK_SLOTS_OFFSET: TPoint = [41, 108];
   _PACK_SLOTS_OFFSET: TPoint = [523, 111];
-  _TAB_OFFSET: TPoint = [34, 65];
+  _TAB_OFFSET: TPoint = [34, 66];
   BANK_SLOT_LOW = 1;
   BANK_SLOT_HIGH = 28;
 (*
@@ -879,8 +869,7 @@ begin
   tabBox := self._getTabBounds(tab);
 
   if (tabBox.x1 <> -1) then
-    if (countColor(6672631, tabBox) <> 5) then // gold color of the very top of the "+"
-      result := findColorTolerance(px, py, _COLOR_BANK_TAB_ACTIVE, tabBox, 5);
+    Result:= (countColor(6672631, tabBox) <> 5); // gold color of the very top of the "+"
 end;
 
 (*
@@ -917,8 +906,7 @@ begin
   tabBox := self._getTabBounds(tab);
 
   if (tabBox.x1 <> -1) then
-    // light background color of an active tab - actual count is around 71 for an active tab
-    result := (countColorTolerance(_COLOR_BANK_TAB_ACTIVE, tabBox, 5) > 50);
+    result := (countColorTolerance(4407350, tabBox, 0) < 20); //color at the bottom of inactive tabs
 end;
 
 (*
