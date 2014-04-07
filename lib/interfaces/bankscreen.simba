@@ -182,6 +182,7 @@ begin
   if (not findColors(tpa, TOP_BUTTON_COLOR, getClientBounds())) then
     exit();
 
+  SortTPAByX(tpa, True);
   self.setBounds([tpa[0].x - 11, tpa[0].y - 563, tpa[0].x + 675, tpa[0].y + 36]);
   Result := Length(tpa) > 100;
 end;
