@@ -162,7 +162,7 @@ Returns true if the bank screen is detected, and sets the bounds
 .. note::
 
     - by Olly
-    - Last Updated: 7 April 2014 by riwu
+    - Last Updated: 7 April 2014 by Olly
 
 Example:
 
@@ -174,17 +174,41 @@ Example:
 function TRSBankScreen.__find(): boolean;
 const
   TOP_BUTTON_COLOR = 9998984;
+  BOTTOM_BUTTON_COLOR = 4932662;
+  BUTTON_LENGTH = 29;
+  BROWN_LENGTH = 75;
 var
   tpa: TPointArray;
+  atpa: T2DPointArray;
+  i, hh, wid, hei: integer;
+  b: TBox;
 begin
   result := false;
+  getClientDimensions(wid, hei);
 
-  if (not findColors(tpa, TOP_BUTTON_COLOR, getClientBounds())) then
+  if (not findColors(tpa, TOP_BUTTON_COLOR, 0, hei - 50, wid -1, hei -1)) then // buttons can only be at the bottom of the screen.
     exit();
 
-  SortTPAByX(tpa, True);
-  self.setBounds([tpa[0].x - 11, tpa[0].y - 563, tpa[0].x + 675, tpa[0].y + 36]);
-  Result := Length(tpa) > 100;
+  atpa := clusterTPAEx(tpa, 1, 20);
+  hh := high(atpa);
+
+  for i := 0 to hh do
+    if (length(atpa[i]) = BUTTON_LENGTH) then
+    begin
+      b := getTPABounds(atpa[i]);
+
+      if (((b.x2 - b.x1) + 1) = (BUTTON_LENGTH)) then
+      begin
+        incEx(b.y2, 24);
+
+        if (getColor(b.x1, b.y2) = BOTTOM_BUTTON_COLOR) and (getColor(b.x2, b.y2) = BOTTOM_BUTTON_COLOR) then
+          if (countColorTolerance(1985923, b, 25, colorSetting(1)) = BROWN_LENGTH) then
+          begin
+            self.setBounds([b.x1 - 338, b.y1 - 563, b.x2 + 320, b.y2 + 12]);
+            exit(true);
+          end;
+      end;
+    end;
 end;
 
 (*
