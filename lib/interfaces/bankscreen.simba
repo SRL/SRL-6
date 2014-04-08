@@ -475,7 +475,7 @@ Returns a TBoxArray of all of the Backpack slots in the bank interface.
 .. note::
 
     - by Olly
-    - Last Updated: 04 October 2013 by Olly
+    - Last Updated: 7 April 2014 by riwu
 
 Example:
 
@@ -488,7 +488,7 @@ begin
   if (not self.isOpen()) then
     exit();
 
-  result := grid(4, 7, 35, 31, 42, 36, point(self.x + _PACK_SLOTS_OFFSET.x, self.y + _PACK_SLOTS_OFFSET.y));
+  result := grid(4, 7, 35, 31, 45, 38, point(self.x + _PACK_SLOTS_OFFSET.x, self.y + _PACK_SLOTS_OFFSET.y));
 end;
 
 (*
@@ -505,7 +505,7 @@ start at the top left at 1 and count across the columns.
 .. note::
 
     - by Coh3n
-    - Last Updated: 04 October 2013 by Olly
+    - Last Updated: 7 April 2014 by riwu
 
 Example:
 
@@ -529,7 +529,7 @@ begin
   end;
 
   // - 1 because the grid (array) starts at 0.
-  result := gridBox(slot -1, 4, 7, 35, 31, 42, 36, point(self.x + _PACK_SLOTS_OFFSET.x, self.y + _PACK_SLOTS_OFFSET.y));
+  result := gridBox(slot -1, 4, 7, 35, 31, 45, 38, point(self.x + _PACK_SLOTS_OFFSET.x, self.y + _PACK_SLOTS_OFFSET.y));
 end;
 
 (*
