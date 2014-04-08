@@ -176,7 +176,6 @@ const
   TOP_BUTTON_COLOR = 9998984;
   BOTTOM_BUTTON_COLOR = 4932662;
   BUTTON_LENGTH = 29;
-  BROWN_LENGTH = 75;
 var
   tpa: TPointArray;
   atpa: T2DPointArray;
@@ -202,7 +201,7 @@ begin
         incEx(b.y2, 24);
 
         if (getColor(b.x1, b.y2) = BOTTOM_BUTTON_COLOR) and (getColor(b.x2, b.y2) = BOTTOM_BUTTON_COLOR) then
-          if (countColorTolerance(1985923, b, 25, colorSetting(1)) = BROWN_LENGTH) then
+          if (inRange(countColorTolerance(1985923, b, 25, colorSetting(1)), 70, 80)) then
           begin
             self.setBounds([b.x1 - 338, b.y1 - 563, b.x2 + 320, b.y2 + 12]);
             exit(true);
