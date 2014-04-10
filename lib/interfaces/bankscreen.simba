@@ -31,6 +31,7 @@ const
   _TAB_OFFSET: TPoint = [34, 66];
   BANK_SLOT_LOW = 1;
   BANK_SLOT_HIGH = 28;
+
 (*
 const Deposit Buttons
 ~~~~~~~~~~~~~~~~~~~~~
@@ -43,6 +44,21 @@ const
   QUICK_DEPOSIT_EQIUPMENT   = 1;
   QUICK_DEPOSIT_BOB         = 2;
   QUICK_DEPOSIT_MONEY_POUCH = 3;
+
+(*
+const Bank Buttons
+~~~~~~~~~~~~~~~~~~
+
+Integer constants that represent the order of the bank buttons.
+
+*)
+const
+  BANK_BUTTON_SEARCH = 0;
+  BANK_BUTTON_PIN = 1;
+  BANK_BUTTON_PRESET_SETUP = 2;
+  BANK_BUTTON_PRESET_1 = 3;
+  BANK_BUTTON_PRESET_2 = 4;
+  BANK_BUTTON_NOTE = 5;
 
 (*
 const Withdraw Options
@@ -1060,7 +1076,7 @@ Will click the quick deposit button 'depositType', vaild deposit types are:
 .. note::
 
     - by Olly
-    - Last Updated: 7 April 2014 by riwu
+    - Last Updated: 10 April 2014 by Olly
 
 Example:
 
@@ -1070,9 +1086,10 @@ Example:
 *)
 function TRSBankScreen.quickDeposit(depositType: integer): boolean;
 const
-  DEPOSIT_BUTTON_OFFSET: TPoint = [352, 575];
+  DEPOSIT_BUTTON_OFFSET: TPoint = [-334, -25];
 var
   b: TBox;
+  tba: TBoxArray;
 begin
   result := true;
 
@@ -1085,14 +1102,63 @@ begin
     exit(false);
   end;
 
-  b := gridBox(depositType, 4, 1, 34, 34, 39, 0,
-               point(self.x + DEPOSIT_BUTTON_OFFSET.x,
-                     self.y + DEPOSIT_BUTTON_OFFSET.y));
+  b := gridBox(depositType, 4, 1, 30, 21, 39, 0,
+               point(self.x2 + DEPOSIT_BUTTON_OFFSET.x,
+                     self.y2 + DEPOSIT_BUTTON_OFFSET.y));
 
   mouseBox(b, MOUSE_LEFT);
   wait(200 + random(300));
 
   print('bankScreen.quickDeposit(): Clicked quick deposit id ' + intToStr(depositType), TDebug.SUB);
+end;
+
+(*
+TRSBankScreen.clickButton
+~~~~~~~~~~~~~~~~~~~~~~~~~
+
+.. code-block:: pascal
+
+    function TRSBankScreen.clickButton(button: integer): boolean;
+
+Will click the quick deposit button 'button', vaild button types are:
+
+  * BANK_BUTTON_SEARCH
+  * BANK_BUTTON_PIN
+  * BANK_BUTTON_PRESET_SETUP
+  * BANK_BUTTON_PRESET_1
+  * BANK_BUTTON_PRESET_2
+  * BANK_BUTTON_NOTE
+
+.. note::
+
+    - by Olly
+    - Last Updated: 10 April 2014 by Olly
+
+Example:
+
+.. code-block:: pascal
+
+    bankScreen.clickButton(BANK_BUTTON_PRESET_1);
+*)
+function TRSBankScreen.clickButton(button: integer): boolean;
+const
+  BUTTON_OFFSET: TPoint = [-662, -25];
+var
+  b: TBox;
+begin
+  if (not self.isOpen()) then
+  begin
+    print('bankScreen.clickButton(): Unable to click button since bankscreen isn''t open', TDebug.ERROR);
+    exit(false);
+  end;
+
+  b := gridBox(button, 6, 1, 30, 21, 39, 0,
+               point(self.x2 + BUTTON_OFFSET.x,
+                     self.y2 + BUTTON_OFFSET.y));
+
+  mouseBox(b, MOUSE_LEFT);
+  wait(100 + random(150));
+  result := true;
 end;
 
 (*
