@@ -157,12 +157,12 @@ TRSBankScreen.__find
 
     function TRSBankScreen.__find(): boolean;
 
-Returns true if the bank screen is detected, and sets the bounds
+Returns true if the bank screen is detected, and sets the bounds (fully dynamic).
 
 .. note::
 
     - by Olly
-    - Last Updated: 7 April 2014 by Olly
+    - Last Updated: 10 April 2014 by Olly
 
 Example:
 
@@ -173,41 +173,54 @@ Example:
 *)
 function TRSBankScreen.__find(): boolean;
 const
-  TOP_BUTTON_COLOR = 9998984;
-  BOTTOM_BUTTON_COLOR = 4932662;
-  BUTTON_LENGTH = 29;
+  LINE_COLOR = 4407351;
+  LINE_DIMENSIONS: TPoint = [479, 1];
 var
   tpa: TPointArray;
   atpa: T2DPointArray;
-  i, hh, wid, hei: integer;
+  i, hh, wid, hei, j: integer;
   b: TBox;
+  p: TPoint;
 begin
   result := false;
   getClientDimensions(wid, hei);
 
-  if (not findColors(tpa, TOP_BUTTON_COLOR, 0, hei - 50, wid -1, hei -1)) then // buttons can only be at the bottom of the screen.
+  if (not findColors(tpa, LINE_COLOR, getClientBounds())) then // line can only be at the top of the screen.
     exit();
 
-  atpa := clusterTPAEx(tpa, 1, 20);
+  atpa := clusterTPAEx(tpa, 1, 1);
+  sortATPAFromFirstPointY(atpa, point(wid div 2, 0));
   hh := high(atpa);
 
+  if (length(atpa) < 2) then
+    exit();
+
   for i := 0 to hh do
-    if (length(atpa[i]) = BUTTON_LENGTH) then
+  begin
+    b := getTPABounds(atpa[i]);
+
+    if ((b.x2 - b.x1) + 1 = LINE_DIMENSIONS.x) and ((b.y2 - b.y1) + 1 = LINE_DIMENSIONS.y) then // line matches the width / height
     begin
-      b := getTPABounds(atpa[i]);
+      p := point(atpa[i][0].x, atpa[i][0].y); // calling p is nicer and shorter :)
 
-      if (((b.x2 - b.x1) + 1) = (BUTTON_LENGTH)) then
+      if (inRange(countColorTolerance(3977177, intToBox(p.x, max(p.y - 40, 0), min(p.x + 50, wid - 1), p.y), 50, colorSetting(0)), 190, 210)) then // if the yellow count is near to what we want (199) then we found the top line.
       begin
-        incEx(b.y2, 24);
-
-        if (getColor(b.x1, b.y2) = BOTTOM_BUTTON_COLOR) and (getColor(b.x2, b.y2) = BOTTOM_BUTTON_COLOR) then
-          if (inRange(countColorTolerance(1985923, b, 25, colorSetting(1)), 70, 80)) then
+        if (i <> hh) then
+          for j := (i + 1) to hh do
           begin
-            self.setBounds([b.x1 - 338, b.y1 - 563, b.x2 + 320, b.y2 + 12]);
-            exit(true);
+            b := getTPABounds(atpa[j]);
+
+            if ((b.x2 - b.x1) + 1 = LINE_DIMENSIONS.x) and ((b.y2 - b.y1) + 1 > (LINE_DIMENSIONS.y div 2)) then // check the bottom line is a good enough size.
+            begin
+              self.setBounds([atpa[i][0].x - 8, atpa[i][0].y - 84, atpa[j][0].x + 678, atpa[j][0].y + 40]);
+              exit(true);
+            end;
           end;
+
+        print('TRSBankscreen.__find(): Found the top line, but failed to find the bottom line', TDebug.WARNING);
       end;
     end;
+  end;
 end;
 
 (*
