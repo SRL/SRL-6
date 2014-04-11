@@ -189,53 +189,53 @@ Example:
 *)
 function TRSBankScreen.__find(): boolean;
 const
-  LINE_COLOR = 4407351;
-  LINE_DIMENSIONS: TPoint = [479, 1];
+  TOP_DIMENSIONS: TPoint = [479, 31];
+  LINE_COLOR = 9998984;
 var
   tpa: TPointArray;
-  atpa: T2DPointArray;
-  i, hh, wid, hei, j: integer;
+  atpa, atpa2: T2DPointArray;
+  i, hh, wid, hei, j, c: integer;
   b: TBox;
   p: TPoint;
 begin
   result := false;
+
   getClientDimensions(wid, hei);
+  freeze();
 
-  if (not findColors(tpa, LINE_COLOR, getClientBounds())) then // line can only be at the top of the screen.
-    exit();
-
-  atpa := clusterTPAEx(tpa, 1, 1);
-  sortATPAFromFirstPointY(atpa, point(wid div 2, 0));
-  hh := high(atpa);
-
-  if (length(atpa) < 2) then
-    exit();
-
-  for i := 0 to hh do
-  begin
-    b := getTPABounds(atpa[i]);
-
-    if ((b.x2 - b.x1) + 1 = LINE_DIMENSIONS.x) and ((b.y2 - b.y1) + 1 = LINE_DIMENSIONS.y) then // line matches the width / height
+  try
+    if (findColors(tpa, 65536, 0, 0, wid -1, 300)) then // top can only be at the top of the screen!
     begin
-      p := point(atpa[i][0].x, atpa[i][0].y); // calling p is nicer and shorter :)
+      atpa := clusterTPAEx(tpa, 5, 5);
+      hh := high(atpa);
 
-      if (inRange(countColorTolerance(3977177, intToBox(p.x, max(p.y - 40, 0), min(p.x + 50, wid - 1), p.y), 50, colorSetting(0)), 190, 210)) then // if the yellow count is near to what we want (199) then we found the top line.
+      for i := 0 to hh do
       begin
-        if (i <> hh) then
-          for j := (i + 1) to hh do
-          begin
-            b := getTPABounds(atpa[j]);
+        b := getTPABounds(atpa[i]);
 
-            if ((b.x2 - b.x1) + 1 = LINE_DIMENSIONS.x) and ((b.y2 - b.y1) + 1 > (LINE_DIMENSIONS.y div 2)) then // check the bottom line is a good enough size.
+        if (((b.x2 - b.x1) + 1) = TOP_DIMENSIONS.x) and (((b.y2 - b.y1) + 1) = TOP_DIMENSIONS.y) then // check size if correct
+        begin
+          c := countColorTolerance(1343121, b, 19, colorSetting(2, 0.06, 1.28));  // count yellow text color
+
+          if (c > 500) then  // check we have enough text points
+            if (findColors(tpa, LINE_COLOR, b.x1, b.y2, b.x2, hei - 1)) then // search for line color under the top we just found
             begin
-              self.setBounds([atpa[i][0].x - 8, atpa[i][0].y - 84, atpa[j][0].x + 678, atpa[j][0].y + 40]);
-              exit(true);
-            end;
-          end;
+              atpa2 := findTPARows(tpa);
 
-        print('TRSBankscreen.__find(): Found the top line, but failed to find the bottom line', TDebug.WARNING);
+              for j := 0 to high(atpa2) do
+                if (length(atpa2[j]) > 160) then  // check the line is big enough to be the bottom
+                begin
+                  self.setBounds([b.x1 - 8, b.y1 - 8, b.x2 + 200, atpa2[j][0].y + 36]); // set the bounds based on the top we found, and the line we found.
+                  result := true;
+                  break(2);
+                end;
+              print('TRSBankscreen.__find(): Found the top of the bankscreen, but failed to find the bottom', TDebug.WARNING);
+            end;
+        end;
       end;
     end;
+  finally
+    unFreeze();
   end;
 end;
 
