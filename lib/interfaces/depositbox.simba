@@ -127,7 +127,7 @@ Example:
 *)
 function TRSDepositBox.isOpen(waitTime: integer = 0): boolean;
 const
-  TEXT_COLOR = 300475;
+  TEXT_COLOR = 379903;
   BACKGROUND_COLOR = 2366479;
   BACKGROUND_TOLERANCE = 19;
 var
