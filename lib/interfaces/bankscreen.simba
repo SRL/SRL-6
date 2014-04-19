@@ -100,7 +100,7 @@ const
   BANK_CHEST_DUEL = 7;
   BANK_CHEST_CW = 8;
   BANK_CHEST_GROTTO = 9;
-  BANK_CHEST_BURTHORPE = 10;
+  BANK_CHEST_LUMBRIDGE = 10;
 
 (*
 type TRSBankScreen
@@ -1873,7 +1873,7 @@ begin
     BANK_CHEST_DUEL: begin col1:= [11512192, 18, [2, [0.39, 0.57, 0.00]]]; col2:= [6586289, 10, [2, [0.21, 1.00, 0.00]]]; avelen:= 90; end;                 
     BANK_CHEST_CW: begin col1:= [8088922, 16, [2, [0.06, 0.17, 0.00]]]; col2:= [4808312, 17, [2, [0.03, 0.17, 0.00]]]; avelen:= 90; end;
     BANK_CHEST_GROTTO: begin col1:= [6842481, 6, [2, [0.00, 0.08, 0.00]]]; col2:= [2570316, 4, [2, [0.15, 1.35, 0.00]]]; avelen:= 90; end;
-    BANK_CHEST_BURTHORPE: begin col1:= [14481896, 8, [2, [1.23, 3.66, 0.00]]]; col2:= [6460329, 11, [2, [0.11, 1.29, 0.00]]]; avelen:= 90; end;
+    BANK_CHEST_LUMBRIDGE: begin col1:= [11313299, 10, [2, [0.17, 0.42, 0.00]]]; col2:= [6586289, 10, [2, [0.21, 1.00, 0.00]]]; avelen:= 90; end;
   end;
 
   print('TRSBankscreen.__openChest()', TDebug.HEADER);
@@ -1992,7 +1992,7 @@ Opens the desired bank, current vaild 'bankType' constants are:
     * BANK_CHEST_DUEL
     * BANK_CHEST_CW
     * BANK_CHEST_GROTTO
-    * BANK_CHEST_BURTHORPE
+    * BANK_CHEST_LUMBRIDGE
 
 .. note::
 
@@ -2013,7 +2013,7 @@ begin
   case bankType of
     BANK_NPC_BLUE..BANK_NPC_DRAYNOR: result := self.__openNPC(bankType);
     BANK_BOOTH: result := self.__openBankBooth();
-    BANK_CHEST_SW..BANK_CHEST_BURTHORPE: result := self.__openChest(bankType);
+    BANK_CHEST_SW..BANK_CHEST_LUMBRIDGE: result := self.__openChest(bankType);
   end;
 end;
 
