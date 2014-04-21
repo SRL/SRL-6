@@ -1,3 +1,61 @@
+{$include_once ../core/players.simba}
+
+function Rafiki_ReturnArmyNames(out names: TStringArray): boolean;
+var
+  s: string := Settings.getPrefix();
+begin
+  Settings.setPrefix('');
+  try
+    result := Settings.ListKeys('Rafiki/Armys/', names);
+  finally
+    Settings.setPrefix(s);
+  end;
+end;
+
+function Rafiki_FindArmy(const name: string): boolean;
+var
+  strings: TStringArray;
+  i: integer;
+begin
+  result := false;
+
+  if (Rafiki_ReturnArmyNames(strings)) then
+    for i := 0 to high(strings) do
+      if (lowercase(name) = lowercase(strings[i])) then
+        exit(true);
+end;
+
+function Rafiki_DecryptArmy(const armyName: string; var data: string): boolean;
+var
+  pass: string;
+label
+  lStart;
+begin
+  if (InputQuery('Rafiki Player Manager', 'Please enter your army password for decryption', pass)) then
+  begin
+    rc2_decrypt(pass, htSHA512, data);
+    result := ExecRegExpr('<player>', data);
+  end else
+    exit(false); // user canceled
+
+  if (not result) then
+    writeln(MessageDlg('Rafiki_DecryptArmy', 'Wrong password for decryption', mtError, [mbRetry, mbOk]));
+end;
+
+function Rafiki_GetPlayersFromArmy(const armyName: string): TPlayerArray;
+var
+  s: string := Settings.getPrefix();
+begin
+  Settings.setPrefix('');
+  try
+
+  finally
+    Settings.setPrefix(s);
+  end;
+end;
+
+{Start Form}
+
 const
   RAFIKI_VERSION = '2.00';
 
@@ -944,8 +1002,7 @@ begin
   end;
 end;
 
-// runRafikiPlayerManager: Launches everything!
-procedure runRafikiPlayerManager();
+procedure Rafiki_RunPlayerManager();
 var
   i: byte;
 begin

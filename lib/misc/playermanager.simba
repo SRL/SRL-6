@@ -16,7 +16,7 @@ Rafiki Player Manager
 {$include_once rafiki.simba}
 
 begin
-  runRafikiPlayerManager();
+  Rafiki_RunPlayerManager();
 end.
 
 {$ELSE}
