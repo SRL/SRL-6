@@ -107,7 +107,8 @@ begin
 
     result := Tesseract_GetText(bmp);
     {$IFDEF TESSERACT_DEBUG}
-      print('Tesseract_GetText(): Filtering took: ', t, ' ms, Tesseract Took: ', (getSystemTime() - tt), 'ms, Total Time: ', ((getSystemTime() - tt) + t), ' ms');
+      printf('Tesseract_GetText(): Filtering took: %d ms, Tesseract Took: %d ms, Total Time: %d ms.', [t, (getSystemTime() - tt), (getSystemTime() - tt) + t]);
+      printf('Tesseract_GetText(): Text found: %s', [result]);
     {$ENDIF}
   finally
     {$IFDEF TESSERACT_DEBUG}

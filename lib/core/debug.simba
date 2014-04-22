@@ -296,6 +296,33 @@ begin
 end;
 
 (*
+printf
+~~~~~~
+
+.. code-block:: pascal
+
+    procedure printf(txt: string; args: TVariantArray; debugType: TDebug = TDebug.DEBUG);
+
+Sister function for print, will use the function "format" to print the string + data.
+
+.. note::
+
+    - by Olly
+    - Last Modified: 22 April 2014 by Olly
+
+Example:
+
+.. code-block:: pascal
+
+    printf('hello %d', [50]);
+
+*)
+procedure printf(txt: string; args: TVariantArray; debugType: TDebug = TDebug.DEBUG);
+begin
+  print(format(txt, args), debugType);
+end;
+
+(*
 debugATPA
 ~~~~~~~~~
 
