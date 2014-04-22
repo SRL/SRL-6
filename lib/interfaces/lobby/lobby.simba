@@ -11,7 +11,7 @@ The source for this file can be found `here <https://github.com/SRL/SRL-6/blob/m
 
 {$include_once ../interfaces.simba}
 {$include_once ../options.simba}
-{$include_once ../../tesseract/tesseract.simba}
+{$include_once ../../core/tesseract.simba}
 
 {$f-}
 
@@ -22,9 +22,7 @@ type TRSLobby
 A type that stores functions and properties of the Runescape lobby.
 *)
 type
-  TRSLobby = record(TRSInterface)
-    __placeholder: byte;
-  end;
+  TRSLobby = type TRSInterface;
 
 (*
 var lobby
@@ -468,7 +466,9 @@ begin
 
   for i := 0 to high(woBoxes) do
   begin
+
     foundWo := strToIntDef(trim(tesseractGetText(woBoxes[i].x1, woBoxes[i].y1, woBoxes[i].x2, woBoxes[i].y2, FILTER_SMALL_CHARS_2, 'digits')), -1);
+
     print('TRSLobby.quickSelectWorld(): Tesseract found world '+intToStr(foundWo));
 
     if (foundWo = wo) then

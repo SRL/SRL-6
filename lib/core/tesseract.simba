@@ -1,0 +1,147 @@
+{$loadlib libtesseract}
+{$include_once debug.simba}
+
+type
+  TTesseractFilter = packed record
+    multiplerW, multiplerH: integer;
+    thresholdSettings: packed record invert: boolean; amount: byte; method: TBmpThreshMethod; end;
+ end;
+
+const
+  TESS_DATA_PATH = AppPath + 'tessdata';
+  TESS_LANGUAGE = 'eng';
+
+const
+  TESS_FILTER_SMALL_CHARS: TTesseractFilter = [3, 3, [false, 50, TM_Mean]];
+  TESS_FILTER_SMALL_CHARS_2: TTesseractFilter = [5, 5, [false, 55, TM_Mean]];
+  TESS_FILTER_NPC_CHAT_CHARS: TTesseractFilter = [3, 3, [true, -50, TM_Mean]];
+
+var
+  tesseractPtr: pointer := nil;
+
+procedure Tesseract_Setup();
+begin
+  tesseractPtr := Tesseract_Create();
+
+  if (tesseractPtr = nil) then
+    print('Failed to create a tesseract instance', TDebug.FATAL);
+
+  if (Tesseract_Init(tesseractPtr, TESS_DATA_PATH, TESS_LANGUAGE) <> 0) then
+    print('Unable to initizalse tesseract, check Simba console for more infomation', TDebug.FATAL);
+
+  addOnTerminate('Tesseract_Free');
+  print('Tesseract was succesfully setup', TDebug.SUB);
+end;
+
+procedure Tesseract_Free();
+begin
+  if (tesseractPtr = nil) then
+    exit();
+
+  Tesseract_End(tesseractPtr);
+  Tesseract_Delete(tesseractPtr);
+  tesseractPtr := nil;
+end;
+
+procedure Tesseract_SetWhitelist(const whitelist: string);
+begin
+  Tesseract_SetVariable(tesseractPtr, 'tessedit_char_whitelist', whiteList);
+end;
+
+procedure Tesseract_ResetWhitelist();
+begin
+  Tesseract_Free();
+  Tesseract_Setup();
+end;
+
+procedure Tesseract_ApplyFilter(const bmp: integer; const filter: TTesseractFilter);
+var
+  imgMatrix: T2DIntegerArray;
+  w, h: integer;
+begin
+  getBitmapSize(bmp, w, h);
+
+  imgMatrix := bitmapToMatrix(bmp);
+
+  with filter do
+  begin
+    resizeBilinearMatrix(imgMatrix, max(multiplerH, 1) * w, max(multiplerH, 1) * h);
+    thresholdAdaptiveMatrix(imgMatrix, 0, 255, thresholdSettings.invert, thresholdSettings.method, thresholdSettings.amount);
+  end;
+
+  drawMatrixBitmap(bmp, imgMatrix);
+end;
+
+function Tesseract_GetText(const bmp: integer): string;
+var
+  w, h: integer;
+  res: Pointer;
+begin
+  getBitmapSize(bmp, w, h);
+
+  try
+    Tesseract_SetImage(tesseractPtr, getMufasaBitmap(bmp).getData(), w, h, 4, Integer(w * 4));
+    res := Tesseract_GetUTF8Text(tesseractPtr);
+    result := trim(stringReplace(string(res), #10, #13#10, [rfReplaceAll]));
+  except
+    print('Tesseract_GetText(): Raised a exception!');
+  finally
+    Tesseract_FreeUTF8Text(res);
+    Tesseract_Clear(tesseractPtr);
+  end;
+end;
+
+function Tesseract_GetText(const xs, ys, xe, ye: integer; filter: TTesseractFilter): string; overload;
+var
+  bmp: integer;
+  t, tt: integer;
+begin
+  bmp := bitmapFromClient(xs, ys, xe, ye);
+
+  try
+    t := getSystemTime();
+    Tesseract_ApplyFilter(bmp, filter);
+
+    t := (getSystemTime() - t);
+    tt := getSystemTime();
+
+    result := Tesseract_GetText(bmp);
+    {$IFDEF TESSERACT_DEBUG}
+      print('Tesseract_GetText(): Filtering took: ', t, ' ms, Tesseract Took: ', (getSystemTime() - tt), 'ms, Total Time: ', ((getSystemTime() - tt) + t), ' ms');
+    {$ENDIF}
+  finally
+    {$IFDEF TESSERACT_DEBUG}
+      drawBitmapDebugImg(bmp);
+      displayDebugImgWindow(getMufasaBitmap(bmp).getWidth(), getMufasaBitmap(bmp).getHeight());
+    {$ENDIF}
+    freeBitmap(bmp);
+  end;
+end;
+
+function Tesseract_GetText(const area: TBox; filter: TTesseractFilter): string; overload;
+begin
+  result := Tesseract_GetText(area.x1, area.y1, area.x2, area.y2, filter);
+end;
+
+const
+  FILTER_SMALL_CHARS: TTesseractFilter = TESS_FILTER_SMALL_CHARS;
+  FILTER_NPC_CHAT_CHARS: TTesseractFilter = TESS_FILTER_NPC_CHAT_CHARS;
+  FILTER_SMALL_CHARS_2: TTesseractFilter = TESS_FILTER_SMALL_CHARS_2;
+
+function tesseractGetText(const searchBox: tbox; filterMethod: TTesseractFilter): string;
+begin
+  result := Tesseract_GetText(searchBox, filterMethod);
+end;
+
+function tesseractGetText(const x1, y1, x2, y2: integer; filterMethod: TTesseractFilter; config: string = ''): string; overload;
+begin
+  if (config <> '') then
+    Tesseract_SetWhitelist('0123456789');
+  result := Tesseract_GetText(x1, y1, x2, y2, filterMethod);
+  if (config <> '') then
+    Tesseract_ResetWhitelist();
+end;
+
+begin
+  Tesseract_Setup();
+end;

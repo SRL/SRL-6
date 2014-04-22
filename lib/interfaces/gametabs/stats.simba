@@ -8,7 +8,7 @@ Runescape Stats gametab.
 *)
 
 {$include_once gametab.simba}
-{$include_once ../../tesseract/tesseract.simba}
+{$include_once ../../core/tesseract.simba}
 
 {$f-}
 

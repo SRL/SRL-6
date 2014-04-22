@@ -14,7 +14,7 @@ The source for this file can be found `here <https://github.com/SRL/SRL-6/blob/m
 {$include_once interfaces.simba}
 {$include_once ../core/players.simba}
 {$include_once actionbar.simba}
-{$include_once ../tesseract/tesseract.simba}
+{$include_once ../core/tesseract.simba}
 
 {*
 const Internal
