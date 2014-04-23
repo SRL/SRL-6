@@ -33,7 +33,12 @@ type TRSProductionScreen
 A type that stores the production interface properties.
 *)
 type
-  TRSProductionScreen = type TRSInterface;
+  TRSProductionScreen = record (TRSInterface)
+    {$IFNDEF CODEINSIGHT}
+    __bmpMask: integer;
+    __loaded: boolean;
+    {$ENDIF}
+  end;
 
 (*
 var productionScreen
@@ -81,6 +86,32 @@ begin
     ID := ID_INTERFACE_PRODUCTION;
     parentID := -1;
     static := false;
+    __loaded := false;
+  end;
+end;
+{$ENDIF}
+
+{$IFNDEF CODEINSIGHT}
+procedure __loadProductionScreen();
+begin
+  with (productionScreen) do
+  begin
+    __bmpMask := BitmapFromString(264, 228, 'meJzt3bENgzAARcGMkIY1mCCrsEL2L1PQIB4CmgDFnf4Clvzk0sM4DWaWvYAFXUDpAkoXULqA0gWULqB0AXXYxfvz/fcuOyyctN/FNZdWGjyNLqB0AaULKF1A6QJKF1C6gNIFlC6gdAGlCyhdQOkCShdQuoDSBZQuoHQBpQsoXUDpAkoXULqA0gWULqB0AaULKF1A6QJKF1C6gNIFlP+SoPyvB6ULKF1A6QJKF1C6gNIFlC6g5i7MbLW704QnkgaseDKgdAGlCyhdQOkCShdQuoDSBZQuoHQBpQsoXUDpAkoXULqA0gWULqB0AaULKF1A6QJKF1C6gNIFlC6gdAGlCyhdQOkCShdQuoDSBZQuoHQBpQsoXUDpAkoXULqA0gWULqB0AaULKF1A6QJKF1C6gNIFlC6gdAGlCyhdQOkCShdQuoDSBZQuoHQBpQsoXUDpAkoXULqA0gWULqB0AaULKF1A6QJKF1C6gNIFlC6gdAGlCyhdQOkCShdQuoDSBZQuoHQBpQsoXUDpAkoXULqA0gWULqB0AaULKF1A6QJKF1C6gNIFlC6gdAGlCyhdQOkCShdQuoDSBZQuoHQBpQsoXUDpAkoXULqA0gWULqB0AaULKF1A6QJKF1C6gNIFlC6gdAGlCyhdQOkCShdQuoDSBZQuoHQBpQsoXUDpAkoXULqA0gWULqB0AaULKF1A6QJKF1C6gNIFlC6gdAGlCyhdQOkCShdQuoDSBZQuoHQBpQsoXUDpAkoXULqA0gWULqB0AaULKF1A6QJKF1C6gNIFlC6gdAGlCyhRwKb5yTCz5X7xsGXW');
+    __loaded := true;
+    setBitmapName(__bmpMask, 'SRL - ProductionScreen Mask');
+  end;
+
+  addOnTerminate('__freeProductionScreen');
+end;
+{$ENDIF}
+
+{$IFNDEF CODEINSIGHT}
+procedure __freeProductionScreen();
+begin
+  with (productionScreen) do
+  begin
+    __loaded := false;
+    freeBitmap(__bmpMask);
   end;
 end;
 {$ENDIF}
@@ -107,48 +138,29 @@ Example:
     if (productionScreen.__find()) then
       writeln('bounds are set!');
 *)
+{$IFNDEF CODEINSIGHT}
 function TRSProductionScreen.__find(): boolean;
-const
-  BORDER_COLOR = 11645361;
-  BUTTON_COLOR = 11238410;
 var
-  j, i, wid, hei: integer;
-  b: TBox;
-  lowP, hiP: TPoint;
-  tpa, tpa2: TPointArray;
+  fx, fy: integer;
 begin
-  getClientDimensions(wid, hei);
-  b := [1, 1, wid -1, hei - 1];
+  result := false;
+  freeze();
 
-  findColorsTolerance(tpa, BORDER_COLOR, b, 0,colorSetting(1));
-  tpa.sortByXValue(true);
+  if (not self.__loaded) then
+    __loadProductionScreen();
 
-  tpa2 := tpa;
-  tpa2.invert;
-
-  for i := 0 to high(tpa) do
-  begin
-    for j := 0 to high(tpa2) do
-      if (tpa2[j].x - tpa[i].x = 250) then
+  try
+    if (findBitmap(self.__bmpMask, fx, fy)) then
+      if (countColor(clWhite, fx, y, fx + 260, fy + 50) > 50) then
       begin
-        lowP := tpa[i];
-        hiP := tpa2[j];
-        break;
+        self.setBounds([fx - 230, fy - 32, fx + 273, fy + 290]);
+        result := true;
       end;
-    if (hiP.x - lowP.x = 250) then
-      break;
+  finally
+    unfreeze();
   end;
-
-  if (hiP.x - lowP.x <> 250) then
-    exit(false);
-
-  if (hiP.x - lowP.x = 250) then
-    if countColorTolerance(BUTTON_COLOR, intToBox(lowP.x, lowP.y - 10, hiP.x, lowP.y + 10), 50) > 250 then
-    begin
-      self.setBounds(intToBox(lowP.x - 238, lowP.y - 311, hiP.x + 15, lowP.y + 14));
-      result := true;
-    end;
 end;
+{$ENDIF}
 
 (*
 TRSProductionScreen.isOpen
@@ -175,28 +187,17 @@ Example:
       writeln('it''s open!');
 *)
 function TRSProductionScreen.isOpen(waitTime: integer = 0): boolean;
-const
-  BORDER_COLOR = 1388125;
-  BACKGROUND_COLOR = 921102;
 var
-  t, cts: integer;
+  t: longWord;
 begin
-  t := (getSystemTime() + waitTime);
+  result := false;
+  t := (getTimeRunning() + waitTime);
 
-  cts := getToleranceSpeed();
-  setColorToleranceSpeed(1);
-
-  repeat
-    if (self.x1 - self.x2 = 0) then
-      result := self.__find() else
-      if (getColor(self.x1 + 8, self.y1 + 33) = BORDER_COLOR) or (getColor(self.x1 + 8, self.y1 + 34) = BORDER_COLOR) then
-        if (countColor(BACKGROUND_COLOR, intToBox(self.x1 +250, self.y1 +40, self.x2 -20, self.y2 -250)) > 2000) then
-          result := true;
-
-    wait(20 + random(50));
-  until (getSystemTime() >= t) or (result);
-
-  setColorToleranceSpeed(cts);
+  while (not result) and (t >= getTimeRunning()) do
+  begin
+    result := self.__find();
+    wait(randomRange(20, 50));
+  end;
 end;
 
 (*

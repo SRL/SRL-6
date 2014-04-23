@@ -25,10 +25,6 @@ The source for this file can be found `here <https://github.com/SRL/SRL-6/blob/m
 
 *)
 
-{$include_once globals.simba}
-{$include_once ../utilities/time.simba}
-{$include_once ../utilities/wrappers.simba}
-{$include_once ../utilities/types/types.simba}
 {$include_once ../utilities/drawing.simba}
 
 {$f-}

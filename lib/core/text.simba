@@ -12,6 +12,7 @@ The source for this file can be found `here <https://github.com/SRL/SRL-6/blob/m
 {$include_once ../interfaces/interfaces.simba}
 {$include_once debug.simba}
 {$include_once mouse.simba}
+{$include_once ../utilities/types/tpointarrays.simba}
 
 {$f-}
 
