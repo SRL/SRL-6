@@ -244,8 +244,10 @@ Example:
 procedure smartSetDebug(enable: boolean); overload;
 begin
   if (__smartNativeDebugButtonID <> -1) then
-    smartSetNativeButton(__smartCurrentTarget, 0, __smartNativeDebugButtonID, not enable)
-  else
+  begin
+    smartSetNativeButton(__smartCurrentTarget, 0, __smartNativeDebugButtonID, not enable);
+    smartSetNativeButton(__smartCurrentTarget, 1, __smartNativeDebugButtonID, not enable);
+  end else
     smartSetDebug(__smartCurrentTarget, enable);
 end;
 
