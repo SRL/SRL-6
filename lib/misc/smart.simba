@@ -34,7 +34,7 @@ var SMART plugins
   A TStringArray of smart plugins
 *)
 var
-  smartPlugins: TStringArray = ['OpenGL32.dll'];
+  smartPlugins: TStringArray = ['OpenGL32.dll', 'd3d9.dll'];
 
 (*
 var User Set
@@ -739,12 +739,27 @@ begin
     print('Client never reloaded after restart..', TDebug.FATAL);
 end;
 
+procedure __smartCheckPlugins();
+var
+  dx, ogl: boolean;
+begin
+  dx := fileExists(pluginPath + 'd3d9.dll');
+  ogl := fileExists(pluginPath + 'OpenGL32.dll');
+
+  if (dx = false) and (ogl = false) then
+    print('No SMART Plugins found, make sure you update your plugins!', TDebug.FATAL);
+
+  if (dx = true) and (ogl = false) then
+    print('Only found the direct-x plugin, you must be in direct-x mode!');
+
+  if (dx = false) and (ogl = true) then
+    print('Only found the OpenGL plugin, you must be in OpenGL mode');
+end;
+
 begin
   SRL_Events[EVENT_RS_UPDATE] := sixHourFix;
 
   {$IFDEF WINDOWS}
-  // check for the plugin on compile
-  if (not fileExists(PluginPath + 'OpenGL32.dll')) then
-    print('SMART - Unable to find OpenGL32.dll (plugin required for SRL to work with SMART)', TDebug.FATAL);
+  __smartCheckPlugins();
   {$ENDIF}
 end;

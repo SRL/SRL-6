@@ -291,6 +291,16 @@ begin
     writeln(debugMSG);
 end;
 
+function print(txt: string; _result: variant; footerTxt: string = ''; debugType: TDebug = TDebug.WARNING): variant; overload;
+begin
+  print(txt, debugType);
+
+  if (footerTxt <> '') then // add a footer
+    print(footerTxt, TDebug.FOOTER);
+
+  exit(_result);
+end;
+
 (*
 printf
 ~~~~~~

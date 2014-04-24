@@ -1098,7 +1098,7 @@ begin
 
   if (not self.isOpen()) then
   begin
-    print('bankScreen.quickDeposit(): Unable to quick-deposit since bankscreen isn''t open', TDebug.ERROR);
+    print('TRSBankScreen.quickDeposit(): Unable to quick-deposit since bankscreen isn''t open', TDebug.ERROR);
     exit(false);
   end;
 
@@ -1109,7 +1109,7 @@ begin
   mouseBox(b, MOUSE_LEFT);
   wait(200 + random(300));
 
-  print('bankScreen.quickDeposit(): Clicked quick deposit id ' + intToStr(depositType), TDebug.SUB);
+  print('TRSBankScreen.quickDeposit(): Clicked quick deposit id ' + intToStr(depositType), TDebug.SUB);
 end;
 
 (*
@@ -1148,7 +1148,7 @@ var
 begin
   if (not self.isOpen()) then
   begin
-    print('bankScreen.clickButton(): Unable to click button since bankscreen isn''t open', TDebug.ERROR);
+    print('TRSBankScreen.clickButton(): Unable to click button since bankscreen isn''t open', TDebug.ERROR);
     exit(false);
   end;
 
@@ -1159,6 +1159,7 @@ begin
   mouseBox(b, MOUSE_LEFT);
   wait(100 + random(150));
   result := true;
+  print('TRSBankScreen.clickButton(): Clicked button id: ' + intToStr(button), TDebug.SUB);
 end;
 
 (*

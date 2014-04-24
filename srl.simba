@@ -58,7 +58,7 @@ SRL library isn't available to you.
 
 function setupSRL(): boolean;
 var
-  t := getSystemTime();
+  t: longWord := getTimeRunning();
 begin
   print('setupSRL()', TDebug.HEADER);
   print('Setting up SRL...');
@@ -83,6 +83,6 @@ begin
   end;
 
   result := true;
-  print('Setup SRL in '+toStr(getSystemTime() - t)+'ms.');
+  print('Setup SRL in '+msToTime(GetTimeRunning() - t, TIME_FORMAL));
   print('setupSRL(): '+toStr(result), TDebug.FOOTER);
 end;

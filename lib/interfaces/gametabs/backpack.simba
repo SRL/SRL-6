@@ -1139,6 +1139,11 @@ begin
   result := chooseOption.select(['Set quick-inventory '+ s, 'ventory ' + s], 300);
 end;
 
+function TRSTabBackpack.isLocked(): boolean;
+begin
+  result := (getColor(gameTabs.tabArea.x1 + 92, gameTabs.tabArea.y2 -35) = 1906963);
+end;
+
 (*
 TRSTabBackpack.waitWhileLocked
 ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
@@ -1161,21 +1166,15 @@ Example:
    tabBackpack.waitWhileLocked();
 *)
 procedure TRSTabBackpack.waitWhileLocked();
-
-  function isLocked(): boolean;
-  begin
-    result := (getColor(gameTabs.tabArea.x1 + 92, gameTabs.tabArea.y2 -35) = 1906963);
-  end;
-
 var
   t: integer;
 begin
   t := (getSystemTime() + 10000);
 
-  if (not isLocked()) then
+  if (not self.isLocked()) then
     exit();
 
-  while (isLocked()) and (t > getSystemTime()) do
+  while (self.isLocked()) and (t > getSystemTime()) do
     wait(50 + random(50));
 
   print('TRSBackpack.waitUnlocked(): Backpack is now unlocked');
