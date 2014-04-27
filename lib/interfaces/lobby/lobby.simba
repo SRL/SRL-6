@@ -447,37 +447,38 @@ Example:
 function TRSLobby.quickSelectWorld(wo: integer): boolean;
 var
   woBoxes: TBoxArray;
-  i, bmp, foundWo: integer;
-  tpa: TPointArray;
-  atpa: T2DPointArray;
+  i, tab, foundWo: integer;
 begin
   result := false;
 
   if (not self.isOpen()) then
     exit();
 
-  // because the quick-select buttons don't appear in the options tab
-  if (self.getCurrentTab() = LOBBY_OPTIONS) then
+  // quick select only shows on player info, friends, or friend chat.
+  tab := self.getCurrentTab();
+  if (tab = LOBBY_OPTIONS) or (tab = LOBBY_WORLDS) then
     if (not self.openTab(LOBBY_PLAYER)) then
       exit();
 
   // a box around each of the quick select world boxes
-  woBoxes := grid(2, 1, 25, 15, 44, 0, point(self.x + self.w - 125, self.y + self.h - 27));
+  woBoxes := grid(2, 1, 25, 15, 44, 0, point(self.x2 - 125, self.y2 - 28));
+  Tesseract_SetWhitelist('0123456789');
 
   for i := 0 to high(woBoxes) do
   begin
-
-    foundWo := strToIntDef(trim(tesseractGetText(woBoxes[i].x1, woBoxes[i].y1, woBoxes[i].x2, woBoxes[i].y2, FILTER_SMALL_CHARS_2, 'digits')), -1);
-
+    foundWo := StrToIntDef(ExtractFromStr(Tesseract_GetText(woBoxes[i], TESS_FILTER_SMALL_CHARS), Numbers), -1);
     print('TRSLobby.quickSelectWorld(): Tesseract found world '+intToStr(foundWo));
 
     if (foundWo = wo) then
     begin
       mouseBox(woBoxes[i], MOUSE_LEFT);
       print('TRSLobby.quickSelectWorld(): Clicked quick-select world '+toStr(wo), TDebug.SUB);
-      exit(true);
+      result := true;
+      break();
     end;
   end;
+
+  Tesseract_ResetWhitelist();
 end;
 
 begin
