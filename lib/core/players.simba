@@ -9,11 +9,10 @@ The source for this file can be found `here <https://github.com/SRL/SRL-6/blob/m
 
 *)
 
+{$include_once ../misc/miscforms.simba}
 {$include_once ../interfaces/lobby/worlds.simba}
-{$include_once ../interfaces/options.simba}
 {$include_once ../interfaces/minimap.simba}
 {$include_once ../core/mouse.simba}
-{$include_once ../utilities/wrappers.simba}
 
 {$f-}
 
@@ -195,13 +194,17 @@ end;
 
 function Rafiki_DecryptArmy(const armyName: string; var data: string): boolean;
 var
-  pass: string;
+  pass, dataCopy: string;
 label
   lStart;
 begin
-  lStart:
+  dataCopy := copy(data);
 
-  if (InputQuery('Rafiki Player Manager', 'Please enter your army password for decryption', pass)) then
+  lStart:
+  pass := '';
+  data := copy(dataCopy);
+
+  if (SafeInputQuery('Rafiki Player Manager', 'Please enter your army password for decryption', pass, true)) then
   begin
     rc2_decrypt(pass, htSHA512, data);
     result := ExecRegExpr('<player>', data);
@@ -211,7 +214,7 @@ begin
   end;
 
   if (not result) then
-    if (MessageDlg('Rafiki_DecryptArmy', 'Wrong password for decryption', mtError, [mbRetry, mbOk]) = 4) then // retry
+    if (SafeMessageDlg('Rafiki_DecryptArmy', 'Wrong password for decryption', mtError, [mbRetry, mbOk]) = 'mbRetry') then // retry
       goto lStart
     else
       print('Ok clicked');

@@ -219,12 +219,12 @@ end;
 {$ENDIF}
 
 (*
-ShowFormSafeMsgDlg
-~~~~~~~~~~~~~~~~~~
+SafeMessageDlg
+~~~~~~~~~~~~~~
 
 .. code-block:: pascal
 
-    function ShowFormSafeMsgDlg(const Caption, Message: string; const DlgType: TMsgDlgType; const Buttons: TMsgDlgButtons): string;
+    function SafeMessageDlg(const Caption, Message: string; const DlgType: TMsgDlgType; const Buttons: TMsgDlgButtons): string;
 
 Attempt at a exact copy of MessageDlg. For use when the procedure your running
 has been called via sync() ie. forms.
@@ -241,9 +241,9 @@ Example:
 
 .. code-block:: pascal
 
-   ShowFormSafeMsgDlg('Warning!', 'This is a warning', mtWarning, [mbOk]);
+   SafeMessageDlg('Warning!', 'This is a warning', mtWarning, [mbOk]);
 *)
-function ShowFormSafeMsgDlg(fCaption, fMessage: string; fDlgType: TMsgDlgType; const fButtons: TMsgDlgButtons): string;
+function SafeMessageDlg(fCaption, fMessage: string; fDlgType: TMsgDlgType; const fButtons: TMsgDlgButtons): string;
 begin
   with (__FSMessageDlg) do
   begin
@@ -255,6 +255,7 @@ begin
     except
       writeln('** ShowFormSafeMsgDlg: Sync Failed');
     finally
+      data.buttons := [];
       result := res;
     end;
   end;
@@ -377,12 +378,12 @@ end;
 {$ENDIF}
 
 (*
-ShowFormSafeInputQuery
-~~~~~~~~~~~~~~~~~~~~~~
+SafeInputQuery
+~~~~~~~~~~~~~~
 
 .. code-block:: pascal
 
-    function ShowFormSafeInputQuery(const fCaption, fMessage: string; out fValue: string; const fIsPassword: boolean = false): boolean;
+    function SafeInputQuery(const fCaption, fMessage: string; out fValue: string; const fIsPassword: boolean = false): boolean;
 
 Attempt at a exact copy of InputQuery. For use when the procedure your running
 has been called via sync() ie. forms.
@@ -396,9 +397,9 @@ Example:
 
 .. code-block:: pascal
 
-   ShowFormSafeInputQuery('Caption', 'Message', s);
+  SafeInputQuery('Caption', 'Message', s);
 *)
-function ShowFormSafeInputQuery(const fCaption, fMessage: string; out fValue: string; const fIsPassword: boolean = false): boolean;
+function SafeInputQuery(const fCaption, fMessage: string; out fValue: string; const fIsPassword: boolean = false): boolean;
 begin
   with (__FSInputQuery) do
   begin
