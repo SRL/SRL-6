@@ -206,7 +206,7 @@ begin
   try
     if (findColors(tpa, 65536, 0, 0, wid -1, 300)) then // top can only be at the top of the screen!
     begin
-      atpa := clusterTPAEx(tpa, 5, 5);
+      atpa := clusterTPAEx(tpa, 6, 5);
       hh := high(atpa);
 
       for i := 0 to hh do
@@ -264,30 +264,35 @@ Example:
 *)
 function TRSBankScreen.isOpen(waitTime: integer = 0): boolean;
 var
-  t, tt: integer;
-  bb: TBox;
+  t, itemTimer: longWord;
+  box: TBox;
   tpa: TPointArray;
 begin
-  t := (getSystemTime() + waitTime);
   result := false;
+  t := (getTimeRunning() + waitTime);
 
   repeat
     if (self.__find()) then
     begin
-      tt := (getSystemTime() + randomRange(2500, 3200));
-      bb := gridBox(0, 10, 10, 35, 31, 44, 44, point(self.x + _BANK_SLOTS_OFFSET.x, self.y + _BANK_SLOTS_OFFSET.y));
+      result := true;
 
-      while (tt > getSystemTime()) and (not result) do
+      // now we attempt to wait for items to load
+      itemTimer := (getSystemTime() + randomRange(1200, 1600));
+      box := gridBox(0, 10, 10, 35, 31, 44, 44, point(self.x + _BANK_SLOTS_OFFSET.x, self.y + _BANK_SLOTS_OFFSET.y)); // box around where the first item should be in the bank
+
+      while (itemTimer > getTimeRunning()) do
       begin
-        findColors(tpa, ITEM_OUTLINE_BLACK, bb);
-        result := (length(tpa) > 5);
+        if (countColor(ITEM_OUTLINE_BLACK, box) > 5) then
+          break();
+
+        wait(randomRange(30, 60));
       end;
     end;
 
     if (waitTime > 0) then
-      wait(15 + random(25));
+      wait(randomRange(30, 60));
 
-  until (getSystemTime() >= t) or (result);
+  until (getTimeRunning() >= t) or (result);
 end;
 
 (*
