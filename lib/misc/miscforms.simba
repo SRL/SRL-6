@@ -67,7 +67,7 @@ Paints the __FSMessageDlg form to look like a message dialog copy.
 
 *}
 {$IFNDEF CODEINSIGHT}
-procedure __FSMessageDlg_Paint(); native;
+procedure __FSMessageDlg_Paint(Sender: TObject); native;
 
   function getImage(): TBitmap;
   var
@@ -305,7 +305,7 @@ Inits the __TFSInputQuery form.
 
 *}
 {$IFNDEF CODEINSIGHT}
-procedure __TFSInputQuery_Init(); native;
+procedure TFSInputQuery_Init(); native;
 var
   bmp: TBitmap;
 begin
@@ -407,7 +407,7 @@ begin
     value := '';
 
     try
-      sync(__TFSInputQuery_Init);
+      sync(TFSInputQuery_Init);
     except
       writeln('** ShowFormSafeInputQuery: Sync Failed');
     finally

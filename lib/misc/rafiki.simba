@@ -1,5 +1,4 @@
 {$include_once ../core/players.simba}
-{$include_once miscforms.simba}
 
 const
   RAFIKI_VERSION = '2.00';
