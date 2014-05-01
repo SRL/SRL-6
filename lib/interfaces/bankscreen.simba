@@ -206,7 +206,7 @@ begin
   try
     if (findColors(tpa, 65536, 0, 0, wid -1, 300)) then // top can only be at the top of the screen!
     begin
-      atpa := clusterTPAEx(tpa, 5, 5);
+      atpa := clusterTPAEx(tpa, 6, 5);
       hh := high(atpa);
 
       for i := 0 to hh do
@@ -264,30 +264,35 @@ Example:
 *)
 function TRSBankScreen.isOpen(waitTime: integer = 0): boolean;
 var
-  t, tt: integer;
-  bb: TBox;
+  t, itemTimer: longWord;
+  box: TBox;
   tpa: TPointArray;
 begin
-  t := (getSystemTime() + waitTime);
   result := false;
+  t := (getTimeRunning() + waitTime);
 
   repeat
     if (self.__find()) then
     begin
-      tt := (getSystemTime() + randomRange(2500, 3200));
-      bb := gridBox(0, 10, 10, 35, 31, 44, 44, point(self.x + _BANK_SLOTS_OFFSET.x, self.y + _BANK_SLOTS_OFFSET.y));
+      result := true;
 
-      while (tt > getSystemTime()) and (not result) do
+      // now we attempt to wait for items to load
+      itemTimer := (getSystemTime() + randomRange(1200, 1600));
+      box := gridBox(0, 10, 10, 35, 31, 44, 44, point(self.x + _BANK_SLOTS_OFFSET.x, self.y + _BANK_SLOTS_OFFSET.y)); // box around where the first item should be in the bank
+
+      while (itemTimer > getTimeRunning()) do
       begin
-        findColors(tpa, ITEM_OUTLINE_BLACK, bb);
-        result := (length(tpa) > 5);
+        if (countColor(ITEM_OUTLINE_BLACK, box) > 5) then
+          break();
+
+        wait(randomRange(30, 60));
       end;
     end;
 
     if (waitTime > 0) then
-      wait(15 + random(25));
+      wait(randomRange(30, 60));
 
-  until (getSystemTime() >= t) or (result);
+  until (getTimeRunning() >= t) or (result);
 end;
 
 (*
@@ -1098,7 +1103,7 @@ begin
 
   if (not self.isOpen()) then
   begin
-    print('TRSBankScreen.quickDeposit(): Unable to quick-deposit since bankscreen isn''t open', TDebug.ERROR);
+    print('bankScreen.quickDeposit(): Unable to quick-deposit since bankscreen isn''t open', TDebug.ERROR);
     exit(false);
   end;
 
@@ -1109,7 +1114,7 @@ begin
   mouseBox(b, MOUSE_LEFT);
   wait(200 + random(300));
 
-  print('TRSBankScreen.quickDeposit(): Clicked quick deposit id ' + intToStr(depositType), TDebug.SUB);
+  print('bankScreen.quickDeposit(): Clicked quick deposit id ' + intToStr(depositType), TDebug.SUB);
 end;
 
 (*
@@ -1148,7 +1153,7 @@ var
 begin
   if (not self.isOpen()) then
   begin
-    print('TRSBankScreen.clickButton(): Unable to click button since bankscreen isn''t open', TDebug.ERROR);
+    print('bankScreen.clickButton(): Unable to click button since bankscreen isn''t open', TDebug.ERROR);
     exit(false);
   end;
 
@@ -1159,7 +1164,6 @@ begin
   mouseBox(b, MOUSE_LEFT);
   wait(100 + random(150));
   result := true;
-  print('TRSBankScreen.clickButton(): Clicked button id: ' + intToStr(button), TDebug.SUB);
 end;
 
 (*
@@ -1871,7 +1875,7 @@ begin
   case bankType of
     BANK_CHEST_SW: begin col1:= [8946555, 15, [2, [0.18, 0.18, 0.00]]]; col2:= [5863053, 10, [2, [0.13, 0.10, 0.00]]]; avelen:= 90; end;
     BANK_CHEST_SHANTAY: begin col1:= [4335674, 6, [2, [0.38, 1.96, 0.00]]]; col2:= [7247287, 6, [2, [0.16, 1.41, 0.00]]]; avelen:= 90; end;
-    BANK_CHEST_DUEL: begin col1:= [11512192, 18, [2, [0.39, 0.57, 0.00]]]; col2:= [6586289, 10, [2, [0.21, 1.00, 0.00]]]; avelen:= 90; end;                 
+    BANK_CHEST_DUEL: begin col1:= [11512192, 18, [2, [0.39, 0.57, 0.00]]]; col2:= [6586289, 10, [2, [0.21, 1.00, 0.00]]]; avelen:= 90; end;
     BANK_CHEST_CW: begin col1:= [8088922, 16, [2, [0.06, 0.17, 0.00]]]; col2:= [4808312, 17, [2, [0.03, 0.17, 0.00]]]; avelen:= 90; end;
     BANK_CHEST_GROTTO: begin col1:= [6842481, 6, [2, [0.00, 0.08, 0.00]]]; col2:= [2570316, 4, [2, [0.15, 1.35, 0.00]]]; avelen:= 90; end;
     BANK_CHEST_LUMBRIDGE: begin col1:= [11313299, 10, [2, [0.17, 0.42, 0.00]]]; col2:= [6586289, 10, [2, [0.21, 1.00, 0.00]]]; avelen:= 90; end;
