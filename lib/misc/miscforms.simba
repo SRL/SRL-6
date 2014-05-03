@@ -1,3 +1,14 @@
+(*
+MiscForms
+=========
+
+The MiscForms file contains forms that don't reqiure their own file, currently
+it holds copys of MessageDlg and InputQuery which can be called when a form is open.
+
+*)
+
+{$f+}
+
 {*
 type __TFSMessageDlg
 ~~~~~~~~~~~~~~~~~~~~
@@ -416,3 +427,5 @@ begin
     end;
   end;
 end;
+
+{$f+}
