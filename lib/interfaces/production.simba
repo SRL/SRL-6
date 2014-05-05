@@ -224,21 +224,48 @@ Example:
 function TRSProductionScreen.clickStart(): boolean;
 var
   b: TBox;
+  timeOut: Integer;
 begin
   result := false;
 
   b := [self.x1 +252, self.y2 -30, self.x2 -29, self.y2 -3];
 
-  if (self.isOpen()) then
-    if (countColorTolerance(10647049, b, 20) > 100) then
-    begin
-      mouseBox(b, MOUSE_LEFT);
-      result := true;
+  // try Space key first
+  timeOut := (getSystemTime() + randomRange(600, 900));
+  repeat
+    typeByte(VK_SPACE);
+    wait(100 + random(50));
+    result := (not self.isOpen());
+  until((getSystemTime() > timeOut) or result);
 
-      wait(150 + random(150));
+  if (result) then
+    exit();
+
+  // click the button as a failsafe
+  mouseBox([self.x1 +252, self.y2 -30, self.x2 -29, self.y2 -3], MOUSE_MOVE);
+
+  // this is a failsafe in case the productionscreen closes (from the space key) while moving the mouse
+  if (self.isOpen()) then
+  begin
+    fastClick(MOUSE_LEFT);
+    wait(50 + random(50));
+  end else
+    exit(true);
+
+  // wait for the productionscreen to close
+  timeOut := (getSystemTime() + randomRange(5000, 6000));
+  while (timeOut > getSystemTime()) do
+  begin
+    if (not self.isOpen()) then
+    begin
+      result := true;
+      break;
+    end;
+
+    wait(50 + random(50));
   end;
 
-  print('TRSProductionScreen.clickStart(): result = ' + lowercase(boolToStr(result)), TDebug.SUB);
+  print('TRSProductionScreen.clickStart(): result = '+boolToStr(result), TDebug.SUB);
 end;
 
 (*
