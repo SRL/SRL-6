@@ -233,7 +233,7 @@ begin
   // try Space key first
   timeOut := (getSystemTime() + randomRange(600, 900));
   repeat
-    typeByte(VK_SPACE);
+    multiType(VK_SPACE, randomRange(30, 50), 3);
     wait(100 + random(50));
     result := (not self.isOpen());
   until((getSystemTime() > timeOut) or result);

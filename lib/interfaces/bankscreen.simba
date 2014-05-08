@@ -330,7 +330,7 @@ begin
   // try ESC key first
   timeOut := (getSystemTime() + randomRange(600, 900));
   repeat
-    typeByte(VK_ESCAPE);
+    multiType(VK_ESCAPE, randomRange(30, 50), 3);
     wait(100 + random(50));
     result := (not self.isOpen());
   until((getSystemTime() > timeOut) or result);
