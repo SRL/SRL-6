@@ -231,7 +231,7 @@ begin
   b := [self.x1 +252, self.y2 -30, self.x2 -29, self.y2 -3];
 
   // try Space key first
-  timeOut := (getSystemTime() + randomRange(600, 900));
+  timeOut := (getSystemTime() + randomRange(1500, 1900));
   repeat
     multiType(VK_SPACE, randomRange(30, 50), 3);
     wait(100 + random(50));
