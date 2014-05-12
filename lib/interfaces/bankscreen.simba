@@ -277,10 +277,10 @@ begin
       result := true;
 
       // now we attempt to wait for items to load
-      itemTimer := (getSystemTime() + randomRange(1200, 1600));
+      itemTimer := (getTimeRunning() + randomRange(1200, 1600));
       box := gridBox(0, 10, 10, 35, 31, 44, 44, point(self.x + _BANK_SLOTS_OFFSET.x, self.y + _BANK_SLOTS_OFFSET.y)); // box around where the first item should be in the bank
 
-      while (itemTimer > getTimeRunning()) do
+      while (getTimeRunning() >= itemTimer) do
       begin
         if (countColor(ITEM_OUTLINE_BLACK, box) > 5) then
           break();
