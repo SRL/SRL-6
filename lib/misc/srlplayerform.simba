@@ -14,6 +14,18 @@ The source for this file can be found
 
 *)
 
+{$include_once srl-6/lib/core/globals.simba}
+{$include_once srl-6/lib/core/debug.simba}
+{$include_once srl-6/lib/core/players.simba}
+
+{$f+} // On since "native" reqiures it.
+
+{$IFNDEF CODEINSIGHT}
+const
+  BTN_BMP_TICK = 0;
+  BTN_BMP_CROSS = 1;
+{$ENDIF}
+
 {*
 type __TFormPlayer
 ~~~~~~~~~~~~~~~~~~
@@ -35,6 +47,14 @@ a full list of customizable options.
 *)
 type
   TPlayerForm = record
+    // static form components
+    mainForm: TForm;
+    groupBox: TGroupBox;
+    editArmyName: TEdit;
+    btnLoadArmy, btnStartScript: TSpeedButton;
+    clbPlayers: TCheckListBox;
+    btnStart: TButton;
+
     name: string; // the title for the main window
     scriptHelpThread: string;
     scriptSettingsPath: string;
@@ -46,6 +66,8 @@ type
     playerNames: TStringArray;
     players: array of __TFormPlayer;
     isScriptReady: boolean;
+    __bmps: array [0..1] of TBitmap; // bitmaps used for speed buttons
+    __loadedArmy, selectedPlayers: TPlayerArray; // player array of the loaded army
   end;
 
 (*
@@ -72,13 +94,6 @@ unless you know exactly what you're doing.
 *}
 {$IFNDEF CODEINSIGHT}
 var
-  __mainForm: TForm;
-  __edtPlayerAdd: TEdit;
-  __btnPlayerAdd: TButton;
-  __btnPlayerDel: TButton;
-  __lstPlayerList: TListBox;
-  __lblPlayerFile: TLabel;
-  __cboPlayerFile: TComboBox;
   __scriptEditBoxes: array of TEdit;
   __scriptEditLabels: array of TLabel;
   __scriptCheckBoxes: array of TCheckBox;
@@ -86,12 +101,134 @@ var
   __scriptComboBoxes: array of TComboBox;
   __scriptComboLabels: array of TLabel;
   __btnHelp: TButton;
-  __btnThread: TButton;
   __btnSave: TButton;
-  __btnRun: TButton;
   __memo: TMemo;
   __tslSettings: TStringList;
-  __prevPlayerIndex: integer = -1;
+{$ENDIF}
+
+
+{loads all bitmaps needed for the playerform}
+{$IFNDEF CODEINSIGHT}
+procedure __TPlayerForm_LoadBitmaps();
+const
+  strings: TStringArray = ['000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000B0B7B1E2E2E2000000000000000000000000000000000000000000000000000000000000000000000000000000000000B8BDB861AA6957B061E0E0E0000000000000000000000000000000000000000000000000000000000000000000000000B3B9B460AB6877C98669BD744FA658DFDFDF0000000000000000000000000000000000000000000000000000000000000000009CAA9D6BC07780CE8D84D29061B56B479A4FDFDFDF00000000000000000000000000000000000000000000000000000000000000000093A49550A55978C9857CCE8959AC623E8E45DFDFDF00000000000000000000000000000000000000000000000000000000000000000092A2945EB26879CC8775CA8252A35A35833BDEDEDE0000000000000000000000000000000000000000000000000000000000007F988161B46B74CA8172C87C4D9F55337937E1E1E10000000000000000000000000000000000000000000000000000007C977F5AAD6576C98374C9814FA057317B37E2E2E20000000000000000000000000000000000000000000000000000007C977F5CAE667ACC8676CB8250A258327C38E1E1E10000000000000000000000000000000000000000000000000000007D98805DAF677BCD8977CB8551A35A337D39E1E1E10000000000000000000000000000000000000000000000000000007E99815EB0687DCE8A7ACD8752A45B347D3AE2E2E20000000000000000000000000000000000000000000000000000007E998160B26A81CF8D7CCE8954A55D367F3CE3E3E30000000000000000000000000000000000000000000000000000007E9A8161B36B82D18F7DCF8B55A65E37803DE3E3E3000000000000000000000000000000000000000000000000000000000000889D8A5DAF6778C88556A75F38813EE3E3E30000000000000000000000000000000000000000000000000000000000000000000000008B9D8D55A65E37853EE4E4E4000000000000000000000000000000000000000000000000000000000000000000000000000000000000869888E5E5E5000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000', '000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000D1D1D3E5E5E5000000000000000000000000000000000000C3C3C7B2B2BC000000000000000000000000000000000000D1D1D37875FF726FFCE5E5E5000000000000000000000000C4C4C85956F65654F5B1B1BC000000000000000000000000D2D2D47875FF817CFF7B78FE6D6AF9E4E4E4000000000000C5C5C95957F66360FA615FFA4D4AF2AFAFBB000000000000000000C9C9CD7774FE817CFE8A87FF7572FD6562F6E3E3E3C5C5C95A58F66461FA6F6EFF5653F6403EEBE0E0E0000000000000000000000000C8C8CC726FFD7A77FD8682FF6E6BFB5B58F45B59F76562FA726FFF5754F64140EAE1E1E1000000000000000000000000000000000000C8C7CC6A67FB7471FC807CFF7B77FF7774FF7270FF5856F64241EBE1E1E1000000000000000000000000000000000000000000000000C6C6CA6260F87C79FF5C59FF5754FF716EFF4241EBE1E1E1000000000000000000000000000000000000000000000000000000C6C6CA5E5BF77A77FF5956FF5552FF6E6CFF3E3CEAE1E1E1000000000000000000000000000000000000000000000000C7C7CB5F5CF86B68FA7775FF7472FF706EFF6C6AFF4E4BF43633E6E1E1E1000000000000000000000000000000000000C7C7CB605DF86C6AFA7977FF5C5AF74643ED4644F05553F76665FF4543F22D2BE3E1E1E1000000000000000000000000C8C8CC625FF86D6BFB7B78FF5E5BF74643ECE3E3E3C4C4C93D3BEE4E4CF56160FF3F3DF12523E1E0E0E00000000000000000009796B46866F97C7AFF5F5DF74744ECE4E4E4000000000000C4C4C93432EB4846F44A48F62F2DEAADADBA000000000000000000B9B8C27573BA605DF84845EDE5E5E5000000000000000000000000C3C3C82D2BE92F2DEAAEAEBB000000000000000000000000000000C8C8CD9393B3E7E7E7000000000000000000000000000000000000C1C1C7AEAEBB000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000'];
+var
+  i: byte;
+begin
+  for i := 0 to high(playerForm.__bmps) do
+  with (playerForm.__bmps[i]) do
+    begin
+      init();
+      loadFromString(18, 17, 0, strings[i]);
+    end;
+end;
+{$ENDIF}
+
+{frees all bitmaps used by the playerform}
+{$IFNDEF CODEINSIGHT}
+procedure __TPlayerForm_FreeBitmaps();
+var
+  i: byte;
+begin
+  for i := 0 to high(playerForm.__bmps) do
+    playerForm.__bmps[i].free();
+end;
+{$ENDIF}
+
+{$IFNDEF CODEINSIGHT}
+procedure __TPlayerForm_LoadArmy(const armyName: string);
+var
+  j, i: integer;
+  a: TIntegerArray;
+begin
+  with (playerForm) do
+  begin
+    setLength(__loadedArmy, 0); // clear old data
+    clbPlayers.clear();
+
+    if (Rafiki_FindArmy(armyName)) then
+      Rafiki_GetPlayersFromArmy(armyName, __loadedArmy);
+
+    if (length(__loadedArmy) = 0) then
+    begin
+      SafeMessageDlg('RawPlayerForm', format('Army "%s" doesn''t exist, make sure you''ve saved a army in the player manager (SRL > Run Player Manager)', [armyName]), mtWarning, [mbOk]);
+      exit();
+    end;
+
+    for j := 0 to high(__loadedArmy) do
+    begin
+      clbPlayers.getItems().add(__loadedArmy[i].logInName + '  ('+__loadedArmy[i].nickName+')');
+      for i := 0 to (clbPlayers.getItems().getCount() - 1) do
+        insert(clbPlayers.getCanvas().TextWidth(clbPlayers.getItems().getStrings(i)), a);
+
+      clbPlayers.setScrollWidth(MaxA(a) + 25);
+    end;
+  end;
+end;
+{$ENDIF}
+
+{$IFNDEF CODEINSIGHT}
+procedure __TPlayerForm_OnNotifyEvent(Sender: TObject); native;
+
+  function removeNick(const str: string): string;
+  var
+    p: integer;
+  begin
+    result := str;
+
+    try
+      p := Pos(' (', result);
+      if (p > 0) then
+        result := copy(result, 0, p);
+    finally
+      trim(result);
+    end;
+  end;
+
+var
+  i, j: integer;
+  s: string;
+begin
+  with (playerForm) do
+    case (Sender) of
+      btnLoadArmy: __TPlayerForm_LoadArmy(editArmyName.getCaption());
+      btnStart:
+        begin
+          isScriptReady := true;
+
+          for i := 0 to (clbPlayers.getItems().getCount() -1) do
+          begin
+            s := removeNick(clbPlayers.getItems().getStrings(i));
+            for j := 0 to high(__loadedArmy) do
+              if (__loadedArmy[i].loginName = s) then
+              begin
+                setLength(selectedPlayers, length(selectedPlayers) + 1);
+                with selectedPlayers[i] do
+                begin
+                  loginName := __loadedArmy[i].loginName;
+                  passWord := __loadedArmy[i].password;
+                  nickname := __loadedArmy[i].nickName;
+                  bankPin := __loadedArmy[i].bankPin;
+                  isMember := __loadedArmy[i].isMember;
+                end;
+              end;
+          end;
+          mainForm.close();
+        end;
+  end;
+end;
+{$ENDIF}
+
+{$IFNDEF CODEINSIGHT}
+procedure __TRawPlayerForm_CheckArmyExists(Sender: TObject); native;
+begin
+  with (PlayerForm) do
+    case (Rafiki_FindArmy(editArmyName.getCaption())) of
+      true: btnLoadArmy.setGlyph(__bmps[BTN_BMP_TICK]);
+      false: btnLoadArmy.setGlyph(__bmps[BTN_BMP_CROSS]);
+    end;
+end;
+{$ENDIF}
 
 {*
 __writeln
@@ -184,7 +321,7 @@ var
   i: integer;
 begin
   s := getFiles(__PATH_PLAYER, 'xml');
-
+  {
   for i := 0 to high(s) do
   begin
     if (s[i] = 'settings.xml') then
@@ -196,7 +333,7 @@ begin
   s := getFiles(__PATH_PLAYER, 'raf');
 
   for i := 0 to high(s) do
-    __cboPlayerFile.addItem(s[i], nil);
+    __cboPlayerFile.addItem(s[i], nil);  }
 end;
 
 {*
@@ -307,14 +444,14 @@ Displays the correct player information in the form's components.
 *}
 procedure __showPlayerInfo();
 begin
-  if (length(playerForm.players) <= 0) then
+ { if (length(playerForm.players) <= 0) then
     exit;
 
   if (__prevPlayerIndex <> -1) then
     playerForm.players[__prevPlayerIndex].settings := __componentSettings();
 
   __fillPlayerInfo(playerForm.players[__lstPlayerList.getItemIndex()].settings);
-  __prevPlayerIndex := __lstPlayerList.getItemIndex();
+  __prevPlayerIndex := __lstPlayerList.getItemIndex(); }
 end;
 
 {*
@@ -340,7 +477,7 @@ var
   tsl: TStringList;
   s: string;
 begin
-  if (playerForm.scriptSettingsPath = '') then
+  {if (playerForm.scriptSettingsPath = '') then
     playerForm.scriptSettingsPath := scriptPath + 'settings.txt';
 
   tsl.init();
@@ -379,7 +516,7 @@ begin
   tsl.free();
 
   __writeln('Successfully saved settings.');
-  result := true;
+  result := true;}
 end;
 
 {*
@@ -403,7 +540,7 @@ var
   tsl: TStringList;
   startIndex, settingLength, i, j, c: integer;
 begin
-  if (playerForm.scriptSettingsPath = '') then
+ { if (playerForm.scriptSettingsPath = '') then
     playerForm.scriptSettingsPath := scriptPath + 'settings.txt';
 
   if (not fileExists(playerForm.scriptSettingsPath)) then
@@ -449,7 +586,7 @@ begin
 
   setLength(playerForm.players, c); // set the real length of players
   setLength(playerForm.playerNames, c);
-  tsl.free();
+  tsl.free(); }
 end;
 
 {*
@@ -469,15 +606,28 @@ Creates all the form's components based on the "playerForm"'s settings.
 
 *}
 procedure __createScriptComponents();
+  function getLongestText(const txtArr: T2DStringArray): integer;
+  var a: TIntegerArray; i, j: integer;
+  begin
+    for i := 0 to high(txtArr) do
+      for j := 0 to high(txtArr[i]) do
+        insert(playerForm.mainForm.getCanvas().TextWidth(txtArr[i][j]), a);
+
+    exit(MaxA(a));
+  end;
+
 var
   i, j, lblLeft, lblWidth, cmpLeft, cmpWidth, top, topInc: integer;
   first: boolean;
+  frmWidth: TIntegerArray;
 begin
-  lblLeft := __lblPlayerFile.getLeft();
-  cmpLeft := __cboPlayerFile.getLeft();
-  lblWidth := __lblPlayerFile.getWidth();
-  cmpWidth := __cboPlayerFile.getWidth();
-  top := __cboPlayerFile.getTop() + __cboPlayerFile.getHeight() + 10;
+  with (playerForm) do
+  begin
+  lblLeft := groupBox.getLeft() + groupBox.getWidth() + 14;
+  cmpLeft := lblLeft + getLongestText([playerForm.editBoxLabels, playerForm.checkBoxLabels, playerForm.comboBoxLabels]) + 7;
+  lblWidth := 20;
+  cmpWidth := 100;
+  top := 40;
   topInc := top;
   first := true;
 
@@ -486,20 +636,23 @@ begin
   setLength(__scriptEditLabels, length(__scriptEditBoxes));
   for i := 0 to high(playerForm.editBoxLabels) do
   begin
-    __scriptEditBoxes[i].init(__mainForm);
+    if (first) then
+      top := 10;
+
+    __scriptEditBoxes[i].init(mainForm);
     with __scriptEditBoxes[i] do
     begin
-      setParent(__mainForm);
+      setParent(mainForm);
       setLeft(cmpLeft);
       setTop(top);
       setWidth(cmpWidth);
       setCaption(playerForm.editBoxDefaults[i]);
     end;
 
-    __scriptEditLabels[i].init(__mainForm);
+    __scriptEditLabels[i].init(mainForm);
     with __scriptEditLabels[i] do
     begin
-      setParent(__mainForm);
+      setParent(mainForm);
       setTop(top + 3);
       setLeft(lblLeft);
       setWidth(lblWidth);
@@ -513,36 +666,7 @@ begin
     end;
 
     top := top + topInc;
-  end;
-
-  // TCheckBoxes
-  setLength(__scriptCheckBoxes, length(playerForm.checkBoxLabels));
-  setLength(__scriptCheckLabels, length(__scriptCheckBoxes));
-  for i := 0 to high(playerForm.checkBoxLabels) do
-  begin
-    __scriptCheckBoxes[i].init(__mainForm);
-    with __scriptCheckBoxes[i] do
-    begin
-      setParent(__mainForm);
-      setLeft(cmpLeft);
-      setTop(top);
-      setWidth(cmpWidth);
-
-      if (lowercase(playerForm.checkBoxDefaults[i]) = 'true') then
-       setState(cbChecked);
-    end;
-
-    __scriptCheckLabels[i].init(__mainForm);
-    with __scriptCheckLabels[i] do
-    begin
-      setParent(__mainForm);
-      setTop(top + 3);
-      setLeft(lblLeft);
-      setWidth(lblWidth);
-      setCaption(playerForm.checkBoxLabels[i]);
-    end;
-
-    top := top + topInc;
+    insert(cmpLeft + cmpWidth, frmWidth);
   end;
 
   // TComboBoxes
@@ -550,10 +674,10 @@ begin
   setLength(__scriptComboLabels, length(__scriptComboBoxes));
   for i := 0 to high(playerForm.comboBoxLabels) do
   begin
-    __scriptComboBoxes[i].init(__mainForm);
+    __scriptComboBoxes[i].init(mainForm);
     with __scriptComboBoxes[i] do
     begin
-      setParent(__mainForm);
+      setParent(mainForm);
       setLeft(cmpLeft);
       setTop(top);
       setWidth(cmpWidth);
@@ -563,26 +687,55 @@ begin
         addItem(playerForm.comboBoxItems[i][j], nil);
     end;
 
-    __scriptComboLabels[i].init(__mainForm);
+    __scriptComboLabels[i].init(mainForm);
     with __scriptComboLabels[i] do
     begin
-      setParent(__mainForm);
+      setParent(mainForm);
       setTop(top + 3);
       setLeft(lblLeft);
       setWidth(lblWidth);
       setCaption(playerForm.comboBoxLabels[i]);
     end;
 
+    insert(cmpLeft + cmpWidth, frmWidth);
+    top := top + topInc;
+  end;
+
+  // TCheckBoxes
+  setLength(__scriptCheckBoxes, length(playerForm.checkBoxLabels));
+  setLength(__scriptCheckLabels, length(__scriptCheckBoxes));
+  for i := 0 to high(playerForm.checkBoxLabels) do
+  begin
+    __scriptCheckBoxes[i].init(mainForm);
+    with __scriptCheckBoxes[i] do
+    begin
+      setParent(mainForm);
+      setLeft(cmpLeft);
+      setTop(top + 1);
+      setWidth(cmpWidth);
+
+      if (lowercase(playerForm.checkBoxDefaults[i]) = 'true') then
+       setState(cbChecked);
+    end;
+
+    __scriptCheckLabels[i].init(mainForm);
+    with __scriptCheckLabels[i] do
+    begin
+      setParent(mainForm);
+      setTop(top + 3);
+      setLeft(lblLeft);
+      setWidth(lblWidth);
+      setCaption(playerForm.checkBoxLabels[i]);
+    end;
+
+    insert(lblLeft + 10, frmWidth);
     top := top + topInc;
   end;
 
   // other, non customizable components
-  __mainForm.setHeight(top + __btnSave.getHeight() + __memo.getHeight() + 20);
-  __btnSave.setTop(__mainForm.getHeight() - __btnSave.getHeight() - 10);
-  __btnHelp.setTop(__btnSave.getTop());
-  __btnRun.setTop(__btnSave.getTop());
-  __memo.setTop(__btnRun.getTop() - __memo.getHeight() - 10);
-  __lstPlayerList.setHeight(__memo.getTop() - __lstPlayerList.getTop() - 10);
+  mainForm.setHeight(top + 5);
+  mainForm.setWidth(maxA(frmWidth) + 10);
+  end;
 end;
 
 {*
@@ -607,113 +760,6 @@ begin
     openWebPage('http://villavu.com/forum/showthread.php?t=47714')
   else
     openWebPage(playerForm.scriptHelpThread);
-end;
-
-{*
-__onClickAdd
-~~~~~~~~~~~~
-
-.. code-block:: pascal
-
-    procedure __onClickAdd(sender: TObject); native;
-
-Adds a player to the player array and displays new information in the form
-components.
-
-.. note::
-
-    - by Coh3n
-    - Last Updated: 10 January 2014 by Coh3n
-
-*}
-procedure __onClickAdd(sender: TObject); native;
-begin
-  if (__edtPlayerAdd.getText() <> '') then
-  begin
-    __lstPlayerList.getItems().add(__edtPlayerAdd.getText());
-
-    setLength(playerForm.players, length(playerForm.players) + 1);
-    playerForm.players[high(playerForm.players)].name := __edtPlayerAdd.getText();   // set player's name
-    playerForm.players[high(playerForm.players)].settings := __getDefaultSettings(); // set player's default settings
-    __lstPlayerList.setItemIndex(high(playerForm.players));                          // automatically select the new player
-    __showPlayerInfo();
-
-    // add the player's name for easy use with TPlayerArray.setup()
-    setLength(playerForm.playerNames, length(playerForm.playerNames) + 1);
-    playerForm.playerNames[high(playerForm.playerNames)] := __edtPlayerAdd.getText();
-
-    __writeln('Added player: '+toStr(__edtPlayerAdd.getText()));
-    __edtPlayerAdd.setCaption('');
-  end else
-    __writeln('You need to enter a player''s login name, nickname, or display name first!');
-end;
-
-{*
-__onClickDel
-~~~~~~~~~~~~
-
-.. code-block:: pascal
-
-    procedure __onClickDel(sender: TObject); native;
-
-Removes the selected player.
-
-.. note::
-
-    - by Coh3n
-    - Last Updated: 10 January 2014 by Coh3n
-
-*}
-procedure __onClickDel(sender: TObject); native;
-var
-  element, i: integer;
-begin
-  element := __lstPlayerList.getItemIndex();
-
-  if (element = -1) then
-  begin
-    __writeln('You need to select a player to delete!');
-    exit;
-  end;
-
-  __writeln('Deleting player: '+__lstPlayerList.getItems().getStrings(element));
-
-  // remove the player from the player array
-  if (element <> high(playerForm.players)) then
-    for i := element to (high(playerForm.players) - 1) do
-      playerForm.players[i] := playerForm.players[i + 1];
-
-  setLength(playerForm.players, high(playerForm.players));
-
-  // remove from the TListBox
-  if (__lstPlayerList.getCount() > 1) then
-    if (__lstPlayerList.getItemIndex() = 0) then
-      __lstPlayerList.setItemIndex(1)
-    else
-      __lstPlayerList.setItemIndex(__lstPlayerList.getItemIndex() - 1);
-
-  __lstPlayerList.getItems().delete(element);
-end;
-
-{*
-__onClickPlayerList
-~~~~~~~~~~~~~~~~~~~
-
-.. code-block:: pascal
-
-    procedure __onClickPlayerList(sender: TObject); native;
-
-Called when an item in the player list is clicked.
-
-.. note::
-
-    - by Coh3n
-    - Last Updated: 10 January 2014 by Coh3n
-
-*}
-procedure __onClickPlayerList(sender: TObject); native;
-begin
-  __showPlayerInfo();
 end;
 
 {*
@@ -758,7 +804,7 @@ procedure __onClickRun(sender: TObject); native;
 begin
   if (__saveSettings()) then
   begin
-    __mainForm.close();
+   // __mainForm.close();
     playerForm.isScriptReady := true;
   end;
 end;
@@ -779,135 +825,99 @@ Shows the player form.
     - Last Updated: 10 January 2014 by Coh3n
 
 *)
-procedure showForm(); native;
+procedure __showForm(); native;
 begin
-  __mainForm.init(nil);
-  with __mainForm do
+  __TPlayerForm_LoadBitmaps();
+
+  with (playerForm) do
   begin
-    setWidth(546);
-    setHeight(200);
-    setCaption(playerForm.name);
-    setPosition(poScreenCenter);
+    mainForm.init(nil);
+    with (mainForm) do
+    begin
+      setWidth(248);
+      setHeight(249);
+      setPosition(poScreenCenter);
+      setShowHint(true);
+      setCaption('Player Form');
+      setBorderStyle(bsSingle);
+    end;
+
+    groupBox.init(mainForm);
+    with (groupBox) do
+    begin
+      setParent(mainForm);
+      setBounds(9, 4, 230, 200);
+      setCaption('Players');
+      setShowHint(true);
+    end;
+
+    editArmyName.init(mainForm);
+    with (editArmyName) do
+    begin
+      setParent(groupBox);
+      setBounds(6, 5, 130, 20);
+      setCaption('default');
+      setOnChange(__TRawPlayerForm_CheckArmyExists);
+    end;
+
+    btnLoadArmy.init(mainForm);
+    with (btnLoadArmy) do
+    begin
+      setParent(groupBox);
+      setBounds(141, 4, 80, 25);
+      setCaption('Load');
+      setOnClick(__TPlayerForm_OnNotifyEvent);
+      setGlyph(__bmps[BTN_BMP_CROSS]);
+    end;
+
+    clbPlayers.init(groupBox);
+    with (clbPlayers) do
+    begin
+      setParent(groupBox);
+      setBounds(6, 35, 214, 140);
+    end;
+
+    btnStart.init(mainForm);
+    with (btnStart) do
+    begin
+      setParent(mainForm);
+      setBounds(8, 211, 232, 30);
+      setCaption('Start Script');
+      setOnClick(__TPlayerForm_OnNotifyEvent);
+    end;
+
+    if (Rafiki_FindArmy(editArmyName.getCaption())) then
+    begin
+      btnLoadArmy.setGlyph(__bmps[BTN_BMP_TICK]);
+      __TPlayerForm_LoadArmy(editArmyName.getCaption());
+    end;
   end;
 
-  __edtPlayerAdd.init(__mainForm);
-  with __edtPlayerAdd do
-  begin
-    setParent(__mainForm);
-    setLeft(10);
-    setTop(10);
-    setHeight(25);
-    setWidth(126);
+  if (@SRL_Events[EVENT_PLAYERFORM_CREATE] <> nil) then
+    SRL_Events[EVENT_PLAYERFORM_CREATE]();
+
+  try
+    playerForm.mainForm.showModal();
+  except
+    client.writeln('Error in playerform; ShowModal failed');
+  finally
+    if (playerForm.mainForm <> nil) then
+      playerForm.mainForm.free();
+
+    __TPlayerForm_FreeBitmaps();
   end;
 
-  __btnPlayerAdd.init(__mainForm);
-  with __btnPlayerAdd do
-  begin
-    setParent(__mainForm);
-    setLeft(__edtPlayerAdd.getLeft() + __edtPlayerAdd.getWidth() + 5);
-    setTop(__edtPlayerAdd.getTop() - 1);
-    setHeight(__edtPlayerAdd.getHeight());
-    setWidth(45);
-    setCaption('Add');
-    setOnClick(__onClickAdd);
-  end;
-
-  __btnPlayerDel.init(__mainForm);
-  with __btnPlayerDel do
-  begin
-    setParent(__mainForm);
-    setLeft(__btnPlayerAdd.getLeft() + __btnPlayerAdd.getWidth() + 5);
-    setTop(__btnPlayerAdd.getTop());
-    setHeight(__btnPlayerAdd.getHeight());
-    setWidth(__btnPlayerAdd.getWidth());
-    setCaption('Del');
-    setOnClick(__onClickDel);
-  end;
-
-  __lstPlayerList.init(__mainForm);
-  with __lstPlayerList do
-  begin
-    setParent(__mainForm);
-    setLeft(__edtPlayerAdd.getLeft());
-    setTop(__edtPlayerAdd.getTop() + __edtPlayerAdd.getHeight() + 8);
-    setWidth(225);
-    setHeight(__mainForm.getHeight() - getTop() - 10);
-    setOnClick(__onClickPlayerList);
-  end;
-
-  __lblPlayerFile.init(__mainForm);
-  with __lblPlayerFile do
-  begin
-    setParent(__mainForm);
-    setCaption('Player File');
-    setLeft(__lstPlayerList.getLeft() + __lstPlayerList.getWidth() + 25);
-    setTop(__btnPlayerAdd.getTop() + 3);
-    setWidth(150);
-  end;
-
-  __cboPlayerFile.init(__mainForm);
-  with __cboPlayerFile do
-  begin
-    setParent(__mainForm);
-    setLeft(__lblPlayerFile.getLeft() + __lblPlayerFile.getWidth());
-    setTop(__btnPlayerAdd.getTop());
-    setWidth(128);
-    __loadPlayerFiles();
-  end;
-
-  __btnHelp.init(__mainForm);
-  with __btnHelp do
-  begin
-    setParent(__mainForm);
-    setWidth(120);
-    setHeight(25);
-    setCaption('Help');
-    setLeft(round((0.25 * __mainForm.getWidth()) - (getWidth() / 2)));
-    setOnClick(__onClickHelp);
-  end;
-
-  __btnSave.init(__mainForm);
-  with __btnSave do
-  begin
-    setParent(__mainForm);
-    setWidth(__btnHelp.getWidth());
-    setHeight(25);
-    setCaption('Save');
-    setLeft(round((0.50 * __mainForm.getWidth()) - (getWidth() / 2)));
-    setOnClick(__onClickSave);
-  end;
-
-  __btnRun.init(__mainForm);
-  with __btnRun do
-  begin
-    setParent(__mainForm);
-    setWidth(__btnSave.getWidth());
-    setHeight(25);
-    setCaption('Run');
-    setLeft(round((0.75 * __mainForm.getWidth()) - (getWidth() / 2)));
-    setOnClick(__onClickRun);
-  end;
-
-  __memo.init(__mainForm);
-  with __memo do
-  begin
-    setParent(__mainForm);
-    setLeft(__lstPlayerList.getLeft());
-    setWidth(__mainForm.getWidth() - 18);
-    setHeight(100);
-    setScrollBars(ssAutoBoth);
-  end;
 
   // need to be called in this order
-  __createScriptComponents();
-  __loadSettings();
+  //__createScriptComponents();
+  {__loadSettings();
   __showPlayerInfo();
 
   __mainForm.showModal();
   __mainForm.free();
-  __tslSettings.free();
+  __tslSettings.free(); }
 end;
-{$ENDIF}
+
 
 (*
 runPlayerForm
@@ -927,5 +937,9 @@ The function to be called by scripters when they want to open the player form.
 *)
 procedure runPlayerForm();
 begin
-  sync(showForm);
+  with (playerForm) do
+    if (length(editBoxLabels) > 0) or (length(checkBoxLabels) > 0) or (length(comboBoxLabels) > 0) then
+      SRL_Events[EVENT_PLAYERFORM_CREATE] := @__createScriptComponents;
+
+  sync(__showForm);
 end;

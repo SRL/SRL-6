@@ -60,12 +60,13 @@ Example:
 
 *)
 const
-  EVENT_COUNT = 5;
+  EVENT_COUNT = 6;
     EVENT_RS_UPDATE   = 0;
     EVENT_LOGOUT      = 1;
     EVENT_LOGIN       = 2;
     EVENT_PLAYER_NEXT = 3;
     EVENT_ANTIBAN     = 4;
+    EVENT_PLAYERFORM_CREATE = 5;
 
 (*
 Variable: SRL_Events
