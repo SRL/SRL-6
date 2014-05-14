@@ -318,7 +318,7 @@ Example:
     if (bankScreen.close()) then
       writeln('closed the bankscreen');
 *)
-function TRSBankScreen.close(): boolean;
+function TRSBankScreen.close(escape: boolean = true): boolean;
 var
   timeOut: integer;
 begin
@@ -328,15 +328,18 @@ begin
     exit(true);
 
   // try ESC key first
-  timeOut := (getSystemTime() + randomRange(600, 900));
-  repeat
-    multiType(VK_ESCAPE, randomRange(30, 50), 3);
-    wait(100 + random(50));
-    result := (not self.isOpen());
-  until((getSystemTime() > timeOut) or result);
+  if escape then
+  begin
+    timeOut := (getSystemTime() + randomRange(600, 900));
+    repeat
+      multiType(VK_ESCAPE, randomRange(30, 50), 2);
+      wait(100 + random(50));
+      result := (not self.isOpen());
+    until((getSystemTime() > timeOut) or result);
 
-  if (result) then
-    exit();
+    if (result) then
+      exit();
+  end;
 
   // click the X as a failsafe
   mouseBox(intToBox(self.x1 + 465, self.y1 + 15, self.x2 - 207, self.y1 + 30), MOUSE_MOVE);

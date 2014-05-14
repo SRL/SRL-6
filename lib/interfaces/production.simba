@@ -221,7 +221,7 @@ Example:
     if (productionScreen.clickStart()) then
       writeln('We started making something!');
 *)
-function TRSProductionScreen.clickStart(): boolean;
+function TRSProductionScreen.clickStart(space: boolean = true): boolean;
 var
   b: TBox;
   timeOut: Integer;
@@ -231,15 +231,18 @@ begin
   b := [self.x1 +252, self.y2 -30, self.x2 -29, self.y2 -3];
 
   // try Space key first
-  timeOut := (getSystemTime() + randomRange(1500, 1900));
-  repeat
-    multiType(VK_SPACE, randomRange(30, 50), 3);
-    wait(100 + random(50));
-    result := (not self.isOpen());
-  until((getSystemTime() > timeOut) or result);
+  if space then
+  begin
+    timeOut := (getSystemTime() + randomRange(1500, 1900));
+    repeat
+      multiType(VK_SPACE, randomRange(30, 50), 3);
+      wait(100 + random(50));
+      result := (not self.isOpen());
+    until((getSystemTime() > timeOut) or result);
 
-  if (result) then
-    exit();
+    if (result) then
+      exit();
+  end;
 
   // click the button as a failsafe
   mouseBox([self.x1 +252, self.y2 -30, self.x2 -29, self.y2 -3], MOUSE_MOVE);
