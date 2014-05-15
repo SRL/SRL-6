@@ -199,13 +199,13 @@ Example:
     if (toolScreen.select('Knife')) then
       writeln('We started making something!');
 *)
-function TRSToolScreen.select(tool: String): boolean;
+function TRSToolScreen.select(tool: String; key: boolean = true): boolean;
 const
   TEXT_COLOR = 2070783;
 var
   textArea: TBox;
   boxArr: TBoxArray;
-  i: integer;
+  i, timeout: integer;
   p: TPoint;
 begin
   result := false;
@@ -221,7 +221,21 @@ begin
   if (result) then
     for i := 0 to high(boxArr) do
       if (pointInBox([p.x + 20, p.y + 50], boxArr[i])) then
+      begin
+        if key then
+        begin
+          timeOut := (getSystemTime() + randomRange(1500, 1900));
+          repeat
+            multiType(toStr(i+1), randomRange(30, 50), 2, false);
+            wait(100 + random(50));
+            result := (not self.isOpen());
+          until((getSystemTime() > timeOut) or result);
+
+          if (result) then
+            exit();
+        end;
         mouseBox(boxArr[i], MOUSE_LEFT);
+      end;
 
   print('TRSToolScreen.select(): result = ' + lowercase(boolToStr(result)), TDebug.SUB);
 end;
