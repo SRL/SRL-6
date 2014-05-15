@@ -86,26 +86,31 @@ end;
 
 function Tesseract_GetText(const bmp: integer): string;
 var
-  w, h: integer;
-  res: Pointer;
+  w, h, i: integer;
+  textLen: UInt32;
+  textPtr: PChar;
 begin
   if (not tesseractIsSetup) then
     Tesseract_Setup();
 
+  result := '';
   getBitmapSize(bmp, w, h);
 
   try
     Tesseract_SetImage(tesseractPtr, getMufasaBitmap(bmp).getData(), w, h, 4, Integer(w * 4));
-    res := Tesseract_GetUTF8Text(tesseractPtr);
-    result := trim(stringReplace(string(res), #10, #13#10, [rfReplaceAll]));
-  finally
-    if (res <> nil) then
-      Tesseract_FreeUTF8Text(res);
-    try
-      Tesseract_Clear(tesseractPtr);
-    except
-      printf('Tesseract_Clear threw a exception :/ [%s]', [toString(tesseractPtr)], TDebug.WARNING);
+    textPtr := Tesseract_GetUTF8Text(tesseractPtr, textLen);
+
+    setLength(result, textLen);
+    if (textLen > 0) then
+    begin
+      for i := 1 to textLen do
+        result[i] := textPtr[i - 1]^;
+
+      result := trim(stringReplace(result, #10, #13#10, [rfReplaceAll]));
     end;
+  finally
+    Tesseract_FreeUTF8Text(textPtr);
+    Tesseract_Clear(tesseractPtr);
   end;
 end;
 
@@ -130,8 +135,9 @@ begin
     {$ENDIF}
   finally
     {$IFDEF TESSERACT_DEBUG}
-    drawBitmapDebugImg(bmp);
+    clearDebugImg();
     displayDebugImgWindow(getMufasaBitmap(bmp).getWidth(), getMufasaBitmap(bmp).getHeight());
+    drawBitmapDebugImg(bmp);
     {$ENDIF}
     freeBitmap(bmp);
   end;
