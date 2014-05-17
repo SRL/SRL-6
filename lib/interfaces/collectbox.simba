@@ -1,0 +1,291 @@
+(*
+CollectBox
+==========
+
+The CollectBox file holds functions and procedures that are used in the
+Runescape collection box screen.
+
+The source for this file can be found `here <https://github.com/SRL/SRL-6/blob/master/lib/interfaces/collectbox.simba>`_.
+
+*)
+
+{$include_once interfaces.simba}
+{$include_once ../core/text.simba}
+
+{$f-}
+
+(*
+const Collect Buttons
+~~~~~~~~~~~~~~~~~~~~~
+
+Integer constants that represent the order of the collect buttons.
+
+*)
+const
+  COLLECT_BUTTON_BANK = 0;
+  COLLECT_BUTTON_INV = 1;
+
+(*
+type TRSCollectBox
+~~~~~~~~~~~~~~~~~~
+
+A type that stores the collection box interface properties.
+*)
+type
+  TRSCollectBox = type TRSInterface;
+
+(*
+var collectbox
+~~~~~~~~~~~~~~
+
+The variable used to call collect box functions, procedures and attributes.
+
+Example:
+
+.. code-block:: pascal
+
+    if (collectbox.isOpen()) then
+      writeln('Collectionbox is open');
+*)
+var
+  collectbox: TRSCollectBox;
+
+{*
+TRSCollectBox.__init
+~~~~~~~~~~~~~~~~~~~~
+
+.. code-block:: pascal
+
+    procedure TRSCollectBox.__init
+
+Initializes the TRSCollectBox.
+
+.. note::
+
+    - by Ashaman88
+    - Last Updated: 15 March 2014 by Ashaman88
+
+Example:
+
+.. code-block:: pascal
+
+    collectbox.__init();
+
+*}
+{$IFNDEF CODEINSIGHT}
+procedure TRSCollectBox.__init();
+begin
+  with (self) do
+  begin
+    name := 'Collect Box';
+    ID := ID_INTERFACE_COLLECTBOX;
+    parentID := -1;
+    static := false;
+  end;
+end;
+{$ENDIF}
+
+(*
+TRSCollectBox.__find
+~~~~~~~~~~~~~~~~~~~~
+
+.. code-block:: pascal
+
+    function TRSCollectBox.__find(): boolean;
+
+Returns true if the collectbox is detected, and sets the bounds
+
+.. note::
+
+    - by Ashaman88
+    - Last Updated: 15 March 2014 by Ashaman88
+
+Example:
+
+.. code-block:: pascal
+
+    if (collectbox.__find()) then
+      writeln('bounds are set!');
+*)
+function TRSCollectBox.__find(): boolean;
+const
+  BACKGROUND_COLOR = 4208939;
+  EYE_LENGTH = 2502;
+  OFFSET_COLOR = 1316170;
+var
+  tpa : TPointArray;
+  atpa : T2DPointArray;
+  i, hh: integer;
+  b: TBox;
+begin
+  result := false;
+
+  if (not findColors(tpa, BACKGROUND_COLOR, getClientBounds())) then
+    exit();
+
+  atpa := tpa.cluster(3);
+  hh := high(atpa);
+
+  for i := 0 to hh do
+    if (length(atpa[i]) = EYE_LENGTH) then
+    begin
+      b := getTPABounds(atpa[i]);
+
+      if (getColor(b.x2, b.y1 - 30) = OFFSET_COLOR) then
+      begin
+        self.setBounds([b.x1 - 9, b.y1 - 39, b.x2 + 243, b.y2 + 179]);
+        exit(true);
+      end;
+    end;
+end;
+
+(*
+TRSCollectBox.isOpen
+~~~~~~~~~~~~~~~~~~~~
+
+.. code-block:: pascal
+
+    function TRSCollectBox.isOpen(waitTime: integer = 0): boolean;
+
+Returns true if the collectbox screen is open. Includes an optional parameter
+'waitTime' (default 0) which will search for the collectbox screen until
+'waitTime' is reached.
+
+.. note::
+
+    - by Ashaman88
+    - Last Updated: 15 March 2014 by Ashaman88
+
+Example:
+
+.. code-block:: pascal
+
+    if (collectbox.isOpen()) then
+      writeln('The collectbox screen is open!');
+
+*)
+function TRSCollectBox.isOpen(waitTime: integer = 0): boolean;
+var
+  t: integer;
+begin
+  t := (getSystemTime() + waitTime);
+
+  repeat
+    result := self.__find();
+    wait(20 + random(20));
+  until (getSystemTime() >= t) or (result);
+end;
+
+(*
+TRSCollectBox.close
+~~~~~~~~~~~~~~~~~~~
+
+.. code-block:: pascal
+
+    function TRSCollectBox.close(escape: boolean = true): boolean;
+
+Closes the collectbox, will return if succesful or not.  Closes via the Escape
+key.
+
+.. note::
+
+    - by Ashaman88
+    - Last Updated: 15 March 2014 by Ashaman88
+
+Example:
+
+.. code-block:: pascal
+
+    if (collectbox.close()) then
+      writeln('closed the collectbox');
+*)
+function TRSCollectBox.close(escape: boolean = true): boolean;
+var
+  timeOut: integer;
+begin
+  result := false;
+
+  if (not self.isOpen()) then
+    exit(true);
+
+  // try ESC key first
+  if escape then
+  begin
+    timeOut := (getSystemTime() + randomRange(600, 900));
+    repeat
+      multiType(VK_ESCAPE, randomRange(30, 50), 2);
+      wait(100 + random(50));
+      result := (not self.isOpen());
+    until((getSystemTime() > timeOut) or result);
+
+    if (result) then
+      exit();
+  end;
+
+  // click the X as a failsafe
+  mouseBox(intToBox(self.x1 + 345, self.y1 + 8, self.x2 - 4, self.y1 + 14), MOUSE_MOVE);
+
+  // this is a failsafe in case the bankscreen closes (from the ESC key) while moving the mouse
+  if (self.isOpen()) then
+  begin
+    fastClick(MOUSE_LEFT);
+    wait(50 + random(50));
+  end else
+    exit(true);
+
+  // wait for the bankscreen to close
+  timeOut := (getSystemTime() + randomRange(5000, 6000));
+  while (timeOut > getSystemTime()) do
+  begin
+    if (not self.isOpen()) then
+    begin
+      result := true;
+      break;
+    end;
+
+    wait(50 + random(50));
+  end;
+
+  print('collectbox.close(): result = '+boolToStr(result), TDebug.SUB);
+end;
+
+(*
+TRSCollectBox.collectButton
+~~~~~~~~~~~~~~~~~~~
+
+.. code-block:: pascal
+
+    function TRSCollectBox.collectButton(slot: integer): boolean;
+
+Selects one of the two collect buttons, either to collect to bank or
+inventory, based upon parameter slot.
+
+.. note::
+
+    - by Ashaman88
+    - Last Updated: 15 March 2014 by Ashaman88
+
+Example:
+
+.. code-block:: pascal
+
+    if (collectbox.collectButton(COLLECT_BUTTON_BANK)) then
+      writeln('collected to the bank');
+*)
+function TRSCollectBox.collectButton(slot: integer): boolean;
+const
+  BUTTON_OFFSET = 40;
+begin
+  if (not self.isOpen()) then
+    exit;
+
+  mouseBox([(self.x1 + 140), self.y1 + 226 + (slot * BUTTON_OFFSET), (self.x2 - 26), (self.y2 - 52) + (slot * BUTTON_OFFSET)], MOUSE_LEFT);
+
+  wait(50 + random(50));
+
+  result := true;
+end;
+
+begin
+  collectbox.__init();
+end;
