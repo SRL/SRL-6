@@ -110,7 +110,8 @@ Example:
 function TRSProductionScreen.__find(): boolean;
 const
   BORDER_COLOR = 11645361;
-  BUTTON_COLOR = 11238410;
+  BUTTON_COLOR = 11238410;     //blue button color
+  BUTTON_COLOR_2 = 1447449;   //if no valid box selected it's this color
 var
   j, i, wid, hei: integer;
   b: TBox;
@@ -143,7 +144,7 @@ begin
     exit(false);
 
   if (hiP.x - lowP.x = 250) then
-    if countColorTolerance(BUTTON_COLOR, intToBox(lowP.x, lowP.y - 10, hiP.x, lowP.y + 10), 50) > 250 then
+    if (countColorTolerance(BUTTON_COLOR, intToBox(lowP.x, lowP.y - 10, hiP.x, lowP.y + 10), 50) > 250) or (countColorTolerance(BUTTON_COLOR_2, intToBox(lowP.x, lowP.y - 10, hiP.x, lowP.y + 10), 50) > 250) then
     begin
       self.setBounds(intToBox(lowP.x - 238, lowP.y - 311, hiP.x + 15, lowP.y + 14));
       result := true;
