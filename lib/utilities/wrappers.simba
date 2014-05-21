@@ -461,6 +461,35 @@ begin
 end;
 
 (*
+findBitmapTolerance
+~~~~~~~~~~~~~~~~~~~
+
+.. code-block:: pascal
+
+    function findBitmapTolerance(const bmp: integer; var x, y: integer; const tolerance: integer): boolean;
+
+Searches the whole client for a bitmap with tolerance.
+
+.. note::
+
+    - by Ollybest
+
+Example:
+
+.. code-block:: pascal
+
+    result := findBitmapTolerance(bmp, x, y, 50);
+
+*)
+function findBitmapTolerance(const bmp: integer; var x, y: integer; const tolerance: integer): boolean;
+var
+  w, h: integer;
+begin
+  getClientDimensions(w, h);
+  result := findBitmapToleranceIn(bmp, x, y, 0, 0, w-1, h-1, tolerance);
+end;
+
+(*
 findBitmapToleranceIn: overload;
 ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
 

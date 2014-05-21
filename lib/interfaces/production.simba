@@ -33,10 +33,10 @@ type TRSProductionScreen
 A type that stores the production interface properties.
 *)
 type
-  TRSProductionScreen = record (TRSInterface)
+  TRSProductionScreen = record
     {$IFNDEF CODEINSIGHT}
-    __bmpMask: integer;
-    __loaded: boolean;
+    __bmp: integer;
+    __isLoaded: boolean;
     {$ENDIF}
   end;
 
@@ -86,7 +86,7 @@ begin
     ID := ID_INTERFACE_PRODUCTION;
     parentID := -1;
     static := false;
-    __loaded := false;
+    __isLoaded := false;
   end;
 end;
 {$ENDIF}
@@ -96,9 +96,9 @@ procedure __loadProductionScreen();
 begin
   with (productionScreen) do
   begin
-    __bmpMask := BitmapFromString(264, 228, 'meJzt3bENgzAARcGMkIY1mCCrsEL2L1PQIB4CmgDFnf4Clvzk0sM4DWaWvYAFXUDpAkoXULqA0gWULqB0AXXYxfvz/fcuOyyctN/FNZdWGjyNLqB0AaULKF1A6QJKF1C6gNIFlC6gdAGlCyhdQOkCShdQuoDSBZQuoHQBpQsoXUDpAkoXULqA0gWULqB0AaULKF1A6QJKF1C6gNIFlP+SoPyvB6ULKF1A6QJKF1C6gNIFlC6g5i7MbLW704QnkgaseDKgdAGlCyhdQOkCShdQuoDSBZQuoHQBpQsoXUDpAkoXULqA0gWULqB0AaULKF1A6QJKF1C6gNIFlC6gdAGlCyhdQOkCShdQuoDSBZQuoHQBpQsoXUDpAkoXULqA0gWULqB0AaULKF1A6QJKF1C6gNIFlC6gdAGlCyhdQOkCShdQuoDSBZQuoHQBpQsoXUDpAkoXULqA0gWULqB0AaULKF1A6QJKF1C6gNIFlC6gdAGlCyhdQOkCShdQuoDSBZQuoHQBpQsoXUDpAkoXULqA0gWULqB0AaULKF1A6QJKF1C6gNIFlC6gdAGlCyhdQOkCShdQuoDSBZQuoHQBpQsoXUDpAkoXULqA0gWULqB0AaULKF1A6QJKF1C6gNIFlC6gdAGlCyhdQOkCShdQuoDSBZQuoHQBpQsoXUDpAkoXULqA0gWULqB0AaULKF1A6QJKF1C6gNIFlC6gdAGlCyhdQOkCShdQuoDSBZQuoHQBpQsoXUDpAkoXULqA0gWULqB0AaULKF1A6QJKF1C6gNIFlC6gdAGlCyhRwKb5yTCz5X7xsGXW');
-    __loaded := true;
-    setBitmapName(__bmpMask, 'SRL - ProductionScreen Mask');
+    __bmp := BitmapFromString(487, 6, 'meJztl21r40YUhTf4VZZk62X0ZkmWJTshdZOlTRrKtqEsy1IathRKvvTL/v+/sY99vNNS+i2EmFTiMty5c+6ZM4PnzrjO/W0d1bmfhDPfnZ69eYPdXnefPtz89cfPinRLD3t8uKtSbzIaTsejJA66OqmX0XlbYIXxi+QYwb7ZFJtVbkJPAFq6OETIpaUrvEbFJipFIITEpmhGusDmnkOuCMUTzmeawuoh8uIiM7NolklTmjKLooXrzSbAMhPEoVekAeY5k/FwMPfdLJ7bYOg74fwYwcosIGXuTgWIDww4RPa57pSu8BoVm6gUgRASm6IZ6QJjj/a5B0LxICnuRfYinyaySMJ4ASxsqmSZBSZatJV5Zaf7WUXuzqvHh3cP91fY/febjz99+8OuwvDfve1+/O7cdYYUbeK0lGjPGVKlaX99f2srNkO/f7hSVacWebPxgTzFQdthselBVWr3hKAE4ABDKgpRxah8WuI2FwcqTPugbbEpmNYFszBaI2YZlKWtEPnLityu802Tl3nI77YuoqaKmzKpC0P1zpNFV5sk9GfTEZGmjHD4tVd5iE+dp4WB+5GW4AFjcICRRS4MjMoXj83FgQrD13T/TMFwGIJZGIwIZhl6kb3Ip4jcrJI0mrvOqCnjTZNwEF7f6X5ukW2V/vnxdrP0jD8ooyEV++669Z0BBZl2Mho4k1FVhDytKc7h/PjYllG9d11MxQaAv21SaJmOKSBHCVeJnVQ3CEEwWpQk0bVi9sKMr/Xqvvt6E6WKKAUYyxcD09HVjtld1e6JVjAAdp9PROR2XcSBl5vFRZt1TdYs4zIP9hdfvDhfZ7ST0YggfuA7cbhYl2m32sOwZR4QBENEQUbpKpdRDkUWeQzh85JnVFndyiiiFGDMKAamo3vA7GfERA5YtIIte5G9yKeIbDLeKnHgdnXWVq/2dD+3yOuL6tP7G8p1vjijeteJgznjwW67dJ1xaubebErFfny4u1gbqrTe2874jGf2/c2mzv3An9R5JFW6I6xO3VB2UTZOUDugywVH9wsMWotdps3VBuqS+s8d01ZosQLb+1ETWc7TEdnWCT9dieR/Ig8P2qo4iuTfpY3QSiQ+QRsnCEy52zVsJv4qEv+y+5vQ5h7Oi8nNUaSoJFIAhujSWrBm70X2Ip8sMrnsivb/cbqfVeTtVfvb/dWujXhsY5er8Je7y/1b2u2//ju5z/f9/pfZf/33r887HI3k7efeejs148f54hp66+0EjaPxBUJhV/A=');
+    setBitmapName(__bmp, 'SRL - ProductionScreen Mask');
+    __isLoaded := true;
   end;
 
   addOnTerminate('__freeProductionScreen');
@@ -110,8 +110,8 @@ procedure __freeProductionScreen();
 begin
   with (productionScreen) do
   begin
-    __loaded := false;
-    freeBitmap(__bmpMask);
+    __isLoaded := false;
+    freeBitmap(__bmp);
   end;
 end;
 {$ENDIF}
@@ -124,12 +124,12 @@ TRSProductionScreen.__find
 
     function TRSProductionScreen.__find(): boolean;
 
-Returns true if the production screen is detected, and sets the bounds
+Returns true if the production screen is detected, if detected will set the bounds.
 
 .. note::
 
-    - by Ashaman88
-    - Last Updated: 27 February 2014 by Ashaman88
+    - by Olly
+    - Last Updated: 20 May 2014 by Olly
 
 Example:
 
@@ -144,20 +144,22 @@ var
   fx, fy: integer;
 begin
   result := false;
-  freeze();
 
-  if (not self.__loaded) then
+  if (not self.__isLoaded) then
     __loadProductionScreen();
 
+  freeze();
+  // debugBitmap(self.__bmp);
+
   try
-    if (findBitmap(self.__bmpMask, fx, fy)) then
-      if (countColor(clWhite, fx, y, fx + 260, fy + 50) > 50) then
+    if (findBitmapTolerance(self.__bmp, fx, fy, 10, colorSetting(1))) then
+      if (countColor(clWhite, TBox([fx + 270, fy + 20, fx + 450, fy + 40])) > 15) then  // look for white item text to verify
       begin
-        self.setBounds([fx - 230, fy - 32, fx + 273, fy + 290]);
+        self.setBounds([fx - 8, fy - 27, fx + 495, fy + 295]);
         result := true;
       end;
   finally
-    unfreeze();
+    unFreeze();
   end;
 end;
 {$ENDIF}
@@ -188,12 +190,12 @@ Example:
 *)
 function TRSProductionScreen.isOpen(waitTime: integer = 0): boolean;
 var
-  t: longWord;
+  t: UInt64;
 begin
   result := false;
-  t := (getTimeRunning() + waitTime);
+  t := (getTickCount64() + waitTime);
 
-  while (not result) and (t >= getTimeRunning()) do
+  while (not result) and (t >= getTickCount64()) do
   begin
     result := self.__find();
     wait(randomRange(20, 50));
@@ -337,13 +339,13 @@ const
   __COLOR_SCROLL_BAR = 1266553;
 var
   p: TPoint;
-  t: integer;
+  t: Int64;
   down: boolean;
 begin
   if (not self.isOpen()) then
     exit(false);
 
-  t := (getSystemTime() + 3000);
+  t := (getTickCount64() + 3000);
 
   repeat
     if (slot>20) and ((getColor(self.x1 + 223, self.y1 + 285) = __COLOR_SCROLL_BAR) or (getColor(self.x1 + 223, self.y1 + 286) = __COLOR_SCROLL_BAR)) then
@@ -362,13 +364,13 @@ begin
     getMousePos(p.x,p.y);
 
     if (slot>20) then
-      down := true else
+      down := true
+    else
       down := false;
 
     mouseScroll(p, 3 + random(5), down);
     wait(50 + random(50));
-
-  until(getSystemTime() > t);
+  until(getTickCount64() > t);
 
   print('TRSProductionScreen._scrollToItem(): result = ' + lowercase(boolToStr(result)), TDebug.SUB);
 end;

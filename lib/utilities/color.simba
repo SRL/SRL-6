@@ -359,7 +359,6 @@ begin
   cs.apply();
 end;
 
-
 (*
 countColorTolerance; overload;
 ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
@@ -391,6 +390,36 @@ begin
   cs.apply();
 end;
 
+(*
+findBitmapTolerance; overload;
+~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+
+.. code-block:: pascal
+
+    function findBitmapTolerance(const bmp: integer; var x, y: integer; const tolerance: integer; settings: TColorSettings): boolean; overload;
+
+Calls findBitmapTolerance with an additional color settings parameter.
+
+.. note::
+
+    - by Olly
+    - Last Updated: 19 May 2014 by Olly
+
+Example:
+
+.. code-block:: pascal
+
+
+*)
+function findBitmapTolerance(const bmp: integer; var x, y: integer; const tolerance: integer; settings: TColorSettings): boolean; overload;
+var
+  cs: TColorSettings;
+begin
+  cs.retrieve();
+  settings.apply();
+  result := findBitmapTolerance(bmp, x, y, tolerance);
+  cs.apply();
+end;
 (*
 waitColorCountRange
 ~~~~~~~~~~~~~~~~~~~
