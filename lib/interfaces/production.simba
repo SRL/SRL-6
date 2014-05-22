@@ -33,7 +33,7 @@ type TRSProductionScreen
 A type that stores the production interface properties.
 *)
 type
-  TRSProductionScreen = record
+  TRSProductionScreen = record (TRSInterface)
     {$IFNDEF CODEINSIGHT}
     __bmp: integer;
     __isLoaded: boolean;
