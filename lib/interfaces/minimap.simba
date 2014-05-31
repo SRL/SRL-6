@@ -1363,11 +1363,14 @@ begin
     MM_SYMBOL_BANK:
       with result do
       begin
-        name := 'Bank';
-        color := 2216175;
-        bmp := BitmapFromString(15, 5, 'beNpjYGRgYDwAAxsWun/9NjnbX' +
-          '/D9BUUgOR8GILJAlWiKIcogJBAdQAKYiiHqIQiiHpfJyOqRHYNLMa' +
-          'ZjEIoBKZB32A==');
+        name := 'Bank'; //d
+        color := 1908001;
+        bmp := BitmapFromString(9, 9, 'meJzLnrAmtnuDR8ce9/bdEBTRsT68' +
+        'fp6Sup5XdqdVQpNhXKthbAsIxbWaxzWYR5bJKWnGVM3wzJlonjQha' +
+        '8/duB23zZP6PbL7fbLa5JW0osomu6f3msT3+8/Z7zJhk3Fcn2taj3' +
+        'daM1BXYG6fXUKnTkSPTd1aq4qlQIZtfLtjbK2UnKpzUqtpeL1KYLt' +
+        'qYLsKGAG5FqEVkrKqxkFlWt5F0i7lcATkGvoWSMqqSErKYkWysop4' +
+        'EAAaMUy8');
       end;
 
     MM_SYMBOL_OBELISK_MINI:
