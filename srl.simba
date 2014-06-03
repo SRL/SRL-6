@@ -8,6 +8,8 @@ SRL library isn't available to you.
 
 *)
 
+{$DEFINE SRL6}
+
 {$include_once lib/utilities/types/types.simba}
 {$include_once lib/utilities/time.simba}
 {$include_once lib/utilities/drawing.simba}
