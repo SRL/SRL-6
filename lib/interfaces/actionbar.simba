@@ -791,7 +791,7 @@ begin
     exit(self.__printWarning('actionBar.isSlotActive()', false));
 
   result := (getColor(self.__slots[slot - 1].x1-1,
-   self.__slots[slot - 1].y2-1) = 13158600); //Color is of the white box present outside of an active slot.
+   self.__slots[slot - 1].y2+1) = 13158600); //Color is of the white box present outside of an active slot.
 end;
 
 (*
