@@ -8,11 +8,7 @@ The source for this file can be found `here <https://github.com/SRL/SRL-6/blob/m
 
 *)
 
-{$include_once ../interfaces.simba}
-{$include_once ../../core/text.simba}
-
 {$f-}
-
 
 const
   NAV_BUTTON_HERO = 0;
@@ -722,3 +718,5 @@ end;
 begin
   gameTabs.__init();
 end;
+
+{$f+}

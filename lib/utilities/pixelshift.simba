@@ -8,7 +8,7 @@ The source for this file can be found `here <https://github.com/SRL/SRL-6/blob/m
 
 *)
 
-{$include_once ../core/debug.simba}
+{$f-}
 
 (*
 getPixelShift
@@ -323,3 +323,5 @@ begin
   arr := getPixelShiftAverage([b], waitPerLoop, maxTime);
   result := arr[0];
 end;
+
+{$f+}

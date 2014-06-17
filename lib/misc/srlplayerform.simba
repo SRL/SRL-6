@@ -35,7 +35,6 @@ a full list of customizable options.
 *)
 type
   TPlayerForm = record
-    // static form components
     mainForm: TForm;
     groupBox: TGroupBox;
     editArmyName: TEdit;
@@ -43,21 +42,23 @@ type
     clbPlayers: TCheckListBox;
     btnStart: TButton;
     debug: procedure(s: string);
+    __bmps: array [0..1] of TBitmap;
+    __loadedArmy: TPlayerArray;
+    __loadedArmyName: string;
 
-
-    maxPlayers: integer;
+    // dynamic stuff.
+    maxPlayers: integer; // max amount of players to be selected
     name: string; // the title for the main window
-    scriptHelpThread: string;
-    scriptSettingsPath: string;
+    scriptHelpThread: string; // URL for script help thread
+    scriptSettingsPath: string; // path to save settings
     editBoxLabels, editBoxDefaults: TStringArray;
     checkBoxLabels, checkBoxDefaults: TStringArray;
     comboBoxLabels, comboBoxDefaults: TStringArray;
     comboBoxItems: array of TStringArray;
     playerFile: string;
     playerNames: TStringArray;
+    selectedPlayers: TPlayerArray;
     isScriptReady: boolean;
-    __bmps: array [0..1] of TBitmap; // bitmaps used for speed buttons
-    __loadedArmyName: string;
   end;
 
 (*
@@ -93,7 +94,7 @@ var
   __btnHelp: TButton;
   __btnSave: TButton;
   __lbDebug: TListBox;
-  __debugGroupBox: TGroupBox;
+  __debugGroupBox, __cmpGroupBox: TGroupBox;
 {$ENDIF}
 
 
@@ -130,24 +131,23 @@ procedure __TPlayerForm_LoadArmy(const armyName: string);
 var
   j, i: integer;
   a: TIntegerArray;
-  tmpArmy: TPlayerArray;
 begin
   with (playerForm) do
   begin
     clbPlayers.clear();
 
     if (Rafiki_FindArmy(armyName)) then
-      Rafiki_GetPlayersFromArmy(armyName, tmpArmy);
+      Rafiki_GetPlayersFromArmy(armyName, __loadedArmy);
 
-    if (length(tmpArmy) = 0) then
+    if (length(__loadedArmy) = 0) then
     begin
       SafeMessageDlg('PlayerForm', format('Army "%s" doesn''t exist, make sure you''ve saved a army in the player manager (SRL > Run Player Manager)', [armyName]), mtWarning, [mbOk]);
       exit();
     end;
 
-    for j := 0 to high(tmpArmy) do
+    for j := 0 to high(__loadedArmy) do
     begin
-      clbPlayers.getItems().add(tmpArmy[i].logInName + '  ('+tmpArmy[i].nickName+')');
+      clbPlayers.getItems().add(__loadedArmy[i].logInName + '  ('+__loadedArmy[i].nickName+')');
       for i := 0 to (clbPlayers.getItems().getCount() - 1) do
         insert(clbPlayers.getCanvas().TextWidth(clbPlayers.getItems().getStrings(i)), a);
 
@@ -155,7 +155,7 @@ begin
     end;
 
     if (assigned(@debug)) then
-      debug(format('Loaded %d players from army "%s"', [length(tmpArmy), armyName]));
+      debug(format('Loaded %d players from army "%s"', [length(__loadedArmy), armyName]));
 
     __loadedArmyName := armyName;
   end;
@@ -182,7 +182,7 @@ procedure __TPlayerForm_OnNotifyEvent(Sender: TObject); native;
   end;
 
 var
-  i, c, p: integer;
+  i, c, p, j: integer;
   s: string;
 begin
   with (playerForm) do
@@ -196,17 +196,22 @@ begin
             if (clbPlayers.getChecked(i)) then
             begin
               p := Pos(' (', clbPlayers.getItems().getStrings(i));
-              insert(copy(clbPlayers.getItems().getStrings(i), 0, p - 2), playerNames);
+              s := trim(copy(clbPlayers.getItems().getStrings(i), 0, p - 2));
+              insert(s, playerNames);
+
+              for j := 0 to high(__loadedArmy) do
+                if (__loadedArmy[j].loginName = s) then
+                  insert(__loadedArmy[j], selectedPlayers);
             end;
 
           if (length(playerNames) = 0) then
           begin
             print('No players have been selected, script not ready!', TDebug.WARNING);
             isScriptReady := false;
-          end;
+          end else
+            isScriptReady := true;
 
           playerFile := __loadedArmyName;
-          isScriptReady := true;
           mainForm.close();
         end;
     end;
@@ -313,183 +318,163 @@ procedure __createScriptComponents();
 
     exit(MaxA(a));
   end;
-
 var
-  i, j, lblLeft, lblWidth, cmpLeft, cmpWidth, top, topInc: integer;
-  first: boolean;
-  frmWidth: TIntegerArray;
+  i, j, cmpLeft, cmpTop, cmpTopInc, cmpWidth, lblLeft: integer;
+  widths: TIntegerArray;
 begin
+  print('__createScriptComponents(): Adding components to player form...');
+
+  // At this stage, the raw form is created we're just adding what we need to it
+  // to turn it into the SRL-Playerform.
   with (playerForm) do
   begin
-    debug := @__writeln;
+    debug := @__writeln;  // assign the raw forms debugging to __writeln.
+    cmpLeft := getLongestText([editBoxLabels, checkBoxLabels, comboBoxLabels]) + 12; // where to start the components, we find out the longest caption.
+    cmpTop := 7;
+    cmpTopInc := 30;
+    cmpWidth := 100;
+    lblLeft := 7;
 
-
-  mainForm.setCaption(name);
-  lblLeft := groupBox.getLeft() + groupBox.getWidth() + 14;
-  cmpLeft := lblLeft + getLongestText([playerForm.editBoxLabels, playerForm.checkBoxLabels, playerForm.comboBoxLabels]) + 7;
-  lblWidth := 20;
-  cmpWidth := 100;
-  top := 40;
-  topInc := top;
-  first := true;
-
-  // TEdit boxes
-  setLength(__scriptEditBoxes, length(playerForm.editBoxLabels));
-  setLength(__scriptEditLabels, length(__scriptEditBoxes));
-  for i := 0 to high(playerForm.editBoxLabels) do
-  begin
-    if (first) then
-      top := 10;
-
-    __scriptEditBoxes[i].init(mainForm);
-    with __scriptEditBoxes[i] do
+    // Creating the groupbox to store the components in
+    __cmpGroupBox.init(mainForm);
+    with (__cmpGroupBox) do
     begin
       setParent(mainForm);
-      setLeft(cmpLeft);
-      setTop(top);
-      setWidth(cmpWidth);
-      setCaption(playerForm.editBoxDefaults[i]);
+      setBounds((groupBox.getLeft() + groupBox.getWidth()) + 10, 4, 1, 1); // we will resize later.
+      setCaption('Settings for player: Not selected');
     end;
 
-    __scriptEditLabels[i].init(mainForm);
-    with __scriptEditLabels[i] do
+    // Adding the TEdits
+    setLength(__scriptEditBoxes, length(editBoxLabels));
+    setLength(__scriptEditLabels, length(__scriptEditBoxes));
+    for i := 0 to high(editBoxLabels) do
+    begin
+      __scriptEditBoxes[i].init(__cmpGroupBox);
+      with (__scriptEditBoxes[i]) do
+      begin
+        setParent(__cmpGroupBox);
+        setLeft(cmpLeft);
+        setTop(cmpTop);
+        setWidth(cmpWidth);
+        setCaption(editBoxDefaults[i]);
+      end;
+
+      __scriptEditLabels[i].init(__cmpGroupBox);
+      with (__scriptEditLabels[i]) do
+      begin
+        setParent(__cmpGroupBox);
+        setTop(cmpTop + 2);
+        setLeft(lblLeft);
+        setWidth(cmpLeft);
+        setCaption(editBoxLabels[i]);
+      end;
+
+      inc(cmpTop, cmpTopInc);
+      insert(cmpLeft + cmpWidth, widths);
+    end;
+
+    // TComboBoxes
+    setLength(__scriptComboBoxes, length(comboBoxLabels));
+    setLength(__scriptComboLabels, length(__scriptComboBoxes));
+    for i := 0 to high(playerForm.comboBoxLabels) do
+    begin
+      __scriptComboBoxes[i].init(__cmpGroupBox);
+      with (__scriptComboBoxes[i]) do
+      begin
+        setParent(__cmpGroupBox);
+        setLeft(cmpLeft);
+        setTop(cmpTop);
+        setWidth(cmpWidth);
+        setCaption(comboBoxDefaults[i]);
+
+        for j := 0 to high(playerForm.comboBoxItems[i]) do
+          addItem(comboBoxItems[i][j], nil);
+      end;
+
+      __scriptComboLabels[i].init(__cmpGroupBox);
+      with (__scriptComboLabels[i]) do
+      begin
+        setParent(__cmpGroupBox);
+        setTop(cmpTop + 2);
+        setLeft(lblLeft);
+        setWidth(cmpLeft);
+        setCaption(comboBoxLabels[i]);
+      end;
+
+      inc(cmpTop, cmpTopInc);
+      insert(cmpLeft + cmpWidth, widths);
+    end;
+
+    // TCheckBoxes
+    setLength(__scriptCheckBoxes, length(checkBoxLabels));
+    setLength(__scriptCheckLabels, length(__scriptCheckBoxes));
+    for i := 0 to high(checkBoxLabels) do
+    begin
+      __scriptCheckBoxes[i].init(__cmpGroupBox);
+      with (__scriptCheckBoxes[i]) do
+      begin
+        setParent(__cmpGroupBox);
+        setLeft(cmpLeft);
+        setTop(cmpTop + 1);
+        setWidth(cmpWidth);
+
+        if (lowercase(checkBoxDefaults[i]) = 'true') then
+          setState(cbChecked);
+      end;
+
+      __scriptCheckLabels[i].init(__cmpGroupBox);
+      with (__scriptCheckLabels[i]) do
+      begin
+        setParent(__cmpGroupBox);
+        setTop(cmpTop);
+        setLeft(lblLeft);
+        setWidth(cmpLeft);
+        setCaption(checkBoxLabels[i]);
+      end;
+
+      inc(cmpTop, cmpTopInc);
+      insert(cmpLeft + cmpWidth, widths);
+    end;
+
+    // Now know what these should be.
+    __cmpGroupBox.setWidth(maxA(widths) + 9);
+    __cmpGroupBox.setHeight((cmpTop + 4) + (cmpTopInc div 2));
+    mainForm.setHeight(max(350, cmpTop + cmpTopInc));  // min height of 350.
+    mainForm.setWidth(5 + (__cmpGroupBox.getLeft() + __cmpGroupBox.getWidth()));
+    btnStart.setBounds(btnStart.getLeft(), (mainForm.getHeight() - 8) - btnStart.getHeight(), btnStart.getWidth(), btnStart.getHeight()); // move the start button
+
+    __btnHelp.init(mainForm);
+    with (__btnHelp) do
     begin
       setParent(mainForm);
-      setTop(top + 3);
-      setLeft(lblLeft);
-      setWidth(lblWidth);
-      setCaption(playerForm.editBoxLabels[i]);
+      setBounds(btnStart.getLeft(), btnStart.getTop() - 35, btnStart.getWidth() div 2 - 3, btnStart.getHeight());
+      setCaption('Help');
+      setOnClick(__OnNotifyEvent);
     end;
 
-    if (first) then
-    begin
-      first := false;
-      topInc := topInc - 10;
-    end;
-
-    top := top + topInc;
-    insert(cmpLeft + cmpWidth, frmWidth);
-  end;
-
-  // TComboBoxes
-  setLength(__scriptComboBoxes, length(playerForm.comboBoxLabels));
-  setLength(__scriptComboLabels, length(__scriptComboBoxes));
-  for i := 0 to high(playerForm.comboBoxLabels) do
-  begin
-    if (first) then
-      top := 10;
-
-    __scriptComboBoxes[i].init(mainForm);
-    with __scriptComboBoxes[i] do
+    __btnSave.init(mainForm);
+    with (__btnSave) do
     begin
       setParent(mainForm);
-      setLeft(cmpLeft);
-      setTop(top);
-      setWidth(cmpWidth);
-      setCaption(playerForm.comboBoxDefaults[i]);
-
-      for j := 0 to high(playerForm.comboBoxItems[i]) do
-        addItem(playerForm.comboBoxItems[i][j], nil);
+      setBounds(btnStart.getLeft() + __btnHelp.getWidth() + 3, btnStart.getTop() - 35, btnStart.getWidth() div 2, btnStart.getHeight());
+      setCaption('Save Settings');
+      setOnClick(__OnNotifyEvent);
     end;
 
-    __scriptComboLabels[i].init(mainForm);
-    with __scriptComboLabels[i] do
+     __debugGroupBox.init(mainForm);
+    with (__debugGroupBox) do
     begin
       setParent(mainForm);
-      setTop(top + 3);
-      setLeft(lblLeft);
-      setWidth(lblWidth);
-      setCaption(playerForm.comboBoxLabels[i]);
+      setBounds(groupBox.getLeft(), groupBox.getTop() + groupBox.getHeight() + 3, groupBox.getLeft() + groupBox.getWidth() - 9, __btnSave.getTop() - (groupBox.getTop() + groupBox.getHeight()) - 11);
+      setCaption('Debug');
     end;
 
-    if (first) then
+    __lbDebug.init(mainForm);
+    with (__lbDebug) do
     begin
-      first := false;
-      topInc := topInc - 10;
+      setParent(__debugGroupBox);
+      setBounds(6, 3, __debugGroupBox.getWidth() - 16, __debugGroupBox.getHeight() - 28);
     end;
-
-    insert(cmpLeft + cmpWidth, frmWidth);
-    top := top + topInc;
-  end;
-
-  // TCheckBoxes
-  setLength(__scriptCheckBoxes, length(playerForm.checkBoxLabels));
-  setLength(__scriptCheckLabels, length(__scriptCheckBoxes));
-  for i := 0 to high(playerForm.checkBoxLabels) do
-  begin
-    if (first) then
-      top := 10;
-
-    __scriptCheckBoxes[i].init(mainForm);
-    with __scriptCheckBoxes[i] do
-    begin
-      setParent(mainForm);
-      setLeft(cmpLeft);
-      setTop(top + 1);
-      setWidth(cmpWidth);
-
-      if (lowercase(playerForm.checkBoxDefaults[i]) = 'true') then
-       setState(cbChecked);
-    end;
-
-    __scriptCheckLabels[i].init(mainForm);
-    with __scriptCheckLabels[i] do
-    begin
-      setParent(mainForm);
-      setTop(top + 3);
-      setLeft(lblLeft);
-      setWidth(lblWidth);
-      setCaption(playerForm.checkBoxLabels[i]);
-    end;
-
-    if (first) then
-    begin
-      first := false;
-      topInc := topInc - 10;
-    end;
-
-    insert(lblLeft + 10, frmWidth);
-    top := top + topInc;
-  end;
-
-  // other, non customizable components
-  mainForm.setHeight(max(350, top + 5));
-  mainForm.setWidth(maxA(frmWidth) + 10);
-  btnStart.setBounds(btnStart.getLeft(), (mainForm.getHeight() - 8) - btnStart.getHeight(), btnStart.getWidth(), btnStart.getHeight());
-
-  __btnHelp.init(mainForm);
-  with (__btnHelp) do
-  begin
-    setParent(mainForm);
-    setBounds(btnStart.getLeft(), btnStart.getTop() - 35, btnStart.getWidth() div 2 - 3, btnStart.getHeight());
-    setCaption('Help');
-    setOnClick(__OnNotifyEvent);
-  end;
-
-  __btnSave.init(mainForm);
-  with (__btnSave) do
-  begin
-    setParent(mainForm);
-    setBounds(btnStart.getLeft() + __btnHelp.getWidth() + 3, btnStart.getTop() - 35, btnStart.getWidth() div 2, btnStart.getHeight());
-    setCaption('Save Settings');
-    setOnClick(__OnNotifyEvent);
-  end;
-
-
-
-  __debugGroupBox.init(mainForm);
-  with (__debugGroupBox) do
-  begin
-    setParent(mainForm);
-    setBounds(groupBox.getLeft(), groupBox.getTop() + groupBox.getHeight() + 3, groupBox.getLeft() + groupBox.getWidth() - 9, __btnSave.getTop() - (groupBox.getTop() + groupBox.getHeight()) - 11);
-    setCaption('Debug');
-  end;
-  __lbDebug.init(mainForm);
-  with (__lbDebug) do
-  begin
-    setParent(__debugGroupBox);
-    setBounds(6, 3, __debugGroupBox.getWidth() - 16, __debugGroupBox.getHeight() - 28);
-  end;
   end;
 end;
 

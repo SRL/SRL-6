@@ -9,11 +9,6 @@ The source for this file can be found `here <https://github.com/SRL/SRL-6/blob/m
 
 *)
 
-{$include_once interfaces.simba}
-{$include_once ../core/text.simba}
-{$include_once gametabs/backpack.simba}
-{$include_once ../utilities/color.simba}
-
 {$f-}
 
 (*
@@ -1462,3 +1457,5 @@ end;
 begin
   actionBar.__init();
 end;
+
+{$f+}

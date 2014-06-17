@@ -10,9 +10,7 @@ The source for this file can be found `here <https://github.com/SRL/SRL-6/blob/m
 
 *)
 
-{$include_once ../core/globals.simba}
-{$include_once ../core/text.simba}
-{$include_once ../utilities/types/integerarrays.simba}
+{$f-}
 
 (*
 Constant: Item Colors
@@ -253,4 +251,6 @@ begin
   if (result = -1) then
     print('getItemAmount(): Didn''t find any text color, result = -1', TDebug.WARNING);
 end;
+
+{$f+}
 

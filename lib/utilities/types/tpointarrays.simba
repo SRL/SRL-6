@@ -8,9 +8,6 @@ The source for this file can be found `here <https://github.com/SRL/SRL-6/blob/m
 
 *)
 
-{$include_once ../math.simba}
-{$include_once tpoint.simba}
-
 {$f-}
 
 (*
@@ -1634,4 +1631,6 @@ begin
     end;
   end;
 end;
+
+{$f+}
 

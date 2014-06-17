@@ -9,7 +9,7 @@ The source for this file can be found `here <https://github.com/SRL/SRL-6/blob/m
 
 *)
 
-{$include_once lobby.simba}
+{$f-}
 
 {*
 const Internal
@@ -653,3 +653,5 @@ end;
 begin
   lobbyWorlds.__init();
 end;
+
+{$f+}

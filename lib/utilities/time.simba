@@ -476,4 +476,6 @@ function TTimeMarker.getTotalTime(): LongWord;
 begin
   if (Self.startTime > 0) then
     Result := getTickCount64() - Self.startTime;
-end;                       
+end;
+
+{$f+}

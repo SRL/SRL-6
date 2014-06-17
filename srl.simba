@@ -8,47 +8,54 @@ SRL library isn't available to you.
 
 *)
 
+{$include_once lib/utilities/wrappers.simba}
+{$include_once lib/core/globals.simba}
+{$include_once lib/utilities/math.simba}
+{$include_once lib/core/mouse.simba}
 {$include_once lib/utilities/types/types.simba}
 {$include_once lib/utilities/time.simba}
 {$include_once lib/utilities/drawing.simba}
 {$include_once lib/utilities/pixelshift.simba}
 {$include_once lib/utilities/color.simba}
-{$include_once lib/utilities/math.simba}
 
-{$include_once lib/core/globals.simba}
-{$include_once lib/core/mouse.simba}
 {$include_once lib/core/debug.simba}
-{$include_once lib/core/text.simba}
-{$include_once lib/core/players.simba}
-{$include_once lib/core/client.simba}
 {$include_once lib/core/tesseract.simba}
+{$include_once lib/core/text.simba}
+{$include_once lib/interfaces/interfaces.simba}
+{$include_once lib/interfaces/chooseoption.simba}
+{$include_once lib/misc/items.simba}
 
 {$include_once lib/interfaces/gametabs/gametab.simba}
 {$include_once lib/interfaces/gametabs/backpack.simba}
 {$include_once lib/interfaces/gametabs/stats.simba}
 
+
+{$include_once lib/interfaces/options.simba}
 {$include_once lib/interfaces/lobby/lobby.simba}
 {$include_once lib/interfaces/lobby/worlds.simba}
-{$include_once lib/interfaces/mainscreen.simba}
 {$include_once lib/interfaces/actionbar.simba}
+{$include_once lib/interfaces/mainscreen.simba}
 {$include_once lib/interfaces/minimap.simba}
-{$include_once lib/interfaces/bankscreen.simba}
+
+{$include_once lib/interfaces/actionbar.simba}
+{$include_once lib/interfaces/conversationbox.simba}
 {$include_once lib/interfaces/pinscreen.simba}
+{$include_once lib/interfaces/bankscreen.simba}
 {$include_once lib/interfaces/depositbox.simba}
 {$include_once lib/interfaces/options.simba}
 {$include_once lib/interfaces/chatbox.simba}
-{$include_once lib/interfaces/conversationbox.simba}
 {$include_once lib/interfaces/production.simba}
-{$include_once lib/interfaces/chooseoption.simba}
 {$include_once lib/interfaces/lodestone.simba}
 {$include_once lib/interfaces/toolscreen.simba}
 {$include_once lib/interfaces/progressscreen.simba}
 {$include_once lib/interfaces/powerscreen.simba}
 
+{$include_once lib/misc/miscforms.simba}
+{$include_once lib/core/players.simba}
+{$include_once lib/core/client.simba}
+
 {$include_once lib/misc/srlstats.simba}
 {$include_once lib/misc/antiban.simba}
-{$include_once lib/misc/items.simba}
-
 
 {$IFDEF SMART}
   {$include_once lib/misc/smart.simba}

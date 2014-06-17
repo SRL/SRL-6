@@ -8,8 +8,7 @@ The source for this file can be found `here <https://github.com/SRL/SRL-6/blob/m
 
 *)
 
-{$include_once wrappers.simba}
-{$include_once ../core/globals.simba}
+{$f-}
 
 type
   TColorArray = array of TColor;
@@ -974,3 +973,5 @@ begin
 
   self.drawTPA(tpa, color);
 end;
+
+{$f+}

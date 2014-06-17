@@ -8,8 +8,6 @@ The source for this file can be found `here <https://github.com/SRL/SRL-6/blob/m
 
 *)
 
-{$include_once ../utilities/time.simba}
-
 {$f-}
 
 const
@@ -66,7 +64,6 @@ const
     EVENT_LOGIN       = 2;
     EVENT_PLAYER_NEXT = 3;
     EVENT_ANTIBAN     = 4;
-    EVENT_PLAYERFORM_CREATE = 5;
 
 (*
 Variable: SRL_Events
@@ -84,3 +81,88 @@ Example:
 *)
 var
   SRL_Events: array[0..(EVENT_COUNT - 1)] of procedure;
+
+(*
+const Mouse Styles
+~~~~~~~~~~~~~~~~~~
+
+Different ways of moving the mouse:
+
+    * MOUSE_BREAK: moves slower when reaching destination.
+    * MOUSE_ACCURATE: a slower, more accurate movement.
+    * MOUSE_HUMAN: the most human-like movement of the mouse styles.
+
+Example:
+
+.. code-block:: pascal
+
+    mouse(p, MOUSE_MOVE, MOUSE_ACCURATE);
+*)
+const
+  MOUSE_BREAK    = 8;
+  MOUSE_ACCURATE = 14;
+  MOUSE_HUMAN    = 7;
+
+(*
+const Mouse Buttons
+~~~~~~~~~~~~~~~~~~~
+
+Mouse buttons not included in Simba:
+
+    * MOUSE_NONE: Doesn't do anything.
+    * MOUSE_MOVE: Moves the mouse without clicking.
+
+Also available from Simba are MOUSE_LEFT, MOUSE_MIDDLE, and MOUSE_RIGHT.
+
+Example:
+
+.. code-block:: pascal
+
+    mouse(p, MOUSE_MOVE, MOUSE_ACCURATE);
+*)
+const
+  MOUSE_NONE = -1;
+  MOUSE_MOVE = 3;
+
+(*
+const Skills
+~~~~~~~~~~~~
+
+Integer constants that represent each skill.
+
+Example:
+
+.. code-block:: pascal
+
+    players[currentPlayer].skillLevel[SKILL_ATTACK] := 50;
+*)
+const
+  SKILL_COUNT = 26;
+    SKILL_ATTACK = 0;
+    SKILL_HITPOINTS = 1;
+    SKILL_MINING = 2;
+    SKILL_STRENGTH = 3;
+    SKILL_AGILITY = 4;
+    SKILL_SMITHING = 5;
+    SKILL_DEFENCE = 6;
+    SKILL_HERBLORE = 7;
+    SKILL_FISHING = 8;
+    SKILL_RANGE = 9;
+    SKILL_THIEVING = 10;
+    SKILL_COOKING = 11;
+    SKILL_PRAYER = 12;
+    SKILL_CRAFTING = 13;
+    SKILL_FIREMAKING = 14;
+    SKILL_MAGIC = 15;
+    SKILL_FLETCHING = 16;
+    SKILL_WOODCUTTING = 17;
+    SKILL_RUNECRAFTING = 18;
+    SKILL_SLAYER = 19;
+    SKILL_FARMING = 20;
+    SKILL_CONSTRUCTION = 21;
+    SKILL_HUNTER = 22;
+    SKILL_SUMMONING = 23;
+    SKILL_DUNGEONEERING = 24;
+    SKILL_DIVINATION = 25;
+
+{$f+}

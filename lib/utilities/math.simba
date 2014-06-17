@@ -649,3 +649,5 @@ begin
   __gaussPoint := 0.4;
   __gaussRange := 0.3;
 end;
+
+{$f+}

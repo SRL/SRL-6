@@ -11,11 +11,6 @@ The source for this file can be found `here <https://github.com/SRL/SRL-6/blob/m
 
 {$f-}
 
-{$include_once interfaces.simba}
-{$include_once ../core/players.simba}
-{$include_once actionbar.simba}
-{$include_once ../core/tesseract.simba}
-
 {*
 const Internal
 ~~~~~~~~~~~~~~
@@ -339,7 +334,7 @@ const
   __COLOR_SCROLL_BAR = 1266553;
 var
   p: TPoint;
-  t: Int64;
+  t: UInt64;
   down: boolean;
 begin
   if (not self.isOpen()) then
@@ -669,3 +664,5 @@ end;
 begin
   productionScreen.__init();
 end;
+
+{$f+}

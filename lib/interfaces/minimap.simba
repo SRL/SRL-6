@@ -9,12 +9,6 @@ The source for this file can be found `here <https://github.com/SRL/SRL-6/blob/m
 
 *)
 
-{$include_once interfaces.simba}
-{$include_once chooseoption.simba}
-{$include_once ../utilities/color.simba}
-{$include_once ../utilities/pixelshift.simba}
-{$include_once mainscreen.simba}
-
 {$f-}
 
 (*
@@ -2695,3 +2689,5 @@ end;
 begin
   minimap.__init();
 end;
+
+{$f+}

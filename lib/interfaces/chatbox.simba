@@ -10,10 +10,6 @@ The source for this file can be found
 
 *)
 
-{$include_once interfaces.simba}
-{$include_once actionbar.simba}
-{$include_once ../core/tesseract.simba}
-
 {$f-}
 
 (*
@@ -225,3 +221,5 @@ end;
 begin
   chatbox.__init();
 end;
+
+{$f+}

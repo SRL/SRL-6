@@ -405,3 +405,5 @@ function TExtendedArray.average() : Extended;
 begin
   result := averageExtended(self);
 end;
+
+{$f+}

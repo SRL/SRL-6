@@ -10,10 +10,6 @@ The source for this file can be found
 
 *)
 
-{$include_once ../core/debug.simba}
-{$include_once ../core/mouse.simba}
-{$include_once ../utilities/types/tbox.simba}
-
 {$f-}
 
 (*
@@ -166,3 +162,5 @@ function TRSInterface.getCenterPoint(): TPoint;
 begin
   result := self.getBounds().getMiddle();
 end;
+
+{$f+}

@@ -1,5 +1,6 @@
 {$loadlib libtesseract}
-{$include_once debug.simba}
+
+{$f-}
 
 type
   TTesseractFilter = packed record
@@ -143,12 +144,13 @@ begin
   end;
 end;
 
-// keep old versions working
 function Tesseract_GetText(const area: TBox; filter: TTesseractFilter): string; overload;
 begin
   result := Tesseract_GetText(area.x1, area.y1, area.x2, area.y2, filter);
 end;
 
+
+// keep old versions working
 const
   FILTER_SMALL_CHARS: TTesseractFilter = TESS_FILTER_SMALL_CHARS;
   FILTER_NPC_CHAT_CHARS: TTesseractFilter = TESS_FILTER_NPC_CHAT_CHARS;
@@ -167,4 +169,6 @@ begin
   if (config <> '') then
     Tesseract_ResetWhitelist();
 end;
+
+{$f+}
 

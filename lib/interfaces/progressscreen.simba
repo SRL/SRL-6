@@ -9,10 +9,6 @@ The source for this file can be found `here <https://github.com/SRL/SRL-6/blob/m
 
 *)
 
-{$include_once ../core/tesseract.simba}
-{$include_once ../core/players.simba}
-
-
 {$f-}
 
 (*
@@ -473,3 +469,5 @@ end;
 begin
   progressScreen.__init();
 end;
+
+{$f+}

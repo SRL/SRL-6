@@ -13,15 +13,6 @@ The source for this file can be found
 
 {$f-}
 
-{$include_once ../core/debug.simba}
-{$include_once ../core/text.simba}
-{$include_once ../core/players.simba}
-{$include_once ../utilities/color.simba}
-{$include_once ../interfaces/gametabs/backpack.simba}
-{$include_once ../interfaces/conversationbox.simba}
-{$include_once ../interfaces/mainscreen.simba}
-{$include_once ../interfaces/gametabs/stats.simba}
-
 (*
 randomRClickItem
 ~~~~~~~~~~~~~~~~
@@ -1165,4 +1156,6 @@ begin
   if (returnToStartAngle) then
     minimap.setAngle(round(startAngle));
 end;
+
+{$f+}
 
