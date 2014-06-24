@@ -413,6 +413,23 @@ begin
   print('TPlayerArray.setup(): Success', TDebug.FOOTER);
 end;
 
+procedure TPlayerArray.setup(const players: PF_TPlayerArray); overload;
+var
+  i: integer;
+  p: TPlayer;
+begin
+  for i := 0 to high(players) do
+  begin
+    p.loginName := players[i].loginName;
+    p.nickName := players[i].nickName;
+    p.password := players[i].password;
+    p.bankPin := players[i].bankPin;
+    p.isMember := players[i].isMember;
+    self._add(p);
+  end;
+  self.setDefaults();
+end;
+
 (*
 TPlayerArray.switchTo
 ~~~~~~~~~~~~~~~~~~~~~

@@ -974,4 +974,14 @@ begin
   self.drawTPA(tpa, color);
 end;
 
+procedure TMufasaBitmap.drawCrosshairs(const box: TBox; const pnt: TPoint; const color: TColor; const boxColor: integer = -1);
+begin
+  self.rectangle([box.x1, box.y1 + pnt.y, box.x2, box.y1 + pnt.y], color); // faster than lineTo :)
+  self.rectangle([box.x1 + pnt.x, box.y1, box.x1 + pnt.x, box.y2], color);
+
+  if (boxColor > -1) then
+    self.drawBox(box, false, boxColor);
+end;
+
+
 {$f+}
