@@ -98,6 +98,7 @@ Example:
 function __openLogFile(): boolean;
 var
   fileName, start: string;
+  i: integer;
 begin
   if (disableSRLLog) then
     exit;
@@ -106,16 +107,19 @@ begin
     forceDirectories(logPath);
 
   start := replace(theDate(DATE_DAY)+' at '+theTime(), ':', '.', [rfReplaceAll]);
+  fileName := logPath + 'SRL log ('+start+').txt';
 
-  // make sure it's a valid file name (Windows)
-  fileName := 'SRL log ('+start+').txt';
-  fileName := replace(fileName, '/', '-', [rfReplaceAll]);
-  fileName := replace(fileName, ':', '-', [rfReplaceAll]);
-  fileName := logPath + fileName;
+  writeln(Format('SRL: Logfile = %s', [fileName]));
 
   try
-    __logFile := appendFile(fileName);
-    result := (__logFile <> -1);
+    i := createFile(fileName);
+
+    if (i > -1) then
+    begin
+      closeFile(i);
+      __logFile := appendFile(fileName);
+      result := (__logFile <> -1);
+    end;
   except
     writeln('Could not open/create log file');
   end;

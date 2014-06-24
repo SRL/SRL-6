@@ -9,16 +9,16 @@ SRL library isn't available to you.
 *)
 
 {$include_once lib/utilities/wrappers.simba}
+{$include_once lib/utilities/time.simba}
+{$include_once lib/core/debug.simba}
 {$include_once lib/core/globals.simba}
 {$include_once lib/utilities/math.simba}
 {$include_once lib/core/mouse.simba}
 {$include_once lib/utilities/types/types.simba}
-{$include_once lib/utilities/time.simba}
 {$include_once lib/utilities/drawing.simba}
 {$include_once lib/utilities/pixelshift.simba}
 {$include_once lib/utilities/color.simba}
 
-{$include_once lib/core/debug.simba}
 {$include_once lib/core/tesseract.simba}
 {$include_once lib/core/text.simba}
 {$include_once lib/interfaces/interfaces.simba}
