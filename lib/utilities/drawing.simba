@@ -558,7 +558,7 @@ Example:
     tmb.drawText('hello world!', point(55, 55), upchars, false, clRed);
 
 *)
-procedure TMufasaBitmap.drawText(txt: string; pnt: TPoint; font: string; shadow: boolean; color: TColor);
+procedure TMufasaBitmap.drawText(txt: string; pnt: TPoint; font: string; shadow: boolean; color: TColor); overload;
 var
   tpa, tpaShadow: TPointArray;
 begin
@@ -729,49 +729,6 @@ begin
   end;
 
   self.drawTPA(tpa, color);
-end;
-
-(*
-TMufasaBitmap.drawSystemFont
-~~~~~~~~~~~~~~~~~~~~~~~~~~~~
-
-.. code-block:: pascal
-
-    procedure TMufasaBitmap.drawSystemFont(txt: string; pnt: TPoint; shadow: boolean; fontName: string; fontSize: integer; color: TColor);
-
-Uses LoadSystemFont() to draw a system font onto the TMufasaBitmap.
-
-.. note::
-
-    - by Olly
-    - Last Updated: 09 August 2013 by Olly
-
-Example:
-
-.. code-block:: pascal
-
-    tmb.drawSystemFont('hello world!', point(10, 10), true, 'comic sans', 45, clLime);
-
-*)
-procedure TMufasaBitmap.drawSystemFont(txt: string; pnt: TPoint; shadow: boolean; fontName: string; fontSize: integer; color: TColor);
-var
-  font: TFont;
-  sysFont: string;
-begin
-  font.init();
-  font.setName(fontName);
-  font.setSize(fontSize);
-
-  if (not loadSystemFont(font, sysFont)) then
-  begin
-    writeln('ERROR: drawSystemFont(): Failed to load the font "' + fontName);
-    exit();
-  end;
-
-  self.drawText(txt, pnt, sysFont, shadow, color);
-
-  font.free();
-  freeFont(sysFont);
 end;
 
 (*
@@ -976,8 +933,8 @@ end;
 
 procedure TMufasaBitmap.drawCrosshairs(const box: TBox; const pnt: TPoint; const color: TColor; const boxColor: integer = -1);
 begin
-  self.rectangle([box.x1, box.y1 + pnt.y, box.x2, box.y1 + pnt.y], color); // faster than lineTo :)
-  self.rectangle([box.x1 + pnt.x, box.y1, box.x1 + pnt.x, box.y2], color);
+  self.rectangle(TBox([box.x1, box.y1 + pnt.y, box.x2, box.y1 + pnt.y]), color); // faster than lineTo :)
+  self.rectangle(TBox([box.x1 + pnt.x, box.y1, box.x1 + pnt.x, box.y2]), color);
 
   if (boxColor > -1) then
     self.drawBox(box, false, boxColor);

@@ -31,9 +31,9 @@ type
     __debugGroupBox, __cmpGroupBox: TGroupBox;
 
     // user should change
-    name, scriptHelpThread: string; // form title.
+    name, scriptHelpThread, scriptSettingsPath: string; // form title.
     isScriptReady: boolean; // true = > 1 player selected.
-    maxPlayers: integer; // limit to how many players can be chosen
+    maxPlayers, size: integer; // limit to how many players can be chosen
 
     // results for user
     players: PF_TPlayerArray;
@@ -52,25 +52,28 @@ begin
     debugLn(s);
 end;
 
-procedure PF_LoadArmy();
+procedure PF_LoadArmy(FName: string = '');
 var
   i, j: integer;
   a: TIntegerArray;
 begin
+  if (FName = '') then
+    FName := playerForm.editArmyName.getCaption();
+
   with (playerForm) do
   begin
     setLength(__loadedArmy, 0);
 
-    if (Rafiki_FindArmy(editArmyName.getCaption())) then
-      Rafiki_GetPlayersFromArmy(editArmyName.getCaption(), __loadedArmy)
+    if (Rafiki_FindArmy(FName)) then
+      Rafiki_GetPlayersFromArmy(FName, __loadedArmy)
     else begin
-      safeMessageDlg('PlayerForm', format('Army "%s" doesn''t exist, make sure you''ve saved a army in the player manager (SRL > Run Player Manager)', [editArmyName.getCaption()]), mtWarning, [mbOk]);
+      safeMessageDlg('PlayerForm', format('Army "%s" doesn''t exist, make sure you''ve saved a army in the player manager (SRL > Run Player Manager)', [FName]), mtWarning, [mbOk]);
       exit();
     end;
 
     if (length(__loadedArmy) = 0) then
     begin
-      safeMessageDlg('PlayerForm', format('Found no players in the army "%s"', [editArmyName.getCaption()]), mtWarning, [mbOk]);
+      safeMessageDlg('PlayerForm', format('Found no players in the army "%s"', [FName]), mtWarning, [mbOk]);
       exit();
     end;
 
@@ -86,39 +89,75 @@ begin
       clbPlayers.setScrollWidth(MaxA(a) + 25);
     end;
 
-    __loadedArmyName := editArmyName.getCaption();
+    __loadedArmyName := FName;
 
-    PF_Debug(format('Loaded %d players from army "%s"', [length(__loadedArmy), editArmyName.getCaption()]));
+    PF_Debug(format('Loaded %d players from army "%s"', [length(__loadedArmy), FName]));
     PF_Debug(format('Our currently loaded army is now "%s"', [__loadedArmyName]));
   end;
 end;
 
-function PF_getDefaultSettings(): TStringArray;
+function PF_GetSettingName(): string;
 var
   i: integer;
 begin
-  if (length(playerForm.editBoxDefaults) > 0) then
-    for i := 0 to high(playerForm.editBoxDefaults) do
-    begin
-      setLength(result, length(result) + 1);
-      result[high(result)] := playerForm.editBoxDefaults[i];
-    end;
+  for i := 1 to length(playerForm.name) do
+    if (playerForm.name[i] in ['A'..'Z', 'a'..'z']) then
+      result += playerForm.name[i];
 
-  if (length(playerForm.checkBoxDefaults) > 0) then
-    for i := 0 to high(playerForm.checkBoxDefaults) do
-    begin
-      setLength(result, length(result) + 1);
-      result[high(result)] := playerForm.checkBoxDefaults[i];
-    end;
+  if (length(result) = 1) then
+    result := 'UnknownName';
+end;
 
-  if (length(playerForm.comboBoxDefaults) > 0) then
-    for i := 0 to high(playerForm.comboBoxDefaults) do
-    begin
-      setLength(result, length(result) + 1);
-      result[high(result)] := playerForm.comboBoxDefaults[i];
-    end;
+procedure PF_SaveSettings();
+var
+  i, j: Integer;
+  Name, PlayerName, Prefix, Data, tmpPrefix: String;
+begin
+  Prefix := settings.getPrefix();
+  Name := PF_GetSettingName();
 
-  PF_Debug('Set default settings to player');
+  if (Name = '') then
+    Exit();
+
+  try
+    with (Settings) do
+    begin
+      setPrefix('SRL_PlayerForm/');
+
+      if (IsKey(Name) + '/') then // Delete old settings if we have them.
+      begin
+        DebugLn('We have previously saved settings, deleting them');
+        if (DeleteSubKeys(Name + '/')) then
+          DebugLn('Succesfully deleted settings')
+        else
+          DebugLn('Failed to delete settings');
+      end else
+        DebugLn('No previous settings to delete');
+
+      setPrefix(Format('%s/', [getPrefix() + Name]));
+      setKeyValue('ArmyName', playerForm.__loadedArmyName);
+      tmpPrefix := getPrefix();
+
+      for i := 0 to High(playerForm.Players) do
+      begin
+        DebugLn(Format('Saving player "%s"', [PlayerForm.Players[i].LoginName]));
+        PlayerName := Replace(Trim(PlayerForm.Players[i].LoginName), ' ', '_', [rfReplaceAll]);
+
+        if (PlayerName <> '') then
+        begin
+          setPrefix(Format('%s/', [tmpPrefix + PlayerName]));
+
+          Data := '';
+          for j := 0 to High(Playerform.Players[i].Settings) do
+            Data += Format('[/]%s[\]', [Playerform.Players[i].Settings[j]]);
+
+          setKeyValue('Settings', Base64Encode(Data));
+        end;
+      end;
+    end;
+  finally
+    Settings.setPrefix(Prefix);
+  end;
 end;
 
 procedure PF_UpdatePlayerSettings();
@@ -161,11 +200,12 @@ begin
     end;
 end;
 
-procedure PF_SetCurrPlayer(const index: integer);
+procedure PF_SetCurrPlayer(const index: integer; const Update: Boolean = True);
 var
   i, c: integer;
 begin
-  PF_UpdatePlayerSettings();
+  if (Update) then
+    PF_UpdatePlayerSettings();
 
   with (playerForm) do
   begin
@@ -202,6 +242,101 @@ begin
       if (players[__currPlayer].loginName = players[index].loginName) then
         break();
   end;
+end;
+
+procedure PF_LoadSettings();
+var
+  Prefix, Name, ArmyName, PlayerName: String;
+  PlayerNames, Strings: TStringArray;
+  i, j: Integer;
+begin
+  Prefix := Settings.getPrefix();
+  Name := PF_GetSettingName();
+
+  if (Name <> '') then
+    Name := 'SRL_PlayerForm/' + Name + '/'
+  else
+    Exit();
+
+  Settings.SetPrefix('');
+
+  try
+    if (Settings.IsDirectory(Name)) then
+    begin
+      DebugLn('Settings exist for this playerform');
+
+      ArmyName := Settings.GetKeyValue(Name + 'ArmyName');
+
+      if (ArmyName <> '') then
+      begin
+        Settings.ListKeys(Name, PlayerNames);
+        Settings.SetPrefix(Name);
+        PF_LoadArmy(ArmyName);
+
+        for i := 1 to high(PlayerNames) do
+        begin
+          Strings := MultiBetween(Base64Decode(Settings.GetKeyValue(PlayerNames[i]+'/Settings')), '[/]', '[\]');
+          PlayerName := Replace(PlayerNames[i], '_', ' ', [rfReplaceAll]);
+
+          for j := 0 to (playerForm.clbPlayers.getItems().getCount() - 1) do
+            if (Pos(PlayerName, playerForm.clbPlayers.getItems().getStrings(j)) = 1) then
+            begin
+              playerForm.clbPlayers.setChecked(j, True);
+              Insert(PlayerForm.__loadedArmy[j], PlayerForm.Players, Length(PlayerForm.Players));
+              PlayerForm.Players[High(PlayerForm.Players)].Settings := Strings;
+
+              PlayerForm.__currPlayer := high(PlayerForm.Players);
+              PF_SetCurrPlayer(High(PlayerForm.Players), False);
+            end;
+        end;
+
+        if (Length(PlayerForm.Players) > 0) then
+        begin
+          PlayerForm.__cmpGroupBox.setEnabled(True);
+          if (Length(PlayerForm.Players) > 1) then
+          begin
+            PlayerForm.__btnApplyAll.setEnabled(true);
+            PlayerForm.__btnNextPlayer.setEnabled(true);
+            PlayerForm.__btnPrevPlayer.setEnabled(true);
+          end else
+            PlayerForm.__btnApplyAll.setEnabled(false);
+        end else begin
+          PlayerForm.__btnNextPlayer.setEnabled(false);
+          PlayerForm.__btnPrevPlayer.setEnabled(false);
+        end;
+      end;
+    end;
+  finally
+    Settings.SetPrefix(Prefix);
+  end;
+end;
+
+function PF_GetDefaultSettings(): TStringArray;
+var
+  i: integer;
+begin
+  if (length(playerForm.editBoxDefaults) > 0) then
+    for i := 0 to high(playerForm.editBoxDefaults) do
+    begin
+      setLength(result, length(result) + 1);
+      result[high(result)] := playerForm.editBoxDefaults[i];
+    end;
+
+  if (length(playerForm.checkBoxDefaults) > 0) then
+    for i := 0 to high(playerForm.checkBoxDefaults) do
+    begin
+      setLength(result, length(result) + 1);
+      result[high(result)] := playerForm.checkBoxDefaults[i];
+    end;
+
+  if (length(playerForm.comboBoxDefaults) > 0) then
+    for i := 0 to high(playerForm.comboBoxDefaults) do
+    begin
+      setLength(result, length(result) + 1);
+      result[high(result)] := playerForm.comboBoxDefaults[i];
+    end;
+
+  PF_Debug('Set default settings to player');
 end;
 
 procedure PF_OnPlayerSelect(Sender: TObject; Index: Integer); native;
@@ -312,6 +447,7 @@ begin
       btnStart:
         begin
           PF_UpdatePlayerSettings();
+          PF_SaveSettings();
 
           for i := 0 to (clbPlayers.getItems().getCount() - 1) do
             if (clbPlayers.getChecked(i)) then
@@ -657,7 +793,14 @@ begin
 
     groupBox.setHeight(mid - 2);
     clbPlayers.setHeight(groupBox.getHeight() - 58);
+
+    if (size > 0) then
+      mainForm.scaleBy(20 + Size, 20)
+    else
+      mainForm.scaleBy(20 + Size, 20);
   end;
+
+  PF_Debug('Tip: Settings are automaticly saved when you click start');
 end;
 
 procedure PF_Init(); native;
@@ -667,6 +810,7 @@ begin
   PF_Create();
   PF_AddComponents();
   PF_Defaults();
+  PF_LoadSettings();
 
   try
     playerForm.mainForm.showModal();
