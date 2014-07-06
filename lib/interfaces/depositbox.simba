@@ -115,7 +115,7 @@ Returns true if the deposit box is open, includes a optional parameter
 .. note::
 
     - by Olly
-    - Last Updated: 15 January 2014 by The Mayor
+    - Last Updated: 5th July 2014 by The Mayor
 
 Example:
 
@@ -136,7 +136,7 @@ begin
   t := (getSystemTime() + waitTime);
 
   repeat
-    if (getColor(self.x1 +62, self.y1 +19) = TEXT_COLOR) then
+    if (getColor(self.x1 +60, self.y1 +19) = TEXT_COLOR) then
       if (countColorTolerance(BACKGROUND_COLOR, self.getBounds(), BACKGROUND_TOLERANCE) > 20000) then
       begin
         result := true;
