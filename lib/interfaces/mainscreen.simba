@@ -163,6 +163,40 @@ begin
 end;
 
 (*
+TRSMainscreen.isPlayerAnimating
+~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+
+.. code-block:: pascal
+
+    function TRSMainscreen.isPlayerAnimating(maxShift: integer = 100): boolean;
+
+Returns true if the pixel shift around the player is less than 'maxShift'. The
+box around the player is defined in "mainscreen.playerBox". Pixel shifts can
+vary depending on what the player is wearing/holding. This function's default is
+based off of a player wearing nothing, and having the mainscreen at about half
+zoom.
+
+.. note::
+
+    - by Coh3n
+    - Last Updated: 7 July 2014 by Coh3n
+
+Example:
+
+.. code-block:: pascal
+
+    while (mainscreen.isPlayerAnimating()) do
+    begin
+      antiban();
+      wait(50 + random(50));
+    end;
+*)
+function TRSMainscreen.isPlayerAnimating(maxShift: integer = 300): boolean;
+begin
+  result := (getPixelShiftAverage(self.playerBox, 50, 250) >= maxShift);
+end;
+
+(*
 TRSMainscreen.setZoom
 ~~~~~~~~~~~~~~~~~~~~~
 
