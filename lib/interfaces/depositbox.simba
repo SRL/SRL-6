@@ -131,12 +131,12 @@ const
   BACKGROUND_COLOR = 2366479;
   BACKGROUND_TOLERANCE = 19;
 var
-  t: integer;
+  t, a, b: integer;
 begin
   t := (getSystemTime() + waitTime);
 
   repeat
-    if (getColor(self.x1 +60, self.y1 +19) = TEXT_COLOR) then
+    if findColor(a, b, TEXT_COLOR, intToBox(self.x1 + 59, self.y1 + 18, self.x1 + 63, self.y1 + 20)) then
       if (countColorTolerance(BACKGROUND_COLOR, self.getBounds(), BACKGROUND_TOLERANCE) > 20000) then
       begin
         result := true;
