@@ -96,67 +96,65 @@ begin
   end;
 end;
 
-function PF_GetSettingName(): string;
-var
-  i: integer;
-begin
-  for i := 1 to length(playerForm.name) do
-    if (playerForm.name[i] in ['A'..'Z', 'a'..'z']) then
-      result += playerForm.name[i];
+{*
+_PF_SaveSettings
+~~~~~~~~~~~~~~~~
 
-  if (length(result) = 1) then
-    result := 'UnknownName';
-end;
+.. code-block:: pascal
 
-procedure PF_SaveSettings();
+    procedure _PF_SaveSettings();
+
+Creates a script directory and saves the settings of the selected players to a
+file named settings.txt.
+
+ (Uses a TStringList since Simbas file system isn't threadsafe).
+
+.. note::
+
+    - by Coh3n
+    - Last Updated: 10 January 2014 by Coh3n
+
+*}
+procedure _PF_SaveSettings();
 var
   i, j: Integer;
-  Name, PlayerName, Prefix, Data, tmpPrefix: String;
+  Path, FilePath: String;
+  List: TStringList;
 begin
-  Prefix := settings.getPrefix();
-  Name := PF_GetSettingName();
+  Path := AppPath + 'Scripts/' + PlayerForm.MainForm.getCaption() + '/';
+  FilePath := Path + 'Settings.txt';
 
-  if (Name = '') then
+  DebugLn(Format('PlayerForm: Saving player settings to %s', [Path]));
+
+  if (Length(PlayerForm.Players) = 0) then
     Exit();
 
-  try
-    with (Settings) do
-    begin
-      setPrefix('SRL_PlayerForm/');
+  if (not DirectoryExists(Path)) then
+    ForceDirectories(Path);
 
-      if (IsKey(Name) + '/') then // Delete old settings if we have them.
+  if (DirectoryExists(Path)) then
+  begin
+    if (FileExists(FilePath)) then
+      DeleteFile(FilePath);
+
+    List.Init();
+
+    try
+      List.Add(Format('<Army>%s</Army>', [playerForm.__loadedArmyName]));
+      List.Add('');
+
+      for i := 0 to High(PlayerForm.Players) do
       begin
-        DebugLn('We have previously saved settings, deleting them');
-        if (DeleteSubKeys(Name + '/')) then
-          DebugLn('Succesfully deleted settings')
-        else
-          DebugLn('Failed to delete settings');
-      end else
-        DebugLn('No previous settings to delete');
-
-      setPrefix(Format('%s/', [getPrefix() + Name]));
-      setKeyValue('ArmyName', playerForm.__loadedArmyName);
-      tmpPrefix := getPrefix();
-
-      for i := 0 to High(playerForm.Players) do
-      begin
-        DebugLn(Format('Saving player "%s"', [PlayerForm.Players[i].LoginName]));
-        PlayerName := Replace(Trim(PlayerForm.Players[i].LoginName), ' ', '_', [rfReplaceAll]);
-
-        if (PlayerName <> '') then
-        begin
-          setPrefix(Format('%s/', [tmpPrefix + PlayerName]));
-
-          Data := '';
-          for j := 0 to High(Playerform.Players[i].Settings) do
-            Data += Format('[/]%s[\]', [Playerform.Players[i].Settings[j]]);
-
-          setKeyValue('Settings', Base64Encode(Data));
-        end;
+        List.Add(Format('<%s>', [PlayerForm.Players[i].LoginName]));
+        List.Add(' ' + ToString(PlayerForm.Players[i].Settings));
+        List.Add(Format('</%s>', [PlayerForm.Players[i].LoginName]));
+        List.Add('');
       end;
+    finally
+      if (Length(List.getText()) > 0) then
+        List.SaveToFile(FilePath);
+      List.Free();
     end;
-  finally
-    Settings.setPrefix(Prefix);
   end;
 end;
 
@@ -246,69 +244,74 @@ end;
 
 procedure PF_LoadSettings();
 var
-  Prefix, Name, ArmyName, PlayerName: String;
-  PlayerNames, Strings: TStringArray;
-  i, j: Integer;
+  Data, EvenMoreData: TStringArray;
+  List: TStringList;
+  Name, Text, FilePath, UserName: String;
+  i, p, j, k: Integer;
 begin
-  Prefix := Settings.getPrefix();
-  Name := PF_GetSettingName();
+  FilePath := AppPath + 'Scripts/' + PlayerForm.MainForm.getCaption() + '/' + 'Settings.txt';
 
-  if (Name <> '') then
-    Name := 'SRL_PlayerForm/' + Name + '/'
-  else
+  if (not FileExists(FilePath)) then
     Exit();
 
-  Settings.SetPrefix('');
+  List.Init();
+  List.LoadFromFile(FilePath);
 
-  try
-    if (Settings.IsDirectory(Name)) then
+  Text := List.getText();
+  Name := Between('<Army>', '</Army>', Text);
+
+  if (Name <> '') then
+  begin
+    PF_Debug(Format('Loading previous army "%s"', [Name]));
+    PF_LoadArmy(Name);
+
+    if (Length(PlayerForm.__loadedArmy) = 0) then // Load army failed
     begin
-      DebugLn('Settings exist for this playerform');
-
-      ArmyName := Settings.GetKeyValue(Name + 'ArmyName');
-
-      if (ArmyName <> '') then
-      begin
-        Settings.ListKeys(Name, PlayerNames);
-        Settings.SetPrefix(Name);
-        PF_LoadArmy(ArmyName);
-
-        for i := 1 to high(PlayerNames) do
-        begin
-          Strings := MultiBetween(Base64Decode(Settings.GetKeyValue(PlayerNames[i]+'/Settings')), '[/]', '[\]');
-          PlayerName := Replace(PlayerNames[i], '_', ' ', [rfReplaceAll]);
-
-          for j := 0 to (playerForm.clbPlayers.getItems().getCount() - 1) do
-            if (Pos(PlayerName, playerForm.clbPlayers.getItems().getStrings(j)) = 1) then
-            begin
-              playerForm.clbPlayers.setChecked(j, True);
-              Insert(PlayerForm.__loadedArmy[j], PlayerForm.Players, Length(PlayerForm.Players));
-              PlayerForm.Players[High(PlayerForm.Players)].Settings := Strings;
-
-              PlayerForm.__currPlayer := high(PlayerForm.Players);
-              PF_SetCurrPlayer(High(PlayerForm.Players), False);
-            end;
-        end;
-
-        if (Length(PlayerForm.Players) > 0) then
-        begin
-          PlayerForm.__cmpGroupBox.setEnabled(True);
-          if (Length(PlayerForm.Players) > 1) then
-          begin
-            PlayerForm.__btnApplyAll.setEnabled(true);
-            PlayerForm.__btnNextPlayer.setEnabled(true);
-            PlayerForm.__btnPrevPlayer.setEnabled(true);
-          end else
-            PlayerForm.__btnApplyAll.setEnabled(false);
-        end else begin
-          PlayerForm.__btnNextPlayer.setEnabled(false);
-          PlayerForm.__btnPrevPlayer.setEnabled(false);
-        end;
-      end;
+      PF_Debug('Loading previous army error: PF_LoadArmy failed');
+      Exit();
     end;
-  finally
-    Settings.SetPrefix(Prefix);
+
+    Data := MultiBetween(Text, '<', '</');
+
+    for i := 1 to High(Data) do // 1 = army name
+    begin
+      p := Pos('>', Data[i]);
+      if (p = 0) then
+        Continue();
+
+      UserName := Copy(data[i], 0, p - 1);
+      EvenMoreData := Explode(',', Between('[', ']', Data[i]));
+      for k := 0 to High(EvenMoreData) do
+        EvenMoreData[k] := Trim(EvenMoreData[k]);
+
+      for j := 0 to (playerForm.clbPlayers.getItems().getCount() - 1) do
+        if (Pos(UserName, playerForm.clbPlayers.getItems().getStrings(j)) = 1) then
+        begin
+          PlayerForm.clbPlayers.setChecked(j, True);
+          Insert(PlayerForm.__LoadedArmy[j], PlayerForm.Players, Length(PlayerForm.Players));
+          PlayerForm.Players[High(PlayerForm.Players)].Settings := EvenMoreData;
+          PlayerForm.__currPlayer := High(PlayerForm.Players);
+          PF_SetCurrPlayer(High(PlayerForm.Players), False);
+        end;
+    end;
   end;
+
+  if (Length(PlayerForm.Players) > 0) then // Check to enable stuff
+  begin
+    PlayerForm.__cmpGroupBox.setEnabled(True);
+    if (Length(PlayerForm.Players) > 1) then
+    begin
+      PlayerForm.__btnApplyAll.setEnabled(true);
+      PlayerForm.__btnNextPlayer.setEnabled(true);
+      PlayerForm.__btnPrevPlayer.setEnabled(true);
+    end else
+      PlayerForm.__btnApplyAll.setEnabled(false);
+  end else begin
+    PlayerForm.__btnNextPlayer.setEnabled(false);
+    PlayerForm.__btnPrevPlayer.setEnabled(false);
+  end;
+
+  List.Free();
 end;
 
 function PF_GetDefaultSettings(): TStringArray;
@@ -447,7 +450,7 @@ begin
       btnStart:
         begin
           PF_UpdatePlayerSettings();
-          PF_SaveSettings();
+          _PF_SaveSettings();
 
           for i := 0 to (clbPlayers.getItems().getCount() - 1) do
             if (clbPlayers.getChecked(i)) then
