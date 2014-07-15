@@ -1150,11 +1150,12 @@ Example:
 
     bankScreen.clickButton(BANK_BUTTON_PRESET_1);
 *)
-function TRSBankScreen.clickButton(button: integer): boolean;
+function TRSBankScreen.clickButton(button: integer; useKey: boolean = true): boolean;
 const
   BUTTON_OFFSET: TPoint = [-662, -25];
 var
   b: TBox;
+  timeOut: integer;
 begin
   if (not self.isOpen()) then
   begin
@@ -1166,7 +1167,29 @@ begin
                point(self.x2 + BUTTON_OFFSET.x,
                      self.y2 + BUTTON_OFFSET.y));
 
-  mouseBox(b, MOUSE_LEFT);
+  // try ESC key first
+  if (useKey) and ((button = BANK_BUTTON_PRESET_1) or (button = BANK_BUTTON_PRESET_2)) then
+  begin
+    timeOut := (getSystemTime() + randomRange(600, 900));
+    repeat
+      multiType(toStr(button - 2), randomRange(30, 50), 2, false);
+      wait(100 + random(50));
+      result := (not self.isOpen());
+    until((getSystemTime() > timeOut) or result);
+
+    if (result) then
+      exit();
+  end;
+
+  mouseBox(b, MOUSE_MOVE);
+
+  if (self.isOpen()) then
+  begin
+    fastClick(MOUSE_LEFT);
+    wait(50 + random(50));
+  end else
+    exit(true);
+
   wait(100 + random(150));
   result := true;
 end;
