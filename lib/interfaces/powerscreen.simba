@@ -96,33 +96,35 @@ new abilities are added, it's easy to update.
 const
 
 { Attack Abilities }
-  PS_SLICE              = [1, 1, 1];
-  PS_SLAUGHTER          = [1, 1, 2];
+  PS_SLAUGHTER          = [1, 1, 1];
+  PS_SLICE              = [1, 1, 2];
   PS_OVERPOWER          = [1, 1, 3];
   PS_HAVOC              = [1, 1, 4];
   PS_BACKHAND           = [1, 1, 5];
-  PS_SMASH              = [1, 1, 6];
-  PS_BARGE              = [1, 1, 7];
-  PS_FLURRY             = [1, 1, 8];
-  PS_SEVER              = [1, 1, 9];
-  PS_HURRICANE          = [1, 1, 10];
-  PS_MASSACRE           = [1, 1, 11];
-  PS_METEOR_STRIKE      = [1, 1, 12];
-  PS_BALANCED_STRIKE    = [1, 1, 13];
+  PS_FORCEFUL_BACKHAND  = [1, 1, 6];
+  PS_SMASH              = [1, 1, 7];
+  PS_BARGE              = [1, 1, 8];
+  PS_FLURRY             = [1, 1, 9];
+  PS_SEVER              = [1, 1, 10];
+  PS_HURRICANE          = [1, 1, 11];
+  PS_MASSACRE           = [1, 1, 12];
+  PS_METEOR_STRIKE      = [1, 1, 13];
+  PS_BALANCED_STRIKE    = [1, 1, 14];
 
 { Strength Abilities }
-  PS_KICK               = [1, 2, 1];
-  PS_PUNISH             = [1, 2, 2];
-  PS_DISMEMBER          = [1, 2, 3];
-  PS_FURY               = [1, 2, 4];
-  PS_DESTROY            = [1, 2, 5];
-  PS_QUAKE              = [1, 2, 6];
-  PS_BERSERK            = [1, 2, 7];
-  PS_CLEAVE             = [1, 2, 8];
-  PS_ASSAULT            = [1, 2, 9];
-  PS_DECIMATE           = [1, 2, 10];
-  PS_PULVERISE          = [1, 2, 11];
-  PS_FRENZY             = [1, 2, 12];
+  PS_STOMP              = [1, 2, 1];
+  PS_KICK               = [1, 2, 2];
+  PS_PUNISH             = [1, 2, 3];
+  PS_DISMEMBER          = [1, 2, 4];
+  PS_FURY               = [1, 2, 5];
+  PS_DESTROY            = [1, 2, 6];
+  PS_QUAKE              = [1, 2, 7];
+  PS_BERSERK            = [1, 2, 8];
+  PS_CLEAVE             = [1, 2, 9];
+  PS_ASSAULT            = [1, 2, 10];
+  PS_DECIMATE           = [1, 2, 11];
+  PS_PULVERISE          = [1, 2, 12];
+  PS_FRENZY             = [1, 2, 13];
 
 { Ranged Abilities }
   PS_PIERCING_SHOT      = [2, 1, 1];
@@ -130,33 +132,35 @@ const
   PS_DEADSHOT           = [2, 1, 3];
   PS_SNIPE              = [2, 1, 1];
   PS_DAZING_SHOT        = [2, 1, 5];
-  PS_NEEDLE_STRIKE      = [2, 1, 6];
-  PS_BINDING_SHOT       = [2, 1, 7];
-  PS_FRAGMENTATION_SHOT = [2, 1, 8];
-  PS_ESCAPE             = [2, 1, 9];
-  PS_RAPID_FIRE         = [2, 1, 10];
-  PS_RICOCHET           = [2, 1, 11];
-  PS_BOMBARDMENT        = [2, 1, 12];
-  PS_INCENDIARY_SHOT    = [2, 1, 13];
-  PS_UNLOAD             = [2, 1, 14];
-  PS_DEATHS_SWIFTNESS   = [2, 1, 15];
+  PS_BINDING_SHOT       = [2, 1, 6];
+  PS_NEEDLE_STRIKE      = [2, 1, 7];
+  PS_TIGHT_BINDINGS     = [2, 1, 8];
+  PS_FRAGMENTATION_SHOT = [2, 1, 9];
+  PS_ESCAPE             = [2, 1, 10];
+  PS_RAPID_FIRE         = [2, 1, 11];
+  PS_RICOCHET           = [2, 1, 12];
+  PS_BOMBARDMENT        = [2, 1, 13];
+  PS_INCENDIARY_SHOT    = [2, 1, 14];
+  PS_UNLOAD             = [2, 1, 15];
+  PS_DEATHS_SWIFTNESS   = [2, 1, 16];
 
 { Magic Abilities }
-  PS_WRACK              = [3, 1, 1];
-  PS_ASPHYXIATE         = [3, 1, 2];
+  PS_ASPHYXIATE         = [3, 1, 1];
+  PS_WRACK              = [3, 1, 2];
   PS_OMNIPOWER          = [3, 1, 3];
   PS_DRAGON_BREATH      = [3, 1, 4];
   PS_SONIC_WAVE         = [3, 1, 5];
-  PS_CONCENTRATED_BLAST = [3, 1, 6];
-  PS_IMPACT             = [3, 1, 7];
-  PS_COMBUST            = [3, 1, 8];
-  PS_SURGE              = [3, 1, 9];
-  PS_DETONATE           = [3, 1, 10];
-  PS_CHAIN              = [3, 1, 11];
-  PS_WILD_MAGIC         = [3, 1, 12];
-  PS_METAMORPHOSIS      = [3, 1, 13];
-  PS_TSUNAMI            = [3, 1, 14];
-  PS_SUNSHINE           = [3, 1, 15];
+  PS_IMPACT             = [3, 1, 6];
+  PS_CONCENTRATED_BLAST = [3, 1, 7];
+  PS_DEEP_IMPACT        = [3, 1, 8];
+  PS_COMBUST            = [3, 1, 9];
+  PS_SURGE              = [3, 1, 10];
+  PS_DETONATE           = [3, 1, 11];
+  PS_CHAIN              = [3, 1, 12];
+  PS_WILD_MAGIC         = [3, 1, 13];
+  PS_METAMORPHOSIS      = [3, 1, 14];
+  PS_TSUNAMI            = [3, 1, 15];
+  PS_SUNSHINE           = [3, 1, 16];
 
 { Magic Combat Spells }
   PS_AIR_STRIKE         = [3, 2, 1];
@@ -186,11 +190,11 @@ const
   PS_FIRE_WAVE          = [3, 2, 25];
   PS_STORM_OF_ARMADYL   = [3, 2, 26];
   PS_ENTANGLE           = [3, 2, 27];
-  PS_STAGGER            = [3, 2, 28];
-  PS_POLYPORE_STRIKE    = [3, 2, 29];
+  PS_POLYPORE_STRIKE    = [3, 2, 28];
+  PS_STAGGER            = [3, 2, 29];
   PS_AIR_SURGE          = [3, 2, 30];
-  PS_TELEPORT_BLOCK     = [3, 2, 31];
-  PS_WATER_SURGE        = [3, 2, 32];
+  PS_WATER_SURGE        = [3, 2, 31];
+  PS_TELEPORT_BLOCK     = [3, 2, 32];
   PS_EARTH_SURGE        = [3, 2, 33];
   PS_FIRE_SURGE         = [3, 2, 34];
 
@@ -204,11 +208,12 @@ const
   PS_CAMELOT_TELEPORT           = [3, 3, 7];
   PS_ARDOUGNE_TELEPORT          = [3, 3, 8];
   PS_WATCHTOWER_TELEPORT        = [3, 3, 9];
-  APS_TROLLHEIM_TELEPORT        = [3, 3, 10];
-  PS_APE_ATOLL_TELEPORT         = [3, 3, 11];
-  PS_TELE_OTHER_LUMBRIDGE       = [3, 3, 12];
-  PS_TELE_OTHER_FALADOR         = [3, 3, 13];
-  PS_TELE_OTHER_CAMELOT         = [3, 3, 14];
+  PS_GOD_WARS_DUNGEON_TELEPORT  = [3, 3, 10];
+  PS_TROLLHEIM_TELEPORT         = [3, 3, 11];
+  PS_APE_ATOLL_TELEPORT         = [3, 3, 12];
+  PS_TELE_OTHER_LUMBRIDGE       = [3, 3, 13];
+  PS_TELE_OTHER_FALADOR         = [3, 3, 14];
+  PS_TELE_OTHER_CAMELOT         = [3, 3, 15];
 
 { Magic Skilling Spells }
   PS_ENCHANT_CROSSBOW_BOLT      = [3, 4, 1];
@@ -230,27 +235,25 @@ const
   PS_LVL_6_ENCHANT              = [3, 4, 17];
 
 { Defensive Abilities }
-  PS_DEVOTION                   = [4, 1, 1];
-  PS_ANTICIPATION               = [4, 1, 2];
-  PS_BASH                       = [4, 1, 3];
-  PS_REVENGE                    = [4, 1, 4];
-  PS_PROVOKE                    = [4, 1, 5];
-  PS_IMMORTALITY                = [4, 1, 6];
-  PS_FREEDOM                    = [4, 1, 7];
-  PS_REFLECT                    = [4, 1, 8];
-  PS_RESONANCE                  = [4, 1, 9];
-  PS_REJUVENATE                 = [4, 1, 10];
-  PS_DEBILITATE                 = [4, 1, 11];
-  PS_PREPARATION                = [4, 1, 12];
-  PS_BARRICADE                  = [4, 1, 13];
-  PS_NATURAL_INSTINCT           = [4, 1, 14];
+  PS_ANTICIPATION               = [4, 1, 1];
+  PS_BASH                       = [4, 1, 2];
+  PS_REVENGE                    = [4, 1, 3];
+  PS_PROVOKE                    = [4, 1, 4];
+  PS_IMMORTALITY                = [4, 1, 5];
+  PS_FREEDOM                    = [4, 1, 6];
+  PS_REFLECT                    = [4, 1, 7];
+  PS_RESONANCE                  = [4, 1, 8];
+  PS_REJUVENATE                 = [4, 1, 9];
+  PS_DEBILITATE                 = [4, 1, 10];
+  PS_PREPARATION                = [4, 1, 11];
+  PS_BARRICADE                  = [4, 1, 12];
 
 { Constitution Abilities }
-  PS_REGENERATE                 = [4, 2, 1];
-  PS_MOMENTUM                   = [4, 2, 2];
-  PS_INCITE                     = [4, 2, 3];
-  PS_SINGLE_WAY_WILDERNESS      = [4, 2, 4];
-  PS_GUTHIXS_BLESSING           = [4, 2, 5];
+  PS_WEAPON_SPECIAL_ATTACK      = [4, 2, 1];
+  PS_REGENERATE                 = [4, 2, 2];
+  PS_SIPHON                     = [4, 2, 3];
+  PS_INCITE                     = [4, 2, 4];
+
 
 
 (*
@@ -1088,7 +1091,7 @@ used in the functions below.
 .. note::
 
     - by Olly
-    - Last Updated: 5th July 2014 by The Mayor
+    - Last Updated: 15th July 2014 by The Mayor
 
 Example:
 
@@ -1109,8 +1112,8 @@ begin
 
   case combatStyle of
     1: startPoint := point(self.x1 + 569, self.y1 + 216);
-    2: startPoint := point(self.x1 + 569, self.y1 + 318);
-    3: startPoint := point(self.x1 + 569, self.y1 + 421);
+    2: startPoint := point(self.x1 + 569, self.y1 + 299);
+    3: startPoint := point(self.x1 + 569, self.y1 + 380);
   end;
 
   result := gridBox(experienceType - 1, 2, 2, 60, 13, 110, 20, startPoint);
@@ -1245,7 +1248,7 @@ used in the functions below.
 .. note::
 
     - by Olly
-    - Last Updated: 5th July 2014 by The Mayor
+    - Last Updated: 15th July 2014 by The Mayor
 
 Example:
 
@@ -1264,7 +1267,7 @@ begin
     exit;
   end;
 
-  result := gridBox(combatMode - 1, 1, 3, 140, 50, 0, 70, point(self.x + 170, self.y + 215));
+  result := gridBox(combatMode - 1, 1, 3, 140, 40, 0, 60, point(self.x + 170, self.y + 205));
 end;
 
 (*
