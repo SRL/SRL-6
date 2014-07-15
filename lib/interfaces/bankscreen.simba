@@ -27,7 +27,7 @@ Internal bankscreen constants.
 *}
 const
   _BANK_SLOTS_OFFSET: TPoint = [41, 108];
-  _PACK_SLOTS_OFFSET: TPoint = [519, 107];
+  _PACK_SLOTS_OFFSET: TPoint = [516, 94];
   _TAB_OFFSET: TPoint = [34, 66];
   BANK_SLOT_LOW = 1;
   BANK_SLOT_HIGH = 28;
@@ -514,7 +514,7 @@ Returns a TBoxArray of all of the Backpack slots in the bank interface.
 .. note::
 
     - by Olly
-    - Last Updated: 7 April 2014 by riwu
+    - Last Updated: 15 July 2014 by The Mayor
 
 Example:
 
@@ -527,7 +527,7 @@ begin
   if (not self.isOpen()) then
     exit();
 
-  result := grid(4, 7, 35, 31, 45, 38, point(self.x + _PACK_SLOTS_OFFSET.x, self.y + _PACK_SLOTS_OFFSET.y));
+  result := grid(4, 7, 35, 31, 46, 36, point(self.x + _PACK_SLOTS_OFFSET.x, self.y + _PACK_SLOTS_OFFSET.y));
 end;
 
 (*
@@ -544,7 +544,7 @@ start at the top left at 1 and count across the columns.
 .. note::
 
     - by Coh3n
-    - Last Updated: 7 April 2014 by riwu
+    - Last Updated: 15 July 2014 by The Mayor
 
 Example:
 
@@ -568,7 +568,7 @@ begin
   end;
 
   // - 1 because the grid (array) starts at 0.
-  result := gridBox(slot -1, 4, 7, 35, 31, 45, 38, point(self.x + _PACK_SLOTS_OFFSET.x, self.y + _PACK_SLOTS_OFFSET.y));
+  result := gridBox(slot -1, 4, 7, 35, 31, 46, 36, point(self.x + _PACK_SLOTS_OFFSET.x, self.y + _PACK_SLOTS_OFFSET.y));
 end;
 
 (*
