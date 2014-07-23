@@ -867,7 +867,7 @@ begin
   end;
 
   // - 1 because the grid (array) starts at 0.
-  result := gridBox(tab -1, 9, 1, 45, 35, 48, 0, point(self.x + _TAB_OFFSET.x, self.y + _TAB_OFFSET.y));
+  result := gridBox(tab -1, 9, 1, 45, 35, 46, 0, point(self.x + _TAB_OFFSET.x, self.y + _TAB_OFFSET.y));
 end;
 
 {*
@@ -941,9 +941,10 @@ begin
     exit();
 
   tabBox := self._getTabBounds(tab);
+  tabBox.edit(0, 20, 0, 0);  // Only consider bottom half of the tab
 
   if (tabBox.x1 <> -1) then
-    result := (countColorTolerance(4407350, tabBox, 0) < 20); //color at the bottom of inactive tabs
+    result := (countColorTolerance(1380879, tabBox, 7) < 50); //color at the bottom of inactive tabs
 end;
 
 (*
