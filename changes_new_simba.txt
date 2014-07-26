@@ -1,0 +1,31 @@
+Added new tesseract plugin
+  Much faster in general and less overhead
+    
+  deprecated
+    tesseractGetText methods. Use Tesseract_GetText
+    constants FILTER_SMALL_CHARS, ILTER_NPC_CHAT_CHARS,FILTER_SMALL_CHARS_2
+    have been replaced with a new type, TTesseractFilter, these same filters are found under
+    TESS_FILTER_SMALL_CHARS, TESS_FILTER_SMALL_CHARS_2, TESS_FILTER_NPC_CHAT_CHARS.
+
+  added
+    Tesseract_GetText (Three versions)
+    Tesseract_(Set/Reset)Whitelist.
+
+Added New rafiki
+  - *Previous players will NOT be saved.
+
+Added New playermanager:
+  added propertys:
+   - maxPlayers
+   - size
+  deprecated
+   - scriptSettingsPath
+   - playerNames
+   - playerFiles
+
+  ** For replacement for playerNames and playerFiles use:
+    players.setup(playerForm.players);  
+
+Fix chatBox.getTextOnLines();
+Add printF
+Add Direct-X SMART plugin as default.  
