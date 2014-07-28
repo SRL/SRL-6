@@ -166,7 +166,6 @@ Example:
 {$IFNDEF CODEINSIGHT}
 function TRSActionBar.__findButton(out pnt: TPoint): boolean;
 const
-  LINE_COLOR = 10328208;
   BACKGROUND_COLOR = 462872;
   TOLERANCE = 18;
   BORDER_LINE_COLOR = 8155999;
@@ -177,7 +176,6 @@ var
   possibleBounds: TBoxArray;
   i: integer;
   b: TBox;
-  p: TPoint;
 begin
   result := false;
 
