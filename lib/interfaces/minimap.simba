@@ -264,7 +264,7 @@ begin
     setBitmapName(bmpMask, 'Minimap Mask');
     setBounds([577, 12, 798, 200]);
                                           {bounds  center, radius}
-    button[MM_BUTTON_COMPASS]   := [[583, 19, 615, 51], [599, 35], 16];
+    button[MM_BUTTON_COMPASS]   := [[583, 19, 612, 48], [597, 33], 15];
     button[MM_BUTTON_RUN]       := [[759, 18, 793, 52], [776, 35], 16];
     button[MM_BUTTON_LODESTONE] := [[586, 161, 613, 188], [599, 174], 13];
     button[MM_BUTTON_MAP]       := [[764, 162, 788, 187], [776, 174], 12];
