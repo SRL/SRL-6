@@ -155,7 +155,7 @@ Attempts to find the minimize button on the actionbar
 .. note::
 
     - by Olly
-    - Last Updated: 24 November 2013 by Olly
+    - Last Updated: 28 July 2014 by Turpinator
 
 Example:
 
@@ -166,18 +166,16 @@ Example:
 {$IFNDEF CODEINSIGHT}
 function TRSActionBar.__findButton(out pnt: TPoint): boolean;
 const
-  LINE_COLOR = 10328208;
-  BACKGROUND_COLOR = 1774600;
-  TOLERANCE = 15;
-  BORDER_LINE_COLOR = 11509631;
-  BORDER_LINE_MODS = [0.10, 0.69];
+  BACKGROUND_COLOR = 462872;
+  TOLERANCE = 18;
+  BORDER_LINE_COLOR = 8155999;
+  BORDER_LINE_MODS = [0.09, 0.53];
 var
   tpaBackground, tpaBorder: TPointArray;
   atpa: T2DPointArray;
   possibleBounds: TBoxArray;
   i: integer;
   b: TBox;
-  p: TPoint;
 begin
   result := false;
 
@@ -206,19 +204,14 @@ begin
 
   for i := 0 to high(possibleBounds) do
     if (findColorsTolerance(tpaBackground, BACKGROUND_COLOR, possibleBounds[i], TOLERANCE)) then
-     begin
-       if (inRange(length(tpaBackground), 100, 200)) then
-       begin
-         p := middleBox(possibleBounds[i]);
-         if (similarColors(getColor(p.x, p.y+1), LINE_COLOR, 50)) then
-         begin
-           print('TRSActionBar.__findButton(): Found the actionbar button @ '+toStr(p), TDebug.SUB);
-           pnt := p;
-           exit(true);
-         end;
-       end;
-     end;
-
+    begin
+      if (length(tpaBackground) = 48) then
+      begin
+        pnt := middleBox(possibleBounds[i]);
+        print('TRSActionBar.__findButton(): Found the actionbar button @ '+toStr(pnt), TDebug.SUB);
+        exit(true);
+      end;
+    end;
   print('TRSActionBar.__findButton(): Failed to find any button matches', TDebug.WARNING);
 end;
 {$ENDIF}
