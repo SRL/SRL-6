@@ -459,16 +459,16 @@ begin
     exit();
 
   // because the quick-select buttons don't appear in the options tab
-  if (self.getCurrentTab() = LOBBY_OPTIONS) then
+  if (not inRange(self.getCurrentTab(), LOBBY_FRIENDS, LOBBY_CLAN)) and (not self.getCurrentTab() = LOBBY_PLAYER) then
     if (not self.openTab(LOBBY_PLAYER)) then
       exit();
 
   // a box around each of the quick select world boxes
-  woBoxes := grid(2, 1, 25, 15, 44, 0, point(self.x + self.w - 125, self.y + self.h - 27));
+  woBoxes := grid(3, 1, 32, 16, 65, 0, point(self.x2 - 195, self.y2 - 30));
 
   for i := 0 to high(woBoxes) do
   begin
-    foundWo := strToIntDef(trim(tesseractGetText(woBoxes[i].x1, woBoxes[i].y1, woBoxes[i].x2, woBoxes[i].y2, FILTER_SMALL_CHARS_2, 'digits')), -1);
+    foundWo := strToIntDef(trim(tesseractGetText(woBoxes[i].x1, woBoxes[i].y1, woBoxes[i].x2, woBoxes[i].y2, FILTER_NPC_CHAT_CHARS, 'digits')), -1);
     print('TRSLobby.quickSelectWorld(): Tesseract found world '+intToStr(foundWo));
 
     if (foundWo = wo) then
