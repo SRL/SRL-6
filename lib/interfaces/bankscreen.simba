@@ -1171,7 +1171,7 @@ begin
   // try ESC key first
   if (useKey) and ((button = BANK_BUTTON_PRESET_1) or (button = BANK_BUTTON_PRESET_2)) then
   begin
-    timeOut := (getSystemTime() + randomRange(600, 900));
+    timeOut := (getSystemTime() + randomRange(1500, 2000));
     repeat
       multiType(toStr(button - 2), randomRange(30, 50), 2, false);
       wait(100 + random(50));
