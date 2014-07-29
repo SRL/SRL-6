@@ -24,6 +24,7 @@ const
   _WORLD_COLOR_ARROW         = 1074576;  // arrow color that can order the worlds
   _WORLD_COLOR_SCROLL_LEFT   = 3615246;  // blue color on the left side of scroll area
   _WORLD_COLOR_SCROLL_BOTTOM = 3753285;   // black color under scroll bar
+  _WORLD_NUMBER_AREA : TBox  = [58, 238, 87, 524];
 
 (*
 const Order
@@ -253,7 +254,7 @@ Example:
 *)
 function TRSLobbyWorlds.open(): boolean;
 var
-  t: integer;
+  t, yellow, white: integer;
   p: TPoint;
 begin
   result := lobby.openTab(self.lobbyID);
@@ -268,7 +269,10 @@ begin
 
     while (getSystemTime() < t) do
     begin
-      if (findText(p, ['Free', 'Members'], [statChars], self.getBounds())) then
+      yellow := countColor(379903, _WORLD_NUMBER_AREA);
+      white := countColor(16777215, _WORLD_NUMBER_AREA);
+
+      if ((white + yellow) > 500) then
         exit(true);
 
       wait(50);

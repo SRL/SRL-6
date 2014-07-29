@@ -107,7 +107,7 @@ begin
     ID := ID_INTERFACE_LOBBY;
     parentID := -1;
     static := true;
-    setBounds([21, 110, 782, 563]);
+    setBounds([21, 110, 782, 587]);
   end;
 end;
 {$ENDIF}
@@ -192,7 +192,7 @@ begin
   t := (getSystemTime() + randomRange(7500, 8500));
   result := false;
 
-  self.__skipEmailScreen(); // just in case
+ // self.__skipEmailScreen(); // just in case
 
   result := (getColor(lobby.x1 + 41, lobby.y1 - 105) = COLOR); // color of the green person on the friends chat
 end;
@@ -459,12 +459,12 @@ begin
     exit();
 
   // because the quick-select buttons don't appear in the options tab
-  if (not inRange(self.getCurrentTab(), LOBBY_FRIENDS, LOBBY_CLAN)) and (not self.getCurrentTab() = LOBBY_PLAYER) then
+  if (self.getCurrentTab() = LOBBY_WORLDS) or (self.getCurrentTab() = LOBBY_OPTIONS) then
     if (not self.openTab(LOBBY_PLAYER)) then
       exit();
 
   // a box around each of the quick select world boxes
-  woBoxes := grid(3, 1, 32, 16, 65, 0, point(self.x2 - 195, self.y2 - 30));
+  woBoxes := grid(3, 1, 32, 16, 65, 0, point(self.x2 - 195, self.y2 - 54));
 
   for i := 0 to high(woBoxes) do
   begin
