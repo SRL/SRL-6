@@ -135,6 +135,10 @@ Example:
 *)
 {$IFNDEF CODEINSIGHT}
 function TRSProductionScreen.__find(): boolean;
+const
+  BORDER_COLOR = 11645361;
+  BUTTON_COLOR = 11238410;     //blue button color
+  BUTTON_COLOR_2 = 1447449;   //if no valid box selected it's this color
 var
   fx, fy: integer;
 begin
@@ -155,6 +159,16 @@ begin
   finally
     unFreeze();
   end;
+
+  if (hiP.x - lowP.x <> 250) then
+    exit(false);
+
+  if (hiP.x - lowP.x = 250) then
+    if (countColorTolerance(BUTTON_COLOR, intToBox(lowP.x, lowP.y - 10, hiP.x, lowP.y + 10), 50) > 250) or (countColorTolerance(BUTTON_COLOR_2, intToBox(lowP.x, lowP.y - 10, hiP.x, lowP.y + 10), 50) > 250) then
+    begin
+      self.setBounds(intToBox(lowP.x - 238, lowP.y - 311, hiP.x + 15, lowP.y + 14));
+      result := true;
+    end;
 end;
 {$ENDIF}
 
@@ -218,24 +232,54 @@ Example:
     if (productionScreen.clickStart()) then
       writeln('We started making something!');
 *)
-function TRSProductionScreen.clickStart(): boolean;
+function TRSProductionScreen.clickStart(space: boolean = true): boolean;
 var
   b: TBox;
+  timeOut: Integer;
 begin
   result := false;
 
   b := [self.x1 +252, self.y2 -30, self.x2 -29, self.y2 -3];
 
-  if (self.isOpen()) then
-    if (countColorTolerance(10647049, b, 20) > 100) then
-    begin
-      mouseBox(b, MOUSE_LEFT);
-      result := true;
+  // try Space key first
+  if space then
+  begin
+    timeOut := (getSystemTime() + randomRange(1500, 1900));
+    repeat
+      multiType(VK_SPACE, randomRange(30, 50), 3);
+      wait(100 + random(50));
+      result := (not self.isOpen());
+    until((getSystemTime() > timeOut) or result);
 
-      wait(150 + random(150));
+    if (result) then
+      exit();
   end;
 
-  print('TRSProductionScreen.clickStart(): result = ' + lowercase(boolToStr(result)), TDebug.SUB);
+  // click the button as a failsafe
+  mouseBox([self.x1 +252, self.y2 -30, self.x2 -29, self.y2 -3], MOUSE_MOVE);
+
+  // this is a failsafe in case the productionscreen closes (from the space key) while moving the mouse
+  if (self.isOpen()) then
+  begin
+    fastClick(MOUSE_LEFT);
+    wait(50 + random(50));
+  end else
+    exit(true);
+
+  // wait for the productionscreen to close
+  timeOut := (getSystemTime() + randomRange(5000, 6000));
+  while (timeOut > getSystemTime()) do
+  begin
+    if (not self.isOpen()) then
+    begin
+      result := true;
+      break;
+    end;
+
+    wait(50 + random(50));
+  end;
+
+  print('TRSProductionScreen.clickStart(): result = '+boolToStr(result), TDebug.SUB);
 end;
 
 (*

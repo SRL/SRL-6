@@ -67,8 +67,8 @@ Internal lobby constants.
 *}
 const
   // used in getCurrentTab and openTab calulations
-  __LOBBY_TAB_WIDTH    = 102;
-  __LOBBY_TAB_OFFSET_X = 8;  // x/y is the midpoint of the left border of the first tab
+  __LOBBY_TAB_WIDTH    = 96;
+  __LOBBY_TAB_OFFSET_X = 75;  // x/y is the midpoint of the left border of the first tab
   __LOBBY_TAB_OFFSET_Y = 22;
 
 {*
@@ -101,7 +101,7 @@ begin
     ID := ID_INTERFACE_LOBBY;
     parentID := -1;
     static := true;
-    setBounds([72, 62, 726, 538]);
+    setBounds([21, 110, 782, 587]);
   end;
 end;
 {$ENDIF}
@@ -179,16 +179,16 @@ Example:
 *)
 function TRSLobby.isOpen(): boolean;
 const
-  COLOR = 4104543;
+  COLOR = 16379862;
 var
   t: integer;
 begin
   t := (getSystemTime() + randomRange(7500, 8500));
   result := false;
 
-  self.__skipEmailScreen(); // just in case
+ // self.__skipEmailScreen(); // just in case
 
-  result := (getColor(lobby.x1 + 333, lobby.y1 + 20) = COLOR); // color of the green person on the friends chat
+  result := (getColor(lobby.x1 + 41, lobby.y1 - 105) = COLOR); // color of the green person on the friends chat
 end;
 
 (*
@@ -223,12 +223,12 @@ begin
   result := false;
   getClientDimensions(width, height);
 
-  if (findColorsTolerance(tpa, 3324410, 0, 0, width -1, height -1, 4)) then
+  if (findColorsTolerance(tpa, 3850483, 0, 0, width -1, height -1, 10)) then
   begin
-    atpa := tpa.cluster(8, 2);
+    atpa := tpa.cluster(30, 10);
 
     for i := 0 to high(atpa) do
-      if (inRange(length(atpa[i]), 620, 680)) then
+      if (inRange(length(atpa[i]), 280, 375)) then
       begin
         res := atpa[i].getMiddle();
         result := true;
@@ -271,7 +271,7 @@ begin
   begin
     // color of an active tab's border
 
-    if (getColor((self.x + __LOBBY_TAB_OFFSET_X) + (result * __LOBBY_TAB_WIDTH), (self.y + __LOBBY_TAB_OFFSET_Y)) = 7831173) then
+    if (getColor((self.x + __LOBBY_TAB_OFFSET_X) + (result * __LOBBY_TAB_WIDTH), (self.y)) = 11313803) then
     begin
       print('TRSLobby.getCurrentTab(): Current tab: '+toStr(result), TDebug.SUB);
       exit;
@@ -366,7 +366,7 @@ begin
     exit(true);
 
   p := point(self.x + __LOBBY_TAB_OFFSET_X + (tab * __LOBBY_TAB_WIDTH), self.y + __LOBBY_TAB_OFFSET_Y);
-  mouse(p.rand(randomRange(20, 90), randomRange(-10, 10)), MOUSE_LEFT);
+  mouse(p.rand(randomRange(-20, 20), randomRange(-5, 5)), MOUSE_LEFT);
   wait(200 + random(200));
   result := true;
 
@@ -406,7 +406,7 @@ begin
   result := (not self.isOpen());
 
   t := (getSystemTime() + 30000);
-  exitButton := point(self.x+self.w - 20, self.y + 20).rand(3);
+  exitButton := point(self.x2 - 9, self.y1 - 77).rand(3);
 
   while (not result) and (getSystemTime() < t) do
   begin
@@ -457,7 +457,7 @@ begin
       exit();
 
   // a box around each of the quick select world boxes
-  woBoxes := grid(2, 1, 25, 15, 44, 0, point(self.x2 - 125, self.y2 - 28));
+  woBoxes := grid(3, 1, 32, 16, 65, 0, point(self.x2 - 195, self.y2 - 54));
   Tesseract_SetWhitelist('0123456789');
 
   for i := 0 to high(woBoxes) do

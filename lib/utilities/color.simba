@@ -224,9 +224,13 @@ Example:
 *)
 procedure TColorSettings.apply();
 begin
-  SetColorToleranceSpeed(Self.CTS);
-  SetToleranceSpeed2Modifiers(Self.modifier.hue, Self.modifier.saturation);
-  SetToleranceSpeed3Modifier(Self.modifier.sensitivity);
+  try
+    SetColorToleranceSpeed(Self.CTS);
+    SetToleranceSpeed2Modifiers(Self.modifier.hue, Self.modifier.saturation);
+    SetToleranceSpeed3Modifier(Self.modifier.sensitivity);
+  except
+    writeln('failed setting CTS');
+  end;
 end;
 
 (*

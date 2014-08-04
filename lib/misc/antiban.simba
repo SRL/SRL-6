@@ -599,11 +599,16 @@ Example:
     exitTreasure();
 *)
 function exitTreasure(): boolean;
+const
+  CLOSE_BORDER_COLOR = 9145232;
+  CLOSE_BORDER_COLOR_HOVER = 12500676;
+  CLOSE_BORDER_LENGTH = 10;
+  CHEST_COLOR = 1716311;
+  CHEST_COLOR_COUNT = 90;
 var
-  w, h, i, x, y, dtmTreasure, t: integer;
-  dtmSearchBox, mouseOverBox, clientArea: TBox;
-  p: TPoint;
-  tpa: TPointArray;
+  w, h, i: integer;
+  b, clientArea: TBox;
+  tpa, tpa2: TPointArray;
   atpa: T2DPointArray;
 begin
   result := false;
@@ -611,57 +616,31 @@ begin
   getClientDimensions(w, h);
   clientArea := [0, 0, w-1, h-1];
 
-  // gold color of chest
-  if (not findColorsTolerance(tpa, 741517, clientArea, 2, colorSetting(1))) then
+  // "x" button (if mouse hovers "x" it changes colors, that's why there are two)
+  if (not findColorsTolerance(tpa, CLOSE_BORDER_COLOR, clientArea, 0, colorSetting(1))) and (not findColorsTolerance(tpa2, CLOSE_BORDER_COLOR_HOVER, clientArea, 0, colorSetting(1))) then
     exit(false);
 
   print('exitTreasure()', TDebug.HEADER);
 
-  // dtm of the X
-  dtmTreasure := DTMFromString('mggAAAHicY2NgYPjCCCSYGBjOA+n9QPwbiN8B8Wogng3ES4F4GRDvBOJdQPz/lCcDr6I2wzQfG4bJXtYM3NLKDMy8QgxcQGOwYUYcGAIA5gwN0Q==');
-  setDTMName(dtmTreasure, 'SRL - DTM Treasure');
+  tpa.combine(tpa2);
 
-  atpa := tpa.cluster(5);
+  atpa := tpa.cluster(1);
 
   for i := 0 to high(atpa) do
-  begin
-    p := atpa[i].getMiddle();
-
-    dtmSearchBox := [p.x - 32, p.y - 28, p.x + 85, p.y + 13];
-    dtmSearchBox.setLimit(clientArea);
-
-    print('Found gold chest color around ' + toStr(p) + ' looking for the dtm of the X..');
-
-    if (findDTM(dtmTreasure, x, y, dtmSearchBox)) then
+  begin                //border length - top of "x" button
+    if (length(atpa[i]) = CLOSE_BORDER_LENGTH) then
     begin
-      print('Found DTM, attempting to exit...');
-      mouse(point(x, y).rand(3), MOUSE_MOVE);
-
-      t := (getSystemTime() + randomRange(2500, 3200));
-      while (t > getSystemTime()) do
+      b := getTPABounds(atpa[i]);     //color of the chest
+      if countColorTolerance(CHEST_COLOR, intToBox(b.x1 - 67, b.y1 - 16, b.x2 - 23, b.y2 + 27), 10) > CHEST_COLOR_COUNT then
       begin
-        if countColor(clBlack,x-30,y-65,x+20,y+40) > 200 then
-        begin
-          print('Found black popup, count color: ' + toStr(countColor(clBlack,x-30,y-65,x+20,y-40)));
-          break();
-        end;
-        wait(10 + random(30));
+        mouseBox([b.x1, b.y1, b.x2, b.y2 + 15], MOUSE_LEFT);
+        wait(2000 + random(1000));
+        print('exitTreasure(): result = ' + toStr(result), TDebug.FOOTER);
+        exit(true);
       end;
-
-
-      if (t > getSystemTime()) then
-      begin
-        fastClick(MOUSE_LEFT);
-        print('Successfully exited the Treasure Chest');
-        wait(500 + random(250));
-        result := true;
-        break();
-      end;
-    end else
-      print('Failed to find the DTM, we may have found a false area of color');
+    end;
   end;
 
-  freeDTM(dtmTreasure);
   print('exitTreasure(): result = ' + toStr(result), TDebug.FOOTER);
 end;
 

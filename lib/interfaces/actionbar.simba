@@ -149,7 +149,7 @@ Attempts to find the minimize button on the actionbar
 .. note::
 
     - by Olly
-    - Last Updated: 24 November 2013 by Olly
+    - Last Updated: 28 July 2014 by Turpinator
 
 Example:
 
@@ -160,18 +160,16 @@ Example:
 {$IFNDEF CODEINSIGHT}
 function TRSActionBar.__findButton(out pnt: TPoint): boolean;
 const
-  LINE_COLOR = 10328208;
-  BACKGROUND_COLOR = 1774600;
-  TOLERANCE = 15;
-  BORDER_LINE_COLOR = 11509631;
-  BORDER_LINE_MODS = [0.10, 0.69];
+  BACKGROUND_COLOR = 462872;
+  TOLERANCE = 18;
+  BORDER_LINE_COLOR = 8155999;
+  BORDER_LINE_MODS = [0.09, 0.53];
 var
   tpaBackground, tpaBorder: TPointArray;
   atpa: T2DPointArray;
   possibleBounds: TBoxArray;
   i: integer;
   b: TBox;
-  p: TPoint;
 begin
   result := false;
 
@@ -200,19 +198,14 @@ begin
 
   for i := 0 to high(possibleBounds) do
     if (findColorsTolerance(tpaBackground, BACKGROUND_COLOR, possibleBounds[i], TOLERANCE)) then
-     begin
-       if (inRange(length(tpaBackground), 100, 200)) then
-       begin
-         p := middleBox(possibleBounds[i]);
-         if (similarColors(getColor(p.x, p.y+1), LINE_COLOR, 50)) then
-         begin
-           print('TRSActionBar.__findButton(): Found the actionbar button @ '+toStr(p), TDebug.SUB);
-           pnt := p;
-           exit(true);
-         end;
-       end;
-     end;
-
+    begin
+      if (length(tpaBackground) = 48) then
+      begin
+        pnt := middleBox(possibleBounds[i]);
+        print('TRSActionBar.__findButton(): Found the actionbar button @ '+toStr(pnt), TDebug.SUB);
+        exit(true);
+      end;
+    end;
   print('TRSActionBar.__findButton(): Failed to find any button matches', TDebug.WARNING);
 end;
 {$ENDIF}
@@ -230,7 +223,7 @@ Returns true if the action bar is found.  Sets its coordinates in the process.
 .. note::
 
     - by Olly
-    - Last Updated: 24 November 2013 by Olly
+    - Last Updated: 5th July 2014 by The Mayor
 
 Example:
 
@@ -272,9 +265,6 @@ begin
     if (not self.setSlots) then
     begin
       __slots := grid(14, 1, 29, 29, 36, 0, point(self.x1 + 67, self.y1 + 53));
-
-      self.__slots[high(self.__slots)-1].offset([18, 0]);
-      self.__slots[high(self.__slots)].offset([18, 0]);
       setSlots := true;
     end;
   end;
@@ -600,7 +590,7 @@ Returns true if the specified Action Bar slot is empty.
 .. note::
 
     - by euphemism
-    - Last Updated: 18 April 2013 by euphemism
+    - Last Updated: 5th July 2014 by The Mayor
 
 Example:
 
@@ -616,7 +606,7 @@ begin
     exit(self.__printWarning('actionBar.isSlotEmpty()', false));
 
   result := (getColor(self.__slots[slot - 1].getMiddle().x,
-   self.__slots[slot - 1].getMiddle().y) = 60); //Color is of the dark red X present in the center of an empty slot.
+   self.__slots[slot - 1].getMiddle().y) = 2761233);
 end;
 
 (*
@@ -802,7 +792,7 @@ Returns true if the Action Bar is locked.
 .. note::
 
     - by euphemism
-    - Last Updated: 4 February 2014 by Ashaman88
+    - Last Updated: 5th July 2014 by The Mayor
 
 Example:
 
@@ -813,19 +803,9 @@ Example:
 *)
 function TRSActionBar.isLocked(): boolean;
 const
-
-  SPECIFIC_BLACK_COLOR = 1840913; //Specific point in the space between the shackle/shank of the lock and the lock's body.
-var
-
-  color: integer;
-begin
-
-  color := getColor(self.getBounds().x1 + 494, self.getBounds().y1 + 63);
-
-  print('actionBar.isLocked() grabbed the color ' + toStr(color) +
-   ' and we were looking at a point in the space between where the' +
-    ' shackle/shank meets the body of the lock symbol', TDebug.LOG);
-  result := (not (color = SPECIFIC_BLACK_COLOR));
+  SPECIFIC_BLACK_COLOR = 1775120; // Point between the shackle and the body.
+begin                             // I.e. the gap when it's unlocked
+  result := (not (getColor(self.x2 - 9, self.y2 - 13) = SPECIFIC_BLACK_COLOR));
 end;
 
 {*
@@ -841,7 +821,7 @@ Internal function to toggle the lock of the Action Bar.
 .. note::
 
     - by euphemism
-    - Last Updated: 18 April 2013 by euphemism
+    - Last Updated: 5th July 2014 by The Mayor
 
 Example:
 
@@ -860,8 +840,8 @@ begin
   if (((lock) and (not self.isLocked())) or ((not lock) and (self.isLocked()))) then //Lape currently does weird things with xor
   begin
 
-    intToBox(self.getBounds().x1 + 486, self.getBounds().y1 + 62,
-    self.getBounds().x1 + 492, self.getBounds().y1 + 70).mouse(MOUSE_LEFT);
+    intToBox(actionBar.x2 - 15, actionBar.y2 - 17,
+    actionBar.x2 - 7, actionBar.y2 - 5).mouse(MOUSE_LEFT);
 
     timeMarker.start();
 
@@ -944,7 +924,7 @@ Clears the specified Action Bar slot.
 .. note::
 
     - by euphemism
-    - Last Updated: 18 April 2013 by euphemism
+    - Last Updated: 5th July 2014 by The Mayor
 
 Example:
 
@@ -971,9 +951,9 @@ begin
 
   mouse(point(self.__slots[slot - 1].x1, self.__slots[slot - 1].y1).rand(29, 27), MOUSE_MOVE);
   wait(random(200));
-  dragMouse(intToBox(self.getBounds().x1 + 486, self.getBounds().y1 + 41, self.getBounds().x1 + 492, self.getBounds().y1 + 51).getRandomPoint());
+  dragMouse(point(50 + random(450), 220 + random(140)));
 
-  wait(randomRange(100, 300));
+  wait(randomRange(650, 850));
 
   result := self.isSlotEmpty(slot);
 end;
@@ -991,7 +971,7 @@ Clears every slot of the Action Bar.
 .. note::
 
     - by euphemism
-    - Last Updated: 18 April 2013 by euphemism
+    - Last Updated: 5th July 2014 by The Mayor
 
 Example:
 
@@ -1002,35 +982,28 @@ Example:
 *)
 function TRSActionBar.clear(): boolean;
 var
-
-  timeMarker: integer;
+  t: integer;
 begin
-
-  result := false;
   if (self.isEmpty()) then
     exit(true);
 
-  intToBox(self.x2-89, self.y2-36, self.x2-80, self.y2-26).mouse(MOUSE_RIGHT);
+  t := getSystemTime() + randomRange(3000, 5500);
+  repeat
+    intToBox(self.x2 - 15, self.y2 - 36, self.x2 - 7, self.y2 - 26).mouse(MOUSE_RIGHT);
+    chooseOption.select(['Clear', 'lear']);
 
-  timeMarker := getSystemTime() + randomRange(1504, 2306);
-
-  while (getSystemTime() < timeMarker) do
-    if (chooseOption.select(['Clear', 'all', 'r-a', 'ear', 'ar'])) then
+    if conversationBox.isOpen(randomRange(2000, 3500)) then
     begin
-
+      conversationBox.selectOption(1);
+      wait(randomRange(1000, 1500));
+    end;
+    if self.isEmpty() then
+    begin
       result := true;
       break;
     end;
+  until (getSystemTime() > t);
 
-  if (not result) then
-    exit(false);
-
-  timeMarker := getSystemTime() + randomRange(1507, 2030);
-
-  repeat
-
-    result := self.isEmpty();
-  until (result or (getSystemTime() > TimeMarker));
 end;
 
 {*

@@ -388,6 +388,7 @@ begin
   Self.paused := False;
   Self.time := 0;
   Self.startTime := 0;
+  Self.__prevMark := 0;
 end;
 
 (*

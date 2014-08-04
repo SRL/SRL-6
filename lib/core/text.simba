@@ -298,6 +298,87 @@ begin
   if (pressEnter) then
     TypeByte(VK_ENTER);
 end;
+
+(*
+multiType
+~~~~~~~~~
+
+.. code-block:: pascal
+
+    function multiType(text: string; chance, maxSends: integer; pressEnter: boolean = true): boolean;
+
+Will simulate "spam" typing of string, text.  Will do it a random amount
+between 1 and 'maxSends'.  Will always type once, then has a percent
+'chance' of typing again.  Will not exceed 'maxSends'.
+
+.. note::
+
+    - Author: Ashaman88
+    - Last Updated: 7 May 2014 by Ashaman88
+
+Example:
+
+.. code-block:: pascal
+
+    if (mainscreen.isUptext('Tree')) then
+      multiType('woot', 35, 5, true);
+*)
+function multiType(text: string; chance, maxSends: integer; pressEnter: boolean = true): boolean;
+var
+  sends: integer;
+begin
+  result := true;
+
+  repeat
+    inc(sends);
+    typeSend(text, pressEnter);
+
+    if (random(100) > chance) or (not result) then
+      break;
+
+    wait(50 + random(50));
+  until(sends >= maxSends);
+end;
+
+(*
+multiType
+~~~~~~~~~
+
+.. code-block:: pascal
+
+    function multiType(k: byte; chance, maxSends: integer; pressEnter: boolean = true): boolean; overload;
+
+Overload for the other multiType, but uses bytes for the key sending
+
+.. note::
+
+    - Author: Ashaman88
+    - Last Updated: 7 May 2014 by Ashaman88
+
+Example:
+
+.. code-block:: pascal
+
+    if (mainscreen.isUptext('Tree')) then
+      multiType(VK_SPACE, 35, 5);
+*)
+function multiType(k: byte; chance, maxSends: integer): boolean; overload;
+var
+  sends: integer;
+begin
+  result := true;
+
+  repeat
+    inc(sends);
+    typeByte(k);
+
+    if (random(100) > chance) or (not result) then
+      break;
+
+    wait(50 + random(50));
+  until(sends >= maxSends);
+end;
+
 {*
 __findMouseOverBox
 ~~~~~~~~~~~~~~~~~~

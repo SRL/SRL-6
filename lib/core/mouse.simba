@@ -594,12 +594,13 @@ Example:
 *)
 procedure mouseOval(cx, cy, rx, ry, mouseAction: Integer = MOUSE_MOVE);
 var
-  o: TPoint;
+  a: single;
+  p: TPoint;
 begin
-  o.y := random(ry) * ((random(2) * 2) - 1);
-  o.x := random(round(sqrt(sqr(ry) - sqr(o.y)) * rx / ry)) * ((random(2) * 2) - 1);
-
-  mouse(point(cx + o.x, cy + o.y), mouseAction);
+  a := randomE() * PI * 2;
+  p.x := cx + round(cos(a) * randomRange(-rx, rx));
+  p.y := cy + round(sin(a) * randomRange(-ry, ry));
+  mouse(p, mouseAction);
 end;
 
 (*

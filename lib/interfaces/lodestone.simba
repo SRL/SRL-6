@@ -47,6 +47,7 @@ const
   LOCATION_BANDIT_CAMP     = 19;
   LOCATION_AL_KHARID       = 20;
   LOCATION_CANIFIS         = 21;
+  LOCATION_ASHDALE         = 22;
   LOCATION_PREVIOUS        = 1337;
 
 (*
@@ -132,10 +133,10 @@ Example:
 *)
 function TRSLodestoneScreen.__find(): boolean;
 const
-  TOP_COLOR = 1118779;
-  MENU_LENGTH = 768;
-  MENU_OFFSET_COLOR = 1189179;
-  MENU_OFFSET_COLOR_FTP = 4934467;
+  TOP_COLOR = 1118779;    //red color behind lodestone
+  MENU_LENGTH = 768;      //length of large red background
+  MENU_OFFSET_COLOR = 6385013; //p2p offset color on map
+  MENU_OFFSET_COLOR_FTP = 6513233;  //f2p offset color on map
 var
   tpa : TPointArray;
   atpa : T2DPointArray;
@@ -157,7 +158,7 @@ begin
 
       if (getColor(b.x2, b.y2 + 5) = MENU_OFFSET_COLOR) or (getColor(b.x2, b.y2 + 5) = MENU_OFFSET_COLOR_FTP) then
       begin
-        self.setBounds([b.x1 - 15, b.y1 - 2, b.x2 + 305, b.y2 + 276]);
+        self.setBounds([b.x1 - 15, b.y1 - 2, b.x2 + 310, b.y2 + 300]);
         exit(true);
       end;
     end;
@@ -187,10 +188,6 @@ Example:
       writeln('Lodestone screen is open!');
 *)
 function TRSLodestoneScreen.isOpen(waitTime: integer = 0): boolean;
-const
-  TEXT_COLOR = 379903;
-  BACKGROUND_COLOR = 13164271;
-  BACKGROUND_TOLERANCE = 25;
 var
   t, cts: integer;
 begin
@@ -200,10 +197,7 @@ begin
   setColorToleranceSpeed(1);
 
   repeat
-    if (self.x1 - self.x2 = 0) then
-      result := self.__find() else
-      if (getColor(self.x1 + 168, self.y1 + 10) = TEXT_COLOR) then
-        result := (countColorTolerance(BACKGROUND_COLOR, self.getBounds(), BACKGROUND_TOLERANCE) > 1000);
+    result := self.__find();
     wait(20 + random(20));
   until (getSystemTime() >= t) or (result);
 
@@ -285,7 +279,7 @@ Example:
 *}
 function TRSLodestoneScreen._isLocationVaild(location: integer): boolean;
 begin
-  result := inRange(location, LOCATION_LUNAR_ISLE, LOCATION_CANIFIS);
+  result := inRange(location, LOCATION_LUNAR_ISLE, LOCATION_ASHDALE);
 
   if (not result) then
     print('TRSLodestoneScreen._isLocationVaild(): Location isn''t vaild!');
@@ -314,7 +308,7 @@ Example:
 *}
 function TRSLodestoneScreen._getTeleportBox(location: integer): TBox;
 const
-  pnts: TPointArray = [[34, 55], [91, 155], [86, 207], [190, 98], [181, 135], [156, 189], [150, 235], [137, 274], [242, 121], [210, 157], [243, 155], [212, 236], [303, 96], [282, 134], [268, 180], [265, 225], [335, 158], [298, 187], [315, 219], [315, 273], [352, 206], [393, 150]];
+  pnts: TPointArray = [[30, 48], [98, 117], [75, 194], [187, 53], [169, 100], [160, 144], [151, 209], [143, 262], [243, 87], [202, 130], [234, 124], [202, 198], [302, 60], [285, 99], [265, 146], [266, 188], [340, 131], [303, 162], [314, 199], [314, 243], [355, 193], [397, 105], [88, 298]];
 var
   p: TPoint;
 begin

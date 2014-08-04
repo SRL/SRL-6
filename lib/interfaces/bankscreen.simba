@@ -20,7 +20,7 @@ Internal bankscreen constants.
 *}
 const
   _BANK_SLOTS_OFFSET: TPoint = [41, 108];
-  _PACK_SLOTS_OFFSET: TPoint = [519, 107];
+  _PACK_SLOTS_OFFSET: TPoint = [516, 94];
   _TAB_OFFSET: TPoint = [34, 66];
   BANK_SLOT_LOW = 1;
   BANK_SLOT_HIGH = 28;
@@ -94,6 +94,8 @@ const
   BANK_CHEST_CW = 8;
   BANK_CHEST_GROTTO = 9;
   BANK_CHEST_LUMBRIDGE = 10;
+  BANK_TABLE_BURTHORPE = 11;
+
 
 (*
 type TRSBankScreen
@@ -270,10 +272,10 @@ begin
       result := true;
 
       // now we attempt to wait for items to load
-      itemTimer := (getSystemTime() + randomRange(1200, 1600));
+      itemTimer := (getTimeRunning() + randomRange(1200, 1600));
       box := gridBox(0, 10, 10, 35, 31, 44, 44, point(self.x + _BANK_SLOTS_OFFSET.x, self.y + _BANK_SLOTS_OFFSET.y)); // box around where the first item should be in the bank
 
-      while (itemTimer > getTimeRunning()) do
+      while (getTimeRunning() >= itemTimer) do
       begin
         if (countColor(ITEM_OUTLINE_BLACK, box) > 5) then
           break();
@@ -311,7 +313,7 @@ Example:
     if (bankScreen.close()) then
       writeln('closed the bankscreen');
 *)
-function TRSBankScreen.close(): boolean;
+function TRSBankScreen.close(escape: boolean = true): boolean;
 var
   timeOut: integer;
 begin
@@ -321,15 +323,18 @@ begin
     exit(true);
 
   // try ESC key first
-  timeOut := (getSystemTime() + randomRange(600, 900));
-  repeat
-    typeByte(VK_ESCAPE);
-    wait(100 + random(50));
-    result := (not self.isOpen());
-  until((getSystemTime() > timeOut) or result);
+  if escape then
+  begin
+    timeOut := (getSystemTime() + randomRange(600, 900));
+    repeat
+      multiType(VK_ESCAPE, randomRange(30, 50), 2);
+      wait(100 + random(50));
+      result := (not self.isOpen());
+    until((getSystemTime() > timeOut) or result);
 
-  if (result) then
-    exit();
+    if (result) then
+      exit();
+  end;
 
   // click the X as a failsafe
   mouseBox(intToBox(self.x1 + 465, self.y1 + 15, self.x2 - 207, self.y1 + 30), MOUSE_MOVE);
@@ -346,7 +351,7 @@ begin
   timeOut := (getSystemTime() + randomRange(5000, 6000));
   while (timeOut > getSystemTime()) do
   begin
-    if (not self.isOpen()) then
+    if (not self.__find()) then
     begin
       result := true;
       break;
@@ -502,7 +507,7 @@ Returns a TBoxArray of all of the Backpack slots in the bank interface.
 .. note::
 
     - by Olly
-    - Last Updated: 7 April 2014 by riwu
+    - Last Updated: 15 July 2014 by The Mayor
 
 Example:
 
@@ -515,7 +520,7 @@ begin
   if (not self.isOpen()) then
     exit();
 
-  result := grid(4, 7, 35, 31, 45, 38, point(self.x + _PACK_SLOTS_OFFSET.x, self.y + _PACK_SLOTS_OFFSET.y));
+  result := grid(4, 7, 35, 31, 46, 36, point(self.x + _PACK_SLOTS_OFFSET.x, self.y + _PACK_SLOTS_OFFSET.y));
 end;
 
 (*
@@ -532,7 +537,7 @@ start at the top left at 1 and count across the columns.
 .. note::
 
     - by Coh3n
-    - Last Updated: 7 April 2014 by riwu
+    - Last Updated: 15 July 2014 by The Mayor
 
 Example:
 
@@ -556,7 +561,7 @@ begin
   end;
 
   // - 1 because the grid (array) starts at 0.
-  result := gridBox(slot -1, 4, 7, 35, 31, 45, 38, point(self.x + _PACK_SLOTS_OFFSET.x, self.y + _PACK_SLOTS_OFFSET.y));
+  result := gridBox(slot -1, 4, 7, 35, 31, 46, 36, point(self.x + _PACK_SLOTS_OFFSET.x, self.y + _PACK_SLOTS_OFFSET.y));
 end;
 
 (*
@@ -855,7 +860,7 @@ begin
   end;
 
   // - 1 because the grid (array) starts at 0.
-  result := gridBox(tab -1, 9, 1, 45, 35, 48, 0, point(self.x + _TAB_OFFSET.x, self.y + _TAB_OFFSET.y));
+  result := gridBox(tab -1, 9, 1, 45, 35, 46, 0, point(self.x + _TAB_OFFSET.x, self.y + _TAB_OFFSET.y));
 end;
 
 {*
@@ -929,9 +934,10 @@ begin
     exit();
 
   tabBox := self._getTabBounds(tab);
+  tabBox.edit(0, 20, 0, 0);  // Only consider bottom half of the tab
 
   if (tabBox.x1 <> -1) then
-    result := (countColorTolerance(4407350, tabBox, 0) < 20); //color at the bottom of inactive tabs
+    result := (countColorTolerance(1380879, tabBox, 7) < 50); //color at the bottom of inactive tabs
 end;
 
 (*
@@ -1138,11 +1144,12 @@ Example:
 
     bankScreen.clickButton(BANK_BUTTON_PRESET_1);
 *)
-function TRSBankScreen.clickButton(button: integer): boolean;
+function TRSBankScreen.clickButton(button: integer; useKey: boolean = true): boolean;
 const
   BUTTON_OFFSET: TPoint = [-662, -25];
 var
   b: TBox;
+  timeOut: integer;
 begin
   if (not self.isOpen()) then
   begin
@@ -1154,7 +1161,29 @@ begin
                point(self.x2 + BUTTON_OFFSET.x,
                      self.y2 + BUTTON_OFFSET.y));
 
-  mouseBox(b, MOUSE_LEFT);
+  // try ESC key first
+  if (useKey) and ((button = BANK_BUTTON_PRESET_1) or (button = BANK_BUTTON_PRESET_2)) then
+  begin
+    timeOut := (getSystemTime() + randomRange(1500, 2000));
+    repeat
+      multiType(toStr(button - 2), randomRange(30, 50), 2, false);
+      wait(100 + random(50));
+      result := (not self.isOpen());
+    until((getSystemTime() > timeOut) or result);
+
+    if (result) then
+      exit();
+  end;
+
+  mouseBox(b, MOUSE_MOVE);
+
+  if (self.isOpen()) then
+  begin
+    fastClick(MOUSE_LEFT);
+    wait(50 + random(50));
+  end else
+    exit(true);
+
   wait(100 + random(150));
   result := true;
 end;
@@ -1870,8 +1899,9 @@ begin
     BANK_CHEST_SHANTAY: begin col1:= [4335674, 6, [2, [0.38, 1.96, 0.00]]]; col2:= [7247287, 6, [2, [0.16, 1.41, 0.00]]]; avelen:= 90; end;
     BANK_CHEST_DUEL: begin col1:= [11512192, 18, [2, [0.39, 0.57, 0.00]]]; col2:= [6586289, 10, [2, [0.21, 1.00, 0.00]]]; avelen:= 90; end;
     BANK_CHEST_CW: begin col1:= [8088922, 16, [2, [0.06, 0.17, 0.00]]]; col2:= [4808312, 17, [2, [0.03, 0.17, 0.00]]]; avelen:= 90; end;
-    BANK_CHEST_GROTTO: begin col1:= [6842481, 6, [2, [0.00, 0.08, 0.00]]]; col2:= [2570316, 4, [2, [0.15, 1.35, 0.00]]]; avelen:= 90; end;
+    BANK_CHEST_GROTTO: begin col1:= [6842737, 6, [2, [0.31, 0.08, 0.00]]]; col2:= [2570316, 4, [2, [0.15, 1.35, 0.00]]]; avelen:= 90; end;
     BANK_CHEST_LUMBRIDGE: begin col1:= [11313299, 10, [2, [0.17, 0.42, 0.00]]]; col2:= [6586289, 10, [2, [0.21, 1.00, 0.00]]]; avelen:= 90; end;
+    BANK_TABLE_BURTHORPE: begin col1:= [14547176, 8, [2, [1.24, 4.52, 0.00]]]; col2:= [6460329, 11, [2, [0.11, 1.29, 0.00]]]; avelen:= 90; end;
   end;
 
   print('TRSBankscreen.__openChest()', TDebug.HEADER);
@@ -1990,6 +2020,7 @@ Opens the desired bank, current vaild 'bankType' constants are:
     * BANK_CHEST_DUEL
     * BANK_CHEST_CW
     * BANK_CHEST_GROTTO
+    * BANK_TABLE_BURTHORPE
     * BANK_CHEST_LUMBRIDGE
 
 .. note::
@@ -2011,7 +2042,7 @@ begin
   case bankType of
     BANK_NPC_BLUE..BANK_NPC_DRAYNOR: result := self.__openNPC(bankType);
     BANK_BOOTH: result := self.__openBankBooth();
-    BANK_CHEST_SW..BANK_CHEST_LUMBRIDGE: result := self.__openChest(bankType);
+    BANK_CHEST_SW..BANK_TABLE_BURTHORPE: result := self.__openChest(bankType);
   end;
 end;
 

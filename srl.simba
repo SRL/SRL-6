@@ -49,6 +49,7 @@ SRL library isn't available to you.
 {$include_once lib/interfaces/toolscreen.simba}
 {$include_once lib/interfaces/progressscreen.simba}
 {$include_once lib/interfaces/powerscreen.simba}
+{$include_once lib/interfaces/collectbox.simba}
 
 {$include_once lib/misc/miscforms.simba}
 {$include_once lib/core/players.simba}

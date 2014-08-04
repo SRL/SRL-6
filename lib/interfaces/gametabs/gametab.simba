@@ -132,7 +132,7 @@ Inits the gametabs, loads the bitmap, nav button ID and finally the nav box inde
 .. note::
 
     - by Coh3n
-    - Last Updated: 26 July 2013 by Coh3n
+    - Last Updated: 15 July 2014 by The Mayor
 
 Example:
 
@@ -149,14 +149,14 @@ begin
 
   with self.tabs[TAB_TASK] do
   begin
-    _bmp := bitmapFromString(10, 4, 'meJyz+vje6uN7hdhGNWU5RwtNIHKx1bczVQciNzsDK7Cs9dmPfOFJUlKSElZO4kEREoEROhYOJnoqQHGIAr51d1jtgmWqJsNFZLx9gYJwLs/EnUAFIJGVJ8X8Q7W15QE4lDKB');
+    _bmp := bitmapFromString(3, 8, 'meJyzvvPN+s439oIetex2IAlEnHwagrKuQAarewqQ5HUIATG8jQREeNmNxDk8ZTg9ZOTTRGXSHSCk/lxJIAIANFkTWA==');
     _navBarId := NAV_BUTTON_HERO;
     _navBarBoxIndex := 2;
   end;
 
   with self.tabs[TAB_STATS] do
   begin
-    _bmp := bitmapFromString(6, 7, 'meJyzsXgszPtBXVU9fg1nwjoQsrF4zMU5V91UBMIFIqACfqF003QOZBE+Ad2sZEG4CDvnCVUToYS1UG5OqgAvT72KMUKBSTaboJi/STo7XETFRBAAw3ol8A==');
+    _bmp := bitmapFromString(9, 2, 'meJzjZbzGxdotoCeWtoJJf64kEMkniwqL8kx0k+RlvMbH0azhzKU/R1I+TRQoxeMqrS7FdSZHCgBfRQzG');
     _navBarId := NAV_BUTTON_HERO;
     _navBarBoxIndex := 1;
   end;
@@ -184,14 +184,14 @@ begin
 
   with self.tabs[TAB_MAGIC] do
   begin
-    _bmp := bitmapFromString(4, 10, 'meJxb6CS4EIxqbXmvpIsCyYVIIsgkEDlqcEHYsSY8QNI6qVlTnAvITnHVM+3dIiyTa2A/OalztWxCJ79YEJCdkXdFziqIj4tfXtXCUlcPYghQPRABAE1GIYc=');
+    _bmp := bitmapFromString(6, 4, 'meJxzie5QFWPzUGCptxLwkHcy9koz7toqIp4ub9Dqm7MdSALZatnt7OxuQC4QcXLPA7KlLX0YGRgEZV2BWhSk5YEmAAC4KBGC');
     _navBarId := NAV_BUTTON_POWERS;
     _navBarBoxIndex := 2;
   end;
 
    with self.tabs[TAB_MELEE] do
   begin
-    _bmp := bitmapFromString(4, 4, 'meJwTF+ScPnnKlz9/Fzz/PmfdFiBjz4mbSanJSbfeZfz4BWS42RtbrzzFNXW3S1SqmCAnANE4Gm4=');
+    _bmp := bitmapFromString(4, 5, 'meJzj4udctnDev3//Hty7unzTDiBjzZF76bnZxec+Z3z5GxMa6WRjaLLghvDm264p6Wri7DKWXlx8YuwFPdyO4QAyrR2H');
     _navBarId := NAV_BUTTON_POWERS;
     _navBarBoxIndex := 3;
   end;
@@ -205,7 +205,7 @@ begin
 
   with self.tabs[TAB_DEFENSIVE] do
   begin
-    _bmp := bitmapFromString(9, 4, 'meJxLTEkuqqh2dbBkZc2zsXg8YeKtXafufv75G0gmpiR3908GSvGLBRnYT87IuwKXBUotXjIbSAKlgBqBskmdq+umrQYqAApCEEQKiIRlcoEKgIYDAA/lL/8=');
+    _bmp := bitmapFromString(8, 5, 'meJxrae/MygwREU/XU38UEf90zZF7QCQs59zWlG3j7AkRb1l07vL5K//+/QNKdU+f5WRjCBTXUF3lm7MdKAUU/Pju9bKF89Jzs4HinNzz5A1agVIQWaAgEAnKujKxZgARRCPQIgCjYzZb');
     _navBarId := NAV_BUTTON_POWERS;
     _navBarBoxIndex := 5;
   end;
@@ -233,7 +233,7 @@ begin
 
   with self.tabs[TAB_NOTES] do
   begin
-    _bmp := bitmapFromString(8, 6, 'meJxziUr9/PM3BD25cwNI7nv9rXrlUUYGBicXXyAbIgJBQHZ5x0SglLyV1a5Td4Ei818gpOqmrYbomrbvFlwLRAHQQCXbnNRpp5DFIQioOGHDYbg5AP/SZ+c=');
+    _bmp := bitmapFromString(6, 6, 'meJwz0VWyNlaztbPRzFgqb9Aq65AqKi6goiS/+9bj9LlnNQJbTrz+zsbLoWNoAGRA0L9///h4OICCxl5pEC6QjEvPT++YxsjAYOPsufLVT4g4EMAF1xy5BwALKjWC');
     _navBarId := NAV_BUTTON_OTHER;
     _navBarBoxIndex := 1;
   end;
