@@ -159,16 +159,6 @@ begin
   finally
     unFreeze();
   end;
-
-  if (hiP.x - lowP.x <> 250) then
-    exit(false);
-
-  if (hiP.x - lowP.x = 250) then
-    if (countColorTolerance(BUTTON_COLOR, intToBox(lowP.x, lowP.y - 10, hiP.x, lowP.y + 10), 50) > 250) or (countColorTolerance(BUTTON_COLOR_2, intToBox(lowP.x, lowP.y - 10, hiP.x, lowP.y + 10), 50) > 250) then
-    begin
-      self.setBounds(intToBox(lowP.x - 238, lowP.y - 311, hiP.x + 15, lowP.y + 14));
-      result := true;
-    end;
 end;
 {$ENDIF}
 

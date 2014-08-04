@@ -359,41 +359,41 @@ var
 begin
   with (playerForm) do
   begin
-      for i := 0 to (clbPlayers.getItems().getCount() - 1) do
-        if (clbPlayers.getChecked(i)) then
-          inc(count);
+    for i := 0 to (clbPlayers.getItems().getCount() - 1) do
+      if (clbPlayers.getChecked(i)) then
+        inc(count);
 
-      if (count = 0) then
-      begin
-        __cmpGroupBox.setEnabled(false);
-        __cmpGroupBox.setCaption('Select a player!');
-        __cmpGroupBox.rePaint();
-      end else
-        __cmpGroupBox.setEnabled(True);
+    if (count = 0) then
+    begin
+      __cmpGroupBox.setEnabled(false);
+      __cmpGroupBox.setCaption('Select a player!');
+      __cmpGroupBox.rePaint();
+    end else
+       __cmpGroupBox.setEnabled(True);
 
-      if (maxPlayers > 0) then
-      if (count > maxPlayers) then
-      begin
-        PF_Debug(format('Unable to select player, max player limit reached (%d)', [maxPlayers]));
-        clbPlayers.setChecked(index, false);
-        exit();
-      end;
+    if (maxPlayers > 0) then
+    if (count > maxPlayers) then
+    begin
+      PF_Debug(format('Unable to select player, max player limit reached (%d)', [maxPlayers]));
+      clbPlayers.setChecked(index, false);
+      exit();
+    end;
 
-      if (count > 0) then
-      begin
-        if (count > 1) then
-        begin
-          PF_UpdatePlayerSettings();
+    if (count > 0) then
+    begin
+     if (count > 1) then
+     begin
+       PF_UpdatePlayerSettings();
 
-          __btnApplyAll.setEnabled(true);
-          __btnNextPlayer.setEnabled(true);
-          __btnPrevPlayer.setEnabled(true);
-        end else
-          __btnApplyAll.setEnabled(false);
-      end else begin
-        __btnNextPlayer.setEnabled(false);
-        __btnPrevPlayer.setEnabled(false);
-      end;
+       __btnApplyAll.setEnabled(true);
+       __btnNextPlayer.setEnabled(true);
+       __btnPrevPlayer.setEnabled(true);
+     end else
+       __btnApplyAll.setEnabled(false);
+    end else begin
+      __btnNextPlayer.setEnabled(false);
+      __btnPrevPlayer.setEnabled(false);
+    end;
 
     s := clbPlayers.getItems().getStrings(index);
     if (clbPlayers.getChecked(index)) then
@@ -407,7 +407,10 @@ begin
 
       for i := 0 to high(players) do
         if (players[i].loginName = trim(copy(s, 0, Pos('(', s) - 3))) then // login name matches
+        begin
           deleteIndex(players, i);
+          break();
+        end;
     end;
   end;
 end;
