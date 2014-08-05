@@ -125,7 +125,7 @@ Handles the validate email screen that comes up when you enter to lobby.
 .. note::
 
     - by NCDS & Coh3n
-    - Last updated: 23 July 2013 by Coh3n
+    - Last updated: 8th August 2014 by The Mayor
 
 Example:
 
@@ -149,7 +149,7 @@ begin
   b.offset([0, 370]); //offset the red background bounds to where we think the button should be
   b.setLimit([0, 0, wid-1, hei-1]); // prevent out of bound errors
 
-  if (not findColors(tpa, 14733486, b)) then // color of the "Skip" text
+  if (not findColors(tpa, 14457110, b)) then // color of the "Skip" text
     exit();
 
   if (inRange(length(tpa), 30, 60)) then
