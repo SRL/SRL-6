@@ -72,10 +72,9 @@ const Internal
 Internal lobby constants.
 *}
 const
-  // used in getCurrentTab and openTab calulations
-  __LOBBY_TAB_WIDTH    = 96;
-  __LOBBY_TAB_OFFSET_X = 75;  // x/y is the midpoint of the left border of the first tab
-  __LOBBY_TAB_OFFSET_Y = 22;
+  // used in getTabBounds calculations
+  __LOBBY_TAB_OFFSET: TPoint = [70, 16];
+
 
 {*
 TRSLobby.__init()
@@ -142,17 +141,21 @@ var
 begin
   getClientDimensions(wid, hei);
 
-  if (not findColors(tpa, 658491, 0, 0, wid-1, hei-1)) then  // the red background of the text at the top
+  findColors(tpa, 658491, 0, 0, wid-1, hei-1);
+
+  if (length(tpa) < 20) then  // the red background of the text at the top
     exit();
 
   b := getTPABounds(tpa);
+
   b.offset([0, 370]); //offset the red background bounds to where we think the button should be
+  getClientDimensions(wid, hei);
   b.setLimit([0, 0, wid-1, hei-1]); // prevent out of bound errors
 
-  if (not findColors(tpa, 14457110, b)) then // color of the "Skip" text
+  if (not findColorsTolerance(tpa, 14601123, b, 13)) then // color of the "Skip" text
     exit();
 
-  if (inRange(length(tpa), 30, 60)) then
+  if (inRange(length(tpa), 35, 65)) then
   begin
     mouseBox(tpa.getBounds(), MOUSE_LEFT);
     print('TRSLobby.__skipEmailScreen(): Closed validate email screen', TDebug.SUB);
@@ -185,16 +188,16 @@ Example:
 *)
 function TRSLobby.isOpen(): boolean;
 const
-  COLOR = 16379862;
+  COLOR = 16379862; // top left corner of lobby sword symbol
 var
   t: integer;
 begin
   t := (getSystemTime() + randomRange(7500, 8500));
   result := false;
 
- // self.__skipEmailScreen(); // just in case
+  self.__skipEmailScreen();
 
-  result := (getColor(lobby.x1 + 41, lobby.y1 - 105) = COLOR); // color of the green person on the friends chat
+  result := (getColor(lobby.x1 + 41, lobby.y1 - 105) = COLOR);
 end;
 
 (*
@@ -246,6 +249,36 @@ begin
 end;
 
 (*
+TRSLobby._getTabBounds()
+~~~~~~~~~~~~~~~~~~~~~~~~
+
+.. code-block:: pascal
+
+    function TRSLobby._getTabBounds: TBox;
+
+Returns the bounds of the desired tab as a TBox. You should use lobby.openTab() to open a tab
+
+.. note::
+
+    - by The Mayor
+    - Last Updated: 8th August 2014
+
+Example:
+
+.. code-block:: pascal
+
+  lobby._getTabBounds(LOBBY_FRIENDS);
+
+*)
+function TRSLobby._getTabBounds(tab: integer): TBox;
+begin
+  if (not self.isOpen()) then
+    exit;
+
+  result := gridBox(tab, 6, 1, 45, 22, 100, 0, point(self.x1 + __LOBBY_TAB_OFFSET.x, self.y1 + __LOBBY_TAB_OFFSET.y));
+end;
+
+(*
 TRSLobby.getCurrentTab()
 ~~~~~~~~~~~~~~~~~~~~~~~~
 
@@ -257,8 +290,8 @@ Gets current lobby tab.
 
 .. note::
 
-    - by Bionicle1800, NCDS
-    - Last Updated: 23 July 2013 by Coh3n
+    - by Bionicle1800, NCDS, & Coh3n
+    - Last Updated: 8 August 2014 by The Mayor
 
 Example:
 
@@ -269,15 +302,15 @@ Example:
 
 *)
 function TRSLobby.getCurrentTab(): integer;
+const
+  INACTIVE_TAB_BOTTOM = 9078134; // Bottom line of inactive tab
 begin
   if (not self.isOpen()) then
     exit(-1);
 
   for result := 0 to (LOBBY_COUNT - 1) do
   begin
-    // color of an active tab's border
-
-    if (getColor((self.x + __LOBBY_TAB_OFFSET_X) + (result * __LOBBY_TAB_WIDTH), (self.y)) = 11313803) then
+    if not (getColor(self._getTabBounds(result).x2, self._getTabBounds(result).y2) = INACTIVE_TAB_BOTTOM) then
     begin
       print('TRSLobby.getCurrentTab(): Current tab: '+toStr(result), TDebug.SUB);
       exit;
@@ -349,7 +382,7 @@ use the lobby file's variables instead.
 .. note::
 
     - by Bionicle1800 & Coh3n
-    - Last Updated: 23 July 2013 by Coh3n
+    - Last Updated: 8th August 2014 by The Mayor
 
 Example:
 
@@ -371,8 +404,8 @@ begin
   if (currTab = tab) then
     exit(true);
 
-  p := point(self.x + __LOBBY_TAB_OFFSET_X + (tab * __LOBBY_TAB_WIDTH), self.y + __LOBBY_TAB_OFFSET_Y);
-  mouse(p.rand(randomRange(-20, 20), randomRange(-5, 5)), MOUSE_LEFT);
+  mouseBox(self._getTabBounds(tab), MOUSE_LEFT);
+
   wait(200 + random(200));
   result := true;
 
@@ -459,6 +492,7 @@ begin
     exit();
 
   // because the quick-select buttons don't appear in the options tab
+  // and buttons are offset on the worlds tab
   if (self.getCurrentTab() = LOBBY_WORLDS) or (self.getCurrentTab() = LOBBY_OPTIONS) then
     if (not self.openTab(LOBBY_PLAYER)) then
       exit();
