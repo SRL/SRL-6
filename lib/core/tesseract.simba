@@ -90,7 +90,7 @@ begin
   if (Tesseract_Init(__tesseractPtr, TESS_DATA_PATH, TESS_LANGUAGE) <> 0) then
     print('Unable to initizalse tesseract, check Simba console for more infomation', TDebug.FATAL);
 
-  addOnTerminate('Tesseract_Free');
+  addOnTerminate('_Tesseract_Free');
   __tesseractIsSetup := true;
 end;
 

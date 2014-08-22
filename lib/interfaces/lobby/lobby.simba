@@ -18,7 +18,9 @@ type TRSLobby
 A type that stores functions and properties of the Runescape lobby.
 *)
 type
-  TRSLobby = type TRSInterface;
+  TRSLobby = record(TRSInterface)
+    tabBoxes: TBoxArray;
+ end;
 
 (*
 var lobby
@@ -58,19 +60,6 @@ const
     LOBBY_CHAT = 3;
     LOBBY_CLAN = 4;
     LOBBY_OPTIONS = 5;
-
-{*
-const Internal
-~~~~~~~~~~~~~~
-
-Internal lobby constants.
-*}
-const
-  // used in getCurrentTab and openTab calulations
-  __LOBBY_TAB_WIDTH    = 96;
-  __LOBBY_TAB_OFFSET_X = 75;  // x/y is the midpoint of the left border of the first tab
-  __LOBBY_TAB_OFFSET_Y = 22;
-
 {*
 TRSLobby.__init()
 ~~~~~~~~~~~~~~~~~
@@ -95,63 +84,56 @@ Example:
 {$IFNDEF CODEINSIGHT}
 procedure TRSLobby.__init();
 begin
-  with self do
+  with (Self) do
   begin
     name := 'RS Lobby';
     ID := ID_INTERFACE_LOBBY;
     parentID := -1;
     static := true;
     setBounds([21, 110, 782, 587]);
+    tabBoxes := Grid(6, 1, 80, 20, 102, 0, Point(x1 + 70, y1 + 10));
   end;
 end;
 {$ENDIF}
 
 {*
-TRSLobby.__skipEmailScreen()
-~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+TRSLobby._skipEmailScreen
+~~~~~~~~~~~~~~~~~~~~~~~~~
 
 .. code-block:: pascal
 
-    procedure TRSLobby.__skipEmailScreen();
+    procedure TRSLobby._skipEmailScreen();
 
 Handles the validate email screen that comes up when you enter to lobby.
 
 .. note::
 
     - by NCDS & Coh3n
-    - Last updated: 8th August 2014 by The Mayor
+    - Last updated: 22nd August 2014 by Olly
 
 Example:
 
 .. code-block:: pascal
 
-    lobby.__skipEmailScreen();
+    lobby._skipEmailScreen();
 *}
 {$IFNDEF CODEINSIGHT}
-procedure TRSLobby.__skipEmailScreen();
+procedure TRSLobby._skipEmailScreen();
 var
-  tpa: TPointArray;
-  wid, hei: integer;
+  TPA: TPointArray;
   b: TBox;
 begin
-  getClientDimensions(wid, hei);
+  FindColorsTolerance(TPA, 14197278, GetClientBounds(), 60, ColorSetting(1));
 
-  findColors(tpa, 658491, 0, 0, wid-1, hei-1);
-
-  if (length(tpa) < 20) then  // the red background of the text at the top
-    exit();
-
-  b := getTPABounds(tpa);
-  b.offset([0, 370]); //offset the red background bounds to where we think the button should be
-  b.setLimit([0, 0, wid-1, hei-1]); // prevent out of bound errors (this doesn't work ~TM)
-
-  if (not findColorsTolerance(tpa, 14601123, b, 13)) then // color of the "Skip" text
-    exit();
-
-  if (inRange(length(tpa), 35, 65)) then
+  if (Length(TPA) > 200) and (CountColor(1, GetClientBounds()) > 10000) then
   begin
-    mouseBox(tpa.getBounds(), MOUSE_LEFT);
-    print('TRSLobby.__skipEmailScreen(): Closed validate email screen', TDebug.SUB);
+    b := GetTPABounds(TPA);
+    if (InRange(b.x2 - b.x1, 70, 90)) then
+    begin
+      MouseBox(b, MOUSE_LEFT);
+      Wait(Random(1000, 2000));
+      print('TRSLobby._skipEmailScreen(): Closed validate email screen', TDebug.SUB);
+    end;
   end;
 end;
 {$ENDIF}
@@ -188,7 +170,7 @@ begin
   t := (getSystemTime() + randomRange(7500, 8500));
   result := false;
 
-  self.__skipEmailScreen();
+  self._skipEmailScreen();
 
   result := (getColor(lobby.x1 + 41, lobby.y1 - 105) = COLOR); // color of top/left lobby sword symbol
 end;
@@ -264,23 +246,22 @@ Example:
       writeln('The world list is open!');
 
 *)
-function TRSLobby.getCurrentTab(): integer;
+function TRSLobby.getCurrentTab(): Integer;
+var
+  i: Integer;
 begin
-  if (not self.isOpen()) then
-    exit(-1);
-
-  for result := 0 to (LOBBY_COUNT - 1) do
-  begin
-    // color of an active tab's border
-
-    if (getColor((self.x + __LOBBY_TAB_OFFSET_X) + (result * __LOBBY_TAB_WIDTH), (self.y)) = 11313803) then
-    begin
-      print('TRSLobby.getCurrentTab(): Current tab: '+toStr(result), TDebug.SUB);
-      exit;
-    end;
-  end;
-
   Result := -1;
+  if (not Self.isOpen()) then
+    Exit();
+
+  for i := 0 to High(Self.tabBoxes) do
+    if (CountColor($FFFFFF, Self.tabBoxes[i]) > 5) then
+    begin
+      Result := i;
+      Break();
+    end;
+
+  printf('TRSLobby.getCurrentTab(): Current tab is %d', [Result]);
 end;
 
 {*
@@ -339,13 +320,12 @@ TRSLobby.openTab
     function TRSLobby.openTab(tab: integer): boolean;
 
 Opens the lobby tab specified by 'tab'. Valied arguments for 'tab' are the
-lobby tab constants at the top of the file. Is an internal SRL function, should
-use the lobby file's variables instead.
+lobby tab constants at the top of the file.
 
 .. note::
 
-    - by Bionicle1800 & Coh3n
-    - Last Updated: 29th July by Ashaman88
+    - by Olly
+    - Last Updated: 22nd August 2014 by Olly
 
 Example:
 
@@ -354,26 +334,29 @@ Example:
     lobby.openTab(LOBBY_WORLDS);
 
 *}
-function TRSLobby.openTab(tab: integer): boolean;
+function TRSLobby.openTab(const tab: Integer): Boolean;
 var
+  Timeout: UInt64;
   p: TPoint;
-  currTab: integer;
 begin
   if (not self.isOpen()) then
     exit(false);
 
-  currTab := self.getCurrentTab();
-
-  if (currTab = tab) then
+  if (self.getCurrentTab() = tab) then
     exit(true);
 
-  p := point(self.x + __LOBBY_TAB_OFFSET_X + (tab * __LOBBY_TAB_WIDTH), self.y + __LOBBY_TAB_OFFSET_Y);
-  mouse(p.rand(randomRange(-20, 20), randomRange(-5, 5)), MOUSE_LEFT);
-  wait(200 + random(200));
-  result := true;
+  p := MiddleBox(Self.tabBoxes[tab]).randRange(-9, 9, -7, 7);
 
-  if (not result) then
-    print('TRSLobby.openTab(): Failed to open tab '+toStr(tab), TDebug.ERROR);
+  Mouse(p, MOUSE_LEFT);
+  Timeout := (GetTickCount64() + Random(4000, 5000));
+
+  while (not Result) and (Timeout > GetTickCount64()) do
+  begin
+    Result := (Self.getCurrentTab() = tab);
+    Wait(Random(300, 600));
+  end;
+
+  print('TRSLobby.openTab(): Result = ' + BoolToStr(Result));
 end;
 
 {*
@@ -433,7 +416,7 @@ in the bottom right of the interface.  Will click the world if found.
 .. note::
 
     - by Coh3n
-    - Last Updated: 29th July by Ashaman88
+    - Last Updated: 22nd August 2014 by Olly
 
 Example:
 
@@ -442,12 +425,13 @@ Example:
     if (not lobby.isOpen()) then
       lobby.open();
 *)
-function TRSLobby.quickSelectWorld(wo: integer): boolean;
+function TRSLobby.quickSelectWorld(const World: Integer): Boolean;
 var
-  woBoxes: TBoxArray;
-  i, tab, foundWo: integer;
+  Boxes: TBoxArray;
+  fWorlds: array [0..2] of Integer;
+  i, tab: Integer;
 begin
-  result := false;
+  Result := False;
 
   if (not self.isOpen()) then
     exit();
@@ -459,24 +443,23 @@ begin
       exit();
 
   // a box around each of the quick select world boxes
-  woBoxes := grid(3, 1, 32, 16, 65, 0, point(self.x2 - 195, self.y2 - 54));
-  Tesseract_SetWhitelist('0123456789');
-
-  for i := 0 to high(woBoxes) do
+  Boxes := Grid(3, 1, 37, 16, 62, 0, Point(Self.x2 - 193, Self.y2 - 54));
+  for i := 0 to High(Boxes) do
   begin
-    foundWo := StrToIntDef(ExtractFromStr(Tesseract_GetText(woBoxes[i], TESS_FILTER_SMALL_CHARS), Numbers), -1);
-    print('TRSLobby.quickSelectWorld(): Tesseract found world '+intToStr(foundWo));
+    fWorlds[i] := -1;
 
-    if (foundWo = wo) then
-    begin
-      mouseBox(woBoxes[i], MOUSE_LEFT);
-      print('TRSLobby.quickSelectWorld(): Clicked quick-select world '+toStr(wo), TDebug.SUB);
-      result := true;
-      break();
-    end;
+    if (CountColorTolerance(12484874, Boxes[i], 20, ColorSetting(1)) > 10) then // Check if fav world exists (Light blue).
+      fWorlds[i] := StrToIntDef(Tesseract_GetText(Boxes[i], TTesseractFilter([5, 5, [True, -40, TM_Mean]]), TESS_WHITELIST_NUMBERS), -1);
   end;
 
-  Tesseract_ResetWhitelist();
+  printf('TRSLobby.quickSelectWorld(): Found worlds %s', [toString(fWorlds)]);
+
+  if (InIntArrayEx(fWorlds, i, World)) then
+  begin
+    mouseBox(Boxes[i], MOUSE_LEFT);
+    printf('TRSLobby.quickSelectWorld(): Clicked world %d. [Index %d]', [World, i]);
+    Exit(True);
+  end;
 end;
 
 begin

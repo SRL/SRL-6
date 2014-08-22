@@ -20,9 +20,7 @@ Internal constants used throughout several functions.
 const
   _WORLD_HIGH                = 139; // the highest number world
   _WORLD_PATH                = includePath + 'SRL-6/lib/interfaces/lobby/worlds.ini';
-  _WORLD_FONT                = statChars;
   _WORLD_SORT_BUTTON         = 10328724;  // top of sort buttons
-  _WORLD_NUMBER_AREA : TBox  = [58, 238, 84, 522]; // box around world numbers
   _WORLD_SORT_AREA : TBox    = [110, 215, 751, 233]; // box around all sort buttons
 
 (*
@@ -65,9 +63,10 @@ type TRSLobbyWorlds
 The type representing the worlds interface in the RS lobby.
 *)
 type
-  TRSLobbyWorlds = record(TRSLobby)
+  TRSLobbyWorlds = record(TRSInterface)
     lobbyID: integer;
     worlds: array of __TRSWorld;
+    worldNumArea: TBox;
   end;
 
 (*
@@ -165,7 +164,9 @@ begin
     parentID := ID_INTERFACE_LOBBY;
     static := true;
     lobbyID := LOBBY_WORLDS;
-    self.__loadFromINI();
+    SetBounds(lobby.getBounds());
+    __loadFromINI();
+    worldNumArea := [x1 + 35, y1 + 125, x1 + 100, y2 - 62];
   end;
 end;
 {$ENDIF}
@@ -223,10 +224,6 @@ Example:
 function TRSLobbyWorlds.isOpen(): boolean;
 begin
   result := (lobby.getCurrentTab() = self.lobbyID);
-
-  // set the world's bounds to the same as the lobby's
-  if (result) then
-    self.setBounds(lobby.getBounds());
 end;
 
 (*
@@ -269,8 +266,8 @@ begin
 
     while (getSystemTime() < t) do
     begin
-      yellow := countColor(379903, _WORLD_NUMBER_AREA);
-      white := countColor(16777215, _WORLD_NUMBER_AREA);
+      yellow := countColor(1272955, self.worldNumArea);
+      white := countColor(16777215, self.worldNumArea);
 
       if ((white + yellow) > 100) then
         exit(true);
@@ -337,21 +334,20 @@ Example:
     if (not lobbyWorlds.getCurrentWorld() = 115) then
       lobbyWorlds.selectWorld(115);
 *)
-function TRSLobbyWorlds.getCurrentWorld(): integer;
+function TRSLobbyWorlds.getCurrentWorld(): Integer;
 var
-  n: integer;
-  s: string;
+  TPA: TPointArray;
+  Box: TBox;
 begin
-  result := -1;
+  Result := -1;
+  if (not Self.isOpen()) then
+    Exit();
 
-  if (not self.isOpen()) then
-    exit();
-
-  s := tesseractGetText(self.x1 + 159, self.y2 - 37, self.x1 + 244, self.y2 - 25, FILTER_SMALL_CHARS_2);
-  n := strToIntDef(extractFromStr(s, numbers), -1);
-
-  if (self._isWorldValid(n)) then
-    result := n;
+  if (FindColors(TPA, 3088905, Self.getBounds())) then
+  begin
+    Box := GetTPABounds(TPA);
+    Result := StrToIntDef(ExtractFromStr(Tesseract_GetText(Box, TESS_FILTER_SMALL_CHARS_2), Numbers), -1);
+  end;
 
   print('TRSLobbyWorlds.getCurrentWorld(): Current world is '+toStr(result), TDebug.SUB);
 end;
@@ -468,42 +464,44 @@ Example:
 *}
 function TRSLobbyWorlds._findWorldNumber(var res: TPoint; wo: integer): boolean;
 var
-  i: integer;
-  cols: array [0..1] of integer;
-  worldBox: TBox;
+  i: Integer;
   TPA: TPointArray;
   ATPA: T2DPointArray;
+  Boxes: TBoxArray;
+  Box: TBox;
+  BMP: Integer;
+  Strings: TStringArray;
 begin
+  FindColorsTolerance(TPA, clBlack, Self.worldNumArea, 25, colorSetting(1));
+  ATPA := ClusterTPAEx(TPA, 20, 3);
 
-  if (self.worlds[self._getWorldIndex(wo)].members) then
-    cols := [1218748, 86] // Text [color, tolerance]
-  else
-    cols := [12368565, 123];
-
-  if findColorsTolerance(TPA, cols[0], _WORLD_NUMBER_AREA, cols[1]) then
+  for i := 0 to High(ATPA) do
   begin
-    ATPA := TPA.cluster(5);
+    Box := GetTPABounds(ATPA[i]);
 
-    for i := 0 to high(ATPA) do
+    if (Box.getHeight() > 5) and (Box.getHeight() < 13) and (Box.getWidth() < 50) then
     begin
-      worldBox := ATPA[i].getBounds();
-      worldBox.edit(-3, -2, 3, 2);
-      //writeln(strToIntDef(trim(tesseractGetText(worldBox.x1, worldBox.y1, worldBox.x2, worldBox.y2, 5, 5, false, 20, 'digits')), -1)); // left in to debug
-      if (strToIntDef(trim(tesseractGetText(worldBox.x1, worldBox.y1, worldBox.x2, worldBox.y2, 5, 5, false, 20, 'digits')), -1) = wo) then
-      begin
-        res := ATPA[i].getMiddle();
-        result := true;
-        break;
-      end;
+      Box.expand(3);
+      Insert(Box, Boxes);
     end;
-
   end;
 
-  if (result) then
-  begin
-    print('TRSLobbyWorlds._findWorldNumber(): Found world '+toStr(wo), TDebug.SUB);
-    res := res.rand(400, 10);
-  end;
+  BMP := CreateBitmap(50, 400);
+  for i := 0 to High(Boxes) do
+    GetMufasaBitmap(BMP).CopyClientToBitmap(Client.getIOManager(), False, 0, Max(Boxes[i].y1 - Boxes[High(Boxes)].y1, 0), Boxes[i].x1, Boxes[i].y1, Boxes[i].x2, Boxes[i].y2);
+
+  // Prepare for Tesseract
+  ResizeBitmapEx(BMP, RM_Bilinear, 50 * 3, 400 * 3);
+  ThresholdAdaptiveBitmap(BMP, 0, 255, False, TM_Mean, 55);
+  Strings := explode(#10, Tesseract_GetText(BMP, TESS_WHITELIST_NUMBERS));
+  FreeBitmap(BMP);
+
+  for i := 0 to high(Strings) do
+    if (StrToIntDef(Trim(Strings[i]), -1) = wo) then
+    begin
+      Res := MiddleBox(Boxes[High(Boxes) - i]);
+      Exit(True);
+    end;
 end;
 
 {*
@@ -533,9 +531,9 @@ function TRSLobbyWorlds._scrollToWorld(var res: TPoint; wo: integer): boolean;
 const
   __COLOR_SCROLL_BAR = 3455991;
 var
-  p, tmp: TPoint;
   t: integer;
   down: boolean;
+  p: TPoint;
 begin
   if (not self.isOpen()) then
     exit(false);
@@ -545,21 +543,21 @@ begin
 
   repeat
     if (self._findWorldNumber(res, wo)) then
-    begin
-      result := true;
       break;
-    end;
 
-    if (getColor(self.x2 - 25, self.y2 - 334) = __COLOR_SCROLL_BAR) then
+    if (getColor(self.x2 - 25, self.y2 - 287) = __COLOR_SCROLL_BAR) then
       down := true;
 
     if (getColor(self.x2 - 25, self.y2 - 79) = __COLOR_SCROLL_BAR) then
       down := false;
 
     mouseScroll(p, 4 + random(3), down);
-    wait(50 + random(50));
+    Wait(50 + random(100));
 
   until(getSystemTime() > t);
+
+  Wait(Random(200, 300));
+  Result := self._findWorldNumber(res, wo);
 end;
 
 (*
@@ -620,7 +618,7 @@ begin
     if (not p.isInvalid()) then
     begin
       print('Selected world '+toStr(wo));
-      mouse(p, MOUSE_LEFT);
+      mouse(p.rand(-6, 6), MOUSE_LEFT);
       result := true;
     end;
   end;
