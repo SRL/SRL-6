@@ -119,7 +119,7 @@ Handles the validate email screen that comes up when you enter to lobby.
 .. note::
 
     - by NCDS & Coh3n
-    - Last updated: 23 July 2013 by Coh3n
+    - Last updated: 8th August 2014 by The Mayor
 
 Example:
 
@@ -136,17 +136,19 @@ var
 begin
   getClientDimensions(wid, hei);
 
-  if (not findColors(tpa, 658491, 0, 0, wid-1, hei-1)) then  // the red background of the text at the top
+  findColors(tpa, 658491, 0, 0, wid-1, hei-1);
+
+  if (length(tpa) < 20) then  // the red background of the text at the top
     exit();
 
   b := getTPABounds(tpa);
   b.offset([0, 370]); //offset the red background bounds to where we think the button should be
-  b.setLimit([0, 0, wid-1, hei-1]); // prevent out of bound errors
+  b.setLimit([0, 0, wid-1, hei-1]); // prevent out of bound errors (this doesn't work ~TM)
 
-  if (not findColors(tpa, 14733486, b)) then // color of the "Skip" text
+  if (not findColorsTolerance(tpa, 14601123, b, 13)) then // color of the "Skip" text
     exit();
 
-  if (inRange(length(tpa), 30, 60)) then
+  if (inRange(length(tpa), 35, 65)) then
   begin
     mouseBox(tpa.getBounds(), MOUSE_LEFT);
     print('TRSLobby.__skipEmailScreen(): Closed validate email screen', TDebug.SUB);
@@ -168,7 +170,7 @@ the tabs.
 .. note::
 
     - by Coh3n
-    - Last Updated: 11 September 2013 by Olly
+    - Last Updated: 29th July by Ashaman88
 
 Example:
 
@@ -186,9 +188,9 @@ begin
   t := (getSystemTime() + randomRange(7500, 8500));
   result := false;
 
- // self.__skipEmailScreen(); // just in case
+  self.__skipEmailScreen();
 
-  result := (getColor(lobby.x1 + 41, lobby.y1 - 105) = COLOR); // color of the green person on the friends chat
+  result := (getColor(lobby.x1 + 41, lobby.y1 - 105) = COLOR); // color of top/left lobby sword symbol
 end;
 
 (*
@@ -205,8 +207,8 @@ lobby interface to change.
 
 .. note::
 
-    - by Coh3n
-    - Last updated: 30 October by Olly
+    - by Coh3n & Olly
+    - Last updated: 29th July by Ashaman88
 
 Example:
 
@@ -251,8 +253,8 @@ Gets current lobby tab.
 
 .. note::
 
-    - by Bionicle1800, NCDS
-    - Last Updated: 23 July 2013 by Coh3n
+    - by Bionicle1800, NCDS & Cohen
+    - Last Updated: 29th July by Ashaman88
 
 Example:
 
@@ -343,7 +345,7 @@ use the lobby file's variables instead.
 .. note::
 
     - by Bionicle1800 & Coh3n
-    - Last Updated: 23 July 2013 by Coh3n
+    - Last Updated: 29th July by Ashaman88
 
 Example:
 
@@ -387,8 +389,8 @@ players[currentPlayer].logout();.
 
 .. note::
 
-    - by IceFire908
-    - Last Updated: 23 July 2013 by Coh3n
+    - by IceFire908 & Coh3n
+    - Last Updated: 29th July by Ashaman88
 
 Example:
 
@@ -431,7 +433,7 @@ in the bottom right of the interface.  Will click the world if found.
 .. note::
 
     - by Coh3n
-    - Last Updated: 11 September 2013 by Olly
+    - Last Updated: 29th July by Ashaman88
 
 Example:
 

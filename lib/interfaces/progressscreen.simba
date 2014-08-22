@@ -81,11 +81,65 @@ begin
     name := 'RS Progress Screen';
     ID := ID_INTERFACE_PROGRESS;
     parentID := -1;
-    static := true;
-    setBounds([120, 78, 457, 224]);
+    static := false;
   end;
 end;
 {$ENDIF}
+
+(*
+TRSProgressScreen.__find
+~~~~~~~~~~~~~~~~~~~~~~~~
+
+.. code-block:: pascal
+
+    function TRSProgressScreen.__find(): boolean;
+
+Returns true if the progress screen is detected, and sets the bounds
+
+.. note::
+
+    - by Ashaman88
+    - Last Updated: 10 August 2014 by Ashaman88
+
+Example:
+
+.. code-block:: pascal
+
+    if (progressScreen.__find()) then
+      writeln('bounds are set!');
+*)
+function TRSProgressScreen.__find(): boolean;
+const
+  BORDER_COLOR = 5327681;
+  BORDER_COLOR_BOTTOM = 5919042;
+  BORDER_LENGTH = 226;
+var
+  tpa: TPointArray;
+  atpa: T2DPointArray;
+  i, hh: integer;
+  b: TBox;
+  p: TPoint;
+begin
+  result := false;
+
+  if (not findColors(tpa, BORDER_COLOR, getClientBounds())) then
+    exit();
+
+  atpa := tpa.cluster(1);
+  hh := high(atpa);
+
+  for i := 0 to hh do
+    if (length(atpa[i]) = BORDER_LENGTH) then
+    begin
+      b := atpa[i].getBounds();
+
+      if (getColor(b.x1 - 34, b.y1 + 125) = BORDER_COLOR_BOTTOM) then
+      begin
+        self.setBounds([b.x1 - 54, b.y1 + 2, b.x2 + 58, b.y2 + 148]);
+        exit(true);
+      end;
+    end;
+end;
 
 (*
 TRSProgressScreen.isOpen
@@ -102,7 +156,7 @@ Returns true if the progress screen is open, includes a optional parameter
 .. note::
 
     - by Ashaman88
-    - Last Updated: 08 January 2013 by Ashaman88
+    - Last Updated: 10 August 2014 by Ashaman88
 
 Example:
 
@@ -121,17 +175,11 @@ var
 begin
   t := (getSystemTime() + waitTime);
 
-  borderTPA := tpaFromBox(intToBox(self.x1 + 59, self.y1 + 23, self.x2 - 171, self.y1 + 23));
-
   repeat
-    borders := getColors(borderTPA, true);
-
-    if (length(borders) = 1) then
-      if (borders[0] = BORDER_COLOR) then
-        exit(true);
+    result := self.__find();
 
     wait(20 + random(20));
-  until (getSystemTime() >= t);
+  until (getSystemTime() >= t) or (result);
 end;
 
 (*

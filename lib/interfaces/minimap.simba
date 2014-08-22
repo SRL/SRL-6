@@ -1357,14 +1357,13 @@ begin
     MM_SYMBOL_BANK:
       with result do
       begin
-        name := 'Bank'; //d
+        name := 'Bank';
         color := 1908001;
-        bmp := BitmapFromString(9, 9, 'meJzLnrAmtnuDR8ce9/bdEBTRsT68' +
-        'fp6Sup5XdqdVQpNhXKthbAsIxbWaxzWYR5bJKWnGVM3wzJlonjQha' +
-        '8/duB23zZP6PbL7fbLa5JW0osomu6f3msT3+8/Z7zJhk3Fcn2taj3' +
-        'daM1BXYG6fXUKnTkSPTd1aq4qlQIZtfLtjbK2UnKpzUqtpeL1KYLt' +
-        'qYLsKGAG5FqEVkrKqxkFlWt5F0i7lcATkGvoWSMqqSErKYkWysop4' +
-        'EAAaMUy8');
+        bmp := BitmapFromString(8, 6, 'meJz7eX7bj3Nbv53ZjIa+n1hbl5UT' +
+        '5RcBRb4h8UXVWbuPfjm62sLEnYVbG4jYRU3ki6boLD+js/XOlyOrI' +
+        'OJAQeW2Nca7HutvuKW39d6HA8ssjN2A4gIW0Xqrr2rNPCLgXyg549' +
+        'DrfUvMjVyB4oJ2ifrr72lM3ifomqa57BwAxABEEg==');
+        color := 3324402;
       end;
 
     MM_SYMBOL_OBELISK_MINI:
@@ -1381,11 +1380,14 @@ begin
       with result do
       begin
         name := 'Mining Site';
-        bmp := BitmapFromString(15, 5, 'beNpjYGRgYDyAAXqrfB' +
-          'vCddIzMsrKSiMiIiCCQJWYiufk2INUWova2dkD1Xv7ec+fPx+rYrj' +
-          'K+WAANBaXYqDK7GDtIAsBiEqgCFAxnI2seEKsNVCluzoPXBauGOpm' +
-          'ADVlcCo=');
-        color := 5077645;
+        bmp := BitmapFromString(9, 9, 'meJxbvWppfn6OjLySnKIKBKlr6qan' +
+        '5dfWdJ47f7KjvUlWXklBSVUeLKWgZWjhGeZT0HXmzLHlyxYAdWkY2' +
+        '+j7xGpEFCmldKnnTFKIbdq7d/vRY4fj2marVCyTKl4qE1UraeUrpW' +
+        'OupGWwc/+eo8cOFPTNFnWKkVPRVFRWU1bVhKD8mrqVK+bXVpdraOm' +
+        'qaegA3QBBquraunqGudkps6b3u7q6AEW0dAyASFNbH6gMyDAwNC7K' +
+        'Sy/ISdfRM9TWBSGgVFBAuJ6BCZBtaGyWlBDr6OgAkTI1t25v6AIAH' +
+        'HNKdw==');
+        color := 12961475;
       end;
 
     MM_SYMBOL_TRANSPORTATION:
@@ -1403,12 +1405,11 @@ begin
       with result do
       begin
         name := 'Magic';
-        bmp := BitmapFromString(15, 5, 'z78DA95D0510A80300806' +
-          'E02B9906B6C77F3AEF7FA4A0066DABC17A1111FD1469A74CC5C46' +
-          '0D6C60875CEA17288D63CE08C771D02A09BA5CBA499DC99AD3CFA' +
-          'EB72041B97B9D9C83F6F2ECE69C3D71F46F9EE5C979D155AFDBAA' +
-          '5BBFF312D915399C927AF756C82');
-        color := 1714669;
+        bmp := BitmapFromString(7, 6, 'meJy7lu5+NszYqXYGBAHZ19LdL2f5' +
+        'nEvxOBFqcSjYDEgC2UARRXndMDOTCnuzGgdjIAlkA0WkpY0w0ZaeO' +
+        'hVlCzk5KAKygSKXZjdubKsAsoEKgCSQDRQBAE/LKiY=');
+
+        color := 13456947;
       end;
 
     MM_SYMBOL_WATER:
@@ -1467,12 +1468,12 @@ begin
       with result do
       begin
         name := 'Cook';
-        bmp := BitmapFromString(15, 5, 'z78DAA590410AC0200C04BFB41' +
-          'B4D5B8F2ACDFF9FD4D25008885EBC0C21EC0E211010EC6CD66EE7' +
-          'C1A4F869A9524AD74BB2CF3139233E2782D9BB713F52CE37A1D98' +
-          '4A823D7E678A15FAE4CC4EDDDB5B9B258D932BB61C67DF3FACF0F' +
-          '3E40632F');
-        color := 1194607;
+        bmp := BitmapFromString(9, 6, 'meJwBogBd/8TBv8zIxsfCwc3Jx6Sd' +
+        'mmNVTcigiem/ppSGdm1mZldfZlpfZNrOyIeBfWxnZzAoJJJ2Z/LCp' +
+        '1uetFSauaa1u3WkukNjepePjRgWFj0yLO29ok+ixjCJuCN+sD2GsL' +
+        '++w7ewqxoYGD0yLOy8oeHa1+PW09/SztbLxa2qp6WfmSMhID4yLOm' +
+        '3nLm5tq6tqaakoZ6bl56alaafmSclJEE2MOa0mfKWWXk=');
+        color := 3115191;
       end;
 
     MM_SYMBOL_QUEST:
@@ -1521,12 +1522,11 @@ begin
       with result do
       begin
         name := 'Potter''s Wheel';
-        bmp := BitmapFromString(15, 5, 'z78DA8DCE5B0AC0200C44D1' +
-          '2D6592691B3F2DD5FD2FA98F08554A410217C9C73102B966673E7' +
-          '64617AA094DA16349D4B15E96621EED05C13B5F19F9DEFF178E14' +
-          '3F869CE8479A9267FCFEE619992A55100D7F8519CC37562DBDD6F' +
-          'AECE76FEEFD55D5A50983FFBCB76A807CE5139EC460AC');
-        color := 270148;
+        name := 'Potter''s Wheel';
+        bmp := BitmapFromString(8, 4, 'meJwzjd6k7bZY03fOnN4pGxatFxYS' +
+        'AqK9k2oUHWYrO02pLWlYPGXRshnL4OLNpU3T27uBgkDU19AHEd/VV' +
+        'wER6a3pLUwuBJJAQWlJ8W29lQB8SCe8');
+        color := 2179227;
       end;
 
     MM_SYMBOL_WHEEL:
@@ -2174,10 +2174,13 @@ begin
       with result do
       begin
         name := 'Lodestone';
-        bmp := BitmapFromString(7, 7, 'meJzb09k0KSgPgvZ0Ni2qzb0yDyRS' +
-        'YhkMQUA2UBCIfv/5DWQ72tkBSQh7D1jvw8cPgVwgCdEFIYEiEARUD' +
-        'xfcvXX9y/MHgCTcZCAXyICYCWEDzQQA7QVQBA==');
-        color := 13934210;
+        bmp := BitmapFromString(9, 8, 'meJxbW90wLaUQiNZWN+zr6VxeUn1j' +
+        '9bQJJSn91bk5tiGNmVVABGQsLqial1N6anrPvNrcrZPrK5KKtmw/A' +
+        'ERARmNg/KL84qVFJTsn1W7try5KLJg4eS4QARllHmGz0rPmZGXv6C' +
+        'rf0lcZrOOUE5cDREBGU0BMZ3jshrriqUVJ+6fWl7kFxhg4ARGQsSA' +
+        'npdo76EhfZby38/kF7V0REd1gBGSUufkvK04vifAJcHG4vqR7cmJU' +
+        'nW8gEAEZ6yoyikK9rCzMowO8bi3pBgC7LWRW');
+        color := 7093588;
       end;
 
     MM_SYMBOL_DIVINATION:

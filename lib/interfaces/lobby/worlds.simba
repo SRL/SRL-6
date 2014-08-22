@@ -21,10 +21,9 @@ const
   _WORLD_HIGH                = 139; // the highest number world
   _WORLD_PATH                = includePath + 'SRL-6/lib/interfaces/lobby/worlds.ini';
   _WORLD_FONT                = statChars;
-  _WORLD_COLOR_ARROW         = 1074576;  // arrow color that can order the worlds
-  _WORLD_COLOR_SCROLL_LEFT   = 3615246;  // blue color on the left side of scroll area
-  _WORLD_COLOR_SCROLL_BOTTOM = 3753285;   // black color under scroll bar
-  _WORLD_NUMBER_AREA : TBox  = [58, 238, 87, 524];
+  _WORLD_SORT_BUTTON         = 10328724;  // top of sort buttons
+  _WORLD_NUMBER_AREA : TBox  = [58, 238, 84, 522]; // box around world numbers
+  _WORLD_SORT_AREA : TBox    = [110, 215, 751, 233]; // box around all sort buttons
 
 (*
 const Order
@@ -43,8 +42,9 @@ const
   WORLD_ORDER_PLAYERS  = 1;
   WORLD_ORDER_ACTIVITY = 2;
   WORLD_ORDER_LOCATION = WORLD_ORDER_ACTIVITY;
-  WORLD_ORDER_TYPE     = 3;
-  WORLD_ORDER_PING     = 4;
+  WORLD_ORDER_LOOT     = 3;
+  WORLD_ORDER_TYPE     = 4;
+  WORLD_ORDER_PING     = 5;
 
 {*
 type __TRSWorld
@@ -243,7 +243,7 @@ after the tab is clicked to compensate for lag.
 .. note::
 
     - by Bionicle1800 & Coh3n
-    - Last Updated: 23 July 2013 by Coh3n
+    - Last Updated: 8th August 2014 by The Mayor
 
 Example:
 
@@ -272,7 +272,7 @@ begin
       yellow := countColor(379903, _WORLD_NUMBER_AREA);
       white := countColor(16777215, _WORLD_NUMBER_AREA);
 
-      if ((white + yellow) > 500) then
+      if ((white + yellow) > 100) then
         exit(true);
 
       wait(50);
@@ -327,8 +327,8 @@ Returns the currently selected world.
 
 .. note::
 
-    - by Home
-    - Last Updated: 28 November 2013 by Coh3n
+    - by Home & Coh3n
+    - Last Updated: 8th August 2014 by The Mayor
 
 Example:
 
@@ -347,7 +347,7 @@ begin
   if (not self.isOpen()) then
     exit();
 
-  s := tesseractGetText(self.x + 550, self.y + 62, self.x+self.w - 15, self.y + 80, FILTER_SMALL_CHARS_2);
+  s := tesseractGetText(self.x1 + 159, self.y2 - 37, self.x1 + 244, self.y2 - 25, FILTER_SMALL_CHARS_2);
   n := strToIntDef(extractFromStr(s, numbers), -1);
 
   if (self._isWorldValid(n)) then
@@ -373,12 +373,13 @@ arguements for 'by' are:
     * WORLD_ORDER_ACTIVITY
     * WORLD_ORDER_LOCATION
     * WORLD_ORDER_TYPE
+    * WORLD_ORDER_LOOT
     * WORLD_ORDER_PING
 
 .. note::
 
     - by Naum & Coh3n
-    - Last Updated: 23 July 2013 by Coh3n
+    - Last Updated: 8th August 2014 by The Mayor
 
 Example:
 
@@ -391,35 +392,55 @@ var
   ATPA: T2DPointArray;
   TPA: TPointArray;
   TB: TBox;
+  i: Integer;
 begin
   print('TRSLobbyWorlds.sort()', TDebug.HEADER);
 
   if (not self.isOpen()) then
     exit(false);
 
-  // long box around the arrows
-  if (findColorsTolerance(TPA, _WORLD_COLOR_ARROW, self.x, self.y + 115, self.x+self.w, self.y + 130, 1)) then
+  if findColors(TPA, _WORLD_SORT_BUTTON, _WORLD_SORT_AREA) then
   begin
-    print('Found _WORLD_COLOR_ARROW');
+    print('Found _WORLD_SORT_BUTTON');
 
-    ATPA := splitTPA(TPA, 2);
-    sortATPAFromFirstPoint(ATPA, point(self.x, self.y));
+    ATPA := TPA.cluster(2);
 
-    if (length(ATPA) < (by * 2)) then
+    if (length(ATPA) < 1) then
     begin
-      print('Didn''t find enough of _WORLD_COLOR_ARROW', TDebug.ERROR);
+      print('Didn''t find enough of _WORLD_SORT_BUTTON', TDebug.ERROR);
       print('TRSLobbyWorlds.sort(): '+toStr(result), TDebug.FOOTER);
       exit();
     end;
 
-    TB := getTPABounds(ATPA[(by * 2) + ord(descending)]);
-    mouseBox(intToBox(TB.x1 + 2, TB.y1 + 2, TB.x2, TB.y2), MOUSE_LEFT);
+    sortATPAFromFirstPoint(ATPA, point(self.x, self.y));
 
-    result := true;
+    TB := getTPABounds(ATPA[by]);
+    TB.edit(-1, 0, 1, 14);
+
+    for i := 0 to 2 do
+    begin
+      if (getColor(TB.getMiddle()) = 3427397) then
+        if descending then
+        begin
+          result := true;
+          break;
+        end;
+
+      if (getColor(TB.getMiddle()) = 3032127) then
+        if not descending then
+        begin
+          result := true;
+          break;
+        end;
+
+      mouseBox(TB, MOUSE_LEFT);
+      wait(randomRange(1500, 2000));
+    end;
   end else
-    print('Failed to find _WORLD_COLOR_ARROW', TDebug.ERROR);
+    print('Failed to find _WORLD_SORT_BUTTON', TDebug.ERROR);
 
   print('TRSLobbyWorlds.sort(): '+toStr(result), TDebug.FOOTER);
+
 end;
 
 {*
@@ -436,7 +457,7 @@ coordinates in 'res'.
 .. note::
 
     - by Coh3n
-    - Last Updated: 24 July 2013 by Coh3n
+    - Last Updated: 9th August 2014 by The Mayor
 
 Example:
 
@@ -447,40 +468,41 @@ Example:
 *}
 function TRSLobbyWorlds._findWorldNumber(var res: TPoint; wo: integer): boolean;
 var
-  i, hi, l, col: integer;
-  worldsArea: TBox;
-  tpa: TPointArray;
-  atpa: T2DPointArray;
-  p: TPoint;
+  i: integer;
+  cols: array [0..1] of integer;
+  worldBox: TBox;
+  TPA: TPointArray;
+  ATPA: T2DPointArray;
 begin
-  // box is the world number column
-  worldsArea := intToBox(self.x + 60, self.y + 110, self.x + 83, self.y+self.h - 15);
 
   if (self.worlds[self._getWorldIndex(wo)].members) then
-    col := 6618364
+    cols := [1218748, 86] // Text [color, tolerance]
   else
-    col := 16579836;
+    cols := [12368565, 123];
 
-  findColors(tpa, col, worldsArea);
-  atpa := splitTPA(tpa, 10); // separate each row
+  if findColorsTolerance(TPA, cols[0], _WORLD_NUMBER_AREA, cols[1]) then
+  begin
+    ATPA := TPA.cluster(5);
 
-  l := length(TPAFromText(intToStr(wo), statChars));
-  hi := high(atpa);
-
-  // checks TPA length first, then for the text
-  for i := 0 to hi do
-    if (length(atpa[i]) = l) then
-      if (strToIntDef(getTextAtEx(atpa[i].getBounds(), 0, 0, 0, col, 0, statChars, Numbers), -1) = wo) then
+    for i := 0 to high(ATPA) do
+    begin
+      worldBox := ATPA[i].getBounds();
+      worldBox.edit(-3, -2, 3, 2);
+      //writeln(strToIntDef(trim(tesseractGetText(worldBox.x1, worldBox.y1, worldBox.x2, worldBox.y2, 5, 5, false, 20, 'digits')), -1)); // left in to debug
+      if (strToIntDef(trim(tesseractGetText(worldBox.x1, worldBox.y1, worldBox.x2, worldBox.y2, 5, 5, false, 20, 'digits')), -1) = wo) then
       begin
-        res := atpa[i].getMiddle();
+        res := ATPA[i].getMiddle();
         result := true;
         break;
       end;
+    end;
+
+  end;
 
   if (result) then
   begin
     print('TRSLobbyWorlds._findWorldNumber(): Found world '+toStr(wo), TDebug.SUB);
-    res := res.rand(400, 10); // add randomness to the point clicked
+    res := res.rand(400, 10);
   end;
 end;
 
@@ -498,7 +520,7 @@ Function is internal.  Use TRSLobbyWorlds.selectWorld instead.
 .. note::
 
     - by Coh3n
-    - Last Updated: 28 November 2013 by Coh3n
+    - Last Updated: 8th August 2014 by The Mayor
 
 Example:
 
@@ -519,7 +541,7 @@ begin
     exit(false);
 
   p := self.getCenterPoint().rand(randomRange(-200, 200), randomRange(-50, 50));
-  t := (getSystemTime() + 15000);
+  t := (getSystemTime() + 20000);
 
   repeat
     if (self._findWorldNumber(res, wo)) then
@@ -528,13 +550,13 @@ begin
       break;
     end;
 
-    if (getColor(self.x2 - 20, self.y1 + 204) = __COLOR_SCROLL_BAR) then
+    if (getColor(self.x2 - 25, self.y2 - 334) = __COLOR_SCROLL_BAR) then
       down := true;
 
-    if (getColor(self.x2 - 20, self.y2 - 29) = __COLOR_SCROLL_BAR) then
+    if (getColor(self.x2 - 25, self.y2 - 79) = __COLOR_SCROLL_BAR) then
       down := false;
 
-    mouseScroll(p, 3 + random(5), down);
+    mouseScroll(p, 4 + random(3), down);
     wait(50 + random(50));
 
   until(getSystemTime() > t);
