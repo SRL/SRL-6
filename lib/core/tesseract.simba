@@ -42,6 +42,11 @@ const
   TESS_LANGUAGE = 'eng';
 
 const
+  TESS_WHITELIST_NUMBERS = '0123456789';
+  TESS_WHITELIST_LETTERS = 'abcdefghijklmnopqrstuvwxyzABCDEFGHIJKLMNOPQRSTUVWXYZ';
+  TESS_WHITELIST_NONE = '';
+
+const
   TESS_FILTER_SMALL_CHARS: TTesseractFilter = [3, 3, [false, 50, TM_Mean]];
   TESS_FILTER_SMALL_CHARS_2: TTesseractFilter = [5, 5, [false, 55, TM_Mean]];
   TESS_FILTER_NPC_CHAT_CHARS: TTesseractFilter = [3, 3, [true, -50, TM_Mean]];
@@ -87,8 +92,6 @@ begin
 
   addOnTerminate('Tesseract_Free');
   __tesseractIsSetup := true;
-
-  print('Tesseract was succesfully setup [' + toString(__tesseractPtr) + ']');
 end;
 
 (*
@@ -122,83 +125,19 @@ begin
   Tesseract_Delete(__tesseractPtr);
   __tesseractPtr := nil;
   __tesseractIsSetup := false;
-
-  print('Succesfully freed tesseract');
-end;
-
-(*
-Tesseract_SetWhitelist
-~~~~~~~~~~~~~~~~~~~~~~
-
-.. code-block:: pascal
-
-    procedure Tesseract_SetWhitelist(const whitelist: string);
-
-Sets a whitelist of chars for the tesseract to only recognize. Must remember to
-reset via Tesseract_ResetWhitelist.
-
-.. note::
-
-    - by Olly
-    - Last updated: July. 26th, 2014 by Olly
-
-Example:
-
-.. code-block:: pascal
-
-    Tesseract_SetWhitelist('0123456789');
-*)
-procedure Tesseract_SetWhitelist(const whitelist: string);
-begin
-  if (not __tesseractIsSetup) then
-    _Tesseract_Setup();
-
-  Tesseract_SetVariable(__tesseractPtr, 'tessedit_char_whitelist', whiteList);
-end;
-
-(*
-Tesseract_ResetWhitelist
-~~~~~~~~~~~~~~~~~~~~~~
-
-.. code-block:: pascal
-
-    procedure Tesseract_ResetWhitelist();
-
-Resets the tesseract whitelist therefore it reads all chars.
-
-.. note::
-
-    - by Olly
-    - Last updated: July. 26th, 2014 by Olly
-
-Example:
-
-.. code-block:: pascal
-
-    Tesseract_ResetWhitelist();
-*)
-procedure Tesseract_ResetWhitelist();
-begin
-  _Tesseract_Free();
-  _Tesseract_Setup();
 end;
 
 procedure Tesseract_ApplyFilter(const bmp: integer; const filter: TTesseractFilter);
 var
-  imgMatrix: T2DIntegerArray;
   w, h: integer;
 begin
   getBitmapSize(bmp, w, h);
 
-  imgMatrix := bitmapToMatrix(bmp);
-
   with (filter) do
   begin
-    resizeBilinearMatrix(imgMatrix, max(multiplerH, 1) * w, max(multiplerH, 1) * h);
-    thresholdAdaptiveMatrix(imgMatrix, 0, 255, thresholdSettings.invert, thresholdSettings.method, thresholdSettings.amount);
+    ResizeBitmapEx(bmp, RM_Bilinear, max(multiplerH, 1) * w, max(multiplerH, 1) * h);
+    ThresholdAdaptiveBitmap(bmp, 0, 255, thresholdSettings.invert, thresholdSettings.method, thresholdSettings.amount);
   end;
-
-  drawMatrixBitmap(bmp, imgMatrix);
 end;
 
 (*
@@ -222,7 +161,7 @@ Example:
 
     writeln(Tesseract_GetText(bmp));
 *)
-function Tesseract_GetText(const bmp: integer): string;
+function Tesseract_GetText(const bmp: integer; const Whitelist: String = TESS_WHITELIST_NONE): string;
 var
   w, h, i: integer;
   textLen: UInt32;
@@ -230,6 +169,9 @@ var
 begin
   if (not __tesseractIsSetup) then
     _Tesseract_Setup();
+
+  if (Whitelist <> TESS_WHITELIST_NONE) then
+    Tesseract_SetVariable(__tesseractPtr, 'tessedit_char_whitelist', WhiteList);
 
   result := '';
   getBitmapSize(bmp, w, h);
@@ -249,6 +191,12 @@ begin
   finally
     Tesseract_FreeUTF8Text(textPtr);
     Tesseract_Clear(__tesseractPtr);
+
+    if (Whitelist <> TESS_WHITELIST_NONE) then // reset to default
+    begin
+      _Tesseract_Free();
+      _Tesseract_Setup();
+    end;
   end;
 end;
 
@@ -273,7 +221,7 @@ Example:
 
     writeln(Tesseract_GetText(100, 100, 200, 200, TESS_FILTER_SMALL_CHARS));
 *)
-function Tesseract_GetText(const xs, ys, xe, ye: integer; filter: TTesseractFilter): string; overload;
+function Tesseract_GetText(const xs, ys, xe, ye: integer; filter: TTesseractFilter; Whitelist: String = TESS_WHITELIST_NONE): string; overload;
 var
   bmp: integer;
   t, tt: integer;
@@ -287,7 +235,7 @@ begin
     t := (getSystemTime() - t);
     tt := getSystemTime();
 
-    result := Tesseract_GetText(bmp);
+    result := Tesseract_GetText(bmp, Whitelist);
     {$IFDEF TESSERACT_DEBUG}
     printf('Tesseract_GetText(): Filtering took: %d ms, Tesseract Took: %d ms, Total Time: %d ms.', [t, (getSystemTime() - tt), (getSystemTime() - tt) + t]);
     printf('Tesseract_GetText(): Text found: %s', [result]);
@@ -324,9 +272,9 @@ Example:
 
     writeln(Tesseract_GetText(box, TESS_FILTER_SMALL_CHARS));
 *)
-function Tesseract_GetText(const area: TBox; filter: TTesseractFilter): string; overload;
+function Tesseract_GetText(const area: TBox; filter: TTesseractFilter; Whitelist: String = TESS_WHITELIST_NONE): string; overload;
 begin
-  result := Tesseract_GetText(area.x1, area.y1, area.x2, area.y2, filter);
+  result := Tesseract_GetText(area.x1, area.y1, area.x2, area.y2, filter, Whitelist);
 end;
 
 
@@ -347,11 +295,7 @@ end;
 // deprecated use Tesseract_GetText().
 function tesseractGetText(const x1, y1, x2, y2: integer; filterMethod: TTesseractFilter; config: string = ''): string; overload;
 begin
-  if (config <> '') then
-    Tesseract_SetWhitelist('0123456789');
-  result := Tesseract_GetText(x1, y1, x2, y2, filterMethod);
-  if (config <> '') then
-    Tesseract_ResetWhitelist();
+  result := Tesseract_GetText(x1, y1, x2, y2, filterMethod, config);
 end;
 
 {$f+}
