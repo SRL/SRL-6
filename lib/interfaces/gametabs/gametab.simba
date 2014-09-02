@@ -160,14 +160,14 @@ begin
 
   with self.tabs[TAB_STATS] do
   begin
-    _bmp := bitmapFromString(9, 2, 'meJzjZbzGxdotoCeWtoJJf64kEMkniwqL8kx0k+RlvMbH0azhzKU/R1I+TRQoxeMqrS7FdSZHCgBfRQzG');
+    _bmp := bitmapFromString(10, 2, 'meJwTFHknKPKOj3exuJawWSmTRQMjEJlXMklL8bf6CHBy7gbKCvFHaRnyWtQzQmT5HaW05ATOpnIAALt/Dhg=');    _navBarId := NAV_BUTTON_HERO;
     _navBarId := NAV_BUTTON_HERO;
     _navBarBoxIndex := 1;
   end;
 
   with self.tabs[TAB_BACKPACK] do
   begin
-    _bmp := bitmapFromString(3, 8, 'meJxTss0x7d3Co2xpndScv+dpUudq/drpSrY5FrnrgSL8YkHCMrlABlANUAoo7lo5JWHDYaA4J58akARqBCIgAwC+OReT');
+    _bmp := bitmapFromString(10, 2, 'meJzjktQQlLJTdu4AIgHJICCbi1lZwsjLJnuiqGIBkAtBSq5ZQARUAyRB6lOqgIoBZmsMmA==');
     _navBarId := NAV_BUTTON_GEAR;
     _navBarBoxIndex := 1;
   end;
@@ -188,14 +188,14 @@ begin
 
   with self.tabs[TAB_MAGIC] do
   begin
-    _bmp := bitmapFromString(6, 4, 'meJxzie5QFWPzUGCptxLwkHcy9koz7toqIp4ub9Dqm7MdSALZatnt7OxuQC4QcXLPA7KlLX0YGRgEZV2BWhSk5YEmAAC4KBGC');
+    _bmp := bitmapFromString(11, 5, 'meJzbHmmk37bMdtVl24ApmlI8HgrsqY7KHvJO1uGFqRHBbZb8tRVBHG0LODwzgMpEFQuACKiSh2cWK2uRipw6ULGnEadN9sTApgXKWdMEJIOAsoUlF4DK2Jm9IQZCUHBqroSRFyMDg6CUHdB8oBRcFmgLMkqz4QQiOHd7pBEAQGorag==');
     _navBarId := NAV_BUTTON_POWERS;
     _navBarBoxIndex := 2;
   end;
 
    with self.tabs[TAB_MELEE] do
   begin
-    _bmp := bitmapFromString(4, 5, 'meJzj4udctnDev3//Hty7unzTDiBjzZF76bnZxec+Z3z5GxMa6WRjaLLghvDm264p6Wri7DKWXlx8YuwFPdyO4QAyrR2H');
+    _bmp := bitmapFromString(9, 4, 'meJyz9vJRVxRXlhUSFuPbOWfm318/5h64WpCb6+7mWnjkpVV0iZS44NQZs16+/wAR93B3k5WTUdC10G9bNm/DFrh6oLiSrIiKjICYMBevlHrxiXc53/8Gp4LEZSSFpEU4lSR5AM6bKxQ=');
     _navBarId := NAV_BUTTON_POWERS;
     _navBarBoxIndex := 3;
   end;
@@ -209,7 +209,7 @@ begin
 
   with self.tabs[TAB_DEFENSIVE] do
   begin
-    _bmp := bitmapFromString(8, 5, 'meJxrae/MygwREU/XU38UEf90zZF7QCQs59zWlG3j7AkRb1l07vL5K//+/QNKdU+f5WRjCBTXUF3lm7MdKAUU/Pju9bKF89Jzs4HinNzz5A1agVIQWaAgEAnKujKxZgARRCPQIgCjYzZb');
+    _bmp := bitmapFromString(13, 3, 'meJwryM2ta6iqrQgSkAzSVD5aWHJh37kHk2edE5b2EZbyBTIg3AKwMg93N1bWIguXixDxv79+AEkI4+X7D0C9QGVTZ8wCKgOaxsMzCygCUQmUBSKIUUBBAB0HQt0=');
     _navBarId := NAV_BUTTON_POWERS;
     _navBarBoxIndex := 5;
   end;
