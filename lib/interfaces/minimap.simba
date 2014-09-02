@@ -52,9 +52,9 @@ Example:
 
 *)
 const
-  MM_DOT_NPC    = 4369;
-  MM_DOT_ITEM   = 23;
-  MM_DOT_PLAYER = 1907997;
+  MM_DOT_NPC    = 74522;
+  MM_DOT_ITEM   = 34;
+  MM_DOT_PLAYER = 2171169;
   MM_DOT_FRIEND = 5376;
   MM_DOT_TEAM   = 2171941;
 
@@ -707,10 +707,12 @@ Example:
 
     dots := minimap.getDots(MM_DOT_NPC, minimap.getBounds());
 *)
-function TRSMinimap.getDots(dotType: integer; searchBox: TBox): TPointArray;
+function TRSMinimap.getDots(dotType: integer; searchBox: TBox; tol: Integer = 30): TPointArray;
 var
-  i, c: integer;
-  tpa: TPointArray;
+  i: integer;
+  tpa, res: TPointArray;
+  atpa: T2DPointArray;
+  cols: array [0..1] of UInt32;
 begin
   print('TRSMinimap.getDots()', TDebug.HEADER);
 
@@ -734,19 +736,24 @@ begin
     exit;
   end;
 
-  setLength(result, length(tpa));
-  c := 0;
-
   // gets the difference between the bottom two colors of a dot
   for i := 0 to high(tpa) do
-    if (getColor(tpa[i].x - 1, tpa[i].y - 1) - getColor(tpa[i].x, tpa[i].y - 1) = dotType) then
-    begin
-      result[c] := point(tpa[i].x, tpa[i].y - 2);
-      inc(c);
-    end;
+  begin
+    cols[0] := GetColor(tpa[i].x, tpa[i].y -2);
+    cols[1] := GetColor(tpa[i].x, tpa[i].y -1);
+
+    if (cols[0] = cols[1]) then
+      continue();
+
+    if (inRange(Integer(Abs(cols[0] - cols[1])), dotType - tol, dotType + tol)) then
+      Insert(tpa[i], res)
+  end;
 
   unfreeze();
-  setLength(result, c);
+
+  atpa := SplitTPA(res, 1);
+  for i := 0 to high(ATPA) do
+    Insert(atpa[i][0], Result);
 
   print('Found '+toStr(length(result))+' minimap dots (ID: '+toStr(dotType)+')');
   print('TRSMinimap.getDots(): '+toStr(result), TDebug.FOOTER);
