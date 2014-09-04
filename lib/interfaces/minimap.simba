@@ -52,9 +52,9 @@ Example:
 
 *)
 const
-  MM_DOT_NPC    = 74522;
-  MM_DOT_ITEM   = 34;
-  MM_DOT_PLAYER = 2171169;
+  MM_DOT_NPC    = 714965;
+  MM_DOT_ITEM   = 3023;
+  MM_DOT_PLAYER = 13813713;
   MM_DOT_FRIEND = 5376;
   MM_DOT_TEAM   = 2171941;
 
@@ -686,77 +686,81 @@ begin
   result := inIntArray(arr, dotType);
 end;
 
-(*
-TRSMinimap.getDots
-~~~~~~~~~~~~~~~~~~
-
-.. code-block:: pascal
-
-    function TRSMinimap.getDots(dotType: integer; searchBox: TBox): TPointArray;
-
-Returns a TPointArray of every instance of "dotType" found on in "searchBox".
-
-.. note::
-
-    - by Nava2 & Sir R. Magician
-    - Last Updated: 23 May 2013 by Coh3n
-
-Example:
-
-.. code-block:: pascal
-
-    dots := minimap.getDots(MM_DOT_NPC, minimap.getBounds());
-*)
-function TRSMinimap.getDots(dotType: integer; searchBox: TBox; tol: Integer = 30): TPointArray;
+function TRSMinimap.getAllPossibleDots(const Bitmap: Integer): T2DPointArray;
+const
+  BORDER_COL = 65536;
 var
-  i: integer;
-  tpa, res: TPointArray;
-  atpa: T2DPointArray;
-  cols: array [0..1] of UInt32;
+  i, j, H: Integer;
+  TPA: TPointArray;
+  Rows: T2DPointArray;
+  p: TPoint;
 begin
-  print('TRSMinimap.getDots()', TDebug.HEADER);
+  if (not FindColorsBitmap(Bitmap, TPA, BORDER_COL)) then
+    Exit();
 
-  // confirm valid dot type
-  if (not self._isValidDot(dotType)) then
+  Rows := FindTPARows(TPA);
+  for i := 0 to High(Rows) do
   begin
-    print('Invalid dot type '+toStr(dotType), TDebug.ERROR);
-    print('TRSMinimap.getDots(): '+toStr(result), TDebug.FOOTER);
-    exit;
+    H := High(Rows[i]);
+    for j := 0 to H do
+    begin
+      p := Point(Rows[i][j].x - 3, Rows[i][j].y);
+      if (PointInTPA(p, Rows[i])) then
+        Insert(TPointArray([p, Rows[i][j]]), Result)
+      else begin
+        p := Point(Rows[i][j].x + 3, Rows[i][j].y);
+        if (PointInTPA(p, Rows[i])) then
+          Insert(TPointArray([p, Rows[i][j]]), Result);
+      end;
+    end;
   end;
 
-  freeze();
-  findColors(tpa, 65536, searchBox); // the black shadow color of the minimap dots
-  self.filterPoints(tpa);
+  // Sort left to right
+  for i := 0 to High(Result) do
+    if (Result[i][0].X > Result[i][1].X) then
+      Swap(Result[i][0], Result[i][1]);
+end;
 
-  if (length(tpa) <= 0) then
-  begin
-    unfreeze();
-    print('No minimap dot color found', TDebug.ERROR);
-    print('TRSMinimap.getDots(): '+toStr(result), TDebug.FOOTER);
-    exit;
+function TRSMinimap.getDots(const dotType: Integer; const SearchBox: TBox; const Tol: Byte = 30): TPointArray;
+var
+  Bitmap, i, x, Col: Integer;
+  Dots: T2DPointArray;
+{$IFDEF GETDOTS_DEBUG}
+  Found: Boolean;
+  T: Integer;
+{$ENDIF}
+begin
+  Bitmap := BitmapFromClient(SearchBox);
+
+  try
+    Dots := Self.getAllPossibleDots(Bitmap);
+    if (Length(Dots) = 0) then
+      Exit();
+
+    for i := 0 to High(Dots) do
+    begin
+      Col := FastGetPixel(Bitmap, Dots[i][1].X, Dots[i][1].Y - 1);
+      if (Col = FastGetPixel(Bitmap, Dots[i][1].X - 1, Dots[i][1].Y)) then
+      {$IFDEF GETDOTS_DEBUG}
+      Found := False;
+      for T := 1 to Tol do
+        if (SimilarColors(Col, dotType, T)) then
+        begin
+          Found := True;
+          Print('TRSMinimap.getDots(): Tolerance = ' + toString(T));
+          Break();
+        end;
+      if (Found) then
+      {$ELSE}
+      if (SimilarColors(Col, dotType, Tol)) then
+      {$ENDIF}
+        Insert(Dots[i][0], Result);
+    end;
+
+    OffsetTPA(Result, Point(SearchBox.X1, SearchBox.Y1));
+  finally
+    FreeBitmap(Bitmap);
   end;
-
-  // gets the difference between the bottom two colors of a dot
-  for i := 0 to high(tpa) do
-  begin
-    cols[0] := GetColor(tpa[i].x, tpa[i].y -2);
-    cols[1] := GetColor(tpa[i].x, tpa[i].y -1);
-
-    if (cols[0] = cols[1]) then
-      continue();
-
-    if (inRange(Integer(Abs(cols[0] - cols[1])), dotType - tol, dotType + tol)) then
-      Insert(tpa[i], res)
-  end;
-
-  unfreeze();
-
-  atpa := SplitTPA(res, 1);
-  for i := 0 to high(ATPA) do
-    Insert(atpa[i][0], Result);
-
-  print('Found '+toStr(length(result))+' minimap dots (ID: '+toStr(dotType)+')');
-  print('TRSMinimap.getDots(): '+toStr(result), TDebug.FOOTER);
 end;
 
 (*
