@@ -739,6 +739,9 @@ begin
 
     for i := 0 to High(Dots) do
     begin
+      if (Dots[i][1].Y < 0) then
+        Continue();
+
       Col := FastGetPixel(Bitmap, Dots[i][1].X, Dots[i][1].Y - 1);
       if (Col = FastGetPixel(Bitmap, Dots[i][1].X - 1, Dots[i][1].Y)) then
       {$IFDEF GETDOTS_DEBUG}
