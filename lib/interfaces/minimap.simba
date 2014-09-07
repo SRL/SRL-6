@@ -58,7 +58,7 @@ Example:
 
 *)
 const
-  MM_DOT_NPC    = 4369;
+  MM_DOT_NPC    = 0;
   MM_DOT_ITEM   = 23;
   MM_DOT_PLAYER = 1907997;
   MM_DOT_FRIEND = 5376;
