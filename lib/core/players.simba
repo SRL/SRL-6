@@ -114,7 +114,7 @@ var
   currentPlayer: integer;
   disableIPScreenshots: boolean;
 
-function Rafiki_ReturnArmyNames(out names: TStringArray): boolean;
+function Raf_GetArmyNames(out names: TStringArray): boolean;
 var
   s: string := Settings.getPrefix();
 begin
@@ -126,24 +126,24 @@ begin
   end;
 end;
 
-function Rafiki_FindArmy(const name: string): boolean;
+function Raf_FindArmy(const name: string): boolean;
 var
   strings: TStringArray;
   i: integer;
 begin
   result := false;
 
-  if (Rafiki_ReturnArmyNames(strings)) then
+  if (Raf_GetArmyNames(strings)) then
     for i := 0 to high(strings) do
-      if (lowercase(name) = lowercase(strings[i])) then
-        exit(true);
+      if (SameText(Replace(Name, ' ', '_', [rfReplaceAll]), Strings[i])) then
+        Exit(True);
 end;
 
-function Rafiki_IsArmyEncrypted(const armyName: string): boolean;
+function Raf_IsArmyEncrypted(const armyName: string): boolean;
 var
   s: string := Settings.getPrefix();
 begin
-  if (not Rafiki_FindArmy(armyName)) then
+  if (not Raf_FindArmy(armyName)) then
     exit(false);
 
   Settings.setPrefix('');
@@ -154,7 +154,7 @@ begin
   end;
 end;
 
-function Rafiki_DecryptArmy(const armyName: string; var data: string): boolean;
+function Raf_DecryptArmy(const armyName: string; var data: string): boolean;
 var
   pass, dataCopy: string;
 label
@@ -166,7 +166,7 @@ begin
   pass := '';
   data := copy(dataCopy);
 
-  if (SafeInputQuery('Rafiki Player Manager', 'Please enter your army password for decryption', pass)) then
+  if (InputQuery('Rafiki Player Manager', 'Please enter your army password for decryption', pass)) then
   begin
     rc2_decrypt(pass, htSHA512, data);
     result := ExecRegExpr('<player>', data);
@@ -176,79 +176,69 @@ begin
   end;
 
   if (not result) then
-    if (SafeMessageDlg('Rafiki_DecryptArmy', 'Wrong password for decryption', mtError, [mbRetry, mbOk]) = 'mbRetry') then // retry todo fix.
+    if (MessageDlg('Rafiki_DecryptArmy', 'Wrong password for decryption', mtError, [mbRetry, mbOk]) = 4) then
       goto lStart
     else
       print('Ok clicked');
 end;
 
-function Rafiki_GetPlayersFromArmy(const armyName: string; out __players: array of TPlayer): boolean;
+function Raf_GetPlayers(ArmyName: String; out _Players: TPlayerArray): Boolean;
 var
-  s: string := Settings.getPrefix();
-  armyData: string;
-  playersTSA: TStringArray;
+  Data, Pref: String;
+  TSA: TStringArray;
   i: integer;
 begin
-  result := false;
+  Result := False;
+  Print('Raf_GetPlayers()', TDebug.HEADER);
 
-  print('Rafiki_GetPlayersFromArmy()', TDebug.HEADER);
+  if (not Raf_FindArmy(ArmyName)) then
+    Exit(Print('Army doesn''t exist!', False, 'Raf_GetPlayers: Result = false'));
 
-  if (not Rafiki_FindArmy(armyName)) then
-  begin
-    printf('Army "%s" doesn''t exist', [armyName]);
-    print('Rafiki_GetPlayersFromArmy(): result = false', TDebug.FOOTER);
-    exit();
-  end;
-
-  Settings.setPrefix('');
+  Pref := Settings.getPrefix();
+  Settings.setPrefix('Rafiki/Armys/');
+  ArmyName := Replace(Lowercase(ArmyName), ' ', '_', [rfReplaceAll]);
 
   try
-    printf('Army "%s" exists', [armyName]);
-    armyData := DecompressString(Base64Decode(Settings.GetKeyValueDef('Rafiki/Armys/'+armyName+'/Player_Data', '')));
+    Print('Army exists, reading the players...');
+    Data := DeCompressString(Base64Decode(Settings.GetKeyValueDef(ArmyName + '/Player_Data', '')));
 
-    if (length(armyData) < 5) then
+    if (Raf_IsArmyEncrypted(ArmyName)) then
+      if (not Raf_DecryptArmy(ArmyName, Data)) then
+        Exit(Print('Failed to decrpyt army', False, 'Raf_GetPlayers: Result = false'));
+
+    if (Length(Data) <= 1) or (Pos('<player>', Data) = 0) then
     begin
-      printf('Not enough data saved in army "%s"', [armyName]);
-      print('Rafiki_GetPlayersFromArmy(): result = false', TDebug.FOOTER);
-      exit();
+      Print('Corrupted army file, going to remove it');
+      Print('Deleted = ' + BoolToStr(Settings.DeleteKey(ArmyName), 'Succesfull', 'Failed'));
+      Exit();
     end;
 
-    if (Rafiki_IsArmyEncrypted(armyName)) then
-      if (not Rafiki_DecryptArmy(armyName, armyData)) then
-      begin
-        printf('Failed to decrypt army "%s"', [armyName]);
-        print('Rafiki_GetPlayersFromArmy(): result = false', TDebug.FOOTER);
-        exit();
-      end;
+    TSA := MultiBetween(Data, '<player>', '</player>');
+    SetLength(_Players, Length(TSA));
 
-     print('Passed decryption stage');
-     playersTSA := multiBetween(armyData, '<player>', '</player>');
-
-     setLength(__players, length(playersTSA));
-     for i := 0 to high(playersTSA) do
-       with __players[i] do
+    for i := 0 to High(_Players) do
+      with (_Players[i]) do
        begin
-         loginName := between('<loginName>', '</loginName>', playersTSA[i]);
-         nickName := between('<nickName>', '</nickName>', playersTSA[i]);
-         password := between('<password>', '</password>', playersTSA[i]);
-         bankPin := between('<bankPin>', '</bankPin>', playersTSA[i]);
-         isMember := strToBoolDef(between('<isMember>', '</isMember>', playersTSA[i]), false);
+         loginName := Between('<loginName>', '</loginName>', TSA[i]);
+         nickName := Between('<nickName>', '</nickName>', TSA[i]);
+         password := Between('<password>', '</password>', TSA[i]);
+         bankPin := Between('<bankPin>', '</bankPin>', TSA[i]);
+         isMember := StrToBoolDef(Between('<isMember>', '</isMember>', TSA[i]), False);
        end;
   finally
-    Settings.setPrefix(s);
+    Settings.setPrefix(Pref);
   end;
 
-  result := (length(__players) > 0);
-  printf('%d player(s) were found in the army', [length(__players)]);
-  print('Rafiki_GetPlayersFromArmy(): result = '+lowercase(boolToStr(result)), TDebug.FOOTER);
+  Result := (Length(_Players) > 0);
+  Printf('Raf_GetPlayers: Result = %s', [toString(Result)], TDebug.FOOTER);
 end;
 
-function Rafiki_GetPlayersFromArmy(const armyName: string; out __players: PF_TPlayerArray): boolean; overload;
+function Raf_GetPlayers(const armyName: string; out __players: PF_TPlayerArray): boolean; overload;
 var
   tmp: TPlayerArray;
   i: integer;
 begin
-  result := Rafiki_GetPlayersFromArmy(armyName, tmp);
+  result := Raf_GetPlayers(armyName, tmp);
   setLength(__players, length(tmp));
 
   for i := 0 to high(tmp) do
@@ -383,7 +373,7 @@ begin
   print('TPlayerArray.setup()', TDebug.HEADER);
   printf('Attempting to load player(s) "%s" from army "%s"', [toString(names), army]);
 
-  if (not Rafiki_GetPlayersFromArmy(army, tmp)) then
+  if (not Raf_GetPlayers(army, tmp)) then
   begin
     print('Unable to get players from army', TDebug.ERROR);
     print('TPlayerArray.setup(): Failure', TDebug.FATAL);

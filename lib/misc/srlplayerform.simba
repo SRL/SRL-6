@@ -64,16 +64,16 @@ begin
   begin
     setLength(__loadedArmy, 0);
 
-    if (Rafiki_FindArmy(FName)) then
-      Rafiki_GetPlayersFromArmy(FName, __loadedArmy)
+    if (Raf_FindArmy(FName)) then
+      Raf_GetPlayers(FName, __loadedArmy)
     else begin
-      safeMessageDlg('PlayerForm', format('Army "%s" doesn''t exist, make sure you''ve saved a army in the player manager (SRL > Run Player Manager)', [FName]), mtWarning, [mbOk]);
+      MessageDlg('PlayerForm', format('Army "%s" doesn''t exist, make sure you''ve saved a army in the player manager (SRL > Run Player Manager)', [FName]), mtWarning, [mbOk]);
       exit();
     end;
 
     if (length(__loadedArmy) = 0) then
     begin
-      safeMessageDlg('PlayerForm', format('Found no players in the army "%s"', [FName]), mtWarning, [mbOk]);
+      MessageDlg('PlayerForm', format('Found no players in the army "%s"', [FName]), mtWarning, [mbOk]);
       exit();
     end;
 
@@ -90,6 +90,7 @@ begin
     end;
 
     __loadedArmyName := FName;
+    playerForm.editArmyName.setCaption(__loadedArmyName);
 
     PF_Debug(format('Loaded %d players from army "%s"', [length(__loadedArmy), FName]));
     PF_Debug(format('Our currently loaded army is now "%s"', [__loadedArmyName]));
@@ -215,12 +216,18 @@ begin
    begin
      for i := 0 to high(__scriptEditBoxes) do
       begin
+        if (c > high(players[index].settings)) then
+          Continue();
+
         __scriptEditBoxes[i].setCaption(players[index].settings[c]);
         inc(c);
       end;
 
       for i := 0 to high(__scriptCheckBoxes) do
       begin
+        if (c > high(players[index].settings)) then
+          Continue();
+
         if (lowercase(players[index].settings[c]) = 'true') then
           __scriptCheckBoxes[i].setState(cbChecked)
         else
@@ -228,9 +235,12 @@ begin
 
         inc(c);
       end;
-
+         writeln(players[index].settings);
       for i := 0 to high(__scriptComboBoxes) do
       begin
+        if (c > high(players[index].settings)) then
+          Continue();
+
         __scriptComboBoxes[i].setCaption(players[index].settings[c]);
         inc(c);
       end;
@@ -420,6 +430,8 @@ var
   i: integer;
   a: TIntegerArray;
 begin
+  if (not Assigned(playerForm.__lbDebug)) then
+    Exit();
   with (playerForm.__lbDebug) do
   begin
     getItems().append(s);
@@ -442,7 +454,7 @@ begin
   with (playerForm) do
     case (Sender) of
       editArmyName:
-        if (Rafiki_FindArmy(editArmyName.getCaption())) then
+        if (Raf_FindArmy(editArmyName.getCaption())) then
           btnLoadArmy.setGlyph(__btnBmps[0])
         else
           btnLoadArmy.setGlyph(__btnBmps[1]);
@@ -581,7 +593,7 @@ procedure PF_Defaults();
 begin
   with (playerForm) do
   begin
-    if (Rafiki_FindArmy(editArmyName.getCaption())) then
+    if (Raf_FindArmy(editArmyName.getCaption())) then
     begin
       btnLoadArmy.setGlyph(__btnBmps[0]);
       PF_LoadArmy();
@@ -630,7 +642,7 @@ begin
     with (__cmpGroupBox) do
     begin
       setParent(mainForm);
-      setBounds((groupBox.getLeft() + groupBox.getWidth()) + 10, 4, 1, 1); // we will resize later.
+      setBounds((groupBox.getLeft() + groupBox.getWidth()) + 10, 4, 500, 500); // we will resize later.
       setCaption('Settings for player: Select a player!');
       setEnabled(false);
     end;
@@ -809,7 +821,7 @@ begin
   PF_Debug('Tip: Settings are automaticly saved when you click start');
 end;
 
-procedure PF_Init(); native;
+procedure PF_Init(); Native;
 var
   i: integer;
 begin

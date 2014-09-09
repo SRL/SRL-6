@@ -429,6 +429,7 @@ end;
 procedure saveArmy();
 begin
   army.name := rafikiForm.editArmyName.getCaption();
+  army.name := Replace(Lowercase(Army.Name), ' ', '_', [rfReplaceAll]);
 
   if (length(army.players) > 0) then
   begin
@@ -460,14 +461,14 @@ var
 begin
   setLength(players, 0); // clear
 
-  if (not Rafiki_FindArmy(armyName)) then
+  if (not Raf_FindArmy(armyName)) then
   begin
     printf('Army "%s" doesn''t exist', [armyName]);
     print('Rafiki_GetPlayersFromArmy(): result = false', TDebug.FOOTER);
     exit();
   end;
 
-  if (Rafiki_GetPlayersFromArmy(armyName, army.players)) then
+  if (Raf_GetPlayers(armyName, army.players)) then
   begin
     settings.setPrefix('Rafiki/Armys/'+armyName+'/');
     army.encrpyted := strToBoolDef(settings.getKeyValue('Encrpyted'), false);
