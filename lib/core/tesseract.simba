@@ -1,6 +1,5 @@
 {$loadlib libtesseract32.dll}
 
-
 {$f-}
 
 (*
@@ -38,6 +37,18 @@ type
     thresholdSettings: record invert: boolean; amount: byte; method: TBmpThreshMethod; end;
  end;
 
+(*
+const Tesseract
+~~~~~~~~~~~~~~~
+
+String constants that store the data path, language and whitelist presets.
+
+Example:
+
+.. code-block:: pascal
+
+  print(TESS_DATA_PATH);
+*)
 const
   TESS_DATA_PATH = AppPath + 'tessdata';
   TESS_LANGUAGE = 'eng';
@@ -47,11 +58,29 @@ const
   TESS_WHITELIST_LETTERS = 'abcdefghijklmnopqrstuvwxyzABCDEFGHIJKLMNOPQRSTUVWXYZ';
   TESS_WHITELIST_NONE = '';
 
+(*
+const Filter presets
+~~~~~~~~~~~~~~~~~~~~
+
+Constants of TTesseractFilter that are filter presets
+
+Example:
+
+.. code-block:: pascal
+
+  Tesseract_GetText(100, 100, 200, 200, TESS_FILTER_SMALL_CHARS);
+*)
 const
   TESS_FILTER_SMALL_CHARS: TTesseractFilter = [3, 3, [false, 50, TM_Mean]];
   TESS_FILTER_SMALL_CHARS_2: TTesseractFilter = [5, 5, [false, 55, TM_Mean]];
   TESS_FILTER_NPC_CHAT_CHARS: TTesseractFilter = [3, 3, [true, -50, TM_Mean]];
 
+{*
+var Tesseract
+~~~~~~~~~~~~~
+
+Internal variables for use by the Tesseract.
+*}
 var
   __tesseractPtr: pointer := nil;
   __tesseractIsSetup: boolean = false;
@@ -128,17 +157,41 @@ begin
   __tesseractIsSetup := false;
 end;
 
-procedure Tesseract_ApplyFilter(const bmp: integer; const filter: TTesseractFilter);
+(*
+Tesseract_ApplyFilter
+~~~~~~~~~~~~~~~~~~~~~
+
+.. code-block:: pascal
+
+    procedure Tesseract_ApplyFilter(const BMP: integer; const filter: TTesseractFilter);
+
+Applys the tesseract filter onto the bitmap.
+
+.. note::
+
+    - by Olly
+    - Last updated: September. 9th, 2014 by Olly
+
+Example:
+
+.. code-block:: pascal
+
+    Tesseract_ApplyFilter(BMP, MyTesseractFilter);
+*)
+procedure Tesseract_ApplyFilter(const BMP: integer; const filter: TTesseractFilter);
 var
   w, h: integer;
 begin
-  getBitmapSize(bmp, w, h);
+  if (not BitmapExists(BMP)) then
+    Exit();
 
-  with (filter) do
-  begin
-    ResizeBitmapEx(bmp, RM_Bilinear, max(multiplerH, 1) * w, max(multiplerH, 1) * h);
-    ThresholdAdaptiveBitmap(bmp, 0, 255, thresholdSettings.invert, thresholdSettings.method, thresholdSettings.amount);
-  end;
+  GetBitmapSize(BMP, w, h);
+  if (Filter.multiplerH > 0) and (Filter.multiplerH > 0) then
+    ResizeBitmapEx(BMP, RM_Bilinear, Filter.multiplerH * w, Filter.multiplerH * h);
+
+  ThresholdAdaptiveBitmap(bmp, 0, 255, Filter.thresholdSettings.invert,
+                                       Filter.thresholdSettings.method,
+                                       Filter.thresholdSettings.amount);
 end;
 
 (*
@@ -278,9 +331,7 @@ begin
   result := Tesseract_GetText(area.x1, area.y1, area.x2, area.y2, filter, Whitelist);
 end;
 
-
 // keep old versions working
-
 // deprecated use the TTesseractFilter presets
 const
   FILTER_SMALL_CHARS: TTesseractFilter = TESS_FILTER_SMALL_CHARS;
