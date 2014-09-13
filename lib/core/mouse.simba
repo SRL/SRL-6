@@ -548,7 +548,7 @@ on the "down" parameter (set to true by default).
 .. note::
 
     - by Coh3n
-    - Last Updated: 23 July 2013 by Coh3n
+    - Last Updated: 13 September 2014 by riwu
 
 Example:
 
@@ -565,9 +565,9 @@ begin
 
   repeat
     if (down) then
-      scrollMouse(x, y, 1)
+      scrollMouse(x, y, -1)
     else
-      scrollMouse(x, y, -1);
+      scrollMouse(x, y, 1);
 
     wait(16 + random(200));
     inc(c);
