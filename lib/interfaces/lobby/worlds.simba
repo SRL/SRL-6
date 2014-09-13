@@ -262,20 +262,20 @@ begin
   // needed to compensate for lag
   if (result) then
   begin
-    t := (getSystemTime() + 10000);
+    t := (getSystemTime() + randomRange(7500, 11000));
 
     while (getSystemTime() < t) do
     begin
-      yellow := countColor(1272955, self.worldNumArea);
+      yellow := countColor(379903, self.worldNumArea);
       white := countColor(16777215, self.worldNumArea);
 
-      if ((white + yellow) > 100) then
+      if ((white + yellow) > 80) then
         exit(true);
 
       wait(50);
     end;
 
-    print('TRSLobbyWorlds.open(): Worlds list taking to long to load', TDebug.SUB);
+    print('TRSLobbyWorlds.open(): Worlds list taking too long to load', TDebug.SUB);
   end;
 end;
 
@@ -413,7 +413,7 @@ begin
     TB := getTPABounds(ATPA[by]);
     TB.edit(-1, 0, 1, 14);
 
-    for i := 0 to 2 do
+    for i := 0 to 2 ado
     begin
       if (getColor(TB.getMiddle()) = 3427397) then
         if descending then
@@ -545,7 +545,7 @@ begin
     if (self._findWorldNumber(res, wo)) then
       break;
 
-    if (getColor(self.x2 - 25, self.y2 - 287) = __COLOR_SCROLL_BAR) then
+    if (getColor(self.x2 - 25, self.y2 - 334) = __COLOR_SCROLL_BAR) then
       down := true;
 
     if (getColor(self.x2 - 25, self.y2 - 79) = __COLOR_SCROLL_BAR) then

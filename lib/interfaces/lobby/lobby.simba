@@ -53,13 +53,14 @@ Example:
 
 *)
 const
-  LOBBY_COUNT = 6;
-    LOBBY_PLAYER = 0;
-    LOBBY_WORLDS = 1;
-    LOBBY_FRIENDS = 2;
-    LOBBY_CHAT = 3;
-    LOBBY_CLAN = 4;
-    LOBBY_OPTIONS = 5;
+  LOBBY_PLAYER = 0;
+  LOBBY_WORLDS = 1;
+  LOBBY_FRIENDS = 2;
+  LOBBY_CHAT = 3;
+  LOBBY_CLAN = 4;
+  LOBBY_OPTIONS = 5;
+
+
 {*
 TRSLobby.__init()
 ~~~~~~~~~~~~~~~~~
@@ -91,7 +92,7 @@ begin
     parentID := -1;
     static := true;
     setBounds([21, 110, 782, 587]);
-    tabBoxes := Grid(6, 1, 80, 20, 102, 0, Point(x1 + 70, y1 + 10));
+    tabBoxes := grid(6, 1, 45, 22, 100, 0, point(x1 + 70, y1 + 16));
   end;
 end;
 {$ENDIF}
@@ -236,7 +237,7 @@ Gets current lobby tab.
 .. note::
 
     - by Bionicle1800, NCDS & Cohen
-    - Last Updated: 29th July by Ashaman88
+    - Last Updated: 9th September by The Mayor
 
 Example:
 
@@ -247,21 +248,21 @@ Example:
 
 *)
 function TRSLobby.getCurrentTab(): Integer;
-var
-  i: Integer;
+const
+  INACTIVE_TAB_BOTTOM = 9078134; // Bottom line of inactive tab
 begin
-  Result := -1;
-  if (not Self.isOpen()) then
-    Exit();
+  result := -1;
 
-  for i := 0 to High(Self.tabBoxes) do
-    if (CountColor($FFFFFF, Self.tabBoxes[i]) > 5) then
+  if (not self.isOpen()) then
+    exit();
+
+  for result := 0 to high(self.tabBoxes) do
+    if not (getColor(self.tabBoxes[result].x2, self.tabBoxes[result].y2) = INACTIVE_TAB_BOTTOM) then
     begin
-      Result := i;
-      Break();
+      printf('TRSLobby.getCurrentTab(): Current tab is %d', [result]);
+      break();
     end;
 
-  printf('TRSLobby.getCurrentTab(): Current tab is %d', [Result]);
 end;
 
 {*
