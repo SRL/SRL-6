@@ -539,16 +539,16 @@ mouseScroll()
 
 .. code-block:: pascal
 
-    procedure mouseScroll(pnt: TPoint; scrolls: integer; down: boolean = true);
+    procedure mouseScroll(pnt: TPoint; scrolls: integer; up: boolean = true);
 
 Moves the mouse to "pnt", and scrolls the mouse wheel in a human way.  Will
 scroll the number of times declared by "scrolls".  Will scroll up or down depending
-on the "down" parameter (set to true by default).
+on the "up" parameter (set to true by default).
 
 .. note::
 
     - by Coh3n
-    - Last Updated: 23 July 2013 by Coh3n
+    - Last Updated: 13 September 2014 by riwu
 
 Example:
 
@@ -556,7 +556,7 @@ Example:
 
     mouseScroll(p, 50);
 *)
-procedure mouseScroll(pnt: TPoint; scrolls: integer; down: boolean = true);
+procedure mouseScroll(pnt: TPoint; scrolls: integer; up: boolean = true);
 var
   x, y, c: integer;
 begin
@@ -564,7 +564,7 @@ begin
   getMousePos(x, y);
 
   repeat
-    if (down) then
+    if (up) then
       scrollMouse(x, y, 1)
     else
       scrollMouse(x, y, -1);
