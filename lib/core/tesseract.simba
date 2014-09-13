@@ -186,8 +186,8 @@ begin
     Exit();
 
   GetBitmapSize(BMP, w, h);
-  if (Filter.multiplerH > 0) and (Filter.multiplerH > 0) then
-    ResizeBitmapEx(BMP, RM_Bilinear, Filter.multiplerH * w, Filter.multiplerH * h);
+  if (Filter.multiplerW > 0) and (Filter.multiplerH > 0) then
+    ResizeBitmapEx(BMP, RM_Bilinear, Filter.multiplerW * w, Filter.multiplerH * h);
 
   ThresholdAdaptiveBitmap(bmp, 0, 255, Filter.thresholdSettings.invert,
                                        Filter.thresholdSettings.method,
