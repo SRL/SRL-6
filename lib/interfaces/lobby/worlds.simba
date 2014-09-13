@@ -413,7 +413,7 @@ begin
     TB := getTPABounds(ATPA[by]);
     TB.edit(-1, 0, 1, 14);
 
-    for i := 0 to 2 ado
+    for i := 0 to 2 do
     begin
       if (getColor(TB.getMiddle()) = 3427397) then
         if descending then
