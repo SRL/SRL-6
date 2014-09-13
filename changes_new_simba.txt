@@ -28,4 +28,5 @@ Added New playermanager:
 
 Fix chatBox.getTextOnLines();
 Add printF
-Add Direct-X SMART plugin as default.  
+Add Direct-X SMART plugin as default. 
+Add param useTesseract: Boolean; to GetMouseOverText

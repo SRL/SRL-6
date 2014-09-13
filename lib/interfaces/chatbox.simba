@@ -100,8 +100,6 @@ begin
   getClientDimensions(wid, hei);
 
   self.setBounds([1, actionBar.y2, gameTabs.tabArea.x1, hei-2]);
-  setLength(lineBoxes, 0);
-
   chatBounds := chatBox.getChatArea();
 
   for i := 0 to 10 do
@@ -163,14 +161,22 @@ Example:
 
     chatbox.findAnyText(['Hello']);
 *)
-function TRSChatbox.findAnyText(txt: TStringArray): boolean;
+function TRSChatbox.findText(txt: TStringArray; const Filter: TTesseractFilter = CHATBOX_TESSERACT_FILTER): boolean;
 var
   s: string;
 begin
-  s := Tesseract_GetText(chatBox.getChatArea(), CHATBOX_TESSERACT_FILTER);
+  s := Tesseract_GetText(Self.getChatArea(), Filter);
 
   if (length(s) > 1) then
     result := IsArrInStr(txt, s);
+end;
+
+function TRSChatbox.getTextOnLine(Line: Integer; Filter: TTesseractFilter = CHATBOX_TESSERACT_FILTER): String;
+begin
+  if (not inRange(Line, Low(Self.lineBoxes), High(Self.lineBoxes))) then
+    Exit(Print('TRSChatBox.getTextOnLine(): Invaild line', False));
+
+  Result := Tesseract_GetText(Self.lineBoxes[Line], Filter);
 end;
 
 (*
@@ -196,20 +202,16 @@ Example:
     // returns true if "Hello" is found on the first 4 lines
     chatbox.findTextOnLines(['Hello'], [0..3]);
 *)
-function TRSChatbox.findTextOnLines(txt: TStringArray; lines: TIntegerArray): boolean;
+function TRSChatbox.findTextOnLines(txt: TStringArray; lines: TIntegerArray; Filter: TTesseractFilter = CHATBOX_TESSERACT_FILTER): boolean;
 var
   i: integer;
   s: string;
-  b: TBox;
 begin
   result := false;
 
   for i := 0 to high(lines) do
   begin
-    b := lineBoxes[i];
-
-    s := Tesseract_GetText(intToBox(b.x1, b.y1 + 2, b.x2, b.y2 - 2), CHATBOX_TESSERACT_FILTER);
-
+    s := Self.getTextOnLine(Lines[i], Filter);
     if (IsArrInStr(txt, s)) then
     begin
       print('TRSChatBox.findTextOnLines(): Found text '+toStr(txt)+' on line '+intToStr(lines[i]));
@@ -217,6 +219,7 @@ begin
     end;
   end;
 end;
+
 
 begin
   chatbox.__init();
