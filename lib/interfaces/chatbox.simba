@@ -220,6 +220,38 @@ begin
   end;
 end;
 
+function TRSChatbox.getXP(): Integer;
+const
+  Filter: TTesseractFilter = [5, 5, [False, 30, TM_Mean]];
+var
+  b: TBox;
+  Bmp, i, p: Integer;
+  TPA, TextPoints: TPointArray;
+  ATPA: T2DPointArray;
+  s: String;
+begin
+  if (not FindColorsTolerance(TPA, 13158856, IntToBox(Self.X2 - 220, Self.Y1 + 16, Self.X2 - 5, Self.Y1 + 38), 30, ColorSetting(2, 4.17, 0.23))) then
+  begin
+    Print('TRSChatbox.getXP(): Failed to find text to read', TDebug.ERROR);
+    Exit(0);
+  end;
+
+  ATPA := ClusterTPAEx(TPA, 1, 1);
+  for i := 0 to High(ATPA) do
+  begin
+    b := GetTPABounds(ATPA[i]);
+    if (inRange(b.getWidth(), 2, 7)) and (inRange(b.getHeight(), 5, 9)) then
+      Insert(ATPA[i], TextPoints);
+  end;
+
+  b := GetTPABounds(TextPoints);
+  s := Tesseract_GetText(b.X1 - 2, b.Y1 - 5, b.X2 + 2, b.Y2 + 5, Filter);
+  p := Pos('xp', s);
+  if (p > 0) then
+    s := Copy(s, p + 2, Length(s) - (p + 1));
+
+  Result := StrToIntDef(ExtractFromStr(s, Numbers), 0);
+end;
 
 begin
   chatbox.__init();

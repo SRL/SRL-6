@@ -267,7 +267,7 @@ begin
     setBitmapName(bmpMask, 'Minimap Mask');
     setBounds([577, 12, 798, 200]);
                                       (* Bounds | Center | Radius *)
-    button[MM_BUTTON_COMPASS]   := [[583, 19, 612, 48], [598, 34], 15];
+    button[MM_BUTTON_COMPASS]   := [[582, 18, 614, 50], [598, 34], 15];
     button[MM_BUTTON_RUN]       := [[759, 18, 793, 52], [776, 35], 16];
     button[MM_BUTTON_LODESTONE] := [[586, 161, 613, 188], [599, 174], 13];
     button[MM_BUTTON_MAP]       := [[764, 162, 788, 187], [776, 174], 12];
@@ -321,8 +321,8 @@ Returns the compass angle in radians.
 
 .. note::
 
-    - by Coh3n
-    - Last Updated: 26 November 2013 by Olly
+    - by Olly
+    - Last Updated: 16 September 2014 by Olly
 
 Example:
 
@@ -330,50 +330,77 @@ Example:
 
     ang := minimap.getAngleRadians();
 *)
-function TRSMinimap.getAngleRadians(Small: Boolean = False): Extended;
+function TRSMinimap.getAngleRadians(): Extended;
 const
-  PI_OVER_2: Double = PI / 2;
+  PI_OVER_2: Double = PI / 2.00;
+  Templ_Outter: TPointArray = [[16, 0], [11, 1], [12, 1], [13, 1], [14, 1], [15, 1], [17, 1], [18, 1], [19, 1], [20, 1], [21, 1], [9, 2], [10, 2], [22, 2], [23, 2], [7, 3], [8, 3], [24, 3], [25, 3], [6, 4], [26, 4], [5, 5], [27, 5], [4, 6], [28, 6], [3, 7], [29, 7], [3, 8], [29, 8], [2, 9], [30, 9], [2, 10], [30, 10], [1, 11], [31, 11], [1, 12], [31, 12], [1, 13], [31, 13], [1, 14], [31, 14], [1, 15], [31, 15], [0, 16], [32, 16], [1, 17], [31, 17], [1, 18], [31, 18], [1, 19], [31, 19], [1, 20], [31, 20], [1, 21], [31, 21], [2, 22], [30, 22], [2, 23], [30, 23], [3, 24], [29, 24], [3, 25], [29, 25], [4, 26], [28, 26], [5, 27], [27, 27], [6, 28], [26, 28], [7, 29], [8, 29], [24, 29], [25, 29], [9, 30], [10, 30], [22, 30], [23, 30], [11, 31], [12, 31], [13, 31], [14, 31], [15, 31], [17, 31], [18, 31], [19, 31], [20, 31], [21, 31], [16, 32]];
+  Templ_Inner: TPointArray = [[16, 1], [11, 2], [12, 2], [13, 2], [14, 2], [15, 2], [16, 2], [17, 2], [18, 2], [19, 2], [20, 2], [21, 2], [9, 3], [10, 3], [22, 3], [23, 3], [7, 4], [8, 4], [24, 4], [25, 4], [6, 5], [7, 5], [25, 5], [26, 5], [5, 6], [6, 6], [26, 6], [27, 6], [4, 7], [5, 7], [27, 7], [28, 7], [4, 8], [28, 8], [3, 9], [29, 9], [3, 10], [29, 10], [2, 11], [30, 11], [2, 12], [30, 12], [2, 13], [30, 13], [2, 14], [30, 14], [2, 15], [30, 15], [1, 16], [2, 16], [30, 16], [31, 16], [2, 17], [30, 17], [2, 18], [30, 18], [2, 19], [30, 19], [2, 20], [30, 20], [2, 21], [30, 21], [3, 22], [29, 22], [3, 23], [29, 23], [4, 24], [28, 24], [4, 25], [5, 25], [27, 25], [28, 25], [5, 26], [6, 26], [26, 26], [27, 26], [6, 27], [7, 27], [25, 27], [26, 27], [7, 28], [8, 28], [24, 28], [25, 28], [9, 29], [10, 29], [22, 29], [23, 29], [11, 30], [12, 30], [13, 30], [14, 30], [15, 30], [16, 30], [17, 30], [18, 30], [19, 30], [20, 30], [21, 30], [16, 31]];
 var
-  R, G, B, i: Integer;
-  fPoints: TPointArray;
-  ATPA: T2DPointArray;
-  Colors: TIntegerArray;
-  rDial, Mid: TPoint;
+  aDial: T2DPointArray;
+  tDial: TPointArray;
+  Mid, rDial: TPoint;
+  btn, b: TBox;
+  TPA: TPointArray;
+  i, j: Integer;
+  tTempls: array [0..1] of TPointArray;
+  Results: array [0..1] of Extended;
+  Found: array [0..1] of Boolean;
+  Map: array of TBoolArray;
 begin
-  if (Small) then
-    Colors := GetColors(Self.CompassEdge2)
-  else
-    Colors := GetColors(Self.CompassEdge);
-
-  Mid := Self.Button[MM_BUTTON_COMPASS].Center;
-
-  for i := High(Colors) downto 0 do
+  with (Self.button[MM_BUTTON_COMPASS]) do
   begin
-    ColorToRGB(Colors[i], R, G, B);
-    if (R > 140) and (G < 100) and (B < 60) then
-      if (Small) then
-        Insert(Self.CompassEdge2[i], fPoints)
-      else
-        Insert(Self.CompassEdge[i], fPoints);
+    Mid := Center;
+    Btn := Bounds;
   end;
 
-  case (Length(fPoints)) of
-    0:
-    begin
-      if (not Small) then
-        Exit(Self.getAngleRadians(True))
-      else
-        Exit(Print('TRSMinimap.getAngleRadians(): Failed to find compass dial', Extended(0.00)));
-    end;
-    1: rDial := fPoints[0];
-    else begin
-      ATPA := SplitTPA(fPoints, 3);
-      SortATPASize(ATPA, True);
-      rDial := MiddleTPA(ATPA[0]);
-    end;
+  if (not FindColorsTolerance(tDial, 1652630, btn, 22, ColorSetting(2, 0.24, 0.88))) then
+  begin
+    Print('Unable to find any red dial of the compass', TDebug.ERROR);
+    Exit();
   end;
 
-  Result := FixRad(ArcTan2(rDial.Y - Mid.Y, rDial.X - Mid.X) + PI_OVER_2);
+  OffsetTPA(tDial, Point(- btn.X1, - btn.Y1));
+  b := GetTPABounds(Templ_Outter);
+  SetLength(Map, b.getWidth(), b.getHeight());
+  for i := 0 to High(tDial) do
+    Map[tDial[i].x][tDial[i].y] := True;
+
+  tTempls := [Templ_Outter, Templ_Inner];
+  for j := 0 to High(tTempls) do
+  begin
+    Found[j] := True;
+
+    SetLength(tDial, 0);
+    for i := 0 to High(tTempls[j]) do
+      if (Map[tTempls[j][i].x][tTempls[j][i].y]) then
+        Insert(tTempls[j][i], tDial);
+
+    case Length(tDial) of
+      0: begin Found[j] := False; Continue(); end;
+      1: rDial := tDial[0];
+      else
+        begin
+          aDial := SplitTPAEx(tDial, 1, 1);
+          SortATPASize(aDial, True);
+          rDial := MiddleTPA(aDial[0]);
+        end;
+    end;
+
+    rDial := Point(rDial.x + btn.X1, rDial.y + btn.Y1);
+    Results[j] := FixRad(ArcTan2(rDial.Y - Mid.Y, rDial.X - Mid.X) + PI_OVER_2);
+  end;
+
+  if (Found[0] and Found[1]) then
+  begin
+    if (Abs(Results[0] - Results[1]) > 5.00) then // Fix: If points are different side of 'n' you could get 359 and 1 (deg) so if there's a big difference between them lets force it to 0.
+      Result := 0.00
+    else
+      Result := AverageExtended(Results);
+  end else
+    if (Found[0]) and (not Found[1]) then
+      Result := Results[0]
+    else if (not Found[0]) and (Found[1]) then
+      Result := Results[1];
 end;
 
 (*
@@ -399,7 +426,9 @@ Example:
 *)
 function TRSMinimap.getAngleDegrees(): extended;
 begin
-  result := degrees(self.getAngleRadians());
+  Result := Degrees(Self.getAngleRadians());
+  if (Result = 360.0) then
+    Result := 0.00;
 end;
 
 (*
@@ -438,61 +467,71 @@ function TRSMinimap.setAngle(Angle: Extended; Accurate: Boolean = False): Boolea
     else
       Result := Target - Angle + 360;
   end;
-var
-  Left: Boolean;
-  AngleDistance, CurrentAngle: Extended;
-  Tries: Integer = 0;
-  Tolerance: Integer = 5;
-begin
-  Angle := FixD(Angle);
-
-  while (Tries < Random(7, 8)) do
+  procedure Key(Left: Boolean);
   begin
-    Inc(Tries);
-    if (Tries > 1) then
-      Tolerance := 4;
-
-    CurrentAngle := Self.getAngleDegrees();
-    while (Abs(Compass_Distance(CurrentAngle, Angle)) > Tolerance) do
-    begin
-      AngleDistance := CurrentAngle - Angle;
-      Left := ((AngleDistance > 0) and (abs(AngleDistance) <= 180)) or ((AngleDistance < 0) and (abs(AngleDistance) > 180));
-
-      if (Left) Then
-      begin
+    case (Left) of
+      True:
         if (not isKeyDown(VK_LEFT)) then
         begin
           if (isKeyDown(VK_RIGHT)) then
             KeyUp(VK_RIGHT);
           KeyDown(VK_LEFT)
         end;
-      end else begin
+      False:
         if (not isKeyDown(VK_RIGHT)) then
         begin
           if (isKeyDown(VK_LEFT)) then
             KeyUp(VK_LEFT);
-          KeyDown(VK_RIGHT);
+          KeyDown(VK_RIGHT)
         end;
-      end;
-
-      CurrentAngle := Self.getAngleDegrees();
-      Result := Abs(Compass_Distance(CurrentAngle, Angle)) <= Tolerance;
-      if (Result) then
-      begin
-        if (Left) then
-          KeyUp(VK_LEFT)
-        else
-          KeyUp(VK_RIGHT);
-        Break();
-      end;
-      Wait(Random(5, 10));
     end;
+  end;
+var
+  Left: Boolean;
+  AngleDistance, CurrentAngle: Extended;
+  Tries, Tolerance, MaxTries: Integer;
+  Time: UInt64;
+label
+  Retry;
+begin
+  Tries := 0;
+  MaxTries := Random(10, 13);
+  Tolerance := 5;
+  Angle := FixD(Angle);
 
-    Wait(Random(266, 388));
-    Result := Abs(Compass_Distance(Self.getAngleDegrees(), Angle)) <= Tolerance;
+  Retry:
+  Inc(Tries);
+  CurrentAngle := Self.getAngleDegrees();
+  Time := GetTickCount64() + Random(5000, 6000);
+
+  while (Abs(Compass_Distance(CurrentAngle, Angle)) > Tolerance) and (GetTickCount64() < Time) do
+  begin
+    AngleDistance := CurrentAngle - Angle;
+    Left := ((AngleDistance > 0) and (abs(AngleDistance) <= 180)) or ((AngleDistance < 0) and (abs(AngleDistance) > 180));
+    Key(Left);
+
+    CurrentAngle := Self.getAngleDegrees();
+    Result := Abs(Compass_Distance(CurrentAngle, Angle)) <= Tolerance;
     if (Result) then
       Break();
+
+    Wait(Random(5, 10));
   end;
+
+  if (Left) then
+    KeyUp(VK_LEFT)
+  else
+    KeyUp(VK_RIGHT);
+
+  if (not Accurate) then
+    Exit();
+
+  Wait(Random(270, 420));
+  CurrentAngle := Self.getAngleDegrees();
+  Result := Abs(Compass_Distance(CurrentAngle, Angle)) <= Tolerance;
+
+  if (not Result) and (Tries < MaxTries) then
+    goto Retry;
 end;
 
 (*
