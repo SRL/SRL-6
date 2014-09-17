@@ -447,7 +447,7 @@ end;
 
 procedure PF_OnNotifyEvent(Sender: TObject); native;
 var
-  i, j: integer;
+  i, j, p: integer;
   a: array of integer;
   s: string;
 begin
@@ -469,7 +469,11 @@ begin
 
           for i := 0 to (clbPlayers.getItems().getCount() - 1) do
             if (clbPlayers.getChecked(i)) then
-              insert(s, playerNames);
+            begin
+              s := clbPlayers.getItems().getStrings(i);
+              p := Pos('(', s);
+              insert(Trim(Copy(s, 0, p - 1)), playerNames);
+            end;
 
           isScriptReady := (length(players) > 0);
           playerFile := __loadedArmyName;
