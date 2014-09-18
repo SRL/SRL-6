@@ -2358,7 +2358,7 @@ begin
 
         if (CountColorTolerance(Sym.Color, SymBox, 30, ColorSetting(1)) > 1) then
         begin
-          RectangleBitmap(Bitmap, IntToBox(SymBox.X1, SymBox.Y1, SymBox.X1 + 10, SymBox.Y1 + 12), 1);
+          RectangleBitmap(Bitmap, IntToBox(SymBox.X1, SymBox.Y1, Min(SymBox.X1 + 10, Wid - 1), Min(SymBox.Y1 + 12, Hei - 1)), 1);
           Inc(P.X, SearchArea.X1 + (Wid div 2));
           Inc(P.Y, SearchArea.Y1 + (Hei div 2));
           Insert([Symbols[i], P, Acc], FSymbols);
