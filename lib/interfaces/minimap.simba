@@ -2332,7 +2332,7 @@ Example:
 *)
 function TRSMinimap.findSymbols(const Symbols: TIntegerArray; const SearchArea: TBox; out FSymbols: TFoundSymbols; FindOne: Boolean = False): Boolean; overload;
 var
-  Bitmap, i, Targ, OldTarg, Wid, Hei: Integer;
+  Bitmap, i, Targ, OldTarg, Wid, Hei, bWid, bHei: Integer;
   Sym: _TRSSymbol;
   SearchBox, SymBox: TBox;
   P: TPoint;
@@ -2344,6 +2344,7 @@ begin
   OldTarg := GetImageTarget();
   Targ := SetTargetBitmap(Bitmap);
   SearchBox := IntToBox(0, 0, SearchArea.X2 - SearchArea.X1, SearchArea.Y2 - SearchArea.Y1);
+  GetBitmapSize(Bitmap, bWid, bHei);
 
   for i := 0 to High(Symbols) do
   begin
@@ -2354,11 +2355,11 @@ begin
     if (FindDeformedBitmapToleranceIn(Sym.Bmp, P.X, P.Y, SearchBox, 40, 0, True, Acc)) then
       if (Acc > Self.symbolAccuracy) then
       begin
-        SymBox := IntToBox(P.X, P.Y, P.X + Wid, P.Y + Hei);
+        SymBox := IntToBox(P.X, P.Y, Min(P.X + Wid, bWid - 1), Min(P.Y + Hei, bHei - 1));
 
         if (CountColorTolerance(Sym.Color, SymBox, 30, ColorSetting(1)) > 1) then
         begin
-          RectangleBitmap(Bitmap, IntToBox(SymBox.X1, SymBox.Y1, Min(SymBox.X1 + 10, Wid - 1), Min(SymBox.Y1 + 12, Hei - 1)), 1);
+          RectangleBitmap(Bitmap, IntToBox(SymBox.X1, SymBox.Y1, Min(SymBox.X1 + 10, bWid - 1), Min(SymBox.Y1 + 12, bHei - 1)), 1);
           Inc(P.X, SearchArea.X1 + (Wid div 2));
           Inc(P.Y, SearchArea.Y1 + (Hei div 2));
           Insert([Symbols[i], P, Acc], FSymbols);
