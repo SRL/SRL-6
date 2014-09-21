@@ -1460,7 +1460,7 @@ Example:
 function TRSMinimap._getSymbol(sym: integer): _TRSSymbol;
 begin
   case sym of
-    MM_SYMBOL_BANK: // (10/09/1014 dd/mm/yy)
+    MM_SYMBOL_BANK: // 10 September 2014
       with result do
       begin
         name := 'Bank';
@@ -1475,21 +1475,30 @@ begin
         bmp := BitmapFromString(15, 5, 'meJxjYGDYjwTO75ymWJUpaO7FKyw' +
           '7f/58ZCkGMEAW0QrM8q3vAapPz/AgqFg2wguoGEhyKfHhVwx0w4NH' +
           'D4AIaL5TQh4Q4VEMcQNQDVA90HAeRStkw4EqAbnwdxs=');
-        color := 12566463;
+        color := -1;
       end;
 
-    MM_SYMBOL_MINING:
+    MM_SYMBOL_MINING: // 21 September 2014
       with result do
       begin
         name := 'Mining Site';
-        bmp := BitmapFromString(9, 9, 'meJxbvWppfn6OjLySnKIKBKlr6qan' +
-        '5dfWdJ47f7KjvUlWXklBSVUeLKWgZWjhGeZT0HXmzLHlyxYAdWkY2' +
-        '+j7xGpEFCmldKnnTFKIbdq7d/vRY4fj2marVCyTKl4qE1UraeUrpW' +
-        'OupGWwc/+eo8cOFPTNFnWKkVPRVFRWU1bVhKD8mrqVK+bXVpdraOm' +
-        'qaegA3QBBquraunqGudkps6b3u7q6AEW0dAyASFNbH6gMyDAwNC7K' +
-        'Sy/ISdfRM9TWBSGgVFBAuJ6BCZBtaGyWlBDr6OgAkTI1t25v6AIAH' +
-        'HNKdw==');
-        color := 12961475;
+        bmp := BitmapFromString(16, 19, 'meJyNkvluElEYxXkJ/7BBlimUgb' +
+        'INqxS1gKCFYqslQUoBSdlqoAyFAkFZyjoUyjKURFNQmhisywMYE5s' +
+        '0MSUxafSV/NJJ1DREPTmZ3HvOL/fOnbk02m/1e6NW6yVJDtrto05n' +
+        'AO52h/3DEW2aisX2yord5wsGgiGFUqtS36G8uuooFTtXYKLW39pKz' +
+        'HL5Hz+McTxCZyIMNocyjy8KBfF8rvkLdgWy1Qqp092nM9jff3yrE6' +
+        'UbTISFcJmXPEuA3TTbrbHG7dSQ4itl0r8ZQbgowkEvLiYnJ8ewPiq' +
+        '/JbG6UUcc8Td4kR7LXdL6ywD7QplSvikSy2BnhVJ5evrpfPLVUxtw' +
+        'Mm9nEmO6M3d94cGMUI0IpOlk0eMO7tf6y+ZH8OZggyf8+ezL+eQs1' +
+        'h5cM7gYHD57do6qwIDVaz2iQmo0i3OokMubVxsteDb//t0o9zyNCk' +
+        'QQwmEpQwsYUe7uJkqJ2DNIUIEYAJEY2w77j150TCYjhAKhFMyfl0A' +
+        'FWDyWgyO06v21h48hnBdh0EoxeTwaikVCQjEGCRgqAFpEn/o+8Z0C' +
+        'UW4r1VqoxFIFPDG5atPr1ut1FA8VsdfcuVyc0kGlE/A+lWBKsEy9q' +
+        'Lm3rrprV2n1VAIVAH/+X493m8jvm4wWuXZJYw0vrKXBMIAphFA92Q' +
+        'hcuRLVHPHq8PWb4djqTGHWXaklbnUmYQphNUtMvXLrNlc5Uy5mG7K' +
+        'lKLiUb8PUYduYClMyGZa7NdLmToNhYNSb/wJTKqT2KvkDcCFZ+CdM' +
+        'qVvtgv8TBuEhPBrEp1Y/AQCS2Ls=');
+        color := 2390438;
       end;
 
     MM_SYMBOL_TRANSPORTATION:
@@ -1500,7 +1509,7 @@ begin
           '4B73032219E34763173348592A62E666E66A6C8B20660330D904C' +
           '86A841D6858BC454896C3EA6C9C498899FC465B291A3B193910B3' +
           '124A69910715C269317CEC866229B0C00B3496273');
-        color := 2650848;
+        color := -1;
       end;
 
     MM_SYMBOL_SHOP_MAGIC:
@@ -1511,17 +1520,29 @@ begin
         'nEvxOBFqcSjYDEgC2UARRXndMDOTCnuzGgdjIAlkA0WkpY0w0ZaeO' +
         'hVlCzk5KAKygSKXZjdubKsAsoEKgCSQDRQBAE/LKiY=');
 
-        color := 13456947;
+        color := -1;
       end;
 
-    MM_SYMBOL_WATER:
+    MM_SYMBOL_WATER: // 21 September 2014
       with result do
       begin
         name := 'Water';
-        bmp := BitmapFromString(15, 5, 'beNpjYGRgYDyABFJrHmt' +
-          'm/ACi+fPnH0AFQJW4FAMRfsUQlYfPPgSS7Hb30QzHVAxUCVcMRHgUQ2xHVoxs' +
-          'OAMAbyOCjQ==');
-        color := 16279593;
+        bmp := BitmapFromString(16, 19, 'meJyNkv9rEmEcx/1LaurpnVNPd+' +
+        'cX3HW25la4Su1a6NgvrRgorbJ0LZSp7TzPDfVuuwXRrEbZF4IgKGJ' +
+        'QbT9s0KAgoqJBP/VT0V/Re11YLKN9ePPw+bzfr+Oe57kzGH7Xoras' +
+        'qk1FWWoLo6YtGzrVlVI9Gkv4/EGot3dbeh+NJkql+g64ImnJ5EXS5' +
+        'tzTRUCRfjuk9zARSdLCn3xZnN/fd2ivkegyWWyUVcn4qhMsSVqMZi' +
+        'tMRADasFiqnT41YSIoo5kEH+53bLTCT2rcAGczESR8CACwXzsvzDl' +
+        'pBqbZYgOvTfPvnwkvr/HSORYjTEQAgAGWpfnD4WMwLaQdq5ehttZG' +
+        'Pq3G15rB1es846IIazeECJgsLVRENRAIAsa54E+Os18/JL+8Htt8e' +
+        'HC91ZceY2AislIOYLKoXJ4sZtN5jDa7C+tdZd+3j6nvW2fercQ2Hh' +
+        'y4NcvpER4BVi03sKW6vCjE4lQ3Dd1W+LcrRz6vj7x5Gt58FLo5x+s' +
+        '+gHr1qn7ebDonzzR8fs7u7DkRY1/cD716PAg9vxcSIgxMRACmMoX2' +
+        'ldbKjfGTKdrtcdCMEPEUs1whwx0dYp0u1uX2IKqXlR2fWC5UBweGH' +
+        'HQP7d5mIDS4RpiIzqYu/M03tRt3llrDQpxh/RAajDCrxdmOvxxKyk' +
+        'szOdHjDXi9ATRSvvIvsl2qpMaPjyaGR9H8F0aVcyL2Jk/LaHbD/3y' +
+        'FAu0SRk2dvwR1jH4ANBvVhQ==');
+        color := 13744208;
       end;
 
     MM_SYMBOL_FURNACE:
@@ -1532,31 +1553,58 @@ begin
           '3101423308696A028466E6C6A6A626E66E6E1640062E12A206A2D' +
           'EC90408A1261882CD3424CA6427472320DBCDCDC810C61EFC2653' +
           '3F34882171990C0058F36390');
-        color := 3508223;
+        color := -1;
       end;
 
-    MM_SYMBOL_ANVIL:
+    MM_SYMBOL_ANVIL: // 21 September 2014
       with result do
       begin
         name := 'Anvil';
-        bmp := BitmapFromString(15, 5, 'z78DA95CF510AC0300803D02B' +
-          'A59DE0F2D9F6FE771A2CFB10CAC4FE04117C443434D8E4C2EA4A8' +
-          '7DFCE8B06FB369AF38C025E139B5C7194EA106F73B9D2991C187D' +
-          '3773F92F2BE6A91CBFD05CE9FC00C9DB6164');
-        color := 4012591;
+        bmp := BitmapFromString(14, 20, 'meJxjYEABl7YvfXdo1dtDK/fO7w' +
+        'Fy2djZGFmYIQiuZvnE5leHVl1eMyXMzTrS3fbO2ikv9i9jwADvj62' +
+        '7v3l2T2EiHw83IxgAGX3FyY+2z3t3dC1QATsnO5B8tGvx8tZiFwsD' +
+        'djY2RiTAyc7maWW0or302e5FQGXvDiwviPKTkxJjZ2fDiuSlxUvjg' +
+        '17vWfx672JLfU0uLk48yNZY59WeRU93LrDQ09i+buXODauBaBcMLZ' +
+        'szVVVFWV5ORkZa0tZE78mO+U+3zrHQVU+Ni2qrLV84fQJQARAtnTU' +
+        'ZSK6cP3P+tP7i7FRXK5PHm2cBka2RtqioiI6WemFmytxJPbMndHbW' +
+        'V2Qnx8eEBTnaWgHNdDI3fLRp5v110+2MdUVEhIHIy81paldLS3WJp' +
+        'ZmxtJSkpIQ40ASguLOl0YP10+6smWJvoictJaWmrFSUk97TUtNQXu' +
+        'Dl4qikIC8pIQFUDiSBZt5ePenumsllsYEGWhq2lmYRQb5hfl5h/t4' +
+        'RAT4uDrZA7UCkr6Venhh2Y3nf4ob8c3NalzYWhLvbK8jJAqWA3oUg' +
+        'IDfCy3l5a8mZ2S3w2Dwzvf7snJby2AB5OVllRQVlBTmgsurk8DNz2' +
+        '45NqUGL+tllaccmV+toqKooKQKRrqb6yekNk/MTMBMJEKxvzm9NCV' +
+        'VVVgKinrzEFXXZWJVBwJH+ciczQxcrU6CBeJQBwanJ1U1JIe1ZsUf' +
+        '7SvGrrI72OdRXfqCnLD/QBb9KINjVUbihLhNTHACPw9VG');
+        color := 12234923;
       end;
 
-    MM_SYMBOL_TREE:
+    MM_SYMBOL_TREE: // 21 September 2014
       with result do
       begin
         name := 'Tree';
-        bmp := BitmapFromString(15, 5, 'beNpjYGRgYDwABmw+jCx5' +
-          'vBDE08sOQZK7GYAkRAFQJX7FcISpGK4eKIumZf78+ZiKsZo/HwyQF' +
-          'cPVA8Xd1XmAJLJKkDMAo5RFgw==');
-        color := 494860;
+        bmp := BitmapFromString(16, 19, 'meJxjYECAgkn9lXUt6XXVQa2lwa' +
+        '1lzpPKXSaURrfVMGADHh1VttvnOa6YbjApT216vtL0fNmGWPm6aK3' +
+        'uTKfCZDTFJjvn6s0qkZtdJDY5Q3hqFt/GfvaJWSxZrqxZLvzVQcoT' +
+        'M/UaU+CKJdf0iG+ZyD0xhaXaj7HKm6nQi7kjgWVGPnOmK1OaI0uhB' +
+        '29DiExRsHyMO1CxqLsZz/xynhUNbB1xTLmuzNnOQPVMlQHM+R5MgR' +
+        'aMoWYMKfZMGY5c8Q7iKV4iTsYiecE8C8tY2mJ4/a15bHS5bbW4A+w' +
+        'Y85IZ42wZ3fW4zZUZ450YizyY053Ys1y5irwMciI5W0OYClL4DfX4' +
+        'NeRYHLR4XS0YAoOYvPQ57JQ5bWNY3VLZIi1ZQqwYw03YczzcE2L4Y' +
+        'xyZsmO47Px5LY0EDY04XHyZvfvZfaNZPbI5bPP49U3YnEwYHc25LV' +
+        'Q53fWTU7JVPG05gm25rYFaQvgsnHksE1jDZrOHTuF2yOczceY2suc' +
+        'y8eIyMOWy0lCwM40Ki8/IzJd1Neez0uDVVeXVUeMxNGOPms8Vt5Tb' +
+        'LofNKonLPJpP34VV30nIQMPWzjkuKq2suLaquEZVX09YT53fWFVQz' +
+        '5I7cRlPSD+/voOAjhS/upyArpqErqqWhUV4SNyZ05d6uif2t01ISk' +
+        'jX1DdU19ETN7LjCJ/J4VHDbRQgri0nq63qFRiYkVOYm1U4qW8mMAq' +
+        '8/QJzMwra6jtdXT21dPRFjby4PGvYHPK4jfyVlVRdnNzb6jrqKptm' +
+        'zZ6PnCRaatvnTpm/cOYia7cQftsUbrNoHRufhTMWAQVbatqxJrnw4' +
+        'KimyubKkgYpUx9pY/fKknogFyiIVTEEODu69TT1unhHOvrF9TT3OT' +
+        'm74lEMAXXl9bUVzbWVLbWV9QQVQ0BfSx8QEakYCHJy83Jy87FKAQC' +
+        '4ZMIO');
+        color := 231520;
       end;
 
-    MM_SYMBOL_FISHING: // (10/09/1014 dd/mm/yy)
+    MM_SYMBOL_FISHING: // 10 September 2014
       with result do
       begin
         name := 'Fishing Spot';
@@ -1573,10 +1621,10 @@ begin
         '1uetFSauaa1u3WkukNjepePjRgWFj0yLO29ok+ixjCJuCN+sD2GsL' +
         '++w7ewqxoYGD0yLOy8oeHa1+PW09/SztbLxa2qp6WfmSMhID4yLOm' +
         '3nLm5tq6tqaakoZ6bl56alaafmSclJEE2MOa0mfKWWXk=');
-        color := 3115191;
+        color := -1;
       end;
 
-    MM_SYMBOL_QUEST: // (10/09/1014 dd/mm/yy)
+    MM_SYMBOL_QUEST: // 10 September 2014
       with result do
       begin
         name := 'Quest';
@@ -1592,10 +1640,10 @@ begin
           '75D3CD621BEFF9102D52228822C5D1EC69F878C8140CCA8AEE5D8' +
           'DD0BA97C223BED3E5E27C48CBAE7B878ABF54987B5337FB3E995D' +
           '26DF2973F323B33C9A9D26573A47303B52569D1');
-        color := 655103;
+        color := -1;
       end;
 
-    MM_SYMBOL_DUNGEON: // (10/09/1014 dd/mm/yy)
+    MM_SYMBOL_DUNGEON: // 10 September 2014
       with result do
       begin
         name := 'Dungeon';
@@ -1611,18 +1659,17 @@ begin
           '73724526CD0C4C0C8CDC1C0D2DDD2C5D8DDD8C4C0CA0E2103644D' +
           'CDCD1CCD4C40CC246D66B0036D300AFC9986622B3293119979B21' +
           'ECC1E966649793EA6600F03E685F');
-        color := 926783;
+        color := -1;
       end;
 
     MM_SYMBOL_POTTERY:
       with result do
       begin
         name := 'Potter''s Wheel';
-        name := 'Potter''s Wheel';
         bmp := BitmapFromString(8, 4, 'meJwzjd6k7bZY03fOnN4pGxatFxYS' +
         'AqK9k2oUHWYrO02pLWlYPGXRshnL4OLNpU3T27uBgkDU19AHEd/VV' +
         'wER6a3pLUwuBJJAQWlJ8W29lQB8SCe8');
-        color := 2179227;
+        color := -1;
       end;
 
     MM_SYMBOL_WHEEL:
@@ -1632,7 +1679,7 @@ begin
         bmp := BitmapFromString(15, 5, 'beNpjYGRgYDwABtn' +
           '+gvPnz28I1wGygSQaG8gAqoQoDrIQAJIQQbgauMiEWGs0xenWokAE0QVXD0dA' +
           'XciK58MAUAvIVcHaEJMh7kFWDAQQNZgk3D0MAH8HZ/A=');
-        color := 2710649;
+        color := -1;
       end;
 
     MM_SYMBOL_GUIDE:
@@ -1643,7 +1690,7 @@ begin
           '33086961E168E4EC64E866E264EE0C614349170B0B4B336411143' +
           '56059880906860848C06488995432193F89CB47F84D869A8FE14E' +
           '8869F8CD24C664E2431E533DC44C00EBA66771');
-        color := 13345416;
+        color := -1;
       end;
 
     MM_SYMBOL_STORE:
@@ -1656,7 +1703,7 @@ begin
           '84D78C8435849DD5970E9EC0629AB13B692ABB5B34F279BCF6F32' +
           '12A15CE3E8B9B7EE3265C52C73EFF0818A6FB2CA085D4FF317598' +
           '484FA9B6C69689FB37FBFF9FEC35D3E01559765AB');
-        color := 3176384;
+        color := -1;
       end;
 
     MM_SYMBOL_SHOP_SHIELD:
@@ -1667,7 +1714,7 @@ begin
           'B611484920DE4FE47CA8CA63085BDCD9F6DF6511614BE233CEADA' +
           '16ECFC9553204DD36055D92EF56E2AFD99DB038EDF97864927C8C' +
           '339595EFD9D3CCD9DFC02CAE26976');
-        color := 9542286;
+        color := -1;
       end;
 
     MM_SYMBOL_ALTAR:
@@ -1678,7 +1725,7 @@ begin
           '7431B670B574B2A4888498630036D300C96464F3DD880610F58E2' +
           'E4E8E4E501297C9C49B8F69267E37936732B25EFC26131F1AB84C' +
           '06006E357035');
-        color := 9542286;
+        color := -1;
       end;
 
     MM_SYMBOL_ARROW:
@@ -1689,7 +1736,7 @@ begin
           '3372249E343633B33475829026161646E626C8B20660330D904C8' +
           '6A841D6858BC454896C3EA6C9C498899FC465B2919BB1A5B12931' +
           '24A69910715C269317CEC866229B0C001E5A61CB');
-        color := 2782945;
+        color := -1;
       end;
 
     MM_SYMBOL_BAR:
@@ -1700,7 +1747,7 @@ begin
           'E3001D0389EF7FA44ACD82D4952E5F968757B5B4E28EA56B66E33' +
           '685908EEEA4115736FF1523A016BD8113A636079B0877A1BE663D' +
           '24E73E25A7F99F9CE659F96BEEF2031A5D69A8');
-        color := 4433385;
+        color := -1;
       end;
 
     MM_SYMBOL_UNDERGROUND:
@@ -1711,7 +1758,7 @@ begin
           '272727134CD2D5C2C8D4D01993B47033303630B434B474B2C4A2C' +
           'BC01001E96FB28B9BA3A10516335D5DCC8C4D9D293119D97C62CC' +
           '24D5646412622631260300830265FA');
-        color := 1844712;
+        color := -1;
       end;
 
     MM_SYMBOL_TANNER:
@@ -1723,7 +1770,7 @@ begin
           'E5C4ABB52289FED316E8699229DBE63ECB8AA7F8D75319843374C' +
           'C594B4FC2C5177003C7FAE0A90CC2C92ACA392E5B3FDED9F22DCB' +
           '47D9FFF30DFAEB6308');
-        color := 3363443;
+        color := -1;
       end;
 
     MM_SYMBOL_CHURN:
@@ -1735,7 +1782,7 @@ begin
           '104C7D04365F159253E2C16A5737342B5735F6F6938E960D66430' +
           '9B0D1B5292146ECD92156ABF1F013CD39DBE736D1E05FCF644FFE' +
           '8BAC6A8FAF927AEB5338A958DF905A105631F');
-        color := 1720403;
+        color := -1;
       end;
 
     MM_SYMBOL_HOUSE:
@@ -1747,7 +1794,7 @@ begin
           '33E5F5A08DC3ECD434550779BBBE9D3D1290C9846FDEC63EC02A8' +
           '13D9B7F5C77AE9AF337B86DE4A5E1E0D7649EABE4F9F601C37765' +
           'F5');
-        color := 4740173
+        color := -1
       end;
 
     MM_SYMBOL_SHOP_AXE:
@@ -1760,7 +1807,7 @@ begin
           '1136D2C7C583CAC6E0CCCABF7235B9A13A728B34EB2EA1E1F148E' +
           'E8D8655CDECADF7C977D69FC8B1BA0269E2B27DEEDA9B13D63933' +
           'EB356E4B7C6439');
-        color := 6841956;
+        color := -1;
       end;
 
     MM_SYMBOL_COOK:
@@ -1772,7 +1819,7 @@ begin
           '4C484236CA341999CBBFA7020A6CEFEDF74339B9CF3463E530A99' +
           '4993ADDCA55C6D6F647E955B959CB757F22754F2F9ED8DBCCCD01' +
           'B137B3CDAB290E76797E60B5A736560');
-        color := 7565679
+        color := -1
       end;
 
     MM_SYMBOL_WINDMILL:
@@ -1783,7 +1830,7 @@ begin
           '6367536C745BA0181A11132E968EC68EA8853BD01D84C0324930D' +
           '5C4C8D8C9C217A91D9C48840D8B84CC6741BB22E6412974A885F6' +
           '8E1665C264348882C3289CB6DB848889900AC8467DB');
-        color := 1245183;
+        color := -1;
       end;
 
     MM_SYMBOL_MINIGAME:
@@ -1791,7 +1838,7 @@ begin
       begin
         name := 'Minigame';
         Bmp := BitmapFromString(14, 17, 'meJxjYEAB745v/Hx6y8cTG18fWceAA7w9subM8umdJaXpUWlA1FNecX717DdH1qIp+3Rszaz6ah0dT1EZBzXjUjWjYjEZRz19n0XtLZ+PrYEre3NwxYquRgXNCFGFIEEpd3XTJjWTegEJZyBXUTNm06TuF3sWQ1ReWj1dXcNTzaTWwHGBjlmnre9Oc7eVWiZNhk4LlfQrNLV9b66fA1R2d/Ps1vwCoFHiihHGjsvdok47BO619t5sH3jG0GGxsIwPv4Rjd2nNjbXTn+yYH+AeKyjtJauebmQ7y9prnW/Kfdeou0b2i7RMWqWUowWlPUJ80x9umvF482wHmyjbwPNWPhftg646ht5wCLlv5X3VxPWoufspc48zJi6HnezjHm+aeW/9tAi/VCEZH3HFcA3Den3r5QZ2O3UsVqubTFHVrRBXCBWQcosKSL21atKZ+Z19xWXC8sESynF61st1LRdpGk9RM+jSMp2paTZfVCFSWC5wclX9kRktQE9dXtBpZJKgbNClqNstrZqsaTJJ3ahHVi1NQaddTqvB0CTh5srJ8CDd2t2oqZ8qIhciLB8kq1UnrVYGNEpUMVJNN27n1N7Dk2vgKi/ObZ1SWq6lHyemFCOlViihnC6qGK5jlDy9uv7srGa0CD0+ua6voFxWPUFCOUFUMRrImFTRcHxKPdZEcmZ6/fSySnmNZDmNpNn1LSen1eFKTkBwdkpNV15FT3HdmSnVeJRBwLEJFYd7SzHFAUr3y8A=');
-        color := 1384530;
+        color := -1;
       end;
 
     MM_SYMBOL_TRADER_FUR:
@@ -1802,7 +1849,7 @@ begin
           '67636753647262D2C4C8C0D2C31497357A07A0B64D2D1D8D1D4D1' +
           '1C4242F41A80CD34C06132A6F9C49849BCC9B8CCC76526792623B' +
           'B16BF7A52438378F321660200DE126419');
-        color := 607112;
+        color := -1;
       end;
 
     MM_SYMBOL_SHOP_ARCHERY:
@@ -1814,7 +1861,7 @@ begin
           '8A2AD5769A9A29172F8385CD9B91253F1BBA4DDA964733A91A07D' +
           '7FEC8A366A702C59D51DB9215140BF77804BCCC2E0D6136E7AE64' +
           '37477FF5F35BBE0049C36545');
-        color := 4945565;
+        color := -1;
       end;
 
     MM_SYMBOL_SHOP_STAFF:
@@ -1825,7 +1872,7 @@ begin
           '3D02BD9F1AF198D83EF7FA442BCB6C1B48B26F110020685191412' +
           'D6C9A96A8C96B2089D5CFCA103DB84B65CA60F49CC32FFCBA55D8' +
           'B7DD0D9ECCBFD9DDFE4F3AB6FF20D38E96664');
-        color := 4286358;
+        color := -1;
       end;
 
     MM_SYMBOL_SHOP_CLOTHES:
@@ -1837,7 +1884,7 @@ begin
           '76F51925BE2023CAB2A0D66916F09A487236CF66A73AAFE4686C8' +
           'C4D6DE25622AFE4D8E4FDBE55C8D1BE9CF7FF6FFEFC585B3EFFF9' +
           '012BE4618A');
-        color := 5935156;
+        color := -1;
       end;
 
     MM_SYMBOL_FARMING:
@@ -1847,7 +1894,7 @@ begin
         bmp := BitmapFromString(15, 5, 'beNpjYGRgYDyAAwRZC' +
           'Lir87iJ8c2fPx/IBarEpRiicj4M4FGMrBIuiKm4rKw0PSMDqBhNJaZiiEoIQl' +
           'MJUgwAOf97Lg==');
-        color := 12632256;
+        color := -1;
       end;
 
     MM_SYMBOL_APOTHECARY:
@@ -1858,7 +1905,7 @@ begin
           '5E12B69A3A68ED6D6FB1FA9D02C4230942CFF241F0F814040BD39' +
           '7BAFAA8748C46847C2A75B33B6F21E3E13967236B33CBA2767CDD' +
           '5EFE05926C5F3D23DB932B33C7FE6FFE66AED5A7E01E72B65AE');
-        color := 16737938;
+        color := -1;
       end;
 
     MM_SYMBOL_SHOP_SWORD:
@@ -1870,7 +1917,7 @@ begin
           'EEE33FC5EF918535971A1B0C6000539B761D91D1A4C7A4829CCD1' +
           '06293E5DCFF929BF231CEBAB92B47EE9A956FBC2FAF9859BE0057' +
           'DB6637');
-        color := 10067100;
+        color := -1;
       end;
 
     MM_SYMBOL_SHOP_PLATEBODY:
@@ -1882,7 +1929,7 @@ begin
           'DDD5CA0B6CF48818F1E042633190A87D55B0CF349167534FD459D' +
           'DBB92596EB2A527DC3DFC4FFE6EE446F7EC4A66CF65DDEFDFAC3D' +
           '97E77F7E014609646B');
-        color := 8157816;
+        color := -1;
       end;
 
     MM_SYMBOL_SHOP_SCIMITAR:
@@ -1895,7 +1942,7 @@ begin
           '61DBAB56CDEC6963A2F14CAE5AA69B0FF76ADE95315CBDA59FBB2' +
           'AEAAAF50367F35A0630711C0AB697B1B9E9678223F3DAACF21B5C' +
           '65625E');
-        color := 8752522;
+        color := -1;
       end;
 
     MM_SYMBOL_STALL_GEM:
@@ -1907,7 +1954,7 @@ begin
           '6ECCD772FE0E03AAA057B32F350338DF50B6A03F1932FF34DEDDC' +
           '1BED0433E7900FCD835C76011B89BFCDAFB6AEAEFB504FCC6013F' +
           '6C4DA8C9E306B1653E29C4D6DBE0027B7630B');
-        color := 1777896;
+        color := -1;
       end;
 
     MM_SYMBOL_STALL_SILK:
@@ -1918,7 +1965,7 @@ begin
           '733276364D2C2C4C0D0D488181253AF81210262CA42484B67030B' +
           '33476248DA996C696869664994C9C48706B299F84D36733630347' +
           '62486849889CB6400B4306127');
-        color := 5374340;
+        color := -1;
       end;
 
     MM_SYMBOL_SHOP_PLATESKIRT:
@@ -1929,7 +1976,7 @@ begin
           '2743273327634CD2D9D8CCC2D9009974323235763282909686966' +
           '696587419182220F126239B4F9EC9B8DC8929423B93315D4E2034' +
           '709843BCC900457662CC');
-        color := 12609731;
+        color := -1;
       end;
 
     MM_SYMBOL_AGILITY:
@@ -1938,7 +1985,7 @@ begin
         name := 'Agility';
         bmp := BitmapFromString(15, 5, 'beNpjYGRgYDwABkAGEM2fPx' +
           '+NAWHDFRyAAbgssgIIA1Mxsnq4GjyK0czHFMcUmQ8G6I4EAIrAWyc=');
-        color := 65536;
+        color := -1;
       end;
 
     MM_SYMBOL_TRAINING_DUMMY:
@@ -1950,7 +1997,7 @@ begin
           'DF0210386A6A6B9D3833270E0F5F5B7371D2FD2B93F857FFE4D4A' +
           'AE962D402E738ED1A0768E08D5CE743FA14A49CB9DF3C95CDA4B3' +
           'A6EC1FB73E6BBE974D6572403C74F9AB2F9769DEA32D69B5');
-        color := 1586538;
+        color := -1;
       end;
 
     MM_SYMBOL_SHOP_FOOD:
@@ -1962,7 +2009,7 @@ begin
           'A825E09908A0893A0B4C25441ED49A0DA2AB3DFFDDF7B467FE64D' +
           'C88594CF13E56651A08C1DD66146F9A82E47532C0DDFE531F92C8' +
           '77A9183F945BED9C66F396EC385D91F321AD29FE41DF6B66191');
-        color := 7837098;
+        color := -1;
       end;
 
     MM_SYMBOL_SHOP_FISHING:
@@ -1973,7 +2020,7 @@ begin
           '27134CD2D2C2C4C8C010425A0081A509844456832962608880E49' +
           '9099431773425DE64E2CD4426F19B8C6CA6990950812BAE50C234' +
           '19D9765C6E8698894C62BA193334304D0600DE086263');
-        color := 9734280;
+        color := -1;
       end;
 
     MM_SYMBOL_JEWELERY:
@@ -1985,7 +2032,7 @@ begin
           '6054AB664DB46B07E64276220109A1D7EEFB4CDE85C5840D79E0E' +
           '05223D3D5BBEEFB4CF4DF933333AA5FFE957CFFDB95DB5356CBFF' +
           '479E471FB395F2DCE59FC917FB9B6AAB');
-        color := 4829105;
+        color := -1;
       end;
 
     MM_SYMBOL_SHOP_CRAFTING:
@@ -1997,7 +2044,7 @@ begin
           '2648B24BEFDD5B36414149626F793E45D3708CBDEACA98EAA662A' +
           '94DA2C4FE5D5F49A374FE53F73FF642F9B693D627A79020EC868E' +
           'C');
-        color := 3159851;
+        color := -1;
       end;
 
     MM_SYMBOL_PORTAL:
@@ -2009,7 +2056,7 @@ begin
           '4942D2F4858DAA9B05A6A4895251DB93FD2DE6DC6E6BD0078D7B7' +
           'A98374A0CFC86761E2173977C052F764DB8DE43F375B46F2DE3F7' +
           'BD3CB13F26764CE');
-        color := 15287202;
+        color := -1;
       end;
 
     MM_SYMBOL_MAKEOVER_MAGE:
@@ -2020,7 +2067,7 @@ begin
           '7236707676B68490066011571367734B174CD2D2D8CCD5C418993' +
           '4C06182015E9391D5608A209BEC68E0E8EC4882C9C4BB99129391' +
           'DD499EC9F8CDC76526A6C9003E5F6688');
-        color := 10340324;
+        color := -1;
       end;
 
     MM_SYMBOL_SHOP_MACE:
@@ -2032,7 +2079,7 @@ begin
           'CFE7DAD7BB89A38D9A6696EA2A4A511888C4712878909D9521BB3' +
           'A6086368B248C969FE932F7381546BE477ED6DCEC80F135C64DFD' +
           'A8C7CDFFEEE39F39161EE1ADD6893');
-        color := 8817273;
+        color := -1;
       end;
 
     MM_SYMBOL_HAIR_DRESSER:
@@ -2043,7 +2090,7 @@ begin
           '36707676B68490066011030C71E2D5E0977534707476C4A206998' +
           'DAC8654B7E1B2059984C84248F27C8D6C3EB269C4BB19531CD91C' +
           '4CF7E37233005E916796');
-        color := 13225152;
+        color := -1;
       end;
 
     MM_SYMBOL_SHOP_MINING:
@@ -2054,7 +2101,7 @@ begin
           'B670367672C5241D2D1C8D2DA1A40158258474737473333285909' +
           '8BA9055E232199944360DBFF9C49B8C6926B22F20E21011FC263B' +
           '5998BAC0447099499EC9C498896C022E9301172B6823');
-        color := 10396584;
+        color := -1;
       end;
 
     MM_SYMBOL_STALL_SILVER:
@@ -2065,7 +2112,7 @@ begin
           '803BF14D1823D6E6DF3FF2715EA4510A17B09C198211008347031' +
           'A4AB4169E2E6EA071F06EFF4F5DE5BF89818C8D9ADB4AE13FF0FB' +
           '976FBF2F4F9B370726D90FBB64977C913BFA6D3E61755066363');
-        color := 8749956;
+        color := -1;
       end;
 
     MM_SYMBOL_STALL_SPICE:
@@ -2077,7 +2124,7 @@ begin
           'A0E5619D3984CAC714B50B224D1A72B9BEEBDF71BBFC56DC2C96F' +
           'CCB5EFE5A9F9D1F77244609C66B67CE6B6CE0263997EE39FDFCD5' +
           '1BE002BE06493');
-        color := 157167;
+        color := -1;
       end;
 
     MM_SYMBOL_SHOP_FARMING:
@@ -2089,7 +2136,7 @@ begin
           '68A30B6B559340150D25F5F95ED55392D556735365BBA96B661DE' +
           '7F025E031F192A9D1E75CAA1D52A2CFD2E42FFB7234BFE478FF8E' +
           '9CE7128332E72FEDAF1C2FDF91A319E51BD93562F0');
-        color := 1918090;
+        color := -1;
       end;
 
     MM_SYMBOL_SLAYER_MASTER:
@@ -2101,7 +2148,7 @@ begin
           '00EAC1CA2A85461E3F34C1CB366FBCE7634F6533C4C04D9FAEE62' +
           '84ECF22EDB3F9D53B89525CADF7F4E1BB864B77FB411B359C351D' +
           'E019F8C655C');
-        color := 7666933;
+        color := -1;
       end;
 
     MM_SYMBOL_SLAYER_CONTRACT:
@@ -2111,7 +2158,7 @@ begin
         bmp := BitmapFromString(8, 8, 'meJw7cOCAna0dEFlZfUBGWAUh4kBS' +
         'TnUKEMEFgWxkxRApCAkRZ2RgACK4AiAbWRwiBWGgWQrXheweZF0AZ' +
         'Mk/Hw==');
-        color := 3816176;
+        color := -1;
       end;
 
     MM_SYMBOL_HERBALIST:
@@ -2123,7 +2170,7 @@ begin
           'B5EF5166D7D4C89DE6DE9C45C6DF8BB1733FBBB15FD0A1B10B001' +
           '99F9CCC42C5AB77B16DFEF4C86BF370B355C653272428513EA990' +
           'C3FF3393954EEFC2327CFE4CCCFC933136A263F5CC35F29');
-        color := 682309
+        color := -1;
       end;
 
     MM_SYMBOL_SHOP_CANDLE:
@@ -2134,7 +2181,7 @@ begin
           '470B470B4CD2CDD0C2D5C01042BA9ABB9A9A3A218BE0D26560888' +
           '0B8D4209B8F6CB2A591051040488A4C367035753571317136B134' +
           '8390B8CC1CEA26030022F6653F');
-        color := 6022631;
+        color := -1;
       end;
 
     MM_SYMBOL_SAWMILL:
@@ -2146,7 +2193,7 @@ begin
           '3A2A4D3ABA0FF1E99619EFBB2BBA9B54CA0A157D69C66FED87FFA' +
           '55CD7663FF7C30120F87173EEEFCA266DF2431F0AB6E11D3C770C' +
           'A76EBE00CD48658B');
-        color := 8882835;
+        color := -1;
       end;
 
     MM_SYMBOL_SHOP_KEBAB:
@@ -2157,7 +2204,7 @@ begin
           'xhKD/mpo9DAwgEScJiAKgSohioIjEFJBKIAlEQJUQxcjqkRUDVULE' +
           'gSQQzUl2ArKB5N7qKCBj6dKlyIoh4lhJNMWY6iEIZCNYJUgxALQIU' +
           '2Q=');
-        color := 7316427;
+        color := -1;
       end;
 
     MM_SYMBOL_SHORTCUT:
@@ -2169,7 +2216,7 @@ begin
           '9821B1A206E3EE49F5DAC1F835724F36F7E9D12CCD370DBE40EE7' +
           '9854FE9864330DF993C8ECC9CC66F65039F7FD551B3BDCFFF9018' +
           '756682E');
-        color := 5286667
+        color := -1;
       end;
 
     MM_SYMBOL_SHOP_HUNTER:
@@ -2182,7 +2229,7 @@ begin
           'FA36FEC3204819E663A77F25CAE633C972F01BC48AAB9FBB9C373' +
           '79DFB6E69C98DDE1E0813FAE1106FCF897564C992A6277F20B925' +
           '96443');
-        color := 1261916;
+        color := -1;
       end;
 
     MM_SYMBOL_HUNTING:
@@ -2194,7 +2241,7 @@ begin
           '8D3678C55D360F6F89FE919211B9EC267A2C87CB32F6FFD08EC70' +
           'CF6FDDC8D554597F712FF3AC3AE546C96A1FE573B2BC0197F063A' +
           'B');
-        color := 10398118
+        color := -1
       end;
 
     MM_SYMBOL_SAND:
@@ -2206,7 +2253,7 @@ begin
           '51B4FA1C4998CBD07EE5D5EFA654B34F9BC75B7C2682BC336D72E' +
           '247B921239137577766ECB629E9BD959D5CC14CCF8F1FBE88A665' +
           '8794BE952DFDFE49DA95972794856206');
-        color := 7717352;
+        color := -1;
       end;
 
     MM_SYMBOL_SHOP_PET:
@@ -2217,7 +2264,7 @@ begin
           'skCsQ7dm7CYIgXKB4dUkYUA1QJVwxULyypllFSQMoBUEQLlAcyF68' +
           'bA1ccV1hBlAQKAXkQoxdOL0LyMalGCgLUQYRhOsCOgOI0BQfWt0JQ' +
           'TomBhAEVAnkAo0FGg5SDADYtlua');
-        color := 11713980;
+        color := -1;
       end;
 
     MM_SYMBOL_OBELISK:
@@ -2228,7 +2275,7 @@ begin
           'XaoKeidC0SeUTWfHj4AiixetgYoCCSBKuGKgSKVNc1AZXMO3AOpWf' +
           '8EqBiiEaIFrhioEigCRJPnrAAqBqJjl98BEVAlxFigGmSTIVqAtgM' +
           'VAI0FqgeSEBMwFQNVAo0FigPVgxjrnwB1Obj4IBQDAImMdLM=');
-        color := 10325360;
+        color := -1;
       end;
 
     MM_SYMBOL_SHOP_SUMMONING:
@@ -2238,10 +2285,10 @@ begin
         bmp := BitmapFromString(15, 5, 'meJyzicq0QUKMDAzIyAZVFk3ZAVS' +
           'AVQtQJGrCfCA6gA0gqweyFyxY8OjFi5MPvwLVb9uyEVM9muLJ377C' +
           '1WNqgRgOABDhZzk=');
-        color := 9697013;
+        color := -1;
       end;
 
-    MM_SYMBOL_SPOT_REST: // (10/09/1014 dd/mm/yy)
+    MM_SYMBOL_SPOT_REST: // 10 September 2014
       with result do
       begin
         name := 'Resting Spot';
@@ -2249,15 +2296,27 @@ begin
         color := 920844;
       end;
 
-    MM_SYMBOL_RUNECRAFTING:
+    MM_SYMBOL_RUNECRAFTING: // 21 September 2014
       with result do
       begin
         name := 'Runecrafting';
-        bmp := BitmapFromString(15, 5, 'meJxjZGA4cOBAREpJY3M7U+tPxu3' +
-          'fgAjICAmJBCKIOJABVMPIwMAIVgwR5/T8C1QGIZkFvsPVY1UMJOGG' +
-          'A7VA1GMq1rawgQgCFQCVwdUD9QLFgbLIilV0teCGABFcPcRwoCxEM' +
-          'QBG91kH');
-        color := 542972;
+        bmp := BitmapFromString(16, 19, 'meJxjYECAxoYurIgBGygpbfMPiL' +
+        'K2cTG3sLOxdQYiIMPKyt7fL7SyvBFNcXF5b1hii5F9cnLH0uoZa2Z' +
+        'tPTZ396k5u09O23wwKDE7MSG9rLQOWX1O1XSBmluSTa+Uy845FKzO' +
+        '7VhdMnlF3ZzVjfPX5zRO8PIJrqpAWFFe0RAWlafhV2c083Xa5X8KU' +
+        'z9oRa2LrlyY0za7oGdBYd9Cz4ik2Njk0tJaiPqaigYNLWP/mGLHhI' +
+        'Wq2ZeLrv8TK7jjkrjIN7UjILMzp2NOat0EbX3j8pIaoOLamlZnZ3c' +
+        'lNc3kml6X2Ba+uNsNL//brvkhkPBGIPmxuke1d2pDYt1kY3tvoLLa' +
+        '6pbamjZ9A2N5ZTXflHLfzDZ1p1qZ3jf5h34WHP7V+uQ/j89eI88yn' +
+        '4xmU5cAXV3D2srG7LzShLgUKRk5Q3tvz5Ram5AahYBpSv6rxSMvT3' +
+        'nwR3Xaa+mAxaY+hXJq+mEhUdk5RSAnVTRYWlirGdo4RBTYhebZBOe' +
+        '6hpdrhi1T6PhWceu/xdK3Epb1ugZWRXml0MDMLcpIyZZX1tCx8TJy' +
+        'jwQiY/doTetYKcVo4eQXrpu/y/j0h4ZlpmXkw4O0orjK0cFZTlFNV' +
+        'sNETs9e3tBZXs9F3tBHwqmLz32uVvj0tIxqtCjOTs/VUNcUEhbhF5' +
+        'IQEJEWEJYQEJMVEVNWUbWMjC0PCI9DU19RUl1WVJmWlKGtYyAhKQ1' +
+        'EQEZkeFxeVkFJYTnWJAfRlZuZr6mhBURZqdkl+WW4VMJBS22zt4cP' +
+        'EAEZBBUDQXlJZVlBGQgVVxKjHgg6GtqAiEjFQJCZmQtEWKUAGX3nxA==');
+        color := 7324409;
       end;
 
     MM_SYMBOL_LODESTONE:
@@ -2270,7 +2329,7 @@ begin
         'rf0lcZrOOUE5cDREBGU0BMZ3jshrriqUVJ+6fWl7kFxhg4ARGQsSA' +
         'npdo76EhfZby38/kF7V0REd1gBGSUufkvK04vifAJcHG4vqR7cmJU' +
         'nW8gEAEZ6yoyikK9rCzMowO8bi3pBgC7LWRW');
-        color := 7093588;
+        color := -1;
       end;
 
     MM_SYMBOL_DIVINATION:
@@ -2281,7 +2340,7 @@ begin
         'y//gfMGWWYWRgAApCEJALRGgKgOL/+NZDELIaoCzQQCAbqBIo9S1s' +
         'LlAEogyiAKISogAoC0QvLxyGqIHbgmwXUBZo4K+JFyC2YLofqAZoC' +
         'JABcS3Q5chqgFyIdUAGsjMwAVAv0CigRUAFAPKplbk=');
-        color := 16649903;
+        color := -1;
       end;
     else
       print('Invalid symbol constant: ' + toStr(sym), TDebug.ERROR);
@@ -2345,6 +2404,13 @@ begin
   for i := 0 to High(Symbols) do
   begin
     Sym := Self._getSymbol(Symbols[i]);
+
+    if (Sym.Color = -1) then
+    begin
+      Printf('%s symbol needs to be updated! Please post a bug report in the SRL bugs section.', [Sym.name], TDebug.ERROR);
+      Result := false;
+    end;
+
     GetBitmapSize(Sym.Bmp, Wid, Hei);
 
     Loop:
