@@ -346,7 +346,7 @@ begin
   if (FindColors(TPA, 3088905, Self.getBounds())) then
   begin
     Box := GetTPABounds(TPA);
-    Result := StrToIntDef(ExtractFromStr(Tesseract_GetText(Box, TESS_FILTER_SMALL_CHARS_2), Numbers), -1);
+    Result := StrToIntDef(ExtractFromStr(Tesseract_GetText(Box.x1, Box.y1, Box.x2, Box.y2, TESS_FILTER_SMALL_CHARS_2), Numbers), -1);
   end;
 
   print('TRSLobbyWorlds.getCurrentWorld(): Current world is '+toStr(result), TDebug.SUB);
@@ -472,6 +472,8 @@ var
   BMP: Integer;
   Strings: TStringArray;
 begin
+
+  {$IFDEF SIMBAMAJOR1100}
   FindColorsTolerance(TPA, clBlack, Self.worldNumArea, 25, colorSetting(1));
   ATPA := ClusterTPAEx(TPA, 20, 3);
 
@@ -502,6 +504,9 @@ begin
       Res := MiddleBox(Boxes[High(Boxes) - i]);
       Exit(True);
     end;
+  {$ELSE}
+  Writeln('Update your Simba for FindWorldNumber to work');
+  {$ENDIF}
 end;
 
 {*

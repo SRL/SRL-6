@@ -780,7 +780,7 @@ function TRSMinimap.getAllPossibleDots(const Bitmap: Integer): T2DPointArray;
 const
   BORDER_COL = 65536;
 var
-  i, j, H: Integer;
+  i, j, Hi: Integer;
   TPA: TPointArray;
   Rows: T2DPointArray;
   p: TPoint;
@@ -791,8 +791,8 @@ begin
   Rows := FindTPARows(TPA);
   for i := 0 to High(Rows) do
   begin
-    H := High(Rows[i]);
-    for j := 0 to H do
+    Hi := High(Rows[i]);
+    for j := 0 to Hi do
     begin
       p := Point(Rows[i][j].x - 3, Rows[i][j].y);
       if (PointInTPA(p, Rows[i])) then
@@ -813,7 +813,7 @@ end;
 
 function TRSMinimap.getDots(const dotType: Integer; const SearchBox: TBox; const Tol: Byte = 30): TPointArray;
 var
-  Bitmap, i, x, Col: Integer;
+  Bitmap, i, Col: Integer;
   Dots: T2DPointArray;
 {$IFDEF GETDOTS_DEBUG}
   Found: Boolean;

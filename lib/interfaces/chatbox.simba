@@ -164,8 +164,10 @@ Example:
 function TRSChatbox.findText(txt: TStringArray; const Filter: TTesseractFilter = CHATBOX_TESSERACT_FILTER): boolean;
 var
   s: string;
+  b: TBox;
 begin
-  s := Tesseract_GetText(Self.getChatArea(), Filter);
+  b := Self.getChatArea();
+  s := Tesseract_GetText(b.x1, b.y1, b.x2, b.y2, Filter);
 
   if (length(s) > 1) then
     result := IsArrInStr(txt, s);
@@ -176,7 +178,8 @@ begin
   if (not inRange(Line, Low(Self.lineBoxes), High(Self.lineBoxes))) then
     Exit(Print('TRSChatBox.getTextOnLine(): Invaild line', False));
 
-  Result := Tesseract_GetText(Self.lineBoxes[Line], Filter);
+  with (Self.lineBoxes[Line]) do
+    Result := Tesseract_GetText(x1, y1, x2, y2, Filter);
 end;
 
 (*

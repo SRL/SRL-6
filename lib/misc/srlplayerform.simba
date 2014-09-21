@@ -1,3 +1,5 @@
+{$IFDEF SIMBAMAJOR1100}
+
 {$f+} // native keyword reqiures it on.
 
 type
@@ -849,4 +851,8 @@ procedure runPlayerForm();
 begin
   sync(PF_Init);
 end;
+
+{$ELSE}
+  {$i srlplayerform_old.simba}
+{$ENDIF}
 

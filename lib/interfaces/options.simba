@@ -208,7 +208,7 @@ begin
     if ((b.X2 - b.X1) > 30) then
     begin
       Insert(b, Button);
-      Insert(Tesseract_GetText(b, TESS_FILTER_SMALL_CHARS), Text);
+      Insert(Tesseract_GetText(b.x1, b.y1, b.x2, b.y2, TESS_FILTER_SMALL_CHARS), Text);
     end;
   end;
 end;

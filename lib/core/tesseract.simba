@@ -1,4 +1,4 @@
-{$loadlib libtesseract32.dll}
+{$loadlib libtesseract2_}
 
 {$f-}
 

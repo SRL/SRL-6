@@ -8,6 +8,10 @@ SRL library isn't available to you.
 
 *)
 
+{$IFNDEF SIMBAMAJOR1100}
+function GetTickCount64(): UInt64; begin Result := GetTickCount(); end;
+{$ENDIF}
+
 {$include_once lib/utilities/wrappers.simba}
 {$include_once lib/utilities/time.simba}
 {$include_once lib/core/debug.simba}
@@ -19,7 +23,12 @@ SRL library isn't available to you.
 {$include_once lib/utilities/pixelshift.simba}
 {$include_once lib/utilities/color.simba}
 
-{$include_once lib/core/tesseract.simba}
+{$IFDEF SIMBAMAJOR1100}
+  {$include_once lib/core/tesseract.simba}
+{$ELSE}
+  {$include_once lib/old_tesseract/tesseract.simba}
+{$ENDIF}
+
 {$include_once lib/core/text.simba}
 {$include_once lib/interfaces/interfaces.simba}
 {$include_once lib/interfaces/chooseoption.simba}
@@ -28,7 +37,6 @@ SRL library isn't available to you.
 {$include_once lib/interfaces/gametabs/gametab.simba}
 {$include_once lib/interfaces/gametabs/backpack.simba}
 {$include_once lib/interfaces/gametabs/stats.simba}
-
 
 {$include_once lib/interfaces/options.simba}
 {$include_once lib/interfaces/lobby/lobby.simba}
@@ -50,10 +58,14 @@ SRL library isn't available to you.
 {$include_once lib/interfaces/powerscreen.simba}
 {$include_once lib/interfaces/collectbox.simba}
 
-{$include_once lib/misc/miscforms.simba}
-{$include_once lib/core/players.simba}
-{$include_once lib/core/client.simba}
 
+{$IFDEF SIMBAMAJOR1100}
+  {$include_once lib/core/players.simba}
+{$ELSE}
+  {$include_once lib/core/players_old.simba}
+{$ENDIF}
+
+{$include_once lib/core/client.simba}
 {$include_once lib/misc/srlstats.simba}
 {$include_once lib/misc/antiban.simba}
 
