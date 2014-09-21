@@ -1,134 +1,114 @@
-(*
-SRL Player Form
-===============
+{$f+} // native keyword reqiures it on.
 
-The SRL Player Form is an optional script feature.  It allows scripters to
-integrate a user interface into their scripts, making it easier for their users
-to setup the script.
-
-For a tutorial on how to add the SRL player form to any script, see
-`this <http://villavu.com/forum/showthread.php?t=107572>`_ thread.
-
-The source for this file can be found
-`here <https://github.com/SRL/SRL-6/blob/master/lib/misc/srlplayerform.simba>`_.
-
-*)
-
-{*
-type __TFormPlayer
-~~~~~~~~~~~~~~~~~~
-
-Stores temporary information for each player.
-*}
 type
-  __TFormPlayer = record
-    name: string;
-    settings: TStringArray;
-  end;
+  __TPF = record
+    mainForm: TForm;
+    groupBox: TGroupBox;
+    editArmyName: TEdit;
+    btnLoadArmy, btnStartScript, __btnNextPlayer, __btnPrevPlayer: TSpeedButton;
+    clbPlayers: TCheckListBox;
+    btnStart: TButton;
+    debugProc: procedure(const s: string);
+    __btnBmps: array [0..1] of TBitmap;
+    __loadedArmy: PF_TPlayerArray;
+    __loadedArmyName: string;
+    __currPlayer: integer;
 
-(*
-type TPlayerForm
-~~~~~~~~~~~~~~~~
-
-Stores all information pertaining to a TPlayerForm.  View the source file for
-a full list of customizable options.
-*)
-type
-  TPlayerForm = record
-    name: string; // the title for the main window
-    scriptHelpThread: string;
-    scriptSettingsPath: string;
-    editBoxLabels, editBoxDefaults: TStringArray;
-    checkBoxLabels, checkBoxDefaults: TStringArray;
-    comboBoxLabels, comboBoxDefaults: TStringArray;
+    editBoxLabels, editBoxDefaults, editBoxHints: TStringArray;
+    checkBoxLabels, checkBoxDefaults, checkBoxHints: TStringArray;
+    comboBoxLabels, comboBoxDefaults, comboBoxHints: TStringArray;
     comboBoxItems: array of TStringArray;
-    playerFile: string;
+
+    __scriptEditBoxes: array of TEdit;
+    __scriptEditLabels: array of TLabel;
+    __scriptCheckBoxes: array of TCheckBox;
+    __scriptCheckLabels: array of TLabel;
+    __scriptComboBoxes: array of TComboBox;
+    __scriptComboLabels: array of TLabel;
+    __btnHelp: TButton;
+    __btnApplyAll: TButton;
+    __lbDebug: TListBox;
+    __debugGroupBox, __cmpGroupBox: TGroupBox;
+
+    // user should change
+    name, scriptHelpThread, scriptSettingsPath: string; // form title.
+    isScriptReady: boolean; // true = > 1 player selected.
+    maxPlayers, size: integer; // limit to how many players can be chosen
+
+    // results for user
+    players: PF_TPlayerArray;
     playerNames: TStringArray;
-    players: array of __TFormPlayer;
-    isScriptReady: boolean;
-  end;
+    playerFile: string;
+ end;
 
-(*
-var playerForm
-~~~~~~~~~~~~~~
-
-The variable used by scripters to enable the SRL Player Form.
-
-Example:
-
-.. code-block:: pascal
-
-    playerForm.scriptSettingsPath := 'C:/settings.txt';
-*)
 var
-  playerForm: TPlayerForm;
+  playerForm: __TPF;
 
-{*
-var Internal
-~~~~~~~~~~~~
-
-All internal vairables.  Most are form components.  You should never edit these
-unless you know exactly what you're doing.
-*}
-{$IFNDEF CODEINSIGHT}
-var
-  __mainForm: TForm;
-  __edtPlayerAdd: TEdit;
-  __btnPlayerAdd: TButton;
-  __btnPlayerDel: TButton;
-  __lstPlayerList: TListBox;
-  __lblPlayerFile: TLabel;
-  __cboPlayerFile: TComboBox;
-  __scriptEditBoxes: array of TEdit;
-  __scriptEditLabels: array of TLabel;
-  __scriptCheckBoxes: array of TCheckBox;
-  __scriptCheckLabels: array of TLabel;
-  __scriptComboBoxes: array of TComboBox;
-  __scriptComboLabels: array of TLabel;
-  __btnHelp: TButton;
-  __btnThread: TButton;
-  __btnSave: TButton;
-  __btnRun: TButton;
-  __memo: TMemo;
-  __tslSettings: TStringList;
-  __prevPlayerIndex: integer = -1;
-
-{*
-__writeln
-~~~~~~~~~
-
-.. code-block:: pascal
-
-    procedure __writeln(s: string);
-
-Used to print debug in the form's debug box.  Needed because forms are separate
-from Simba and "writeln" doesn't print to Simba's debug box.
-
-.. note::
-
-    - by Coh3n
-    - Last Updated: 10 January 2014 by Coh3n
-
-Example:
-
-.. code-block:: pascal
-
-    __writeln('Some debug here');
-*}
-procedure __writeln(s: string);
+procedure PF_Debug(const s: string);
 begin
-  __memo.getLines().add(s);
+  if (assigned(@playerForm.debugProc)) then
+    playerForm.debugProc(s)
+  else
+    debugLn(s);
+end;
+
+procedure PF_LoadArmy(FName: string = '');
+var
+  i, j: integer;
+  a: TIntegerArray;
+begin
+  if (FName = '') then
+    FName := playerForm.editArmyName.getCaption();
+
+  with (playerForm) do
+  begin
+    setLength(__loadedArmy, 0);
+
+    if (Raf_FindArmy(FName)) then
+      Raf_GetPlayers(FName, __loadedArmy)
+    else begin
+      MessageDlg('PlayerForm', format('Army "%s" doesn''t exist, make sure you''ve saved a army in the player manager (SRL > Run Player Manager)', [FName]), mtWarning, [mbOk]);
+      exit();
+    end;
+
+    if (length(__loadedArmy) = 0) then
+    begin
+      MessageDlg('PlayerForm', format('Found no players in the army "%s"', [FName]), mtWarning, [mbOk]);
+      exit();
+    end;
+
+    clbPlayers.clear();
+    setLength(players, 0);
+
+    for i := 0 to high(__loadedArmy) do
+    begin
+      clbPlayers.getItems().add(__loadedArmy[i].logInName + '  ('+__loadedArmy[i].nickName+')');
+      for j := 0 to (clbPlayers.getItems().getCount() - 1) do // Set scroll width - not auto :(
+        insert(clbPlayers.getCanvas().TextWidth(clbPlayers.getItems().getStrings(j)), a);
+
+      clbPlayers.setScrollWidth(MaxA(a) + 25);
+    end;
+
+    __loadedArmyName := FName;
+    playerForm.editArmyName.setCaption(__loadedArmyName);
+
+    PF_Debug(format('Loaded %d players from army "%s"', [length(__loadedArmy), FName]));
+    PF_Debug(format('Our currently loaded army is now "%s"', [__loadedArmyName]));
+  end;
 end;
 
 {*
-__getDefaultSettings
-~~~~~~~~~~~~~~~~~~~~
+_PF_SaveSettings
+~~~~~~~~~~~~~~~~
 
 .. code-block:: pascal
 
-    function __getDefaultSettings(): TStringArray;
+    procedure _PF_SaveSettings();
 
-Returns all the player form's default settings in one array.
+Creates a script directory and saves the settings of the selected players to a
+file named settings.txt.
+
+ (Uses a TStringList since Simbas file system isn't threadsafe).
 
 .. note::
 
@@ -136,7 +116,215 @@ Returns all the player form's default settings in one array.
     - Last Updated: 10 January 2014 by Coh3n
 
 *}
-function __getDefaultSettings(): TStringArray;
+procedure _PF_SaveSettings();
+var
+  i, j: Integer;
+  Path, FilePath: String;
+  List: TStringList;
+begin
+  Path := AppPath + 'Scripts/' + PlayerForm.MainForm.getCaption() + '/';
+  FilePath := Path + 'Settings.txt';
+
+  DebugLn(Format('PlayerForm: Saving player settings to %s', [Path]));
+
+  if (Length(PlayerForm.Players) = 0) then
+    Exit();
+
+  if (not DirectoryExists(Path)) then
+    ForceDirectories(Path);
+
+  if (DirectoryExists(Path)) then
+  begin
+    if (FileExists(FilePath)) then
+      DeleteFile(FilePath);
+
+    List.Init();
+
+    try
+      List.Add(Format('<Army>%s</Army>', [playerForm.__loadedArmyName]));
+      List.Add('');
+
+      for i := 0 to High(PlayerForm.Players) do
+      begin
+        List.Add(Format('<%s>', [PlayerForm.Players[i].LoginName]));
+        List.Add(' ' + ToString(PlayerForm.Players[i].Settings));
+        List.Add(Format('</%s>', [PlayerForm.Players[i].LoginName]));
+        List.Add('');
+      end;
+    finally
+      if (Length(List.getText()) > 0) then
+        List.SaveToFile(FilePath);
+      List.Free();
+    end;
+  end;
+end;
+
+procedure PF_UpdatePlayerSettings();
+var
+  i, index: integer;
+begin
+    with (playerForm) do
+    begin
+      if (length(players) = 0) then
+        exit();
+
+      index := __currPlayer;
+
+      setLength(players[index].settings, 0);
+
+      if (length(__scriptEditBoxes) > 0) then
+        for i := 0 to high(__scriptEditBoxes) do
+        begin
+          setLength(players[index].settings, length(players[index].settings) + 1);
+          players[index].settings[high(players[index].settings)] := __scriptEditBoxes[i].getText();
+        end;
+
+      if (length(__scriptCheckBoxes) > 0) then
+        for i := 0 to high(__scriptCheckBoxes) do
+        begin
+          setLength(players[index].settings, length(players[index].settings) + 1);
+
+          if (__scriptCheckBoxes[i].getState() = cbChecked) then
+            players[index].settings[high(players[index].settings)] := 'True'
+          else
+            players[index].settings[high(players[index].settings)] := 'False';
+        end;
+
+      if (length(__scriptComboBoxes) > 0) then
+        for i := 0 to high(__scriptComboBoxes) do
+        begin
+          setLength(players[index].settings, length(players[index].settings) + 1);
+          players[index].settings[high(players[index].settings)] := __scriptComboBoxes[i].getText();
+        end;
+    end;
+end;
+
+procedure PF_SetCurrPlayer(const index: integer; const Update: Boolean = True);
+var
+  i, c: integer;
+begin
+  if (Update) then
+    PF_UpdatePlayerSettings();
+
+  with (playerForm) do
+  begin
+    __cmpGroupBox.setCaption('Settings for player: ' + players[index].loginName);
+    __cmpGroupBox.rePaint(); // Olly is a genius.
+
+   c := 0;
+   with (playerForm) do
+   begin
+     for i := 0 to high(__scriptEditBoxes) do
+      begin
+        if (c > high(players[index].settings)) then
+          Continue();
+
+        __scriptEditBoxes[i].setCaption(players[index].settings[c]);
+        inc(c);
+      end;
+
+      for i := 0 to high(__scriptCheckBoxes) do
+      begin
+        if (c > high(players[index].settings)) then
+          Continue();
+
+        if (lowercase(players[index].settings[c]) = 'true') then
+          __scriptCheckBoxes[i].setState(cbChecked)
+        else
+          __scriptCheckBoxes[i].setState(cbUnchecked);
+
+        inc(c);
+      end;
+         writeln(players[index].settings);
+      for i := 0 to high(__scriptComboBoxes) do
+      begin
+        if (c > high(players[index].settings)) then
+          Continue();
+
+        __scriptComboBoxes[i].setCaption(players[index].settings[c]);
+        inc(c);
+      end;
+
+   end;
+    for __currPlayer := 0 to high(players) do
+      if (players[__currPlayer].loginName = players[index].loginName) then
+        break();
+  end;
+end;
+
+procedure PF_LoadSettings();
+var
+  Data, EvenMoreData: TStringArray;
+  List: TStringList;
+  Name, Text, FilePath, UserName: String;
+  i, p, j, k: Integer;
+begin
+  FilePath := AppPath + 'Scripts/' + PlayerForm.MainForm.getCaption() + '/' + 'Settings.txt';
+
+  if (not FileExists(FilePath)) then
+    Exit();
+
+  List.Init();
+  List.LoadFromFile(FilePath);
+
+  Text := List.getText();
+  Name := Between('<Army>', '</Army>', Text);
+
+  if (Name <> '') then
+  begin
+    PF_Debug(Format('Loading previous army "%s"', [Name]));
+    PF_LoadArmy(Name);
+
+    if (Length(PlayerForm.__loadedArmy) = 0) then // Load army failed
+    begin
+      PF_Debug('Loading previous army error: PF_LoadArmy failed');
+      Exit();
+    end;
+
+    Data := MultiBetween(Text, '<', '</');
+
+    for i := 1 to High(Data) do // 1 = army name
+    begin
+      p := Pos('>', Data[i]);
+      if (p = 0) then
+        Continue();
+
+      UserName := Copy(data[i], 0, p - 1);
+      EvenMoreData := Explode(',', Between('[', ']', Data[i]));
+      for k := 0 to High(EvenMoreData) do
+        EvenMoreData[k] := Trim(EvenMoreData[k]);
+
+      for j := 0 to (playerForm.clbPlayers.getItems().getCount() - 1) do
+        if (Pos(UserName, playerForm.clbPlayers.getItems().getStrings(j)) = 1) then
+        begin
+          PlayerForm.clbPlayers.setChecked(j, True);
+          Insert(PlayerForm.__LoadedArmy[j], PlayerForm.Players, Length(PlayerForm.Players));
+          PlayerForm.Players[High(PlayerForm.Players)].Settings := EvenMoreData;
+          PlayerForm.__currPlayer := High(PlayerForm.Players);
+          PF_SetCurrPlayer(High(PlayerForm.Players), False);
+        end;
+    end;
+  end;
+
+  if (Length(PlayerForm.Players) > 0) then // Check to enable stuff
+  begin
+    PlayerForm.__cmpGroupBox.setEnabled(True);
+    if (Length(PlayerForm.Players) > 1) then
+    begin
+      PlayerForm.__btnApplyAll.setEnabled(true);
+      PlayerForm.__btnNextPlayer.setEnabled(true);
+      PlayerForm.__btnPrevPlayer.setEnabled(true);
+    end else
+      PlayerForm.__btnApplyAll.setEnabled(false);
+  end else begin
+    PlayerForm.__btnNextPlayer.setEnabled(false);
+    PlayerForm.__btnPrevPlayer.setEnabled(false);
+  end;
+
+  List.Free();
+end;
+
+function PF_GetDefaultSettings(): TStringArray;
 var
   i: integer;
 begin
@@ -160,772 +348,505 @@ begin
       setLength(result, length(result) + 1);
       result[high(result)] := playerForm.comboBoxDefaults[i];
     end;
+
+  PF_Debug('Set default settings to player');
 end;
 
-{*
-__loadPlayerFiles
-~~~~~~~~~~~~~~~~~
+procedure PF_OnPlayerSelect(Sender: TObject; Index: Integer); native;
 
-.. code-block:: pascal
+  procedure deleteIndex(var arr: PF_TPlayerArray; const index : Integer);
+  var
+    I : Integer;
+  begin
+    for I := index to high(arr)-1 do
+      arr[I] := arr[I+1];
+    setLength(arr, length(arr)-1);
+  end;
 
-    procedure __loadPlayerFiles();
-
-Loadsd all the user's player files into the "Player File" combo box.
-
-.. note::
-
-    - by Coh3n
-    - Last Updated: 10 January 2014 by Coh3n
-
-*}
-procedure __loadPlayerFiles();
 var
-  s: TStringArray;
+  s: string;
+  i, count: integer;
+begin
+  with (playerForm) do
+  begin
+    for i := 0 to (clbPlayers.getItems().getCount() - 1) do
+      if (clbPlayers.getChecked(i)) then
+        inc(count);
+
+    if (count = 0) then
+    begin
+      __cmpGroupBox.setEnabled(false);
+      __cmpGroupBox.setCaption('Select a player!');
+      __cmpGroupBox.rePaint();
+    end else
+       __cmpGroupBox.setEnabled(True);
+
+    if (maxPlayers > 0) then
+    if (count > maxPlayers) then
+    begin
+      PF_Debug(format('Unable to select player, max player limit reached (%d)', [maxPlayers]));
+      clbPlayers.setChecked(index, false);
+      exit();
+    end;
+
+    if (count > 0) then
+    begin
+     if (count > 1) then
+     begin
+       PF_UpdatePlayerSettings();
+
+       __btnApplyAll.setEnabled(true);
+       __btnNextPlayer.setEnabled(true);
+       __btnPrevPlayer.setEnabled(true);
+     end else
+       __btnApplyAll.setEnabled(false);
+    end else begin
+      __btnNextPlayer.setEnabled(false);
+      __btnPrevPlayer.setEnabled(false);
+    end;
+
+    s := clbPlayers.getItems().getStrings(index);
+    if (clbPlayers.getChecked(index)) then
+    begin
+      PF_Debug(format('Player "%s" was selected', [copy(s, 0, Pos('(', s) - 3)]));
+      insert(__loadedArmy[index], players, length(players));
+      players[high(players)].settings := PF_getDefaultSettings();
+      PF_SetCurrPlayer(high(players));
+    end else begin
+      PF_Debug(format('Player "%s" un-selected', [copy(s, 0, Pos('(', s) - 3)]));
+
+      for i := 0 to high(players) do
+        if (players[i].loginName = trim(copy(s, 0, Pos('(', s) - 3))) then // login name matches
+        begin
+          deleteIndex(players, i);
+          break();
+        end;
+    end;
+  end;
+end;
+
+procedure __PF_Writeln(const s: string);
+var
   i: integer;
+  a: TIntegerArray;
 begin
-  s := getFiles(__PATH_PLAYER, 'xml');
-
-  for i := 0 to high(s) do
+  if (not Assigned(playerForm.__lbDebug)) then
+    Exit();
+  with (playerForm.__lbDebug) do
   begin
-    if (s[i] = 'settings.xml') then
-      continue;
+    getItems().append(s);
+    setItemIndex(getItems().getCount() - 1);
+    setItemIndex(-1);
 
-    __cboPlayerFile.addItem(s[i], nil);
+    for i := 0 to (getItems().getCount() - 1) do
+      insert(getCanvas().TextWidth(getItems().getStrings(i)), a);
+
+    setScrollWidth(MaxA(a) + 5);
   end;
-
-  s := getFiles(__PATH_PLAYER, 'raf');
-
-  for i := 0 to high(s) do
-    __cboPlayerFile.addItem(s[i], nil);
 end;
 
-{*
-__componentSettings
-~~~~~~~~~~~~~~~~~~~
-
-.. code-block:: pascal
-
-    function __componentSettings(): TStringArray;
-
-Gets all the settings from the form components and returns them in a
-TStringArray.
-
-.. note::
-
-    - by Coh3n
-    - Last Updated: 10 January 2014 by Coh3n
-
-*}
-function __componentSettings(): TStringArray;
+procedure PF_OnNotifyEvent(Sender: TObject); native;
 var
-  i: integer;
-begin
-  if (length(__scriptEditBoxes) > 0) then
-    for i := 0 to high(__scriptEditBoxes) do
-    begin
-      setLength(result, length(result) + 1);
-      result[high(result)] := __scriptEditBoxes[i].getText();
-    end;
-
-  if (length(__scriptCheckBoxes) > 0) then
-    for i := 0 to high(__scriptCheckBoxes) do
-    begin
-      setLength(result, length(result) + 1);
-
-      if (__scriptCheckBoxes[i].getState() = cbChecked) then
-        result[high(result)] := 'True'
-      else
-        result[high(result)] := 'False';
-    end;
-
-  if (length(__scriptComboBoxes) > 0) then
-    for i := 0 to high(__scriptComboBoxes) do
-    begin
-      setLength(result, length(result) + 1);
-      result[high(result)] := __scriptComboBoxes[i].getText();
-    end;
-end;
-
-{*
-__fillPlayerInfo
-~~~~~~~~~~~~~~~~
-
-.. code-block:: pascal
-
-    procedure __fillPlayerInfo(settings: TStringArray);
-
-Fills the form components with the selected player's informatin.
-
-.. note::
-
-    - by Coh3n
-    - Last Updated: 10 January 2014 by Coh3n
-
-*}
-procedure __fillPlayerInfo(settings: TStringArray);
-var
-  i, c: integer;
-begin
-  for i := 0 to high(__scriptEditBoxes) do
-  begin
-    __scriptEditBoxes[i].setCaption(settings[c]);
-    inc(c);
-  end;
-
-  for i := 0 to high(__scriptCheckBoxes) do
-  begin
-    if (lowercase(settings[c]) = 'true') then
-      __scriptCheckBoxes[i].setState(cbChecked)
-    else
-      __scriptCheckBoxes[i].setState(cbUnchecked);
-
-    inc(c);
-  end;
-
-  for i := 0 to high(__scriptComboBoxes) do
-  begin
-    __scriptComboBoxes[i].setCaption(settings[c]);
-    inc(c);
-  end;
-end;
-
-{*
-__showPlayerInfo
-~~~~~~~~~~~~~~~~
-
-.. code-block:: pascal
-
-    procedure __showPlayerInfo();
-
-Displays the correct player information in the form's components.
-
-.. note::
-
-    - by Coh3n
-    - Last Updated: 10 January 2014 by Coh3n
-
-*}
-procedure __showPlayerInfo();
-begin
-  if (length(playerForm.players) <= 0) then
-    exit;
-
-  if (__prevPlayerIndex <> -1) then
-    playerForm.players[__prevPlayerIndex].settings := __componentSettings();
-
-  __fillPlayerInfo(playerForm.players[__lstPlayerList.getItemIndex()].settings);
-  __prevPlayerIndex := __lstPlayerList.getItemIndex();
-end;
-
-{*
-__saveSettings
-~~~~~~~~~~~~~~
-
-.. code-block:: pascal
-
-    function __saveSettings(): boolean;
-
-Saves the user's settings to a text file.
-
-.. note::
-
-    - by Coh3n
-    - Last Updated: 10 January 2014 by Coh3n
-
-*}
-function __saveSettings(): boolean;
-var
-  st: TCheckBoxState;
-  i, j: integer;
-  tsl: TStringList;
+  i, j, p: integer;
+  a: array of integer;
   s: string;
 begin
-  if (playerForm.scriptSettingsPath = '') then
-    playerForm.scriptSettingsPath := scriptPath + 'settings.txt';
+  with (playerForm) do
+    case (Sender) of
+      editArmyName:
+        if (Raf_FindArmy(editArmyName.getCaption())) then
+          btnLoadArmy.setGlyph(__btnBmps[0])
+        else
+          btnLoadArmy.setGlyph(__btnBmps[1]);
 
-  tsl.init();
+     btnLoadArmy:
+       PF_LoadArmy();
 
-  if (__cboPlayerFile.getText() = '') then
-  begin
-    __writeln('ERROR: You must select a player file use!');
-    exit();
-  end else begin
-    tsl.add(__cboPlayerFile.getText()); // player file
-    playerForm.playerFile := copy(__cboPlayerFile.getText(), 0, length(__cboPlayerFile.getText()) - 4);
-  end;
+      btnStart:
+        begin
+          PF_UpdatePlayerSettings();
+          _PF_SaveSettings();
 
-  // player names
-  if (__lstPlayerList.getCount() <= 0) then
-  begin
-    __writeln('ERROR: You must add players to the list!');
-    exit();
-  end;
+          for i := 0 to (clbPlayers.getItems().getCount() - 1) do
+            if (clbPlayers.getChecked(i)) then
+            begin
+              s := clbPlayers.getItems().getStrings(i);
+              p := Pos('(', s);
+              insert(Trim(Copy(s, 0, p - 1)), playerNames);
+            end;
 
-  if (__lstPlayerList.getItemIndex() <> -1) then
-    playerForm.players[__lstPlayerList.getItemIndex()].settings := __componentSettings();
+          isScriptReady := (length(players) > 0);
+          playerFile := __loadedArmyName;
 
-  // add each player and their settings to the TStringList
-  for i := 0 to high(playerForm.players) do
-  begin
-    tsl.add(playerForm.players[i].name);
+          if (not isScriptReady) then
+            print('No players have been selected, script is not ready', TDebug.WARNING);
 
-    for j := 0 to high(playerForm.players[i].settings) do
-      tsl.add(playerForm.players[i].settings[j]);
-  end;
+          mainForm.close();
+        end;
 
-  __writeln(playerForm.scriptSettingsPath);
+      __btnNextPlayer:
+        begin
+          i := __currPlayer;
+          if (i + 1 > high(players)) then
+            i := -1;
 
-  tsl.saveToFile(playerForm.scriptSettingsPath);
-  tsl.free();
+          PF_SetCurrPlayer(i + 1);
+        end;
 
-  __writeln('Successfully saved settings.');
-  result := true;
+      __btnPrevPlayer:
+      begin
+        i := __currPlayer;
+          if (i - 1 < 0) then
+            i := high(players) + 1;
+
+          PF_SetCurrPlayer(i - 1);
+      end;
+
+      __btnApplyAll:
+        begin
+          __PF_Writeln('Applying current settings to all players');
+          PF_UpdatePlayerSettings();
+
+          for i := 0 to high(players) do
+            players[i].settings := players[__currPlayer].settings;
+        end;
+      __btnHelp:
+        if (scriptHelpThread = '') then
+          openWebPage('http://villavu.com/forum/showthread.php?t=47714')
+        else
+          openWebPage(playerForm.scriptHelpThread);
+    end;
 end;
 
-{*
-__loadSettings
-~~~~~~~~~~~~~~
+procedure PF_Create();
+begin
+  with (playerForm) do
+  begin
+    __btnBmps[0].init();
+    __btnBmps[0].loadFromString(18, 17, 0, '000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000B0B7B1E2E2E2000000000000000000000000000000000000000000000000000000000000000000000000000000000000B8BDB861AA6957B061E0E0E0000000000000000000000000000000000000000000000000000000000000000000000000B3B9B460AB6877C98669BD744FA658DFDFDF0000000000000000000000000000000000000000000000000000000000000000009CAA9D6BC07780CE8D84D29061B56B479A4FDFDFDF00000000000000000000000000000000000000000000000000000000000000000093A49550A55978C9857CCE8959AC623E8E45DFDFDF00000000000000000000000000000000000000000000000000000000000000000092A2945EB26879CC8775CA8252A35A35833BDEDEDE0000000000000000000000000000000000000000000000000000000000007F988161B46B74CA8172C87C4D9F55337937E1E1E10000000000000000000000000000000000000000000000000000007C977F5AAD6576C98374C9814FA057317B37E2E2E20000000000000000000000000000000000000000000000000000007C977F5CAE667ACC8676CB8250A258327C38E1E1E10000000000000000000000000000000000000000000000000000007D98805DAF677BCD8977CB8551A35A337D39E1E1E10000000000000000000000000000000000000000000000000000007E99815EB0687DCE8A7ACD8752A45B347D3AE2E2E20000000000000000000000000000000000000000000000000000007E998160B26A81CF8D7CCE8954A55D367F3CE3E3E30000000000000000000000000000000000000000000000000000007E9A8161B36B82D18F7DCF8B55A65E37803DE3E3E3000000000000000000000000000000000000000000000000000000000000889D8A5DAF6778C88556A75F38813EE3E3E30000000000000000000000000000000000000000000000000000000000000000000000008B9D8D55A65E37853EE4E4E4000000000000000000000000000000000000000000000000000000000000000000000000000000000000869888E5E5E5000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000');
+    __btnBmps[1].init();
+    __btnBmps[1].loadFromString(18, 17, 0, '000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000D1D1D3E5E5E5000000000000000000000000000000000000C3C3C7B2B2BC000000000000000000000000000000000000D1D1D37875FF726FFCE5E5E5000000000000000000000000C4C4C85956F65654F5B1B1BC000000000000000000000000D2D2D47875FF817CFF7B78FE6D6AF9E4E4E4000000000000C5C5C95957F66360FA615FFA4D4AF2AFAFBB000000000000000000C9C9CD7774FE817CFE8A87FF7572FD6562F6E3E3E3C5C5C95A58F66461FA6F6EFF5653F6403EEBE0E0E0000000000000000000000000C8C8CC726FFD7A77FD8682FF6E6BFB5B58F45B59F76562FA726FFF5754F64140EAE1E1E1000000000000000000000000000000000000C8C7CC6A67FB7471FC807CFF7B77FF7774FF7270FF5856F64241EBE1E1E1000000000000000000000000000000000000000000000000C6C6CA6260F87C79FF5C59FF5754FF716EFF4241EBE1E1E1000000000000000000000000000000000000000000000000000000C6C6CA5E5BF77A77FF5956FF5552FF6E6CFF3E3CEAE1E1E1000000000000000000000000000000000000000000000000C7C7CB5F5CF86B68FA7775FF7472FF706EFF6C6AFF4E4BF43633E6E1E1E1000000000000000000000000000000000000C7C7CB605DF86C6AFA7977FF5C5AF74643ED4644F05553F76665FF4543F22D2BE3E1E1E1000000000000000000000000C8C8CC625FF86D6BFB7B78FF5E5BF74643ECE3E3E3C4C4C93D3BEE4E4CF56160FF3F3DF12523E1E0E0E00000000000000000009796B46866F97C7AFF5F5DF74744ECE4E4E4000000000000C4C4C93432EB4846F44A48F62F2DEAADADBA000000000000000000B9B8C27573BA605DF84845EDE5E5E5000000000000000000000000C3C3C82D2BE92F2DEAAEAEBB000000000000000000000000000000C8C8CD9393B3E7E7E7000000000000000000000000000000000000C1C1C7AEAEBB000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000');
 
-.. code-block:: pascal
+    mainForm.init(nil);
+    with (mainForm) do
+    begin
+      setWidth(280);
+      setHeight(249);
+      setPosition(poScreenCenter);
+      setShowHint(true);
+      setBorderStyle(bsSingle);
+      setCaption(name);
+    end;
 
-    procedure __loadSettings();
+    groupBox.init(mainForm);
+    with (groupBox) do
+    begin
+      setParent(mainForm);
+      setBounds(4, 4, 272, 200);
+      setCaption('Players');
+      setShowHint(true);
+    end;
 
-Loads the user's settings from a text file.
+    editArmyName.init(mainForm);
+    with (editArmyName) do
+    begin
+      setParent(groupBox);
+      setBounds(5, 5, 145, 20);
+      setCaption('default');
+      setHint('Enter the name of your army');
+      setOnChange(PF_OnNotifyEvent);
+    end;
 
-.. note::
+    btnLoadArmy.init(mainForm);
+    with (btnLoadArmy) do
+    begin
+      setParent(groupBox);
+      setBounds(154, 4, 110, 25);
+      setCaption('Load Army');
+      setHint('Click to load army a tick will appear if the army exists');
+      setOnClick(PF_OnNotifyEvent);
+      setGlyph(__btnBmps[1]);
+    end;
 
-    - by Coh3n
-    - Last Updated: 10 January 2014 by Coh3n
+    clbPlayers.init(mainForm);
+    with (clbPlayers) do
+    begin
+      setParent(groupBox);
+      setBounds(5, 35, 258, 140);
+      setOnItemClick(PF_OnPlayerSelect);
 
-*}
-procedure __loadSettings();
+      if (maxPlayers = 0) then
+        setHint('Tick the player(s) you want to use'+#10#13+'You can select an unlimited amount of players')
+      else
+        setHint('Tick the player(s) you want to use'+#10#13+'You can select an max amount of '+intToStr(maxPlayers)+' of players');
+    end;
+
+    btnStart.init(mainForm);
+    with (btnStart) do
+    begin
+      setParent(mainForm);
+      setBounds(8, 211, 262, 30);
+      setCaption('Start Script');
+      setHint('Click to start the script, make sure you''ve selected a player!');
+      setOnClick(PF_OnNotifyEvent);
+    end;
+  end;
+end;
+
+procedure PF_Defaults();
+begin
+  with (playerForm) do
+  begin
+    if (Raf_FindArmy(editArmyName.getCaption())) then
+    begin
+      btnLoadArmy.setGlyph(__btnBmps[0]);
+      PF_LoadArmy();
+    end;
+  end;
+end;
+
+procedure PF_AddComponents();
+
+  function Longest(const txtArr: T2DStringArray): integer;
+  var a: TIntegerArray; i, j: integer;
+  begin
+    for i := 0 to high(txtArr) do
+      for j := 0 to high(txtArr[i]) do
+        insert(playerForm.mainForm.getCanvas().TextWidth(txtArr[i][j]), a);
+
+    exit(MaxA(a));
+  end;
+
+  procedure SetHintEx(cmp: TControl; arr: TStringArray; index: integer);
+  begin
+    if (length(arr) = 0) then
+      exit();
+
+    if (inRange(index, low(arr), high(arr))) then
+      cmp.setHint(arr[index]);
+  end;
+
 var
-  tsl: TStringList;
-  startIndex, settingLength, i, j, c: integer;
+  i, j, cmpLeft, cmpTop, cmpTopInc, cmpWidth, lblLeft, mid: integer;
+  widths: TIntegerArray;
 begin
-  if (playerForm.scriptSettingsPath = '') then
-    playerForm.scriptSettingsPath := scriptPath + 'settings.txt';
+  print('__createScriptComponents(): Adding components to player form...');
 
-  if (not fileExists(playerForm.scriptSettingsPath)) then
-    exit;
-
-  tsl.init();
-  tsl.loadFromFile(playerForm.scriptSettingsPath);
-
-  // so we know how many elements of the tsl to go through for each player
-  settingLength := (length(__scriptEditBoxes) + length(__scriptCheckBoxes) + length(__scriptComboBoxes));
-
-  playerForm.playerFile := copy(tsl.getStrings(0), 0, length(tsl.getStrings(0)) - 4);
-  __cboPlayerFile.setText(tsl.getStrings(0));
-
-  if ((tsl.getCount() - 2) mod settingLength <> 0) then
+  with (playerForm) do
   begin
-    __writeln('Components have changed, can''t load previous settings');
-    exit();
-  end;
+    debugProc := @__PF_Writeln;
+    cmpLeft := Longest([editBoxLabels, checkBoxLabels, comboBoxLabels]) + 16; // where to start the components, we find out the longest caption.
+    cmpTop := 7;
+    cmpTopInc := 30;
+    cmpWidth := 100;
+    lblLeft := 7;
 
-  setLength(playerForm.players, tsl.getCount()); // temporarily set the length to avoid errors
-  setLength(playerForm.playerNames, length(playerForm.players));
-
-  for i := 0 to high(playerForm.players) do
-  begin
-    startIndex := (1 + i * (settingLength + 1)); // get the element in the tsl that starts the next player
-
-    if (startIndex >= (tsl.getCount() - 1)) then
-      break;
-
-    playerForm.players[i].name := tsl.getStrings(startIndex);
-    __lstPlayerList.getItems().add(playerForm.players[i].name);
-    __lstPlayerList.setItemIndex(i);
-    playerForm.playerNames[i] := playerForm.players[i].name;
-
-    // get all the players settings
-    setLength(playerForm.players[i].settings, settingLength);
-    for j := 0 to (settingLength - 1) do
-      playerForm.players[i].settings[j] := tsl.getStrings(startIndex + j + 1);
-
-    inc(c);
-  end;
-
-  setLength(playerForm.players, c); // set the real length of players
-  setLength(playerForm.playerNames, c);
-  tsl.free();
-end;
-
-{*
-__createScriptComponents
-~~~~~~~~~~~~~~~~~~~~~~~~
-
-.. code-block:: pascal
-
-    procedure __createScriptComponents();
-
-Creates all the form's components based on the "playerForm"'s settings.
-
-.. note::
-
-    - by Coh3n
-    - Last Updated: 10 January 2014 by Coh3n
-
-*}
-procedure __createScriptComponents();
-var
-  i, j, lblLeft, lblWidth, cmpLeft, cmpWidth, top, topInc: integer;
-  first: boolean;
-begin
-  lblLeft := __lblPlayerFile.getLeft();
-  cmpLeft := __cboPlayerFile.getLeft();
-  lblWidth := __lblPlayerFile.getWidth();
-  cmpWidth := __cboPlayerFile.getWidth();
-  top := __cboPlayerFile.getTop() + __cboPlayerFile.getHeight() + 10;
-  topInc := top;
-  first := true;
-
-  // TEdit boxes
-  setLength(__scriptEditBoxes, length(playerForm.editBoxLabels));
-  setLength(__scriptEditLabels, length(__scriptEditBoxes));
-  for i := 0 to high(playerForm.editBoxLabels) do
-  begin
-    __scriptEditBoxes[i].init(__mainForm);
-    with __scriptEditBoxes[i] do
+    // Creating the groupbox to store the components in
+    __cmpGroupBox.init(mainForm);
+    with (__cmpGroupBox) do
     begin
-      setParent(__mainForm);
-      setLeft(cmpLeft);
-      setTop(top);
-      setWidth(cmpWidth);
-      setCaption(playerForm.editBoxDefaults[i]);
+      setParent(mainForm);
+      setBounds((groupBox.getLeft() + groupBox.getWidth()) + 10, 4, 500, 500); // we will resize later.
+      setCaption('Settings for player: Select a player!');
+      setEnabled(false);
     end;
 
-    __scriptEditLabels[i].init(__mainForm);
-    with __scriptEditLabels[i] do
+    // Adding the TEdits
+    setLength(__scriptEditBoxes, length(editBoxLabels));
+    setLength(__scriptEditLabels, length(__scriptEditBoxes));
+    for i := 0 to high(editBoxLabels) do
     begin
-      setParent(__mainForm);
-      setTop(top + 3);
-      setLeft(lblLeft);
-      setWidth(lblWidth);
-      setCaption(playerForm.editBoxLabels[i]);
+      __scriptEditBoxes[i].init(__cmpGroupBox);
+      with (__scriptEditBoxes[i]) do
+      begin
+        setParent(__cmpGroupBox);
+        setLeft(cmpLeft);
+        setTop(cmpTop);
+        setWidth(cmpWidth);
+        setCaption(editBoxDefaults[i]);
+        setHintEx(__scriptEditBoxes[i], editBoxHints, i);
+      end;
+
+      __scriptEditLabels[i].init(__cmpGroupBox);
+      with (__scriptEditLabels[i]) do
+      begin
+        setParent(__cmpGroupBox);
+        setTop(cmpTop + 2);
+        setLeft(lblLeft);
+        setWidth(cmpLeft);
+        setCaption(editBoxLabels[i]);
+        setHintEx(__scriptEditLabels[i], editBoxHints, i);
+      end;
+
+      inc(cmpTop, cmpTopInc);
+      insert(cmpLeft + cmpWidth, widths);
     end;
 
-    if (first) then
+    // TComboBoxes
+    setLength(__scriptComboBoxes, length(comboBoxLabels));
+    setLength(__scriptComboLabels, length(__scriptComboBoxes));
+    for i := 0 to high(playerForm.comboBoxLabels) do
     begin
-      first := false;
-      topInc := topInc - 10;
+      __scriptComboBoxes[i].init(__cmpGroupBox);
+      with (__scriptComboBoxes[i]) do
+      begin
+        setParent(__cmpGroupBox);
+        setLeft(cmpLeft);
+        setTop(cmpTop);
+        setWidth(cmpWidth);
+        setCaption(comboBoxDefaults[i]);
+        setHintEx(__scriptComboBoxes[i], comboBoxHints, i);
+
+        for j := 0 to high(playerForm.comboBoxItems[i]) do
+          addItem(comboBoxItems[i][j], nil);
+      end;
+
+      __scriptComboLabels[i].init(__cmpGroupBox);
+      with (__scriptComboLabels[i]) do
+      begin
+        setParent(__cmpGroupBox);
+        setTop(cmpTop + 2);
+        setLeft(lblLeft);
+        setWidth(cmpLeft);
+        setCaption(comboBoxLabels[i]);
+        setHintEx(__scriptComboLabels[i], comboBoxHints, i);
+      end;
+
+      inc(cmpTop, cmpTopInc);
+      insert(cmpLeft + cmpWidth, widths);
     end;
 
-    top := top + topInc;
-  end;
-
-  // TCheckBoxes
-  setLength(__scriptCheckBoxes, length(playerForm.checkBoxLabels));
-  setLength(__scriptCheckLabels, length(__scriptCheckBoxes));
-  for i := 0 to high(playerForm.checkBoxLabels) do
-  begin
-    __scriptCheckBoxes[i].init(__mainForm);
-    with __scriptCheckBoxes[i] do
+    // TCheckBoxes
+    setLength(__scriptCheckBoxes, length(checkBoxLabels));
+    setLength(__scriptCheckLabels, length(__scriptCheckBoxes));
+    for i := 0 to high(checkBoxLabels) do
     begin
-      setParent(__mainForm);
-      setLeft(cmpLeft);
-      setTop(top);
-      setWidth(cmpWidth);
+      __scriptCheckBoxes[i].init(__cmpGroupBox);
+      with (__scriptCheckBoxes[i]) do
+      begin
+        setParent(__cmpGroupBox);
+        setLeft(cmpLeft);
+        setTop(cmpTop + 1);
+        setWidth(cmpWidth);
+        setHintEx(__scriptCheckBoxes[i], checkBoxHints, i);
 
-      if (lowercase(playerForm.checkBoxDefaults[i]) = 'true') then
-       setState(cbChecked);
+        if (lowercase(checkBoxDefaults[i]) = 'true') then
+          setState(cbChecked);
+      end;
+
+      __scriptCheckLabels[i].init(__cmpGroupBox);
+      with (__scriptCheckLabels[i]) do
+      begin
+        setParent(__cmpGroupBox);
+        setTop(cmpTop);
+        setLeft(lblLeft);
+        setWidth(cmpLeft);
+        setCaption(checkBoxLabels[i]);
+        setHintEx(__scriptCheckLabels[i], checkBoxHints, i);
+      end;
+
+      inc(cmpTop, cmpTopInc);
+      insert(cmpLeft + cmpWidth, widths);
     end;
 
-    __scriptCheckLabels[i].init(__mainForm);
-    with __scriptCheckLabels[i] do
+    // Now know what these should be.
+    __cmpGroupBox.setWidth(maxA(widths) + 9);
+    __cmpGroupBox.setHeight((cmpTop) + (cmpTopInc div 2));
+
+    __btnPrevPlayer.init(mainForm);
+    with (__btnPrevPlayer) do
     begin
-      setParent(__mainForm);
-      setTop(top + 3);
-      setLeft(lblLeft);
-      setWidth(lblWidth);
-      setCaption(playerForm.checkBoxLabels[i]);
+      setParent(mainForm);
+      setBounds(__cmpGroupBox.getLeft(), __cmpGroupBox.getHeight() + 8, (__cmpGroupBox.getWidth() div 2) - 3, btnStart.getHeight());
+      setEnabled(false);
+      setCaption('Previous Player');
+      setOnClick(PF_OnNotifyEvent);
     end;
 
-    top := top + topInc;
-  end;
-
-  // TComboBoxes
-  setLength(__scriptComboBoxes, length(playerForm.comboBoxLabels));
-  setLength(__scriptComboLabels, length(__scriptComboBoxes));
-  for i := 0 to high(playerForm.comboBoxLabels) do
-  begin
-    __scriptComboBoxes[i].init(__mainForm);
-    with __scriptComboBoxes[i] do
+    __btnNextPlayer.init(mainForm);
+    with (__btnNextPlayer) do
     begin
-      setParent(__mainForm);
-      setLeft(cmpLeft);
-      setTop(top);
-      setWidth(cmpWidth);
-      setCaption(playerForm.comboBoxDefaults[i]);
-
-      for j := 0 to high(playerForm.comboBoxItems[i]) do
-        addItem(playerForm.comboBoxItems[i][j], nil);
+      setParent(mainForm);
+      setBounds((__btnPrevPlayer.getLeft() + __btnPrevPlayer.getWidth()) + 6, __cmpGroupBox.getHeight() + 8, (__cmpGroupBox.getWidth() div 2) - 3, btnStart.getHeight());
+      setEnabled(false);
+      setCaption('Next Player');
+      setOnClick(PF_OnNotifyEvent);
     end;
 
-    __scriptComboLabels[i].init(__mainForm);
-    with __scriptComboLabels[i] do
+    __btnHelp.init(mainForm);
+    with (__btnHelp) do
     begin
-      setParent(__mainForm);
-      setTop(top + 3);
-      setLeft(lblLeft);
-      setWidth(lblWidth);
-      setCaption(playerForm.comboBoxLabels[i]);
+      setParent(mainForm);
+      setBounds(__cmpGroupBox.getLeft(), __btnNextPlayer.getTop() + (__btnNextPlayer.getHeight() + 3), __btnNextPlayer.getWidth(), __btnNextPlayer.getHeight());
+      setCaption('Help');
+      setOnClick(PF_OnNotifyEvent);
     end;
 
-    top := top + topInc;
-  end;
+    __btnApplyAll.init(mainForm);
+    with (__btnApplyAll) do
+    begin
+      setParent(mainForm);
+      setBounds(__btnNextPlayer.getLeft(), __btnNextPlayer.getTop() + (__btnNextPlayer.getHeight() + 3), __btnNextPlayer.getWidth(), __btnNextPlayer.getHeight());
+      setCaption('Apply to all');
+      setEnabled(false);
+      setOnClick(PF_OnNotifyEvent);
+    end;
 
-  // other, non customizable components
-  __mainForm.setHeight(top + __btnSave.getHeight() + __memo.getHeight() + 20);
-  __btnSave.setTop(__mainForm.getHeight() - __btnSave.getHeight() - 10);
-  __btnHelp.setTop(__btnSave.getTop());
-  __btnRun.setTop(__btnSave.getTop());
-  __memo.setTop(__btnRun.getTop() - __memo.getHeight() - 10);
-  __lstPlayerList.setHeight(__memo.getTop() - __lstPlayerList.getTop() - 10);
-end;
+    // we also know where these should be now. :)
+    btnStart.setBounds(__cmpGroupBox.getLeft(), __btnHelp.getTop() + (__btnHelp.getHeight() + 3), __cmpGroupBox.getWidth(), __btnNextPlayer.getHeight());
+    mainForm.setWidth(5 + (__cmpGroupBox.getLeft() + __cmpGroupBox.getWidth()));
+    mainForm.setHeight(btnStart.getTop() + (btnStart.getHeight() + 5));
+    mid := (mainForm.getHeight() div 2);
 
-{*
-__onClickHelp
-~~~~~~~~~~~~~
+    __debugGroupBox.init(mainForm);
+    with (__debugGroupBox) do
+    begin
+      setParent(mainForm);
+      setBounds(groupBox.getLeft(), mid + 2, groupBox.getLeft() + groupBox.getWidth() - 4, mid - 6);
+      setCaption('Debug');
+    end;
 
-.. code-block:: pascal
+    __lbDebug.init(mainForm);
+    with (__lbDebug) do
+    begin
+      setParent(__debugGroupBox);
+      setBounds(6, 3, __debugGroupBox.getWidth() - 16, __debugGroupBox.getHeight() - 28);
+    end;
 
-    procedure __onClickHelp(sender: TObject); native;
+    groupBox.setHeight(mid - 2);
+    clbPlayers.setHeight(groupBox.getHeight() - 58);
 
-Will open a setup tutorial when the Help button is clicked.
-
-.. note::
-
-    - by Coh3n
-    - Last Updated: 10 January 2014 by Coh3n
-
-*}
-procedure __onClickHelp(sender: TObject); native;
-begin
-  if (playerForm.scriptHelpThread = '') then
-    openWebPage('http://villavu.com/forum/showthread.php?t=47714')
-  else
-    openWebPage(playerForm.scriptHelpThread);
-end;
-
-{*
-__onClickAdd
-~~~~~~~~~~~~
-
-.. code-block:: pascal
-
-    procedure __onClickAdd(sender: TObject); native;
-
-Adds a player to the player array and displays new information in the form
-components.
-
-.. note::
-
-    - by Coh3n
-    - Last Updated: 10 January 2014 by Coh3n
-
-*}
-procedure __onClickAdd(sender: TObject); native;
-begin
-  if (__edtPlayerAdd.getText() <> '') then
-  begin
-    __lstPlayerList.getItems().add(__edtPlayerAdd.getText());
-
-    setLength(playerForm.players, length(playerForm.players) + 1);
-    playerForm.players[high(playerForm.players)].name := __edtPlayerAdd.getText();   // set player's name
-    playerForm.players[high(playerForm.players)].settings := __getDefaultSettings(); // set player's default settings
-    __lstPlayerList.setItemIndex(high(playerForm.players));                          // automatically select the new player
-    __showPlayerInfo();
-
-    // add the player's name for easy use with TPlayerArray.setup()
-    setLength(playerForm.playerNames, length(playerForm.playerNames) + 1);
-    playerForm.playerNames[high(playerForm.playerNames)] := __edtPlayerAdd.getText();
-
-    __writeln('Added player: '+toStr(__edtPlayerAdd.getText()));
-    __edtPlayerAdd.setCaption('');
-  end else
-    __writeln('You need to enter a player''s login name, nickname, or display name first!');
-end;
-
-{*
-__onClickDel
-~~~~~~~~~~~~
-
-.. code-block:: pascal
-
-    procedure __onClickDel(sender: TObject); native;
-
-Removes the selected player.
-
-.. note::
-
-    - by Coh3n
-    - Last Updated: 10 January 2014 by Coh3n
-
-*}
-procedure __onClickDel(sender: TObject); native;
-var
-  element, i: integer;
-begin
-  element := __lstPlayerList.getItemIndex();
-
-  if (element = -1) then
-  begin
-    __writeln('You need to select a player to delete!');
-    exit;
-  end;
-
-  __writeln('Deleting player: '+__lstPlayerList.getItems().getStrings(element));
-
-  // remove the player from the player array
-  if (element <> high(playerForm.players)) then
-    for i := element to (high(playerForm.players) - 1) do
-      playerForm.players[i] := playerForm.players[i + 1];
-
-  setLength(playerForm.players, high(playerForm.players));
-
-  // remove from the TListBox
-  if (__lstPlayerList.getCount() > 1) then
-    if (__lstPlayerList.getItemIndex() = 0) then
-      __lstPlayerList.setItemIndex(1)
+    if (size > 0) then
+      mainForm.scaleBy(20 + Size, 20)
     else
-      __lstPlayerList.setItemIndex(__lstPlayerList.getItemIndex() - 1);
+      mainForm.scaleBy(20 + Size, 20);
+  end;
 
-  __lstPlayerList.getItems().delete(element);
+  PF_Debug('Tip: Settings are automaticly saved when you click start');
 end;
 
-{*
-__onClickPlayerList
-~~~~~~~~~~~~~~~~~~~
-
-.. code-block:: pascal
-
-    procedure __onClickPlayerList(sender: TObject); native;
-
-Called when an item in the player list is clicked.
-
-.. note::
-
-    - by Coh3n
-    - Last Updated: 10 January 2014 by Coh3n
-
-*}
-procedure __onClickPlayerList(sender: TObject); native;
+procedure PF_Init(); Native;
+var
+  i: integer;
 begin
-  __showPlayerInfo();
-end;
+  PF_Create();
+  PF_AddComponents();
+  PF_Defaults();
+  PF_LoadSettings();
 
-{*
-__onClickSave
-~~~~~~~~~~~~~
-
-.. code-block:: pascal
-
-    procedure __onClickSave(sender: TObject); native;
-
-What to do when the "Save" button is clicked.
-
-.. note::
-
-    - by Coh3n
-    - Last Updated: 10 January 2014 by Coh3n
-
-*}
-procedure __onClickSave(sender: TObject); native;
-begin
-  __writeln('Saving settings...');
-  __saveSettings();
-end;
-
-{*
-__onClickRun
-~~~~~~~~~~~~
-
-.. code-block:: pascal
-
-    procedure __onClickRun(sender: TObject); native;
-
-Runs the script when the "Run" button is clicked.
-
-.. note::
-
-    - by Coh3n
-    - Last Updated: 10 January 2014 by Coh3n
-
-*}
-procedure __onClickRun(sender: TObject); native;
-begin
-  if (__saveSettings()) then
-  begin
-    __mainForm.close();
-    playerForm.isScriptReady := true;
+  try
+    playerForm.mainForm.showModal();
+  except
+    print('Uh-oh failed to show playerform', TDebug.ERROR);
+  finally
+    playerForm.mainForm.free();
+    for i := 0 to 1 do
+      playerForm.__btnBmps[i].free();
   end;
 end;
 
-(*
-showForm
-~~~~~~~~
-
-.. code-block:: pascal
-
-    procedure showForm(); native;
-
-Shows the player form.
-
-.. note::
-
-    - by Coh3n
-    - Last Updated: 10 January 2014 by Coh3n
-
-*)
-procedure showForm(); native;
-begin
-  __mainForm.init(nil);
-  with __mainForm do
-  begin
-    setWidth(546);
-    setHeight(200);
-    setCaption(playerForm.name);
-    setPosition(poScreenCenter);
-  end;
-
-  __edtPlayerAdd.init(__mainForm);
-  with __edtPlayerAdd do
-  begin
-    setParent(__mainForm);
-    setLeft(10);
-    setTop(10);
-    setHeight(25);
-    setWidth(126);
-  end;
-
-  __btnPlayerAdd.init(__mainForm);
-  with __btnPlayerAdd do
-  begin
-    setParent(__mainForm);
-    setLeft(__edtPlayerAdd.getLeft() + __edtPlayerAdd.getWidth() + 5);
-    setTop(__edtPlayerAdd.getTop() - 1);
-    setHeight(__edtPlayerAdd.getHeight());
-    setWidth(45);
-    setCaption('Add');
-    setOnClick(__onClickAdd);
-  end;
-
-  __btnPlayerDel.init(__mainForm);
-  with __btnPlayerDel do
-  begin
-    setParent(__mainForm);
-    setLeft(__btnPlayerAdd.getLeft() + __btnPlayerAdd.getWidth() + 5);
-    setTop(__btnPlayerAdd.getTop());
-    setHeight(__btnPlayerAdd.getHeight());
-    setWidth(__btnPlayerAdd.getWidth());
-    setCaption('Del');
-    setOnClick(__onClickDel);
-  end;
-
-  __lstPlayerList.init(__mainForm);
-  with __lstPlayerList do
-  begin
-    setParent(__mainForm);
-    setLeft(__edtPlayerAdd.getLeft());
-    setTop(__edtPlayerAdd.getTop() + __edtPlayerAdd.getHeight() + 8);
-    setWidth(225);
-    setHeight(__mainForm.getHeight() - getTop() - 10);
-    setOnClick(__onClickPlayerList);
-  end;
-
-  __lblPlayerFile.init(__mainForm);
-  with __lblPlayerFile do
-  begin
-    setParent(__mainForm);
-    setCaption('Player File');
-    setLeft(__lstPlayerList.getLeft() + __lstPlayerList.getWidth() + 25);
-    setTop(__btnPlayerAdd.getTop() + 3);
-    setWidth(150);
-  end;
-
-  __cboPlayerFile.init(__mainForm);
-  with __cboPlayerFile do
-  begin
-    setParent(__mainForm);
-    setLeft(__lblPlayerFile.getLeft() + __lblPlayerFile.getWidth());
-    setTop(__btnPlayerAdd.getTop());
-    setWidth(128);
-    __loadPlayerFiles();
-  end;
-
-  __btnHelp.init(__mainForm);
-  with __btnHelp do
-  begin
-    setParent(__mainForm);
-    setWidth(120);
-    setHeight(25);
-    setCaption('Help');
-    setLeft(round((0.25 * __mainForm.getWidth()) - (getWidth() / 2)));
-    setOnClick(__onClickHelp);
-  end;
-
-  __btnSave.init(__mainForm);
-  with __btnSave do
-  begin
-    setParent(__mainForm);
-    setWidth(__btnHelp.getWidth());
-    setHeight(25);
-    setCaption('Save');
-    setLeft(round((0.50 * __mainForm.getWidth()) - (getWidth() / 2)));
-    setOnClick(__onClickSave);
-  end;
-
-  __btnRun.init(__mainForm);
-  with __btnRun do
-  begin
-    setParent(__mainForm);
-    setWidth(__btnSave.getWidth());
-    setHeight(25);
-    setCaption('Run');
-    setLeft(round((0.75 * __mainForm.getWidth()) - (getWidth() / 2)));
-    setOnClick(__onClickRun);
-  end;
-
-  __memo.init(__mainForm);
-  with __memo do
-  begin
-    setParent(__mainForm);
-    setLeft(__lstPlayerList.getLeft());
-    setWidth(__mainForm.getWidth() - 18);
-    setHeight(100);
-    setScrollBars(ssAutoBoth);
-  end;
-
-  // need to be called in this order
-  __createScriptComponents();
-  __loadSettings();
-  __showPlayerInfo();
-
-  __mainForm.showModal();
-  __mainForm.free();
-  __tslSettings.free();
-end;
-{$ENDIF}
-
-(*
-runPlayerForm
-~~~~~~~~~~~~~
-
-.. code-block:: pascal
-
-    procedure runPlayerForm();
-
-The function to be called by scripters when they want to open the player form.
-
-.. note::
-
-    - by Coh3n
-    - Last Updated: 10 January 2014 by Coh3n
-
-*)
 procedure runPlayerForm();
 begin
-  sync(showForm);
+  sync(PF_Init);
 end;
+

@@ -25,12 +25,6 @@ The source for this file can be found `here <https://github.com/SRL/SRL-6/blob/m
 
 *)
 
-{$include_once globals.simba}
-{$include_once ../utilities/time.simba}
-{$include_once ../utilities/wrappers.simba}
-{$include_once ../utilities/types/types.simba}
-{$include_once ../utilities/drawing.simba}
-
 {$f-}
 
 (*
@@ -104,6 +98,7 @@ Example:
 function __openLogFile(): boolean;
 var
   fileName, start: string;
+  i: integer;
 begin
   if (disableSRLLog) then
     exit;
@@ -112,16 +107,19 @@ begin
     forceDirectories(logPath);
 
   start := replace(theDate(DATE_DAY)+' at '+theTime(), ':', '.', [rfReplaceAll]);
+  fileName := logPath + 'SRL log ('+start+').txt';
 
-  // make sure it's a valid file name (Windows)
-  fileName := 'SRL log ('+start+').txt';
-  fileName := replace(fileName, '/', '-', [rfReplaceAll]);
-  fileName := replace(fileName, ':', '-', [rfReplaceAll]);
-  fileName := logPath + fileName;
+  writeln(Format('SRL: Logfile = %s', [fileName]));
 
   try
-    __logFile := appendFile(fileName);
-    result := (__logFile <> -1);
+    i := createFile(fileName);
+
+    if (i > -1) then
+    begin
+      closeFile(i);
+      __logFile := appendFile(fileName);
+      result := (__logFile <> -1);
+    end;
   except
     writeln('Could not open/create log file');
   end;
@@ -295,6 +293,43 @@ begin
     writeln(debugMSG);
 end;
 
+function print(txt: string; _result: variant; footerTxt: string = ''; debugType: TDebug = TDebug.WARNING): variant; overload;
+begin
+  print(txt, debugType);
+
+  if (footerTxt <> '') then // add a footer
+    print(footerTxt, TDebug.FOOTER);
+
+  exit(_result);
+end;
+
+(*
+printf
+~~~~~~
+
+.. code-block:: pascal
+
+    procedure printf(txt: string; args: TVariantArray; debugType: TDebug = TDebug.DEBUG);
+
+Sister function for print, will use the function "format" to print the string + data.
+
+.. note::
+
+    - by Olly
+    - Last Modified: 22 April 2014 by Olly
+
+Example:
+
+.. code-block:: pascal
+
+    printf('hello %d', [50]);
+
+*)
+procedure printf(txt: string; args: TVariantArray; debugType: TDebug = TDebug.DEBUG);
+begin
+  print(format(txt, args), debugType);
+end;
+
 (*
 debugATPA
 ~~~~~~~~~
@@ -456,4 +491,6 @@ procedure debugBitmap(bmp: integer);
 begin
   getMufasaBitmap(bmp).debug();
 end;
+
+{$f+}
 

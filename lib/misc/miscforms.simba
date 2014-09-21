@@ -1,0 +1,431 @@
+(*
+MiscForms
+=========
+
+The MiscForms file contains forms that don't reqiure their own file, currently
+it holds copys of MessageDlg and InputQuery which can be called when a form is open.
+
+*)
+
+{$f+}
+
+{*
+type __TFSMessageDlg
+~~~~~~~~~~~~~~~~~~~~
+
+A record that holds all the infomation for the form safe message dialog.
+
+Example:
+
+.. code-block:: pascal
+
+  __FSMessageDlg.frm.init(nil);
+*}
+{$IFNDEF CODEINSIGHT}
+type
+  __TFSMessageDlg = record
+    frm: TForm;
+    buttons: array of TButton;
+    data: record caption, message: string; dlgType: TMsgDlgType; buttons: TMsgDlgButtons; end;
+    res: string;
+ end;
+{$ENDIF}
+
+{*
+type __TFSInputQuery
+~~~~~~~~~~~~~~~~~~~~
+
+A record that holds all the infomation for the form safe input query.
+
+Example:
+
+.. code-block:: pascal
+
+  __FSInputQuery.frm.init(nil);
+*}
+{$IFNDEF CODEINSIGHT}
+type
+  __TFSInputQuery = record
+    frm: TForm;
+    buttons: array [0..1] of TSpeedButton;
+    edit: TEdit;
+    msg: TLabel;
+    data: record caption, message: string; isPassword: boolean; end;
+    value: string;
+ end;
+{$ENDIF}
+
+{$IFNDEF CODEINSIGHT}
+var
+  __FSInputQuery: __TFSInputQuery;
+  __FSMessageDlg: __TFSMessageDlg;
+{$ENDIF}
+
+{*
+__FSMessageDlg_Paint
+~~~~~~~~~~~~~~~~~~~~
+
+.. code-block:: pascal
+
+    procedure __FSMessageDlg_Paint(); native;
+
+Paints the __FSMessageDlg form to look like a message dialog copy.
+
+.. note::
+
+    - By: Olly
+    - Last Updated: April 27, 2014 by Olly
+
+*}
+{$IFNDEF CODEINSIGHT}
+procedure __FSMessageDlg_Paint(Sender: TObject); native;
+
+  function getImage(): TBitmap;
+  var
+    s: string;
+  begin
+    case (__FSMessageDlg.data.dlgType) of
+      mtWarning: s := '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';
+      mtError: s := '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';
+    else
+      client.writeln('The Dialog Type isn''t currently supported');
+    end;
+
+    result.init();
+    result.loadFromString(32, 32, $FFFFFF, DecompressString(Base64Decode(s)));
+  end;
+
+var
+  img: TBitmap;
+begin
+  try
+    img := getImage();
+
+    with (__FSMessageDlg.frm.getCanvas()) do
+    begin
+      getBrush().setColor($FFFFFF); // draw background colours
+      getPen().setColor($FFFFFF);
+      rectangle(0, 0, 400, 55);
+      getBrush().setColor($F0F0F0);
+      getPen().setColor($F0F0F0);
+      rectangle(0, 55, 400, 93);
+      getPen().setColor($DFDFDF);
+      rectangle(0, 55, 400, 56);
+      draw(9, 9, img); // drawing image
+      getBrush().setStyle(bsClear); // finally draw the text on
+      textOut(55, 19, __FSMessageDlg.data.message);
+    end;
+  finally
+    img.free();
+  end;
+end;
+{$ENDIF}
+
+{*
+__FSMessageDlg_OnButtonClick
+~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+
+.. code-block:: pascal
+
+    procedure __FSMessageDlg_OnButtonClick(Sender: TButton); native;
+
+When called, sets the res and closes the form.
+
+.. note::
+
+    - By: Olly
+    - Last Updated: April 27, 2014 by Olly
+
+*}
+{$IFNDEF CODEINSIGHT}
+procedure __FSMessageDlg_OnButtonClick(Sender: TButton); native;
+begin
+  with (__FSMessageDlg) do
+  begin
+    res := 'mb' + Sender.getCaption();
+    frm.close();
+  end;
+end;
+{$ENDIF}
+
+{*
+__TFSMsgDlg_Init
+~~~~~~~~~~~~~~~~
+
+.. code-block:: pascal
+
+    procedure __TFSMsgDlg_Init(); native;
+
+Inits the __TFSMsgDlg form.
+
+.. note::
+
+    - By: Olly
+    - Last Updated: April 27, 2014 by Olly
+
+*}
+{$IFNDEF CODEINSIGHT}
+procedure __TFSMsgDlg_Init(); native;
+
+  function addButton(const caption: string): TButton;
+  var
+    i: integer;
+    arr: TIntegerArray;
+  begin
+    with (__FSMessageDlg) do
+    begin
+      result.init(frm);
+
+      with (result) do
+      begin
+        setParent(frm);
+        setCaption(caption);
+        setTop(61);
+        setOnClick(__FSMessageDlg_OnButtonClick);
+
+        if (length(buttons) = 0) then
+          setLeft(310)
+        else begin
+          for i := 0 to high(buttons) do
+            insert(buttons[i].getLeft(), arr);
+
+          setLeft(minA(arr) - 85);
+        end;
+      end;
+    end;
+  end;
+
+var
+  i, j: integer;
+  sData: TStringArray = ['mbYes', 'mbNo', 'mbRetry', 'mbOK'];
+begin
+  with (__FSMessageDlg) do
+  begin
+    frm.init(nil);
+
+    with (frm) do
+    begin
+      setPosition(poScreenCenter);
+      setWidth(400);
+      setHeight(93);
+      setCaption(data.caption);
+      setOnPaint(__FSMessageDlg_Paint);
+      setBorderStyle(bsSingle);
+    end;
+
+    for i := 0 to high(sData) do
+      if (pos(sData[i], toString(data.buttons)) > 0) then
+        insert(addButton(replace(sData[i], 'mb', '', [rfReplaceAll])), buttons);
+
+    try
+      frm.showModal();
+    except
+      client.writeln('Fudge');
+    finally
+      if (frm <> nil) then
+        frm.free();
+    end;
+  end;
+end;
+{$ENDIF}
+
+(*
+SafeMessageDlg
+~~~~~~~~~~~~~~
+
+.. code-block:: pascal
+
+    function SafeMessageDlg(const Caption, Message: string; const DlgType: TMsgDlgType; const Buttons: TMsgDlgButtons): string;
+
+Attempt at a exact copy of MessageDlg. For use when the procedure your running
+has been called via sync() ie. forms.
+
+  * Supported DialogTypes: (mtWarning, mtError)
+  * Supported DialogButtons: (mbYes, mbNo, mbRetry, mbOK)
+
+.. note::
+
+    - By: Olly
+    - Last Updated: April 26, 2014 by Olly
+
+Example:
+
+.. code-block:: pascal
+
+   SafeMessageDlg('Warning!', 'This is a warning', mtWarning, [mbOk]);
+*)
+function SafeMessageDlg(fCaption, fMessage: string; fDlgType: TMsgDlgType; const fButtons: TMsgDlgButtons): string;
+begin
+  with (__FSMessageDlg) do
+  begin
+    res := '';
+    data := [fCaption, fMessage, fDlgType, fButtons];
+
+    try
+      sync(__TFSMsgDlg_Init);
+    except
+      writeln('** ShowFormSafeMsgDlg: Sync Failed');
+    finally
+      data.buttons := [];
+      result := res;
+    end;
+  end;
+end;
+
+{*
+__TFSInputQuery_OnEvent
+~~~~~~~~~~~~~~~~~~~~~~~
+
+.. code-block:: pascal
+
+    procedure __TFSInputQuery_OnEvent(Sender: TObject); native;
+
+Performed when a InputQuery button is pressed, set's the value and closes the form.
+
+.. note::
+
+    - By: Olly
+    - Last Updated: April 27, 2014 by Olly
+
+*}
+{$IFNDEF CODEINSIGHT}
+procedure __TFSInputQuery_OnEvent(Sender: TObject); native;
+begin
+  with (__FSInputQuery) do
+  begin
+    value := edit.getCaption();
+    frm.close();
+  end;
+end;
+{$ENDIF}
+
+{*
+__TFSInputQuery_Init
+~~~~~~~~~~~~~~~~~~~~
+
+.. code-block:: pascal
+
+    procedure __TFSInputQuery_Init(); native;
+
+Inits the __TFSInputQuery form.
+
+.. note::
+
+    - By: Olly
+    - Last Updated: April 27, 2014 by Olly
+
+*}
+{$IFNDEF CODEINSIGHT}
+procedure TFSInputQuery_Init(); native;
+var
+  bmp: TBitmap;
+begin
+  with (__FSInputQuery) do
+  begin
+    frm.init(nil);
+    with (frm) do
+    begin
+      setPosition(poScreenCenter);
+      setWidth(400);
+      setHeight(88);
+      setCaption(data.caption);
+      setBorderStyle(bsSingle);
+    end;
+
+    msg.init(frm);
+    with msg do
+    begin
+      setParent(frm);
+      setTop(6);
+      setLeft(5);
+      setCaption(data.message);
+    end;
+
+    edit.init(frm);
+    with (edit) do
+    begin
+      setParent(frm);
+      setBounds(5, 27, 390, 25);
+      if (data.isPassword) then
+        setPasswordChar('*');
+    end;
+
+    buttons[0].init(frm);
+    with (buttons[0]) do
+    begin
+      setParent(frm);
+      setBounds(228, 57, 80, 25);
+      setCaption('OK');
+      setOnClick(__TFSInputQuery_OnEvent);
+      bmp.init();
+      bmp.loadFromString(18, 17, 0, DecompressString(Base64Decode('LAcAAHiczZNNjkMhDIOvBIT8LRMC9z/S+HWqkbrta6XBrD8Tx7T2H0+21Ox7XPoK37LSpEeIs2aTvtulj/EpPae0SDHV5SbiWTrnCWGrc+m+i68IL8nVVK2tbWWzhmOaZMmpHvN8zItiOnMLZlfDRKwLjs4eSwZt25M/5jVi+OSdA+n5WoiQV9jgEcS4RpS1L91x0eNmHVlNSZ3gdx2wWrP8MBOpk+5+6U3+ctXDESWsgsQILm4dHWis1DXBv9HwJ3/FFtFASgKXREotBiIaushuvb+QT+OKI6q5ymAHPnN/bIG0yG/xtyMNbLlhy4UuBaYoU2x5ctIEP27l8+BLQ4uw23Wsno2d6HCR6KG16dLb/Hj0hwSpV7eDKY4lM/74JvxIqjv832PmZfHcgi1D/hLKh9Bd2vf5L14Jr/p7P4M/L32K/+IlaJdtvvQN/jfOD1rNb8g=')));
+      setGlyph(bmp);
+      bmp.free();
+    end;
+
+    buttons[1].init(frm);
+    with (buttons[1]) do
+    begin
+      setParent(frm);
+      setBounds(315, 57, 80, 25);
+      setCaption('Cancel');
+      setOnClick(__TFSInputQuery_OnEvent);
+      bmp.init();
+      bmp.loadFromString(18, 17, 0, DecompressString(Base64Decode('LAcAAHic3VRJkuMwDPuSFi7SkZTE/z9pINmHTqWTTtecZowqXywBJAg6pf//mRmoizc+OT8qoF6A8Tm/NuUILRIx3msNAhp3lhAWpmDPwEutWQC6+FvWARXXFkumWPRFGw/8DHTwa4hUSWGScdVokkWxsHD/pqoOTFWlWEdlNWsKLdYSE4WWkFU3bn7jBn6SDH58ikAvNYRSXctX2njpQAPG8WqqqcZs0kqARTycHcyEdw89unZOBiu8EsqUlq288cl0oKRjiImGK2mO0dLt4e5u94upaQJ/2xOhQhn1f8z/oCWASYHnTYd2cA7ud+Whebv0N/xfVRAwR/nbvThZCma+PER3e0y/cemBH6UPZ9QeTVwa/NeTbUISQtPuAiUYelnkQVVqXfKLiRx+STzBv3lM++lisEFEqK6JN0VCRxUZEIE6MdUoWAVHBt9qXemSstcFO4JEnX2Jy7HDP+4k703sdVZfe4kGIpwxu6hRZ+TCZSu9SHLXLk7SRKKjIbgBx+Y2iQj8z1t5aVEty6mRBJERNqhEmcts2nR7VvHubRTsYHW7HMNdXvOHP8z+g7XjVb/5EYbvtv7Jt9lrr16Xbrw/f9/KgH7C/68/fwD9436x')));
+      setGlyph(bmp);
+      bmp.free();
+    end;
+
+    try
+      frm.showModal();
+    except
+      client.writeln('Fudge');
+    finally
+      if (frm <> nil) then
+        frm.free();
+    end;
+  end;
+end;
+{$ENDIF}
+
+(*
+SafeInputQuery
+~~~~~~~~~~~~~~
+
+.. code-block:: pascal
+
+    function SafeInputQuery(const fCaption, fMessage: string; out fValue: string; const fIsPassword: boolean = false): boolean;
+
+Attempt at a exact copy of InputQuery. For use when the procedure your running
+has been called via sync() ie. forms.
+
+.. note::
+
+    - By: Olly
+    - Last Updated: April 27, 2014 by Olly
+
+Example:
+
+.. code-block:: pascal
+
+  SafeInputQuery('Caption', 'Message', s);
+*)
+function SafeInputQuery(const fCaption, fMessage: string; out fValue: string; const fIsPassword: boolean = false): boolean;
+begin
+  with (__FSInputQuery) do
+  begin
+    data := [fCaption, fMessage, fisPassword];
+    value := '';
+
+    try
+      sync(TFSInputQuery_Init);
+    except
+      writeln('** ShowFormSafeInputQuery: Sync Failed');
+    finally
+      fValue := value;
+      result := (value <> '');
+    end;
+  end;
+end;
+
+{$f+}

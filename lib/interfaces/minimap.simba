@@ -9,12 +9,6 @@ The source for this file can be found `here <https://github.com/SRL/SRL-6/blob/m
 
 *)
 
-{$include_once interfaces.simba}
-{$include_once chooseoption.simba}
-{$include_once ../utilities/color.simba}
-{$include_once ../utilities/pixelshift.simba}
-{$include_once mainscreen.simba}
-
 {$f-}
 
 (*
@@ -58,9 +52,9 @@ Example:
 
 *)
 const
-  MM_DOT_NPC    = 0;
-  MM_DOT_ITEM   = 23;
-  MM_DOT_PLAYER = 1907997;
+  MM_DOT_NPC    = 714965;
+  MM_DOT_ITEM   = 3023;
+  MM_DOT_PLAYER = 13813713;
   MM_DOT_FRIEND = 5376;
   MM_DOT_TEAM   = 2171941;
 
@@ -183,6 +177,14 @@ type
     color: integer;
   end;
 
+type
+  TFoundSymbol = record
+   ID: Integer;
+   Pos: TPoint;
+   Acc: Extended;
+ end;
+  TFoundSymbols = array of TFoundSymbol;
+
 {*
 type _TRSMMButton
 ~~~~~~~~~~~~~~~~~
@@ -207,6 +209,7 @@ type
     symbolAccuracy: extended;
     bmpMask: integer;
     button: array [0..3] of _TRSMMButton;
+    CompassEdge, CompassEdge2: TPointArray;
   end;
 
 (*
@@ -259,15 +262,20 @@ begin
     ID := ID_INTERFACE_MINIMAP;
     parentID := -1;
     static := true;
-    symbolAccuracy := 0.70;
+    symbolAccuracy := 0.65;
     bmpMask := BitmapFromString(224, 189, 'meJzt0olhpAAAw8D03/RdA+TbwEoYTQmWPz6SJEmSJEmSJ/qXH6ArPRSd/U7oVo9DB78futiD0Knviu72CHTke6PrjaPzLqAbzqLD7qBLbqKr7qBLbqKr7qBLbqKr7qBLbqKr7qBLbqKr7qBLbqKr7qBLbqKr7qBLbqKr7qBLbqKr7qBLbqKr7qBLbqKr7qBLbqKr7qBLbqKr7qBLbqKr7qBLbqKr7qBLbqKr7qBLbqKr7qBLbqKr7qBLbqKr7qBLbqKr7qBLbqKr7qBLbqKr7qBLbqKr7qBLbqKr7qBLbqKr7qBLbqKr7qBLbqKr7qBLbqKr7qBLbqKr7qBLbqKr7qBLbqKr7qBLbqKr7qBLbqKr7qBLbqKr7qBLbqKr7qBLbqKr7qBLbqKr7qBLbqKr7qBLbqKr7qBLbqKr7qBLbqKr7qBLbqKr5jT0lS5Bj5ozdY/Idc7Idc7Idc7Idc7Idc7Idc7I9c+Y9c+Y9c+Y9c+Y9c+Y9c+Y9c+Y9c+Y9c+Y9c+Y9c+Y9c+Y9c+Y9c+Y9c+Y9c+Y9c+Y9c+Y9c+Y9c+Y9c+Y9c+Y9c+Y9c+Y9c+Y9c+Y9c+Y9c+Y9c+Y9c+Y9c+Y9c+Y9c+Y9c+Y9c+Y9c+Y9c+Y9c+Y9c+Y9c+Y9c+Y9c+Y9c+Y9c+Y9c+Y9c+Y9c+Y9c+Y9c+Y9c+Y9c+Y9c+Y9c+Y9c+Y9c+Y9c+Y9c+Y9c+Y9c+Y9c+Y/fyfXTRv9qtzdtG80wvn7KJ5j5fP2UVztT+es4vmOqecs4vmCiees4vmXKefs4vmLBeds3/mFP0zZv0zZv0zZv0zZv0zZv0zZv0zZv0zZv0zZv0zZv0zZm/4Z3/Oy67758voSXKh337g0qf9BbhhTke/6RL0qDkBfaJr0evmT+j7vAO9cV5EH+d96KXza/Rl3o3eO79An4VBr54foW+CoYfP9+iPwOj58w36IDB6/nyFfgePLpCv0O9QoCPkU/Q1FOgIOUb/woLukGP0LyzoDjlG/8KC7pBj9C8s6A45Rv/Cgu6QY/QvLOgOOUb/woLukGP0LyzoDjlG/8KC7pBj9C8s6A45Rv/Cgu6QY/QvFOgI+RR9DQU6Qr5Cv4NHF8hX6HfcDJ3rcejg90MXW0A3HEfnvTe63iPQke+K7vYgdOr7oYs9Dh38TuhWD0Vnvwe60qPR8e3oPk9H91ej4yRJkiRJkiSk/xotWe8=');
     setBitmapName(bmpMask, 'Minimap Mask');
     setBounds([577, 12, 798, 200]);
-                                          {bounds  center, radius}
-    button[MM_BUTTON_COMPASS]   := [[583, 19, 612, 48], [597, 33], 15];
+                                      (* Bounds | Center | Radius *)
+    button[MM_BUTTON_COMPASS]   := [[582, 18, 614, 50], [598, 34], 15];
     button[MM_BUTTON_RUN]       := [[759, 18, 793, 52], [776, 35], 16];
     button[MM_BUTTON_LODESTONE] := [[586, 161, 613, 188], [599, 174], 13];
     button[MM_BUTTON_MAP]       := [[764, 162, 788, 187], [776, 174], 12];
+    with (Button[MM_BUTTON_COMPASS]) do
+    begin
+      CompassEdge := TPAFromCircle(Center.x, Center.y, Radius);
+      CompassEdge2 := TPAFromCircle(Center.x, Center.y, Radius - 1);
+    end;
   end;
 
   addOnTerminate('__freeMinimapMask');
@@ -313,8 +321,8 @@ Returns the compass angle in radians.
 
 .. note::
 
-    - by Coh3n
-    - Last Updated: 26 November 2013 by Olly
+    - by Olly
+    - Last Updated: 16 September 2014 by Olly
 
 Example:
 
@@ -322,37 +330,77 @@ Example:
 
     ang := minimap.getAngleRadians();
 *)
-function TRSMinimap.getAngleRadians(): extended;
+function TRSMinimap.getAngleRadians(): Extended;
+const
+  PI_OVER_2: Double = PI / 2.00;
+  Templ_Outter: TPointArray = [[16, 0], [11, 1], [12, 1], [13, 1], [14, 1], [15, 1], [17, 1], [18, 1], [19, 1], [20, 1], [21, 1], [9, 2], [10, 2], [22, 2], [23, 2], [7, 3], [8, 3], [24, 3], [25, 3], [6, 4], [26, 4], [5, 5], [27, 5], [4, 6], [28, 6], [3, 7], [29, 7], [3, 8], [29, 8], [2, 9], [30, 9], [2, 10], [30, 10], [1, 11], [31, 11], [1, 12], [31, 12], [1, 13], [31, 13], [1, 14], [31, 14], [1, 15], [31, 15], [0, 16], [32, 16], [1, 17], [31, 17], [1, 18], [31, 18], [1, 19], [31, 19], [1, 20], [31, 20], [1, 21], [31, 21], [2, 22], [30, 22], [2, 23], [30, 23], [3, 24], [29, 24], [3, 25], [29, 25], [4, 26], [28, 26], [5, 27], [27, 27], [6, 28], [26, 28], [7, 29], [8, 29], [24, 29], [25, 29], [9, 30], [10, 30], [22, 30], [23, 30], [11, 31], [12, 31], [13, 31], [14, 31], [15, 31], [17, 31], [18, 31], [19, 31], [20, 31], [21, 31], [16, 32]];
+  Templ_Inner: TPointArray = [[16, 1], [11, 2], [12, 2], [13, 2], [14, 2], [15, 2], [16, 2], [17, 2], [18, 2], [19, 2], [20, 2], [21, 2], [9, 3], [10, 3], [22, 3], [23, 3], [7, 4], [8, 4], [24, 4], [25, 4], [6, 5], [7, 5], [25, 5], [26, 5], [5, 6], [6, 6], [26, 6], [27, 6], [4, 7], [5, 7], [27, 7], [28, 7], [4, 8], [28, 8], [3, 9], [29, 9], [3, 10], [29, 10], [2, 11], [30, 11], [2, 12], [30, 12], [2, 13], [30, 13], [2, 14], [30, 14], [2, 15], [30, 15], [1, 16], [2, 16], [30, 16], [31, 16], [2, 17], [30, 17], [2, 18], [30, 18], [2, 19], [30, 19], [2, 20], [30, 20], [2, 21], [30, 21], [3, 22], [29, 22], [3, 23], [29, 23], [4, 24], [28, 24], [4, 25], [5, 25], [27, 25], [28, 25], [5, 26], [6, 26], [26, 26], [27, 26], [6, 27], [7, 27], [25, 27], [26, 27], [7, 28], [8, 28], [24, 28], [25, 28], [9, 29], [10, 29], [22, 29], [23, 29], [11, 30], [12, 30], [13, 30], [14, 30], [15, 30], [16, 30], [17, 30], [18, 30], [19, 30], [20, 30], [21, 30], [16, 31]];
 var
-  tpa: TPointArray;
-  bmp, wid, hei: integer;
-  middle: TPoint;
+  aDial: T2DPointArray;
+  tDial: TPointArray;
+  Mid, rDial: TPoint;
+  btn, b: TBox;
+  TPA: TPointArray;
+  i, j: Integer;
+  tTempls: array [0..1] of TPointArray;
+  Results: array [0..1] of Extended;
+  Found: array [0..1] of Boolean;
+  Map: array of TBoolArray;
 begin
-  bmp := bitmapFromClient(minimap.button[MM_BUTTON_COMPASS].bounds);
-  getBitmapSize(bmp, wid, hei);
-
-  tpa := tpaFromBox([0, 0, wid-1, hei-1]);
-  middle := [wid div 2, hei div 2];
-
-  try
-    filterPointsDist(tpa, 14, 50, middle.x, middle.y); // get rid of outside noise
-    drawTPABitmap(bmp, tpa, clBlack);
-
-    thresholdAdaptiveBitmap(bmp, 0, 255, false, TM_MinMax, 0); // threshold, so we are only left with dial points
-    findColorsBitmap(bmp, tpa, clRed); // gather dial points, and sort from mid point
-    sortTPAFrom(tpa, middle);
-
-    if (length(tpa) > 0) then
-    begin
-      result := arcTan2(tpa[high(tpa)].y - middle.y, tpa[high(tpa)].x - middle.x) + radians(90);
-      result := (result - radians(180)); // we're using the silver compass dial, which is 180 degrees behind the red dial
-
-      if (result < 0) then // to correct -ve answers for angles between 270 and 360
-        result := (result + radians(360));
-    end;
-  finally
-    freeBitmap(bmp);
+  with (Self.button[MM_BUTTON_COMPASS]) do
+  begin
+    Mid := Center;
+    Btn := Bounds;
   end;
+
+  if (not FindColorsTolerance(tDial, 1652630, btn, 22, ColorSetting(2, 0.24, 0.88))) then
+  begin
+    Print('Unable to find any red dial of the compass', TDebug.ERROR);
+    Exit();
+  end;
+
+  OffsetTPA(tDial, Point(- btn.X1, - btn.Y1));
+  b := GetTPABounds(Templ_Outter);
+  SetLength(Map, b.getWidth(), b.getHeight());
+  for i := 0 to High(tDial) do
+    Map[tDial[i].x][tDial[i].y] := True;
+
+  tTempls := [Templ_Outter, Templ_Inner];
+  for j := 0 to High(tTempls) do
+  begin
+    Found[j] := True;
+
+    SetLength(tDial, 0);
+    for i := 0 to High(tTempls[j]) do
+      if (Map[tTempls[j][i].x][tTempls[j][i].y]) then
+        Insert(tTempls[j][i], tDial);
+
+    case Length(tDial) of
+      0: begin Found[j] := False; Continue(); end;
+      1: rDial := tDial[0];
+      else
+        begin
+          aDial := SplitTPAEx(tDial, 1, 1);
+          SortATPASize(aDial, True);
+          rDial := MiddleTPA(aDial[0]);
+        end;
+    end;
+
+    rDial := Point(rDial.x + btn.X1, rDial.y + btn.Y1);
+    Results[j] := FixRad(ArcTan2(rDial.Y - Mid.Y, rDial.X - Mid.X) + PI_OVER_2);
+  end;
+
+  if (Found[0] and Found[1]) then
+  begin
+    if (Abs(Results[0] - Results[1]) > 5.00) then // Fix: If points are different side of 'n' you could get 359 and 1 (deg) so if there's a big difference between them lets force it to 0.
+      Result := 0.00
+    else
+      Result := AverageExtended(Results);
+  end else
+    if (Found[0]) and (not Found[1]) then
+      Result := Results[0]
+    else if (not Found[0]) and (Found[1]) then
+      Result := Results[1];
 end;
 
 (*
@@ -378,7 +426,9 @@ Example:
 *)
 function TRSMinimap.getAngleDegrees(): extended;
 begin
-  result := degrees(self.getAngleRadians());
+  Result := Degrees(Self.getAngleRadians());
+  if (Result = 360.0) then
+    Result := 0.00;
 end;
 
 (*
@@ -403,51 +453,85 @@ Example:
 
     minimap.setAngle(MM_DIRECTION_SOUTH);
 *)
-function TRSMinimap.setAngle(angleDegrees: integer): boolean;
-  // helper function for setCompassAngle to clean up code
-  // compares angle and directionDeg to see how far away it is
-  function __setCompassAngle_minCheck(angle, directionDeg: extended): extended;
+function TRSMinimap.setAngle(Angle: Extended; Accurate: Boolean = False): Boolean;
+  function Compass_Distance(Angle, Target: Extended): Extended;
   begin
-    result := minE(abs(angle - (directionDeg + 360)), abs((angle + 360) - directionDeg));
-    result := minE(abs(angle - directionDeg), result);
+    if (Abs(Target - Angle) < 180) then
+    begin
+      Result := Target - Angle;
+      Exit;
+    end;
+
+    if (Target > Angle) then
+      Result := Target - Angle - 360
+    else
+      Result := Target - Angle + 360;
+  end;
+  procedure Key(Left: Boolean);
+  begin
+    case (Left) of
+      True:
+        if (not isKeyDown(VK_LEFT)) then
+        begin
+          if (isKeyDown(VK_RIGHT)) then
+            KeyUp(VK_RIGHT);
+          KeyDown(VK_LEFT)
+        end;
+      False:
+        if (not isKeyDown(VK_RIGHT)) then
+        begin
+          if (isKeyDown(VK_LEFT)) then
+            KeyUp(VK_LEFT);
+          KeyDown(VK_RIGHT)
+        end;
+    end;
   end;
 var
-  startAngle, angle, directionDeg, i: extended;
-  left: boolean;
-  mark: Integer;
+  Left: Boolean;
+  AngleDistance, CurrentAngle: Extended;
+  Tries, Tolerance, MaxTries: Integer;
+  Time: UInt64;
+label
+  Retry;
 begin
-  result := false;
-  startAngle := (self.getAngleDegrees());
+  Tries := 0;
+  MaxTries := Random(10, 13);
+  Tolerance := 5;
+  Angle := FixD(Angle);
 
-  if (startAngle < 0) then
-    exit;
+  Retry:
+  Inc(Tries);
+  CurrentAngle := Self.getAngleDegrees();
+  Time := GetTickCount64() + Random(5000, 6000);
 
-  directionDeg := (angleDegrees * 1.0);
+  while (Abs(Compass_Distance(CurrentAngle, Angle)) > Tolerance) and (GetTickCount64() < Time) do
+  begin
+    AngleDistance := CurrentAngle - Angle;
+    Left := ((AngleDistance > 0) and (abs(AngleDistance) <= 180)) or ((AngleDistance < 0) and (abs(AngleDistance) > 180));
+    Key(Left);
 
-  if (__setCompassAngle_minCheck(startAngle, directionDeg) <= 8.0) then
-    exit(true);
+    CurrentAngle := Self.getAngleDegrees();
+    Result := Abs(Compass_Distance(CurrentAngle, Angle)) <= Tolerance;
+    if (Result) then
+      Break();
 
-  left := (not (round((360 - startAngle) + directionDeg) mod 360 <= round((startAngle + 360) - directionDeg) mod 360));
-  keyDown((ord(not left) * 2) + 37);
-  wait(15 + random(50));
-  mark := getSystemTime();
+    Wait(Random(5, 10));
+  end;
 
-
-  repeat
-    wait(16);
-    angle := self.getAngleDegrees();
-  until (__setCompassAngle_minCheck(angle, directionDeg) < 14.00) or (getSystemTime() - mark > 14000);
-
-  if (left) then
-    keyUp(VK_LEFT)
+  if (Left) then
+    KeyUp(VK_LEFT)
   else
-    keyUp(VK_RIGHT);
+    KeyUp(VK_RIGHT);
 
-  wait(75 + random(50));
+  if (not Accurate) then
+    Exit();
 
-  result := (__setCompassAngle_minCheck(angle, directionDeg) <= (7.0 + i));
+  Wait(Random(270, 420));
+  CurrentAngle := Self.getAngleDegrees();
+  Result := Abs(Compass_Distance(CurrentAngle, Angle)) <= Tolerance;
 
-  print('minimap.setAngle(): Set the angle @ ' + floatToStr(self.getAngleDegrees()) + ' degrees', TDebug.SUB);
+  if (not Result) and (Tries < MaxTries) then
+    goto Retry;
 end;
 
 (*
@@ -692,70 +776,84 @@ begin
   result := inIntArray(arr, dotType);
 end;
 
-(*
-TRSMinimap.getDots
-~~~~~~~~~~~~~~~~~~
-
-.. code-block:: pascal
-
-    function TRSMinimap.getDots(dotType: integer; searchBox: TBox): TPointArray;
-
-Returns a TPointArray of every instance of "dotType" found on in "searchBox".
-
-.. note::
-
-    - by Nava2 & Sir R. Magician
-    - Last Updated: 23 May 2013 by Coh3n
-
-Example:
-
-.. code-block:: pascal
-
-    dots := minimap.getDots(MM_DOT_NPC, minimap.getBounds());
-*)
-function TRSMinimap.getDots(dotType: integer; searchBox: TBox): TPointArray;
+function TRSMinimap.getAllPossibleDots(const Bitmap: Integer): T2DPointArray;
+const
+  BORDER_COL = 65536;
 var
-  i, c: integer;
-  tpa: TPointArray;
+  i, j, H: Integer;
+  TPA: TPointArray;
+  Rows: T2DPointArray;
+  p: TPoint;
 begin
-  print('TRSMinimap.getDots()', TDebug.HEADER);
+  if (not FindColorsBitmap(Bitmap, TPA, BORDER_COL)) then
+    Exit();
 
-  // confirm valid dot type
-  if (not self._isValidDot(dotType)) then
+  Rows := FindTPARows(TPA);
+  for i := 0 to High(Rows) do
   begin
-    print('Invalid dot type '+toStr(dotType), TDebug.ERROR);
-    print('TRSMinimap.getDots(): '+toStr(result), TDebug.FOOTER);
-    exit;
-  end;
-
-  freeze();
-  findColors(tpa, 65536, searchBox); // the black shadow color of the minimap dots
-  self.filterPoints(tpa);
-
-  if (length(tpa) <= 0) then
-  begin
-    unfreeze();
-    print('No minimap dot color found', TDebug.ERROR);
-    print('TRSMinimap.getDots(): '+toStr(result), TDebug.FOOTER);
-    exit;
-  end;
-
-  setLength(result, length(tpa));
-  c := 0;
-
-  // gets the difference between the bottom two colors of a dot
-  for i := 0 to high(tpa) do
-    if (getColor(tpa[i].x - 1, tpa[i].y - 1) - getColor(tpa[i].x, tpa[i].y - 1) = dotType) then
+    H := High(Rows[i]);
+    for j := 0 to H do
     begin
-      result[c] := point(tpa[i].x, tpa[i].y - 2);
-      inc(c);
+      p := Point(Rows[i][j].x - 3, Rows[i][j].y);
+      if (PointInTPA(p, Rows[i])) then
+        Insert(TPointArray([p, Rows[i][j]]), Result)
+      else begin
+        p := Point(Rows[i][j].x + 3, Rows[i][j].y);
+        if (PointInTPA(p, Rows[i])) then
+          Insert(TPointArray([p, Rows[i][j]]), Result);
+      end;
+    end;
+  end;
+
+  // Sort left to right
+  for i := 0 to High(Result) do
+    if (Result[i][0].X > Result[i][1].X) then
+      Swap(Result[i][0], Result[i][1]);
+end;
+
+function TRSMinimap.getDots(const dotType: Integer; const SearchBox: TBox; const Tol: Byte = 30): TPointArray;
+var
+  Bitmap, i, x, Col: Integer;
+  Dots: T2DPointArray;
+{$IFDEF GETDOTS_DEBUG}
+  Found: Boolean;
+  T: Integer;
+{$ENDIF}
+begin
+  Bitmap := BitmapFromClient(SearchBox);
+
+  try
+    Dots := Self.getAllPossibleDots(Bitmap);
+    if (Length(Dots) = 0) then
+      Exit();
+
+    for i := 0 to High(Dots) do
+    begin
+      if (Dots[i][1].Y <= 0) or (Dots[i][1].X <= 0) then
+        Continue();
+
+      Col := FastGetPixel(Bitmap, Dots[i][1].X, Dots[i][1].Y - 1);
+      if (Col = FastGetPixel(Bitmap, Dots[i][1].X - 1, Dots[i][1].Y)) then
+      {$IFDEF GETDOTS_DEBUG}
+      Found := False;
+      for T := 1 to Tol do
+        if (SimilarColors(Col, dotType, T)) then
+        begin
+          Found := True;
+          Print('TRSMinimap.getDots(): Tolerance = ' + toString(T));
+          Break();
+        end;
+      if (Found) then
+      {$ELSE}
+      if (SimilarColors(Col, dotType, Tol)) then
+      {$ENDIF}
+        Insert(Dots[i][0], Result);
     end;
 
-  unfreeze();
-  setLength(result, c);
-
-  print('Found '+toStr(length(result))+' minimap dots (ID: '+toStr(dotType)+')');
-  print('TRSMinimap.getDots(): '+toStr(result), TDebug.FOOTER);
+    OffsetTPA(Result, Point(SearchBox.X1, SearchBox.Y1));
+  finally
+    FreeBitmap(Bitmap);
+  end;
 end;
 
 (*
@@ -1344,7 +1442,9 @@ TRSMinimap._getSymbol
 
     function TRSMinimap._getSymbol(sym: integer): _TRSSymbol;
 
-Returns a _TRSSymbol of "sym".
+Symbol bitmap should be the whole symbol without the transparent parts of the blue outline.
+The color should be the most common color in the symbol, most of the time this
+is the background color.
 
 .. note::
 
@@ -1360,16 +1460,12 @@ Example:
 function TRSMinimap._getSymbol(sym: integer): _TRSSymbol;
 begin
   case sym of
-    MM_SYMBOL_BANK:
+    MM_SYMBOL_BANK: // (10/09/1014 dd/mm/yy)
       with result do
       begin
         name := 'Bank';
-        color := 1908001;
-        bmp := BitmapFromString(8, 6, 'meJz7eX7bj3Nbv53ZjIa+n1hbl5UT' +
-        '5RcBRb4h8UXVWbuPfjm62sLEnYVbG4jYRU3ki6boLD+js/XOlyOrI' +
-        'OJAQeW2Nca7HutvuKW39d6HA8ssjN2A4gIW0Xqrr2rNPCLgXyg549' +
-        'DrfUvMjVyB4oJ2ifrr72lM3ifomqa57BwAxABEEg==');
-        color := 3324402;
+        color := 594228;
+        bmp := BitmapFromString(14, 17, 'meJz7eX7bj3Nbv53ZjAcBFfw8v+37ibV1WTlRfhFQ5BsSX1SdtftoVEAEXBCoAKjsy9HVFibuLNzaQMQmaiJfNEVn+RmdrXfk8idwKthDxC1N3L8eX/PlyCqISnZRE+W2Nca7HutvuKW39Z7htvvaC07yaHgApYAKgMo+HFhmYewG5ApYROutvqo184iAf6HkjENSia2y2RPZhI1BKo3dPh5Y9nrfEnMjVyBX0C5Rf/09jcn7BF3TNJedZ+XXYxc1hdgOVPBm35JXu+ZbGHuw8+lzyztozTxpvPuD5pIrohP3sPDrs/LoAMWBCKgAqOzF1tlWpl4c/EacAsZ8ql7aM44Z7fxkuu+H/rr7wmYxnEKmQClLYw+gsscbplqaeHIKmoCQgDGHkKFk2ybl1k0mm97rzrvMrxUAFAcqeLxh2sO1kyyMoSp5FVw4RYxUW9YIW8dqtOw0WvtCzCkbKA5UAFR2d2WflakPt4glj6yjRuMWtdp1vOkTBd2zDeZdN5h7XdgsDigFVABUdnNxp6WJN4+olZB2kFbTdsP5N42XPTBe9tBw7nXV3Hm84jZAKaACoLLr89sswCqBiF/eRdqnXLVxs3LBAhmfCl4pO4g4UMG1+W1X57bMrSzqLSwEoorEdGEpOz6jCB45JxEpeyAXIg5UcHVu69H+imP95cf6K05Mqjo7vX5KcaGojCMQARlALlDwGFgBUBkDKjgzuaYtIxOIgAwGQgBsCLoJQAAAS+YFpA==');
       end;
 
     MM_SYMBOL_OBELISK_MINI:
@@ -1460,14 +1556,12 @@ begin
         color := 494860;
       end;
 
-    MM_SYMBOL_FISHING:
+    MM_SYMBOL_FISHING: // (10/09/1014 dd/mm/yy)
       with result do
       begin
         name := 'Fishing Spot';
-        bmp := BitmapFromString(15, 5, 'meJxjZGA4AAOfdzkC0b8pegeQwEs' +
-          '/TgiDkYGBEaYYogwoBUTI6oHc+fPnoykGCgLZEMUQBDEBUzGyGkyE' +
-          '1WQ4OiXBAERANUASWTEAcqluOw==');
-        color := 16743189;
+        bmp := BitmapFromString(16, 19, 'meJxjYICC9pbOnu7pHe2TOjum9PTM6Oud2d83q79/9uRJ8xprmhlQQV5qallpvYuLt6GRuYmJlbm5rYWVg7WNk42tU1h4fGvTBDT1zS19c9bs6p69Ut/ITFhETExcUkJSRlpOEYi0dQzy86o6mhFaygpLi0vqNx6/tGzHkWXbj/bMWmlu4yQpLS8tIy8lqyAjr+Tm5tPa3A9X31DX6R8Q0TBhxqkHLw5cfThv7Y6umSsiU0qdfeJExSSkgBpU1DPTCttbQFY01TSWFNWqqmuHxCadefr2+qc/K3cfm750U8f0VUWN8/kFhETFJWXkFIH+amuZUFFc2dczw8c7SE5eSVlNc8qq9Rfe/Tp65+WybYemL9ta1DKPl5dPRFRCFiirqhEcFN3ZNqWnfZKtrbOyqibQXkev4Hnbju6+8mDrqeuLN+3tmbUc6B4hYRFZOUUlVQ1HR/eutskdTd2FueVaOgYKiqp6RjbGVk5hiekTlqxdve/kgnU7/UKi+QUEgX5QUtEoziuvq2jMSkjob58c4B8O9IKcooq4pLSQsKi0rLyTl9/kBasnzVth6+QODGELc5v8nNLooCCglzvq2xtrO80tbIBaFJXVgeEhKSUrIioOjIKW/pmzV+0obZqRlNMc4BcGD9L+9olJ8ekGhqZAh2lo6QE1yiuqAJ1hbG7TNXtjZdfyvPoFIYEI9R01ja11nZ6e/oZGZgZGZvoGJkCNQDcrqmjm1k1LKuwK8AtHSxITOiZP6589d+r80JAYI1MLI2NzP9+Q/IzC5OzqrNwKBmwgJzmtu7GrrrzB2sbBxs6xtaalJLckLiwSq2IIKM/Omdg2MS4qMS0pc0Jbf0FKCh7FEDC1Y0J3Q2dfS29XXRtBxRAwrWtqb0sfkYqBoKu2pbGsBqsUAAD08vg=');
+        color := 1842978;
       end;
 
     MM_SYMBOL_COOK:
@@ -1482,14 +1576,12 @@ begin
         color := 3115191;
       end;
 
-    MM_SYMBOL_QUEST:
+    MM_SYMBOL_QUEST: // (10/09/1014 dd/mm/yy)
       with result do
       begin
         name := 'Quest';
-        bmp := BitmapFromString(15, 5, 'beNpjYGRgYDwAA22Tnkzffim1' +
-          '5jEQAdmmPvuB5Pz58yGyQJVwxUBxIAIqg6iHqIQgNMUQ0/AgrCbDXQI0GeIYi' +
-          'EuAAFkx3M0Qx8BdAlEJMhkAMoB+aA==');
-        color := 14908517;
+        bmp := BitmapFromString(14, 17, 'meJxjYECAzTM73h7f8OXMlo8nN746vGbDtFYGbODN4dVnVkzvLCrOiE4Fop6yivOrZ78+vBpN2adja2Y1VOnoeIpK24d6x4Z6RYnJOOjp+y9ub/l8bA1c2bsjq1d0N5gY+6lqeEnJOmWHxGUGRUnJ2Kqqe1mYBm6e3P18zyKgsgvbll9cMU1D0zM2IKE/P3typN/l1tT9lbGTIv0m5OVG+0Rq6fje2jgPqPLVgRXN2YWCUh6G2p6biuPuTsq/1pF+ujHpzqT8DUWx2qoOfOIO3aU119dOf7Zzgb97rKC0V4C5575075NVUc8WNzyZV723OGR5tKObgZOAlEeob/rjrXMeb5nlYBN1urf4YnfOnQnZ96cVPZlVendS3uXujBu9mRe6c463Zzs5xD3eNPPu2ikRvqlCMj422o5zgm335/mdqok6VB6+Id1zsq+5laaDgJRbVEDqzdWTTs1t7yspE5EP0dUOXJESvCvLa32C87Jo+61pHovi/bTUfYRk/SdX1R+aAYqFKws6TUwTMjzCC70CEyxtlkU5zwu1T7GyzfMISHIKMDGNv7ZsMiQ8j02r29rdaGwUJaXgKyTjG2obGmTpKywXJKMcamwYtnNqz6GJ1fDAvzSnZUppubZBvJhSjI1hhKWun4h8qI5R8vTq+jMzGtAi9MTk2r6Ccln1BHHleFHFaCBjUkXDsSl1WBPJmWn108sqZTWSgGhWXcvJqdiVQcCpSVVdeeW9xfVnptTgUQYBRydUHO4rwxQHAMx/6QM=');
+        color := 14520942;
       end;
 
     MM_SYMBOL_MILL:
@@ -1503,14 +1595,12 @@ begin
         color := 655103;
       end;
 
-    MM_SYMBOL_DUNGEON:
+    MM_SYMBOL_DUNGEON: // (10/09/1014 dd/mm/yy)
       with result do
       begin
         name := 'Dungeon';
-        bmp :=BitmapFromString(8, 9, 'meJw7cAAEFiz4ExDwBYi0tD4wMMSw' +
-          '5vwDCs6cORMoApHCKg4URBOHiBAUl3b9CxGHG8LPPx8oDkRg50Clg' +
-          'ILp6a+BbEYGhgMwMBMJHEACEKOAJIQLAAEpc48=');
-        color := 2698232;
+        bmp := BitmapFromString(14, 17, 'meJxjYEABV7YufHl43YvD6y5uWcCAA9zcvvD8iolTqrKLYwNLYgOnVudcWjX5xvaFaMreHlu/qLnYxVw/Pjq6pqqhurIhNirSzdJgaVPBo52L4Mru716ycUK9lbFhbm5JSWldbHRMXExsWVl9Rka+jYnpkqb6qROhJl9dM83RzDAqMjYuNkFFSVmQX1iAl19VRSUmuiA+fll47K2gqCf+YbcPze+aVJampaqanZWvp63NxMikohqmqOgjJqYfErE/JPqpo+dVV8/dPj4Lb6+fnuTnZKStnp2RIysjw8zEam41IyTqbnDkZXf/+3auZ7R1suyMzOvTEx5unBniYmWko56dmiIrJcHMzGFht8kj8AUQufpcNjXNEBcRsTfSXtWcf21ZX3aYl5GOWmJSopSkJAsLt7P3bZjKC9a22TISEoneDrsn1qzvKp9Xk2WorRYTFSMtKcnPp2Dr8gSIHDyuWDlssLHv0FRWml6StLy1GOj360v7fOzNPd08ZSUlRYXVVNTSxUUNODgkxcWUTE1sgIF8cX4bJJS29ZbvnVzvZmMmKSrCycYCRxIiwrZGOlv7a9a3FMAD/8iMpnk12U6mutKignxcHEAkKSLoYKwzvzL96IRKtAg9NKFqZmmKvZGWirSYioyYrZHWnPK0A73lWBPJicnVi2pzgCY7m+kua8w/NqkKV3ICgqP9FdNLU2dXZBzrr8CjDAL29Jbv7sFiKQBz/cAx');
+        color := 7039084;
       end;
 
     MM_SYMBOL_WEAVE:
@@ -1700,12 +1790,8 @@ begin
       with result do
       begin
         name := 'Minigame';
-        bmp := BitmapFromString(15, 5, 'z78DA8D90410EC0200804B' +
-          'FB4AD22E568B1FFFF52132129C6DAF432214626CB22A340342929' +
-          '47B68DAE82066E2C0D99323BFBBB0A0E88CD3555AAC32EBA1393D' +
-          '99D6E36E7E38FCEC86FF3906D412D09FBB9E4FFCCA113DFED996D' +
-          '8E7FAC13E3CAFCD2B3DD1BB34D3DC7B6CD79039CA16371');
-        color := 4670928;
+        Bmp := BitmapFromString(14, 17, 'meJxjYEAB745v/Hx6y8cTG18fWceAA7w9subM8umdJaXpUWlA1FNecX717DdH1qIp+3Rszaz6ah0dT1EZBzXjUjWjYjEZRz19n0XtLZ+PrYEre3NwxYquRgXNCFGFIEEpd3XTJjWTegEJZyBXUTNm06TuF3sWQ1ReWj1dXcNTzaTWwHGBjlmnre9Oc7eVWiZNhk4LlfQrNLV9b66fA1R2d/Ps1vwCoFHiihHGjsvdok47BO619t5sH3jG0GGxsIwPv4Rjd2nNjbXTn+yYH+AeKyjtJauebmQ7y9prnW/Kfdeou0b2i7RMWqWUowWlPUJ80x9umvF482wHmyjbwPNWPhftg646ht5wCLlv5X3VxPWoufspc48zJi6HnezjHm+aeW/9tAi/VCEZH3HFcA3Den3r5QZ2O3UsVqubTFHVrRBXCBWQcosKSL21atKZ+Z19xWXC8sESynF61st1LRdpGk9RM+jSMp2paTZfVCFSWC5wclX9kRktQE9dXtBpZJKgbNClqNstrZqsaTJJ3ahHVi1NQaddTqvB0CTh5srJ8CDd2t2oqZ8qIhciLB8kq1UnrVYGNEpUMVJNN27n1N7Dk2vgKi/ObZ1SWq6lHyemFCOlViihnC6qGK5jlDy9uv7srGa0CD0+ua6voFxWPUFCOUFUMRrImFTRcHxKPdZEcmZ6/fSySnmNZDmNpNn1LSen1eFKTkBwdkpNV15FT3HdmSnVeJRBwLEJFYd7SzHFAUr3y8A=');
+        color := 1384530;
       end;
 
     MM_SYMBOL_TRADER_FUR:
@@ -2155,14 +2241,12 @@ begin
         color := 9697013;
       end;
 
-    MM_SYMBOL_SPOT_REST:
+    MM_SYMBOL_SPOT_REST: // (10/09/1014 dd/mm/yy)
       with result do
       begin
         name := 'Resting Spot';
-        bmp := BitmapFromString(15, 5, 'beNptjUENwDAMAw2lU' +
-          'AylUAyljwEZtFryukVd7xHpYisBzF2wjnEdFfjKWCTdtJY9exfJpJ' +
-          'u6kKVhAxeNyj76f/ReM5IceVZ9yhPESE1p');
-        color := 65536;
+        bmp := BitmapFromString(14, 20, 'meJxjYEAH74+te3t0DYYwCri+ZcG9rfNqUsLrUiMe7Zx/ZcssTDU3ty16vW/pstZiBWkJNlZWIAIyVrSXvj+44taWOXBlrw6sOj6/K9rLnouTnREJcHGwx3k7nlrc83r/MqCyD4dX9hYkaCrJsbOzAUF0dHQUDERERCgrK2spy00qS3u7b8nrvYutDLS4ubkg6ODBg6thYMuWLR4e7lxcnHbGuq/2LHq+a6GVviZc5YoVKzhgwMTExMXFBajSxlj32c4FT7bMttTTEOTnAyI+Xp5ly5ZxcnLw8HDz8vJYWlp6e3sBtdsYaT/ePAuIrA20hIWEIGjBggU83FyCAgJAto21tZeXJy8Pt72J3qNNMx+sn2ZnpAMUNzc3r6+vnzx5MtA0MVHRpKSk3t5eoO1AXU7mhvfXTb27ZjJQpayMdGZmxowZM0pLS/l4eQ0NDBYtWtTV1WVmZiokKOhganBn9aS7ayenBbppqihbW1rGREdraWkK8PMDNcbGxvr6+kpKSijISmeEet9c3reiteTc7Nbp5eneduYykhJAZ0iIi8tIS0sBFYmLOZoZTipJPTOnFR5NZ2Y0HJlSmxfmLS8rq6Qgr6yoAGQURAccmFRzdGotZuwfnVytrqKsoqQIREDGqRmNuNLSxrbi+oQgVWUlIGrLjlvdmIcn4R3pq7A3NXC0MD6J20AIOD25BmhsS0b00f4K/CqB4FBf+cHeMoLKgGBXR+GG+kxMcQBnPMK+');
+        color := 920844;
       end;
 
     MM_SYMBOL_RUNECRAFTING:
@@ -2204,73 +2288,89 @@ begin
   end;
 end;
 
-{*
-TRSMinimap._getSymbolColor
-~~~~~~~~~~~~~~~~~~~~~~~~~~
+(*
+TRSMinimap.findSymbols
+~~~~~~~~~~~~~~~~~~~~~~
 
 .. code-block:: pascal
 
-    function TRSMinimap._getSymbolColor(var p: TPoint; symbol: integer; searchBox: TBox): integer;
+    function TRSMinimap.FindSymbols(const Symbols: TIntegerArray; const SearchArea: TBox; out FSymbols: TFoundSymbols; FindOne: Boolean = False): Boolean; overload;
 
-Uses the symbols _TRSSymbol record to return the symbol's color in the "searchBox".
-Stores it's coordinates in "p".
+Searches for all of the symbols in 'Symbols' in the area 'SearchArea', Results
+True if atleast 1 symbol has been found, with the symbol data in the FSymbols param.
+
+* Param FindOne is set to false on default, but if enabled the function will only
+  search for one of each symbol.
 
 .. note::
 
-    - by Coh3n
-    - Last Updated: 23 May 2013 by Coh3n
+    - by Olly
+    - Last Updated: 10 September 2014 by Olly
 
 Example:
 
 .. code-block:: pascal
 
-    See the beginning of TRSMinimap.findSymbol().
-*}
-function TRSMinimap._getSymbolColor(var p: TPoint; symbol: integer; searchBox: TBox): integer;
-var
-  sym: _TRSSymbol;
-  c: integer;
-  acc: extended;
-begin
-  result := -1;
-  sym := self._getSymbol(symbol);
-  print('TRSMinimap._getSymbolColor()', TDebug.HEADER);
-
-  if (sym.name <> '') then
-  begin
-    print('Loaded symbol: '+sym.name);
-
-    if (findDeformedBitmapToleranceIn(sym.bmp, p.x, p.y, searchBox, 70, 0, true, acc)) then
+    procedure Test_Symbols();
+    var
+      Symbols: TFoundSymbols;
+      i: Integer;
     begin
-      print('Found symbol bitmap '+toStr(symbol));
+      Minimap.FindSymbols([MM_SYMBOL_BANK, MM_SYMBOL_DUNGEON, MM_SYMBOL_FISHING, MM_SYMBOL_QUEST, MM_SYMBOL_SPOT_REST], Minimap.getBounds(), Symbols, False);
 
-      if (acc > self.symbolAccuracy) then
-        repeat
-          c := c + 5;
+      for i := 0 to High(Symbols) do
+      begin
+        smartImage.drawCircle(Symbols[i].Pos, 7, False, clLime);
+        smartImage.drawCross(Symbols[i].Pos, 5, clLime);
+        Writeln(Symbols[i].Acc);
+      end;
+    end;
+*)
+function TRSMinimap.findSymbols(const Symbols: TIntegerArray; const SearchArea: TBox; out FSymbols: TFoundSymbols; FindOne: Boolean = False): Boolean; overload;
+var
+  Bitmap, i, Targ, OldTarg, Wid, Hei, bWid, bHei: Integer;
+  Sym: _TRSSymbol;
+  SearchBox, SymBox: TBox;
+  P: TPoint;
+  Acc: Extended;
+label
+  Loop;
+begin
+  Bitmap := BitmapFromClient(SearchArea);
+  OldTarg := GetImageTarget();
+  Targ := SetTargetBitmap(Bitmap);
+  SearchBox := IntToBox(0, 0, SearchArea.X2 - SearchArea.X1, SearchArea.Y2 - SearchArea.Y1);
+  GetBitmapSize(Bitmap, bWid, bHei);
 
-          // look for the symbol's color in a small box around where the bitmap was found
-          if (findColorTolerance(p.x, p.y, sym.color, p.x, p.y, p.x + 15, p.y + 5, c)) then
-          begin
-            result := getColor(p.x, p.y);
+  for i := 0 to High(Symbols) do
+  begin
+    Sym := Self._getSymbol(Symbols[i]);
+    GetBitmapSize(Sym.Bmp, Wid, Hei);
 
-            if (result > 0) then
-            begin
-              print('Found '+sym.name+' symbol at '+toStr(p));
-              print('TRSMinimap._getSymbolColor(): '+toStr(result), TDebug.FOOTER);
-              freeBitmap(sym.bmp);
-              exit();
-            end;
-          end;
-        until(c > 70); // max tolerance
+    Loop:
+    if (FindDeformedBitmapToleranceIn(Sym.Bmp, P.X, P.Y, SearchBox, 40, 0, True, Acc)) then
+      if (Acc > Self.symbolAccuracy) then
+      begin
+        SymBox := IntToBox(P.X, P.Y, Min(P.X + Wid, bWid - 1), Min(P.Y + Hei, bHei - 1));
 
-      end else
-        print('Failed to find bitmap symbol '+toStr(symbol), TDebug.ERROR);
+        if (CountColorTolerance(Sym.Color, SymBox, 30, ColorSetting(1)) > 1) then
+        begin
+          RectangleBitmap(Bitmap, IntToBox(SymBox.X1, SymBox.Y1, Min(SymBox.X1 + 10, bWid - 1), Min(SymBox.Y1 + 12, bHei - 1)), 1);
+          Inc(P.X, SearchArea.X1 + (Wid div 2));
+          Inc(P.Y, SearchArea.Y1 + (Hei div 2));
+          Insert([Symbols[i], P, Acc], FSymbols);
+          if (not FindOne) then
+            goto Loop;
+        end;
+      end;
+    FreeBitmap(Sym.Bmp);
   end;
 
-  print('TRSMinimap._getSymbolColor(): '+toStr(result), TDebug.FOOTER);
-  freeBitmap(sym.bmp);
+  SetImageTarget(OldTarg);
+  FreeTarget(Targ);
+  FreeBitmap(Bitmap);
 
-  p := point(-1, -1);
+  Result := (Length(FSymbols) > 0);
 end;
 
 (*
@@ -2302,8 +2402,16 @@ Example:
     end;
 *)
 function TRSMinimap.findSymbol(var p: TPoint; symbol: integer; searchBox: TBox): boolean;
+var
+  Symbols: TFoundSymbols;
 begin
-  result := (self._getSymbolColor(p, symbol, searchBox) > 0);
+  Result := Self.FindSymbols([Symbol], SearchBox, Symbols, True);
+  if (Result) then
+  begin
+    Printf('TRSMinimap.findSymbol(): Found symbol %d at accuracy %f', [Symbol, Symbols[0].Acc], TDebug.SUB);
+    p := Symbols[0].Pos;
+  end else
+    p := Point(-1, -1);
 end;
 
 (*
@@ -2328,52 +2436,19 @@ Example:
 
     symbols := minimap.findSymbols(tpa, MM_SYMBOL_FISHING, intToBox(minimap.x1, minimap.cy, minimap.x2, minimap.y2));
 *)
-function TRSMinimap.findSymbols(var tpa: TPointArray; symbol: integer; searchBox: TBox): boolean;
+function TRSMinimap.findSymbols(var tpa: TPointArray; symbol: integer; searchBox: TBox): boolean; overload;
 var
-  sym: _TRSSymbol;
-  newColor, i, _x, _y, l: integer;
-  tmpATPA: T2DPointArray;
-  tmpTPA: TPointArray;
-  p, _p: TPoint;
-  acc: Extended;
+  Symbols: TFoundSymbols;
+  i: Integer;
 begin
-  sym := self._getSymbol(symbol);
-  newColor := self._getSymbolColor(_p, symbol, searchBox); // autocolor's the symbol's stored color
-
-  if (sym.color > 0) then
+  Result := Self.FindSymbols([Symbol], SearchBox, Symbols);
+  if (Result) then
   begin
-    // finds all instances of the new color and spits them up
-    findColorsTolerance(tmpTPA, newColor, searchBox, 0);
-    tmpATPA := tmpTPA.toATPA(10);
+    for i := 0 to High(Symbols) do
+      Insert(Symbols[i].Pos, tpa);
 
-    setLength(tpa, length(tmpATPA));
-
-    for i := 0 to high(tmpATPA) do
-    begin
-      p := middleTPA(tmpATPA[i]);
-
-      // if the original found symbol is in the array (skips a findBitmap call)
-      if (tmpATPA[i].isInArray(point(_p.x, _p.y))) then
-        acc := 1
-      else
-        // checks for the bitmap in a small box around where the newColor was found
-        findDeformedBitmapToleranceIn(sym.bmp, _x, _y, p.x - 15, p.y - 5, p.x + 15, p.y + 5, 70, 0, true, acc);
-
-      if (acc > self.symbolAccuracy) then
-      begin
-        tpa[l] := p;
-        inc(l);
-      end;
-    end;
-
-    result := (l > 0);
-    setLength(tpa, l);
-
-    if (result) then
-      print('TRSMinimap.findSymbols(): Found '+sym.name+' symbol '+toStr(length(tpa))+' times', TDebug.SUB);
+    Printf('TRSMinimap.findSymbols(): Found %d symbols (ID: %d)', [Length(Symbols), Symbol], TDebug.SUB);
   end;
-
-  freeBitmap(sym.bmp);
 end;
 
 (*
@@ -2400,20 +2475,17 @@ Example:
 *)
 function TRSMinimap.findSymbols(var tpa: TPointArray; symbols: TIntegerArray; searchBox: TBox): boolean; overload;
 var
-  gTPA: TPointArray;
-  i: integer;
+  fSymbols: TFoundSymbols;
+  i: Integer;
 begin
-  // loops through each symbol, settings the points where each is found
-  for i := 0 to high(symbols) do
+  Result := Self.FindSymbols(Symbols, SearchBox, fSymbols);
+  if (Result) then
   begin
-    if (self.findSymbols(gTPA, symbols[i], searchBox)) then
-      result := true;
+    for i := 0 to High(fSymbols) do
+      Insert(fSymbols[i].Pos, tpa);
 
-    tpa := combineTPA(gTPA, tpa);
+    Printf('TRSMinimap.findSymbols(): Found %d symbols', [Length(fSymbols)], TDebug.SUB);
   end;
-
-  if (result) then
-    print('TRSMinimap.findSymbols(): Found a total of '+toStr(length(tpa))+' symbols', TDebug.SUB);
 end;
 
 (*
@@ -2701,3 +2773,5 @@ end;
 begin
   minimap.__init();
 end;
+
+{$f+}

@@ -9,54 +9,7 @@ The source for this file can be found `here <https://github.com/SRL/SRL-6/blob/m
 
 *)
 
-{$include_once ../interfaces/lobby/worlds.simba}
-{$include_once ../interfaces/options.simba}
-{$include_once ../interfaces/minimap.simba}
-{$include_once ../core/mouse.simba}
-{$include_once ../utilities/wrappers.simba}
-
 {$f-}
-
-(*
-const Skills
-~~~~~~~~~~~~
-
-Integer constants that represent each skill.
-
-Example:
-
-.. code-block:: pascal
-
-    players[currentPlayer].skillLevel[SKILL_ATTACK] := 50;
-*)
-const
-  SKILL_COUNT = 26;
-    SKILL_ATTACK = 0;
-    SKILL_HITPOINTS = 1;
-    SKILL_MINING = 2;
-    SKILL_STRENGTH = 3;
-    SKILL_AGILITY = 4;
-    SKILL_SMITHING = 5;
-    SKILL_DEFENCE = 6;
-    SKILL_HERBLORE = 7;
-    SKILL_FISHING = 8;
-    SKILL_RANGE = 9;
-    SKILL_THIEVING = 10;
-    SKILL_COOKING = 11;
-    SKILL_PRAYER = 12;
-    SKILL_CRAFTING = 13;
-    SKILL_FIREMAKING = 14;
-    SKILL_MAGIC = 15;
-    SKILL_FLETCHING = 16;
-    SKILL_WOODCUTTING = 17;
-    SKILL_RUNECRAFTING = 18;
-    SKILL_SLAYER = 19;
-    SKILL_FARMING = 20;
-    SKILL_CONSTRUCTION = 21;
-    SKILL_HUNTER = 22;
-    SKILL_SUMMONING = 23;
-    SKILL_DUNGEONEERING = 24;
-    SKILL_DIVINATION = 25;
 
 {*
 const Internal
@@ -137,6 +90,14 @@ type
 
   TPlayerArray = array of TPlayer;
 
+type
+  PF_TPlayer = record (TPlayer)
+    settings: TStringArray;
+  end;
+
+  PF_TPlayerArray = array of PF_TPlayer;
+
+
 (*
 Player Variables
 ~~~~~~~~~~~~~~~~
@@ -152,6 +113,144 @@ var
   players: TPlayerArray;
   currentPlayer: integer;
   disableIPScreenshots: boolean;
+
+function Raf_GetArmyNames(out names: TStringArray): boolean;
+var
+  s: string := Settings.getPrefix();
+begin
+  Settings.setPrefix('');
+  try
+    result := Settings.ListKeys('Rafiki/Armys/', names);
+  finally
+    Settings.setPrefix(s);
+  end;
+end;
+
+function Raf_FindArmy(const name: string): boolean;
+var
+  strings: TStringArray;
+  i: integer;
+begin
+  result := false;
+
+  if (Raf_GetArmyNames(strings)) then
+    for i := 0 to high(strings) do
+      if (SameText(Replace(Name, ' ', '_', [rfReplaceAll]), Strings[i])) then
+        Exit(True);
+end;
+
+function Raf_IsArmyEncrypted(const armyName: string): boolean;
+var
+  s: string := Settings.getPrefix();
+begin
+  if (not Raf_FindArmy(armyName)) then
+    exit(false);
+
+  Settings.setPrefix('');
+  try
+    result := (lowercase(Settings.getKeyValueDef('Rafiki/Armys/'+armyName+'/Encrpyted', 'False')) = 'true');
+  finally
+    Settings.setPrefix(s);
+  end;
+end;
+
+function Raf_DecryptArmy(const armyName: string; var data: string): boolean;
+var
+  pass, dataCopy: string;
+label
+  lStart;
+begin
+  dataCopy := copy(data);
+
+  lStart:
+  pass := '';
+  data := copy(dataCopy);
+
+  if (InputQuery('Rafiki Player Manager', 'Please enter your army password for decryption', pass)) then
+  begin
+    rc2_decrypt(pass, htSHA512, data);
+    result := ExecRegExpr('<player>', data);
+  end else begin
+    print('Input query was cancled');
+    exit(false);
+  end;
+
+  if (not result) then
+    if (MessageDlg('Rafiki_DecryptArmy', 'Wrong password for decryption', mtError, [mbRetry, mbOk]) = 4) then
+      goto lStart
+    else
+      print('Ok clicked');
+end;
+
+function Raf_GetPlayers(ArmyName: String; out _Players: TPlayerArray): Boolean;
+var
+  Data, Pref: String;
+  TSA: TStringArray;
+  i: integer;
+begin
+  Result := False;
+  Print('Raf_GetPlayers()', TDebug.HEADER);
+
+  if (not Raf_FindArmy(ArmyName)) then
+    Exit(Print('Army doesn''t exist!', False, 'Raf_GetPlayers: Result = false'));
+
+  Pref := Settings.getPrefix();
+  Settings.setPrefix('Rafiki/Armys/');
+  ArmyName := Replace(Lowercase(ArmyName), ' ', '_', [rfReplaceAll]);
+
+  try
+    Print('Army exists, reading the players...');
+    Data := DeCompressString(Base64Decode(Settings.GetKeyValueDef(ArmyName + '/Player_Data', '')));
+
+    if (Raf_IsArmyEncrypted(ArmyName)) then
+      if (not Raf_DecryptArmy(ArmyName, Data)) then
+        Exit(Print('Failed to decrpyt army', False, 'Raf_GetPlayers: Result = false'));
+
+    if (Length(Data) <= 1) or (Pos('<player>', Data) = 0) then
+    begin
+      Print('Corrupted army file, going to remove it');
+      Print('Deleted = ' + BoolToStr(Settings.DeleteKey(ArmyName), 'Succesfull', 'Failed'));
+      Exit();
+    end;
+
+    TSA := MultiBetween(Data, '<player>', '</player>');
+    SetLength(_Players, Length(TSA));
+
+    for i := 0 to High(_Players) do
+      with (_Players[i]) do
+       begin
+         loginName := Between('<loginName>', '</loginName>', TSA[i]);
+         nickName := Between('<nickName>', '</nickName>', TSA[i]);
+         password := Between('<password>', '</password>', TSA[i]);
+         bankPin := Between('<bankPin>', '</bankPin>', TSA[i]);
+         isMember := StrToBoolDef(Between('<isMember>', '</isMember>', TSA[i]), False);
+       end;
+  finally
+    Settings.setPrefix(Pref);
+  end;
+
+  Result := (Length(_Players) > 0);
+  Printf('Raf_GetPlayers: Result = %s', [toString(Result)], TDebug.FOOTER);
+end;
+
+function Raf_GetPlayers(const armyName: string; out __players: PF_TPlayerArray): boolean; overload;
+var
+  tmp: TPlayerArray;
+  i: integer;
+begin
+  result := Raf_GetPlayers(armyName, tmp);
+  setLength(__players, length(tmp));
+
+  for i := 0 to high(tmp) do
+    with (__players[i]) do
+    begin
+      loginName := tmp[i].loginName;
+      nickName := tmp[i].nickName;
+      password := tmp[i].password;
+      bankPin := tmp[i].bankPin;
+      isMember := tmp[i].isMember;
+    end;
+end;
 
 (*
 TPlayerArray.getActive
@@ -268,125 +367,16 @@ Example:
 *)
 procedure TPlayerArray.setup(names: TStringArray; const army: string = 'default');
 var
-  fileHandle, fileSz: integer;
-  pass, ext, data: string;
-  ArmiesTSA, PlayersTSA: TStringArray;
   i, j: integer;
   tmp: TPlayerArray;
-  mesh: string;
-  dataParts: TStringArray;
 begin
   print('TPlayerArray.setup()', TDebug.HEADER);
-  ext := '.raf';
+  printf('Attempting to load player(s) "%s" from army "%s"', [toString(names), army]);
 
-  if (not FileExists(__PATH_PLAYER + army + ext)) then
+  if (not Raf_GetPlayers(army, tmp)) then
   begin
-    ext := '.xml';
-
-    if not(FileExists(__PATH_PLAYER + army + ext)) then
-    begin
-      print('Couldn''t find army file(' + army + ')', TDebug.ERROR);
-
-      if (army = 'default') then
-        print('Make sure you create an army with the player manager (SRL > Open Player Manager)', TDebug.HINT);
-
-      print('TPlayerArray.setup(): false', TDebug.FOOTER);
-      terminateScript();
-    end;
-  end;
-
-  fileHandle := OpenFile(__PATH_PLAYER + army + ext, true);
-
-  if (not fileHandle >= 0) then // fileHandle = -1 if shit went wrong
-  begin
-    print('Couldn''t open file: ' + __PATH_PLAYER + army + ext, TDebug.ERROR);
-    print('Make sure your folder permissions are set properly', TDebug.HINT);
-    print('TPlayerArray.setup(): false', TDebug.FOOTER);
-    terminateScript();
-  end;
-
-  fileSz := FileSize(fileHandle); // the size of the file in characters
-
-  if (fileSz) = 0 then
-  begin
-    print('File is empty: ' + __PATH_PLAYER + army + ext, TDebug.ERROR);
-    print('Make sure you create an army with the player manager (SRL > Open Player Manager)', TDebug.HINT);
-    print('TPlayerArray.setup(): false', TDebug.FOOTER);
-    terminateScript();
-  end;
-
-  if (not ReadFileString(fileHandle, data, fileSz)) then
-  begin
-    print('Couldn''t read file: ' + __PATH_PLAYER + army + ext, TDebug.ERROR);
-    print('Make sure your folder permissions are set properly', TDebug.HINT);
-    print('TPlayerArray.setup(): false', TDebug.FOOTER);
-    terminateScript();
-  end;
-
-  CloseFile(fileHandle);
-
-  if (ext = '.raf') then
-  begin
-    repeat
-      if (InputQuery('Player Manager', 'Please enter your army password for decryption', pass)) then
-      begin
-        // decrypting the data
-        dataParts := MultiBetween(data, '<block_128_chars>', '</block_128_chars>');
-
-        data := '';
-
-        for i := 0 to High(dataParts) do
-        begin
-          mesh := dataParts[i];
-          rc2_decrypt(pass, htSHA256, mesh);
-          data := data + mesh;
-        end;
-
-        pass := ''; //no longer needed
-
-        if ExecRegExpr('<army>', data) then
-        begin
-          print('Password accepted!');
-          break;
-        end else begin
-          print('Couldn''t decrypt file. Re-enter password.'); // wrong password
-          print('TPlayerArray.setup(): false', TDebug.FOOTER);
-          terminateScript();
-        end;
-      end else begin
-        print('TPlayerArray.setup(): User cancel', TDebug.FOOTER);
-        exit; // cancel button is pressed
-      end;
-
-    until(false);
-  end else
-    if (not ExecRegExpr('<army>', data)) then
-    begin
-      print('File doesn''t contain a valid army', TDebug.FATAL);
-      print('Make sure you create an army with the player manager (SRL > Open Player Manager)', TDebug.HINT);
-      print('TPlayerArray.setup(): false', TDebug.FOOTER);
-      terminateScript();
-    end;
-
-  // finally parse the data
-  ArmiesTSA := MultiBetween(data, '<army>', '</army>');
-
-  if (Length(ArmiesTSA) = 0) then
-  begin
-    print('TPlayerArray.setup(): false', TDebug.FOOTER);
-    exit;
-  end;
-
-  PlayersTSA := multiBetween(ArmiesTSA[0], '<player>', '</player>');
-
-  setLength(tmp, Length(PlayersTSA));
-  for I := 0 to High(PlayersTSA) do
-  begin
-    tmp[I].DisplayName := between('<diplayName>', '</diplayName>', PlayersTSA[I]);
-    tmp[I].LoginName := between('<loginName>', '</loginName>', PlayersTSA[I]);
-    tmp[I].NickName := between('<nickName>', '</nickName>', PlayersTSA[I]);
-    tmp[I].Password := between('<password>', '</password>', PlayersTSA[I]);
-    tmp[I].BankPin := between('<bankPin>', '</bankPin>', PlayersTSA[I]);
+    print('Unable to get players from army', TDebug.ERROR);
+    print('TPlayerArray.setup(): Failure', TDebug.FATAL);
   end;
 
   for i := 0 to high(names) do
@@ -403,94 +393,32 @@ begin
         print('Invalid player name: '+names[i], TDebug.WARNING);
     end;
 
+  if (length(players) < 1) then
+  begin
+    print('Unable to find any players in army', TDebug.ERROR);
+    print('TPlayerArray.setup(): Failure', TDebug.FATAL);
+  end;
+
   self.setDefaults();
   print('TPlayerArray.setup(): Success', TDebug.FOOTER);
 end;
 
-{tmp - for new rafiki untested
-
-procedure TPlayerArray.setup(names: TStringArray; const armyName: string = 'default'); override;
-
-  function decrypt(var dataString: string): boolean;
-  var
-    pass: string;
-  begin
-    result := false;
-
-    if (InputQuery('Player Manager', 'Please enter your army password for decryption', pass)) then
-    begin
-       rc2_decrypt(pass, htSHA512, dataString);
-       result := ExecRegExpr('<player>', dataString);
-    end else
-      print('TPlayerArray.setup(): User Canceled', TDebug.FATAL);
-  end;
-
+procedure TPlayerArray.setup(const players: PF_TPlayerArray); overload;
 var
-  prefix, armyData: string;
-  armys, playersTSA: TStringArray;
-  i, j, k: integer;
-  tmp: TPlayerArray;
+  i: integer;
+  p: TPlayer;
 begin
-  print('TPlayerArray.setup()', TDebug.HEADER);
-
-  if (listSettings('Rafiki/Armys/', armys)) then
+  for i := 0 to high(players) do
   begin
-    print(format('Army''s found: %s', [toString(armys)]));
-
-    for i := 0 to high(armys) do
-    begin
-      if (lowercase(armys[i]) = lowercase(armyName)) then
-      begin
-        print(format('Succesfully found the army "%s"', [armyName]));
-
-        armyData := decompressString(base64decode(getSettingValue('Rafiki/Armys/' + armys[i] + '/Player_Data')));
-
-        if (getSettingValue('Rafiki/Armys/' + armys[i] + '/Encrpyted') = 'True') then
-        begin
-          print('Army is encrpyted, we reqiure the password to decrpyt!');
-
-          if (not decrypt(armyData)) then
-            print('TPlayerArray.Setup(): Encrpytion pass wasn''t correct', TDebug.FATAL)
-          else
-            print('Password accepted! Succesfully decrpyted');
-        end;
-
-        playersTSA := multiBetween(armyData, '<player>', '</player>');
-
-        setLength(tmp, length(playersTSA));
-        for j := 0 to high(playersTSA) do
-        begin
-          tmp[i].LoginName := between('<loginName>', '</loginName>', PlayersTSA[i]);
-          tmp[i].NickName := between('<nickName>', '</nickName>', PlayersTSA[i]);
-          tmp[i].Password := between('<password>', '</password>', PlayersTSA[i]);
-          tmp[i].BankPin := between('<bankPin>', '</bankPin>', PlayersTSA[i]);
-          tmp[i].isMember := strToBoolDef(between('<isMember>', '</isMember>', playersTSA[i]), false);
-        end;
-
-        for j := 0 to high(names) do
-          for k := 0 to high(tmp) do
-          begin
-            if (names[j] = tmp[k].loginName) or (names[j] = tmp[k].displayName) or (names[j] = tmp[k].nickname) then
-            begin
-              print('Loaded player: '+names[j]);
-              self._add(tmp[k]);
-              break;
-            end;
-
-            if (j = high(tmp)) then
-              print('Invalid player name: '+names[j], TDebug.WARNING);
-          end;
-
-        break();
-      end;
-
-      print('Failed to find army...');
-    end;
+    p.loginName := players[i].loginName;
+    p.nickName := players[i].nickName;
+    p.password := players[i].password;
+    p.bankPin := players[i].bankPin;
+    p.isMember := players[i].isMember;
+    self._add(p);
   end;
-
-  print('TPlayerArray.setup(): Success', TDebug.FOOTER);
+  self.setDefaults();
 end;
-}
 
 (*
 TPlayerArray.switchTo

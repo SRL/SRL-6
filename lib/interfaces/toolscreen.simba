@@ -11,9 +11,6 @@ The source for this file can be found `here <https://github.com/SRL/SRL-6/blob/m
 
 {$f-}
 
-{$include_once interfaces.simba}
-{$include_once ../core/text.simba}
-
 (*
 type TRSToolScreen
 ~~~~~~~~~~~~~~~~~~
@@ -243,3 +240,5 @@ end;
 begin
   toolScreen.__init();
 end;
+
+{$f+}

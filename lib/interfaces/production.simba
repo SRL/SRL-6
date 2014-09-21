@@ -11,11 +11,6 @@ The source for this file can be found `here <https://github.com/SRL/SRL-6/blob/m
 
 {$f-}
 
-{$include_once interfaces.simba}
-{$include_once ../core/players.simba}
-{$include_once actionbar.simba}
-{$include_once ../tesseract/tesseract.simba}
-
 {*
 const Internal
 ~~~~~~~~~~~~~~
@@ -33,7 +28,12 @@ type TRSProductionScreen
 A type that stores the production interface properties.
 *)
 type
-  TRSProductionScreen = type TRSInterface;
+  TRSProductionScreen = record (TRSInterface)
+    {$IFNDEF CODEINSIGHT}
+    __bmp: integer;
+    __isLoaded: boolean;
+    {$ENDIF}
+  end;
 
 (*
 var productionScreen
@@ -81,6 +81,32 @@ begin
     ID := ID_INTERFACE_PRODUCTION;
     parentID := -1;
     static := false;
+    __isLoaded := false;
+  end;
+end;
+{$ENDIF}
+
+{$IFNDEF CODEINSIGHT}
+procedure __loadProductionScreen();
+begin
+  with (productionScreen) do
+  begin
+    __bmp := BitmapFromString(487, 6, 'meJztl21r40YUhTf4VZZk62X0ZkmWJTshdZOlTRrKtqEsy1IathRKvvTL/v+/sY99vNNS+i2EmFTiMty5c+6ZM4PnzrjO/W0d1bmfhDPfnZ69eYPdXnefPtz89cfPinRLD3t8uKtSbzIaTsejJA66OqmX0XlbYIXxi+QYwb7ZFJtVbkJPAFq6OETIpaUrvEbFJipFIITEpmhGusDmnkOuCMUTzmeawuoh8uIiM7NolklTmjKLooXrzSbAMhPEoVekAeY5k/FwMPfdLJ7bYOg74fwYwcosIGXuTgWIDww4RPa57pSu8BoVm6gUgRASm6IZ6QJjj/a5B0LxICnuRfYinyaySMJ4ASxsqmSZBSZatJV5Zaf7WUXuzqvHh3cP91fY/febjz99+8OuwvDfve1+/O7cdYYUbeK0lGjPGVKlaX99f2srNkO/f7hSVacWebPxgTzFQdthselBVWr3hKAE4ABDKgpRxah8WuI2FwcqTPugbbEpmNYFszBaI2YZlKWtEPnLityu802Tl3nI77YuoqaKmzKpC0P1zpNFV5sk9GfTEZGmjHD4tVd5iE+dp4WB+5GW4AFjcICRRS4MjMoXj83FgQrD13T/TMFwGIJZGIwIZhl6kb3Ip4jcrJI0mrvOqCnjTZNwEF7f6X5ukW2V/vnxdrP0jD8ooyEV++669Z0BBZl2Mho4k1FVhDytKc7h/PjYllG9d11MxQaAv21SaJmOKSBHCVeJnVQ3CEEwWpQk0bVi9sKMr/Xqvvt6E6WKKAUYyxcD09HVjtld1e6JVjAAdp9PROR2XcSBl5vFRZt1TdYs4zIP9hdfvDhfZ7ST0YggfuA7cbhYl2m32sOwZR4QBENEQUbpKpdRDkUWeQzh85JnVFndyiiiFGDMKAamo3vA7GfERA5YtIIte5G9yKeIbDLeKnHgdnXWVq/2dD+3yOuL6tP7G8p1vjijeteJgznjwW67dJ1xaubebErFfny4u1gbqrTe2874jGf2/c2mzv3An9R5JFW6I6xO3VB2UTZOUDugywVH9wsMWotdps3VBuqS+s8d01ZosQLb+1ETWc7TEdnWCT9dieR/Ig8P2qo4iuTfpY3QSiQ+QRsnCEy52zVsJv4qEv+y+5vQ5h7Oi8nNUaSoJFIAhujSWrBm70X2Ip8sMrnsivb/cbqfVeTtVfvb/dWujXhsY5er8Je7y/1b2u2//ju5z/f9/pfZf/33r887HI3k7efeejs148f54hp66+0EjaPxBUJhV/A=');
+    setBitmapName(__bmp, 'SRL - ProductionScreen Mask');
+    __isLoaded := true;
+  end;
+
+  addOnTerminate('__freeProductionScreen');
+end;
+{$ENDIF}
+
+{$IFNDEF CODEINSIGHT}
+procedure __freeProductionScreen();
+begin
+  with (productionScreen) do
+  begin
+    __isLoaded := false;
+    freeBitmap(__bmp);
   end;
 end;
 {$ENDIF}
@@ -93,12 +119,12 @@ TRSProductionScreen.__find
 
     function TRSProductionScreen.__find(): boolean;
 
-Returns true if the production screen is detected, and sets the bounds
+Returns true if the production screen is detected, if detected will set the bounds.
 
 .. note::
 
-    - by Ashaman88
-    - Last Updated: 27 February 2014 by Ashaman88
+    - by Olly
+    - Last Updated: 20 May 2014 by Olly
 
 Example:
 
@@ -107,49 +133,34 @@ Example:
     if (productionScreen.__find()) then
       writeln('bounds are set!');
 *)
+{$IFNDEF CODEINSIGHT}
 function TRSProductionScreen.__find(): boolean;
 const
   BORDER_COLOR = 11645361;
   BUTTON_COLOR = 11238410;     //blue button color
   BUTTON_COLOR_2 = 1447449;   //if no valid box selected it's this color
 var
-  j, i, wid, hei: integer;
-  b: TBox;
-  lowP, hiP: TPoint;
-  tpa, tpa2: TPointArray;
+  fx, fy: integer;
 begin
-  getClientDimensions(wid, hei);
-  b := [1, 1, wid -1, hei - 1];
+  result := false;
 
-  findColorsTolerance(tpa, BORDER_COLOR, b, 0,colorSetting(1));
-  tpa.sortByXValue(true);
+  if (not self.__isLoaded) then
+    __loadProductionScreen();
 
-  tpa2 := tpa;
-  tpa2.invert;
-
-  for i := 0 to high(tpa) do
-  begin
-    for j := 0 to high(tpa2) do
-      if (tpa2[j].x - tpa[i].x = 250) then
+  freeze();
+  // debugBitmap(self.__bmp);
+  try
+    if (findBitmapTolerance(self.__bmp, fx, fy, 10, colorSetting(1))) then
+      if (countColor(clWhite, TBox([fx + 270, fy + 20, fx + 450, fy + 40])) > 15) then  // look for white item text to verify
       begin
-        lowP := tpa[i];
-        hiP := tpa2[j];
-        break;
+        self.setBounds([fx - 8, fy - 28, fx + 495, fy + 297]);
+        result := true;
       end;
-    if (hiP.x - lowP.x = 250) then
-      break;
+  finally
+    unFreeze();
   end;
-
-  if (hiP.x - lowP.x <> 250) then
-    exit(false);
-
-  if (hiP.x - lowP.x = 250) then
-    if (countColorTolerance(BUTTON_COLOR, intToBox(lowP.x, lowP.y - 10, hiP.x, lowP.y + 10), 50) > 250) or (countColorTolerance(BUTTON_COLOR_2, intToBox(lowP.x, lowP.y - 10, hiP.x, lowP.y + 10), 50) > 250) then
-    begin
-      self.setBounds(intToBox(lowP.x - 238, lowP.y - 311, hiP.x + 15, lowP.y + 14));
-      result := true;
-    end;
 end;
+{$ENDIF}
 
 (*
 TRSProductionScreen.isOpen
@@ -176,28 +187,17 @@ Example:
       writeln('it''s open!');
 *)
 function TRSProductionScreen.isOpen(waitTime: integer = 0): boolean;
-const
-  BORDER_COLOR = 1388125;
-  BACKGROUND_COLOR = 921102;
 var
-  t, cts: integer;
+  t: UInt64;
 begin
-  t := (getSystemTime() + waitTime);
+  result := false;
+  t := (getTickCount64() + waitTime);
 
-  cts := getToleranceSpeed();
-  setColorToleranceSpeed(1);
-
-  repeat
-    if (self.x1 - self.x2 = 0) then
-      result := self.__find() else
-      if (getColor(self.x1 + 8, self.y1 + 33) = BORDER_COLOR) or (getColor(self.x1 + 8, self.y1 + 34) = BORDER_COLOR) then
-        if (countColor(BACKGROUND_COLOR, intToBox(self.x1 +250, self.y1 +40, self.x2 -20, self.y2 -250)) > 2000) then
-          result := true;
-
-    wait(20 + random(50));
-  until (getSystemTime() >= t) or (result);
-
-  setColorToleranceSpeed(cts);
+  while (not result) and (t >= getTickCount64()) do
+  begin
+    result := self.__find();
+    wait(randomRange(20, 50));
+  end;
 end;
 
 (*
@@ -367,13 +367,13 @@ const
   __COLOR_SCROLL_BAR = 1266553;
 var
   p: TPoint;
-  t: integer;
+  t: UInt64;
   down: boolean;
 begin
   if (not self.isOpen()) then
     exit(false);
 
-  t := (getSystemTime() + 3000);
+  t := (getTickCount64() + 3000);
 
   repeat
     if (slot>20) and ((getColor(self.x1 + 223, self.y1 + 285) = __COLOR_SCROLL_BAR) or (getColor(self.x1 + 223, self.y1 + 286) = __COLOR_SCROLL_BAR)) then
@@ -392,13 +392,13 @@ begin
     getMousePos(p.x,p.y);
 
     if (slot>20) then
-      down := true else
+      down := true
+    else
       down := false;
 
     mouseScroll(p, 3 + random(5), down);
     wait(50 + random(50));
-
-  until(getSystemTime() > t);
+  until(getTickCount64() > t);
 
   print('TRSProductionScreen._scrollToItem(): result = ' + lowercase(boolToStr(result)), TDebug.SUB);
 end;
@@ -709,3 +709,5 @@ end;
 begin
   productionScreen.__init();
 end;
+
+{$f+}

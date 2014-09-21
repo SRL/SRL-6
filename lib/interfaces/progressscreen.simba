@@ -9,10 +9,6 @@ The source for this file can be found `here <https://github.com/SRL/SRL-6/blob/m
 
 *)
 
-{$include_once ../tesseract/tesseract.simba}
-{$include_once ../core/players.simba}
-
-
 {$f-}
 
 (*
@@ -478,7 +474,7 @@ Example:
 *)
 function TRSProgressScreen.getTotalToMake: integer;
 const
-  PROGRESS_FILTER_SMALL_CHARS: array [0..3] of variant = [10, 10, false, 50];
+  PROGRESS_FILTER_SMALL_CHARS: TTesseractFilter = [10, 10, [false, 50, TM_Mean]];
 var
   b: TBox;
   tpa : TPointArray;
@@ -521,3 +517,5 @@ end;
 begin
   progressScreen.__init();
 end;
+
+{$f+}

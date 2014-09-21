@@ -13,10 +13,12 @@ Rafiki Player Manager
 *)
 
 {$IFDEF LAPE}
-{$include_once rafiki.simba}
+
+{$i ../../srl.simba}
+{$i rafiki.simba}
 
 begin
-  runRafikiPlayerManager();
+  Rafiki_RunPlayerManager();
 end.
 
 {$ELSE}

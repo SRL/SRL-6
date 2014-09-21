@@ -11,8 +11,6 @@ The source for this file can be found `here <https://github.com/SRL/SRL-6/blob/m
 
 {$f-}
 
-{$include_once ../interfaces/interfaces.simba}
-
 (*
 type TOption
 ~~~~~~~~~~~~
@@ -560,3 +558,5 @@ begin
   result := __TOptionArray(self.getOptions());
 end;
 {$ENDIF}
+
+{$f+}

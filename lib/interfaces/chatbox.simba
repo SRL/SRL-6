@@ -10,10 +10,6 @@ The source for this file can be found
 
 *)
 
-{$include_once interfaces.simba}
-{$include_once actionbar.simba}
-{$include_once ../core/text.simba}
-
 {$f-}
 
 (*
@@ -27,7 +23,6 @@ type
     lineBoxes: TBoxArray;
   end;
 
-
 (*
 var chatbox
 ~~~~~~~~~~~
@@ -36,6 +31,9 @@ Variable that stores functions and properties of the Runescape chatbox interface
 *)
 var
   chatbox: TRSChatbox;
+
+const
+  CHATBOX_TESSERACT_FILTER: TTesseractFilter = [3, 3, [false, 35, TM_Mean]];
 
 {*
 TRSChatbox.__init
@@ -102,8 +100,6 @@ begin
   getClientDimensions(wid, hei);
 
   self.setBounds([1, actionBar.y2, gameTabs.tabArea.x1, hei-2]);
-  setLength(lineBoxes, 0);
-
   chatBounds := chatBox.getChatArea();
 
   for i := 0 to 10 do
@@ -141,7 +137,7 @@ Example:
 *)
 function TRSChatbox.getChatArea(): TBox;
 begin
-  result := intToBox(self.x1+3, self.y1 + 67, self.x2-20, self.y2-21);
+  result := intToBox(self.x1+3, self.y1 + 68, self.x2-20, self.y2-22);
 end;
 
 (*
@@ -165,14 +161,22 @@ Example:
 
     chatbox.findAnyText(['Hello']);
 *)
-function TRSChatbox.findAnyText(txt: TStringArray): boolean;
+function TRSChatbox.findText(txt: TStringArray; const Filter: TTesseractFilter = CHATBOX_TESSERACT_FILTER): boolean;
 var
-  p: TPoint;
+  s: string;
 begin
-  result := findText(p, txt, [smallchars], self.getChatArea());
+  s := Tesseract_GetText(Self.getChatArea(), Filter);
 
-  if (result) then
-    print('TRSChatbox.findAnyText(): Found "'+toStr(txt)+'"', TDebug.SUB);
+  if (length(s) > 1) then
+    result := IsArrInStr(txt, s);
+end;
+
+function TRSChatbox.getTextOnLine(Line: Integer; Filter: TTesseractFilter = CHATBOX_TESSERACT_FILTER): String;
+begin
+  if (not inRange(Line, Low(Self.lineBoxes), High(Self.lineBoxes))) then
+    Exit(Print('TRSChatBox.getTextOnLine(): Invaild line', False));
+
+  Result := Tesseract_GetText(Self.lineBoxes[Line], Filter);
 end;
 
 (*
@@ -198,23 +202,59 @@ Example:
     // returns true if "Hello" is found on the first 4 lines
     chatbox.findTextOnLines(['Hello'], [0..3]);
 *)
-function TRSChatbox.findTextOnLines(txt: TStringArray; lines: TIntegerArray): boolean;
+function TRSChatbox.findTextOnLines(txt: TStringArray; lines: TIntegerArray; Filter: TTesseractFilter = CHATBOX_TESSERACT_FILTER): boolean;
 var
   i: integer;
-  p: TPoint;
+  s: string;
 begin
+  result := false;
+
   for i := 0 to high(lines) do
   begin
-    result := findText(p, txt, [SmallChars], self.lineBoxes[lines[i]]);
-
-    if (result) then
+    s := Self.getTextOnLine(Lines[i], Filter);
+    if (IsArrInStr(txt, s)) then
     begin
       print('TRSChatBox.findTextOnLines(): Found text '+toStr(txt)+' on line '+intToStr(lines[i]));
-      exit();
+      exit(true);
     end;
   end;
+end;
+
+function TRSChatbox.getXP(): Integer;
+const
+  Filter: TTesseractFilter = [5, 5, [False, 30, TM_Mean]];
+var
+  b: TBox;
+  Bmp, i, p: Integer;
+  TPA, TextPoints: TPointArray;
+  ATPA: T2DPointArray;
+  s: String;
+begin
+  if (not FindColorsTolerance(TPA, 13158856, IntToBox(Self.X2 - 220, Self.Y1 + 16, Self.X2 - 5, Self.Y1 + 38), 30, ColorSetting(2, 4.17, 0.23))) then
+  begin
+    Print('TRSChatbox.getXP(): Failed to find text to read', TDebug.ERROR);
+    Exit(0);
+  end;
+
+  ATPA := ClusterTPAEx(TPA, 1, 1);
+  for i := 0 to High(ATPA) do
+  begin
+    b := GetTPABounds(ATPA[i]);
+    if (inRange(b.getWidth(), 2, 7)) and (inRange(b.getHeight(), 5, 9)) then
+      Insert(ATPA[i], TextPoints);
+  end;
+
+  b := GetTPABounds(TextPoints);
+  s := Tesseract_GetText(b.X1 - 2, b.Y1 - 5, b.X2 + 2, b.Y2 + 5, Filter);
+  p := Pos('xp', s);
+  if (p > 0) then
+    s := Copy(s, p + 2, Length(s) - (p + 1));
+
+  Result := StrToIntDef(ExtractFromStr(s, Numbers), 0);
 end;
 
 begin
   chatbox.__init();
 end;
+
+{$f+}

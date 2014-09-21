@@ -9,9 +9,6 @@ The source for this file can be found `here <https://github.com/SRL/SRL-6/blob/m
 
 *)
 
-{$include_once ../interfaces/lobby/lobby.simba}
-{$include_once ../core/players.simba}
-
 {$f-}
 
 (*
@@ -97,4 +94,6 @@ begin
     wait(2000);
   end;
 end;
+
+{$f+}
 

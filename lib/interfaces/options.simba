@@ -9,11 +9,6 @@ The source for this file can be found `here <https://github.com/SRL/SRL-6/blob/m
 
 *)
 
-{$include_once interfaces.simba}
-{$include_once ../core/text.simba}
-{$include_once ../tesseract/tesseract.simba}
-{$include_once ../utilities/color.simba}
-
 {$f-}
 
 (*
@@ -73,13 +68,14 @@ begin
     ID := ID_INTERFACE_OPTIONS;
     parentID := -1;
     static := true;
+    setBounds(IntToBox(300, 95, 499, 469));
   end;
 end;
 {$ENDIF}
 
 {*
-TRSOptions.__find()
-~~~~~~~~~~~~~~~~~~~
+TRSOptions.__find
+~~~~~~~~~~~~~~~~~
 
 .. code-block:: pascal
 
@@ -101,16 +97,12 @@ Example:
     options.__find();
 *}
 {$IFNDEF CODEINSIGHT}
-function TRSOptions.__find(): boolean;
+function TRSOptions.__find(): Boolean;
 var
-  wid, hei: integer;
-  tpa: TPointArray;
-  bds: TBox;
+  b: TBox;
 begin
-  getClientDimensions(wid, hei);
-  result := true;
-
-  setBounds([round(wid / 2 - 100), round(hei / 2 - 188), round(wid / 2 + 100), round(hei / 2 + 187)]);
+  b := IntToBox(Self.X1, Self.Y1, Self.X2, Self.Y1 + 30);
+  Result := (CountColorTolerance(631756, b, 70, ColorSetting(1)) > 300);
 end;
 {$ENDIF}
 
@@ -138,10 +130,7 @@ Example:
 *)
 function TRSOptions.isOpen(): boolean;
 begin
-  self.__find();
-
-  // gold color of the interface's text
-  result := (countColorTolerance(379903, self.x, self.y, self.x+self.w, self.y+self.h + 30, 10) = 135);
+  Result := Self.__find();
 end;
 
 (*
@@ -195,27 +184,32 @@ begin
   until(c > 3);
 end;
 
-function TRSOptions._getOptions(var button: TBoxArray; var text: TStringArray): boolean;
+function TRSOptions._getOptions(var Button: TBoxArray; var Text: TStringArray): boolean;
 var
-  tpa : TPointArray;
-  atpa : T2DPointArray;
+  TPA: TPointArray;
+  ATPA: T2DPointArray;
   i: Integer;
+  b: TBox;
 begin
-  if not self.isOpen() then
-    exit(false);
+  Result := True;
+  if (not Self.isOpen()) then
+    Exit(False);
 
-  findColorsTolerance(tpa, 5927515, self.getBounds(), 17, colorSetting(2, 1.42, 0.39));
+  if (not FindColorsTolerance(TPA, 9998984, Self.getBounds(), 10, ColorSetting(1))) then
+    Exit(False);
 
-  atpa := tpa.cluster(3);
-  atpa.filterBetween(0, 175);
-  atpa.sortBySize;
+  ATPA := ClusterTPAEx(TPA, 5, 1);
 
-  for i := 0 to high(atpa) do
+  for i := 0 to High(ATPA) do
   begin
-    setLength(button, length(button) + 1);
-    button[high(button)] := atpa[i].getBounds();
-    setLength(text, length(text) + 1);
-    text[high(text)] := (trim(tesseractgettext(button[high(button)], FILTER_SMALL_CHARS)));
+    b := GetTPABounds(ATPA[i]);
+    Inc(b.y2, 18);
+
+    if ((b.X2 - b.X1) > 30) then
+    begin
+      Insert(b, Button);
+      Insert(Tesseract_GetText(b, TESS_FILTER_SMALL_CHARS), Text);
+    end;
   end;
 end;
 
@@ -242,3 +236,5 @@ end;
 begin
   options.__init();
 end;
+
+{$f+}
