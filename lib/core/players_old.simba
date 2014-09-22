@@ -719,9 +719,10 @@ Example:
     __setInputBoxes();
 *}
 {$IFNDEF CODEINSIGHT}
-const
-  __BORDER_LENGTH = 524;
 function __setInputBoxes(): boolean;
+const
+  __ACTIVE_BORDER_LENGTH = 524;
+  __INACTIVE_BORDER_LENGTH = 525;
 var
   tpaActive, tpaInactive: TPointArray;
   bdsActive, bdsInactive: TBox;
@@ -732,7 +733,7 @@ begin
   findColors(tpaActive, 6774863, 0, 0, w-1, h-1); // active box border color
   findColors(tpaInactive, 6906451, 0, 0, w-1, h-1); // inactive box border color
 
-  if (length(tpaActive) = __BORDER_LENGTH) and (length(tpaInactive) = __BORDER_LENGTH) then
+  if (length(tpaActive) = __ACTIVE_BORDER_LENGTH) and (length(tpaInactive) = __INACTIVE_BORDER_LENGTH) then
   begin
     result := true;
     print('__setInputBoxes(): Set username and password boxes', TDebug.SUB);

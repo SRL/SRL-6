@@ -48,7 +48,7 @@ procedure __initTesseractPaths();
   end;
 
 const
-  basePath = includePath + 'srl-6/lib/tesseract/';
+  basePath = includePath + 'srl-6/lib/old_tesseract/';
 begin
   savePath := bracketReplace(basePath + 'temp/tmp-'+toStr(client));
   imgPath := bracketReplace(basePath + 'temp/img-'+toStr(client)+'.bmp');
