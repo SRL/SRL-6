@@ -9,13 +9,6 @@ The source for this file can be found `here <https://github.com/SRL/SRL-6/blob/m
 
 *)
 
-{$include_once interfaces.simba}
-{$include_once pinscreen.simba}
-{$include_once ../interfaces/gametabs/backpack.simba}
-{$include_once ../core/text.simba}
-{$include_once minimap.simba}
-{$include_once ../utilities/color.simba}
-
 {$f-}
 
 {*
@@ -1904,7 +1897,7 @@ begin
   case bankType of
     BANK_CHEST_SW: begin col1:= [8946555, 15, [2, [0.18, 0.18, 0.00]]]; col2:= [5863053, 10, [2, [0.13, 0.10, 0.00]]]; avelen:= 90; end;
     BANK_CHEST_SHANTAY: begin col1:= [4335674, 6, [2, [0.38, 1.96, 0.00]]]; col2:= [7247287, 6, [2, [0.16, 1.41, 0.00]]]; avelen:= 90; end;
-    BANK_CHEST_DUEL: begin col1:= [11512192, 18, [2, [0.39, 0.57, 0.00]]]; col2:= [6586289, 10, [2, [0.21, 1.00, 0.00]]]; avelen:= 90; end;                 
+    BANK_CHEST_DUEL: begin col1:= [11512192, 18, [2, [0.39, 0.57, 0.00]]]; col2:= [6586289, 10, [2, [0.21, 1.00, 0.00]]]; avelen:= 90; end;
     BANK_CHEST_CW: begin col1:= [8088922, 16, [2, [0.06, 0.17, 0.00]]]; col2:= [4808312, 17, [2, [0.03, 0.17, 0.00]]]; avelen:= 90; end;
     BANK_CHEST_GROTTO: begin col1:= [6842737, 6, [2, [0.31, 0.08, 0.00]]]; col2:= [2570316, 4, [2, [0.15, 1.35, 0.00]]]; avelen:= 90; end;
     BANK_CHEST_LUMBRIDGE: begin col1:= [11313299, 10, [2, [0.17, 0.42, 0.00]]]; col2:= [6586289, 10, [2, [0.21, 1.00, 0.00]]]; avelen:= 90; end;
@@ -2056,3 +2049,5 @@ end;
 begin
   bankscreen.__init();
 end;
+
+{$f+}

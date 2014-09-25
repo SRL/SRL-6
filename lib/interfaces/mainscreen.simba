@@ -9,11 +9,6 @@ The source for this file can be found `here <https://github.com/SRL/SRL-6/blob/m
 
 *)
 
-{$include_once chatbox.simba}
-{$include_once actionbar.simba}
-{$include_once ../utilities/pixelshift.simba}
-{$include_once ../utilities/color.simba}
-
 {$f-}
 
 (*
@@ -423,3 +418,5 @@ end;
 begin
   mainscreen.__init();
 end;
+
+{$f+}

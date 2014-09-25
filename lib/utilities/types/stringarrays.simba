@@ -634,3 +634,5 @@ begin
 
   result := self.implodeArr(glueArr);
 end;
+
+{$f+}

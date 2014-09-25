@@ -1,0 +1,931 @@
+(*
+SRL Player Form
+===============
+
+The SRL Player Form is an optional script feature.  It allows scripters to
+integrate a user interface into their scripts, making it easier for their users
+to setup the script.
+
+For a tutorial on how to add the SRL player form to any script, see
+`this <http://villavu.com/forum/showthread.php?t=107572>`_ thread.
+
+The source for this file can be found
+`here <https://github.com/SRL/SRL-6/blob/master/lib/misc/srlplayerform.simba>`_.
+
+*)
+
+{*
+type __TFormPlayer
+~~~~~~~~~~~~~~~~~~
+
+Stores temporary information for each player.
+*}
+type
+  __TFormPlayer = record
+    name: string;
+    settings: TStringArray;
+  end;
+
+(*
+type TPlayerForm
+~~~~~~~~~~~~~~~~
+
+Stores all information pertaining to a TPlayerForm.  View the source file for
+a full list of customizable options.
+*)
+type
+  TPlayerForm = record
+    name: string; // the title for the main window
+    scriptHelpThread: string;
+    scriptSettingsPath: string;
+    editBoxLabels, editBoxDefaults: TStringArray;
+    checkBoxLabels, checkBoxDefaults: TStringArray;
+    comboBoxLabels, comboBoxDefaults: TStringArray;
+    comboBoxItems: array of TStringArray;
+    playerFile: string;
+    playerNames: TStringArray;
+    players: array of __TFormPlayer;
+    isScriptReady: boolean;
+  end;
+
+(*
+var playerForm
+~~~~~~~~~~~~~~
+
+The variable used by scripters to enable the SRL Player Form.
+
+Example:
+
+.. code-block:: pascal
+
+    playerForm.scriptSettingsPath := 'C:/settings.txt';
+*)
+var
+  playerForm: TPlayerForm;
+
+{*
+var Internal
+~~~~~~~~~~~~
+
+All internal vairables.  Most are form components.  You should never edit these
+unless you know exactly what you're doing.
+*}
+{$IFNDEF CODEINSIGHT}
+var
+  __mainForm: TForm;
+  __edtPlayerAdd: TEdit;
+  __btnPlayerAdd: TButton;
+  __btnPlayerDel: TButton;
+  __lstPlayerList: TListBox;
+  __lblPlayerFile: TLabel;
+  __cboPlayerFile: TComboBox;
+  __scriptEditBoxes: array of TEdit;
+  __scriptEditLabels: array of TLabel;
+  __scriptCheckBoxes: array of TCheckBox;
+  __scriptCheckLabels: array of TLabel;
+  __scriptComboBoxes: array of TComboBox;
+  __scriptComboLabels: array of TLabel;
+  __btnHelp: TButton;
+  __btnThread: TButton;
+  __btnSave: TButton;
+  __btnRun: TButton;
+  __memo: TMemo;
+  __tslSettings: TStringList;
+  __prevPlayerIndex: integer = -1;
+
+{*
+__writeln
+~~~~~~~~~
+
+.. code-block:: pascal
+
+    procedure __writeln(s: string);
+
+Used to print debug in the form's debug box.  Needed because forms are separate
+from Simba and "writeln" doesn't print to Simba's debug box.
+
+.. note::
+
+    - by Coh3n
+    - Last Updated: 10 January 2014 by Coh3n
+
+Example:
+
+.. code-block:: pascal
+
+    __writeln('Some debug here');
+*}
+procedure __writeln(s: string);
+begin
+  __memo.getLines().add(s);
+end;
+
+{*
+__getDefaultSettings
+~~~~~~~~~~~~~~~~~~~~
+
+.. code-block:: pascal
+
+    function __getDefaultSettings(): TStringArray;
+
+Returns all the player form's default settings in one array.
+
+.. note::
+
+    - by Coh3n
+    - Last Updated: 10 January 2014 by Coh3n
+
+*}
+function __getDefaultSettings(): TStringArray;
+var
+  i: integer;
+begin
+  if (length(playerForm.editBoxDefaults) > 0) then
+    for i := 0 to high(playerForm.editBoxDefaults) do
+    begin
+      setLength(result, length(result) + 1);
+      result[high(result)] := playerForm.editBoxDefaults[i];
+    end;
+
+  if (length(playerForm.checkBoxDefaults) > 0) then
+    for i := 0 to high(playerForm.checkBoxDefaults) do
+    begin
+      setLength(result, length(result) + 1);
+      result[high(result)] := playerForm.checkBoxDefaults[i];
+    end;
+
+  if (length(playerForm.comboBoxDefaults) > 0) then
+    for i := 0 to high(playerForm.comboBoxDefaults) do
+    begin
+      setLength(result, length(result) + 1);
+      result[high(result)] := playerForm.comboBoxDefaults[i];
+    end;
+end;
+
+{*
+__loadPlayerFiles
+~~~~~~~~~~~~~~~~~
+
+.. code-block:: pascal
+
+    procedure __loadPlayerFiles();
+
+Loadsd all the user's player files into the "Player File" combo box.
+
+.. note::
+
+    - by Coh3n
+    - Last Updated: 10 January 2014 by Coh3n
+
+*}
+procedure __loadPlayerFiles();
+var
+  s: TStringArray;
+  i: integer;
+begin
+  s := getFiles(__PATH_PLAYER, 'xml');
+
+  for i := 0 to high(s) do
+  begin
+    if (s[i] = 'settings.xml') then
+      continue;
+
+    __cboPlayerFile.addItem(s[i], nil);
+  end;
+
+  s := getFiles(__PATH_PLAYER, 'raf');
+
+  for i := 0 to high(s) do
+    __cboPlayerFile.addItem(s[i], nil);
+end;
+
+{*
+__componentSettings
+~~~~~~~~~~~~~~~~~~~
+
+.. code-block:: pascal
+
+    function __componentSettings(): TStringArray;
+
+Gets all the settings from the form components and returns them in a
+TStringArray.
+
+.. note::
+
+    - by Coh3n
+    - Last Updated: 10 January 2014 by Coh3n
+
+*}
+function __componentSettings(): TStringArray;
+var
+  i: integer;
+begin
+  if (length(__scriptEditBoxes) > 0) then
+    for i := 0 to high(__scriptEditBoxes) do
+    begin
+      setLength(result, length(result) + 1);
+      result[high(result)] := __scriptEditBoxes[i].getText();
+    end;
+
+  if (length(__scriptCheckBoxes) > 0) then
+    for i := 0 to high(__scriptCheckBoxes) do
+    begin
+      setLength(result, length(result) + 1);
+
+      if (__scriptCheckBoxes[i].getState() = cbChecked) then
+        result[high(result)] := 'True'
+      else
+        result[high(result)] := 'False';
+    end;
+
+  if (length(__scriptComboBoxes) > 0) then
+    for i := 0 to high(__scriptComboBoxes) do
+    begin
+      setLength(result, length(result) + 1);
+      result[high(result)] := __scriptComboBoxes[i].getText();
+    end;
+end;
+
+{*
+__fillPlayerInfo
+~~~~~~~~~~~~~~~~
+
+.. code-block:: pascal
+
+    procedure __fillPlayerInfo(settings: TStringArray);
+
+Fills the form components with the selected player's informatin.
+
+.. note::
+
+    - by Coh3n
+    - Last Updated: 10 January 2014 by Coh3n
+
+*}
+procedure __fillPlayerInfo(settings: TStringArray);
+var
+  i, c: integer;
+begin
+  for i := 0 to high(__scriptEditBoxes) do
+  begin
+    __scriptEditBoxes[i].setCaption(settings[c]);
+    inc(c);
+  end;
+
+  for i := 0 to high(__scriptCheckBoxes) do
+  begin
+    if (lowercase(settings[c]) = 'true') then
+      __scriptCheckBoxes[i].setState(cbChecked)
+    else
+      __scriptCheckBoxes[i].setState(cbUnchecked);
+
+    inc(c);
+  end;
+
+  for i := 0 to high(__scriptComboBoxes) do
+  begin
+    __scriptComboBoxes[i].setCaption(settings[c]);
+    inc(c);
+  end;
+end;
+
+{*
+__showPlayerInfo
+~~~~~~~~~~~~~~~~
+
+.. code-block:: pascal
+
+    procedure __showPlayerInfo();
+
+Displays the correct player information in the form's components.
+
+.. note::
+
+    - by Coh3n
+    - Last Updated: 10 January 2014 by Coh3n
+
+*}
+procedure __showPlayerInfo();
+begin
+  if (length(playerForm.players) <= 0) then
+    exit;
+
+  if (__prevPlayerIndex <> -1) then
+    playerForm.players[__prevPlayerIndex].settings := __componentSettings();
+
+  __fillPlayerInfo(playerForm.players[__lstPlayerList.getItemIndex()].settings);
+  __prevPlayerIndex := __lstPlayerList.getItemIndex();
+end;
+
+{*
+__saveSettings
+~~~~~~~~~~~~~~
+
+.. code-block:: pascal
+
+    function __saveSettings(): boolean;
+
+Saves the user's settings to a text file.
+
+.. note::
+
+    - by Coh3n
+    - Last Updated: 10 January 2014 by Coh3n
+
+*}
+function __saveSettings(): boolean;
+var
+  st: TCheckBoxState;
+  i, j: integer;
+  tsl: TStringList;
+  s: string;
+begin
+  if (playerForm.scriptSettingsPath = '') then
+    playerForm.scriptSettingsPath := scriptPath + 'settings.txt';
+
+  tsl.init();
+
+  if (__cboPlayerFile.getText() = '') then
+  begin
+    __writeln('ERROR: You must select a player file use!');
+    exit();
+  end else begin
+    tsl.add(__cboPlayerFile.getText()); // player file
+    playerForm.playerFile := copy(__cboPlayerFile.getText(), 0, length(__cboPlayerFile.getText()) - 4);
+  end;
+
+  // player names
+  if (__lstPlayerList.getCount() <= 0) then
+  begin
+    __writeln('ERROR: You must add players to the list!');
+    exit();
+  end;
+
+  if (__lstPlayerList.getItemIndex() <> -1) then
+    playerForm.players[__lstPlayerList.getItemIndex()].settings := __componentSettings();
+
+  // add each player and their settings to the TStringList
+  for i := 0 to high(playerForm.players) do
+  begin
+    tsl.add(playerForm.players[i].name);
+
+    for j := 0 to high(playerForm.players[i].settings) do
+      tsl.add(playerForm.players[i].settings[j]);
+  end;
+
+  __writeln(playerForm.scriptSettingsPath);
+
+  tsl.saveToFile(playerForm.scriptSettingsPath);
+  tsl.free();
+
+  __writeln('Successfully saved settings.');
+  result := true;
+end;
+
+{*
+__loadSettings
+~~~~~~~~~~~~~~
+
+.. code-block:: pascal
+
+    procedure __loadSettings();
+
+Loads the user's settings from a text file.
+
+.. note::
+
+    - by Coh3n
+    - Last Updated: 10 January 2014 by Coh3n
+
+*}
+procedure __loadSettings();
+var
+  tsl: TStringList;
+  startIndex, settingLength, i, j, c: integer;
+begin
+  if (playerForm.scriptSettingsPath = '') then
+    playerForm.scriptSettingsPath := scriptPath + 'settings.txt';
+
+  if (not fileExists(playerForm.scriptSettingsPath)) then
+    exit;
+
+  tsl.init();
+  tsl.loadFromFile(playerForm.scriptSettingsPath);
+
+  // so we know how many elements of the tsl to go through for each player
+  settingLength := (length(__scriptEditBoxes) + length(__scriptCheckBoxes) + length(__scriptComboBoxes));
+
+  playerForm.playerFile := copy(tsl.getStrings(0), 0, length(tsl.getStrings(0)) - 4);
+  __cboPlayerFile.setText(tsl.getStrings(0));
+
+  if ((tsl.getCount() - 2) mod settingLength <> 0) then
+  begin
+    __writeln('Components have changed, can''t load previous settings');
+    exit();
+  end;
+
+  setLength(playerForm.players, tsl.getCount()); // temporarily set the length to avoid errors
+  setLength(playerForm.playerNames, length(playerForm.players));
+
+  for i := 0 to high(playerForm.players) do
+  begin
+    startIndex := (1 + i * (settingLength + 1)); // get the element in the tsl that starts the next player
+
+    if (startIndex >= (tsl.getCount() - 1)) then
+      break;
+
+    playerForm.players[i].name := tsl.getStrings(startIndex);
+    __lstPlayerList.getItems().add(playerForm.players[i].name);
+    __lstPlayerList.setItemIndex(i);
+    playerForm.playerNames[i] := playerForm.players[i].name;
+
+    // get all the players settings
+    setLength(playerForm.players[i].settings, settingLength);
+    for j := 0 to (settingLength - 1) do
+      playerForm.players[i].settings[j] := tsl.getStrings(startIndex + j + 1);
+
+    inc(c);
+  end;
+
+  setLength(playerForm.players, c); // set the real length of players
+  setLength(playerForm.playerNames, c);
+  tsl.free();
+end;
+
+{*
+__createScriptComponents
+~~~~~~~~~~~~~~~~~~~~~~~~
+
+.. code-block:: pascal
+
+    procedure __createScriptComponents();
+
+Creates all the form's components based on the "playerForm"'s settings.
+
+.. note::
+
+    - by Coh3n
+    - Last Updated: 10 January 2014 by Coh3n
+
+*}
+procedure __createScriptComponents();
+var
+  i, j, lblLeft, lblWidth, cmpLeft, cmpWidth, top, topInc: integer;
+  first: boolean;
+begin
+  lblLeft := __lblPlayerFile.getLeft();
+  cmpLeft := __cboPlayerFile.getLeft();
+  lblWidth := __lblPlayerFile.getWidth();
+  cmpWidth := __cboPlayerFile.getWidth();
+  top := __cboPlayerFile.getTop() + __cboPlayerFile.getHeight() + 10;
+  topInc := top;
+  first := true;
+
+  // TEdit boxes
+  setLength(__scriptEditBoxes, length(playerForm.editBoxLabels));
+  setLength(__scriptEditLabels, length(__scriptEditBoxes));
+  for i := 0 to high(playerForm.editBoxLabels) do
+  begin
+    __scriptEditBoxes[i].init(__mainForm);
+    with __scriptEditBoxes[i] do
+    begin
+      setParent(__mainForm);
+      setLeft(cmpLeft);
+      setTop(top);
+      setWidth(cmpWidth);
+      setCaption(playerForm.editBoxDefaults[i]);
+    end;
+
+    __scriptEditLabels[i].init(__mainForm);
+    with __scriptEditLabels[i] do
+    begin
+      setParent(__mainForm);
+      setTop(top + 3);
+      setLeft(lblLeft);
+      setWidth(lblWidth);
+      setCaption(playerForm.editBoxLabels[i]);
+    end;
+
+    if (first) then
+    begin
+      first := false;
+      topInc := topInc - 10;
+    end;
+
+    top := top + topInc;
+  end;
+
+  // TCheckBoxes
+  setLength(__scriptCheckBoxes, length(playerForm.checkBoxLabels));
+  setLength(__scriptCheckLabels, length(__scriptCheckBoxes));
+  for i := 0 to high(playerForm.checkBoxLabels) do
+  begin
+    __scriptCheckBoxes[i].init(__mainForm);
+    with __scriptCheckBoxes[i] do
+    begin
+      setParent(__mainForm);
+      setLeft(cmpLeft);
+      setTop(top);
+      setWidth(cmpWidth);
+
+      if (lowercase(playerForm.checkBoxDefaults[i]) = 'true') then
+       setState(cbChecked);
+    end;
+
+    __scriptCheckLabels[i].init(__mainForm);
+    with __scriptCheckLabels[i] do
+    begin
+      setParent(__mainForm);
+      setTop(top + 3);
+      setLeft(lblLeft);
+      setWidth(lblWidth);
+      setCaption(playerForm.checkBoxLabels[i]);
+    end;
+
+    top := top + topInc;
+  end;
+
+  // TComboBoxes
+  setLength(__scriptComboBoxes, length(playerForm.comboBoxLabels));
+  setLength(__scriptComboLabels, length(__scriptComboBoxes));
+  for i := 0 to high(playerForm.comboBoxLabels) do
+  begin
+    __scriptComboBoxes[i].init(__mainForm);
+    with __scriptComboBoxes[i] do
+    begin
+      setParent(__mainForm);
+      setLeft(cmpLeft);
+      setTop(top);
+      setWidth(cmpWidth);
+      setCaption(playerForm.comboBoxDefaults[i]);
+
+      for j := 0 to high(playerForm.comboBoxItems[i]) do
+        addItem(playerForm.comboBoxItems[i][j], nil);
+    end;
+
+    __scriptComboLabels[i].init(__mainForm);
+    with __scriptComboLabels[i] do
+    begin
+      setParent(__mainForm);
+      setTop(top + 3);
+      setLeft(lblLeft);
+      setWidth(lblWidth);
+      setCaption(playerForm.comboBoxLabels[i]);
+    end;
+
+    top := top + topInc;
+  end;
+
+  // other, non customizable components
+  __mainForm.setHeight(top + __btnSave.getHeight() + __memo.getHeight() + 20);
+  __btnSave.setTop(__mainForm.getHeight() - __btnSave.getHeight() - 10);
+  __btnHelp.setTop(__btnSave.getTop());
+  __btnRun.setTop(__btnSave.getTop());
+  __memo.setTop(__btnRun.getTop() - __memo.getHeight() - 10);
+  __lstPlayerList.setHeight(__memo.getTop() - __lstPlayerList.getTop() - 10);
+end;
+
+{*
+__onClickHelp
+~~~~~~~~~~~~~
+
+.. code-block:: pascal
+
+    procedure __onClickHelp(sender: TObject); native;
+
+Will open a setup tutorial when the Help button is clicked.
+
+.. note::
+
+    - by Coh3n
+    - Last Updated: 10 January 2014 by Coh3n
+
+*}
+procedure __onClickHelp(sender: TObject); native;
+begin
+  if (playerForm.scriptHelpThread = '') then
+    openWebPage('http://villavu.com/forum/showthread.php?t=47714')
+  else
+    openWebPage(playerForm.scriptHelpThread);
+end;
+
+{*
+__onClickAdd
+~~~~~~~~~~~~
+
+.. code-block:: pascal
+
+    procedure __onClickAdd(sender: TObject); native;
+
+Adds a player to the player array and displays new information in the form
+components.
+
+.. note::
+
+    - by Coh3n
+    - Last Updated: 10 January 2014 by Coh3n
+
+*}
+procedure __onClickAdd(sender: TObject); native;
+begin
+  if (__edtPlayerAdd.getText() <> '') then
+  begin
+    __lstPlayerList.getItems().add(__edtPlayerAdd.getText());
+
+    setLength(playerForm.players, length(playerForm.players) + 1);
+    playerForm.players[high(playerForm.players)].name := __edtPlayerAdd.getText();   // set player's name
+    playerForm.players[high(playerForm.players)].settings := __getDefaultSettings(); // set player's default settings
+    __lstPlayerList.setItemIndex(high(playerForm.players));                          // automatically select the new player
+    __showPlayerInfo();
+
+    // add the player's name for easy use with TPlayerArray.setup()
+    setLength(playerForm.playerNames, length(playerForm.playerNames) + 1);
+    playerForm.playerNames[high(playerForm.playerNames)] := __edtPlayerAdd.getText();
+
+    __writeln('Added player: '+toStr(__edtPlayerAdd.getText()));
+    __edtPlayerAdd.setCaption('');
+  end else
+    __writeln('You need to enter a player''s login name, nickname, or display name first!');
+end;
+
+{*
+__onClickDel
+~~~~~~~~~~~~
+
+.. code-block:: pascal
+
+    procedure __onClickDel(sender: TObject); native;
+
+Removes the selected player.
+
+.. note::
+
+    - by Coh3n
+    - Last Updated: 10 January 2014 by Coh3n
+
+*}
+procedure __onClickDel(sender: TObject); native;
+var
+  element, i: integer;
+begin
+  element := __lstPlayerList.getItemIndex();
+
+  if (element = -1) then
+  begin
+    __writeln('You need to select a player to delete!');
+    exit;
+  end;
+
+  __writeln('Deleting player: '+__lstPlayerList.getItems().getStrings(element));
+
+  // remove the player from the player array
+  if (element <> high(playerForm.players)) then
+    for i := element to (high(playerForm.players) - 1) do
+      playerForm.players[i] := playerForm.players[i + 1];
+
+  setLength(playerForm.players, high(playerForm.players));
+
+  // remove from the TListBox
+  if (__lstPlayerList.getCount() > 1) then
+    if (__lstPlayerList.getItemIndex() = 0) then
+      __lstPlayerList.setItemIndex(1)
+    else
+      __lstPlayerList.setItemIndex(__lstPlayerList.getItemIndex() - 1);
+
+  __lstPlayerList.getItems().delete(element);
+end;
+
+{*
+__onClickPlayerList
+~~~~~~~~~~~~~~~~~~~
+
+.. code-block:: pascal
+
+    procedure __onClickPlayerList(sender: TObject); native;
+
+Called when an item in the player list is clicked.
+
+.. note::
+
+    - by Coh3n
+    - Last Updated: 10 January 2014 by Coh3n
+
+*}
+procedure __onClickPlayerList(sender: TObject); native;
+begin
+  __showPlayerInfo();
+end;
+
+{*
+__onClickSave
+~~~~~~~~~~~~~
+
+.. code-block:: pascal
+
+    procedure __onClickSave(sender: TObject); native;
+
+What to do when the "Save" button is clicked.
+
+.. note::
+
+    - by Coh3n
+    - Last Updated: 10 January 2014 by Coh3n
+
+*}
+procedure __onClickSave(sender: TObject); native;
+begin
+  __writeln('Saving settings...');
+  __saveSettings();
+end;
+
+{*
+__onClickRun
+~~~~~~~~~~~~
+
+.. code-block:: pascal
+
+    procedure __onClickRun(sender: TObject); native;
+
+Runs the script when the "Run" button is clicked.
+
+.. note::
+
+    - by Coh3n
+    - Last Updated: 10 January 2014 by Coh3n
+
+*}
+procedure __onClickRun(sender: TObject); native;
+begin
+  if (__saveSettings()) then
+  begin
+    __mainForm.close();
+    playerForm.isScriptReady := true;
+  end;
+end;
+
+(*
+showForm
+~~~~~~~~
+
+.. code-block:: pascal
+
+    procedure showForm(); native;
+
+Shows the player form.
+
+.. note::
+
+    - by Coh3n
+    - Last Updated: 10 January 2014 by Coh3n
+
+*)
+procedure showForm(); native;
+begin
+  __mainForm.init(nil);
+  with __mainForm do
+  begin
+    setWidth(546);
+    setHeight(200);
+    setCaption(playerForm.name);
+    setPosition(poScreenCenter);
+  end;
+
+  __edtPlayerAdd.init(__mainForm);
+  with __edtPlayerAdd do
+  begin
+    setParent(__mainForm);
+    setLeft(10);
+    setTop(10);
+    setHeight(25);
+    setWidth(126);
+  end;
+
+  __btnPlayerAdd.init(__mainForm);
+  with __btnPlayerAdd do
+  begin
+    setParent(__mainForm);
+    setLeft(__edtPlayerAdd.getLeft() + __edtPlayerAdd.getWidth() + 5);
+    setTop(__edtPlayerAdd.getTop() - 1);
+    setHeight(__edtPlayerAdd.getHeight());
+    setWidth(45);
+    setCaption('Add');
+    setOnClick(__onClickAdd);
+  end;
+
+  __btnPlayerDel.init(__mainForm);
+  with __btnPlayerDel do
+  begin
+    setParent(__mainForm);
+    setLeft(__btnPlayerAdd.getLeft() + __btnPlayerAdd.getWidth() + 5);
+    setTop(__btnPlayerAdd.getTop());
+    setHeight(__btnPlayerAdd.getHeight());
+    setWidth(__btnPlayerAdd.getWidth());
+    setCaption('Del');
+    setOnClick(__onClickDel);
+  end;
+
+  __lstPlayerList.init(__mainForm);
+  with __lstPlayerList do
+  begin
+    setParent(__mainForm);
+    setLeft(__edtPlayerAdd.getLeft());
+    setTop(__edtPlayerAdd.getTop() + __edtPlayerAdd.getHeight() + 8);
+    setWidth(225);
+    setHeight(__mainForm.getHeight() - getTop() - 10);
+    setOnClick(__onClickPlayerList);
+  end;
+
+  __lblPlayerFile.init(__mainForm);
+  with __lblPlayerFile do
+  begin
+    setParent(__mainForm);
+    setCaption('Player File');
+    setLeft(__lstPlayerList.getLeft() + __lstPlayerList.getWidth() + 25);
+    setTop(__btnPlayerAdd.getTop() + 3);
+    setWidth(150);
+  end;
+
+  __cboPlayerFile.init(__mainForm);
+  with __cboPlayerFile do
+  begin
+    setParent(__mainForm);
+    setLeft(__lblPlayerFile.getLeft() + __lblPlayerFile.getWidth());
+    setTop(__btnPlayerAdd.getTop());
+    setWidth(128);
+    __loadPlayerFiles();
+  end;
+
+  __btnHelp.init(__mainForm);
+  with __btnHelp do
+  begin
+    setParent(__mainForm);
+    setWidth(120);
+    setHeight(25);
+    setCaption('Help');
+    setLeft(round((0.25 * __mainForm.getWidth()) - (getWidth() / 2)));
+    setOnClick(__onClickHelp);
+  end;
+
+  __btnSave.init(__mainForm);
+  with __btnSave do
+  begin
+    setParent(__mainForm);
+    setWidth(__btnHelp.getWidth());
+    setHeight(25);
+    setCaption('Save');
+    setLeft(round((0.50 * __mainForm.getWidth()) - (getWidth() / 2)));
+    setOnClick(__onClickSave);
+  end;
+
+  __btnRun.init(__mainForm);
+  with __btnRun do
+  begin
+    setParent(__mainForm);
+    setWidth(__btnSave.getWidth());
+    setHeight(25);
+    setCaption('Run');
+    setLeft(round((0.75 * __mainForm.getWidth()) - (getWidth() / 2)));
+    setOnClick(__onClickRun);
+  end;
+
+  __memo.init(__mainForm);
+  with __memo do
+  begin
+    setParent(__mainForm);
+    setLeft(__lstPlayerList.getLeft());
+    setWidth(__mainForm.getWidth() - 18);
+    setHeight(100);
+    setScrollBars(ssAutoBoth);
+  end;
+
+  // need to be called in this order
+  __createScriptComponents();
+  __loadSettings();
+  __showPlayerInfo();
+
+  __mainForm.showModal();
+  __mainForm.free();
+  __tslSettings.free();
+end;
+{$ENDIF}
+
+(*
+runPlayerForm
+~~~~~~~~~~~~~
+
+.. code-block:: pascal
+
+    procedure runPlayerForm();
+
+The function to be called by scripters when they want to open the player form.
+
+.. note::
+
+    - by Coh3n
+    - Last Updated: 10 January 2014 by Coh3n
+
+*)
+procedure runPlayerForm();
+begin
+  sync(showForm);
+end;

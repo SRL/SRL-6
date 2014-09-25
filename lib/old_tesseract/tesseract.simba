@@ -48,7 +48,7 @@ procedure __initTesseractPaths();
   end;
 
 const
-  basePath = includePath + 'srl-6/lib/tesseract/';
+  basePath = includePath + 'srl-6/lib/old_tesseract/';
 begin
   savePath := bracketReplace(basePath + 'temp/tmp-'+toStr(client));
   imgPath := bracketReplace(basePath + 'temp/img-'+toStr(client)+'.bmp');
@@ -231,6 +231,36 @@ function tesseractGetText(const searchBox: tbox; filterMethod: array [0..3] of v
 begin
   result := tesseractGetText(searchBox.x1, searchBox.y1, searchBox.x2, searchBox.y2, filterMethod[0], filterMethod[1], filterMethod[2], filterMethod[3], config);
 end;
+
+type
+  TTesseractFilter = record
+    multiplerW, multiplerH: integer;
+    thresholdSettings: record invert: boolean; amount: byte; method: TBmpThreshMethod; end;
+ end;
+
+const
+  TESS_FILTER_SMALL_CHARS: TTesseractFilter = [3, 3, [false, 50, TM_Mean]];
+  TESS_FILTER_SMALL_CHARS_2: TTesseractFilter = [5, 5, [false, 55, TM_Mean]];
+  TESS_FILTER_NPC_CHAT_CHARS: TTesseractFilter = [3, 3, [true, -50, TM_Mean]];
+
+const
+  TESS_WHITELIST_NUMBERS = '0123456789';
+  TESS_WHITELIST_LETTERS = 'abcdefghijklmnopqrstuvwxyzABCDEFGHIJKLMNOPQRSTUVWXYZ';
+  TESS_WHITELIST_NONE = '';
+
+function Tesseract_GetText(const xs, ys, xe, ye: integer; filter: TTesseractFilter; Whitelist: String = ''): string; overload;
+var
+  v: array[0..3] of Variant;
+begin
+  v[0] := Filter.multiplerW;
+  v[1] := Filter.multiplerH;
+  v[2] := Filter.thresholdSettings.invert;
+  v[3] := Filter.thresholdSettings.amount;
+  Result := tesseractGetText(xs, ys, xe, ye, v, Whitelist);
+end;
+
+
+
 
 begin
   __initTesseractPaths();

@@ -10,8 +10,6 @@ The source for this file can be found `here <https://github.com/SRL/SRL-6/blob/m
 
 {$f-}
 
-{$include_once ../utilities/math.simba}
-
 (*
 var mouseSpeed
 ~~~~~~~~~~~~~~
@@ -26,48 +24,6 @@ Example
 *)
 var
   mouseSpeed: Integer = 20;
-
-(*
-const Mouse Styles
-~~~~~~~~~~~~~~~~~~
-
-Different ways of moving the mouse:
-
-    * MOUSE_BREAK: moves slower when reaching destination.
-    * MOUSE_ACCURATE: a slower, more accurate movement.
-    * MOUSE_HUMAN: the most human-like movement of the mouse styles.
-
-Example:
-
-.. code-block:: pascal
-
-    mouse(p, MOUSE_MOVE, MOUSE_ACCURATE);
-*)
-const
-  MOUSE_BREAK    = 8;
-  MOUSE_ACCURATE = 14;
-  MOUSE_HUMAN    = 7;
-
-(*
-const Mouse Buttons
-~~~~~~~~~~~~~~~~~~~
-
-Mouse buttons not included in Simba:
-
-    * MOUSE_NONE: Doesn't do anything.
-    * MOUSE_MOVE: Moves the mouse without clicking.
-
-Also available from Simba are MOUSE_LEFT, MOUSE_MIDDLE, and MOUSE_RIGHT.
-
-Example:
-
-.. code-block:: pascal
-
-    mouse(p, MOUSE_MOVE, MOUSE_ACCURATE);
-*)
-const
-  MOUSE_NONE = -1;
-  MOUSE_MOVE = 3;
 
 {*
 _brakeWindMouse
@@ -775,3 +731,5 @@ begin
     wait(50 + random(50));
   until(clicks >= maxClicks);
 end;
+
+{$f+}

@@ -7,9 +7,6 @@ Runescape Stats gametab.
 
 *)
 
-{$include_once gametab.simba}
-{$include_once ../../tesseract/tesseract.simba}
-
 {$f-}
 
 (*
@@ -300,10 +297,11 @@ begin
   if (isMouseOverMenuOpen(b, 1000 + random(100))) then
   begin
     boxArr := b.split(b.getWidth(), 14);
+    wait(200 + random(300));
 
     for i := 0 to high(boxArr) do
     begin
-      with boxArr[i] do
+      with (boxArr[i]) do
         s := tesseractGetText(x1, y1, x2, y2, FILTER_SMALL_CHARS);
 
       p := pos(infoType, s);
@@ -322,3 +320,5 @@ end;
 begin
   tabStats.__init();
 end;
+
+{$f+}

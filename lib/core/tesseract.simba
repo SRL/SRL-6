@@ -1,0 +1,354 @@
+{$loadlib libtesseract2_}
+
+{$f-}
+
+(*
+type TTesseractFilter
+~~~~~~~~~~~~~~~~~~~~~
+
+A record that stores filtering to apply onto a image.
+
+Example:
+
+.. code-block:: pascal
+
+    var
+      myTesseractFilter: TTesseractFilter;
+    begin
+      with (myTesseractFilter) do
+      begin
+        multiplerW := 3;
+        multiplerH := 3;
+
+        with (thresholdSettings) do
+        begin
+          invert := False;
+          amount := 20;
+          method := TM_Mean;
+        end;
+      end;
+
+      writeln(Tesseract_GetText(100, 100, 200, 200, myTesseractFilter));
+    end;
+*)
+type
+  TTesseractFilter = record
+    multiplerW, multiplerH: integer;
+    thresholdSettings: record invert: boolean; amount: byte; method: TBmpThreshMethod; end;
+ end;
+
+(*
+const Tesseract
+~~~~~~~~~~~~~~~
+
+String constants that store the data path, language and whitelist presets.
+
+Example:
+
+.. code-block:: pascal
+
+  print(TESS_DATA_PATH);
+*)
+const
+  TESS_DATA_PATH = AppPath + 'tessdata';
+  TESS_LANGUAGE = 'eng';
+
+const
+  TESS_WHITELIST_NUMBERS = '0123456789';
+  TESS_WHITELIST_LETTERS = 'abcdefghijklmnopqrstuvwxyzABCDEFGHIJKLMNOPQRSTUVWXYZ';
+  TESS_WHITELIST_NONE = '';
+
+(*
+const Filter presets
+~~~~~~~~~~~~~~~~~~~~
+
+Constants of TTesseractFilter that are filter presets
+
+Example:
+
+.. code-block:: pascal
+
+  Tesseract_GetText(100, 100, 200, 200, TESS_FILTER_SMALL_CHARS);
+*)
+const
+  TESS_FILTER_SMALL_CHARS: TTesseractFilter = [3, 3, [false, 50, TM_Mean]];
+  TESS_FILTER_SMALL_CHARS_2: TTesseractFilter = [5, 5, [false, 55, TM_Mean]];
+  TESS_FILTER_NPC_CHAT_CHARS: TTesseractFilter = [3, 3, [true, -50, TM_Mean]];
+
+{*
+var Tesseract
+~~~~~~~~~~~~~
+
+Internal variables for use by the Tesseract.
+*}
+var
+  __tesseractPtr: pointer := nil;
+  __tesseractIsSetup: boolean = false;
+
+(*
+_Tesseract_Setup
+~~~~~~~~~~~~~~~~
+
+.. code-block:: pascal
+
+    procedure _Tesseract_Setup();
+
+Setups our instance of tesseract-ocr. Is automaticly called if using functions
+from this file.
+
+.. note::
+
+    - by Olly
+    - Last updated: July. 26th, 2014 by Olly
+
+Example:
+
+.. code-block:: pascal
+
+    _Tesseract_Setup();
+*)
+procedure _Tesseract_Setup();
+begin
+  if (__tesseractIsSetup) then
+    exit();
+
+  __tesseractPtr := Tesseract_Create();
+
+  if (__tesseractPtr = nil) then
+    print('Failed to create a tesseract instance', TDebug.FATAL);
+
+  if (Tesseract_Init(__tesseractPtr, TESS_DATA_PATH, TESS_LANGUAGE) <> 0) then
+    print('Unable to initizalse tesseract, check Simba console for more infomation', TDebug.FATAL);
+
+  addOnTerminate('_Tesseract_Free');
+  __tesseractIsSetup := true;
+end;
+
+(*
+_Tesseract_Free
+~~~~~~~~~~~~~~~
+
+.. code-block:: pascal
+
+    procedure _Tesseract_Free();
+
+Frees our instance of tesseract-ocr. Is automaticly called on terminate if
+_Tesseract_Setup() has been called.
+
+.. note::
+
+    - by Olly
+    - Last updated: July. 26th, 2014 by Olly
+
+Example:
+
+.. code-block:: pascal
+
+    _Tesseract_Free();
+*)
+procedure _Tesseract_Free();
+begin
+  if (__tesseractPtr = nil) or (not __tesseractIsSetup) then
+    exit();
+
+  Tesseract_End(__tesseractPtr);
+  Tesseract_Delete(__tesseractPtr);
+  __tesseractPtr := nil;
+  __tesseractIsSetup := false;
+end;
+
+(*
+Tesseract_ApplyFilter
+~~~~~~~~~~~~~~~~~~~~~
+
+.. code-block:: pascal
+
+    procedure Tesseract_ApplyFilter(const BMP: integer; const filter: TTesseractFilter);
+
+Applys the tesseract filter onto the bitmap.
+
+.. note::
+
+    - by Olly
+    - Last updated: September. 9th, 2014 by Olly
+
+Example:
+
+.. code-block:: pascal
+
+    Tesseract_ApplyFilter(BMP, MyTesseractFilter);
+*)
+procedure Tesseract_ApplyFilter(const BMP: integer; const filter: TTesseractFilter);
+var
+  w, h: integer;
+begin
+  if (not BitmapExists(BMP)) then
+    Exit();
+
+  GetBitmapSize(BMP, w, h);
+  if (Filter.multiplerW > 0) and (Filter.multiplerH > 0) then
+    ResizeBitmapEx(BMP, RM_Bilinear, Filter.multiplerW * w, Filter.multiplerH * h);
+
+  ThresholdAdaptiveBitmap(bmp, 0, 255, Filter.thresholdSettings.invert,
+                                       Filter.thresholdSettings.method,
+                                       Filter.thresholdSettings.amount);
+end;
+
+(*
+Tesseract_GetText
+~~~~~~~~~~~~~~~~~
+
+.. code-block:: pascal
+
+    function Tesseract_GetText(const bmp: integer): string;
+
+Runs tesseract on the bitmap 'bmp'.
+
+.. note::
+
+    - by Olly
+    - Last updated: July. 26th, 2014 by Olly
+
+Example:
+
+.. code-block:: pascal
+
+    writeln(Tesseract_GetText(bmp));
+*)
+function Tesseract_GetText(const bmp: integer; const Whitelist: String = TESS_WHITELIST_NONE): string;
+var
+  w, h, i: integer;
+  textLen: UInt32;
+  textPtr: PChar;
+begin
+  if (not __tesseractIsSetup) then
+    _Tesseract_Setup();
+
+  if (Whitelist <> TESS_WHITELIST_NONE) then
+    Tesseract_SetVariable(__tesseractPtr, 'tessedit_char_whitelist', WhiteList);
+
+  result := '';
+  getBitmapSize(bmp, w, h);
+
+  try
+    Tesseract_SetImage(__tesseractPtr, getMufasaBitmap(bmp).getData(), w, h, 4, Integer(w * 4));
+    textPtr := Tesseract_GetUTF8Text(__tesseractPtr, textLen);
+
+    setLength(result, textLen);
+    if (textLen > 0) then
+    begin
+      for i := 1 to textLen do
+        result[i] := textPtr[i - 1]^;
+
+      result := trim(stringReplace(result, #10, #13#10, [rfReplaceAll]));
+    end;
+  finally
+    Tesseract_FreeUTF8Text(textPtr);
+    Tesseract_Clear(__tesseractPtr);
+
+    if (Whitelist <> TESS_WHITELIST_NONE) then // reset to default
+    begin
+      _Tesseract_Free();
+      _Tesseract_Setup();
+    end;
+  end;
+end;
+
+(*
+Tesseract_GetText; overload
+~~~~~~~~~~~~~~~~~~~~~~~~~~~
+
+.. code-block:: pascal
+
+    function Tesseract_GetText(const xs, ys, xe, ye: integer; filter: TTesseractFilter): string; overload;
+
+Overloaded method that searches on the client with a filter to read text.
+
+.. note::
+
+    - by Olly
+    - Last updated: July. 26th, 2014 by Olly
+
+Example:
+
+.. code-block:: pascal
+
+    writeln(Tesseract_GetText(100, 100, 200, 200, TESS_FILTER_SMALL_CHARS));
+*)
+function Tesseract_GetText(const xs, ys, xe, ye: integer; filter: TTesseractFilter; Whitelist: String = TESS_WHITELIST_NONE): string; overload;
+var
+  bmp: integer;
+  t, tt: integer;
+begin
+  bmp := bitmapFromClient(xs, ys, xe, ye);
+
+  try
+    t := getSystemTime();
+    Tesseract_ApplyFilter(bmp, filter);
+
+    t := (getSystemTime() - t);
+    tt := getSystemTime();
+
+    result := Tesseract_GetText(bmp, Whitelist);
+    {$IFDEF TESSERACT_DEBUG}
+    printf('Tesseract_GetText(): Filtering took: %d ms, Tesseract Took: %d ms, Total Time: %d ms.', [t, (getSystemTime() - tt), (getSystemTime() - tt) + t]);
+    printf('Tesseract_GetText(): Text found: %s', [result]);
+    {$ENDIF}
+  finally
+    {$IFDEF TESSERACT_DEBUG}
+    clearDebugImg();
+    displayDebugImgWindow(getMufasaBitmap(bmp).getWidth(), getMufasaBitmap(bmp).getHeight());
+    drawBitmapDebugImg(bmp);
+    {$ENDIF}
+    freeBitmap(bmp);
+  end;
+end;
+
+(*
+Tesseract_GetText; overload
+~~~~~~~~~~~~~~~~~~~~~~~~~~~
+
+.. code-block:: pascal
+
+    function Tesseract_GetText(const area: TBox; filter: TTesseractFilter): string; overload;
+
+Overloaded method that searches on the client with a filter and accepts a TBox
+as an area parameter rather than x1, y1, x2, y2.
+
+.. note::
+
+    - by Olly
+    - Last updated: July. 26th, 2014 by Olly
+
+Example:
+
+.. code-block:: pascal
+
+    writeln(Tesseract_GetText(box, TESS_FILTER_SMALL_CHARS));
+*)
+function Tesseract_GetText(const area: TBox; filter: TTesseractFilter; Whitelist: String = TESS_WHITELIST_NONE): string; overload;
+begin
+  result := Tesseract_GetText(area.x1, area.y1, area.x2, area.y2, filter, Whitelist);
+end;
+
+// keep old versions working
+// deprecated use the TTesseractFilter presets
+const
+  FILTER_SMALL_CHARS: TTesseractFilter = TESS_FILTER_SMALL_CHARS;
+  FILTER_NPC_CHAT_CHARS: TTesseractFilter = TESS_FILTER_NPC_CHAT_CHARS;
+  FILTER_SMALL_CHARS_2: TTesseractFilter = TESS_FILTER_SMALL_CHARS_2;
+
+// deprecated use Tesseract_GetText().
+function tesseractGetText(const searchBox: tbox; filterMethod: TTesseractFilter): string;
+begin
+  result := Tesseract_GetText(searchBox, filterMethod);
+end;
+
+// deprecated use Tesseract_GetText().
+function tesseractGetText(const x1, y1, x2, y2: integer; filterMethod: TTesseractFilter; config: string = ''): string; overload;
+begin
+  result := Tesseract_GetText(x1, y1, x2, y2, filterMethod, config);
+end;
+
+{$f+}
+

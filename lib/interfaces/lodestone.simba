@@ -11,9 +11,6 @@ The source for this file can be found `here <https://github.com/SRL/SRL-6/blob/m
 
 {$f-}
 
-{$include_once interfaces.simba}
-{$include_once minimap.simba}
-
 (*
 const Locations
 ~~~~~~~~~~~~~~~
@@ -394,3 +391,5 @@ end;
 begin
   lodestoneScreen.__init();
 end;
+
+{$f+}

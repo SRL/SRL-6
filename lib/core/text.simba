@@ -9,10 +9,6 @@ The source for this file can be found `here <https://github.com/SRL/SRL-6/blob/m
 
 *)
 
-{$include_once ../interfaces/interfaces.simba}
-{$include_once debug.simba}
-{$include_once mouse.simba}
-
 {$f-}
 
 (*
@@ -407,57 +403,62 @@ Example:
       writeln('Found mouse-over box!');
 *}
 {$IFNDEF CODEINSIGHT}
-function __findMouseOverBox(out box: TBox): boolean;
+function __findMouseOverBox(out b: TBox): boolean;
 const
-  BORDER_COLOR = 4208424;
-  BORDER_TOLERANCE = 7;
-  CORNER_COLOR = 3616289;
+  COLOR_CHECK = 7103059;
 var
+  cW, cH, i, len, matchLen: integer;
+  tpa, tpaMatches, tmp: TPointArray;
+  atpa, lines: T2DPointArray;
+  box: TBox;
   p: TPoint;
-  clientArea, searchBox: TBox;
-  tpaBorder, tpaBorderPoints, tpa: TPointArray;
-  atpa: T2DPointArray;
-  i, h: integer;
-  b: TBox;
+  cts: byte := GetToleranceSpeed();
 begin
   result := false;
-
   getMousePos(p.x, p.y);
-  getClientDimensions(clientArea.x2, clientArea.y2);
+  getClientDimensions(cW, cH);
+  box := intToBox(max(p.x - 200, 0), max(p.y - 100, 0),
+                  min(p.x + 275, cW - 1), min(p.y + 250, cH - 1));
 
-  dec(clientArea.x2); dec(clientArea.y2);
+  // box := [0, 0, cW - 1, cH - 1]; // incase you wanna debug on a img.
 
-  searchBox := [p.x - 200, p.y - 100, p.x + 350, p.y + 150];
-  searchBox.setLimit(clientArea);
+  if (not findColorsTolerance(tpa, 0, box, 15, colorSetting(0))) then
+    exit();
 
-  if (findColorsTolerance(tpaBorder, BORDER_COLOR, searchBox, BORDER_TOLERANCE)) then
-    if (findColors(tpaBorderPoints, CORNER_COLOR, searchBox)) then
+  setColorToleranceSpeed(0);
+  atpa := clusterTPAEx(tpa, 3, 3); // the border is 4*4 so cluster 1 less :)
+  sortATPASize(atpa, true); // the biggest one will most likely be ours.
+
+  len := length(atpa);
+  setLength(lines, 2);
+
+  for i := 0 to (len - 1) do
+  begin
+    if (length(atpa[i]) < 50) then
+      continue();
+
+    box := getTPABounds(atpa[i]);
+    lines[0] := TPAFromLine(box.x1, box.y1, box.x1, box.y2); // two vert lines going down.
+    lines[1] := TPAFromLine(box.x2, box.y2, box.x2, box.y2);
+    tmp := mergeATPA(lines);
+
+    getSamePointsATPA([tmp, atpa[i]], tpaMatches);
+    matchLen := length(tpaMatches);
+
+    if (matchLen = 0) then
+      continue();
+
+    if (inRange(length(lines[0]) + length(lines[1]), matchLen - 2, matchLen + 2)) then // allow some leanway.
+      if (SimilarColors(COLOR_CHECK, getColor(box.x1, box.y2 + 4), 20)) then
     begin
-      tpa := combineTPA(tpaBorder, tpaBorderPoints);
-      atpa := clusterTPAEx(tpa, 1, 1);
-      sortATPASize(atpa, true);
-
-      h := high(atpa);
-
-      for i := 0 to h do
-      begin
-        if (length(atpa[i]) < 15) then
-          continue;
-
-        b := atpa[i].getBounds();
-
-        if (b.getWidth() < 50) or (b.getHeight() < 15) then // basic size check
-          continue;
-
-        result := (getColor(b.x1+1, b.y1) = CORNER_COLOR);// check corner is a corner color
-
-        if (result) then
-        begin
-          box := [b.x1 +1, b.y1 +1, b.x2 -1, b.y2 -1];  // set the result (decrease bounds by 1)
-          break;
-        end;
-      end;
+      b := box;
+      // smartImage.drawBox(b);
+      setColorToleranceSpeed(cts);
+      exit(true);
     end;
+  end;
+
+  setColorToleranceSpeed(cts);
 end;
 {$ENDIF}
 
@@ -489,7 +490,7 @@ Example:
     end;
 *}
 {$IFNDEF CODEINSIGHT}
-function __getMouseOverText(box: TBox): string;
+function __getMouseOverText(const box: TBox): string;
 var
   tpa: TPointArray;
   atpa: T2DPointArray;
@@ -526,6 +527,12 @@ begin
 end;
 {$ENDIF}
 
+function __getMouseOverTextTess(const box: TBox): string;
+begin
+  result := Tesseract_GetText(box.x1, box.y1, box.x2, box.y2, TTesseractFilter([3, 3, [false, 30, TM_Mean]]));
+end;
+
+
 (*
 getMouseOverText
 ~~~~~~~~~~~~~~~~
@@ -547,14 +554,17 @@ Example:
 
     writeln(getMouseOverText());
 *)
-function getMouseOverText(): string;
+function getMouseOverText(useTesseract: boolean = false): string;
 var
   box: TBox;
 begin
   result := '';
 
   if (__findMouseOverBox(box)) then
-    result := __getMouseOverText(box);
+    if (useTesseract) then
+      result := __getMouseOverTextTess(box)
+    else
+      result := __getMouseOverText(box);
 end;
 
 (*
@@ -583,7 +593,7 @@ Example:
       mouse(point(x, y), MOUSE_LEFT);
     end;
 *)
-function isMouseOverText(txt: TStringArray; waitTime: integer = 250): boolean;
+function isMouseOverText(txt: TStringArray; waitTime: integer = 250; useTesseract: boolean = false): boolean;
 var
   i, t: integer;
   s: string;
@@ -592,7 +602,7 @@ begin
   t := (getSystemTime() + waitTime);
 
   repeat
-    s := getMouseOverText();
+    s := getMouseOverText(useTesseract);
     print('Current mouse-over text: "'+s+'"');
 
     for i := 0 to high(txt) do
@@ -647,9 +657,5 @@ begin
 
 end;
 
-
-
-
-
-
+{$f+}
 

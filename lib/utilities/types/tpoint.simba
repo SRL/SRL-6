@@ -426,3 +426,5 @@ begin
   if (Result < 0.0) then
     Result := (Result + 360.0);
 end;
+
+{$f+}

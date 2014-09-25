@@ -7,15 +7,6 @@ type
  end;
 
 type
-  TPlayer = packed record
-    loginName: string;
-    nickname: string;
-    password: string;
-    bankPin: string;
-    isMember: boolean;
- end;
-
-type
   TArmy = packed record
     name: string;
     encrpyted: boolean;
@@ -53,21 +44,10 @@ type
     selectedArmy: string;
  end;
 
-type
-  TPasswordForm = packed record
-    frm: TForm;
-    edit: TEdit;
-    buttons: array [0..1] of TButton;
-    newLabel: TLabel;
-    result: string;
-    canceled: boolean;
-    caption, msg: string;
-  end;
 
 var
   openArmyForm: TOpenArmyForm;
   rafikiForm: TRafikiForm;
-  passwordForm: TPasswordForm;
   army: TArmy;
   loadedBitmaps: array of TBitmap;
 
@@ -189,93 +169,6 @@ begin
     writeln('ERROR: Unable to show OpenArmyForm');
   finally
     loadArmy(openArmyForm.selectedArmy);
-  end;
-end;
-
-procedure passwordForm_SetVars(const caption, msg: string);
-begin
-  passwordForm.caption := caption;
-  passwordForm.msg := msg;
-end;
-
-procedure passwordForm_OnClick(sender: TObject); {$IFNDEF CODEINSIGHT} native; {$ENDIF}
-begin
-  if (sender = passwordForm.buttons[1]) then
-  begin
-    writeln('Password form canceled');
-    passwordForm.canceled := true;
-  end else begin
-    passwordForm.canceled := false;
-    passwordForm.result := passwordForm.edit.getCaption();
-  end;
-
-  passwordForm.frm.close();
-end;
-
-procedure passwordForm_Init(); {$IFNDEF CODEINSIGHT} native; {$ENDIF}
-var
-  i: integer;
-begin
-  with passwordForm do
-  begin
-    frm.init(nil);
-
-    with frm do
-    begin
-      setCaption(caption);
-      setPosition(poScreenCenter);
-      setBorderStyle(bsDialog);
-      setWidth(350);
-      setHeight(85);
-    end;
-
-    newLabel.init(frm);
-
-    with newLabel do
-    begin
-      setParent(frm);
-      setCaption(msg);
-      setLeft(5);
-      setTop(5);
-    end;
-
-    edit.init(frm);
-
-    with edit do
-    begin
-      setParent(frm);
-      setBounds(5, 25, 335, 25);
-    end;
-
-    for i := 0 to high(buttons) do
-    begin
-      buttons[i].init(frm);
-
-      with buttons[i] do
-      begin
-        setParent(frm);
-        setTop(55);
-        setLeft(i * 80 + 186);
-        if (i = 0) then
-          setCaption('OK')
-        else
-          setCaption('Cancel');
-
-        setOnClick(passwordForm_OnClick);
-      end;
-    end;
-
-    frm.showModal();
-    frm.free();
-  end;
-end;
-
-procedure passwordForm_Show();
-begin
-   try
-    sync(passwordForm_Init);
-  except
-    writeln('ERROR: Unable to encpytion form');
   end;
 end;
 
@@ -501,7 +394,7 @@ function armyToString(): string;
 
 var
   i, h: integer;
-  str: string;
+  str, p: string;
 begin
   h := high(army.players);
   str := '';
@@ -522,17 +415,13 @@ begin
   begin
     writeln('Army is encrpyted, we need the password to encrpyt with with');
 
-    passwordForm_SetVars('Rafiki Player Manager', 'Please enter the password you want to encrpyt your army with:');
-    passwordForm_Show();
-
-    if (not passwordForm.canceled) then
-      rc2_encrypt(passwordForm.result, htSHA512, str)
+    if (SafeInputQuery('Rafiki Player Manager', 'Please enter the password you want to encrpyt your army with:', p, true)) then
+      rc2_encrypt(p, htSHA512, str)
     else
       writeln('Password was canceled, not using encrpytion!');
   end;
 
   result := base64Encode(compressString(str));
-
   writeln(format('Converted army into a string of %d', [length(result)]));
 end;
 
@@ -540,6 +429,7 @@ end;
 procedure saveArmy();
 begin
   army.name := rafikiForm.editArmyName.getCaption();
+  army.name := Replace(Lowercase(Army.Name), ' ', '_', [rfReplaceAll]);
 
   if (length(army.players) > 0) then
   begin
@@ -551,6 +441,9 @@ begin
       setPrefix('Rafiki/Armys/'+army.name+'/'); // add army section
       setKeyValue('Encrpyted', boolToStr(army.encrpyted)); // added encrpytion boolean
       setKeyValue('Player_Data', armyToString()); // finally add player data
+
+      if (army.encrpyted) then
+        rafikiForm.encyrptionMenu_Item.setChecked(army.encrpyted);
     end;
 
     writeln('Succesfully saved army "'+army.name+'"');
@@ -560,63 +453,40 @@ end;
 
 // fills the form from getting the army data linked to 'armyName'):
 function loadArmy(const armyName: string): boolean;
-
-  function decrypt(var s: string): boolean;
-  begin
-    passwordForm_SetVars('Rafiki Player Manager', 'Enter your encrpytion password:');
-    passwordForm_Show();
-
-    if (not passwordForm.canceled) then
-       rc2_decrypt(passwordForm.result, htSHA512, s);
-
-    result := ExecRegExpr('<player>', s);
-  end;
-
 var
   armyData, src: string;
   players: TStringArray;
   i: integer;
+  s: string := settings.getPrefix();
 begin
-  settings.setPrefix('Rafiki/Armys/');
+  setLength(players, 0); // clear
 
-  if (settings.isDirectory(armyName)) then
+  if (not Raf_FindArmy(armyName)) then
+  begin
+    printf('Army "%s" doesn''t exist', [armyName]);
+    print('Rafiki_GetPlayersFromArmy(): result = false', TDebug.FOOTER);
+    exit();
+  end;
+
+  if (Raf_GetPlayers(armyName, army.players)) then
   begin
     settings.setPrefix('Rafiki/Armys/'+armyName+'/');
     army.encrpyted := strToBoolDef(settings.getKeyValue('Encrpyted'), false);
+    rafikiForm.encyrptionMenu_Item.setChecked(army.encrpyted); // to-do fix me? :s.
+    settings.setPrefix(s);
 
-    src := base64decode(settings.getKeyValue('Player_Data'));
-    armyData := decompressString(src);
+    rafikiForm.playerList.clear();
 
-    if (army.encrpyted) then
-      if (not decrypt(armyData)) then
-      begin
-        writeln('ERROR: Failed to decrypt army - Wrong password, will create a new army');
-        rafikiForm.fileMenu_Items[0].click(); // new army
-        exit();
-      end;
+    for i := 0 to high(army.players) do
+      rafikiForm.playerList.getItems().add(army.players[i].loginName);
 
-    if (length(armyData) > 0) then
-    begin
-      rafikiForm.playerList.clear();
-      players := multiBetween(armyData, '<player>', '</player>');
-      setLength(army.players, length(players));
-
-      for i := 0 to high(players) do
-        with army.players[i] do
-        begin
-          loginName := between('<loginName>', '</loginName>', players[i]);
-          nickName := between('<nickName>', '</nickName>', players[i]);
-          password := between('<password>', '</password>', players[i]);
-          bankPin := between('<bankPin>', '</bankPin>', players[i]);
-          isMember := strToBoolDef(between('<isMember>', '</isMember>', players[i]), false);
-          rafikiForm.playerList.getItems().add(loginName);
-         end;
-
-      rafikiForm.editArmyName.setCaption(armyName);
-      updatePlayerCount();
-      writeln(format('Succesfully loaded army "%s"', [armyName]));
-    end else
-      writeln('No data to fill form with!');
+    rafikiForm.editArmyName.setCaption(armyName);
+    updatePlayerCount();
+    writeln(format('Succesfully loaded army "%s"', [armyName]));
+  end else begin
+    writeln('ERROR: Failed to decrypt army - Wrong password, will create a new army');
+    rafikiForm.fileMenu_Items[0].click(); // new army
+    exit();
   end;
 end;
 
@@ -660,6 +530,12 @@ begin
     btnDeletePlayer.img2:
       btnDeletePlayer.switch(false);
   end;
+end;
+
+procedure onShow(Sender: TObject); {$IFNDEF CODEINSIGHT} native; {$ENDIF}
+begin
+  rafikiForm.memo_DebugBox.setItemIndex(rafikiForm.memo_DebugBox.getItems().getCount() - 1);  // trick to get listbox to scroll to bottom
+  rafikiForm.memo_DebugBox.setItemIndex(-1); // :)
 end;
 
 procedure THoverButton.add(parent: TWinControl; bmp1, bmp2: TBitmap; bounds: TBox; hint: string);
@@ -760,6 +636,7 @@ begin
       setBorderStyle(bsSingle);
       setWidth(500);
       setHeight(383);
+      setOnShow(onShow);
     end;
 
     playerList.init(frm);
@@ -813,6 +690,13 @@ begin
         setLeft(70);
         setTop(i * 28  + 6);
         setWidth(120);
+
+        if (i = 3) then
+        begin
+          setPasswordChar('*');
+          setMaxLength(4);
+        end else if (i = 1) then
+          setPasswordChar('*');
       end;
     end;
 
@@ -927,7 +811,6 @@ begin
     encyrptionMenu_Item := encyrptionMenu.addMenu('Enable (Click to activate)');
     encyrptionMenu_Item.setOnClick(toggleEncyption);
 
-
     memo_DebugBox.init(frm);
 
     with memo_DebugBox do
@@ -944,14 +827,15 @@ begin
   end;
 end;
 
-// runRafikiPlayerManager: Launches everything!
-procedure runRafikiPlayerManager();
+procedure Rafiki_RunPlayerManager();
 var
   i: byte;
+  s: string := settings.getPrefix();
 begin
   clearDebug();
-  settings.setPrefix('Rafiki/');
+  disableSRLLog := true;
 
+  settings.setPrefix('Rafiki/');
   writeln('Showing Rafiki player manager');
 
   try
@@ -962,7 +846,7 @@ begin
     for i := 0 to high(loadedBitmaps) do
       loadedBitmaps[i].free();
 
-    settings.setPrefix('Scripts/');
+    settings.setPrefix(s);
   end;
 end;
 
