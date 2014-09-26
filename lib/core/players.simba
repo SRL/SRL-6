@@ -974,7 +974,7 @@ const
   __RES_ACTION = 3;
   // compares this string to what's read on the screen
   // make sure string value (or part of it) is in the actual Runescape message
-  __LOGIN_INVALID_INFO   = 'Invalid email or password';
+  __LOGIN_INVALID_INFO   = 'For accounts created after';
   __LOGIN_DISABLED       = 'Your account has been disabled';
   __LOGIN_TEMP_DISABLED  = 'Your ban will be lifted in';
   __LOGIN_LOGGED_IN      = 'Your account has not logged out';
