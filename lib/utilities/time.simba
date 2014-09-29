@@ -251,7 +251,7 @@ Example:
 *)
 function waitFunc(Func: function: Boolean; WaitPerLoop, MaxTime: Integer): Boolean;
 var
-  T: Integer;
+  T: LongWord;
 begin
   T := GetSystemTime() + MaxTime;
   while (GetSystemTime() < T) do
@@ -291,7 +291,7 @@ Example:
 *)
 function waitTypeFunc(Func: function: boolean of object; WaitPerLoop, MaxTime: Integer): Boolean;
 var
-  T: Integer;
+  T: LongWord;
 begin
   T := GetSystemTime() + MaxTime;
   while (GetSystemTime() < T) do

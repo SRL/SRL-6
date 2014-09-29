@@ -344,7 +344,7 @@ const
   POWERS_TAB_COLOR = 1317690;
   POWERS_TAB_TOLERANCE = 28;
 var
-  t: integer;
+  t: LongWord;
 begin
   t := (getSystemTime() + waitTime);
 
@@ -380,7 +380,8 @@ Example:
 *)
 function TRSPowersScreen.open(waitTime: integer = 3000): boolean;
 var
-  t, i: integer;
+  i: integer;
+  t : LongWord;
 begin
   if self.isOpen() then
     exit(true);
@@ -428,7 +429,7 @@ Example:
 *)
 function TRSPowersScreen.close(): boolean;
 var
-  t: integer;
+  t: LongWord;
 begin
   if not self.isOpen() then
   begin
@@ -560,7 +561,7 @@ Example:
 *)
 function TRSPowersScreen.openTab(tab: integer): boolean;
 var
-  t: integer;
+  t: LongWord;
 begin
   if not self.open() then
   begin
@@ -711,7 +712,7 @@ Example:
 *)
 function TRSPowersScreen.openSubTab(tab: integer): boolean;
 var
-  t: integer;
+  t: LongWord;
 begin
   if not self.open() then
   begin
@@ -908,7 +909,7 @@ Example:
 *)
 function TRSPowersScreen.clearActionBar(): boolean;
 var
-  t: integer;
+  t: LongWord;
 begin
   if (not self.open()) then
   begin
@@ -1018,7 +1019,8 @@ Example:
 *)
 function TRSPowersScreen.addAbilityToActionBar(ability: TIntegerArray; slot: integer): boolean;
 var
-  t, i: integer;
+  i: integer;
+  t : LongWord;
   p: TPoint;
 begin
   print('powersScreen.addAbilityToActionBar()', TDebug.HEADER);
@@ -1189,7 +1191,7 @@ Example:
 *)
 function TRSPowersScreen.setCombatExperience(combatStyle, experienceType: integer): boolean;
 var
-  t: integer;
+  t: LongWord;
 begin
   if (experienceType = 2) and ((combatStyle = 2) or (combatStyle = 3)) then
   begin
@@ -1338,7 +1340,7 @@ Example:
 *)
 function TRSPowersScreen.setCombatMode(combatMode: integer): boolean;
 var
-  t: integer;
+  t: LongWord;
 begin
   if (not self.open()) then
   begin

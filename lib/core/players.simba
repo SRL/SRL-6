@@ -740,7 +740,8 @@ function __enterLoginInfo(const inputBox: TBox; const info: string; clickBox: bo
 var
   tpa: TPointArray;
   p: TPoint;
-  c, t: integer;
+  c: integer;
+  t : LongWord;
   tmpBox: TBox;
 begin
   t := (getSystemTime() + (60000 * 2));
@@ -991,7 +992,7 @@ const
 
   __LOGIN_ERROR_COUNT    = 14;
 
-function __getLoginResponse(txt: string; timer: integer): TVariantArray;
+function __getLoginResponse(txt: string; timer: LongWord): TVariantArray;
 var
   msg: string;
   responses: array [0..(__LOGIN_ERROR_COUNT - 1)] of TVariantArray;
@@ -1174,7 +1175,8 @@ Example:
 function TPlayer.loginToLobby(): boolean;
 var
   arr: TVariantArray;
-  c, t, tries, popup: integer;
+  c, tries, popup: integer;
+  t : LongWord;
 begin
   if (isLoggedIn() or lobby.isOpen()) then
     exit(true);
@@ -1269,7 +1271,8 @@ Example:
 *)
 function TPlayer.login(): boolean;
 var
-  tries, t, popup: integer;
+  tries, popup: integer;
+  t : LongWord;
   p: TPoint;
   skipPlay: boolean;
 begin
@@ -1362,7 +1365,7 @@ Example:
 *)
 function TPlayer.logout(): boolean;
 var
-  t: integer;
+  t: LongWord;
   p: TPoint;
 begin
   if (not isLoggedIn()) then

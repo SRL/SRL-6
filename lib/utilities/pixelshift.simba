@@ -203,7 +203,8 @@ Example:
 *)
 function getPixelShiftAverage(b: TBoxArray; waitPerLoop, maxTime: integer): TIntegerArray;
 var
-  t, l, i: integer;
+  l, i: integer;
+  t : LongWord;
   shifts: array of TIntegerArray;
 begin
   l := length(b);
@@ -276,7 +277,8 @@ Example:
 *)
 function getPixelShiftAverage(atpa: T2DPointArray; waitPerLoop, maxTime: integer): TIntegerArray; overload;
 var
-  t, l, i: integer;
+  l, i: integer;
+  t : LongWord;
   shifts: array of TIntegerArray;
 begin
   l := length(atpa);

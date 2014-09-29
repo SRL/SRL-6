@@ -225,7 +225,7 @@ Example:
 function TRSProductionScreen.clickStart(space: boolean = true): boolean;
 var
   b: TBox;
-  timeOut: Integer;
+  timeOut: LongWord;
 begin
   result := false;
 

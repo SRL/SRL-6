@@ -157,7 +157,8 @@ Example:
 *)
 function TRSOptions.open(): boolean;
 var
-  t, c: integer;
+  c: integer;
+  t : LongWord;
 begin
   if (self.isOpen()) then
     exit(true);

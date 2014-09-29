@@ -53,7 +53,8 @@ procedure _brakeWindMouse(xs, ys, xe, ye, gravity, wind, minWait, maxWait,
           targetArea: extended; double: boolean);
 var
   veloX,veloY,windX,windY,veloMag,dist,randomDist,lastDist,D: extended;
-  lastX,lastY,MSP,W,TDist,T: integer;
+  lastX,lastY,MSP,W,TDist: integer;
+  T : LongWord;
   sqrt2,sqrt3,sqrt5,PDist,maxStep,dModA,dModB,nModA,nModB: extended;
 begin
   MSP  := mouseSpeed;
@@ -199,7 +200,8 @@ Example:
 procedure _humanWindMouse(xs, ys, xe, ye, gravity, wind, minWait, maxWait, targetArea: extended);
 var
   veloX,veloY,windX,windY,veloMag,dist,randomDist,lastDist,D: extended;
-  lastX,lastY,MSP,W,T,TDist: integer;
+  lastX,lastY,MSP,W,TDist: integer;
+  T : LongWord;
   sqrt2,sqrt3,sqrt5,maxStep,rCnc: extended;
 begin
   MSP  := mouseSpeed;
@@ -654,7 +656,8 @@ Example:
 *)
 function didClick(Red: Boolean; Time: Integer = 1000): boolean;
 var
-  TimeOut, x, y, w, h, R, G: integer;
+  x, y, w, h, R, G: integer;
+  TimeOut : LongWord;
   B: TBox;
 begin
   fastClick(MOUSE_LEFT);

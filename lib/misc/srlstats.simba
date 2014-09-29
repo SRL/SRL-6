@@ -43,7 +43,7 @@ Internal variables of the SRL stats file.
 *}
 var
   __statsVars: array of __TStatsVar;
-  __statsTimer: integer;
+  __statsTimer: LongWord;
 
 (*
 var User-set Variables
@@ -257,7 +257,8 @@ Example:
 *)
 function statsCommit: Boolean;
 var
-  SRLClient, Worked, i, ExtraTime, Increment: integer;
+  SRLClient, Worked, i, Increment: integer;
+  ExtraTime : LongWord;
   S: String;
 begin
   ExtraTime := (GetSystemTime() - __statsTimer);
