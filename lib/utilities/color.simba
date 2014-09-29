@@ -452,7 +452,8 @@ Example:
 *)
 function waitColorCountRange(color, tol: integer; area: TBox; waitTime, minCount: integer; maxCount: integer = maxInt): boolean;
 var
-  timeOut, c: integer;
+  c: integer;
+  timeOut : LongWord;
 begin
   timeOut := getSystemTime() + waitTime;
   result := false;

@@ -190,7 +190,8 @@ Example:
 *)
 function TRSLodestoneScreen.isOpen(waitTime: integer = 0): boolean;
 var
-  t, cts: integer;
+  cts: integer;
+  t : LongWord;
 begin
   t := (getSystemTime() + waitTime);
 

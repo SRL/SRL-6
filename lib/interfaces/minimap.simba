@@ -1077,7 +1077,7 @@ Example:
 function TRSMinimap.isFlagPresent(waitTime: integer = 0): boolean; overload;
 var
   p: TPoint;
-  timeOut: integer;
+  timeOut : LongWord;
 begin
   timeOut := getSystemTime() + waitTime;
   result := false;
@@ -1152,7 +1152,8 @@ Example:
 *)
 function TRSMinimap.waitFlag(dist: integer = 0): boolean;
 var
-  m, t, d1, d2: integer;
+  m, t : LongWord;
+  d1, d2: integer;
   p, c: TPoint;
 begin
   result := false;
@@ -1256,7 +1257,7 @@ Example:
 *)
 function TRSMinimap.waitPlayerMoving(shiftInterval: integer = 500): boolean;
 var
-  t: integer;
+  t: LongWord;
 begin
   result := false;
   t := (getSystemTime() + 20000);
