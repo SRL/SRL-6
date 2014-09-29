@@ -223,7 +223,7 @@ begin
   end;
 end;
 
-function TRSChatbox.getXP(): Integer;
+function TRSChatbox.getXPBar(): Integer;
 const
   Filter: TTesseractFilter = [5, 5, [False, 30, TM_Mean]];
 var

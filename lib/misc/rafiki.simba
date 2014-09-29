@@ -415,7 +415,7 @@ begin
   begin
     writeln('Army is encrpyted, we need the password to encrpyt with with');
 
-    if (SafeInputQuery('Rafiki Player Manager', 'Please enter the password you want to encrpyt your army with:', p, true)) then
+    if (InputQuery('Rafiki Player Manager', 'Please enter the password you want to encrpyt your army with:', p)) then
       rc2_encrypt(p, htSHA512, str)
     else
       writeln('Password was canceled, not using encrpytion!');
