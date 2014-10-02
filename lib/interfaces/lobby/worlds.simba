@@ -551,14 +551,14 @@ begin
     if (self._findWorldNumber(res, wo)) then
       break;
 
-    if (getColor(self.x2 - 25, self.y2 - 334) = __COLOR_SCROLL_BAR) then
+    if (getColor(self.x2 - 25, self.y2 - 308) = __COLOR_SCROLL_BAR) then
       down := true;
 
     if (getColor(self.x2 - 25, self.y2 - 79) = __COLOR_SCROLL_BAR) then
       down := false;
 
     mouseScroll(p, 4 + random(3), down);
-    Wait(50 + random(100));
+    wait(700 + random(250));
 
   until(getSystemTime() > t);
 
