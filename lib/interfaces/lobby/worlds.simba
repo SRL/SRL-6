@@ -251,8 +251,7 @@ Example:
 *)
 function TRSLobbyWorlds.open(): boolean;
 var
-  yellow, white: integer;
-  t : LongWord;
+  t, yellow, white: integer;
   p: TPoint;
 begin
   result := lobby.openTab(self.lobbyID);
@@ -537,7 +536,7 @@ function TRSLobbyWorlds._scrollToWorld(var res: TPoint; wo: integer): boolean;
 const
   __COLOR_SCROLL_BAR = 3455991;
 var
-  t: LongWord;
+  t: integer;
   down: boolean;
   p: TPoint;
 begin
@@ -551,14 +550,14 @@ begin
     if (self._findWorldNumber(res, wo)) then
       break;
 
-    if (getColor(self.x2 - 25, self.y2 - 334) = __COLOR_SCROLL_BAR) then
+    if (getColor(self.x2 - 25, self.y2 - 308) = __COLOR_SCROLL_BAR) then
       down := true;
 
     if (getColor(self.x2 - 25, self.y2 - 79) = __COLOR_SCROLL_BAR) then
       down := false;
 
     mouseScroll(p, 4 + random(3), down);
-    Wait(50 + random(100));
+    wait(700 + random(250));
 
   until(getSystemTime() > t);
 
