@@ -182,7 +182,7 @@ Example:
 *)
 function TRSConversationBox.isOpen(waitTime: integer = 200): boolean;
 var
-  t: integer;
+  t: LongWord;
 begin
   t := (getSystemTime() + waitTime);
   repeat
@@ -585,7 +585,8 @@ function TRSConversationBox.continue(spaceBar, doWait: boolean; advance: boolean
 var
   tpaButton: TPointArray;
   atpaButton: T2DPointArray;
-  i, t, c, px, py: integer;
+  i, c, px, py: integer;
+  t : LongWord;
   b: TBox;
 begin
   if (not self.isOpen()) then

@@ -151,7 +151,7 @@ function TRSToolScreen.isOpen(waitTime: integer = 0): boolean;
 const
   BORDER_COLOR = 1388125;
 var
-  t: integer;
+  t: LongWord;
   borderTPA: TPointArray;
   borders: TIntegerArray;
 begin
@@ -202,7 +202,8 @@ const
 var
   textArea: TBox;
   boxArr: TBoxArray;
-  i, timeout: integer;
+  i : integer;
+  timeout : LongWord;
   p: TPoint;
 begin
   result := false;

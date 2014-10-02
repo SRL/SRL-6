@@ -169,7 +169,7 @@ function TRSProgressScreen.isOpen(waitTime: integer = 0): boolean;
 const
   BORDER_COLOR = 5327681;
 var
-  t: integer;
+  t: LongWord;
   borderTPA: TPointArray;
   borders: TIntegerArray;
 begin
@@ -333,7 +333,7 @@ Example:
 *)
 function TRSProgressScreen.findButton(buttonType: integer = -1; waitTime: integer = 0; lClick: boolean = false): boolean;
 var
-  t: Integer;
+  t: LongWord;
 begin
   t := (getSystemTime() + waitTime);
 

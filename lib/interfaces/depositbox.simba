@@ -174,7 +174,7 @@ Example:
 *)
 function TRSDepositBox.isOpen(waitTime: integer = 0): boolean;
 var
-  t: integer;
+  t: LongWord;
 begin
   t := (getSystemTime() + waitTime);
 
@@ -214,7 +214,7 @@ Example:
 *)
 function TRSDepositBox.close(): boolean;
 var
-  timeOut: integer;
+  timeOut: LongWord;
 begin
   timeOut := (getSystemTime() + randomRange(5000, 6000));
 
@@ -671,7 +671,8 @@ Examples:
 function TRSDepositBox.deposit(slots: TIntegerArray; amounts: TIntegerArray = []; oneByOne: boolean = false): boolean;
 var
   b: TBox;
-  t, tt, i, _x, _y: integer;
+  i, _x, _y: integer;
+  tt,t : LongWord;
 begin
   result := false;
 

@@ -393,7 +393,7 @@ Example:
 *)
 function TRSTabBackpack.waitCount(backPackCount: integer; waitTime: integer): boolean;
 var
-  timeOut: integer;
+  timeOut: LongWord;
 begin
   timeOut := getSystemTime() + waitTime;
   result := false;
@@ -499,7 +499,8 @@ Example:
 *)
 function TRSTabBackpack.waitForShift(waitTime: integer): boolean;
 var
-  c, timeOut: integer;
+  c: integer;
+  timeOut : LongWord;
 begin
   result := false;
   c := self.count();
@@ -539,7 +540,7 @@ function TRSTabBackpack.waitSlotPixelChange(slot, waitTime: integer): boolean;
 var
   b: Tbox;
   bmp, bmp1: Integer;
-  t: integer;
+  t: LongWord;
 begin
   if (not self.open()) or (not self.isSlotVaild(slot))then
     exit(false);
@@ -1163,7 +1164,7 @@ Example:
 *)
 procedure TRSTabBackpack.waitWhileLocked();
 var
-  t: integer;
+  t: LongWord;
 begin
   t := (getSystemTime() + 10000);
 

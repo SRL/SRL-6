@@ -166,7 +166,7 @@ function TRSLobby.isOpen(): boolean;
 const
   COLOR = 16379862;
 var
-  t: integer;
+  t: LongWord;
 begin
   t := (getSystemTime() + randomRange(7500, 8500));
   result := false;
@@ -290,7 +290,7 @@ Example:
 *}
 function TRSLobby._open(): boolean;
 var
-  t: integer;
+  t: LongWord;
   p: TPoint;
   b: TBox;
 begin
@@ -386,7 +386,7 @@ Example:
 *}
 function TRSLobby._leave(): boolean;
 var
-  t: integer;
+  t: LongWord;
   exitButton: TPoint;
 begin
   result := (not self.isOpen());

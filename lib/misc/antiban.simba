@@ -802,6 +802,114 @@ begin
 end;
 
 (*
+closePollButton
+~~~~~~~~~~~~~
+
+.. code-block:: pascal
+
+    function closePollButton(): boolean;
+
+Finds and exits the community poll button pop up window.
+
+.. note::
+
+    - by slushpuppy
+    - Last Updated: 29 September 2014 by slushpuppy
+
+Example:
+
+.. code-block:: pascal
+
+    closePollWindow();
+*)
+function closePollWindow : Boolean;
+var Bmp,wid, hei,tmpX,tmpY,x,y : Integer;
+begin
+getClientDimensions(wid, hei);
+  Bmp := BitmapFromString(110, 32, 'meJztWm1wVOUVznc2IcnuZnezu' +
+        '/nabEJEA1j5LKQUCuhoRJliwKEUKmD4UKQUwmdEahkjRQMOCeKEYE' +
+        'tBai0w2KmVlgBWIhiIWEqYUorWIi2daadj63T6Y+mPPrvP5XBy7+5' +
+        'yw/izmWfeOfe8zznvOc/93tygt6CkyBUu8QJBb0F5sBCbRYV5NOis' +
+        'rgjQhlMzaWBKMjAWfNrgkAAP/OTT4MhYnRxMvQrAKfBp31VVIoXRk' +
+        'HAGsnIuygz0sx5ZVNu6BpnV9cDDdUUWGSWP1CxSSAsmDttnhZLQ1L' +
+        'juUQKpJyqhIamkcWYT0aQLiZXWZE8JXxRgJXTKIcFGdLhsalsfFZy' +
+        'SdQWmPcKjRdYi2KMUrwXXnZr2l2il945IzSOZI0XTu5jCivIiqegs' +
+        'e0oy6wK0yCKC6Cky6mNPkpNDHcSWFvQRhdmBFX59bsq6Wnx9sOkTg' +
+        'd1VlHh97ryKYk+xzxkq9pQF3BgDnnxswva5B8CgDcDAVChGJoebEs' +
+        'gk4sFmVbkfSSQEm8JkLEc4YYgNkIlY2WQexmKT5EHhYpanF2UICNZ' +
+        'RMphGCSSngrCcuaaLm1zHEHjniHvm7D383Yv/eu7Kf/8PAQSZu+9X' +
+        'lXcPgbw8p0zXH32UDgz57xg+7PGzn6366Dqw7uM+0E4a9GjAyXXX/' +
+        '9EcbhNrP76++kY2GGtvxbFCR6GM7/3JkAJG8qWtXVuTLz//WfXwYT' +
+        'g45ZjU1wc5/Uv97nt/2DmrN7Lo4vXbBldc8vvbz/AFAmUsv3xDhMt' +
+        'fTM663Z1Br1OutLz+y0MOD06va0DdqX/W/zYCQE87IFkge2HOBYMw' +
+        'szcy47wxC2OmvbR2oDNbwbVQRsPvDAVg6Jpvr0Fg5tnP5UFL3/4op' +
+        'nEJ9Tknn4lM+TA+rDmT06adizz8m4TZEgEhCEykT38zW7MlIdtsEI' +
+        'BQlA73d3mElnsNUDOo4t53/gYx40LymGwrDWPd2T5LY/O+nvhpTQA' +
+        'tbmwiv51skiFJ2TYb/NqpCCSCUMadpcJvfSaHc11jQ+32w6Pe+jv4' +
+        'X+kyAmHIps5sWgscodnBpNORie9HJpyMjHsv8tWTkYndUcCgrRWwo' +
+        'zNnmQEJkVZnjlsAqu1XgyCMP/EfiAOJIBTvL3z3Iagq7fsmjHpmzW' +
+        'KKiSjEmiCrWBXTNKqqwb6sCRPBqoDWOdHeIceajdpKMaZqbTYoMkI' +
+        'iCKXfquSpXt6MUlNStJhjjtvqWitpM8SEQRtf906sd42c7CgOE6HF' +
+        'zXoWnpSUlKpVO+gBMyPfXflE88ifXtIq6f019t3I6GNRwLiNkuSQk' +
+        'FFkrJs0GkLJGa3fjuXFDQQAzKaVC0xiwhjZeQuhyAH6VS1Egyxf2t' +
+        'XN3hHum9IA3Yoeahj7TqT2RJRDJckf/NJh8hMlRAgCv3wsMuqoUY8' +
+        'dPZM3aJIR0K+i+vcQGsuWzCUNR6aIyWKs4BJcPRHnlqh65nVIVNrQ' +
+        'bPK7x9drf3YwqiSMwa90Q1XKSOUhF0TTuvULSYqXBikjBKGMjuwsS' +
+        'CrPPKZf0rgJMsTMyc2xKaYV97zdv0YKhk+GREP3XDL5Q9/ZAX9u9X' +
+        'CtZM2ObhgY7WQecSQy7HAUMG57R4uMvDZCFoiz6dmlO7as0D+IyUk' +
+        'tv2BMrq0Eht4VQojbmYddUFs7auiP/jH0rX+btMIYVzTxJ+lC95gS' +
+        '+4vbAqfIpJIQtmjGKuS3ow9XYT3kA6aaE7UgjaDxmgOfQwRI4XU5I' +
+        'Mv0B2rWLBi34NHh+vc0/VMVX8kri3PIh/IzH3lgzIia4ulPl2ztqe' +
+        'j4c9WeaxhNgFPDSrglKJdOUrn7WvhVYyot10lahq8cm/njv4nRXd8' +
+        'EAmim1a0ZbCJ5/QNbP6xYtAlSQBCerVBpxB158vSoX3bCN34bN8no' +
+        '+voK3/J9weaeko4rTFvWdoWo3P5XOuMqiVlwyl/+NNR+FYBB2yC0/' +
+        'yW841p4+7XytquOQeMgTuE3vn9zNoaS5pPwY5bLZXijSsLIKh9KMc' +
+        'GxoydXl7IBdqHrlE1pEH42OLDjfLD1bHnjQUhhElM/AsnbIh8vMfJ' +
+        '283DdJJzglNG74QiULG27LCjeeklvYjki2n7M0LNRtF4ueekPAAyr' +
+        '3/3YNiiTWTbENOucugp+z7xWxmZ4yqI3IKy++YOssiE4VotWHyp9+' +
+        'aOS9k+kgOjSHZ+GOq4CMAxn+yegmUrSLcA2dWTaDLRdgAiQAoJAFo' +
+        'hDlSCXPPbIP1zk2ZI3GpOMgeZe69Imj1m9tqhKwgT6KBnTMLjlor/' +
+        'lgv+F87mjp0evgWMeje6yGAcqQSuISSbC02NKgh/YcsG/4ShmAc/8' +
+        '1mR7yopWc/Ewil48n7xBEFCYFpO3Hh578vyj/+UEYSF4VSjgrFsaW' +
+        'tGO2MLnziAPgV1DiOfmVHOviWbl+Lf0Brb1Gkm29WJTzzrntGRVj0' +
+        'n3lAJZg8Y6ht3vmr9FmK6FO1NzCqLXyfoNvo3vgV+47CcZpTVR/Sf' +
+        'Ody/YGdjUC2Cn2F/RWmfyBt0bT0IQyAIxIRGEMv0rhCO1xQhO9oSG' +
+        '7IXt7sY3EVvY0sNUkFSrCj89hrH+VBQ3CFFnS4/n+Q8MDvH8mcIXe' +
+        'jwtZ30vntNFYhNOhoAAGgJ9m+NxYrPMRg4QXWXj6cIN7xs1wNh42p' +
+        'rByLP5nK68Tzsxvyb3aTDWI5SELBAHRxqEkocfXid5ssvPQXk5Wam' +
+        'PtKXOfy1/xTGKY04oYOXrTxU0dbkazxSsehcwc3SPGrF+zWSbUDnd' +
+        'TSeda044V3a5VnajhihWdmPTua7L/Wx3wgy6kiQNKiYbhCZA2pMHI' +
+        'BGEEiXlVyD5/xpGZ54jdVZHzqKfZy09AjAWoFBRNHVFEbPhJw1wNB' +
+        'wFDCY5wLqugtUnjMCVv85vPD5g+VHHtzsBGJI8isbjIJBj2Ahcd4s' +
+        '8sjqQvaTTsbCTZeQsPpq37FicPFJ8UxeLt98gNKEsGHGked15covh' +
+        'hVFOcKrqc+elz/oBo4i0JW9mzd6vPYKMx/cDmBXQz9pyn3ybm47Fv' +
+        '8h+6pcADGsSx8KfZTYcBGDEXSUuP2Pe/sxv9VlaI/uxg44GIxvKyF' +
+        'vWyZJgaEEE9hsE4Mmc92OPcwAfeOTzBv3PXIweZ27u/WslQ3r9HoG' +
+        'kSpu9F9BTQoAfgRCfGdhv5twD6YsOwQnAwGbmrDcyZrxmzQAnpnTZ' +
+        'mbPfSJ+9jyumzdqbPsMckiQDlkYBGQsOpD9xCIAhfbEY2Kb6jdnED' +
+        'Ro6PPh0qd+tPwbQShqeUp8rEMqYtgshqfU70x7q0BAPDCGIEx5jZC' +
+        'Xxu96dWr8rddrOtKkdpuQ3MbUDhD4ceupR1e4+Gaa+mj5tNwDjBlN' +
+        '5aM/Yg11wc1+oYqwNagiBfYkBcdzFYa9rgJzR8qMQL5V8OvJ78nFY' +
+        'esuqs2uXpj/4Sh8Zp7QKdH5rATehO9L9xkF76pTteom+2A6CvTx6j' +
+        '8T4lr2pVepfg3VbM8c+5QyGcQ0Mep36S5iw5YsgcEr8Lhy6uA6UBT' +
+        '2FBbmlgUJ3QS5QXOTyFxYA7pgTBNyeZBMjbTHAB2CASQ+S08DIWHg' +
+        '4CwNAHvhJkygYyMNNJgRAo8GlGc4oTumS4GTBBMnaRgj5yK/DpWVW' +
+        'CDWCPifEgUQVxR556Zbzmh/zyLdY/B6DnnDfb8D0ZUH/XCxvoLyLy' +
+        'UVYj/q+Jpt8+pJ/EwtTPisSD/9jQr7s+qD60E4+fpP/94lff8jEzP' +
+        'KFFW05Se++s1w+BjD9T4Efy+lRvx7KWtKL5Nct82ci/bGB/owt0eE' +
+        'tb0+6cfknJneThvVbNflgSchSgH6tCKtPAcWWtYYNrqwOBXTB1tH0' +
+        'eaHcOPTHFayKh5l8OabD/wcM628c');
+
+  if (findBitmapToleranceIn(Bmp, x, y, 0, 0, wid - 1, hei - 1, 5)) then
+    begin
+      GetBitmapSize(Bmp,tmpX,tmpY);
+      mouse(point(x, y).rand(tmpX,tmpY), MOUSE_LEFT);
+	  Result := true;
+    end;
+    FreeBitmap(Bmp);
+end;    
+
+(*
 hoverSkill
 ~~~~~~~~~~
 
@@ -1013,7 +1121,7 @@ Example:
 function claimTicket(): boolean;
 var
   p: TPoint;
-  t: integer;
+  t: LongWord;
 begin
   if (findTicket(p)) then
   begin

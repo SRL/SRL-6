@@ -548,7 +548,7 @@ Example:
 *)
 function TRSGameTabs.waitTabActive(tab: integer; timeOut: integer): boolean;
 var
-  t: integer;
+  t: LongWord;
 begin
   result := false;
   t := (getSystemTime() + timeOut);

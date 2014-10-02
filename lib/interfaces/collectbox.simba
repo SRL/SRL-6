@@ -166,7 +166,7 @@ Example:
 *)
 function TRSCollectBox.isOpen(waitTime: integer = 0): boolean;
 var
-  t: integer;
+  t: LongWord;
 begin
   t := (getSystemTime() + waitTime);
 
@@ -201,7 +201,7 @@ Example:
 *)
 function TRSCollectBox.close(escape: boolean = true): boolean;
 var
-  timeOut: integer;
+  timeOut: LongWord;
 begin
   result := false;
 

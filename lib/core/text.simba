@@ -112,7 +112,8 @@ Example:
 function findText(var p: TPoint; col, tol: integer; txt, fonts: TStringArray; lookIn: TBox; waitTime: integer = 0): boolean; overload;
 var
   b: TBox;
-  i, j, w, h, t: integer;
+  i, j, w, h : integer;
+  t : LongWord;
   tpaColors, tpaText, matches: TPointArray;
 begin
   t := (getSystemTime() + waitTime);
@@ -595,7 +596,8 @@ Example:
 *)
 function isMouseOverText(txt: TStringArray; waitTime: integer = 250; useTesseract: boolean = false): boolean;
 var
-  i, t: integer;
+  i : integer;
+  t : LongWord;
   s: string;
 begin
   print('isMouseOverText()', TDebug.HEADER);
@@ -644,7 +646,7 @@ Example:
 *)
 function isMouseOverMenuOpen(var res: TBox; waitTime: integer = 100): boolean;
 var
-  t: integer;
+  t: LongWord;
 begin
   res := [-1, -1, -1, -1];
   t := (getSystemTime() + waitTime);

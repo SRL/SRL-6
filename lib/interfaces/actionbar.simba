@@ -982,7 +982,7 @@ Example:
 *)
 function TRSActionBar.clear(): boolean;
 var
-  t: integer;
+  t: LongWord;
 begin
   if (self.isEmpty()) then
     exit(true);
@@ -1400,7 +1400,7 @@ Example:
 *)
 function TRSActionBar.setRetaliate(enabled: boolean): boolean;
 var
-  t: Integer;
+  t: LongWord;
 begin
   if enabled then
     result := (self._isRetaliateEnabled()) else

@@ -315,7 +315,7 @@ Example:
 *)
 function TRSBankScreen.close(escape: boolean = true): boolean;
 var
-  timeOut: integer;
+  timeOut: LongWord;
 begin
   result := false;
 
@@ -964,7 +964,7 @@ Example:
 function TRSBankScreen.openTab(tab: integer): boolean;
 var
   boxTab: TBox;
-  t: integer;
+  t: LongWord;
 begin
   if (not self._doesTabExist(tab)) then
   begin
@@ -1026,7 +1026,8 @@ procedure TRSBankScreen.scrollUp();
 const
   COLOR_RESULT = 3321831; // color when scroll bar is all the way up
 var
-  col, t: integer;
+  col : integer;
+  t : LongWord;
   tpa: TPointArray;
   scrollP, p: TPoint;
   itemArea, b: TBox;
@@ -1149,7 +1150,7 @@ const
   BUTTON_OFFSET: TPoint = [-662, -25];
 var
   b: TBox;
-  timeOut: integer;
+  timeOut: LongWord;
 begin
   if (not self.isOpen()) then
   begin
@@ -1279,7 +1280,8 @@ Examples:
 function TRSBankScreen.deposit(slots: TIntegerArray; amounts: TIntegerArray = []; oneByOne: boolean = false): boolean;
 var
   b: TBox;
-  t, tt, i, _x, _y: integer;
+  t, tt : LongWord;
+  i, _x, _y: integer;
 begin
   result := false;
 
@@ -1624,7 +1626,7 @@ Example:
 *)
 function _waitBankOrPinScreen(waitTime: integer): boolean;
 var
-  t: integer;
+  t: LongWord;
 begin
   t := (getSystemTime() + waitTime);
   result := false;

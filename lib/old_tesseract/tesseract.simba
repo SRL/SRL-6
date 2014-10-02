@@ -146,7 +146,7 @@ function tesseractGetText(const x1, y1, x2, y2, resizeMultiW, resizeMultiH: inte
 var
   matrix: T2DIntegerArray;
   bmp, w, h, rw, rh: integer;
-  {$IFDEF TESSERACT_DEBUG} t: integer := getSystemTime(); {$ENDIF}
+  {$IFDEF TESSERACT_DEBUG} t: LongWord := getSystemTime(); {$ENDIF}
 begin
   bmp := bitmapFromClient(x1, y1, x2, y2);
 
