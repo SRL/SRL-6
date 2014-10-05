@@ -1393,7 +1393,7 @@ TRSBankScreen.withdraw
 
 .. code-block:: pascal
 
-    function TRSBankScreen.withdraw(slot, amount: integer; var toFamiliar: boolean = false; mouseOverText: TStringArray): boolean;
+    function TRSBankScreen.withdraw(slot, amount: integer; mouseOverText: TStringArray; toFamiliar: boolean = false): boolean;
 
 Withdraws the the amount 'amount' from the bank slot 'slot', if the mouse-over
 text is correct, mouse-over text can also be skipped.  If toFamiliar is true, will
