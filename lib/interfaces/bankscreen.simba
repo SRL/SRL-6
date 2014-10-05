@@ -1393,7 +1393,7 @@ TRSBankScreen.withdraw
 
 .. code-block:: pascal
 
-    function TRSBankScreen.withdraw(slot, amount: integer; toFamiliar: boolean = false; mouseOverText: TStringArray): boolean;
+    function TRSBankScreen.withdraw(slot, amount: integer; var toFamiliar: boolean = false; mouseOverText: TStringArray): boolean;
 
 Withdraws the the amount 'amount' from the bank slot 'slot', if the mouse-over
 text is correct, mouse-over text can also be skipped.  If toFamiliar is true, will
@@ -1424,9 +1424,9 @@ Example:
     bankScreen.withdraw(1, 28, ['']);
 
     // To withdraw 28 items from slot 1 into your beast of burden familiar if mouseover text is valid
-    bankScreen.withdraw(1, 28, true, ['Yew Log', 'Log']);
+    bankScreen.withdraw(1, 28, ['Yew Log', 'Log'], true);
 *)
-function TRSBankScreen.withdraw(slot, amount: integer; toFamiliar: boolean = false; mouseOverText: TStringArray): boolean;
+function TRSBankScreen.withdraw(slot, amount: integer; mouseOverText: TStringArray; toFamiliar: boolean = false): boolean;
 var
   b: TBox;
 begin
@@ -1577,7 +1577,7 @@ begin
   slot := self.pointToSlot(p);
 
   if (slot <> -1) then
-    result := self.withdraw(slot, amount, toFamiliar, ['']);
+    result := self.withdraw(slot, amount, [''], toFamiliar);
 end;
 
 (*
@@ -1625,7 +1625,7 @@ begin
   slot := self.pointToSlot(p);
 
   if (slot <> -1) then
-    result := self.withdraw(slot, amount, toFamiliar, ['']);
+    result := self.withdraw(slot, amount, [''], toFamiliar);
 end;
 
 (*
