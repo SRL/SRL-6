@@ -80,7 +80,7 @@ Example:
 
 .. code-block:: pascal
 
-    bankscreen.optn(BANK_NPC_BLUE);
+    bankscreen.open(BANK_NPC_BLUE);
 *)
 const
   BANK_NPC_BLUE = 0;
@@ -95,8 +95,7 @@ const
   BANK_CHEST_GROTTO = 9;
   BANK_CHEST_LUMBRIDGE = 10;
   BANK_TABLE_BURTHORPE = 11;
-  BANK_GE = 12;
-
+  BANK_GE = 12;  BANK_CHEST_PRIFDDINAS = 13;
 
 (*
 type TRSBankScreen
@@ -1393,10 +1392,11 @@ TRSBankScreen.withdraw
 
 .. code-block:: pascal
 
-    function TRSBankScreen.withdraw(slot, amount: integer; mouseOverText: TStringArray): boolean;
+    function TRSBankScreen.withdraw(slot, amount: integer; mouseOverText: TStringArray; toFamiliar: boolean = false): boolean;
 
 Withdraws the the amount 'amount' from the bank slot 'slot', if the mouse-over
-text is correct, mouse-over text can also be skipped.
+text is correct, mouse-over text can also be skipped.  If toFamiliar is true, will
+withdraw items into your beast of burden familiar (default false).
 
 Extra vaild constants for 'amount' are:
 
@@ -1407,7 +1407,7 @@ Extra vaild constants for 'amount' are:
 .. note::
 
     - by Olly
-    - Last Updated: 20 October 2013 by Olly
+    - Last Updated: 3 October 2014 by Clarity
 
 Example:
 
@@ -1421,8 +1421,11 @@ Example:
 
     // To withdraw 28 items from slot 1 and will *ignore* mouse-over text
     bankScreen.withdraw(1, 28, ['']);
+
+    // To withdraw 28 items from slot 1 into your beast of burden familiar if mouseover text is valid
+    bankScreen.withdraw(1, 28, ['Yew Log', 'Log'], true);
 *)
-function TRSBankScreen.withdraw(slot, amount: integer; mouseOverText: TStringArray): boolean;
+function TRSBankScreen.withdraw(slot, amount: integer; mouseOverText: TStringArray; toFamiliar: boolean = false): boolean;
 var
   b: TBox;
 begin
@@ -1466,13 +1469,23 @@ begin
       WITHDRAW_AMOUNT_ALL_BUT_ONE: result := chooseOption.select(['Withdraw-All but one', 'All but one']);
 
       // check if the number is already availble, else let's withdraw X it
-      else
+      else begin
+        if toFamiliar then
+        begin
+          if (chooseOption.select(['Withdraw-X to BoB', 'to', 'BoB'])) then
+          begin
+            result := (self._enterAmount(amount, 6000));
+            print('bankscreen.withdraw(): result = ' + boolToStr(result), TDebug.SUB);
+            exit;
+          end;
+        end;
         if (not chooseOption.optionsExist(['Withdraw-' + intToStr(amount), '-' + intToStr(amount), toStr(amount)])) then
         begin
           if (chooseOption.select(['Withdraw-X', '-X'])) then
             result := (self._enterAmount(amount, 6000));
         end else
-          result := chooseOption.select(['Withdraw-' + intToStr(amount), '-' + intToStr(amount), toStr(amount)])
+          result := chooseOption.select(['Withdraw-' + intToStr(amount), '-' + intToStr(amount), toStr(amount)]);
+        end;
      end;
   end else
     print('bankscreen.withdraw(): chooseOption menu failed to open', TDebug.SUB);
@@ -1524,23 +1537,28 @@ TRSBankScreen.withdraw; overload
 
 .. code-block:: pascal
 
-    function TRSBankScreen.withdraw(dtm, amount: integer): boolean; overload;
+    function TRSBankScreen.withdraw(dtm, amount: integer, toFamiliar: boolean = false): boolean; overload;
 
 Searches for the dtm 'dtm' in each slot if found, will withdraw the amount
-'amount' from that bank slot.
+'amount' from that bank slot.  If toFamiliar is true, will withdraw the amount
+to your beast of burden familiar (default false).
 
 .. note::
 
     - by Olly
-    - Last Updated: 20 October 2013 by Olly
+    - Last Updated: 03 October 2014 by Clarity
 
 Example:
 
 .. code-block:: pascal
 
+    //To withdraw 28 items normally
     bankScreen.withdraw(dtm, 28);
+
+    //To withdraw 28 items to your beast of burden familiar
+    bankScreen.withdraw(dtm, 28, true);
 *)
-function TRSBankScreen.withdraw(dtm, amount: integer): boolean; overload;
+function TRSBankScreen.withdraw(dtm, amount: integer; toFamiliar: boolean = false): boolean; overload;
 var
   p: TPoint;
   slot: integer;
@@ -1558,7 +1576,7 @@ begin
   slot := self.pointToSlot(p);
 
   if (slot <> -1) then
-    result := self.withdraw(slot, amount, ['']);
+    result := self.withdraw(slot, amount, [''], toFamiliar);
 end;
 
 (*
@@ -1567,23 +1585,28 @@ TRSBankScreen.withdraw; overload
 
 .. code-block:: pascal
 
-    function TRSBankScreen.withdraw(bitmap, tolerance, amount: integer): boolean; overload;
+    function TRSBankScreen.withdraw(bitmap, tolerance, amount: integer; toFamiliar: boolean = false): boolean; overload;
 
 Searches for the bitmap 'bitmap' with the tolerance 'tolerance' in each slot
-if found, will withdraw the amount 'amount' from that bank slot.
+if found, will withdraw the amount 'amount' from that bank slot.  If toFamiliar is true, will withdraw the amount
+to your beast of burden familiar (default false).
 
 .. note::
 
     - by Olly
-    - Last Updated: 20 October 2013 by Olly
+    - Last Updated: 03 October 2014 by Clarity
 
 Example:
 
 .. code-block:: pascal
 
+    //To withdraw 28 items normally from slot 10
     bankScreen.withdraw(bmp, 10, 28);
+
+    //To withdraw 28 items from slot 10 to your beast of burden familiar
+    bankScreen.withdraw(bmp, 10, 28, true);
 *)
-function TRSBankScreen.withdraw(bitmap, tolerance, amount: integer): boolean; overload;
+function TRSBankScreen.withdraw(bitmap, tolerance, amount: integer; toFamiliar: boolean = false): boolean; overload;
 var
   p: TPoint;
   slot: integer;
@@ -1601,7 +1624,7 @@ begin
   slot := self.pointToSlot(p);
 
   if (slot <> -1) then
-    result := self.withdraw(slot, amount, ['']);
+    result := self.withdraw(slot, amount, [''], toFamiliar);
 end;
 
 (*
@@ -1873,12 +1896,12 @@ TRSBankScreen.__openChest
 
     function TRSBankScreen.__openChest(bankType: integer): boolean;
 
-Internal function that attemps to open the bank chest at bankType.
+Internal function that attempts to open the bank chest at bankType.
 
 .. note::
 
     - by Olly
-    - Last Updated: 08 January 2013 by Ashaman88
+    - Last Updated: 03 October 2014 by Clarity
 
 Example:
 
@@ -1905,6 +1928,7 @@ begin
     BANK_CHEST_GROTTO: begin col1:= [6842737, 6, [2, [0.31, 0.08, 0.00]]]; col2:= [2570316, 4, [2, [0.15, 1.35, 0.00]]]; avelen:= 90; end;
     BANK_CHEST_LUMBRIDGE: begin col1:= [11313299, 10, [2, [0.17, 0.42, 0.00]]]; col2:= [6586289, 10, [2, [0.21, 1.00, 0.00]]]; avelen:= 90; end;
     BANK_TABLE_BURTHORPE: begin col1:= [14547176, 8, [2, [1.24, 4.52, 0.00]]]; col2:= [6460329, 11, [2, [0.11, 1.29, 0.00]]]; avelen:= 90; end;
+    BANK_CHEST_PRIFDDINAS: begin col1:= [1022461, 2, [2, [0.08, 0.83, 0.00]]]; col2:= [10350335, 3, [2, [0.75, 0.00, 0.00]]]; avelen:= 90; end;
   end;
 
   print('TRSBankscreen.__openChest()', TDebug.HEADER);
@@ -2123,12 +2147,11 @@ Opens the desired bank, current vaild 'bankType' constants are:
     * BANK_CHEST_GROTTO
     * BANK_TABLE_BURTHORPE
     * BANK_CHEST_LUMBRIDGE
-    * BANK_GE
-
+    * BANK_CHEST_PRIFDDINAS    * BANK_GE
 .. note::
 
     - by Olly
-    - Last Updated: 08 January 2013 by Ashaman88
+    - Last Updated: 03 October 2014 by Clarity
 
 Example:
 
@@ -2144,7 +2167,7 @@ begin
   case bankType of
     BANK_NPC_BLUE..BANK_NPC_DRAYNOR: result := self.__openNPC(bankType);
     BANK_BOOTH: result := self.__openBankBooth();
-    BANK_CHEST_SW..BANK_TABLE_BURTHORPE: result := self.__openChest(bankType);
+    BANK_CHEST_SW..BANK_CHEST_PRIFDDINAS: result := self.__openChest(bankType);
     BANK_GE: Result := Self.__openGE();
   end;
 end;
