@@ -2302,17 +2302,20 @@ begin
         color := 7324409;
       end;
 
-    MM_SYMBOL_LODESTONE:
+    MM_SYMBOL_LODESTONE: // 5th October 2014
       with result do
       begin
         name := 'Lodestone';
-        bmp := BitmapFromString(9, 8, 'meJxbW90wLaUQiNZWN+zr6VxeUn1j' +
-        '9bQJJSn91bk5tiGNmVVABGQsLqial1N6anrPvNrcrZPrK5KKtmw/A' +
-        'ERARmNg/KL84qVFJTsn1W7try5KLJg4eS4QARllHmGz0rPmZGXv6C' +
-        'rf0lcZrOOUE5cDREBGU0BMZ3jshrriqUVJ+6fWl7kFxhg4ARGQsSA' +
-        'npdo76EhfZby38/kF7V0REd1gBGSUufkvK04vifAJcHG4vqR7cmJU' +
-        'nW8gEAEZ6yoyikK9rCzMowO8bi3pBgC7LWRW');
-        color := -1;
+        bmp := BitmapFromString(12, 11, 'meJwdiklLAmEAhv9Qh0BlJAgcFR' +
+        'EtmrFtsrHJpVz6LP1mnFxQXDJwoSzRATGLUiOs6BClENGhU+cCf05' +
+        'vwXN43mXcLjXV4PdAu0/m7xL5l9IxgCD+DDVME+3oVPZPR61bJfNe' +
+        'rzxk8u1AHEAQUU5H7YYS6GWjX1r9MproU5XMrxTCaQC5iaV7JIEJh' +
+        '7dGdkiV6wO5wEtJH31+/QAQRJQDqkzOs5NaqhsmnVBEta9Rb+yseQ' +
+        'EgiJ1gpBvZG1cPW7LvKSdXBE/RtbE8YyZbBECKnFhZ92BqUZ/ktHy' +
+        'epNIO1xUJqDZenDUDCGLG6cKEA2c1KcJCP76r2paqglD7B4I4lIOY' +
+        'cNjkHHNGhq46HpOhptedW+QBBBElJhxEzsmaWIPBwDK6ssSPUjsAg' +
+        'vhXmlgcymRb9ov7kmC3WhjGqNfpAQQRJSYcfgH3Zq3k');
+        color := 7751249;
       end;
 
     MM_SYMBOL_DIVINATION:
