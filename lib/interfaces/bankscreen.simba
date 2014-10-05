@@ -95,6 +95,7 @@ const
   BANK_CHEST_GROTTO = 9;
   BANK_CHEST_LUMBRIDGE = 10;
   BANK_TABLE_BURTHORPE = 11;
+  BANK_GE = 12;
 
 
 (*
@@ -2002,6 +2003,104 @@ begin
 end;
 {$ENDIF}
 
+{$IFNDEF CODEINSIGHT}
+function TRSBankScreen.__openGE(): Boolean;
+  function findBanker(const Area: TBox): Boolean;
+  var
+    tFace, TPA: TPointArray;
+    aFace, ATPA: T2DPointArray;
+    i, j: Integer;
+    b: TBox;
+    p: TPoint;
+  begin
+    if (not FindColorsTolerance(tFace, 5408694, Area, 15, ColorSetting(2, 0.18, 0.67))) then
+      Exit(False);
+
+    aFace := ClusterTPAEx(tFace, 3, 3);
+    SortATPAFromMidPoint(aFace, MiddleBox(Area));
+
+    for i := 0 to High(aFace) do
+      if (Length(aFace[i]) > 4) and (Length(aFace[i]) < 50) then
+      begin
+        p := MiddleTPA(aFace[i]);
+        b := intToBox(p.x - 12, p.y, p.x + 12, p.y + 30);
+
+        if (not FindColorsTolerance(TPA, 11382432, b, 9, ColorSetting(2, 5.57, 0.48))) then
+          Continue();
+
+        ATPA := ClusterTPAEx(TPA, 4, 4);
+        SortATPASize(ATPA, True);
+
+        for j := 0 to High(ATPA) do
+        begin
+          if (Length(ATPA[j]) < 15) then
+            Continue();
+
+          mouse(ATPA[j].getMiddle().randRange(-4, 5));
+
+          if (isMouseOverText(['Bank Banker', 'ank Bank'])) then
+          begin
+            fastClick(MOUSE_LEFT);
+
+            if (minimap.isFlagPresent(Random(300, 600))) then
+              minimap.waitFlag(10);
+
+            Result := _waitBankOrPinScreen(Random(4000, 5000));
+            if (Result) then
+              Exit(True);
+         end;
+        end;
+      end;
+  end;
+var
+  tPiller, tPillerEdge, tEdge, tFloor, tFloorEdge, TPA: TPointArray;
+  aPiller, aSearchArea, ATPA: T2DPointArray;
+  i, j: Integer;
+  b: TBox;
+begin
+  FindColorsTolerance(tPiller, 7437434, mainScreen.getBounds(), 10, ColorSetting(2, 0.38, 0.15));
+  aPiller := ClusterTPAEx(tPiller, 8, 8);
+
+  FindColorsTolerance(tFloor, 6646636, mainScreen.getBounds(), 10, ColorSetting(2, 1.20, 0.29));
+  tFloorEdge := FindTPAEdges(tFloor);
+
+  if (Length(tFloor) < 20) or (Length(tPiller) < 20) then
+    Exit(False);
+
+  for i := 0 to High(aPiller) do
+  begin
+    b := GetTPABounds(aPiller[i]);
+    if (b.getWidth() > 100) and (b.getHeight() > 100) then
+      Continue();
+
+    tPillerEdge := FindTPAEdges(aPiller[i]);
+
+    for j := 0 to High(tPillerEdge) do
+      if (NearbyPointInArrayEx(tPillerEdge[j], 2, 2, tFloorEdge)) then
+        tEdge := tEdge + tPillerEdge[j];
+  end;
+
+  if (Length(tEdge) < 20) then
+    Exit(False);
+
+  aSearchArea := ClusterTPAEx(tEdge, 13, 13);
+
+  for i := 0 to High(aSearchArea) do
+  begin
+    b := GetTPABounds(aSearchArea[i]);
+
+    if (inRange(b.getWidth(), 15, 90)) and (inRange(b.getHeight(), 15, 90)) then
+    begin
+      Dec(b.X1, 15); Inc(b.X2, 15); Inc(b.Y2, 30);
+      b.SetLimit(mainScreen.getBounds());
+
+      if (FindBanker(b)) then
+        Exit(True);
+    end;
+  end;
+end;
+{$ENDIF}
+
 (*
 TRSBankScreen.open
 ~~~~~~~~~~~~~~~~~~
@@ -2024,6 +2123,7 @@ Opens the desired bank, current vaild 'bankType' constants are:
     * BANK_CHEST_GROTTO
     * BANK_TABLE_BURTHORPE
     * BANK_CHEST_LUMBRIDGE
+    * BANK_GE
 
 .. note::
 
@@ -2045,6 +2145,7 @@ begin
     BANK_NPC_BLUE..BANK_NPC_DRAYNOR: result := self.__openNPC(bankType);
     BANK_BOOTH: result := self.__openBankBooth();
     BANK_CHEST_SW..BANK_TABLE_BURTHORPE: result := self.__openChest(bankType);
+    BANK_GE: Result := Self.__openGE();
   end;
 end;
 

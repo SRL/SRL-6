@@ -811,7 +811,7 @@ begin
       Swap(Result[i][0], Result[i][1]);
 end;
 
-function TRSMinimap.getDots(const dotType: Integer; const SearchBox: TBox; const Tol: Byte = 30): TPointArray;
+function TRSMinimap.getDots(const dotType: Integer; const SearchBox: TBox; const Tol: Byte = 55): TPointArray;
 var
   Bitmap, i, Col: Integer;
   Dots: T2DPointArray;
