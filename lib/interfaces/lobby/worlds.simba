@@ -464,50 +464,54 @@ Example:
       mouse(p.rand(5), MOUSE_LEFT);
 *}
 function TRSLobbyWorlds._findWorldNumber(var res: TPoint; wo: integer): boolean;
+const
+  Colors = [827845, 13093322];
+  fFilter: TTesseractFilter = [4, 4, [False, 20, TM_Mean]];
+  mFilter: TTesseractFilter = [4, 4, [False, 45, TM_Mean]];
+type
+  TWorldBox = record
+    Bounds: TBox;
+    Members: Boolean;
+ end;
 var
-  i: Integer;
+  WorldBoxes: array of TWorldBox;
   TPA: TPointArray;
   ATPA: T2DPointArray;
-  Boxes: TBoxArray;
-  Box: TBox;
-  BMP: Integer;
-  Strings: TStringArray;
+  i, j, n: Integer;
+  b: TBox;
 begin
-
-  {$IFDEF SIMBAMAJOR1100}
-  FindColorsTolerance(TPA, clBlack, Self.worldNumArea, 25, colorSetting(1));
-  ATPA := ClusterTPAEx(TPA, 20, 3);
-
-  for i := 0 to High(ATPA) do
-  begin
-    Box := GetTPABounds(ATPA[i]);
-
-    if (Box.getHeight() > 5) and (Box.getHeight() < 13) and (Box.getWidth() < 50) then
+  for i := 0 to High(Colors) do
+    if (FindColorsTolerance(TPA, Colors[i], Self.worldNumArea, 100, ColorSetting(1))) then
     begin
-      Box.expand(3);
-      Insert(Box, Boxes);
+      ATPA := ClusterTPAEx(TPA, 10, 4);
+
+      for j := 0 to High(ATPA) do
+      begin
+        b := GetTPABounds(ATPA[j]);
+
+        if (inRange(b.getWidth(), 2, 25)) then
+          if (b.getHeight() > 7) then
+          begin
+            b := intToBox(b.X1 - 3, b.Y1 - 5, b.X2 + 5, b.Y2 + 5);
+            WorldBoxes := WorldBoxes + TWorldBox([b, Boolean(i = 0)]);
+          end;
+      end;
     end;
-  end;
 
-  BMP := CreateBitmap(50, 400);
-  for i := 0 to High(Boxes) do
-    GetMufasaBitmap(BMP).CopyClientToBitmap(Client.getIOManager(), False, 0, Max(Boxes[i].y1 - Boxes[High(Boxes)].y1, 0), Boxes[i].x1, Boxes[i].y1, Boxes[i].x2, Boxes[i].y2);
+  for i := 0 to High(WorldBoxes) do
+  begin
+    n := -1;
+    if (WorldBoxes[i].Members) then
+      n := StrToIntDef(Trim(Tesseract_GetText(WorldBoxes[i].Bounds, fFilter, TESS_WHITELIST_NUMBERS)), -1)
+    else
+      n := StrToIntDef(Trim(Tesseract_GetText(WorldBoxes[i].Bounds, mFilter, TESS_WHITELIST_NUMBERS)), -1);
 
-  // Prepare for Tesseract
-  ResizeBitmapEx(BMP, RM_Bilinear, 50 * 3, 400 * 3);
-  ThresholdAdaptiveBitmap(BMP, 0, 255, False, TM_Mean, 55);
-  Strings := explode(#10, Tesseract_GetText(BMP, TESS_WHITELIST_NUMBERS));
-  FreeBitmap(BMP);
-
-  for i := 0 to high(Strings) do
-    if (StrToIntDef(Trim(Strings[i]), -1) = wo) then
+    if (n = wo) then
     begin
-      Res := MiddleBox(Boxes[High(Boxes) - i]);
+      res := MiddleBox(WorldBoxes[i].Bounds);
       Exit(True);
     end;
-  {$ELSE}
-  Writeln('Update your Simba for FindWorldNumber to work');
-  {$ENDIF}
+  end;
 end;
 
 {*

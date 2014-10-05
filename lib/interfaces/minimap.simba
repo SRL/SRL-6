@@ -331,76 +331,58 @@ Example:
     ang := minimap.getAngleRadians();
 *)
 function TRSMinimap.getAngleRadians(): Extended;
+
+  function AvgExtended(const tE: TExtendedArray): Extended;
+  var
+    i, h: Integer;
+  begin
+    h := High(tE);
+    if h < 0 then Exit(0);
+    for i := 0 to h do
+      Result := (Result + tE[i]);
+    Result := Result / (H+1);
+  end;
+
 const
-  PI_OVER_2: Double = PI / 2.00;
-  Templ_Outter: TPointArray = [[16, 0], [11, 1], [12, 1], [13, 1], [14, 1], [15, 1], [17, 1], [18, 1], [19, 1], [20, 1], [21, 1], [9, 2], [10, 2], [22, 2], [23, 2], [7, 3], [8, 3], [24, 3], [25, 3], [6, 4], [26, 4], [5, 5], [27, 5], [4, 6], [28, 6], [3, 7], [29, 7], [3, 8], [29, 8], [2, 9], [30, 9], [2, 10], [30, 10], [1, 11], [31, 11], [1, 12], [31, 12], [1, 13], [31, 13], [1, 14], [31, 14], [1, 15], [31, 15], [0, 16], [32, 16], [1, 17], [31, 17], [1, 18], [31, 18], [1, 19], [31, 19], [1, 20], [31, 20], [1, 21], [31, 21], [2, 22], [30, 22], [2, 23], [30, 23], [3, 24], [29, 24], [3, 25], [29, 25], [4, 26], [28, 26], [5, 27], [27, 27], [6, 28], [26, 28], [7, 29], [8, 29], [24, 29], [25, 29], [9, 30], [10, 30], [22, 30], [23, 30], [11, 31], [12, 31], [13, 31], [14, 31], [15, 31], [17, 31], [18, 31], [19, 31], [20, 31], [21, 31], [16, 32]];
-  Templ_Inner: TPointArray = [[16, 1], [11, 2], [12, 2], [13, 2], [14, 2], [15, 2], [16, 2], [17, 2], [18, 2], [19, 2], [20, 2], [21, 2], [9, 3], [10, 3], [22, 3], [23, 3], [7, 4], [8, 4], [24, 4], [25, 4], [6, 5], [7, 5], [25, 5], [26, 5], [5, 6], [6, 6], [26, 6], [27, 6], [4, 7], [5, 7], [27, 7], [28, 7], [4, 8], [28, 8], [3, 9], [29, 9], [3, 10], [29, 10], [2, 11], [30, 11], [2, 12], [30, 12], [2, 13], [30, 13], [2, 14], [30, 14], [2, 15], [30, 15], [1, 16], [2, 16], [30, 16], [31, 16], [2, 17], [30, 17], [2, 18], [30, 18], [2, 19], [30, 19], [2, 20], [30, 20], [2, 21], [30, 21], [3, 22], [29, 22], [3, 23], [29, 23], [4, 24], [28, 24], [4, 25], [5, 25], [27, 25], [28, 25], [5, 26], [6, 26], [26, 26], [27, 26], [6, 27], [7, 27], [25, 27], [26, 27], [7, 28], [8, 28], [24, 28], [25, 28], [9, 29], [10, 29], [22, 29], [23, 29], [11, 30], [12, 30], [13, 30], [14, 30], [15, 30], [16, 30], [17, 30], [18, 30], [19, 30], [20, 30], [21, 30], [16, 31]];
+  PI_OVER_2: Extended = PI / 2.00;
 var
-  aDial: T2DPointArray;
   tDial: TPointArray;
-  Mid, rDial: TPoint;
-  btn, b: TBox;
-  TPA: TPointArray;
-  i, j: Integer;
-  tTempls: array [0..1] of TPointArray;
-  Results: array [0..1] of Extended;
-  Found: array [0..1] of Boolean;
-  Map: array of TBoolArray;
+  aDial: T2DPointArray;
+  Angles: TExtendedArray;
+  i: Integer;
+  Mid: TPoint;
+  Bools: array [0..1] of Boolean;
 begin
-  with (Self.button[MM_BUTTON_COMPASS]) do
+  with (Self.Button[MM_BUTTON_COMPASS]) do
   begin
+    FindColorsTolerance(tDial, 9477483, Bounds, 25, ColorSetting(2, 2.20, 0.97));
+    FilterPointsDist(tDial, 12, 15, Center.x, Center.y);
     Mid := Center;
-    Btn := Bounds;
   end;
 
-  if (not FindColorsTolerance(tDial, 1652630, btn, 22, ColorSetting(2, 0.24, 0.88))) then
-  begin
-    Print('Unable to find any red dial of the compass', TDebug.ERROR);
-    Exit();
-  end;
+  if (Length(tDial) = 0) then
+    Exit(Print('TRSMinimap.getAngleRads(): Found no dial', 0.00));
 
-  OffsetTPA(tDial, Point(- btn.X1, - btn.Y1));
-  b := GetTPABounds(Templ_Outter);
-  SetLength(Map, b.getWidth(), b.getHeight());
+  aDial := SplitTPAEx(tDial, 2, 2);
+  SortATPAFromMidPoint(aDial, Mid);
+  SetLength(tDial, 0);
+  tDial := aDial[High(aDial)];
+
+  SetLength(Angles, Length(tDial));
   for i := 0 to High(tDial) do
-    Map[tDial[i].x][tDial[i].y] := True;
+    Angles[i] := Degrees(FixRad(ArcTan2(tDial[i].Y - Mid.Y, tDial[i].X - Mid.X) + PI_OVER_2));
 
-  tTempls := [Templ_Outter, Templ_Inner];
-  for j := 0 to High(tTempls) do
-  begin
-    Found[j] := True;
+  Bools := [False, False];
+  for i := 0 to High(Angles) do
+    if (Angles[i] >= 0.00) and (Angles[i] <= 10.0) then
+      Bools[0] := True
+    else if (Angles[i] <= 360.0) and (Angles[i] >= 350.0) then
+      Bools[1] := True;
 
-    SetLength(tDial, 0);
-    for i := 0 to High(tTempls[j]) do
-      if (Map[tTempls[j][i].x][tTempls[j][i].y]) then
-        Insert(tTempls[j][i], tDial);
+  if (Bools[0]) and (Bools[1]) then
+    Exit(Radians(180.0));
 
-    case Length(tDial) of
-      0: begin Found[j] := False; Continue(); end;
-      1: rDial := tDial[0];
-      else
-        begin
-          aDial := SplitTPAEx(tDial, 1, 1);
-          SortATPASize(aDial, True);
-          rDial := MiddleTPA(aDial[0]);
-        end;
-    end;
-
-    rDial := Point(rDial.x + btn.X1, rDial.y + btn.Y1);
-    Results[j] := FixRad(ArcTan2(rDial.Y - Mid.Y, rDial.X - Mid.X) + PI_OVER_2);
-  end;
-
-  if (Found[0] and Found[1]) then
-  begin
-    if (Abs(Results[0] - Results[1]) > 5.00) then // Fix: If points are different side of 'n' you could get 359 and 1 (deg) so if there's a big difference between them lets force it to 0.
-      Result := 0.00
-    else
-      Result := AverageExtended(Results);
-  end else
-    if (Found[0]) and (not Found[1]) then
-      Result := Results[0]
-    else if (not Found[0]) and (Found[1]) then
-      Result := Results[1];
+  Result := FixRad(Radians(AvgExtended(Angles)) - Radians(180));
 end;
 
 (*
