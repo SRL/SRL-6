@@ -1218,7 +1218,7 @@ TRSMinimap.waitPlayerMoving
 
 .. code-block:: pascal
 
-    function TRSMinimap.waitPlayerMoving(waitFlagGone: boolean): boolean;
+    function TRSMinimap.waitPlayerMoving(shiftInterval: integer; maxTime: integer = 20000): boolean;
 
 Waits while the player is moving.  Returns true if the player is not moving.
 
@@ -1237,12 +1237,12 @@ Example:
       minimap.waitPlayerMoving();
     end;
 *)
-function TRSMinimap.waitPlayerMoving(shiftInterval: integer = 500): boolean;
+function TRSMinimap.waitPlayerMoving(shiftInterval: integer = 500; maxTime: integer = 20000): boolean;
 var
   t: LongWord;
 begin
   result := false;
-  t := (getSystemTime() + 20000);
+  t := (getSystemTime() + maxTime);
 
   print('Waiting while the player is moving...', TDebug.SUB);
 
