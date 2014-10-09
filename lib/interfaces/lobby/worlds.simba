@@ -496,7 +496,7 @@ worldNumArea relative to the amount of favorited worlds.
 .. note::
 
     - by Coh3n
-    - Last Updated: 9th October 2014 by Clarity
+    - Last Updated: 9th August 2014 by The Mayor
 
 Example:
 
@@ -505,7 +505,7 @@ Example:
     if (lobbyWorlds._findWorldNumber(p, 115)) then
       mouse(p.rand(5), MOUSE_LEFT);
 *}
-function TRSLobbyWorlds._findWorldNumber(var res: TPoint; wo: integer; favorite: boolean = false): boolean;
+function TRSLobbyWorlds._findWorldNumber(var res: TPoint; wo: integer): boolean;
 const
   Colors = [827845, 13093322];
   fFilter: TTesseractFilter = [4, 4, [False, 20, TM_Mean]];
@@ -519,26 +519,9 @@ var
   WorldBoxes: array of TWorldBox;
   TPA: TPointArray;
   ATPA: T2DPointArray;
-  i, j, n, favs, modY: Integer;
+  i, j, n: Integer;
   b: TBox;
 begin
-
-  favs := self._getFavoriteCount();
-
-  case favs of
-    1: modY := 4;
-    2: modY := 3;
-    3: modY := 2;
-  end;
-
-  if (favs >= 1) then
-  begin
-    if favorite then
-      self.worldNumArea := [x1 + 35, y1 + 125, x1 + 100, (y2 - 356 + (favs * 22) + modY)]
-    else
-      self.worldNumArea := [x1 + 35, (y1 + 125 + (favs * 22) + modY), x1 + 100, y2 - 62];
-  end else
-    self.worldNumArea := [x1 + 35, y1 + 125, x1 + 100, y2 - 62];
 
   for i := 0 to High(Colors) do
     if (FindColorsTolerance(TPA, Colors[i], self.worldNumArea, 100, ColorSetting(1))) then
@@ -587,7 +570,7 @@ Function is internal.  Use TRSLobbyWorlds.selectWorld instead.
 .. note::
 
     - by Coh3n
-    - Last Updated: 8th August 2014 by The Mayor
+    - Last Updated: 9th October 2014 by Clarity
 
 Example:
 
@@ -600,10 +583,10 @@ function TRSLobbyWorlds._scrollToWorld(var res: TPoint; wo: integer): boolean;
 const
   __COLOR_SCROLL_BAR = 3455991;
 var
+  favs, modY1, modY2: integer;
   t: LongWord;
   down: boolean;
   p: TPoint;
-  nArr: TIntegerArray;
 begin
   if (not self.isOpen()) then
     exit(false);
@@ -611,11 +594,20 @@ begin
   p := self.getCenterPoint().rand(randomRange(-200, 200), randomRange(-50, 50));
   t := (getSystemTime() + 20000);
 
+  favs := self._getFavoriteCount();
+
+  case favs of
+    0: modY2 := 0;
+    1: modY2 := 20;
+    2: modY2 := 35;
+    3: modY2 := 54;
+  end;
+
   repeat
     if (self._findWorldNumber(res, wo)) then
       break;
 
-    if (getColor(self.x2 - 25, self.y2 - 308) = __COLOR_SCROLL_BAR) then
+    if (getColor(self.x2 - 25, self.y2 - 308 + modY2) = __COLOR_SCROLL_BAR) then
       down := true;
 
     if (getColor(self.x2 - 25, self.y2 - 79) = __COLOR_SCROLL_BAR) then
@@ -652,12 +644,11 @@ Example:
 
     lobbyWorlds.selectWorld(115);
 *)
-function TRSLobbyWorlds.selectWorld(wo: integer; favorite: boolean = false): boolean;
+function TRSLobbyWorlds.selectWorld(wo: integer): boolean;
 var
   p: TPoint;
   tpa: TPointArray;
   atpa: T2DPointArray;
-  nArr: TIntegerArray;
 begin
   result := false;
 
@@ -682,7 +673,7 @@ begin
   if (not result) then
   begin
     p := [-1, -1];
-    if (self._findWorldNumber(p, wo, favorite)) then // check to see if the worlds already visible (or if it's favorited)
+    if (self._findWorldNumber(p, wo)) then // check to see if the worlds already visible (or if it's favorited)
       print('Found world '+toStr(wo))
     else
       if (self._scrollToWorld(p, wo)) then
@@ -931,7 +922,7 @@ begin
   for i := 0 to high(wArray) do
   begin
     p := [-1, -1];
-    if (self._findWorldNumber(p, wArray[i], true)) then
+    if (self._findWorldNumber(p, wArray[i])) then
       print('Found world '+toStr(wArray[i]))
     else
       if (self._scrollToWorld(p, wArray[i])) then
