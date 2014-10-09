@@ -22,6 +22,7 @@ const
   _WORLD_PATH                  = includePath + 'SRL-6/lib/interfaces/lobby/worlds.ini';
   _WORLD_SORT_BUTTON           = 10328724;  // top of sort buttons
   _WORLD_SORT_AREA : TBox      = [110, 215, 751, 233]; // box around all sort buttons
+  
 (*
 const Order
 ~~~~~~~~~~~
@@ -451,9 +452,8 @@ TRSLobbyWorlds._getFavoriteCount
 
     function TRSLobbyWorlds._getFavoriteCount(): integer;
 
-Determines the amount of currently existing favorite worlds.  Plays a role in
-general world selection as the favorite world count affects the bounds of the
-worldNumArea TBox variable.
+Determines the amount of currently existing favorite worlds.  Plays a role in world scrolling
+as the favorite world count affects the position of the scrollbar.
 
 .. note::
 
@@ -490,8 +490,7 @@ TRSLobbyWorlds._findWorldNumber
     function TRSLobbyWorlds._findWorldNumber(var res: TPoint; wo: integer): boolean;
 
 Searches for the text of the world 'wo'. Returns true if found. Returns it's
-coordinates in 'res'.  Before every search this function updates the bounds of
-worldNumArea relative to the amount of favorited worlds.
+coordinates in 'res'.
 
 .. note::
 
@@ -583,7 +582,7 @@ function TRSLobbyWorlds._scrollToWorld(var res: TPoint; wo: integer): boolean;
 const
   __COLOR_SCROLL_BAR = 3455991;
 var
-  favs, modY1, modY2: integer;
+  favs, modY2: integer;
   t: LongWord;
   down: boolean;
   p: TPoint;
