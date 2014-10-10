@@ -152,7 +152,7 @@ numbers. Uses extended format instead of integer
 
 .. note::
 
-    - by PriSoner and Nava2
+    - by PriSoner, Nava2 and bonsai
 
 Example:
 
@@ -168,7 +168,11 @@ var
 begin
   result := toStr(n);
 
-  b := length(result) + 1;
+  b := pos('.', result);
+
+  if (b < 1) then
+    b := length(result) + 1;
+
   if (b > 3) then
   repeat
     b := b - 3;
