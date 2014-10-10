@@ -409,15 +409,16 @@ TRSLobby.quickSelectWorld
 
 .. code-block:: pascal
 
-    function TRSLobby.quickSelectWorld(wo: integer): boolean;
+    function TRSLobby.quickSelectWorld(wo: integer; click: boolean = true): boolean;
 
 Returns true if the desired world appears in the quick select favorites boxes
-in the bottom right of the interface.  Will click the world if found.
+in the bottom right of the interface.  Will click the world if found and if
+click boolean is set to true.
 
 .. note::
 
     - by Coh3n
-    - Last Updated: 22nd August 2014 by Olly
+    - Last Updated: 10 October 2014 by Ashaman88
 
 Example:
 
@@ -426,40 +427,45 @@ Example:
     if (not lobby.isOpen()) then
       lobby.open();
 *)
-function TRSLobby.quickSelectWorld(const World: Integer): Boolean;
+function TRSLobby.quickSelectWorld(const World: Integer; click: boolean = true): boolean;
 var
   Boxes: TBoxArray;
-  fWorlds: array [0..2] of Integer;
+  fWorlds: array [0..2] of Integer;        //Note this should be moved to worlds.simba probably
   i, tab: Integer;
 begin
-  Result := False;
-
   if (not self.isOpen()) then
     exit();
 
   // quick select only shows on player info, friends, or friend chat.
   tab := self.getCurrentTab();
-  if (tab = LOBBY_OPTIONS) or (tab = LOBBY_WORLDS) then
+
+  case tab of
+    LOBBY_PLAYER, LOBBY_FRIENDS..LOBBY_CLAN: boxes := grid(3, 1, 37, 16, 62, 0, point(self.x2 - 193, self.y2 - 54));
+    LOBBY_WORLDS: boxes := grid(3, 1, 37, 16, 62, 0, point(self.x2 - 193, self.y2 - 30));
+  else
     if (not self.openTab(LOBBY_PLAYER)) then
       exit();
+  end;
 
   // a box around each of the quick select world boxes
-  Boxes := Grid(3, 1, 37, 16, 62, 0, Point(Self.x2 - 193, Self.y2 - 54));
-  for i := 0 to High(Boxes) do
+  for i := 0 to high(boxes) do
   begin
     fWorlds[i] := -1;
 
-    if (CountColorTolerance(12484874, Boxes[i], 20, ColorSetting(1)) > 10) then // Check if fav world exists (Light blue).
-      fWorlds[i] := StrToIntDef(Tesseract_GetText(Boxes[i].x1, Boxes[i].y1, Boxes[i].x2, Boxes[i].y2, TTesseractFilter([5, 5, [True, -40, TM_Mean]]), TESS_WHITELIST_NUMBERS), -1);
+    if (countColorTolerance(12484874, boxes[i], 20, colorSetting(1)) > 10) then // Check if fav world exists (Light blue).
+      fWorlds[i] := strToIntDef(tesseract_getText(boxes[i].x1, boxes[i].y1, boxes[i].x2, boxes[i].y2, TTesseractFilter([5, 5, [true, -40, TM_Mean]]), TESS_WHITELIST_NUMBERS), -1);
   end;
 
   printf('TRSLobby.quickSelectWorld(): Found worlds %s', [toString(fWorlds)]);
 
-  if (InIntArrayEx(fWorlds, i, World)) then
+  if (inIntArrayEx(fWorlds, i, world)) then
   begin
-    mouseBox(Boxes[i], MOUSE_LEFT);
-    printf('TRSLobby.quickSelectWorld(): Clicked world %d. [Index %d]', [World, i]);
-    Exit(True);
+    if click then
+    begin
+      mouseBox(boxes[i], MOUSE_LEFT);
+      printf('TRSLobby.quickSelectWorld(): Clicked world %d. [Index %d]', [World, i]);
+    end;
+    exit(true);
   end;
 end;
 
