@@ -2,7 +2,7 @@
 Lodestone
 =========
 
-The pinscreen file holds functions and procedures that are used in the
+The lodestone file holds functions and procedures that are used in the
 Runescape lodestone-teleport screen.
 
 The source for this file can be found `here <https://github.com/SRL/SRL-6/blob/master/lib/interfaces/lodestone.simba>`_.
@@ -49,6 +49,7 @@ const
   LOCATION_AL_KHARID       = 20;
   LOCATION_CANIFIS         = 21;
   LOCATION_ASHDALE         = 22;
+  LOCATION_PRIFDDINAS      = 23;
   LOCATION_PREVIOUS        = 1337;
 
 (*
@@ -156,7 +157,6 @@ begin
     if (length(atpa[i]) = MENU_LENGTH) then
     begin
       b := getTPABounds(atpa[i]);
-
       if (getColor(b.x2, b.y2 + 5) = MENU_OFFSET_COLOR) or (getColor(b.x2, b.y2 + 5) = MENU_OFFSET_COLOR_FTP) then
       begin
         self.setBounds([b.x1 - 15, b.y1 - 2, b.x2 + 310, b.y2 + 300]);
@@ -281,7 +281,7 @@ Example:
 *}
 function TRSLodestoneScreen._isLocationVaild(location: integer): boolean;
 begin
-  result := inRange(location, LOCATION_LUNAR_ISLE, LOCATION_ASHDALE);
+  result := inRange(location, LOCATION_LUNAR_ISLE, LOCATION_PRIFDDINAS);
 
   if (not result) then
     print('TRSLodestoneScreen._isLocationVaild(): Location isn''t vaild!');
@@ -310,7 +310,7 @@ Example:
 *}
 function TRSLodestoneScreen._getTeleportBox(location: integer): TBox;
 const
-  pnts: TPointArray = [[30, 48], [98, 117], [75, 194], [187, 53], [169, 100], [160, 144], [151, 209], [143, 262], [243, 87], [202, 130], [234, 124], [202, 198], [302, 60], [285, 99], [265, 146], [266, 188], [340, 131], [303, 162], [314, 199], [314, 243], [355, 193], [397, 105], [88, 298]];
+  pnts: TPointArray = [[30, 48], [98, 117], [75, 194], [187, 53], [169, 100], [160, 144], [151, 209], [143, 262], [243, 87], [202, 130], [234, 124], [202, 198], [302, 60], [285, 99], [265, 146], [266, 188], [340, 131], [303, 162], [314, 199], [314, 243], [355, 193], [397, 105], [88, 298], [55, 139]];
 var
   p: TPoint;
 begin
