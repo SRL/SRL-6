@@ -1484,15 +1484,27 @@ begin
         color := 2390438;
       end;
 
-    MM_SYMBOL_TRANSPORTATION:
+    MM_SYMBOL_TRANSPORTATION: // 10 October 2014
       with result do
       begin
         name := 'Transportation';
-        bmp := BitmapFromString(15, 5, 'z78DA33303534347074353' +
-          '4B73032219E34763173348592A62E666E66A6C8B20660330D904C' +
-          '86A841D6858BC454896C3EA6C9C498899FC465B291A3B193910B3' +
-          '124A69910715C269317CEC866229B0C00B3496273');
-        color := -1;
+        bmp := BitmapFromString(14, 18, 'meJxjYEAAZiamG1sXvDy8Gohubl' +
+        '0A5DJgACYmpie7lxxb3NdWmJoeHQxEQAaQ+3TPEhYWZrgyIPvjkVV' +
+        'Ta/Oc7O2sbWxs7eytwcDJwQ4oCJQS5OOBqHyyY/7sxiIHO1t7Bwdn' +
+        'JODkBFRrC5QCKoCoPLW419XJwdHREaLAxcXFITzd2cUVyAYKAqWAC' +
+        'lhZmC8u7W0rTHGwB5nm5uLi6ekJZBiXr7Du2+/gGwxkA6WACi4t63' +
+        'u8ZVZaTBjILFcPJ98Ip5Bk+9A0/dqtapPuG089a5tW7ejulRkb9nT' +
+        'b7GdbZyWEBTj6hrrk9ltU7DNovKTbeUu1+650122FyXfVpl3RyZ8U' +
+        'FxoAVPZk47T4mDDPqslGRTvkMi5IZZ6RKjwpVXcBqFKq87Js+RoDj' +
+        '9DoAC+gsgfrJsfnZ1jmdKpFTVN0r9Ww8Nc2MJWP7ZesOSWXMlnf2t' +
+        'nGxiY60Beo7M6K/picVKPwXB1zF1NTM3t7e1sbG62wKvXgEhMLa1t' +
+        'bW6AP4oL97qyccGtpT1RWsp6ds4W5BVDQHQjc3B3cfOwdHIHhCQm3' +
+        'uCBfoLLrC9sikmJNTU3t7OyAqjzBwN3dAxRobh4u4FCNDfQGKru2o' +
+        'K25ILUgKSY3PsLX08MdCfh5exYmRZekxLbnJgKVHZ9UdXxy9YlpDa' +
+        'dnNs2pyYXEEhg5A7lAQaAUUAFQGRMjIxCxMDFxsbOdnFK9oqXE3tY' +
+        'WiICM01NrWYApjxEEgCRy2gMKn5hYOasiC4iO9Zezs7EiyzKiKmZj' +
+        'Zd3bWQRELMzMDKgAABJW9+Y=');
+        color := 4342338;
       end;
 
     MM_SYMBOL_SHOP_MAGIC: // 9 October 2014
