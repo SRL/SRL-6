@@ -2141,16 +2141,22 @@ begin
         color := -1;
       end;
 
-    MM_SYMBOL_TRAINING_DUMMY:
+    MM_SYMBOL_TRAINING_DUMMY: // 12 October 2014
       with result do
       begin
         name := 'Training Dummy';
-        bmp := BitmapFromString(15, 5, 'z78DAA5CC5B0AC43' +
-          '00805D02D69468DF9BC6DEAFE97D401032384F92845B8888F434C' +
-          'DF0210386A6A6B9D3833270E0F5F5B7371D2FD2B93F857FFE4D4A' +
-          'AE962D402E738ED1A0768E08D5CE743FA14A49CB9DF3C95CDA4B3' +
-          'A6EC1FB73E6BBE974D6572403C74F9AB2F9769DEA32D69B5');
-        color := -1;
+        bmp := BitmapFromString(14, 15, 'meJxjYEAHF3atAyIMYQxlO1at7q' +
+        '8AIiADj7Lti6evmVA1IdsJiICMrYunY1U2+8zdrlmzq2Nt+jIdgQj' +
+        'IyJ88O3bfPTRlq2b1Ny9Y2nniblV3e2W0JRDFtLT77LkfO2PFspkT' +
+        '4MpObli8tKO4LNoma8rshguvUptavMrrXQ69ceudVxptA5QCKgAqO' +
+        '7Jm/pKusqYEm+ZEm7wQs6i+2RkH7nktOWRRPxHIbUm0aUm2W9pVCl' +
+        'S2f9mMBc2ZJblhOUXJ2UGmzgXlzksOx+y6FVxRC+QW5MeUZQcvas7' +
+        'YvxTku31Lp3f1toQu2ek+c63Whhv6lRNcO+aE77kbPH1F3Pz1PT1N' +
+        '+5YiAmHNlPboCXP9Trwznrc31scYiOznbA/e9yixfyZQCs37Ycv2e' +
+        'U5dHbz2REKCf1yMV9iKAz5TVsWs2I81SKe11ZS0tcVXFMYUZpa0tg' +
+        'K5uOJoWnPFxhldU2tSgQjImNFSiSdCF7ZX7Vo4CYiADDzKIKC3NAu' +
+        'IMMUBZnC56A==');
+        color := 6208727;
       end;
 
     MM_SYMBOL_SHOP_FOOD:
