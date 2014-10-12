@@ -2776,20 +2776,48 @@ Returns the players current run energy.
 
 .. note::
 
-    - by Olly
-    - Last Updated: 08 August 2013 by Olly
+    - by Clarity
+    - Last Updated: 12th October 2014 by Clarity
 
 Example:
 
 .. code-block:: pascal
 
-    if (minimap.isResting()) then
-      writeln('we are resting!');
+    if (minimap.getRunEnergy() > 50) then
+      minimap.toggleRun();
 *)
 function TRSMinimap.getRunEnergy(): integer;
+const
+  RUN_DIGIT_1_TESSERACT_FILTER: TTesseractFilter = [5, 5, [true, 10, TM_Mean]];
+  RUN_DIGIT_2_TESSERACT_FILTER: TTesseractFilter = [5, 5, [false, 35, TM_Mean]];
+var
+  position, y, percBMP: integer;
+  caps: TStringArray;
+  searchBox1st, searchBox2nd: TBox;
 begin
- // i'll figure this out soon..
- print('TRSMinimap.getRunEnergy(): Function hasn''t been coded yet!', TDebug.WARNING);
+    percBMP := BitmapFromString(8, 9, 'meJz7z/D/P6kIArBJMTAwkGwa3Ewq' +
+        'qYe4AQBnyo9x');
+    setTransparentColor(percBMP, 16711935);
+    findBitmap(percBMP, position, y);
+    freeBitmap(percBMP);
+    case position of
+      783: exit(100);
+      780: begin
+             searchBox1st := IntToBox(766, 31, 771, 41);
+             searchBox2nd := IntToBox(773, 31, 779, 41);
+             setLength(caps, 2);
+             caps[0] := extractFromStr(tesseract_GetText(searchBox1st, RUN_DIGIT_1_TESSERACT_FILTER), numbers);
+             caps[1] := extractFromStr(tesseract_GetText(searchBox2nd, RUN_DIGIT_2_TESSERACT_FILTER), numbers);
+             result := (strToIntDef(caps[0] + caps[1], -1));
+             if (result < 10) then result := (result * 10);
+           end;
+      776: begin
+             searchBox1st := IntToBox(769, 31, 775, 41);
+             setLength(caps, 1);
+             caps[0] := extractFromStr(tesseract_GetText(searchBox1st, RUN_DIGIT_2_TESSERACT_FILTER), numbers);
+             result := (strToIntDef(caps[0], -1));
+           end;
+    end;
 end;
 
 (*
