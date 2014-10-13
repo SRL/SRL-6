@@ -2403,17 +2403,26 @@ begin
         color := -1;
       end;
 
-    MM_SYMBOL_HUNTING:
+    MM_SYMBOL_HUNTING: // 13 October 2014
       with result do
       begin
         name := 'Hunting';
-        bmp := BitmapFromString(15, 5, 'z78DA8DCF410A00' +
-          '210C03C02FC52D76E9B18AFFFF92B0EB2150025E728876AC78916' +
-          '8D3678C55D360F6F89FE919211B9EC267A2C87CB32F6FFD08EC70' +
-          'CF6FDDC8D554597F712FF3AC3AE546C96A1FE573B2BC0197F063A' +
-          'B');
-        color := -1
-      end;
+        bmp := BitmapFromString(14, 19, 'meJxjYEABddWFF3avA6K6skImJi' +
+        'YGHICFleXCjlVr+suB6MKOlSwsLFiVAU04s3X56v6qnmw3IAIygFw' +
+        'WFmZMZUfXL1zRXdKc4tKaFwREQAaQe2zDQg4ONhRl6+Yv7yxsTnZs' +
+        'mjyrsqO/qmtiVfdUIBcoCJTi5GAHKmNkZDi9ccnyrpKGeNu8MJu6N' +
+        'WfLeuaWT1hcNXcHkAsUBEqd3rSEg4P9yFqgaWVNCVbVjXV1a84kBD' +
+        'nlxXrkx3slhbi0bblSVVMJlAIqOLp2wf6l0xa1ZLUm2VQUpVdMWZ2' +
+        'cFN08czEQpafFV85YX5YTD5QCKti/bDoHO/v+pdMXt+XWxFnnxPtX' +
+        'LNjVe/JLz/FPlXO2Z8f718VZL2nPPbh8Bis4xLg4OYCK5zWkFSb5d' +
+        'Rx43br9YfPm2207nwC5QEGgFFAB3PvAoNg+v39yWUxBhE1WoFlWgE' +
+        'lBuDWQCxQEWooSnszMlWUpW2f1zK5NqosxByIgY+vsnuaSJGYW9Dh' +
+        'lYmVuL8ncPrt3Tl0KEAEZvZWZLKzocQQBrKwsi9urdy+aDERABhsr' +
+        'UrwDwx0J1GUnTqzI7SvNBCIgo6UoCaSdDYuxwGhd2lkd6+0CREAGI' +
+        '6o5aKC9ILWrJKuzOAvIQBbH1ASM38XtVYtaK/GYBgfF8WFABDaHkR' +
+        'Ep2QMAQMzYtg==');
+        color := 8150587;
+      end; 
 
     MM_SYMBOL_SAND:
       with result do
