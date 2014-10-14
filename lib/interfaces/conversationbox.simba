@@ -593,7 +593,7 @@ begin
     exit();
 
   // yellow of the top of the button
-  findColorsTolerance(tpaButton, 7003134, self.getBounds(), 15, colorSetting(1));
+  findColorsTolerance(tpaButton, 3717085, self.getBounds(), 72, colorSetting(1));
 
   if (length(tpaButton) <= 0) then
   begin
