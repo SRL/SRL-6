@@ -1477,7 +1477,13 @@ begin
           begin
             result := (self._enterAmount(amount, 6000));
             print('bankscreen.withdraw(): result = ' + boolToStr(result), TDebug.SUB);
-            exit;
+            exit();
+          end else
+          begin
+            result := false;
+            chooseOption.close();
+            print('bankscreen.withdraw(): Withdraw-X to BoB option not present.  result = ' + boolToStr(result), TDebug.ERROR);
+            exit();
           end;
         end;
         if (not chooseOption.optionsExist(['Withdraw-' + intToStr(amount), '-' + intToStr(amount), toStr(amount)])) then
