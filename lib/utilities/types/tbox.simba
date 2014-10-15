@@ -11,42 +11,6 @@ The source for this file can be found `here <https://github.com/SRL/SRL-6/blob/m
 {$f-}
 
 (*
-TBoxArray.deleteIndex
-~~~~~~~~~~~~~~~~~~~~~
-
-.. code-block:: pascal
-
-    procedure TBoxArray.deleteIndex(const index : Integer);
-
-Used to delete a value of a TBoxArray at a chosen index larger than the array's lowest index.
-
-.. note::
-
-    - by Zyt3x
-
-Example:
-
-.. code-block:: pascal
-
-    tba.deleteIndex(0);
-
-*)
-procedure TBoxArray.deleteIndex(const index : Integer);
-var
-  I : Integer;
-begin
-  if not inRange(index, low(self), high(self)) then
-  begin
-    WriteLn('ERROR: deleteIndex: index larger than array length.');
-    Exit;
-  end;
-
-  for I := index to high(self)-1 do
-    self[I] := self[I+1];
-  setLength(self, length(self)-1);
-end;
-
-(*
 TBox.isPointInside
 ~~~~~~~~~~~~~~~~~~
 
@@ -459,6 +423,45 @@ begin
 end;
 
 (*
+TBox.normalize()
+~~~~~~~~~~~~~~
+
+.. code-block:: pascal
+
+    procedure TBox.normalize(b: TBox);
+
+Makes sure the box is top-left to bottom-right
+
+.. note::
+
+    - by bonsai
+
+Example:
+
+.. code-block:: pascal
+
+    someBox.normalize();
+
+*)
+procedure TBox.normalize();
+var
+  tmp: integer;
+begin
+  if (self.x1 > self.x2) then
+  begin
+    tmp := self.x1;
+    self.x1 := self.x2;
+    self.x2 := tmp;
+  end;
+  if (self.y1 > self.y2) then
+  begin
+    tmp := self.y1;
+    self.y1 := self.y2;
+    self.y2 := tmp;
+  end;
+end;
+
+(*
 TBox.setLimit
 ~~~~~~~~~~~~~~
 
@@ -471,6 +474,7 @@ Limits the TBox to another TBox (b).
 .. note::
 
     - by Olly
+    - modified by bonsai 20140719
 
 Example:
 
@@ -481,9 +485,17 @@ Example:
 *)
 procedure TBox.setLimit(b: TBox);
 begin
+  self.normalize();
+  b.normalize();
+
   if (self.x1 < b.x1) then self.x1 := b.x1;
+  if (self.x1 > b.x2) then self.x1 := b.x2;
+  if (self.x2 < b.x1) then self.x2 := b.x1;
   if (self.x2 > b.x2) then self.x2 := b.x2;
+
   if (self.y1 < b.y1) then self.y1 := b.y1;
+  if (self.y1 > b.y2) then self.y1 := b.y2;
+  if (self.y2 < b.y1) then self.y2 := b.y1;
   if (self.y2 > b.y2) then self.y2 := b.y2;
 end;
 
@@ -862,53 +874,6 @@ Example:
 procedure TBox.shrink(const size: integer);
 begin
   self.edit(+size, +size, -size, -size);
-end;
-
-(*
-TBoxArray.getBounds
-~~~~~~~~~~~~~~~~~~~
-
-.. code-block:: pascal
-
-    function TBoxArray.getBounds(): TBox;
-
-Returns the bounds of the TBoxArray.
-
-.. note::
-
-    - by Janilabo
-    - Last Updated: 17 September 2013 by Janilabo
-
-Example:
-
-.. code-block:: pascal
-
-    b := tba.getBounds();
-*)
-function TBoxArray.getBounds(): TBox;
-var
-  h, i: Integer;
-  e: TBox;
-begin
-  h := High(self);
-  if (h > -1) then
-  begin
-    Result := TBox(self[0]);
-    if (h < 1) then
-      Exit;
-    for i := 1 to h do
-    begin
-      if (Result.X1 > self[i].X1) then
-        Result.X1 := Integer(self[i].X1);
-      if (Result.Y1 > self[i].Y1) then
-        Result.Y1 := Integer(self[i].Y1);
-      if (Result.X2 < self[i].X2) then
-        Result.X2 := Integer(self[i].X2);
-      if (Result.Y2 < self[i].Y2) then
-        Result.Y2 := Integer(self[i].Y2);
-    end;
-  end else
-    Result := e;
 end;
 
 {$f+}

@@ -193,7 +193,7 @@ Returns the average pixel shifts in each box in "b" over "maxTime", waiting
 .. note::
 
     - by Coh3n
-    - Last Updated: 23 May 2013 by Coh3n
+    - Last Updated: 10 October 2014 by Bonsai
 
 Example:
 
@@ -203,24 +203,32 @@ Example:
 *)
 function getPixelShiftAverage(b: TBoxArray; waitPerLoop, maxTime: integer): TIntegerArray;
 var
-  l, i: integer;
-  t : LongWord;
-  shifts: array of TIntegerArray;
+  len, i, j: integer;
+  samples: array of TIntegerArray;
+  tmp: TIntegerArray;
+  timer: TTimeMarker;
+
 begin
-  l := length(b);
-  setLength(result, l);
+   i := 0;
+   timer.start();
+   while (timer.getTime() < maxTime) do
+   begin
+      setLength(samples, i + 1);
+      samples[i] := getPixelShift(b, waitPerLoop);
+      inc(i);
+   end;
 
-  t := (getSystemTime() + maxTime);
+   setLength(tmp, i);
+   len := length(b);
+   setLength(result, len);
 
-  while (getSystemTime() < t) do
-    for i := 0 to (l - 1) do
-    begin
-      setLength(shifts, length(shifts) + 1);
-      shifts[high(shifts)] := getPixelShift(b, waitPerLoop);
-    end;
+   for i := 0 to (len - 1) do
+   begin
+      for j := 0 to high(samples) do
+         tmp[j] := samples[j][i];
 
-  for i := 0 to (l - 1) do
-    result[i] := averageTIA(shifts[i]);
+      result[i] := tmp.average();
+   end;
 end;
 
 (*
