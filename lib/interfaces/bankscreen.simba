@@ -2089,10 +2089,10 @@ var
   i, j: Integer;
   b: TBox;
 begin
-  FindColorsTolerance(tPiller, 7437434, mainScreen.getBounds(), 10, ColorSetting(2, 0.38, 0.15));
+  FindColorsTolerance(tPiller, 7437434, mainScreen.getBounds(), 12, ColorSetting(2, 0.38, 0.15));
   aPiller := ClusterTPAEx(tPiller, 8, 8);
 
-  FindColorsTolerance(tFloor, 6646636, mainScreen.getBounds(), 10, ColorSetting(2, 1.20, 0.29));
+  FindColorsTolerance(tFloor, 6646636, mainScreen.getBounds(), 12, ColorSetting(2, 1.20, 0.29));
   tFloorEdge := FindTPAEdges(tFloor);
 
   if (Length(tFloor) < 20) or (Length(tPiller) < 20) then
