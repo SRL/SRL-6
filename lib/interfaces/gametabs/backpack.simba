@@ -981,7 +981,7 @@ Will return how much money is in the money pouch.
 .. note::
 
     - by Olly
-    - Last Updated: 19 August 2013 by Olly
+    - Last Updated: 18 October 2014 by Ashaman88
 
 Example:
 
@@ -991,43 +991,25 @@ Example:
 *)
 function TRSTabBackpack.getMoneyPouchAmount(): integer;
 var
-  b, bounds: TBox;
-  tpa: TPointArray;
-  colArr: array [0..1] of integer;
+  b: TBox;
   s: string;
-  i: integer;
 begin
-  result := 0;
-             { green, white }
-  colArr := [65280, 16777215];
-
   if (not self.open()) then
     exit();
 
-  b := intToBox(gameTabs.TabArea.x1, gameTabs.TabArea.y2 - 35, gameTabs.TabArea.x2, gameTabs.TabArea.y2);
+  b := intToBox(gameTabs.TabArea.x1 + 127, gameTabs.TabArea.y2 - 30, gameTabs.TabArea.x2 - 40, gameTabs.TabArea.y2 - 10);
 
-  for i := 0 to 1 do
-    if (findColors(tpa, colArr[i], b)) then
-    begin
-      bounds := tpa.getBounds();
-      bounds.edit(-1, -1, +1, +1);
+  s := replace(tesseract_getText(b.x1, b.y1, b.x2, b.y2, TTesseractFilter([5, 5, [true, 30, TM_Mean]])), ' ', '', [rfReplaceAll]);
+  result := strToIntDef(extractFromStr(s, numbers), 0);
 
-      s := getTextAtEx(bounds, 0, 4, 4, colArr[i], 1, upChars);
+  if pos('K', s) > 0 then
+    result := result * 1000;
 
-      result := strToIntDef(ExtractFromStr(s, numbers), 0);
+  if pos('M', s) > 0 then
+    result := result * 1000000;
 
-      if pos('K', s) > 0 then
-        result := result * 1000;
-
-      if pos('M', s) > 0 then
-        result := result * 1000000;
-
-      print('tabBackpack.getMoneyPouchAmount(): result = ' + intToStr(result) +
-            ' (' + s + ')', TDebug.SUB);
-      exit();
-    end;
-
-  print('tabBackpack.getMoneyPouchAmount(): Failed to find any text color, resulting as 0', TDebug.ERROR);
+  print('tabBackpack.getMoneyPouchAmount(): result = ' + intToStr(result) +
+        ' (' + s + ')', TDebug.SUB);
 end;
 
 (*
