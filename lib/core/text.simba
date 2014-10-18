@@ -450,15 +450,14 @@ begin
       continue();
 
     if (inRange(length(lines[0]) + length(lines[1]), matchLen - 2, matchLen + 2)) then // allow some leanway.
-      if (SimilarColors(COLOR_CHECK, getColor(box.x1, box.y2 + 4), 20)) then
-    begin
-      b := box;
-      // smartImage.drawBox(b);
-      setColorToleranceSpeed(cts);
-      exit(true);
-    end;
+      if (similarColors(COLOR_CHECK, getColor(box.x1, box.y2 + 4), 20)) or (similarColors(COLOR_CHECK, getColor(box.x1, box.y2 + 3), 20)) then
+      begin
+        b := box;
+       // smartImage.drawBox(b);
+        setColorToleranceSpeed(cts);
+        exit(true);
+      end;
   end;
-
   setColorToleranceSpeed(cts);
 end;
 {$ENDIF}
