@@ -319,8 +319,6 @@ Example:
     end;
 *}
 procedure TPlayerArray._add(const info: TPlayer);
-var
-  h: integer;
 begin
   setLength(self, length(self) + 1);
   self[high(self)] := info;
