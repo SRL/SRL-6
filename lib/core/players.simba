@@ -680,14 +680,18 @@ const
 var
   tpaActive, tpaInactive: TPointArray;
   bdsActive, bdsInactive: TBox;
-  w, h: integer;
 begin
-  getClientDimensions(w, h);
+  findColors(tpaActive, 6774863, 247, 229, 547, 375); // active box border color
+  findColors(tpaInactive, 6906451, 247, 229, 547, 380); // inactive box border color
 
-  findColors(tpaActive, 6774863, 0, 0, w-1, h-1); // active box border color
-  findColors(tpaInactive, 6906451, 0, 0, w-1, h-1); // inactive box border color
 
-  if (length(tpaActive) = __ACTIVE_BORDER_LENGTH) and (length(tpaInactive) = __INACTIVE_BORDER_LENGTH) then
+  if length(tpaActive) = 0 then
+    findColors(tpaActive, 9867393, 247, 229, 547, 375); // active box border color when mouse is hovering
+
+  if length(tpaInactive) = 0 then
+    findColors(tpaInactive, 9867393, 247, 229, 547, 375); // inactive box border color when mouse is hovering
+
+  if ((length(tpaActive) = __ACTIVE_BORDER_LENGTH) or (length(tpaActive) = __INACTIVE_BORDER_LENGTH)) and ((length(tpaInactive) = __INACTIVE_BORDER_LENGTH) or (length(tpaInactive) = __ACTIVE_BORDER_LENGTH)) then
   begin
     result := true;
     print('__setInputBoxes(): Set username and password boxes', TDebug.SUB);
