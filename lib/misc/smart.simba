@@ -33,6 +33,7 @@ var SMART plugins
 *)
 var
   smartPlugins: TStringArray = ['OpenGL32.dll', 'd3d9.dll'];
+  smartResetAttempts: integer = 5;
 
 (*
 var User Set
@@ -343,7 +344,7 @@ Example:
 .. code-block:: pascal
 
 *)
-procedure smartCreateClient(w, h: integer);
+function smartCreateClient(w, h: integer): boolean;
 var
   plugins: string;
   params: TStringArray;
@@ -352,7 +353,10 @@ begin
   print('smartCreateClient():', TDebug.HEADER);
 
   if (not smartGetParameters(params)) then
-    print('Failed to grab parameters', TDebug.FATAL);
+  begin
+    print('Failed to grab parameters', TDebug.FOOTER);
+    exit(false);
+  end;
 
   path := getJavaPath();
   plugins := implode(',', smartPlugins);
@@ -371,9 +375,12 @@ begin
     __smartCurrentPID := smartGetClientPID(__smartCurrentTarget);
 
     if (smartSetAsTarget(__smartCurrentPID)) then
+    begin
       print('smartCreateClient(): result = true', TDebug.FOOTER);
+      result := true;
+    end;
   end else
-    print('Failed to spawn a SMART client', TDebug.FATAL);
+    print('Failed to spawn a SMART client', TDebug.FOOTER);
 end;
 
 (*
@@ -505,7 +512,7 @@ Example:
 .. code-block:: pascal
 
 *)
-procedure initSmart(forceNew: boolean);
+function initSmart(forceNew: boolean): boolean;
 begin
   print('initSmart():', TDebug.HEADER);
 
@@ -517,15 +524,17 @@ begin
     begin
       print('Succesfully initialized via pairing to a previously spawned client');
       print('initSmart()', TDebug.FOOTER);
-      exit();
+      exit(true);
     end;
   end;
 
   print('Attempting to spawn a new client..');
 
-  smartCreateClient(__smartClientWidth, __smartClientHeight);
-
-  print('Succesfully initialized via spawning a new client');
+  if smartCreateClient(__smartClientWidth, __smartClientHeight) then
+  begin
+    result := true;
+    print('Succesfully initialized via spawning a new client');
+  end;
 
   smartSetDebug(false);
   addOnTerminate('smartFreeCurrentClient');
@@ -658,38 +667,45 @@ Example:
 *)
 procedure smartReloadClient(waitTime: integer);
 var
-  img, r: integer;
+  img, r, i, j: integer;
 begin
-  print('smartReloadClient()', TDebug.HEADER);
-  img := -999;
-
-  if (__smartIsDrawingSetup) then
+  for i = 1 to smartResetAttempts do
   begin
-    img := copyBitmap(smartImage.getIndex());
-    smartFreeDrawing();
-  end;
+    inc(j);     //added a second var to keep track of attempts in case user wants infinite smartresetattempts with a negative number
+    print('smartReloadClient()', TDebug.HEADER);
+    print('attempt #: ' + toStr(j));
+    img := -999;
 
-  r := SmartGetRefresh(__smartCurrentTarget);
+    if (__smartIsDrawingSetup) then
+    begin
+      img := copyBitmap(smartImage.getIndex());
+      smartFreeDrawing();
+    end;
 
-  smartFreeCurrentClient();
-  smartKillClient(__smartCurrentPID);
+    r := SmartGetRefresh(__smartCurrentTarget);
 
-  print('Killed our current client, waiting ' + intToStr(waitTime) + ' ms before reloading client');
-  wait(waitTime);
+    smartFreeCurrentClient();
+    smartKillClient(__smartCurrentPID);
 
-  initSmart(true);
+    print('Killed our current client, waiting ' + intToStr(waitTime) + ' ms before reloading client');
+    wait(waitTime);
 
-  print('Setting refresh rate back to ' + intToStr(r));
-  SmartSetRefresh(__smartCurrentTarget, r);
+    if initSmart(true) then
+    begin
+      print('Setting refresh rate back to ' + intToStr(r));
+      SmartSetRefresh(__smartCurrentTarget, r);
 
-  if (bitmapExists(img)) then
-  begin
-    smartSetupDrawing();
+      if (bitmapExists(img)) then
+      begin
+        smartSetupDrawing();
 
-    print('Re-drawing the smartImage bitmap');
+        print('Re-drawing the smartImage bitmap');
 
-    getMufasaBitmap(img).drawTransparent(0, 0, smartImage);
-    freeBitmap(img);
+        getMufasaBitmap(img).drawTransparent(0, 0, smartImage);
+        freeBitmap(img);
+      end;
+      break;
+    end;
   end;
 
   print('smartReloadClient()', TDebug.FOOTER);

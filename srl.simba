@@ -78,6 +78,7 @@ function GetTickCount64(): UInt64; begin Result := GetTickCount(); end;
 function setupSRL(): boolean;
 var
   t: longWord := getTimeRunning();
+  i, j: integer;
 begin
   print('setupSRL()', TDebug.HEADER);
   print('Setting up SRL...');
@@ -87,7 +88,13 @@ begin
   {$IFNDEF SMART}
     activateClient();
   {$ELSE}
-    initSmart(smartForceNewClient);
+    for i = 1 to smartResetAttempts do
+    begin
+      inc(j);
+      print('attempting to spawn smart, attempt #: ' + toStr(j));
+      if initSmart(smartForceNewClient) then
+        break;
+    end;
 
     if (smartEnableDrawing) then
       smartSetupDrawing();
