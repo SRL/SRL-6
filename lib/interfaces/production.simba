@@ -91,7 +91,7 @@ procedure __loadProductionScreen();
 begin
   with (productionScreen) do
   begin
-    __bmp := BitmapFromString(487, 6, 'meJztl21r40YUhTf4VZZk62X0ZkmWJTshdZOlTRrKtqEsy1IathRKvvTL/v+/sY99vNNS+i2EmFTiMty5c+6ZM4PnzrjO/W0d1bmfhDPfnZ69eYPdXnefPtz89cfPinRLD3t8uKtSbzIaTsejJA66OqmX0XlbYIXxi+QYwb7ZFJtVbkJPAFq6OETIpaUrvEbFJipFIITEpmhGusDmnkOuCMUTzmeawuoh8uIiM7NolklTmjKLooXrzSbAMhPEoVekAeY5k/FwMPfdLJ7bYOg74fwYwcosIGXuTgWIDww4RPa57pSu8BoVm6gUgRASm6IZ6QJjj/a5B0LxICnuRfYinyaySMJ4ASxsqmSZBSZatJV5Zaf7WUXuzqvHh3cP91fY/febjz99+8OuwvDfve1+/O7cdYYUbeK0lGjPGVKlaX99f2srNkO/f7hSVacWebPxgTzFQdthselBVWr3hKAE4ABDKgpRxah8WuI2FwcqTPugbbEpmNYFszBaI2YZlKWtEPnLityu802Tl3nI77YuoqaKmzKpC0P1zpNFV5sk9GfTEZGmjHD4tVd5iE+dp4WB+5GW4AFjcICRRS4MjMoXj83FgQrD13T/TMFwGIJZGIwIZhl6kb3Ip4jcrJI0mrvOqCnjTZNwEF7f6X5ukW2V/vnxdrP0jD8ooyEV++669Z0BBZl2Mho4k1FVhDytKc7h/PjYllG9d11MxQaAv21SaJmOKSBHCVeJnVQ3CEEwWpQk0bVi9sKMr/Xqvvt6E6WKKAUYyxcD09HVjtld1e6JVjAAdp9PROR2XcSBl5vFRZt1TdYs4zIP9hdfvDhfZ7ST0YggfuA7cbhYl2m32sOwZR4QBENEQUbpKpdRDkUWeQzh85JnVFndyiiiFGDMKAamo3vA7GfERA5YtIIte5G9yKeIbDLeKnHgdnXWVq/2dD+3yOuL6tP7G8p1vjijeteJgznjwW67dJ1xaubebErFfny4u1gbqrTe2874jGf2/c2mzv3An9R5JFW6I6xO3VB2UTZOUDugywVH9wsMWotdps3VBuqS+s8d01ZosQLb+1ETWc7TEdnWCT9dieR/Ig8P2qo4iuTfpY3QSiQ+QRsnCEy52zVsJv4qEv+y+5vQ5h7Oi8nNUaSoJFIAhujSWrBm70X2Ip8sMrnsivb/cbqfVeTtVfvb/dWujXhsY5er8Je7y/1b2u2//ju5z/f9/pfZf/33r887HI3k7efeejs148f54hp66+0EjaPxBUJhV/A=');
+    __bmp := BitmapFromString(486, 5, 'meJztV2tv2jAULSRAQhISJwQSngFSBvQJbaVtqqaqmiZV3Zdpn/f//8ZOeuhtBqPrqm2tpkRH1rV9Xz6xrxPb1NO+//H9AVrHMmxTL+3tof10dYYu5HHHxtTn68OWX2/Uq6PIsk3NrJa7TfNgHCQtE4JvaxhEKzIU0IqAloLMQph0bHiAwFmaAx1fpyCGawXHSHvevG+v9puIS/+AWMFD1MgSg2fi7bydD7GRBjCILAC2RDblGFwFuohCW4ycz1qIiwToGW4BCLvYUPAQmMrSLEMzKmW0IqCl4NXXgxCG7fp0oCBwFkKkDKDtrQUxXCtYtSRqpHH9MFG9wKB/QKzgIbTLkOGZWKbNfIiNNIBOWAdgS2RTVg0eoIAuotAWI8eTAHGHUYOe4RaAwCShgC70acsQIv8lNoYvzUbymth4sb3hG8dp82jkjzouasUothYjfzF67KQUdWObjVkSfvl4BrWmo3V9/XzRuzgaOaaGglzRSlq51IvV7fUKlVk1siotQOlejAOU636sXCt7NcwEnuFNMpSFiAAgSSSDbNGGnplfuCgj1fnAg+DUjfw4AZnjtIKTllchRfIGkT8gaRBwm+/SJxOGDH0Y0rPoUJ8ZMgoHqQ8Zb5xsc1Hoiskv2bBMbdxxZ4l/MgnQNl3DqJYJOU2o7YPQmPZcCLZZy48TkDlOKzgJ3UqkdGB9L9yzgS4HCbjNd+kTpym+O8vQN7Il1PKxqM8MGYWD1Ic87VpYCIFFoSsm0KFz8SMLkUUVbPzHbLzpWvPEn2eF2l+mwW+dlKJuCBvpILy9WqJWR24Jav3QBMxq5rZWKVf1Esr115uLadJEieaXtlkt4QP7cjXpR45j6i33oVwjN94jsjT4YTjmyfR4s4Db/LUiamiRJ++dPCckkwqkIj8iEcUbp3jbEkgPkK6Qs5pGyEpuYTGUly5+5MVRTT4Dtt/UU9jAN8ZpGky67ji2Z30POxnCNhuxr2Mcs/g4fzobagcbyl7P4liFW2wg0HK/jQPFWI+zEasf2Fj/Ptz7V3cKypYDUhmGD7MbbKiMjewgT7reH2dD7WZDlp+x4VaY2wYbp09gI1vs1t4QNog4tzcQC2w8ujfybLj/Zm/I8rk31HPZ8Hew8eyTUtSNPBvvTpKby0O8dHxmA7OB+nAxs63iKZ5X9ziOU+zM4imejQeHIjz+VqDAa0OxMwsU+Cm+A6u0UO0=');
     setBitmapName(__bmp, 'SRL - ProductionScreen Mask');
     __isLoaded := true;
   end;
@@ -148,7 +148,7 @@ begin
     __loadProductionScreen();
 
   freeze();
-  // debugBitmap(self.__bmp);
+   //debugBitmap(self.__bmp);
   try
     if (findBitmapTolerance(self.__bmp, fx, fy, 10, colorSetting(1))) then
       if (countColor(clWhite, TBox([fx + 270, fy + 20, fx + 450, fy + 40])) > 15) then  // look for white item text to verify
