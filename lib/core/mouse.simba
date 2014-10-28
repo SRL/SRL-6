@@ -341,12 +341,11 @@ Example:
 procedure mouse(pnt: TPoint; button: integer; mmType: integer = MOUSE_HUMAN); overload;
 var
   randSpeed: extended;
-  x,y,ms: integer;
+  x,y: integer;
 begin
   if (button = MOUSE_NONE) then
     exit;
 
-  ms := mouseSpeed;
   randSpeed := (random(mouseSpeed) / 2.0 + mouseSpeed) / 10.0;
   getMousePos(x,y);
 
@@ -355,7 +354,6 @@ begin
   else
     _brakeWindMouse(x, y, pnt.x, pnt.y, mmType, 3, 10.0/randSpeed, 15.0/randSpeed, 10.0*randSpeed, false);
 
-  mouseSpeed := ms;
   fastClick(button);
 end;
 
