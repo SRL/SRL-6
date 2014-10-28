@@ -322,7 +322,7 @@ Returns the compass angle in radians.
 .. note::
 
     - by Olly
-    - Last Updated: 16 September 2014 by Olly
+    - Last Updated: 28 October 2014 by Olly
 
 Example:
 
@@ -346,18 +346,31 @@ function TRSMinimap.getAngleRadians(): Extended;
 const
   PI_OVER_2: Extended = PI / 2.00;
 var
-  tDial: TPointArray;
+  tDial, tmp: TPointArray;
   aDial: T2DPointArray;
   Angles: TExtendedArray;
-  i: Integer;
+  i, mX, mY: Integer;
   Mid: TPoint;
   Bools: array [0..1] of Boolean;
+  MouseHovered: Boolean;
 begin
   with (Self.Button[MM_BUTTON_COMPASS]) do
   begin
     FindColorsTolerance(tDial, 9477483, Bounds, 25, ColorSetting(2, 2.20, 0.97));
     FilterPointsDist(tDial, 12, 15, Center.x, Center.y);
     Mid := Center;
+    GetMousePos(mX, mY);
+    MouseHovered := (Distance(Point(mX, mY), Mid) <= Radius);
+  end;
+
+  if (MouseHovered) then
+  begin
+    for i := 0 to High(tDial) do
+      if (not SimilarColors(3366763, GetColor(tDial[i]), 20)) then // yellow border when hovered
+        tmp := tmp + tDial[i];
+
+    if (Length(tmp) > 0) then
+      tDial := tmp;
   end;
 
   if (Length(tDial) = 0) then
