@@ -2184,15 +2184,27 @@ begin
         color := -1;
       end;
 
-    MM_SYMBOL_SHOP_FISHING:
+    MM_SYMBOL_SHOP_FISHING: // 31st October 2014
       with result do
       begin
         name := 'Fishing Shop';
-        bmp := BitmapFromString(15, 5, 'z78DA3330340042470B470B' +
-          '27134CD2D2C2C4C8C010425A0081A509844456832962608880E49' +
-          '9099431773425DE64E2CD4426F19B8C6CA6990950812BAE50C234' +
-          '19D9765C6E8698894C62BA193334304D0600DE086263');
-        color := -1;
+        bmp := BitmapFromString(14, 17, 'meJz7eX7b97Nbv5/dggf9urD9x9' +
+        'nNX0+s6yzKyYuLx0Tlaam91WWFCYndJfnfjq/9fHyNn4uPkpIJGJn' +
+        'DGCD2vBl9G5dP7mutCHDz/3xszcdDK8EqTZWULJSVLYAkBAX6R0xo' +
+        'K1dVMVoxry09KvTdgWXv9y/zc/aByBobOoGNBbEd7b3XLJ2WEhe7f' +
+        'F5HmLfX423z3uxd7OvkraRkpqNtn5ORraBoDFHp5xO2fe20isI0Hw' +
+        '8PV2uHZ9vmvdwx38fJC+iwmKjUfVsWgV1ooalpu2vz0rqyXAV5XVl' +
+        'ZI19n7xfb5z3fNsfD1lNb237OlJ7uprLosBBlZcvi/JJDW+dpaRnL' +
+        'y4M0ejn4PNs6+9GG6e42Hm4uwZtXzTYxspaVNbSx9tm0ak5sRLiUl' +
+        'A7Y2Waedt4P10+7v2aym7VHeEjcqkVTtbUsVZQt66tr5kztlJXRVl' +
+        'AwhbjZ084LqOzOin43K3dTE9dje1f1dbQ21jUf37cmwCdARsYIokx' +
+        'BwRLovDvL+28s6XK1dFVQtIwIidmyeua+rQtS4uPlZPUUwcoUFUEI' +
+        '6LzrizuvLewAqpSVNZGVNZWTM5KWNpCS0gOy5eUt5eTN5eTMgFJA5' +
+        '11d0A5E8yvzJxXlAFFDaoqCgoWcHAgBGUAuSLw4d2FtycU5zccnVh' +
+        '3rLz8+qfrU5Oqz02qnF2YoKJgD0ezKwrMzG05NqQZKAdUc7illhAI' +
+        'mBjB1dkpNZ0ZiT07a2SnVEAkGBpAMExMzAyoACgKtACIGDAAAwsAK' +
+        'Ig==');
+        color := 2236984;
       end;
 
     MM_SYMBOL_JEWELERY:
