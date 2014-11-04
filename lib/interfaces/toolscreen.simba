@@ -24,7 +24,7 @@ type
 var toolScreen
 ~~~~~~~~~~~~~~
 
-Variable that stores functions and properties of the Runescape production interface.
+Variable that stores functions and properties of the Runescape toolScreen interface.
 
 Example:
 
@@ -83,7 +83,7 @@ Returns true if the tools screen is detected, and sets the bounds
 .. note::
 
     - by Ashaman88
-    - Last Updated: 28 February 2014 by Ashaman88
+    - Last Updated: 4 November 2014 by The Mayor
 
 Example:
 
@@ -95,31 +95,32 @@ Example:
 function TRSToolScreen.__find(): boolean;
 const
   TEXT_COLOR = 2070783;
-  BUTTON_LENGTH = 54;
+  TEXT_TOP = [54, 79]; // 'knife' and 'needle' length
+  TEXT_BOTTOM = 40;
 var
-  tpa: TPointArray;
-  atpa: T2DPointArray;
-  i, hh: integer;
+  TPA: TPointArray;
+  ATPA: T2DPointArray;
+  i: integer;
   b: TBox;
-  p: TPoint;
 begin
-  result := false;
+  if (not findColors(TPA, TEXT_COLOR, getClientBounds())) then
+    exit(false);
 
-  if (not findColors(tpa, TEXT_COLOR, getClientBounds())) then
-    exit();
+  ATPA := TPA.cluster(9);
 
-  atpa := tpa.cluster(5);
-  hh := high(atpa);
-
-  for i := 0 to hh do
-    if (length(atpa[i]) = BUTTON_LENGTH) then
+  for i := 0 to high(ATPA) do
+    if inRange(length(ATPA[i]), TEXT_TOP[0],  TEXT_TOP[1]) then
     begin
-      b := atpa[i].getBounds();
-      if (findText(p, TEXT_COLOR, 0, ['Knife'], [StatChars], b)) then
-      begin
-        self.setBounds([b.x1 - 184, b.y1 - 64, b.x2 + 184, b.y2 + 131]);
-        exit(true);
-      end;
+      b := ATPA[i].getBounds();
+      b.offset([0, 118]);
+
+      if findColors(TPA, TEXT_COLOR, b) then
+        if length(TPA) = TEXT_BOTTOM then
+        begin
+          b := TPA.getBounds();
+          self.setBounds([b.x1 - 186, b.y1 - 183, b.x2 + 186, b.y2 + 15]);
+          exit(true);
+        end;
     end;
 end;
 
@@ -129,49 +130,39 @@ TRSToolScreen.isOpen
 
 .. code-block:: pascal
 
-    function TRSProductionScreen.isOpen(waitTime: integer = 0): boolean;
+    function TRSToolScreen.isOpen(waitTime: integer = 0): boolean;
 
-Returns true if the production screen is open, includes a optional parameter
+Returns true if the tool screen is open, includes a optional parameter
 'waitTime' (default 0) which will search for the production screen until
 'waitTime' is reached.
 
 .. note::
 
     - by footballjds
-    - Last Updated: 14 December 2013 by footballjds
+    - Last Updated: 4 November 2014 by The Mayor
 
 Example:
 
 .. code-block:: pascal
 
-    if (productionScreen.isOpen()) then
+    if (toolScreen.isOpen()) then
       writeln('it''s open!');
 *)
 function TRSToolScreen.isOpen(waitTime: integer = 0): boolean;
-const
-  BORDER_COLOR = 1388125;
 var
   t: LongWord;
-  borderTPA: TPointArray;
-  borders: TIntegerArray;
 begin
   t := (getSystemTime() + waitTime);
 
-  borderTPA := tpaFromBox(intToBox(self.x1 + 31, self.y1 + 55, self.x1 + 361, self.y1 + 55));
-
   repeat
-    if (self.x1 - self.x2 = 0) then
-      result := self.__find() else
-      begin
-        borders := getColors(borderTPA, true);
+    if self.__find() then
+    begin
+      result := true;
+      break;
+    end;
+  until (getSystemTime() >= t);
 
-        if (length(borders) = 1) then
-          if (borders[0] = BORDER_COLOR) then
-            exit(true);
-      end;
-
-    wait(20 + random(20));
-  until (getSystemTime() >= t) or (result);
+  print('toolScreen.isOpen(): Result = ' + boolToStr(result));
 end;
 
 (*
