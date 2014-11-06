@@ -1526,6 +1526,43 @@ begin
 end;
 
 (*
+T2DPointArray.deleteIndex
+~~~~~~~~~~~~~~~~~~~~~~~
+
+.. code-block:: pascal
+
+    procedure TPointArray.deleteIndex(const index: Integer);
+
+Used to delete a TPointArray of a T2DPointArray at a chosen index.
+Made from TPointArray.deleteIndex
+
+.. note::
+
+    - by TomTuff
+
+Example:
+
+.. code-block:: pascal
+
+    ATPA.deleteIndex(0);
+
+*)
+procedure T2DPointArray.deleteIndex(const index: Integer);
+var
+  i : Integer;
+begin
+  if not inRange(index, low(self), length(self)) then
+  begin
+    print('T2DPointArray.deleteIndex(): index is larger than the array length', TDebug.ERROR);
+    Exit;
+  end;
+
+  for i := index to high(self)-1 do
+    self[i] := self[i+1];
+  setLength(self, length(self)-1);
+end;
+
+(*
 TPointArray.getConvexHull
 ~~~~~~~~~~~~~~~~~~~~~~~~~
 

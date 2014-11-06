@@ -151,6 +151,8 @@ const
   MM_SYMBOL_WATER           = 92;
   MM_SYMBOL_DIVINATION      = 93;
 
+  MM_SYMBOL_SEASONAL_EVENT  = 94;
+
 (*
 const Buttons
 ~~~~~~~~~~~~~
@@ -2604,6 +2606,28 @@ begin
         'LlAEogyiAKISogAoC0QvLxyGqIHbgmwXUBZo4K+JFyC2YLofqAZoC' +
         'JABcS3Q5chqgFyIdUAGsjMwAVAv0CigRUAFAPKplbk=');
         color := -1;
+      end;
+    MM_SYMBOL_SEASONAL_EVENT:
+      with result do
+      begin
+        name := 'Seasonal Event';
+        bmp := BitmapFromString(14, 17, 'meJxjYECAbUsmvju58dPpzZ9ObX' +
+        'x9bN2W+X0MGKC1Nu/N0bWnl0/rLC5Ji0xNj0rtKa86t2rOm6NrWqq' +
+        'z4cq6m0s+HVs9q6FKR8dTVNqBX9wWiMRkHPUMAha1twClumpzICpf' +
+        'H1qxorNBXNaRX9pNQM5L0rVLwn2KgJw3kCsh57JpUtfzvYuBymb2V' +
+        'F1YMVVV00NEN1U2fK1szG7lyk9S+Z8lI3dLBq0V1EzR0Pa7uX7O1N' +
+        'aiO9vntuQX8Mv5KKcfc5z5RTz5gXDKe8HEdyIJD6wnfhYLOcQn49N' +
+        'TWnVjw4zH2+f5u0eLmFVaT3hfdPlP3Nr3MhnPgQjIKLz0x6DuOZ9W' +
+        'UYhv2uNtcx5vnmVvGy1k1SOX8dS597Vx8VWHzldABGQAudJxd3n12' +
+        '5wc4x9tmnl33dRw31R+jWw+34vi4TeEfI7Lx98CIiBDIvw6r+sJfr' +
+        'XMqICMW6snnVrU1VdcLiQfwms0zbjgcvC8Z6kbPwARkGFScInPYJK' +
+        'QXMiUqtojc1pq8uMuL+g0NEkQko8Q0iwL6NxfdvEHEAEZQC5QECh1' +
+        'ffnk0owoYEAdm9mwtbtRQy9BVCFMWC6UTzoTiIAMUYVwTf3EndP6D' +
+        'k2tg0fTxXmtk0urtA2SxJRi4EjHKGVadeOZmY3I8Z4c5398cl1fQb' +
+        'mseoK4CggBGZMqGo5NbUgL9UVLJHmxwaen1M4oq5TVSAaiWbWNJ6f' +
+        'VZ0f4YyYnIGhMjTg7paY7t6K3uPbM5OrKuCCsyqCK0yKOTag40ldW' +
+        'kxiCJgUA8lT8BQ==');
+        color := 1139182;
       end;
     else
       print('Invalid symbol constant: ' + toStr(sym), TDebug.ERROR);

@@ -72,6 +72,7 @@ Example:
 
     productionScreen.__init();
 *}
+
 {$IFNDEF CODEINSIGHT}
 procedure TRSProductionScreen.__init();
 begin
@@ -704,6 +705,76 @@ begin
   end;
 
   print('TRSProductionScreen.selectBox(): result = ' + lowercase(boolToStr(result)), TDebug.SUB);
+end;
+
+(*
+TRSProductionScreen.close
+~~~~~~~~~~~~~~~~~~~~~~~~~
+
+.. code-block:: pascal
+    function TRSProductionScreen._close(): Boolean;
+
+Closes the production screen menu.
+Made from TRSBankScreen.close
+
+.. note::
+
+    - by TomTuff
+    - Last Updated: 03 November 2014 by TomTuff
+
+Example:
+.. code-block:: pascal;
+
+    productionScreen.close();
+*)
+function TRSProductionScreen.close(escape: boolean = true): Boolean;
+var
+  timeOut: LongWord;
+begin
+  if not(self.isOpen()) then
+    Exit(True);
+
+  // try ESC key first
+  if escape then
+  begin
+    timeOut := (getSystemTime() + randomRange(600, 900));
+    repeat
+      multiType(VK_ESCAPE, randomRange(30, 50), 2);
+      wait(100 + random(50));
+      result := (not self.isOpen());
+    until((getSystemTime() > timeOut) or result);
+
+    if (result) then
+      exit();
+  end;
+
+  // click the X as a failsafe
+  mouseBox(intToBox(self.x1 + 490, self.y1 + 13, self.x2 - 4, self.y2 - 299), MOUSE_MOVE);
+
+  // this is a failsafe in case the bankscreen closes (from the ESC key) while moving the mouse
+  if (self.isOpen()) then
+  begin
+    fastClick(MOUSE_LEFT);
+    wait(50 + random(50));
+  end else
+    exit(true);
+
+  // wait for the bankscreen to close
+  timeOut := (getSystemTime() + randomRange(5000, 6000));
+  while (timeOut > getSystemTime()) do
+  begin
+    if (not self.__find()) then
+    begin
+      result := true;
+      break;
+    end;
+
+    wait(50 + random(50));
+  end;
+
+  print('productionScreen.close(): result = '+boolToStr(result), TDebug.SUB);
+
+
 end;
 
 begin
