@@ -559,16 +559,17 @@ begin
   if (random(4) = 2) then
   begin
     fastClick(MOUSE_RIGHT);
-    if (not chooseOption.select(['Face North', 'ace N', 'Face NoMh', 'orth'], 500)) then
-      begin
-        chooseOption.close();  //Move the mouse away to close the chooseOption dropdown
-        mouseCircle(self.button[MM_BUTTON_COMPASS].center.x, self.button[MM_BUTTON_COMPASS].center.y,
+    if (not chooseOption.select(['Face', 'NoMh', 'orth'], 500)) then
+    begin
+      chooseOption.close();  //Move the mouse away to close the chooseOption dropdown
+      mouseCircle(self.button[MM_BUTTON_COMPASS].center.x, self.button[MM_BUTTON_COMPASS].center.y,
                     self.button[MM_BUTTON_COMPASS].radius, MOUSE_MOVE);  //Move the mouse back to the compass
-        fastClick(MOUSE_LEFT); // failsafe
-      end;
+      fastClick(MOUSE_LEFT); // failsafe
+    end;
   end else
     fastClick(MOUSE_LEFT);
 
+  mouse(575, 55, 30, 30, MOUSE_MOVE); //Move mouse off compass so dial appears
   wait(150 + random(300));
 
   print('TRSMinimap.clickCompass(): Clicked compass', TDebug.SUB);
