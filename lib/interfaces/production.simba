@@ -712,7 +712,7 @@ TRSProductionScreen.close
 ~~~~~~~~~~~~~~~~~~~~~~~~~
 
 .. code-block:: pascal
-    function TRSProductionScreen._close(): Boolean;
+    function TRSProductionScreen.close(): Boolean;
 
 Closes the production screen menu.
 Made from TRSBankScreen.close
@@ -751,7 +751,7 @@ begin
   // click the X as a failsafe
   mouseBox(intToBox(self.x1 + 490, self.y1 + 13, self.x2 - 4, self.y2 - 299), MOUSE_MOVE);
 
-  // this is a failsafe in case the bankscreen closes (from the ESC key) while moving the mouse
+  // this is a failsafe in case the productionscreen closes (from the ESC key) while moving the mouse
   if (self.isOpen()) then
   begin
     fastClick(MOUSE_LEFT);
@@ -759,7 +759,7 @@ begin
   end else
     exit(true);
 
-  // wait for the bankscreen to close
+  // wait for the productionscreen to close
   timeOut := (getSystemTime() + randomRange(5000, 6000));
   while (timeOut > getSystemTime()) do
   begin
