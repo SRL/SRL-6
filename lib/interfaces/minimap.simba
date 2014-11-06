@@ -530,6 +530,52 @@ begin
 end;
 
 (*
+TRSMinimap.mouseOffCompass
+~~~~~~~~~~~~~~~~~~~~~~~~~~
+
+.. code-block:: pascal
+
+    procedure TRSMinimap.mouseOffCompass();
+
+Moves the mouse off of the compass due to a glitch which causes the compass icon to disappear
+while mouse is over compass
+
+.. note::
+
+    - by Olly
+    - Last Modified: 6 November 2014 by Ashaman88
+
+Example:
+
+.. code-block:: pascal
+
+      minimap.mouseOffCompass();
+*)
+procedure TRSMinimap.mouseOffCompass();
+var
+  b, mouseRange, clientArea: TBox;
+  p: TPoint;
+begin
+  getClientDimensions(clientArea.x2, clientArea.y2);
+
+  b := self.button[MM_BUTTON_COMPASS].bounds;
+  b.edit(-10, -25, 10, 10);
+
+  mouseRange := [b.x1 -50, b.y1 -50, b.x2 +50, b.y2 +50];
+  mouseRange.setLimit([0, 0, clientArea.x2 -1, clientArea.y2 -1]);
+
+  // get a point that is in mouseRange but not in b (compass bounds);
+  p := mouseRange.getRandomPoint([b]);
+
+  if (p.x <> -1) then
+  begin
+    mouse(p, MOUSE_MOVE);
+    print('minimap.mouseOffCompass(): Succesfully moved mouse off of compass', TDebug.SUB);
+  end else
+    print('minimap.mouseOffCompass(): Failed to move mouse off of compass', TDebug.ERROR);
+end;
+
+(*
 TRSMinimap.clickCompass
 ~~~~~~~~~~~~~~~~~~~~~~~
 
@@ -568,6 +614,8 @@ begin
       end;
   end else
     fastClick(MOUSE_LEFT);
+
+  self.mouseOffCompass();
 
   wait(150 + random(300));
 
