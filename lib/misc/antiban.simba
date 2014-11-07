@@ -986,6 +986,133 @@ begin
 end;
 
 (*
+browseSkillMenu
+~~~~~~~~~~~~~~~
+
+.. code-block:: pascal
+
+    procedure browseSkillMenu(skill: integer; maxScrollAmount: integer = 10);
+
+Clicks on the skill 'skill' and scrolls through its skill information menu.
+Specify the maximum scroll amount via maxScrollAmount.
+
+.. note::
+
+    - by Clarity
+    - Last Updated: 7th November 2014 by Clarity
+
+Example:
+
+.. code-block:: pascal
+
+    browseSkillMenu(SKILL_ATTACK, 5);
+*)
+function browseSkillMenu(skill: integer; maxScrollAmount: integer = 10): boolean;
+var
+  t, x, y, w, h, k, menuBMP: integer;
+begin
+  print('browseSkillMenu()', TDebug.HEADER);
+  result := false;
+  t := gameTabs.getActiveTab();
+  menuBMP := BitmapFromString(53, 4, 'meJyrqaosLC6Fo9SkhOysnKjo2Oy' +
+        'YQPngem4fEOJMny9ZuVR/4h69+q1AttGkC9XH761aPn/NunWnls/s' +
+        'WrGff8ppoCxQjXr2Al6ffBFNJzFxW3EpBwlpZwXlECCSlvVBRnJKX' +
+        'nA2UA0aA1lZDarzgG6DuBDoPKAjWYInwp0HdBuQBCKg8xI3PIc4D+' +
+        'JCoALump1At/FnT5D1SBaWsxYRMwM6D9M9QDegOUNM0hpZCq4SwkB' +
+        'zGxyBHBkTCAk9oKUQh0EQMKyAzgMG2oxpU4EI6DxgOAPFgY4EMtiM' +
+        'wvkE1EXEzJGdB7Ea03ZcshAF8NADugfNeZAAtPeLAAYg0HnILgQGF' +
+        'NB5kcuvQQIQSAIVA+MUFHQW8cLaDqLi5lKyDuJSjhDrIPbCbUeLTW' +
+        'DUw6XgzoOkByAXACKyxKI=');
+  getClientDimensions(w, h);
+
+  if (t <> TAB_STATS) then
+    gameTabs.openTab(TAB_STATS);
+
+  mouseBox(tabStats.getSkillBox(skill), MOUSE_LEFT, MOUSE_HUMAN);
+
+  k := (getSystemTime() + 10000);
+
+  repeat
+    wait(random(100, 300));
+  until findBitmapIn(menuBMP, x, y, 1, 1, w-1, h-1) or (getSystemTime() > k);
+
+  writeln(findBitmapIn(menuBMP, x, y, 1, 1, w-1, h-1));
+
+  if not findBitmapIn(menuBMP, x, y, 1, 1, w-1, h-1) then
+  begin
+    print('browseSkillMenu(): Skill menu never opened.', TDebug.SUB);
+  end else
+  begin
+    wait(150 + random(500));
+    mouseScroll(point(492 + random(-90, 90), 364 + random(-90, 90)), random(0, maxScrollAmount));
+    wait(150 + random(3500));
+    repeat
+      typeByte(VK_ESCAPE);
+      wait(500 + random(500));
+    until (not findBitmapIn(menuBMP, x, y, mainscreen.getBounds()));
+    result := true;
+  end;
+
+  if (t <> TAB_STATS) then
+    gameTabs.openTab(t);
+
+  freeBitmap(menuBMP);
+  print('browseSkillMenu(): result = ' + toStr(result), TDebug.FOOTER);
+end;
+
+(*
+hoverXPPopup
+~~~~~~~~~~~~
+
+.. code-block:: pascal
+
+    function hoverXPPopup(moveAway: boolean = true);
+
+If the circular XP tracker is present, this procedure will hover over to check
+your player's skill progress.
+
+.. note::
+
+    - by Clarity
+    - Last Updated: 7th November 2014 by Clarity
+
+Example:
+
+.. code-block:: pascal
+
+    hoverXPPopup();
+*)
+function hoverXPPopup(moveAway: boolean = true): boolean;
+var
+  popupDTM, x, y: integer;
+  finalBox: TBox;
+begin
+  print('hoverXPPopup()', TDebug.HEADER);
+  result := false;
+  popupDTM := DTMFromString('mWAAAAHicY2FgYJgHxAuBeDaUHcHIwBDJCKGjgTjDESjIwMiQEcHAcGg+AwMXAypmRMMgAACX2Qbc');
+
+  if findDTM(popupDTM, x, y, mainscreen.getBounds()) then
+  begin
+    mouseCircle(x, y - 20, 15, MOUSE_MOVE);
+
+    wait(150 + random(4500));
+
+    if moveAway then
+    begin
+      finalBox := IntToBox(mainscreen.x1 + 20, mainscreen.y1 + 80, mainscreen.x2 - 20, mainscreen.y2 + 20);
+      mouseBox(finalBox, MOUSE_MOVE, MOUSE_HUMAN);
+      wait(50 + random(500));
+    end;
+
+    result := true;
+  end else
+    print('hoverXPPopup(): XP Popup was not found.', TDebug.SUB);
+
+  freeDTM(popupDTM);
+  print('hoverXPPopup(): result = ' + toStr(result), TDebug.FOOTER);
+end;
+
+(*
 hoverOnlineFriend
 ~~~~~~~~~~~~~~~~~
 
