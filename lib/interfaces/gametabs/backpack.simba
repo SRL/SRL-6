@@ -617,7 +617,7 @@ Will return true if a desired slot is activated.
 .. note::
 
     - by Olly
-    - Last Updated: March. 12, 2013
+    - Last Updated: 15 November 2014 by Ashaman88
 
 Example:
 
@@ -628,11 +628,16 @@ Example:
 
 *)
 function TRSTabBackpack.isSlotActivated(slot: integer): boolean;
+var
+  b: tbox;
 begin
   if (not self.open()) or (not self.isSlotVaild(slot)) then
     exit(false);
 
-  result := self.getSlotBox(slot).colorExists(ITEM_OUTLINE_WHITE);
+  b := self.getSlotBox(slot);
+  b.edit(0, +15, 0, 0);
+
+  result := b.colorExists(ITEM_OUTLINE_WHITE);
 end;
 
 (*
