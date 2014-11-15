@@ -27,7 +27,7 @@ Example:
 *)
 const
   ITEM_OUTLINE_BLACK = 131072;
-  ITEM_OUTLINE_BLACK_SECONDARY = 65536;
+  ITEM_OUTLINE_BLACK_SECONDARY = 985603; // for the rare cases when outline is a different color
   ITEM_OUTLINE_WHITE = 16777215;
   ITEM_TEXT_YELLOW   = 65535;
   ITEM_TEXT_WHITE = ITEM_OUTLINE_WHITE;
@@ -184,7 +184,7 @@ Uses the black outline of a item to result whether or not a item is in the area.
 .. note::
 
     - by Ollybest
-    - Last Updated: 06 June by Coh3n
+    - Last Updated: 15 November 2014 by Ashaman88
 
 Example:
 
@@ -197,7 +197,7 @@ function isItemIn(area: TBox): boolean;
 var
   p: TPoint;
 begin
-  result := (findColorTolerance(p.x, p.y, ITEM_OUTLINE_BLACK, area, 1) or
+  result := (findColorTolerance(p.x, p.y, ITEM_OUTLINE_BLACK, area, 1) or findColorTolerance(p.x, p.y, ITEM_OUTLINE_BLACK_SECONDARY, area, 1) or
              findColor(p.x, p.y, ITEM_OUTLINE_WHITE, area));
 end;
 
