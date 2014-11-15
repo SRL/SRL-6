@@ -571,7 +571,7 @@ is present.
 .. note::
 
     - by Coh3n
-    - Last Updated: 17 January 2014 by Ashaman88
+    - Last Updated: 15 November 2014 by Ashaman88
 
 Example:
 
@@ -622,7 +622,7 @@ begin
           if (spaceBar) then
             typeByte(VK_SPACE)
           else
-            mouseBox([b.x1, b.y1, b.x2, b.y2 + 10], MOUSE_LEFT);
+            mouseBox(b, MOUSE_LEFT);
 
 
           if (doWait) then
