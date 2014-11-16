@@ -54,6 +54,7 @@ var
   smartForceNewClient: boolean := false;
   smartEnableDrawing: boolean := false;
   smartInitSeq: string := '';
+  smartUserAgent: string := '';
 
 {*
 var Internal
@@ -366,7 +367,7 @@ begin
 
   __smartCurrentTarget := 0;
   __smartCurrentTarget := smartSpawnClient(path, stringReplace(PluginPath, '\', '/', [rfReplaceAll]),
-                                           params[0], ',' + params[1], w, h, smartInitSeq, '', '', plugins);
+                                           params[0], ',' + params[1], w, h, smartInitSeq, smartUserAgent, '', plugins);
 
   if (__smartCurrentTarget <> 0) then
   begin
@@ -667,44 +668,37 @@ Example:
 *)
 procedure smartReloadClient(waitTime: integer);
 var
-  img, r, i, j: integer;
+  img, r: integer;
 begin
-  for i = 1 to smartResetAttempts do
+  img := -999;
+
+  if (__smartIsDrawingSetup) then
   begin
-    inc(j);     //added a second var to keep track of attempts in case user wants infinite smartresetattempts with a negative number
-    print('smartReloadClient()', TDebug.HEADER);
-    print('attempt #: ' + toStr(j));
-    img := -999;
+    img := copyBitmap(smartImage.getIndex());
+    smartFreeDrawing();
+  end;
 
-    if (__smartIsDrawingSetup) then
+  r := SmartGetRefresh(__smartCurrentTarget);
+
+  smartFreeCurrentClient();
+  smartKillClient(__smartCurrentPID);
+
+  print('Killed our current client, waiting ' + intToStr(waitTime) + ' ms before reloading client');
+  wait(waitTime);
+
+  if initSmart(true) then
+  begin
+    print('Setting refresh rate back to ' + intToStr(r));
+    SmartSetRefresh(__smartCurrentTarget, r);
+
+    if (bitmapExists(img)) then
     begin
-      img := copyBitmap(smartImage.getIndex());
-      smartFreeDrawing();
-    end;
+      smartSetupDrawing();
 
-    r := SmartGetRefresh(__smartCurrentTarget);
+      print('Re-drawing the smartImage bitmap');
 
-    smartFreeCurrentClient();
-    smartKillClient(__smartCurrentPID);
-
-    print('Killed our current client, waiting ' + intToStr(waitTime) + ' ms before reloading client');
-    wait(waitTime);
-
-    if initSmart(true) then
-    begin
-      print('Setting refresh rate back to ' + intToStr(r));
-      SmartSetRefresh(__smartCurrentTarget, r);
-
-      if (bitmapExists(img)) then
-      begin
-        smartSetupDrawing();
-
-        print('Re-drawing the smartImage bitmap');
-
-        getMufasaBitmap(img).drawTransparent(0, 0, smartImage);
-        freeBitmap(img);
-      end;
-      break;
+      getMufasaBitmap(img).drawTransparent(0, 0, smartImage);
+      freeBitmap(img);
     end;
   end;
 
@@ -732,27 +726,36 @@ Example:
 
 *)
 procedure sixHourFix();
+var
+  i, j: integer;
 begin
-  print('sixHourFix():', TDebug.HEADER);
-
-  if (players.getActive() < 1) then
-    print('No active players, no use in reloading the client!', TDebug.FATAL);
-
-  smartReloadClient((5 * 60000) + random(15000));
-
-  if (waitClientReady()) then
+  for i = 1 to smartResetAttempts do
   begin
-    print('Client succesfully loaded after reload');
+    inc(j);     //added a second var to keep track of attempts in case user wants infinite smartresetattempts with a negative number
+    print('sixHourFix():', TDebug.HEADER);
+    print('attempt #: ' + toStr(j));
 
-    if (players[currentPlayer].login()) then
+    if (players.getActive() < 1) then
+      print('No active players, no use in reloading the client!', TDebug.FATAL);
+
+    smartReloadClient((5 * 60000) + random(15000));
+    inc(i);
+
+    if (waitClientReady()) then
     begin
-      print('Succesfully logged in after client was reloaded');
-      print('sixHourFix()', TDebug.FOOTER);
-      exit();
+      print('Client succesfully loaded after reload');
+
+      if (players[currentPlayer].login()) then
+      begin
+        print('Succesfully logged in after client was reloaded');
+        print('sixHourFix()', TDebug.FOOTER);
+        exit();
+      end else
+        print('Failed to login player after restart', TDebug.FATAL);
     end else
-      print('Failed to login player after restart', TDebug.FATAL);
-  end else
-    print('Client never reloaded after restart..', TDebug.FATAL);
+      if i = smartResetAttempts then
+        print('Client never reloaded after restart..', TDebug.FATAL);
+  end;
 end;
 
 procedure __smartCheckPlugins();

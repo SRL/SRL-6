@@ -262,7 +262,7 @@ Returns the type of button present for the open progress screen.
 .. note::
 
     - by Ashaman88
-    - Last Updated: 08 January 2013 by Ashaman88
+    - Last Updated: 31 October 2014 by The Mayor
 
 Example:
 
@@ -273,36 +273,28 @@ Example:
 *)
 function TRSProgressScreen.getButton(): integer;
 var
-  b: TBox;
-  s: String;
-  tpa : TPointArray;
-  atpa : T2DPointArray;
+  button: TBox;
+  redTPA, blueTPA: TPointArray;
 begin
-  result:= -1;
-  if (self.isOpen()) then
+  result := -1;
+
+  if self.isOpen() then
   begin
-    b := [self.x1 + 137, self.y1 + 123, self.x2 - 127, self.y2 - 5];
+    button := [self.x1 + 124, self.y1 + 120, self.x1 + 212, self.y1 + 143];
 
-    findColorsTolerance(tpa, 13618403, b, 0, colorSetting(0));
+    findColorsTolerance(redTPA, 1645023, button, 36);
+    findColorsTolerance(blueTPA, 13673258, button, 63);
 
-    if length(tpa) < 50 then
+    if (length(redTPA) < 10) and (length(blueTPA) < 10) then
     begin
-      print('progressScreen.getButton(): Unable to find enough text colors for progress screen button type', TDebug.ERROR);
-      exit;
+      print('progressScreen.getButton(): Unable to find enough button colors for progress screen button type', TDebug.ERROR);
+      exit();
     end;
 
-    atpa := tpa.cluster(5);
-
-    b:= atpa.getbounds();
-    b.edit(-2, -2, +2, +2);
-    b.setlimit(self.getbounds());
-
-    s:=trim(tesseractgettext(b.x1, b.y1, b.x2, b.y2, FILTER_SMALL_CHARS));
-
-    case lowercase(s) of
-      'done': result:= PROGRESS_BUTTON_DONE;
-      'cancel': result:= PROGRESS_BUTTON_CANCEL;
-    end;
+    if (length(redTPA) > 300) then
+      result := PROGRESS_BUTTON_CANCEL
+    else if (length(blueTPA) > 300) then
+      result := PROGRESS_BUTTON_DONE;
   end;
 
   print('TRSProgressScreen.getButton(): result = ' + toStr(result), TDebug.SUB);

@@ -991,11 +991,11 @@ const
   __LOGIN_SKILL_LEVEL    = 'Skill level 1000+ required';
   __LOGIN_MEMBER_ONLY    = 'Player in member-only area';
   __LOGIN_CANNOT_CONNECT = 'Cannot connect to world';
-  __LOGIN_UNAVAILABLE    = 'RS systems unavailable';
+  __LOGIN_UNAVAILABLE    = 'Our systems are currently unavailable';
 
   __LOGIN_ERROR_COUNT    = 15;
 
-function __getLoginResponse(txt: string; timer: LongWord): TVariantArray;
+function __getLoginResponse(txt: string; timer, timer2: LongWord): TVariantArray;
 var
   msg: string;
   responses: array [0..(__LOGIN_ERROR_COUNT - 1)] of TVariantArray;
@@ -1035,7 +1035,13 @@ begin
       print('Please report this issue in the SRL bugs section of the forum', TDebug.HINT);
 
       takeScreenshot('unknown_login_count.png');
-    end;
+    end else
+      if ((getSystemTime() > timer2) and (timer2 > 0)) then
+        if (pos('Please Wait', txt) > 0) then
+        begin
+          result := [__LOGIN_UPDATE,         0,         0,  'update'];
+          print('Loading screen present for too long, restarting smart');
+        end;
   end;
 {$ENDIF}
 
@@ -1100,7 +1106,7 @@ begin
     result := tesseractGetText(b.x1, b.y1, b.x2, b.y2, FILTER_SMALL_CHARS);
 end;
 
-function TPlayer.__loginResponse(const tries: integer; const timer: integer): integer;
+function TPlayer.__loginResponse(const tries: integer; const timer, timer2: integer): integer;
 var
   c: integer;
   arr: TVariantArray;
@@ -1108,7 +1114,7 @@ begin
   result := __RES_NOTHING;
 
   // get the text on the login error message
-  arr := __getLoginResponse(getLoginResponseText(), timer);
+  arr := __getLoginResponse(getLoginResponseText(), timer, timer2);
 
   if (length(arr) > 0) then // if there was an error logging in
   begin
@@ -1180,7 +1186,7 @@ function TPlayer.loginToLobby(): boolean;
 var
   arr: TVariantArray;
   c, tries, popup: integer;
-  t : LongWord;
+  t, t2 : LongWord;
 begin
   if (isLoggedIn() or lobby.isOpen()) then
     exit(true);
@@ -1204,8 +1210,10 @@ begin
     exit(false);
   end;
 
-  typeByte(VK_ESCAPE); // exit any existing windows
+  if not isLoggedIn() then
+    typeByte(VK_ESCAPE); // exit any existing windows
   t := (getSystemTime() + 60000);
+  t2 := (getSystemTime() + 30000);
 
   repeat
     print(capitalize(self.loginName)+' ('+capitalize(self.displayName)+')');
@@ -1225,7 +1233,7 @@ begin
     wait(800 + random(50));	// fixes the login spam recoveries bug
 
     repeat
-      popup := self.__loginResponse(tries, t);
+      popup := self.__loginResponse(tries, t, t2);
 
       // if exceeded maximum tries, break, otherwise terminate
       if (popup = __RES_TERMINATE) then
@@ -1235,7 +1243,7 @@ begin
           break;
 
       wait(100 + random(100));
-      result := (lobby.isOpen());
+      result := lobby.isOpen() or isLoggedIn();
     until(result);
 
     inc(tries);
@@ -1276,7 +1284,7 @@ Example:
 function TPlayer.login(): boolean;
 var
   tries, popup: integer;
-  t : LongWord;
+  t, t2 : LongWord;
   p: TPoint;
   skipPlay: boolean;
 begin
@@ -1309,10 +1317,11 @@ begin
       end;
 
       t := (getSystemTime() + 60000);
+      t2 := (getSystemTime() + 30000);
 
       repeat
         skipPlay := false;
-        popup := self.__loginResponse(tries, t);
+        popup := self.__loginResponse(tries, t, t2);
 
         // if exceeded maximum tries, break, otherwise terminate
         if (popup = __RES_TERMINATE) then
