@@ -135,10 +135,10 @@ Example:
 *)
 function TRSLodestoneScreen.__find(): boolean;
 const
-  TOP_COLOR = 1118779;    //red color behind lodestone
-  MENU_LENGTH = 768;      //length of large red background
-  MENU_OFFSET_COLOR = 6385013; //p2p offset color on map
-  MENU_OFFSET_COLOR_FTP = 6513233;  //f2p offset color on map
+  TOP_COLOR = 855595;    //red color behind lodestone
+  MENU_LENGTH = 165;      //length of large red background
+  MENU_OFFSET_COLOR = 5333103; //p2p offset color on map
+  MENU_OFFSET_COLOR_FTP = 6250064;  //f2p offset color on map
 var
   tpa : TPointArray;
   atpa : T2DPointArray;
@@ -159,7 +159,7 @@ begin
       b := getTPABounds(atpa[i]);
       if (getColor(b.x2, b.y2 + 5) = MENU_OFFSET_COLOR) or (getColor(b.x2, b.y2 + 5) = MENU_OFFSET_COLOR_FTP) then
       begin
-        self.setBounds([b.x1 - 15, b.y1 - 2, b.x2 + 310, b.y2 + 300]);
+        self.setBounds([b.x1 - 13, b.y1 - 14, b.x2 + 304, b.y2 + 297]);
         exit(true);
       end;
     end;
@@ -236,7 +236,7 @@ begin
 
   if (self.isOpen()) then
   begin
-    mouseCircle(self.x2 - 9, self.y1 + 7, 3, MOUSE_LEFT);
+    mouseCircle(self.x2 - 4, self.y1 + 8, 4, MOUSE_LEFT);
 
     while (t > getSystemTime()) do
     begin
@@ -310,7 +310,7 @@ Example:
 *}
 function TRSLodestoneScreen._getTeleportBox(location: integer): TBox;
 const
-  pnts: TPointArray = [[30, 48], [98, 117], [75, 194], [187, 53], [169, 100], [160, 144], [151, 209], [143, 262], [243, 87], [202, 130], [234, 124], [202, 198], [302, 60], [285, 99], [265, 146], [266, 188], [340, 131], [303, 162], [314, 199], [314, 243], [355, 193], [397, 105], [88, 298], [55, 139]];
+  pnts: TPointArray = [[26, 48], [94, 117], [71, 194], [183, 53], [165, 100], [156, 144], [147, 209], [139, 262], [239, 87], [198, 130], [230, 124], [198, 198], [298, 60], [281, 99], [261, 146], [262, 188], [336, 131], [299, 162], [310, 199], [310, 243], [351, 193], [393, 105], [84, 298], [51, 139]];
 var
   p: TPoint;
 begin
