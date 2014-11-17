@@ -570,7 +570,7 @@ begin
     if (isMouseOverMenuOpen(b)) then
     begin
       fastClick(MOUSE_RIGHT);
-      chooseOption.select(['Examine', 'Exam', 'mine']);
+      chooseOption.close();
     end;
 
   wait(300 + random(4000));
