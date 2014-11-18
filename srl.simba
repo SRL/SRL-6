@@ -8,6 +8,8 @@ SRL library isn't available to you.
 
 *)
 
+{$DEFINE SRL6}
+
 {$IFNDEF SIMBAMAJOR1100}
 function GetTickCount64(): UInt64; begin Result := GetTickCount(); end;
 {$ENDIF}
