@@ -156,7 +156,7 @@ begin
 
   with self.tabs[TAB_STATS] do
   begin
-    _bmp := bitmapFromString(10, 2, 'meJwTFHknKPKOj3exuJawWSmTRQMjEJlXMklL8bf6CHBy7gbKCvFHaRnyWtQzQmT5HaW05ATOpnIAALt/Dhg=');
+    _bmp := bitmapFromString(10, 2, 'meJwLaRQOaRSK7ZTk5eE8ksV4IBGEDiYyAtmC/NzRrVJAlNQtz8/LtSuXYWsqEDECyV05TIIC3AAthhHR');
     _navBarId := NAV_BUTTON_HERO;
     _navBarBoxIndex := 1;
   end;
