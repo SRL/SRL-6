@@ -93,7 +93,7 @@ const
   BANK_CHEST_DUEL = 7;
   BANK_CHEST_CW = 8;
   BANK_CHEST_GROTTO = 9;
-  BANK_CHEST_LUMBRIDGE = 10;
+  BANK_CHEST_LUMBRIDGE = 10; //chest in lumbridge field
   BANK_TABLE_BURTHORPE = 11;
   BANK_GE = 12;
   BANK_CHEST_PRIFDDINAS = 13;
@@ -1705,7 +1705,7 @@ begin
                                         //lighter
     BANK_NPC_BLUE: bodyColors := [[5710897, 14, [2, [0.42, 1.04, 0.00]]], [5188663, 12, [2, [0.23, 0.51, 0.00]]]];
                                     //human color                                 greencuffs                       lightgrey                                   bluish ones                             //lightgrey2
-    BANK_NPC_GREY: bodyColors := [[6459339, 7, [2, [0.26, 1.86, 0.00]]], [2248002, 3, [2, [1.05, 4.01, 0.00]]], [7435136, 5, [2, [0.67, 0.52, 0.00]]], [9733762, 2, [2, [1.28, 0.44, 0.00]]], [8814987, 7, [2, [0.60, 0.15, 0.00]]]];
+    BANK_NPC_GREY: bodyColors := [[6461131, 7, [2, [0.42, 1.86, 0.00]]], [2248002, 3, [2, [1.05, 4.01, 0.00]]], [6514028, 3, [2, [1.24, 0.22, 0.00]]], [9733762, 2, [2, [1.28, 0.44, 0.00]]], [8222327, 4, [2, [2.39, 0.32, 0.00]]]];
     BANK_NPC_GREEN: bodyColors := [[3836826, 16, [2, [0.11, 0.91, 0.00]]], [3693340, 9, [2, [0.28, 1.30, 0.00]]]];
                                          //skin                                    dark grey
     BANK_NPC_DRAYNOR: bodyColors := [[6930393, 9, [2, [0.30, 1.72, 0.00]]], [6510184, 10, [2, [1.08, 0.44, 0.00]]]];
@@ -1933,7 +1933,7 @@ begin
     BANK_CHEST_DUEL: begin col1:= [11512192, 18, [2, [0.39, 0.57, 0.00]]]; col2:= [6586289, 10, [2, [0.21, 1.00, 0.00]]]; avelen:= 90; end;
     BANK_CHEST_CW: begin col1:= [8088922, 16, [2, [0.06, 0.17, 0.00]]]; col2:= [4808312, 17, [2, [0.03, 0.17, 0.00]]]; avelen:= 90; end;
     BANK_CHEST_GROTTO: begin col1:= [6842737, 6, [2, [0.31, 0.08, 0.00]]]; col2:= [2570316, 4, [2, [0.15, 1.35, 0.00]]]; avelen:= 90; end;
-    BANK_CHEST_LUMBRIDGE: begin col1:= [11313299, 10, [2, [0.17, 0.42, 0.00]]]; col2:= [6586289, 10, [2, [0.21, 1.00, 0.00]]]; avelen:= 90; end;
+    BANK_CHEST_LUMBRIDGE: begin col1:= [5599380, 7, [2, [0.10, 0.43, 0.00]]]; col2:= [10786444, 6, [2, [0.24, 0.53, 0.00]]]; avelen:= 90; end;
     BANK_TABLE_BURTHORPE: begin col1:= [14547176, 8, [2, [1.24, 4.52, 0.00]]]; col2:= [6460329, 11, [2, [0.11, 1.29, 0.00]]]; avelen:= 90; end;
     BANK_CHEST_PRIFDDINAS: begin col1:= [1022461, 2, [2, [0.08, 0.83, 0.00]]]; col2:= [10350335, 3, [2, [0.75, 0.00, 0.00]]]; avelen:= 90; end;
   end;
