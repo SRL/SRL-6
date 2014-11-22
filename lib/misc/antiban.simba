@@ -1233,10 +1233,7 @@ begin
       fastClick(MOUSE_RIGHT);
       wait(random(500));
 
-      if (random(2) = 0) then
-        chooseOption.select(['xamine'])
-      else
-        chooseOption.close();
+      chooseOption.close();
     end;
   end;
 
