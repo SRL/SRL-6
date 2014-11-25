@@ -466,12 +466,17 @@ Example:
 
 *)
 function TRSTabBackpack.isEmpty: boolean;
+var
+  b: tbox;
 begin
   if (not self.open()) then
     exit(false);
 
-  result := (not self.getBounds().colorExists(ITEM_OUTLINE_BLACK)) and (not self.getBounds().colorExists(ITEM_OUTLINE_BLACK_SECONDARY)) and
-              (not self.getBounds().colorExists(ITEM_OUTLINE_WHITE));
+  b := self.getBounds();
+  b.edit(0, 0, 0, -30);
+
+  result := (not b.colorExists(ITEM_OUTLINE_BLACK)) and (not b.colorExists(ITEM_OUTLINE_BLACK_SECONDARY)) and
+              (not b.colorExists(ITEM_OUTLINE_WHITE));
 end;
 
 
