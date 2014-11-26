@@ -1635,6 +1635,180 @@ begin
 end;
 
 (*
+TRSBankScreen.withdraw
+~~~~~~~~~~~~~~~~~~~~~~
+
+.. code-block:: pascal
+
+    function TRSBankScreen.withdraw(text: String; acc: extended; slot, amount: integer; toFamiliar: boolean = false): boolean; overload;
+
+Withdraws the the amount 'amount' from the bank slot 'slot', if the mouse-over
+text matches with the given accuracy, mouse-over text can also be skipped.
+If toFamiliar is true, will withdraw items into your beast of burden familiar
+(default false).
+
+Extra vaild constants for 'amount' are:
+
+   - WITHDRAW_AMOUNT_ALL = -1;
+   - WITHDRAW_AMOUNT_ALL_BUT_ONE = -2;
+
+
+.. note::
+
+    - by Kevin
+    - Last Updated: 26 November 2014 by Kevin
+
+Example:
+
+.. code-block:: pascal
+
+    // To withdraw 28 items from slot 1 if mouseover text is vaild
+    bankscreen.withdraw('Yew Log', 0.8, 1, 28);
+
+     // To withdraw all items from slot 10 if mouseover text is vaild
+    bankscreen.withdraw('Yew Log', 0.8, 10, WITHDRAW_AMOUNT_ALL);
+
+    // To withdraw 28 items from slot 1 and will *ignore* mouse-over text
+    bankScreen.withdraw('', 0, 1, 28);
+
+    // To withdraw 28 items from slot 1 into your beast of burden familiar if mouseover text is valid
+    bankScreen.withdraw('Yew Log', 0.8, 1, 28, true);
+*)
+function TRSBankScreen.withdraw(text: String; acc: extended; slot, amount: integer; toFamiliar: boolean = false): boolean; overload;
+var
+  b: TBox;
+begin
+  result := false;
+  b := self.getBankSlotBox(slot);
+
+  if (b.x1 = -1) then // invaild slot
+  begin
+    print('bankscreen.withdraw(): Invalid slot ' + toStr(slot), TDebug.WARNING);
+    exit;
+  end;
+
+  if (not isItemIn(b)) then // no item in the slot?
+  begin
+    print('bankscreen.withdraw(): No item in slot ' + toStr(slot), TDebug.WARNING);
+    exit;
+  end;
+
+  mouseBox(b, MOUSE_MOVE);
+
+  if (length(text) > 0) then
+    if (StringMatch(getMouseOverText(true), 'Withdraw-1 ' + text) < acc) then
+    begin
+      print('bankscreen.withdraw(): Incorrect Mouse-over text, result = false. Expected ' + text + '. Read ' + getMouseOverText(true), TDebug.SUB);
+      exit(false);
+    end;
+
+  if (amount = 1) then     // single item? let's just click it
+  begin
+    fastClick(MOUSE_LEFT);
+    wait(400 + random(300));
+    print('bankscreen.withdraw(): result = true', TDebug.SUB);
+    exit(true);
+  end else
+    fastClick(MOUSE_RIGHT);  // more than 1 item? open choose options
+
+  if (chooseOption.isOpen(2000)) then
+  begin
+    case (amount) of
+      WITHDRAW_AMOUNT_ALL: result := chooseOption.select(['Withdraw-All', '-All']);
+      WITHDRAW_AMOUNT_ALL_BUT_ONE: result := chooseOption.select(['Withdraw-All but one', 'All but one']);
+
+      // check if the number is already availble, else let's withdraw X it
+      else begin
+        if toFamiliar then
+        begin
+          if (chooseOption.select(['Withdraw-X to BoB', 'to', 'BoB'])) then
+          begin
+            result := (self._enterAmount(amount, 6000));
+            print('bankscreen.withdraw(): result = ' + boolToStr(result), TDebug.SUB);
+            exit();
+          end else
+          begin
+            result := false;
+            chooseOption.close();
+            print('bankscreen.withdraw(): Withdraw-X to BoB option not present.  result = ' + boolToStr(result), TDebug.ERROR);
+            exit();
+          end;
+        end;
+        if (not chooseOption.optionsExist(['Withdraw-' + intToStr(amount), '-' + intToStr(amount), toStr(amount)])) then
+        begin
+          if (chooseOption.select(['Withdraw-X', '-X'])) then
+            result := (self._enterAmount(amount, 6000));
+        end else
+          result := chooseOption.select(['Withdraw-' + intToStr(amount), '-' + intToStr(amount), toStr(amount)]);
+        end;
+     end;
+  end else
+    print('bankscreen.withdraw(): chooseOption menu failed to open', TDebug.SUB);
+
+  print('bankscreen.withdraw(): result = ' + boolToStr(result), TDebug.SUB);
+end;
+
+(*
+TRSBankScreen.withdraw; overload
+~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+
+.. code-block:: pascal
+
+    function TRSBankScreen.withdraw(dtm, amount: integer; text: string; acc: extended; toFamiliar: boolean = false): boolean;
+
+Searches for the dtm 'dtm' in each slot if found.  If the string 'text' matches
+with a minimum accuracy of 'acc', it will withdraw the amount 'amount' from that
+bank slot.  If toFamiliar is true, will withdraw the amount to your beast of
+burden familiar (default false).
+
+.. note::
+
+    - by Kevin
+    - Last Updated: 26 November 2014 by Kevin
+
+Example:
+
+.. code-block:: pascal
+
+    //To withdraw 28 items normally
+    bankScreen.withdraw(dtm, 28);
+
+    //To withdraw 28 items named 'Potato seed'
+    bankScreen.withdraw(dtm, 28, 'Potato seed', 0.8);
+
+    //To withdraw 28 items named 'Potato seed' to your beast of burden familiar
+    bankScreen.withdraw(dtm, 28, 'Potato seed', 0.8, true);
+
+    //To withdraw 28 items to your beast of burden familiar
+    bankScreen.withdraw(dtm, 28, true);
+*)
+function TRSBankScreen.withdraw(dtm, amount: integer; text: string; acc: extended; toFamiliar: boolean = false): boolean; overload;
+var
+  slot, i: integer;
+  tpa: TPointArray;
+  b: TBox;
+begin
+  result := false;
+
+  // just to wait for items to appear in bank
+  b := self.getBankSlotBoxes().getBounds();
+  waitColorCountRange(ITEM_OUTLINE_BLACK, 0, b, 3600 + random(500), 1);
+
+  if (not findDTMs(dtm, tpa, b)) then
+    exit;
+
+  for i:=0 to high(tpa) do
+  begin
+    slot := self.pointToSlot(tpa[i]);
+
+    if (slot <> -1) then
+      result := self.withdraw(text, acc, slot, amount, toFamiliar);
+    if result then
+      Exit;
+  end;
+end;
+
+(*
 _waitBankOrPinScreen
 ~~~~~~~~~~~~~~~~~~~~
 
