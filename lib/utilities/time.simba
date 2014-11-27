@@ -100,6 +100,44 @@ begin
   STA[TIME_FSTOP] := ['.', '.', '', True, 2];
   STA[TIME_FORMAL_LONG] := [' Years, ', ' Months, ', ' Weeks, ', ' Days, ', ' Hours, ', ' Minutes and ', ' Seconds', False, 0];
 
+  case theType of
+    TIME_FORMAL:
+    begin
+      if time[0]= 1 then
+        sta[TIME_FORMAL][0]:=' Hour, ';
+
+      if time[1]= 1 then
+        sta[TIME_FORMAL][1]:=' Minute and ';
+
+      if time[2]= 1 then
+        sta[TIME_FORMAL][2]:=' Second';
+    end;
+    TIME_FORMAL_LONG:
+    begin
+      if time[0]= 1 then
+        sta[TIME_FORMAL_LONG][0]:=' Year, ';
+
+      if time[1]= 1 then
+        sta[TIME_FORMAL_LONG][1]:=' Month, ';
+
+      if time[2]= 1 then
+        sta[TIME_FORMAL_LONG][2]:=' Week, ';
+
+      if time[3]= 1 then
+        sta[TIME_FORMAL_LONG][3]:=' Day, ';
+
+      if time[4]= 1 then
+        sta[TIME_FORMAL_LONG][4]:=' Hour, ';
+
+      if time[5]= 1 then
+        sta[TIME_FORMAL_LONG][5]:=' Minute and ';
+
+      if time[6]= 1 then
+        sta[TIME_FORMAL_LONG][6]:=' Second';
+    end;
+  end;
+
+
   for i := 0 to t do
     if (Time[i] > 0) or (STA[TheType][tl]) or (i = t) then
       Result := Result + PadZ(IntToStr(Time[i]), STA[TheType][tl+1]) + STA[TheType][i];
