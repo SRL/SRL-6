@@ -183,7 +183,7 @@ Example:
     if (bankScreen.__find()) then
       writeln('bounds are set!');
 *)
-function TRSBankScreen.__find(): boolean; override;
+function TRSBankScreen.__find(): boolean;
 const
   TOP_DIMENSIONS: TPoint = [479, 31];
   LINE_COLOR = 4932919;
