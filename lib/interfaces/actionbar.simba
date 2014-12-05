@@ -1354,12 +1354,12 @@ TRSActionBar._isRetaliateEnabled
 
     function TRSActionBar._isRetaliateEnabled: boolean;
 
-Returns the whether autoretaliate is on or not
+Returns whether autoretaliate is enabled or not
 
 .. note::
 
     - by Ashaman88
-    - Last Updated: 5 February 2014 by Ashaman88
+    - Last Updated: 5 December 2014 by The Mayor
 
 Example:
 
@@ -1368,12 +1368,12 @@ Example:
      if actionBar._isRetaliateEnabled then
         writeln('AutoRetaliate is enabled!');
 *)
-function TRSActionBar._isRetaliateEnabled: boolean;
+function TRSActionBar._isRetaliateEnabled(): boolean;
 const
-  RETALIATE_COLOR = 11842224;
+  RETALIATE_COLOR = 1917801;
 begin
-  result := getColor(self.getbounds().x1+170,self.getbounds().y1+16) = RETALIATE_COLOR;
-  print('actionBar._isRetaliateEnabled(): result = '+boolToStr(result), TDebug.SUB);
+  result := getColor(self.x1 + 175, self.y1 + 23) = RETALIATE_COLOR;
+  print('actionBar._isRetaliateEnabled(): result = ' + boolToStr(result), TDebug.SUB);
 end;
 
 
@@ -1390,7 +1390,7 @@ Enables or disables autoretaliate. Returns true if successfully disables/enabled
 .. note::
 
     - by Ashaman88
-    - Last Updated: 4 February 2014 by Ashaman88
+    - Last Updated: 5 December 2014 by The Mayor
 
 Example:
 
@@ -1403,25 +1403,27 @@ var
   t: LongWord;
 begin
   if enabled then
-    result := (self._isRetaliateEnabled()) else
+    result := (self._isRetaliateEnabled())
+  else
     result := not (self._isRetaliateEnabled());
 
   print('actionBar.setRetaliate(): result = '+boolToStr(result), TDebug.SUB);
 
   if result then
-    exit;
+    exit();
 
   self.mouseIcon(AB_Bar_ADRENALINE, MOUSE_LEFT);
 
-  t := getSystemTime() + randomRange(2000, 3000);
+  t := getSystemTime() + randomRange(3500, 5000);
 
   while (t > getSystemTime()) and (not result) do
   begin
     if enabled then
-      result := (self._isRetaliateEnabled()) else
+      result := (self._isRetaliateEnabled())
+    else
       result := not (self._isRetaliateEnabled());
 
-    wait(100 + random(50));
+    wait(1000 + random(1000));
   end;
 
   print('actionBar.setRetaliate(): result = '+boolToStr(result), TDebug.SUB);
