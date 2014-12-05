@@ -1393,11 +1393,12 @@ TRSBankScreen.withdraw
 
 .. code-block:: pascal
 
-    function TRSBankScreen.withdraw(slot, amount: integer; mouseOverText: TStringArray; toFamiliar: boolean = false): boolean;
+    function TRSBankScreen.withdraw(slot, amount: integer; mouseOverText: TStringArray; asNote: boolean = false; toFamiliar: boolean = false): boolean;
 
 Withdraws the the amount 'amount' from the bank slot 'slot', if the mouse-over
-text is correct, mouse-over text can also be skipped.  If toFamiliar is true, will
-withdraw items into your beast of burden familiar (default false).
+text is correct, mouse-over text can also be skipped. If asNote is true (default false),
+will withdraw items as a note. If toFamiliar is true, will withdraw items into your
+beast of burden familiar (default false).
 
 Extra vaild constants for 'amount' are:
 
@@ -1408,7 +1409,7 @@ Extra vaild constants for 'amount' are:
 .. note::
 
     - by Olly
-    - Last Updated: 3 October 2014 by Clarity
+    - Last Updated: 04 December 2014 by Serajin
 
 Example:
 
@@ -1417,6 +1418,9 @@ Example:
     // To withdraw 28 items from slot 1 if mouseover text is vaild
     bankscreen.withdraw(1, 28, ['Yew Log', 'Log']);
 
+    // To withdraw 500 items as notes from slot 1 if mouseover text is valid
+    bankscreen.withdraw(1, 500, ['Yew Log', 'Log'], true);
+
      // To withdraw all items from slot 10 if mouseover text is vaild
     bankscreen.withdraw(10, WITHDRAW_AMOUNT_ALL, ['Yew Log', 'Log']);
 
@@ -1424,14 +1428,30 @@ Example:
     bankScreen.withdraw(1, 28, ['']);
 
     // To withdraw 28 items from slot 1 into your beast of burden familiar if mouseover text is valid
-    bankScreen.withdraw(1, 28, ['Yew Log', 'Log'], true);
+    bankScreen.withdraw(1, 28, ['Yew Log', 'Log'], false, true);
 *)
-function TRSBankScreen.withdraw(slot, amount: integer; mouseOverText: TStringArray; toFamiliar: boolean = false): boolean;
+function TRSBankScreen.withdraw(slot, amount: integer; mouseOverText: TStringArray; asNote: boolean = false; toFamiliar: boolean = false): boolean;
 var
   b: TBox;
 begin
   result := false;
   b := self.getBankSlotBox(slot);
+
+  if asNote then
+  begin
+    if not self.isButtonActive(BANK_BUTTON_NOTE) then
+    begin
+      self.clickButton(BANK_BUTTON_NOTE);
+      wait(125 + random(50));
+    end;
+  end else
+  begin
+    if self.isButtonActive(BANK_BUTTON_NOTE) then
+    begin
+      self.clickButton(BANK_BUTTON_NOTE);
+      wait(125 + random(50));
+    end;
+  end;
 
   if (b.x1 = -1) then // invaild slot
   begin
@@ -1498,7 +1518,7 @@ begin
     print('bankscreen.withdraw(): chooseOption menu failed to open', TDebug.SUB);
 
   print('bankscreen.withdraw(): result = ' + boolToStr(result), TDebug.SUB);
-end;
+end; 
 
 (*
 TRSBankScreen.pointToSlot
@@ -1544,16 +1564,17 @@ TRSBankScreen.withdraw; overload
 
 .. code-block:: pascal
 
-    function TRSBankScreen.withdraw(dtm, amount: integer, toFamiliar: boolean = false): boolean; overload;
+    function TRSBankScreen.withdraw(dtm, amount: integer; asNote: boolean = false; toFamiliar: boolean = false): boolean; overload;
 
 Searches for the dtm 'dtm' in each slot if found, will withdraw the amount
-'amount' from that bank slot.  If toFamiliar is true, will withdraw the amount
-to your beast of burden familiar (default false).
+'amount' from that bank slot. If asNote is true (default false), will withdraw
+the amount as notes. If toFamiliar is true, will withdraw the amount to your
+beast of burden familiar (default false).
 
 .. note::
 
     - by Olly
-    - Last Updated: 03 October 2014 by Clarity
+    - Last Updated: 04 December 2014 by Serajin
 
 Example:
 
@@ -1562,10 +1583,13 @@ Example:
     //To withdraw 28 items normally
     bankScreen.withdraw(dtm, 28);
 
-    //To withdraw 28 items to your beast of burden familiar
+    //To withdraw 50 items as notes
     bankScreen.withdraw(dtm, 28, true);
+
+    //To withdraw 28 items to your beast of burden familiar
+    bankScreen.withdraw(dtm, 28, false, true);
 *)
-function TRSBankScreen.withdraw(dtm, amount: integer; toFamiliar: boolean = false): boolean; overload;
+function TRSBankScreen.withdraw(dtm, amount: integer; asNote: boolean = false; toFamiliar: boolean = false): boolean; overload;
 var
   p: TPoint;
   slot: integer;
@@ -1583,7 +1607,7 @@ begin
   slot := self.pointToSlot(p);
 
   if (slot <> -1) then
-    result := self.withdraw(slot, amount, [''], toFamiliar);
+    result := self.withdraw(slot, amount, [''], asNote, toFamiliar);
 end;
 
 (*
@@ -1592,16 +1616,17 @@ TRSBankScreen.withdraw; overload
 
 .. code-block:: pascal
 
-    function TRSBankScreen.withdraw(bitmap, tolerance, amount: integer; toFamiliar: boolean = false): boolean; overload;
+    function TRSBankScreen.withdraw(bitmap, tolerance, amount: integer; asNote: boolean = false; toFamiliar: boolean = false): boolean; overload;
 
 Searches for the bitmap 'bitmap' with the tolerance 'tolerance' in each slot
-if found, will withdraw the amount 'amount' from that bank slot.  If toFamiliar is true, will withdraw the amount
-to your beast of burden familiar (default false).
+if found, will withdraw the amount 'amount' from that bank slot. If asNote is
+true (default false), will withdraw the amount 'amount' as notes. If toFamiliar
+is true, will withdraw the amount to your beast of burden familiar (default false).
 
 .. note::
 
     - by Olly
-    - Last Updated: 03 October 2014 by Clarity
+    - Last Updated: 04 December 2014 by Serajin
 
 Example:
 
@@ -1610,10 +1635,13 @@ Example:
     //To withdraw 28 items normally from slot 10
     bankScreen.withdraw(bmp, 10, 28);
 
+    //To withdraw 50 items as notes from slot 10
+    bankScreen.withdraw(bmp, 10, 50, true);
+
     //To withdraw 28 items from slot 10 to your beast of burden familiar
-    bankScreen.withdraw(bmp, 10, 28, true);
+    bankScreen.withdraw(bmp, 10, 28, false, true);
 *)
-function TRSBankScreen.withdraw(bitmap, tolerance, amount: integer; toFamiliar: boolean = false): boolean; overload;
+function TRSBankScreen.withdraw(bitmap, tolerance, amount: integer; asNote: boolean = false; toFamiliar: boolean = false): boolean; overload;
 var
   p: TPoint;
   slot: integer;
@@ -1631,7 +1659,7 @@ begin
   slot := self.pointToSlot(p);
 
   if (slot <> -1) then
-    result := self.withdraw(slot, amount, [''], toFamiliar);
+    result := self.withdraw(slot, amount, [''], asNote, toFamiliar);
 end;
 
 (*
@@ -1640,12 +1668,12 @@ TRSBankScreen.withdraw
 
 .. code-block:: pascal
 
-    function TRSBankScreen.withdraw(text: String; acc: extended; slot, amount: integer; waitTime: integer = 0; toFamiliar: boolean = false): boolean; overload;
+    function TRSBankScreen.withdraw(text: String; acc: extended; slot, amount: integer; waitTime: integer = 0; asNote: boolean = false; toFamiliar: boolean = false): boolean; overload;
 
 Waits up to 'waitTime' (default 1000ms) for the mouse-over text to match with the given accurancy
 and withdraws the the amount 'amount' from the bank slot 'slot', mouse-over text
-can also be skipped. If toFamiliar is true, will withdraw items into your beast
-of burden familiar (default false).
+can also be skipped. If asNote is true (default false), will withdraw items as notes. If
+toFamiliar is true, will withdraw items into your beast of burden familiar (default false).
 
 Extra vaild constants for 'amount' are:
 
@@ -1656,31 +1684,50 @@ Extra vaild constants for 'amount' are:
 .. note::
 
     - by Kevin
-    - Last Updated: 29 November 2014 by Serajin
+    - Last Updated: 04 December 2014 by Serajin
 
 Example:
 
 .. code-block:: pascal
 
-    // To withdraw 28 items from slot 1 if mouseover text is vaild, and waitTime of 1500ms
+    // To withdraw 28 items from slot 1 if mouseover text is valid, and waitTime of 1500ms
     bankscreen.withdraw('Yew Log', 0.8, 1, 28, 1500);
 
-     // To withdraw all items from slot 10 if mouseover text is vaild, with default waitTime
+     // To withdraw all items from slot 10 if mouseover text is valid, with default waitTime
     bankscreen.withdraw('Yew Log', 0.8, 10, WITHDRAW_AMOUNT_ALL);
+    
+    //To withdraw all items from slot 10 if mouseover text is valid, as notes
+    bankscreen.withdraw('Yew Log', 0.8, 10, WITHDRAW_AMOUNT_ALL, 1000, true);
 
     // To withdraw 28 items from slot 1 and will *ignore* mouse-over text
     bankScreen.withdraw('', 0, 1, 28, 50);
 
     // To withdraw 28 items from slot 1 into your beast of burden familiar if mouseover text is valid, and waitTime of 1000ms
-    bankScreen.withdraw('Yew Log', 0.8, 1, 28, 1000, true);
+    bankScreen.withdraw('Yew Log', 0.8, 1, 28, 1000, false, true);
 *)
-function TRSBankScreen.withdraw(text: String; acc: extended; slot, amount: integer; waitTime: integer = 0; toFamiliar: boolean = false): boolean; overload;
+function TRSBankScreen.withdraw(text: String; acc: extended; slot, amount: integer; waitTime: integer = 0; asNote: boolean = false; toFamiliar: boolean = false): boolean; overload;
 var
   b: TBox;
   t: LongWord;
 begin
   result := false;
   b := self.getBankSlotBox(slot);
+
+  if asNote then
+  begin
+    if not self.isButtonActive(BANK_BUTTON_NOTE) then
+    begin
+      self.clickButton(BANK_BUTTON_NOTE);
+      wait(125 + random(50));
+    end;
+  end else
+  begin
+    if self.isButtonActive(BANK_BUTTON_NOTE) then
+    begin
+      self.clickButton(BANK_BUTTON_NOTE);
+      wait(125 + random(50));
+    end;
+  end;
 
   if (b.x1 = -1) then // invaild slot
   begin
@@ -1760,17 +1807,18 @@ TRSBankScreen.withdraw; overload
 
 .. code-block:: pascal
 
-    function TRSBankScreen.withdraw(dtm, amount: integer; waitTime: integer = 0; text: string; acc: extended; toFamiliar: boolean = false): boolean;
+    function TRSBankScreen.withdraw(dtm, amount: integer; waitTime: integer = 0; text: string; acc: extended; asNote: boolean = false; toFamiliar: boolean = false): boolean;
 
 Searches for the dtm 'dtm' in each slot if found up to 'waitTime' (default 1000ms).
 If the string 'text' matches with a minimum accuracy of 'acc', it will withdraw
-the amount 'amount' from that bank slot.  If toFamiliar is true, will withdraw
-the amount to your beast of burden familiar (default false).
+the amount 'amount' from that bank slot. If asNote is true (default false), will
+withdraw items as notes. If toFamiliar is true, will withdraw the amount to your
+beast of burden familiar (default false).
 
 .. note::
 
     - by Kevin
-    - Last Updated: 29 November 2014 by Serajin
+    - Last Updated: 04 December 2014 by Serajin
 
 Example:
 
@@ -1780,15 +1828,16 @@ Example:
     bankScreen.withdraw(dtm, 28);
 
     //To withdraw 28 items named 'Potato seed'
-    bankScreen.withdraw(dtm, 28, 'Potato seed', 0.8);
+    bankScreen.withdraw(dtm, 28, 1000, 'Potato seed', 0.8);
+    
+    //To withdraw 28 items named 'Potato seed' as notes
+    bankScreen.withdraw(dtm, 28, 1000, 'Potato seed', 0.8, true);
 
     //To withdraw 28 items named 'Potato seed' to your beast of burden familiar, and 1500ms waitTime
-    bankScreen.withdraw(dtm, 28, 1500, 'Potato seed', 0.8, true);
+    bankScreen.withdraw(dtm, 28, 1500, 'Potato seed', 0.8, false, true);
 
-    //To withdraw 28 items to your beast of burden familiar
-    bankScreen.withdraw(dtm, 28, true);
 *)
-function TRSBankScreen.withdraw(dtm, amount: integer; waitTime: integer = 0; text: string; acc: extended; toFamiliar: boolean = false): boolean; overload;
+function TRSBankScreen.withdraw(dtm, amount: integer; waitTime: integer = 0; text: string; acc: extended; asNote: boolean = false; toFamiliar: boolean = false): boolean; overload;
 var
   slot, i: integer;
   tpa: TPointArray;
@@ -1808,7 +1857,7 @@ begin
     slot := self.pointToSlot(tpa[i]);
 
     if (slot <> -1) then
-      result := self.withdraw(text, acc, slot, amount, waitTime, toFamiliar);
+      result := self.withdraw(text, acc, slot, amount, waitTime, asNote, toFamiliar);
     if result then
       Exit;
   end;
