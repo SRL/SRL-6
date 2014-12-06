@@ -2877,6 +2877,44 @@ begin
 end;
 
 (*
+TRSMinimap.enableRest
+~~~~~~~~~~~~~~~~~~~~
+
+.. code-block:: pascal
+
+    function TRSMinimap.enableRest(): Boolean;
+
+Right clicks the run button and enables rest
+
+.. note::
+
+    - by The Mayor
+    - Last Updated: 07 December 2014 by The Mayor
+
+Example:
+
+.. code-block:: pascal
+
+    if minimap.enableRest() then
+      writeln('we are now resting');
+*)
+function TRSMinimap.enableRest(): Boolean;
+var
+  p: TPoint;
+begin
+  p := self.button[MM_BUTTON_RUN].center;
+
+  if (not self.isResting()) then
+  begin
+    mouseCircle(p.x, p.y, self.button[MM_BUTTON_RUN].radius, MOUSE_RIGHT);
+    result := chooseOption.select(['est']);
+  end else
+    result := true;
+
+  print('minimap.enableRest(): result = ' + boolToStr(result), TDebug.SUB);
+end;
+
+(*
 TRSMinimap.getRunEnergy
 ~~~~~~~~~~~~~~~~~~~~~~~
 
