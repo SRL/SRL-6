@@ -316,7 +316,7 @@ begin
       exit;
     end;
 
-    skillarray := ['Crafting','Smithing','Herblore','Cooking','Fletching','Divination];
+    skillarray := ['Crafting','Smithing','Herblore','Cooking','Fletching','Divination'];
     intskillarray := [SKILL_CRAFTING, SKILL_SMITHING, SKILL_HERBLORE, SKILL_COOKING, SKILL_FLETCHING, SKILL_DIVINATION];
 
     atpa := tpa.cluster(5);
@@ -337,7 +337,7 @@ begin
     end;
   end;
 
-  print('TRSProductionScreen.getType(): result = ' + toStr(result), TDebug.SUB);
+  print('TRSProductionScreen.getSkill(): result = ' + toStr(result), TDebug.SUB);
 end;
 
 {*
