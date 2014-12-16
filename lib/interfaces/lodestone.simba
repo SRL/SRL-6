@@ -363,6 +363,8 @@ begin
   for i := 0 to high(DTMs) do
     if findDTM(DTMs[i], x, y, b) then
       result := true;
+      
+  freeDTMs(DTMs);
 
   if result then
     print('TRSLodestoneScreen._isLocked(): lodestone ' + toStr(location) + ' is not activated', TDebug.ERROR)
