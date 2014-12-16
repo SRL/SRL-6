@@ -326,6 +326,49 @@ begin
 end;
 
 (*
+TRSLodestoneScreen._isLocked
+~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+
+.. code-block:: pascal
+
+    function TRSLodestoneScreen._isLocked(location: integer): boolean;
+
+Checks if the lodestone is unlocked (actually locked or members only).
+This is only used internally in lodestoneScreen.teleportTo(location).
+
+.. note::
+
+    - by The Mayor
+    - Last Updated: 16 December 2014 by The Mayor
+
+Example:
+
+.. code-block:: pascal
+
+    if (lodestoneScreen._isLocked(LOCATION_VARROCK) then
+      writeln('You need to activate the Varrock loadstone!');
+*)
+function TRSLodestoneScreen._isLocked(location: integer): boolean;
+var
+  x, y, i: integer;
+  b: TBox;
+  DTMs: array[0..1] of integer;
+begin
+  DTMs := [DTMFromString('mbQAAAHicY2VgYKiA4mogrofiQEYGBm8gdoXSIP6kHccZppy+zbDu1lMwDeLzA9WiY0YsGAwA0uoPRA=='),
+           DTMFromString('mWAAAAHicY2FgYHgNxC+B+B0QvwHiZUA8B4oXAfFvIP7/3Ifh/2c/MJsfDTOiYRAAAOaoDNs=')];
+
+  b := self._getTeleportBox(location);
+  b.expand(5);
+
+  for i := 0 to high(DTMs) do
+    if findDTM(DTMs[i], x, y, b) then
+      result := true;
+
+  if result then
+    print('TRSLodestoneScreen._isLocked(): lodestone ' + toStr(location) + ' is not activated', TDebug.ERROR)
+end;
+
+(*
 TRSLodestoneScreen.teleportTo
 ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
 
@@ -338,14 +381,14 @@ Will teleport to location 'location'. Use integer constants at the top of the fi
 .. note::
 
     - by Olly
-    - Last Updated: 16 November 2013 by Olly
+    - Last Updated: 16 December 2014 by The Mayor
 
 Example:
 
 .. code-block:: pascal
 
-    if (lodestoneScreen.isOpen() then
-      writeln('Lodestone screen is open!');
+    if (lodestoneScreen.teleportTo(LOCATION_LUMBRIDGE) then
+      writeln('We just teleported to Lumbrodge');
 *)
 function TRSLodestoneScreen.teleportTo(location: integer): boolean;
 var
@@ -375,19 +418,23 @@ begin
   if (not self.isOpen()) then
     fastClick(MOUSE_LEFT);
 
-  if (self.isOpen(5000)) then
+  if (self.isOpen(4000 + random(1500))) then
   begin
-    b := self._getTeleportBox(location);
-
-    if (b.x1 <> -1) then
+    if not self._isLocked(location) then
     begin
-      mouseBox(b, MOUSE_LEFT);
-      result := true;
+      b := self._getTeleportBox(location);
 
-      print('TRSLodestoneScreen.teleportTo(): result = true', TDebug.SUB);
-    end;
+      if (b.x1 <> -1) then
+      begin
+        mouseBox(b, MOUSE_LEFT);
+        result := true;
+        print('TRSLodestoneScreen.teleportTo(): result = true', TDebug.SUB);
+      end;
+
+    end else
+      self.close();
   end else
-    print('TRSLodestoneScreen.teleportTo(): lodestone screen never appeared', TDebug.ERROR);
+      print('TRSLodestoneScreen.teleportTo(): lodestone screen never appeared', TDebug.ERROR);
 end;
 
 begin
