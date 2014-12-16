@@ -181,6 +181,13 @@ begin
           players[index].settings[high(players[index].settings)] := __scriptEditBoxes[i].getText();
         end;
 
+      if (length(__scriptComboBoxes) > 0) then
+        for i := 0 to high(__scriptComboBoxes) do
+        begin
+          setLength(players[index].settings, length(players[index].settings) + 1);
+          players[index].settings[high(players[index].settings)] := __scriptComboBoxes[i].getText();
+        end;
+
       if (length(__scriptCheckBoxes) > 0) then
         for i := 0 to high(__scriptCheckBoxes) do
         begin
@@ -192,12 +199,6 @@ begin
             players[index].settings[high(players[index].settings)] := 'False';
         end;
 
-      if (length(__scriptComboBoxes) > 0) then
-        for i := 0 to high(__scriptComboBoxes) do
-        begin
-          setLength(players[index].settings, length(players[index].settings) + 1);
-          players[index].settings[high(players[index].settings)] := __scriptComboBoxes[i].getText();
-        end;
     end;
 end;
 
@@ -225,6 +226,15 @@ begin
         inc(c);
       end;
 
+      for i := 0 to high(__scriptComboBoxes) do
+      begin
+        if (c > high(players[index].settings)) then
+          Continue();
+
+        __scriptComboBoxes[i].setCaption(players[index].settings[c]);
+        inc(c);
+      end;
+
       for i := 0 to high(__scriptCheckBoxes) do
       begin
         if (c > high(players[index].settings)) then
@@ -235,15 +245,6 @@ begin
         else
           __scriptCheckBoxes[i].setState(cbUnchecked);
 
-        inc(c);
-      end;
-         writeln(players[index].settings);
-      for i := 0 to high(__scriptComboBoxes) do
-      begin
-        if (c > high(players[index].settings)) then
-          Continue();
-
-        __scriptComboBoxes[i].setCaption(players[index].settings[c]);
         inc(c);
       end;
 
@@ -855,4 +856,3 @@ end;
 {$ELSE}
   {$i srlplayerform_old.simba}
 {$ENDIF}
-
