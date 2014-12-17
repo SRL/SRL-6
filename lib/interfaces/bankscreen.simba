@@ -2527,7 +2527,7 @@ begin
 
   if self.isButtonActive(BANK_BUTTON_SEARCH) then
   begin
-    if not self.isSearchOpen then
+    if not self.isSearchOpen() then
     begin
       self.clickButton(BANK_BUTTON_SEARCH);
       wait(1200 + random(400));
@@ -2543,7 +2543,7 @@ begin
   begin
     self.clickButton(BANK_BUTTON_SEARCH);
     repeat
-      if self.isSearchOpen then
+      if self.isSearchOpen() then
         break;
       wait(250 + random(50));
     until (getTimeRunning() > t);
