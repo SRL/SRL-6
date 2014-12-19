@@ -1518,7 +1518,7 @@ begin
     print('bankscreen.withdraw(): chooseOption menu failed to open', TDebug.SUB);
 
   print('bankscreen.withdraw(): result = ' + boolToStr(result), TDebug.SUB);
-end; 
+end;
 
 (*
 TRSBankScreen.pointToSlot
@@ -1695,7 +1695,7 @@ Example:
 
      // To withdraw all items from slot 10 if mouseover text is valid, with default waitTime
     bankscreen.withdraw('Yew Log', 0.8, 10, WITHDRAW_AMOUNT_ALL);
-    
+
     //To withdraw all items from slot 10 if mouseover text is valid, as notes
     bankscreen.withdraw('Yew Log', 0.8, 10, WITHDRAW_AMOUNT_ALL, 1000, true);
 
@@ -1751,53 +1751,53 @@ begin
       begin
         print('bankscreen.withdraw(): Incorrect Mouse-over text, result = false. Expected ' + text + '. Read ' + getMouseOverText(true), TDebug.SUB);
         wait(25 + random(25));
-      end else
-      begin
-        if (amount = 1) then     // single item? let's just click it
-        begin
-          fastClick(MOUSE_LEFT);
-          wait(400 + random(300));
-          print('bankscreen.withdraw(): result = true', TDebug.SUB);
-          exit(true);
-        end else
-          fastClick(MOUSE_RIGHT);  // more than 1 item? open choose options
-
-        if (chooseOption.isOpen(2000)) then
-        begin
-          case (amount) of
-            WITHDRAW_AMOUNT_ALL: result := chooseOption.select(['Withdraw-All', '-All']);
-            WITHDRAW_AMOUNT_ALL_BUT_ONE: result := chooseOption.select(['Withdraw-All but one', 'All but one']);
-
-            // check if the number is already availble, else let's withdraw X it
-            else begin
-              if toFamiliar then
-              begin
-                if (chooseOption.select(['Withdraw-X to BoB', 'to', 'BoB'])) then
-                begin
-                  result := (self._enterAmount(amount, 6000));
-                  print('bankscreen.withdraw(): result = ' + boolToStr(result), TDebug.SUB);
-                  exit();
-                end else
-                begin
-                  result := false;
-                  chooseOption.close();
-                  print('bankscreen.withdraw(): Withdraw-X to BoB option not present.  result = ' + boolToStr(result), TDebug.ERROR);
-                  exit();
-                end;
-              end;
-              if (not chooseOption.optionsExist(['Withdraw-' + intToStr(amount), '-' + intToStr(amount), toStr(amount)])) then
-              begin
-                if (chooseOption.select(['Withdraw-X', '-X'])) then
-                  result := (self._enterAmount(amount, 6000));
-              end else
-                result := chooseOption.select(['Withdraw-' + intToStr(amount), '-' + intToStr(amount), toStr(amount)]);
-              end;
-          end;
-        end else
-          print('bankscreen.withdraw(): chooseOption menu failed to open', TDebug.SUB);
-
-        print('bankscreen.withdraw(): result = ' + boolToStr(result), TDebug.SUB);
+        exit(false);
       end;
+
+    if (amount = 1) then     // single item? let's just click it
+    begin
+      fastClick(MOUSE_LEFT);
+      wait(400 + random(300));
+      print('bankscreen.withdraw(): result = true', TDebug.SUB);
+      exit(true);
+    end else
+      fastClick(MOUSE_RIGHT);  // more than 1 item? open choose options
+
+    if (chooseOption.isOpen(2000)) then
+    begin
+      case (amount) of
+        WITHDRAW_AMOUNT_ALL: result := chooseOption.select(['Withdraw-All', '-All']);
+        WITHDRAW_AMOUNT_ALL_BUT_ONE: result := chooseOption.select(['Withdraw-All but one', 'All but one']);
+
+      // check if the number is already availble, else let's withdraw X it
+        else begin
+          if toFamiliar then
+          begin
+            if (chooseOption.select(['Withdraw-X to BoB', 'to', 'BoB'])) then
+            begin
+              result := (self._enterAmount(amount, 6000));
+              print('bankscreen.withdraw(): result = ' + boolToStr(result), TDebug.SUB);
+              exit();
+            end else
+            begin
+              result := false;
+              chooseOption.close();
+              print('bankscreen.withdraw(): Withdraw-X to BoB option not present.  result = ' + boolToStr(result), TDebug.ERROR);
+              exit();
+            end;
+          end;
+          if (not chooseOption.optionsExist(['Withdraw-' + intToStr(amount), '-' + intToStr(amount), toStr(amount)])) then
+          begin
+            if (chooseOption.select(['Withdraw-X', '-X'])) then
+              result := (self._enterAmount(amount, 6000));
+          end else
+            result := chooseOption.select(['Withdraw-' + intToStr(amount), '-' + intToStr(amount), toStr(amount)]);
+          end;
+      end;
+    end else
+       print('bankscreen.withdraw(): chooseOption menu failed to open', TDebug.SUB);
+
+     print('bankscreen.withdraw(): result = ' + boolToStr(result), TDebug.SUB);
   end;
 end;
 
@@ -1829,7 +1829,7 @@ Example:
 
     //To withdraw 28 items named 'Potato seed'
     bankScreen.withdraw(dtm, 28, 1000, 'Potato seed', 0.8);
-    
+
     //To withdraw 28 items named 'Potato seed' as notes
     bankScreen.withdraw(dtm, 28, 1000, 'Potato seed', 0.8, true);
 
@@ -1862,7 +1862,7 @@ begin
       Exit;
   end;
 end;
- 
+
 
 (*
 _waitBankOrPinScreen
@@ -2464,7 +2464,7 @@ Will check if a bank button 'button', is activated, valid button types are:
 .. note::
 
     - by Serajin
-    - Last Updated: 30 November 2014 by Serajin
+    - Last Updated: 17 December 2014 by akarigar
 
 Example:
 
@@ -2489,7 +2489,7 @@ begin
                point(self.x2 + BUTTON_OFFSET.x,
                      self.y2 + BUTTON_OFFSET.y));
 
-  result:= (countColorTolerance(7756586, self.getBounds(), 23) > 300);
+  result:= (countColorTolerance(7756586, b, 23) > 250);
 end;
 
 (*

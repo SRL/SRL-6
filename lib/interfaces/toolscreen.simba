@@ -171,14 +171,15 @@ TRSToolScreen.select
 
 .. code-block:: pascal
 
-    function TRSToolScreen.select(tool: string): boolean;
+    function TRSToolScreen.select(tool: string; key: boolean = true): boolean;
 
-Attempts to select the tool, returns if succesfull or not.
+Attempts to select the tool. Uses the corresponding key if key is true.
+Returns true if successful otherwise false.
 
 .. note::
 
     - by footballjds
-    - Last Updated: 14 December 2013 by footballjds
+    - Last Updated: 17 December 2014 by akarigar
 
 Example:
 
@@ -194,7 +195,6 @@ var
   textArea: TBox;
   boxArr: TBoxArray;
   i : integer;
-  timeout : LongWord;
   p: TPoint;
 begin
   result := false;
@@ -211,20 +211,50 @@ begin
     for i := 0 to high(boxArr) do
       if (pointInBox([p.x + 20, p.y + 50], boxArr[i])) then
       begin
-        if key then
-        begin
-          timeOut := (getSystemTime() + randomRange(1500, 1900));
-          repeat
-            multiType(toStr(i+1), randomRange(30, 50), 2, false);
-            wait(100 + random(50));
-            result := (not self.isOpen());
-          until((getSystemTime() > timeOut) or result);
-
-          if (result) then
-            exit();
-        end;
+        if key and self.select(i + 1) then
+          exit(true);
         mouseBox(boxArr[i], MOUSE_LEFT);
       end;
+
+  print('TRSToolScreen.select(): result = ' + lowercase(boolToStr(result)), TDebug.SUB);
+end;
+
+(*
+TRSToolScreen.select; overload
+~~~~~~~~~~~~~~~~~~~~
+
+.. code-block:: pascal
+
+    function TRSToolScreen.select(tool: integer): boolean; overload;
+
+Attempts to select the tool by using the corresponding key. Returns true if
+successful otherwise false.
+
+.. note::
+
+    - by akarigar
+    - Last Updated: 17 December 2014 by akarigar
+
+Example:
+
+.. code-block:: pascal
+
+    if (toolScreen.select(1)) then
+      writeln('We started making something!');
+*)
+function TRSToolScreen.select(tool: integer): boolean; overload;
+var
+  timeout : LongWord;
+begin
+  if (tool <= 0) or (not self.isOpen()) then
+    exit(false);
+
+  timeout := getSystemTime() + randomRange(1500, 1900);
+  repeat
+    multiType(intToStr(tool), randomRange(30, 50), 2, false);
+    wait(100 + random(50));
+    result := not self.isOpen();
+  until (getSystemTime() > timeout) or result;
 
   print('TRSToolScreen.select(): result = ' + lowercase(boolToStr(result)), TDebug.SUB);
 end;
