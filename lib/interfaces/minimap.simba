@@ -1995,12 +1995,28 @@ begin
         color := -1;
       end;
 
-    MM_SYMBOL_MINIGAME:
+    MM_SYMBOL_MINIGAME: // 1 January 2015
       with result do
       begin
         name := 'Minigame';
-        Bmp := BitmapFromString(14, 17, 'meJxjYEAB745v/Hx6y8cTG18fWceAA7w9subM8umdJaXpUWlA1FNecX717DdH1qIp+3Rszaz6ah0dT1EZBzXjUjWjYjEZRz19n0XtLZ+PrYEre3NwxYquRgXNCFGFIEEpd3XTJjWTegEJZyBXUTNm06TuF3sWQ1ReWj1dXcNTzaTWwHGBjlmnre9Oc7eVWiZNhk4LlfQrNLV9b66fA1R2d/Ps1vwCoFHiihHGjsvdok47BO619t5sH3jG0GGxsIwPv4Rjd2nNjbXTn+yYH+AeKyjtJauebmQ7y9prnW/Kfdeou0b2i7RMWqWUowWlPUJ80x9umvF482wHmyjbwPNWPhftg646ht5wCLlv5X3VxPWoufspc48zJi6HnezjHm+aeW/9tAi/VCEZH3HFcA3Den3r5QZ2O3UsVqubTFHVrRBXCBWQcosKSL21atKZ+Z19xWXC8sESynF61st1LRdpGk9RM+jSMp2paTZfVCFSWC5wclX9kRktQE9dXtBpZJKgbNClqNstrZqsaTJJ3ahHVi1NQaddTqvB0CTh5srJ8CDd2t2oqZ8qIhciLB8kq1UnrVYGNEpUMVJNN27n1N7Dk2vgKi/ObZ1SWq6lHyemFCOlViihnC6qGK5jlDy9uv7srGa0CD0+ua6voFxWPUFCOUFUMRrImFTRcHxKPdZEcmZ6/fSySnmNZDmNpNn1LSen1eFKTkBwdkpNV15FT3HdmSnVeJRBwLEJFYd7SzHFAUr3y8A=');
-        color := -1;
+        bmp := BitmapFromString(14, 17, 'meJxjYGBgYWFhYmKCkJ/ObPkCRK' +
+          'c3f7+wk5ODnQEDsLIwvzmy5vTyaZ0lpelRaUDUU15xfvXsN0fWMoI' +
+          'BUA2QFOTn/Xxszaz6ah0dT1EZBzXjUjWjYjEZRz19n0XtLUApRrBp' +
+          'QBvfHlyxoqtRQTNCVCFIUMpN3bRJzaReQMIZyFXUjNk0qfvFnsVAl' +
+          'SzMzJdWTVfX8FQzqTVwXKBj1mnru9PcbaWWSZOh00Il/QpNbd+b6+' +
+          'cwMTLe2zKnNb9AUMpdXDHC2HG5W9Rph8C91t6b7QPPGDosEpbx4Zd' +
+          'w7C6tubJmxpMd8wLcYwWlvWTV041sZ1l7rfNNue8addfIfpGWSauU' +
+          'crSgtEeIb/r9DTMeb57lYBNlG3jeyueifdBVx9AbDiH3rbyvmrgeN' +
+          'Xc/ZeFxxsTlkJN93IONM+6vnx7hlyok4yOuGK5hWK9vvdzAbqeOxW' +
+          'p1kymquhXiCqECUm5RAak3V048v7C7r7hMWD5YQjlOz3q5ruUiTeM' +
+          'pagZdWqYzNc3miypECssFTq6qPzazBeipyws6jUwTlA26FHW7pVWT' +
+          'NU0mqRv1yKqlKei0y2k1GJok3FgxmQEclSdmNGztbtTUTxWRCxGWD' +
+          '5LVqpNWKwMaJaoYqaYbt3Nq75HJtcAIYmFhZWNhuTS3dUppuZZ+nJ' +
+          'hSjLR6oYRyuqhiuI5R8vTq+rOzmnk4OSGxCSTZ2VhPTK7tKyiXVU+' +
+          'QUE4QVYwGMiZVNByfUsfCwgxPHoxMTECSg531zLT66WWV8hrJchpJ' +
+          's+tbTk2rA1qHnJDgSYWdlfXslJquvIqe4rozk6s52dk4ODiQVQKdC' +
+          'lYMNJuJnZXt2ITKw71lHGysQC7EEAgAAJSfz4Y=');
+        color := 1384791;
       end;
 
     MM_SYMBOL_TRADER_FUR:  // 9 October 2014
