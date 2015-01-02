@@ -664,7 +664,7 @@ designed to work with any screen size.  Returns true if both boxes are found.
 .. note::
 
     - by Coh3n
-    - Last updated: 23 July 2013 by Coh3n
+    - Last updated: 3 January 2015 by The Mayor
 
 Example:
 
@@ -675,15 +675,13 @@ Example:
 {$IFNDEF CODEINSIGHT}
 function __setInputBoxes(): boolean;
 const
-  __ACTIVE_BORDER_LENGTH = 524;
-  __INACTIVE_BORDER_LENGTH = 525;
+  __BORDER_LENGTH = 524;
 var
   tpaActive, tpaInactive: TPointArray;
   bdsActive, bdsInactive: TBox;
 begin
-  findColors(tpaActive, 6774863, 247, 229, 547, 375); // active box border color
-  findColors(tpaInactive, 6906451, 247, 229, 547, 380); // inactive box border color
-
+  findColors(tpaActive, 6774863, 247, 229, 547, 379); // active box border color
+  findColors(tpaInactive, 6906451, 247, 229, 547, 379); // inactive box border color
 
   if length(tpaActive) = 0 then
     findColors(tpaActive, 9867393, 247, 229, 547, 375); // active box border color when mouse is hovering
@@ -691,7 +689,7 @@ begin
   if length(tpaInactive) = 0 then
     findColors(tpaInactive, 9867393, 247, 229, 547, 375); // inactive box border color when mouse is hovering
 
-  if ((length(tpaActive) = __ACTIVE_BORDER_LENGTH) or (length(tpaActive) = __INACTIVE_BORDER_LENGTH)) and ((length(tpaInactive) = __INACTIVE_BORDER_LENGTH) or (length(tpaInactive) = __ACTIVE_BORDER_LENGTH)) then
+  if (length(tpaActive) = __BORDER_LENGTH) then
   begin
     result := true;
     print('__setInputBoxes(): Set username and password boxes', TDebug.SUB);
@@ -704,7 +702,8 @@ begin
     begin
       _boxUsername := bdsActive;
       _boxPassword := bdsInactive;
-    end else begin
+    end else
+    begin
       _boxUsername := bdsInactive;
       _boxPassword := bdsActive;
     end;
@@ -729,7 +728,7 @@ pressEnter is set to true. See TPlayer.loginToLobby for usage.
 .. note::
 
     - by Starblaster100, Raymond, IceFire908, Tarajunky, NCDS & Coh3n
-    - Last updated: 30/09/2012 by Coh3n
+    - Last updated: 3 January 2015 by The Mayor
 
 Example:
 
@@ -748,10 +747,10 @@ var
 begin
   t := (getSystemTime() + (60000 * 2));
   tmpBox := inputBox;
+  tmpBox.offset(point(8, 0)); // to remove the cursor so it doesn't interfere
 
   repeat
     // check to see if there is already text in the input box
-    tmpBox.offset(point(8, 0)); // to remove the cursor so it doesn't interfere
     findColors(tpa, __LOGIN_COLOR_TEXT, tmpBox);
 
     // click input box; clicks to the right of existing text
@@ -762,24 +761,25 @@ begin
 
       // make sure the point is in the inputBox
       if (not pointInBox(p, tmpBox)) then
-        p := point(tmpBox.x2 - (10 + random(10)), p.y);
+        p := point(tmpBox.x2 - 12, p.y);
 
-      if (clickBox) then
+      // failsafe if the box isn't active (color 6774863) then we click it
+      if (clickBox) or (not findColors(tpa, 6774863, tmpBox)) then
         mouse(p.rand(3), MOUSE_LEFT);
-    end else begin
-      if (clickBox) then
+    end else
+    begin
+      if (clickBox) or (not findColors(tpa, 6774863, tmpBox)) then
         mouseBox(tmpBox, MOUSE_LEFT);
-
-      break;
+      break();
     end;
 
     // delete any existing text
     c := 0;
-    while (countColor(__LOGIN_COLOR_TEXT, tmpBox) > 0) and (c < 25) do
+    while (countColor(__LOGIN_COLOR_TEXT, tmpBox) > 0) and (c < 31) do
     begin
       inc(c);
       typeByte(VK_BACK);
-      wait(50+random(50));
+      wait(50 + random(50));
     end;
 
   until(getSystemTime() > t);
@@ -1223,6 +1223,8 @@ begin
       print('Entering username...');
       __enterLoginInfo(_boxUsername, self.loginName, true, true);
 
+      wait(250 + random(200));
+
       print('Entering password...');
       __enterLoginInfo(_boxPassword, self.password, false, true);
     end else begin
@@ -1512,4 +1514,3 @@ begin
 end;
 
 {$f+}
-
