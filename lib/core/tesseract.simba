@@ -277,10 +277,13 @@ Example:
 *)
 function Tesseract_GetText(const xs, ys, xe, ye: integer; filter: TTesseractFilter; Whitelist: String = TESS_WHITELIST_NONE): string; overload;
 var
-  bmp: integer;
+  bmp, w, h: Integer;
   t, tt: LongWord;
 begin
   bmp := bitmapFromClient(xs, ys, xe, ye);
+  GetBitmapSize(bmp, w, h);
+  if (w < 10) or (h < 10) then
+    Exit('');
 
   try
     t := getSystemTime();
