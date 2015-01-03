@@ -103,8 +103,8 @@ begin
     static := true;
     setBounds(gameTabs.tabArea);
 
-    __slots[0] := grid(5, 6, 33, 31, 42, 36, point(gameTabs.tabArea.x1 + 24, gameTabs.tabArea.y1 + 22));
-    __slots[1] := grid(5, 6, 33, 31, 42, 36, point(gameTabs.tabArea.x1 + 24, gameTabs.tabArea.y1 + 50));
+    __slots[0] := grid(5, 6, 33, 31, 42, 36, point(gameTabs.tabArea.x1 + 25, gameTabs.tabArea.y1 + 22));
+    __slots[1] := grid(5, 6, 33, 31, 42, 36, point(gameTabs.tabArea.x1 + 25, gameTabs.tabArea.y1 + 50));
   end;
 end;
 {$ENDIF}
