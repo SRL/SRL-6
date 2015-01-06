@@ -395,6 +395,7 @@ Example:
 function TRSLodestoneScreen.teleportTo(location: integer): boolean;
 var
   b: TBox;
+  options: TOptionArray
 begin
   result := false;
 
@@ -406,11 +407,15 @@ begin
     if (location = LOCATION_PREVIOUS) then
     begin
       fastclick(MOUSE_RIGHT);
-      result := chooseOption.select(['Previous dest', 'estination', 'evious']);
+      Wait(Random(200, 300));
 
-      if (result) then
-        print('TRSLodestoneScreen.teleportTo(): Succesfully teleported to previous destination', TDebug.SUB)
-      else
+      Options := ChooseOption.__GetOptions();
+      Result := Length(Options) = 3;
+      if (Result) then
+      begin
+        mouseBox(Options[1].bounds, MOUSE_LEFT);
+        print('TRSLodestoneScreen.teleportTo(): Succesfully teleported to previous destination', TDebug.SUB);
+      end else
         print('TRSLodestoneScreen.teleportTo(): Failed teleport to previous destination (ChooseOption must have failed)', TDebug.SUB);
 
       exit();
