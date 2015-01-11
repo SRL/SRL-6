@@ -33,7 +33,6 @@ var SMART plugins
 *)
 var
   smartPlugins: TStringArray = ['OpenGL32.dll', 'd3d9.dll'];
-  smartResetAttempts: integer = 5;
 
 (*
 var User Set
@@ -46,6 +45,8 @@ Variables that can be used in scripts.
   * smartForceNewClient - If enabled will skip attempting to pair to a previously spawned client
   * smartEnableDrawing - If enabled will allow drawing on smart.
   * smartInitSeq - Key that smart will press while smart is loading.
+  * smartUserAgent -
+  * smartResetAttempts - The max attempts to respawn SMART during sixHourFix()
 
 *)
 var
@@ -55,6 +56,7 @@ var
   smartEnableDrawing: boolean := false;
   smartInitSeq: string := '';
   smartUserAgent: string := '';
+  smartResetAttempts: integer = 5;
 
 {*
 var Internal
@@ -668,9 +670,10 @@ Example:
 *)
 procedure smartReloadClient(waitTime: integer);
 var
-  img, r: integer;
+  img, r, h, m, s: integer;
 begin
   img := -999;
+  ConvertTime(waitTime, h, m, s);
 
   if (__smartIsDrawingSetup) then
   begin
@@ -683,7 +686,7 @@ begin
   smartFreeCurrentClient();
   smartKillClient(__smartCurrentPID);
 
-  print('Killed our current client, waiting ' + intToStr(waitTime) + ' ms before reloading client');
+  print('Killed our current client. Waiting ' + intToStr(m) + 'm & ' + intToStr(s) + 's before reloading');
   wait(waitTime);
 
   if initSmart(true) then
@@ -718,7 +721,7 @@ Kills the current client, and spawns a new one.
 .. note::
 
     - By: Olly
-    - Last Updated: September 2, 2013 by Olly
+    - Last Updated: 11 January 2014 by The Mayor
 
 Example:
 
@@ -727,19 +730,17 @@ Example:
 *)
 procedure sixHourFix();
 var
-  i, j: integer;
+  i: integer;
 begin
-  for i = 1 to smartResetAttempts do
+  for i := 1 to smartResetAttempts do
   begin
-    inc(j);     //added a second var to keep track of attempts in case user wants infinite smartresetattempts with a negative number
     print('sixHourFix():', TDebug.HEADER);
-    print('attempt #: ' + toStr(j));
+    print('Reset attempt #' + toStr(i));
 
     if (players.getActive() < 1) then
       print('No active players, no use in reloading the client!', TDebug.FATAL);
 
     smartReloadClient((5 * 60000) + random(15000));
-    inc(i);
 
     if (waitClientReady()) then
     begin
@@ -751,10 +752,12 @@ begin
         print('sixHourFix()', TDebug.FOOTER);
         exit();
       end else
-        print('Failed to login player after restart', TDebug.FATAL);
+        print('Failed to login player after restart attempt ' + toStr(i), TDebug.ERROR);
     end else
       if i = smartResetAttempts then
-        print('Client never reloaded after restart..', TDebug.FATAL);
+        print('Client never reloaded after ' + toStr(i) + ' attempts', TDebug.FATAL);
+
+    inc(i);
   end;
 end;
 
