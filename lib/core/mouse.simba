@@ -644,8 +644,8 @@ Time.  Time default set to 1000.
 
 .. note::
 
-    - by Rasta Magician & Narcle
-    - Last Updated: Mar. 16, 2013 by Coh3n
+    - by Rasta Magician, Narcle, Coh3n
+    - Last Updated: 14 Jan 2014 by The Mayor
 
 Example:
 
@@ -654,42 +654,37 @@ Example:
     if (didClick(true)) then
       writeln('Clicked object!');
 *)
-function didClick(Red: Boolean; Time: Integer = 1000): boolean;
+function didClick(red: Boolean; time: Integer = 1000): boolean;
 var
-  x, y, w, h, R, G: integer;
-  TimeOut : LongWord;
-  B: TBox;
+  x, y, R, G: integer;
+  timeOut : LongWord;
+  b: TBox;
 begin
   fastClick(MOUSE_LEFT);
 
-  GetMousePos(x, y);
-  GetClientDimensions(w, h);
-  B := IntToBox(x - 15, y - 15, x + 15, y + 15);
+  getMousePos(x, y);
+  b := intToBox(x - 15, y - 15, x + 15, y + 15);
+  b.setLimit(getClientBounds());
 
-  if (B.x1 < 0) then B.x1 := 0;
-  if (B.y1 < 0) then B.y1 := 0;
-  if (B.x2 > w) then B.x2 := w;
-  if (B.y2 > h) then B.y2 := h;
+  timeOut := getSystemTime() + time;
 
-  TimeOut := GetSystemTime() + Time;
-
-  while (GetSystemTime() < TimeOut) and (not Result) do
+  while (getSystemTime() < timeOut) and (not result) do
   begin
-    R := CountColorTolerance(395675, B.x1, B.y1, B.x2, B.y2, 15);
-    G := CountColorTolerance(1695663, B.x1, B.y1, B.x2, B.y2, 15);
+    R := CountColorTolerance(395403, b, 25);
+    G := CountColorTolerance(1558685, b, 35);
 
-    if Red then
+    if red then
     begin
       if (G > 8) then
-        Exit(false);
+        exit(false);
 
-      Result := (R > 20);
+      result := (R > 20);
     end else
     begin
-      if (R > 5) then
-        Exit(false);
+      if (r > 5) then
+        exit(false);
 
-      Result := (G > 35);
+      result := (G > 35);
     end;
   end;
 end;

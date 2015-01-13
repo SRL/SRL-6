@@ -173,14 +173,14 @@ begin
 end;
 
 (*
-TRSTabBackpack.isSlotVaild
+TRSTabBackpack.isSlotValid
 ~~~~~~~~~~~~~~~~~~~~~~~~~~
 
 .. code-block:: pascal
 
-    function TRSTabBackpack.isSlotVaild(slot: integer): boolean;
+    function TRSTabBackpack.isSlotValid(slot: integer): boolean;
 
-Returns true if the vaild (within the range of 1..28).
+Returns true if the valid (within the range of 1..28).
 
 .. note::
 
@@ -192,10 +192,10 @@ Example:
 .. code-block:: pascal
 
     if (tabBackPack.isSlotValid(25) then
-      writeln('Slot 25 is a vaild backpack slot!');
+      writeln('Slot 25 is a valid backpack slot!');
 
 *)
-function TRSTabBackpack.isSlotVaild(slot: integer): boolean;
+function TRSTabBackpack.isSlotValid(slot: integer): boolean;
 begin
   result := (inRange(slot, BACKPACK_SLOT_LOW, BACKPACK_SLOT_HIGH));
 
@@ -292,7 +292,7 @@ Example:
 *)
 function TRSTabBackpack.isItemInSlot(slot: integer): boolean;
 begin
-  if (not self.open()) or (not self.isSlotVaild(slot))then
+  if (not self.open()) or (not self.isSlotValid(slot))then
     exit(false);
 
   result := isItemIn(self.getSlotBox(slot));
@@ -548,7 +548,7 @@ var
   bmp, bmp1: Integer;
   t: LongWord;
 begin
-  if (not self.open()) or (not self.isSlotVaild(slot))then
+  if (not self.open()) or (not self.isSlotValid(slot))then
     exit(false);
 
   b := self.getSlotBox(slot);
@@ -602,7 +602,7 @@ Example:
 *)
 function TRSTabBackpack.mouseSlot(slot, mouseAction: integer): boolean;
 begin
-  if (not self.open()) or (not self.isSlotVaild(slot)) then
+  if (not self.open()) or (not self.isSlotValid(slot)) then
     exit(false);
 
   result := true;
@@ -636,7 +636,7 @@ function TRSTabBackpack.isSlotActivated(slot: integer): boolean;
 var
   b: tbox;
 begin
-  if (not self.open()) or (not self.isSlotVaild(slot)) then
+  if (not self.open()) or (not self.isSlotValid(slot)) then
     exit(false);
 
   b := self.getSlotBox(slot);
@@ -728,7 +728,7 @@ begin
   end;
 
   for i := 0 to (l - 1) do
-    if (self.isSlotVaild(slotArr[i])) and (self.isItemInSlot(slotArr[i])) then
+    if (self.isSlotValid(slotArr[i])) and (self.isItemInSlot(slotArr[i])) then
     begin
       self.mouseSlot(slotArr[i], MOUSE_RIGHT);
       if chooseOption.select(['Drop', 'drop', 'rop']) then
@@ -1032,7 +1032,7 @@ TRSTabBackpack.getQuickInventorySlot
     function TRSTabBackpack.getQuickInventorySlot(quickInvConst: integer): integer;
 
 Will return the slot of what slot the "quickInvConst" is binded to.
-  * vaild quickInvConsts are QUICK_INVENTORY_A or QUICK_INVENTORY_B.
+  * valid quickInvConsts are QUICK_INVENTORY_A or QUICK_INVENTORY_B.
 
 .. note::
 
@@ -1087,7 +1087,7 @@ TRSTabBackpack.setQuickInventorySlot
     function TRSTabBackpack.setQuickInventorySlot(slot, quickInvConst: integer): boolean;
 
 Will set "slot" as the quick inventory slot based on "quickInvConst"
-  * vaild quickInvConsts are QUICK_INVENTORY_A or QUICK_INVENTORY_B.
+  * valid quickInvConsts are QUICK_INVENTORY_A or QUICK_INVENTORY_B.
 
 .. note::
 

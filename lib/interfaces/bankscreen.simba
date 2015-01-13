@@ -1699,9 +1699,6 @@ Example:
     //To withdraw all items from slot 10 if mouseover text is valid, as notes
     bankscreen.withdraw('Yew Log', 0.8, 10, WITHDRAW_AMOUNT_ALL, 1000, true);
 
-    // To withdraw 28 items from slot 1 and will *ignore* mouse-over text
-    bankScreen.withdraw('', 0, 1, 28, 50);
-
     // To withdraw 28 items from slot 1 into your beast of burden familiar if mouseover text is valid, and waitTime of 1000ms
     bankScreen.withdraw('Yew Log', 0.8, 1, 28, 1000, false, true);
 *)
