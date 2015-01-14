@@ -280,7 +280,7 @@ TRSChooseOption.optionsExist
 
 .. code-block:: pascal
 
-    function TRSChooseOption.optionsExist(options: TStringArray; matchPercent: extended = 1.00): boolean;
+    function TRSChooseOption.optionsExist(options: TStringArray): boolean;
 
 Returns true if any of the options exist.
 
@@ -296,7 +296,7 @@ Example:
     if chooseOption.optionsExist(['alk here']) then
       writeln('the option walk here is there!');
 *)
-function TRSChooseOption.optionsExist(options: TStringArray; matchPercent: extended = 1.00): boolean;
+function TRSChooseOption.optionsExist(options: TStringArray): boolean;
 var
   optionArr: TOptionArray;
   i, j: integer;
