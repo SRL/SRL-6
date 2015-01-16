@@ -59,7 +59,7 @@ function GetTickCount64(): UInt64; begin Result := GetTickCount(); end;
 {$include_once lib/interfaces/progressscreen.simba}
 {$include_once lib/interfaces/powerscreen.simba}
 {$include_once lib/interfaces/collectbox.simba}
-
+{$include_once lib/interfaces/grandexchange.simba}
 
 {$IFDEF SIMBAMAJOR1100}
   {$include_once lib/core/players.simba}

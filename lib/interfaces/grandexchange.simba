@@ -1,0 +1,1397 @@
+(*
+GrandExchange
+=============
+
+The grandexchange file holds functions and procedures that are used to interact
+with the Runescape Grand Exchange.
+
+The source for this file can be found here <https://github.com/SRL/SRL-6/blob/master/lib/interfaces/grandexchange.simba>
+
+*)
+
+{$f-}
+
+(*
+type TRSDepositBox
+~~~~~~~~~~~~~~~~~~
+
+A type that stores the deposit box interface properties.
+*)
+
+type
+  TRSGrandExchange = type TRSInterface;
+
+(*
+var grandExchange
+~~~~~~~~~~~~~~~~~
+
+Variable that stores functions and properties of the Runescape Grand Exchange interface.
+*)
+
+var
+  grandExchange: TRSGrandExchange;
+
+{*
+TRSGrandExchange.__init
+~~~~~~~~~~~~~~~~~~~~~~~
+
+.. code-block:: pascal
+
+    procedure TRSGrandExchange.__init();;
+
+Initializes the TRSGrandExchange.
+
+.. note::
+
+    - by The Mayor
+    - Last Updated: 9th October 2014 by Clarity
+
+Example:
+
+.. code-block:: pascal
+
+    grandExchange.__init();
+
+*}
+{$IFNDEF CODEINSIGHT}
+procedure TRSGrandExchange.__init();
+begin
+  with (self) do
+  begin
+    name := 'Grand Exchange';
+    ID := ID_INTERFACE_GRAND_EXCHANGE;
+    parentID := -1;
+    static := false;
+  end;
+end;
+{$ENDIF}
+
+(*
+TRSGrandExchange.__find
+~~~~~~~~~~~~~~~~~~~~~~~
+
+.. code-block:: pascal
+
+    function TRSGrandExchange.__find(): boolean;
+
+Returns true if the Grand Exchange interface is detected, and sets
+the interface's bounds (fully dynamic).
+
+.. note::
+
+    - by The Mayor
+    - Last Updated: 14 January 2015 by The Mayor
+
+Example:
+
+.. code-block:: pascal
+
+    if (grandExchange.__find()) then
+      writeln('bounds are set!');
+*)
+function TRSGrandExchange.__find(): boolean;
+const
+  BURGUNDY_COLOR = [1448256, 26]; // [Col, Tol] background of "GRAND EXCHANGE"
+var
+  i: Integer;
+  TPA: TPointArray;
+  ATPA: T2DPointArray;
+  b: TBox;
+begin
+  findColorsTolerance(TPA, BURGUNDY_COLOR[0], mainScreen.getBounds(), BURGUNDY_COLOR[1]);
+
+  if length(TPA) < 20 then
+  begin
+    print('TRSGrandExchange.__find(): Didn''t find enough BURGUNDY_COLOR', TDebug.WARNING);
+    exit(false);
+  end;
+
+  ATPA := TPA.cluster(5);
+  ATPA.sortBySize(true);
+
+  for i := 0 to high(ATPA) do
+  begin
+    b := ATPA[i].getBounds();
+    if b.getWidth() < 150 then continue();
+
+    if (pos('GRAND EXCHANGE', upperCase(tesseract_GetText(b, TESS_FILTER_SMALL_CHARS))) > 0) then
+    begin
+      self.setBounds([b.x1 - 2, b.y1 - 5, b.x2 + 535, b.y2 + 300]);
+      result := true;
+    end;
+  end;
+
+end;
+
+(*
+TRSGrandExchange.isOpen
+~~~~~~~~~~~~~~~~~~~~~~~
+
+.. code-block:: pascal
+
+    function TRSGrandExchange.isOpen(waitTime: integer = 0): boolean;
+
+Returns true if the Grand Exchange is open, includes a optional parameter
+'waitTime' (default 0) which will search for the Grand Exchange interface
+ until found or 'waitTime' is reached.
+
+.. note::
+
+    - by The Mayor
+    - Last Updated: 14 January 2015 by The Mayor
+
+Example:
+
+.. code-block:: pascal
+
+    if (grandExchange.isOpen()) then
+      writeln('It''s open!');
+
+*)
+function TRSGrandExchange.isOpen(waitTime: integer = 0): boolean;
+var
+  t: UInt64;
+begin
+  t := (getTickCount64() + waitTime);
+
+  repeat
+    if self.__find() then
+    begin
+      result := true;
+      break();
+    end;
+  until (getSystemTime() >= t);
+
+  print('TRSGrandExchange.isOpen(): Result = ' + boolToStr(result));
+end;
+
+(*
+TRSGrandExchange.close
+~~~~~~~~~~~~~~~~~~~~~~
+
+.. code-block:: pascal
+
+    function TRSGrandExchange.close(escape: boolean = true): boolean;
+
+Closes the Grand Exchange interface. By default, it attempts to close the
+interface with the escape button first. It will return if succesful or not.
+
+.. note::
+
+    - by The Mayor
+    - Last Updated: 14 January 2015 by The Mayor
+
+Example:
+
+.. code-block:: pascal
+
+    if grandExchange.close() then
+      writeln('Closed the GE');
+
+*)
+function TRSGrandExchange.close(escape: boolean = true): boolean;
+const
+  __CLOSE_OFFSET: TPoint = [495, 11]; // From self(x1, y1) to middle of 'X'
+var
+  timeOut: UInt64;
+begin
+  if (not self.isOpen()) then
+    exit(true);
+
+  if escape then // Try the escape button first if possible
+  begin
+    timeOut := (getTickCount64() + randomRange(600, 900));
+    repeat
+      multiType(VK_ESCAPE, randomRange(30, 50), 2);
+      wait(100 + random(50));
+    until (not self.isOpen()) or (getTickCount64() > timeOut);
+
+    if (not self.isOpen()) then
+      exit(true);
+  end;
+
+  if self.isOpen(100 + random(50)) then // Wait a bit in case it closes
+  begin
+    mouse(point(self.x1 + __CLOSE_OFFSET.x, self.y1 + __CLOSE_OFFSET.y).rand(3), MOUSE_LEFT);
+    timeOut := (getTickCount64() + randomRange(5000, 6000));
+
+    while (timeOut > getTickCount64()) do
+    begin
+      if (not self.isOpen()) then
+      begin
+        result := true;
+        break();
+      end;
+      wait(50 + random(50));
+    end;
+  end else
+    result := true;
+
+  print('TRSGrandExchange.close(): result = ' + boolToStr(result), TDebug.SUB);
+end;
+
+(*
+TRSGrandExchange.getPackSlotBox
+~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+
+.. code-block:: pascal
+
+    function TRSGrandExchange.getPackSlotBox(slot: integer): TBox;
+
+Returns a TBox of the pack slot 'slot' in the Grand Exchange interface.
+
+.. note::
+
+    - by The Mayor
+    - Last Updated: 14 January 2015 by The Mayor
+
+Example:
+
+.. code-block:: pascal
+
+    mouseBox(grandExchange.getPackSlotBox(1), MOUSE_MOVE);
+
+*)
+function TRSGrandExchange.getPackSlotBox(slot: integer): TBox;
+const
+  __PACK_OFFSET: TPoint = [535, 55]; // From self(x1, y1) to middle of first pack slot
+begin
+  result := gridBox(slot - 1, 4, 7, 35, 31, 46, 36, point(self.x1 + __PACK_OFFSET.x, self.y1 + __PACK_OFFSET.y));
+end;
+
+(*
+TRSGrandExchange._getSlotBoxes
+~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+
+.. code-block:: pascal
+
+    function TRSGrandExchange._getSlotBoxes(): TBoxArray;
+
+Internal function which returns a TBoxArray of the 6 Grand Exchange slots.
+
+.. note::
+
+    - by The Mayor
+    - Last Updated: 14 January 2015 by The Mayor
+
+Example:
+
+.. code-block:: pascal
+
+    tba := grandExchange._getSlotBoxes();
+
+*)
+function TRSGrandExchange._getSlotBoxes(): TBoxArray;
+const
+  __GE_SLOT_OFFSET: TPoint = [95, 124]; // From self(x1, y1) to middle of first GE slot
+begin
+  result := grid(3, 2, 149, 109, 156, 120, point(self.x1 + __GE_SLOT_OFFSET.x, self.y1 + __GE_SLOT_OFFSET.y));
+end;
+
+(*
+TRSGrandExchange._getBuyBoxes
+~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+
+.. code-block:: pascal
+
+    function TRSGrandExchange._getBuyBoxes(): TBoxArray;
+
+Internal function which returns a TBoxArray of the Grand Exchange buy boxes.
+
+.. note::
+
+    - by The Mayor
+    - Last Updated: 14 January 2015 by The Mayor
+
+Example:
+
+.. code-block:: pascal
+
+    tba := grandExchange._getBuyBoxes();
+
+*)
+function TRSGrandExchange._getBuyBoxes(): TBoxArray;
+const
+  __BUY_OFFSET: TPoint = [65, 134]; // From self(x1, y1) to middle of first buy button
+begin
+  result := grid(3, 2, 44, 44, 156, 120, point(self.x1 + __BUY_OFFSET.x, self.y1 + __BUY_OFFSET.y));
+end;
+
+(*
+TRSGrandExchange._getSellBoxes
+~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+
+.. code-block:: pascal
+
+    function TRSGrandExchange._getSellBoxes(): TBoxArray;
+
+Internal function which returns a TBoxArray of the Grand Exchange sell boxes.
+
+.. note::
+
+    - by The Mayor
+    - Last Updated: 14 January 2015 by The Mayor
+
+Example:
+
+.. code-block:: pascal
+
+    tba := grandExchange._getSellBoxes();
+
+*)
+function TRSGrandExchange._getSellBoxes(): TBoxArray;
+const
+  __SELL_OFFSET: TPoint = [125, 134]; // From self(x1, y1) to middle of first sell button
+begin
+  result := grid(3, 2, 44, 44, 156, 120, point(self.x1 + __SELL_OFFSET.x, self.y1 + __SELL_OFFSET.y));
+end;
+
+(*
+TRSGrandExchange._isOfferOpen
+~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+
+.. code-block:: pascal
+
+    function TRSGrandExchange._isOfferOpen(waitTime: integer = 500): boolean;
+
+Internal function which returns if the offer screen is open or not.
+
+.. note::
+
+    - by The Mayor
+    - Last Updated: 14 January 2015 by The Mayor
+
+Example:
+
+.. code-block:: pascal
+
+    writeLn(grandExchange._isOfferOpen());
+
+*)
+function TRSGrandExchange._isOfferOpen(waitTime: integer = 500): boolean;
+var
+  timeOut: UInt64;                // "Confirm Offer" button
+  b: TBox := [self.x1 + 177, self.y1 + 285, self.x1 + 326, self.y1 + 309];
+begin
+  timeOut := getTickCount64() + waitTime;
+
+  while getTickCount64() < timeOut do
+    if (countColorTolerance(4501731, b, 72) > 100) then
+      exit(true);
+end;
+
+(*
+TRSGrandExchange._isProgressOpen
+~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+
+.. code-block:: pascal
+
+    function TRSGrandExchange._isProgressOpen(waitTime: integer = 500): boolean;
+
+Internal function which returns if the GE progress screen is open or not.
+
+.. note::
+
+    - by The Mayor
+    - Last Updated: 14 January 2015 by The Mayor
+
+Example:
+
+.. code-block:: pascal
+
+    writeLn(grandExchange._isProgressOpen());
+
+*)
+function TRSGrandExchange._isProgressOpen(waitTime: integer = 500): boolean;
+var
+  timeOut: integer;
+  TPA: TPointArray;
+begin
+  timeOut := getTickCount64() + waitTime;
+
+  while getTickCount64() < timeOut do
+  begin           // Colour at the top of the price/quanity boxes
+    findColors(TPA, 6445643, self.getBounds());
+    if length(TPA) = 465 then
+      exit(true);
+  end;
+end;
+
+(*
+TRSGrandExchange._isSlotActive
+~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+
+.. code-block:: pascal
+
+    function TRSGrandExchange._isSlotActive(): boolean;
+
+Internal function which determines whether a GE slot is active. This is necessary
+because slots 3 to 5 are inactive when you are not a member.
+
+.. note::
+
+    - by The Mayor
+    - Last Updated: 14 January 2015 by The Mayor
+
+Example:
+
+.. code-block:: pascal
+
+    writeLn(grandExchange._isSlotActive(1));
+
+*)
+function TRSGrandExchange._isSlotActive(geSlot: integer): boolean;
+var
+  TPA: TPointArray;
+  TBA : TBoxArray := self._getSlotBoxes();
+begin
+  findColors(TPA, 4671044, TBA[geSlot - 1]);
+  result := length(TPA) < 5000;
+end;
+
+(*
+TRSGrandExchange._isSlotEmpty
+~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+
+.. code-block:: pascal
+
+    function TRSGrandExchange._isSlotEmpty(geSlot: integer): boolean;
+
+Internal function which returns true if an offer slot is empty (and it's active).
+
+.. note::
+
+    - by The Mayor
+    - Last Updated: 15 January 2015 by The Mayor
+
+Example:
+
+.. code-block:: pascal
+
+    grandExchange._isSlotEmpty(2);
+
+*)
+function TRSGrandExchange._isSlotEmpty(geSlot: integer): boolean;
+var
+  TBA: TBoxArray := self._getSlotBoxes();
+  b: TBox;
+begin
+  if self._isSlotActive(geSlot) then
+  begin
+    b := TBA[geSlot - 1];
+    b.edit(50, 1, -50, -88);
+    result := (pos('EMPTY', upperCase(tesseract_GetText(b, TESS_FILTER_SMALL_CHARS))) > 0);
+  end;
+
+  print('TRSGrandExchange._isSlotEmpty(): Slot ' + toStr(geSlot) + ' = ' + boolToStr(result), TDebug.SUB);
+end;
+
+(*
+TRSGrandExchange._isSlotBuying
+~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+
+.. code-block:: pascal
+
+    function TRSGrandExchange._isSlotBuying(geSlot: integer): boolean;
+
+Internal function which returns true if an item is currently buying in 'geSlot'.
+
+.. note::
+
+    - by The Mayor
+    - Last Updated: 15 January 2015 by The Mayor
+
+Example:
+
+.. code-block:: pascal
+
+    grandExchange._isSlotBuying(2);
+
+*)
+function TRSGrandExchange._isSlotBuying(geSlot: integer): boolean;
+var
+  TBA: TBoxArray := self._getSlotBoxes();
+  b: TBox;
+begin
+  b := TBA[geSlot - 1];
+  b.edit(50, 1, -50, -88);
+  result := (pos('BUY', upperCase(tesseract_GetText(b, TESS_FILTER_SMALL_CHARS))) > 0);
+  print('TRSGrandExchange.isSlotBuying(): Slot ' + toStr(geSlot) + ' = ' + boolToStr(result), TDebug.SUB);
+end;
+
+(*
+TRSGrandExchange._isSlotSelling
+~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+
+.. code-block:: pascal
+
+    function TRSGrandExchange._isSlotSelling(geSlot: integer): boolean;
+
+Internal function which returns true if an item is currently selling in 'geSlot'.
+
+.. note::
+
+    - by The Mayor
+    - Last Updated: 15 January 2015 by The Mayor
+
+Example:
+
+.. code-block:: pascal
+
+    grandExchange._isSlotSelling(2);
+
+*)
+function TRSGrandExchange._isSlotSelling(geSlot: integer): boolean;
+var
+  TBA: TBoxArray := self._getSlotBoxes();
+  b: TBox;
+begin
+  b := TBA[geSlot - 1];
+  b.edit(50, 1, -50, -88);
+  result := (pos('SELL', upperCase(tesseract_GetText(b, TESS_FILTER_SMALL_CHARS))) > 0);
+  print('TRSGrandExchange.isSlotSelling(): Slot ' + toStr(geSlot) + ' = ' + boolToStr(result), TDebug.SUB);
+end;
+
+(*
+TRSGrandExchange._isSlotComplete
+~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+
+.. code-block:: pascal
+
+    function TRSGrandExchange._isSlotComplete(geSlot: integer): boolean;
+
+Internal function which returns true if an offer has completed in 'geSlot'.
+
+.. note::
+
+    - by The Mayor
+    - Last Updated: 15 January 2015 by The Mayor
+
+Example:
+
+.. code-block:: pascal
+
+    grandExchange._isSlotComplete(2);
+
+*)
+function TRSGrandExchange._isSlotComplete(geSlot: integer): boolean;
+var
+  TBA: TBoxArray := self._getSlotBoxes();
+begin
+  result := (countColorTolerance(1799224, TBA[geSlot - 1], 17) > 1700);
+  print('TRSGrandExchange.isSlotComplete(): Slot ' + toStr(geSlot) + ' = ' + boolToStr(result), TDebug.SUB);
+end;
+
+(*
+TRSGrandExchange._isSlotAborted
+~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+
+.. code-block:: pascal
+
+    function TRSGrandExchange._isSlotAborted(geSlot: integer): boolean;
+
+Internal function which returns true if an offer has been aborted in 'geSlot'.
+
+.. note::
+
+    - by The Mayor
+    - Last Updated: 15 January 2015 by The Mayor
+
+Example:
+
+.. code-block:: pascal
+
+    grandExchange._isSlotAborted(2);
+
+*)
+function TRSGrandExchange._isSlotAborted(geSlot: integer): boolean;
+var
+  TBA: TBoxArray := self._getSlotBoxes();
+begin
+  result := (countColorTolerance(983163, TBA[geSlot - 1], 16) > 1700);
+  print('TRSGrandExchange.isSlotAborted(): Slot ' + toStr(geSlot) + ' = ' + boolToStr(result), TDebug.SUB);
+end;
+
+(*
+TRSGrandExchange.__findTypeBox
+~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+
+.. code-block:: pascal
+
+    TRSGrandExchange.__findTypeBox(var box: TBox; waitTime: integer = 4000): boolean;
+
+Internal function which aits for the typing box to appear, and returns it's
+bounds in 'box' variable.
+
+.. note::
+
+    - by The Mayor
+    - Last Updated: 15 January 2015 by The Mayor
+
+Example:
+
+.. code-block:: pascal
+
+    grandExchange.__findTypBox(b);
+
+*)
+function TRSGrandExchange.__findTypeBox(var box: TBox; waitTime: integer = 4000): boolean;
+var
+  timeOut: UInt64;
+  TPA: TPointArray;
+  ATPA: T2DPointArray;
+begin
+  timeOut := getTickCount64() + waitTime;
+
+  while getTickCount64() < timeOut do
+  begin
+    findColorsTolerance(TPA, 9086905, getClientBounds(), 64);
+    if length(TPA) < 50 then
+      continue();
+    ATPA := TPA.cluster(6);
+    ATPA.sortBySize(true);
+
+    if inRange(ATPA[0].getBounds().getWidth(), 480, 510) then
+    begin
+      box := ATPA[0].getBounds();
+      exit(true);
+    end;
+  end;
+end;
+
+(*
+TRSGrandExchange._enterQuantity
+~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+
+.. code-block:: pascal
+
+    function TRSGrandExchange._enterQuantity(quantity: string): boolean;
+
+Internal function which enters the desired item quantity into the input box.
+
+.. note::
+
+    - by The Mayor
+    - Last Updated: 15 January 2015 by The Mayor
+
+Example:
+
+.. code-block:: pascal
+
+    grandExchange._enterQuantity('1500'); // To buy/sell 1500 of an item
+    grandExchange._enterQuantity('all'); // To SELL all of the item
+
+*)
+procedure TRSGrandExchange._enterQuantity(quantity: string);
+var
+  i: integer;
+  b: TBox;
+  strArr : TStringArray;
+  amountBox: TboxArray := grid(5, 1, 34, 24, 41, 0, point(self.x1 + 65, self.y1 + 214));
+begin
+  strArr := ['1', '10', '100', 'all'];
+
+  for i := 0 to high(strArr) do
+    if lowerCase(quantity) = strArr[i] then
+      break();
+
+  mouseBox(amountBox[i], MOUSE_LEFT);
+
+  if i = 4 then
+    if self.__findTypeBox(b) then
+    begin
+      typeSend(toStr(quantity), true);
+      wait(randomRange(1000, 1500));
+    end;
+end;
+
+(*
+TRSGrandExchange._enterPrice
+~~~~~~~~~~~~~~~~~~~~~~~~~~~
+
+.. code-block:: pascal
+
+    function TRSGrandExchange._enterPrice(price: string): boolean;
+
+Internal function which enters the desired buy or sell price into the input box.
+
+.. note::
+
+    - by The Mayor
+    - Last Updated: 15 January 2015 by The Mayor
+
+Example:
+
+.. code-block:: pascal
+
+    grandExchange._enterPrice('+5');    // Will click the +5% button
+    grandExchange._enterPrice('mid');   // Will leave at mid price
+    grandExchange._enterPrice('32500'); // Will type in 32500
+
+*)
+procedure TRSGrandExchange._enterPrice(price: string);
+var
+  i, j: integer;
+  b: TBox;
+  strArr : TStringArray;
+  priceBox, tmp: TboxArray;
+begin
+  priceBox := grid(2, 1, 34, 24, 56, 0, point(self.x1 + 282, self.y1 + 214));
+  tmp := priceBox.copy();   // Copying the first 2 price boxes due to offset
+  tmp.offset([97, 0]);
+  priceBox.combine(tmp);
+
+  strArr := ['-5', 'mid', price, '+5'];
+
+  for j := 0 to high(strArr) do
+    if lowerCase(price) = strArr[j] then
+    begin
+      i := j;
+      if j <> 2 then break();
+    end;
+
+  if i <> 1 then      // Don't click mid button as it's set by default
+    mouseBox(priceBox[i], MOUSE_LEFT);
+
+  if i = 2 then
+    if self.__findTypeBox(b) then
+    begin
+      typeSend(toStr(price), true);
+      wait(randomRange(1000, 1500));
+    end;
+end;
+
+(*
+TRSGrandExchange._enterName
+~~~~~~~~~~~~~~~~~~~~~~~~~~
+
+.. code-block:: pascal
+
+    TRSGrandExchange._enterName(itemName: string)
+
+Internal function which enters the item name into the search box, and clicks it.
+
+.. note::
+
+    - by The Mayor
+    - Last Updated: 15 January 2015 by The Mayor
+
+Example:
+
+.. code-block:: pascal
+
+    grandExchange._enterName('Swamp toad');
+
+*)
+procedure TRSGrandExchange._enterName(itemName: string);
+var
+  x, y: integer;
+  b: TBox;
+  timeOut: UInt64;
+begin
+  timeOut := getTickCount64() + randomRange(3000, 4000);
+
+  if not self.__findTypeBox(b) then
+    exit();
+
+  typeSend(itemName, false);
+  b.edit(60, 0, 0, -115);
+
+  if waitColorCountRange(482978, 9, b, 5000, 10) then
+  begin
+    mouseBox(b, MOUSE_LEFT);
+    timeOut := getTickCount64() + randomRange(3000, 4000);
+
+    while getTickCount64() < timeOut do
+      if (not self.__findTypeBox(b, 100)) then
+        break();
+  end;
+end;
+
+(*
+TRSGrandExchange._returnToSummary
+~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+
+.. code-block:: pascal
+
+    procedure TRSGrandExchange._returnToSummary();
+
+If the GE offer screen or GE progress screen is currently open, it will click
+the back arrow to return to the summary screen.
+
+.. note::
+
+    - by The Mayor
+    - Last Updated: 16 January 2015 by The Mayor
+
+Example:
+
+.. code-block:: pascal
+
+    grandExchange._returnToSummary();
+
+*)
+procedure TRSGrandExchange._returnToSummary();
+var
+  backButton: TPoint := [self.x1 + 40, self.y1 + 290];
+  timeOut: UInt64;
+begin
+  if self._isOfferOpen() or self._isProgressOpen() then
+  begin
+    print('TRSGrandExchange._returnToSummary(): returning to summary screen', TDebug.SUB);
+    multiClick(backButton.rand(5), 30, 3);
+
+    timeOut := getTickCount64() + randomRange(2500, 3500);
+    while getTickCount64() < timeOut do
+    begin
+      if ((not self._isOfferOpen()) and (not self._isProgressOpen())) then
+        break();
+    end;
+  end;
+end;
+
+(*
+TRSGrandExchange.collectSlot
+~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+
+.. code-block:: pascal
+
+    function TRSGrandExchange.collectSlot(geSlot: integer): boolean;
+
+Collects items and/or money from a completed or aborted offer slot.
+
+.. note::
+
+    - by The Mayor
+    - Last Updated: 16 January 2015 by The Mayor
+
+Example:
+
+.. code-block:: pascal
+
+    grandExchange.collectSlot(2);
+
+*)
+function TRSGrandExchange.collectSlot(geSlot: integer): boolean;
+var
+  TBA: TBoxArray := self._getSlotBoxes();
+  collectBox: TBoxArray := grid(2, 1, 37, 32, 49, 0, point(self.x1 + 418, self.y1 + 297));
+  timeOut: UInt64;
+  i: integer;
+begin
+  if not self._isProgressOpen() then
+  begin
+    self._returnToSummary();
+
+    if self._isSlotEmpty(geSlot) then
+    begin
+      print('TRSGrandExchange.collectSlot(): Cannot collect as offer slot ' + toStr(geSlot) + ' is empty', TDebug.ERROR);
+      exit(false);
+    end;
+
+    timeOut := getTickCount64() + randomRange(3000, 4000);
+
+    repeat
+      mouseBox(TBA[geSlot - 1], MOUSE_LEFT);
+      if self._isProgressOpen(2000 + random(500)) then
+        break();
+    until (getTickCount64() < timeOut);
+  end;
+
+  for i := 0 to high(collectBox) do
+    if isItemIn(collectBox[i]) then
+    begin
+      mouseBox(collectBox[i], MOUSE_LEFT);
+      wait(randomRange(750, 1250));
+
+      if not self._isProgressOpen() then
+      begin
+        result := true;
+        break();
+      end;
+    end;
+
+  self._returnToSummary();
+
+  print('TRSGrandExchange.collectSlot(): Slot ' + toStr(geSlot) + ' = ' + boolToStr(result));
+end;
+
+(*
+TRSGrandExchange.waitCollectSlot
+~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+
+.. code-block:: pascal
+
+    function TRSGrandExchange.waitCollectSlot(geSlot, maxTime: integer): boolean;
+
+Waits up to 'maxTime' for 'geSlot' to be completed. If it is completed, it
+will collect the items and/or money from th 'geSlot'.
+
+.. note::
+
+    - by The Mayor
+    - Last Updated: 16 January 2015 by The Mayor
+
+Example:
+
+.. code-block:: pascal
+
+    grandExchange.waitCollectSlot(2, 60000); // Wait up to 1 minute
+
+*)
+function TRSGrandExchange.waitCollectSlot(geSlot, maxTime: Integer): boolean;
+var
+  TBA: TBoxArray := self._getSlotBoxes();
+  timeOut: UInt64;
+begin
+  self._returnToSummary();
+
+  if self._isSlotEmpty(geSlot) then
+  begin
+    print('TRSGrandExchange.waitCollectSlot(): Cannot collect as offer slot ' + toStr(geSlot) + ' is empty', TDebug.ERROR);
+    exit(false);
+  end;
+
+  timeOut := getTickCount64() + maxTime;
+
+  while (getTickCount64() < timeOut) do
+    if self._isSlotComplete(geSlot) then
+    begin
+      if self.collectSlot(geSlot) then
+      begin
+        result := true;
+        break();
+      end;
+    end else
+      wait(500);
+
+  print('TRSGrandExchange.waitCollectSlot(): Slot ' + toStr(geSlot) + ' = ' + boolToStr(result), TDebug.SUB);
+end;
+
+(*
+TRSGrandExchange.collectAllSlots
+~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+
+.. code-block:: pascal
+
+    function TRSGrandExchange.collectAllSlots(): boolean;
+
+Collects all items/gold from each slot that isn't empty. The offer does not
+have to be completed.
+
+.. note::
+
+    - by The Mayor
+    - Last Updated: 16 January 2015 by The Mayor
+
+Example:
+
+.. code-block:: pascal
+
+    grandExchange.collectAllSlots();
+
+*)
+procedure TRSGrandExchange.collectAllSlots();
+var
+  i: integer;
+  TBA: TBoxArray := self._getSlotBoxes();
+begin
+  for i := 1 to length(TBA) do
+    if not self._isSlotEmpty(i) then
+      self.collectSlot(i);
+end;
+
+(*
+TRSGrandExchange.abortSlot
+~~~~~~~~~~~~~~~~~~~~~~~~~~
+
+.. code-block:: pascal
+
+    function TRSGrandExchange.abortSlot(geSlot: integer; collect: boolean = true): boolean;
+
+Aborts the current offer within 'geSlot'. If 'collect' is set to true, it
+will also collect the items/gold from the aborted offer slot.
+
+.. note::
+
+    - by The Mayor
+    - Last Updated: 16 January 2015 by The Mayor
+
+Example:
+
+.. code-block:: pascal
+
+    grandExchange.abortSlot(2);
+    grandExchange.abortSlot(2, false); // To leave items in the aborted offer slot
+
+*)
+function TRSGrandExchange.abortSlot(geSlot: integer; collect: boolean = true): boolean;
+var
+  TBA: TBoxArray := self._getSlotBoxes();
+  abortButton: TPoint := [self.x1 + 355, self.y1 + 282];
+  redBox: TBox := [self.x1 + 67, self.y1 + 300, self.x1 + 364, self.y1 + 312];
+begin
+  if not self.isOpen() then
+  begin
+    print('TRSGrandExchange.abortSlot(): Cannot abort as the GE is not open', TDebug.ERROR);
+    exit(false);
+  end;
+
+  self._returnToSummary();
+
+  if self._isSlotEmpty(geSlot) then
+  begin
+    print('TRSGrandExchange.abortSlot(): Cannot abort as offer slot ' + toStr(geSlot) + ' is empty', TDebug.ERROR);
+    exit(false);
+  end;
+
+  if self._isSlotAborted(geSlot) then
+  begin
+    print('TRSGrandExchange.abortSlot(): Cannot abort as offer slot ' + toStr(geSlot) + ' is already aborted', TDebug.ERROR);
+    exit(false);
+  end;
+
+  if self._isSlotComplete(geSlot) then
+  begin
+    print('TRSGrandExchange.abortSlot(): Cannot abort as offer slot ' + toStr(geSlot) + ' is already completed', TDebug.ERROR);
+    exit(false);
+  end;
+
+  mouseBox(TBA[geSlot - 1], MOUSE_LEFT);
+
+  if self._isProgressOpen(3000) then
+  begin
+    multiClick(abortButton.rand(5), 30, 3);
+    waitColorCountRange(1048714, 5, redBox, 4000, 2000);
+
+    if collect then
+      result := self.collectSlot(geSlot)
+    else
+    begin
+      result := self._isSlotAborted(geSlot);
+      self._returnToSummary();
+    end;
+  end;
+
+  print('TRSGrandExchange.abortSlot(): Slot ' + toStr(geSlot) + ' = ' + boolToStr(result));
+end;
+
+(*
+TRSGrandExchange.abortAllSlots
+~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+
+.. code-block:: pascal
+
+    function TRSGrandExchange.abortAllSlots(collect: boolean): boolean;
+
+Aborts all slots that are not currently empty. If 'collect' is set to true, it
+will also collect all items/gold.
+
+.. note::
+
+    - by The Mayor
+    - Last Updated: 16 January 2015 by The Mayor
+
+Example:
+
+.. code-block:: pascal
+
+    grandExchange.abortAllSlots();
+
+*)
+function TRSGrandExchange.abortAllSlots(collect: boolean): boolean;
+var
+  i: integer;
+  TBA: TBoxArray := self._getSlotBoxes();
+begin
+  for i := 1 to length(TBA) do
+    if not self._isSlotEmpty(i) then
+      self.abortSlot(i, collect);
+end;
+
+(*
+TRSGrandExchange.getPercentDone
+~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+
+.. code-block:: pascal
+
+    function TRSGrandExchange.getPercentDone(geSlot: integer): integer;
+
+Calculates the percentage toward offer completion of 'geSlot'.
+
+.. note::
+
+    - by turpinator
+    - Last Updated: 16 January 2015 by The Mayor
+
+Example:
+
+.. code-block:: pascal
+
+    i := grandExchange.getPercentDone(2);
+
+*)
+function TRSGrandExchange.getPercentDone(geSlot: integer): integer;
+const
+  BACKGROUND_COLOR = 2237482;
+var
+  i, x, y: integer;
+  TBA: TBoxArray := self._getSlotBoxes();
+begin
+  if self._isSlotEmpty(geSlot) or (not self._isSlotActive(geSlot)) then exit(-1);
+
+  x := TBA[geSlot -1].x1 + 6;
+  y := TBA[geSlot -1].y1 + 87;
+
+  for result := 135 downto 1 do
+    if (getColor(x + result, y) <> BACKGROUND_COLOR) then
+      exit(round(0.7402 * result));
+end
+
+(*
+TRSGrandExchange.sellItem
+~~~~~~~~~~~~~~~~~~~~~~~~~
+
+.. code-block:: pascal
+
+    function TRSGrandExchange.sellItem(packSlot: integer; price, quantity: string; waitCollect: boolean = false; waitTime: integer = 10000): boolean;
+
+Sells the item in backpack slot 'packSlot'. If waitCollect is true, it will wait
+the specified waitTime for the offer to complete and collect the resulting gold.
+
+The 'price' parameter is a string; valid options are:
+
+      * 'mid'             : GE mid price button
+      * '-5'              : 5% below mid price button
+      * '+5'              : 5% above mid price button
+      * Any other number  : Type input
+
+The 'quantity' parameter is a string; valid options are:
+
+      * '1'               : '1' button
+      * '10'              : '1' button
+      * '100'             : '1' button
+      * 'all'             : 'All' button (Selling ONLY)
+      * Any other number  : Type input
+
+.. note::
+
+    - by The Mayor
+    - Last Updated: 16 January 2015 by The Mayor
+
+Example:
+
+.. code-block:: pascal
+
+      * Sell all of item in backPack slot 1 for mid price
+    grandExchange.sellItem(1, 'mid', 'all');
+
+      * To sell 100 of the item in backPack slot 1, for 1500gp each
+    grandExchange.sellItem(1, '1500', '100');
+
+      * As above, but waits up to 20 seconds for completion before collecting money
+    grandExchange.sellItem(1, '1500', '100', true, 20000);
+
+*)
+function TRSGrandExchange.sellItem(packSlot: integer; price, quantity: string; waitCollect: boolean = false; waitTime: integer = 10000): boolean;
+var
+  i, nextSlot: integer;
+  confirm: TBox := [self.x1 + 180, self.y1 + 287, self.x1 + 323, self.y1 + 307];
+begin
+  if not self.isOpen() then
+  begin
+    print('TRSGrandExchange.sellItem(): Cannot abort as the GE is not open', TDebug.ERROR);
+    exit(false);
+  end;
+
+  self._returnToSummary();
+
+  for i := 1 to 6 do
+    if self._isSlotEmpty(i) then
+    begin
+      nextSlot := i;
+      break();
+    end;
+
+  if nextSlot < 1 then
+  begin
+    print('TRSGrandExchange.sellItem(): Cannot sell item as there are no empty offer slots', TDebug.ERROR);
+    exit(false);
+  end;
+
+  if isItemIn(self.getPackSlotBox(packSlot)) then
+    mouseBox(self.getPackSlotBox(packSlot), MOUSE_LEFT)
+  else
+  begin
+    print('TRSGrandExchange.sellItem(): No item in pack slot: ' + intToStr(packSlot), TDebug.ERROR);
+    exit(false);
+  end;
+
+  if self._isOfferOpen(3000) then
+  begin
+    self._enterQuantity(quantity);
+    self._enterPrice(price);
+    mouseBox(confirm, MOUSE_LEFT);
+    wait(randomRange(1000, 1500));
+  end;
+
+  result:= self._isSlotSelling(nextSlot);
+  print('TRSGrandExchange.sellItem(): ' + boolToStr(result), TDebug.SUB);
+
+  if waitCollect then
+    self.waitCollectSlot(nextSlot, waitTime);
+end;
+
+(*
+TRSGrandExchange.buyItem
+~~~~~~~~~~~~~~~~~~~~~~~~~
+
+.. code-block:: pascal
+
+    function TRSGrandExchange.buyItem(itemName, price, quantity: string; waitCollect: boolean = false; waitTime: integer = 10000): boolean;
+
+Searches for and buys an item on the Grand Exchange. If waitCollect is true,
+it will wait the specified waitTime for the offer to complete and collect the
+resulting items and gold.
+
+The 'price' parameter is a string; valid options are:
+
+      * 'mid'             : GE mid price button
+      * '-5'              : 5% below mid price button
+      * '+5'              : 5% above mid price button
+      * Any other number  : Type input
+
+The 'quantity' parameter is a string; valid options are:
+
+      * '1'               : '1' button
+      * '10'              : '1' button
+      * '100'             : '1' button
+      * Any other number  : Type input
+
+.. note::
+
+    - by The Mayor
+    - Last Updated: 16 January 2015 by The Mayor
+
+Example:
+
+.. code-block:: pascal
+
+      * To buy 10000 oak logs at 5% over the mid price
+    grandExchange.buyItem('Oak log', '+5', '10000');
+
+      * To buy 10000 oak logs for 150gp each
+    grandExchange.buyItem('Oak log', '150', '10000');
+
+      * As above, but waits up to 20 seconds for completion before collecting items
+    grandExchange.buyItem('Oak log', '150', '10000', true, 20000);
+
+*)
+function TRSGrandExchange.buyItem(itemName, price, quantity: string; waitCollect: boolean = false; waitTime: integer = 10000): boolean;
+var
+  i, nextSlot, x, y: integer;
+  b: TBox;
+  TBA : TBoxArray := self._getBuyBoxes();
+  confirm: TBox := [self.x1 + 180, self.y1 + 287, self.x1 + 323, self.y1 + 307];
+begin
+  if not self.isOpen() then
+  begin
+    print('TRSGrandExchange.sellItem(): Cannot abort as the GE is not open', TDebug.ERROR);
+    exit(false);
+  end;
+
+  self._returnToSummary();
+
+  for i := 1 to 6 do
+    if self._isSlotEmpty(i) then
+    begin
+      nextSlot := i;
+      break();
+    end;
+
+  if nextSlot < 1 then
+  begin
+    print('TRSGrandExchange.sellItem(): Cannot sell item as there are no empty offer slots', TDebug.ERROR);
+    exit(false);
+  end;
+
+  mouseBox(TBA[nextSlot - 1], MOUSE_LEFT);
+
+  if self._isOfferOpen(3000) then
+  begin
+    self._enterName(itemName);
+    self._enterQuantity(quantity);
+    self._enterPrice(price);
+    mouseBox(confirm, MOUSE_LEFT);
+    wait(randomRange(1000, 1500));
+  end;
+
+  result := self._isSlotBuying(nextSlot);
+  print('TRSGrandExchange.buyItem(): ' + boolToStr(result), TDebug.SUB);
+
+  if waitCollect then
+    self.waitCollectSlot(nextSlot, waitTime);
+end;
+
+(*
+TRSGrandExchange.getPrice
+~~~~~~~~~~~~~~~~~~~~~~~~~
+
+.. code-block:: pascal
+
+    TRSGrandExchange.getPrice(item: variant): integer;
+
+Returns the current market price of any item in the Grand Exchange. The 'item'
+parameter can be the name of the item (string), or it's ID (integer). Using the
+ID is recommended as it's slightly faster.
+
+ID's can be found on the Grand Exchange website at the end of the URL.
+
+    E.g the ID in the below URL us 2150 (Swamp toad)
+    http://services.runescape.com/m=itemdb_rs/viewitem.ws?obj=2150
+
+.. note::
+
+    - by The Mayor
+    - Last Updated: 15 January 2015 by The Mayor
+
+Example:
+
+.. code-block:: pascal
+
+    grandExchange.getPrice('Swamp toad');
+    grandExchange.getPrice(2150);        // The ID for Swamp toads
+
+*)
+function TRSGrandExchange.getPrice(item: variant): integer;
+var
+  i: integer;
+  str: string;
+  TSA, lines: TStringArray;
+begin
+  result := -1;
+  str := replace(item, ' ', '%20', [rfReplaceAll]);
+  TSA := explode(#10, getPage('http://rscript.org/lookup.php?type=ge&search=' + toStr(str)));
+
+  for i := 0 to high(TSA) do
+    if (pos('ITEM:', TSA[i]) > 0) and (not (pos('MULTIITEM:', TSA[i]) > 0)) then
+        lines.append(TSA[i]);
+
+  if length(lines) < 1 then
+  begin
+    print('TRSGrandExchange.getPrice(): Search returned no matches', TDebug.ERROR);
+    exit();
+  end;
+
+  if length(lines) > 1 then
+    print('TRSGrandExchange.getPrice(): Search returned multiple items, returning the first one', TDebug.WARNING);
+
+  TSA := explode(' ', lines[0]);
+
+  if length(TSA) = 5 then
+    result := strToIntDef(extractFromStr(TSA[3], numbers), -1);
+
+  print('TRSGrandExchange.getPrice(): ' + TSA[2] + ' = ' + toStr(result));
+end;
+
+{$f+}
