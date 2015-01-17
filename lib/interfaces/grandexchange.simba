@@ -12,10 +12,10 @@ The source for this file can be found here <https://github.com/SRL/SRL-6/blob/ma
 {$f-}
 
 (*
-type TRSDepositBox
+type TRSGrandExchange
 ~~~~~~~~~~~~~~~~~~
 
-A type that stores the deposit box interface properties.
+A type that stores the Grand Exchange interface properties.
 *)
 
 type
@@ -1169,8 +1169,8 @@ The 'price' parameter is a string; valid options are:
 The 'quantity' parameter is a string; valid options are:
 
       * '1'               : '1' button
-      * '10'              : '1' button
-      * '100'             : '1' button
+      * '10'              : '10' button
+      * '100'             : '100' button
       * 'all'             : 'All' button (Selling ONLY)
       * Any other number  : Type input
 
@@ -1264,8 +1264,8 @@ The 'price' parameter is a string; valid options are:
 The 'quantity' parameter is a string; valid options are:
 
       * '1'               : '1' button
-      * '10'              : '1' button
-      * '100'             : '1' button
+      * '10'              : '10' button
+      * '100'             : '100' button
       * Any other number  : Type input
 
 .. note::
