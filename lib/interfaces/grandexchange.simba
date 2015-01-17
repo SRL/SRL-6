@@ -59,7 +59,7 @@ begin
   with (self) do
   begin
     name := 'Grand Exchange';
-    ID := ID_INTERFACE_GRAND_EXCHANGE;
+    ID := ID_INTERFACE_GRANDEXCHANGE;
     parentID := -1;
     static := false;
   end;
@@ -202,8 +202,8 @@ begin
   begin
     timeOut := (getTickCount64() + randomRange(600, 900));
     repeat
-      multiType(VK_ESCAPE, randomRange(30, 50), 2);
-      wait(100 + random(50));
+      typeByte(VK_ESCAPE);
+      wait(300 + random(50));
     until (not self.isOpen()) or (getTickCount64() > timeOut);
 
     if (not self.isOpen()) then
@@ -1392,6 +1392,10 @@ begin
     result := strToIntDef(extractFromStr(TSA[3], numbers), -1);
 
   print('TRSGrandExchange.getPrice(): ' + TSA[2] + ' = ' + toStr(result));
+end;
+
+begin
+  grandExchange.__init();
 end;
 
 {$f+}
