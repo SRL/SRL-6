@@ -1,0 +1,985 @@
+(*
+BeastOfBurden
+=============
+
+The BeastofBurden file holds functions and procedures that are used in the
+Runescape beast of burden familiar inventory screen.
+
+The source for this file can be found `here <https://github.com/SRL/SRL-6/blob/master/lib/interfaces/beastofburden.simba>`_.
+
+*)
+
+{$include_once interfaces.simba}
+{$include_once ../core/text.simba}
+
+{$f-}
+
+(*
+const Internal
+~~~~~~~~~~~~~~
+
+Internal beast of burden screen constants.
+
+*)
+const
+  FAMILIAR_SLOT_LOW = 1;
+  PLAYER_SLOT_LOW = 1;
+  PLAYER_SLOT_HIGH = 28;
+  FAMILIAR_BACKGROUND = 2433824;
+  PLAYER_BACKGROUND = 3088905;
+
+(*
+const Slot & Button Types
+~~~~~~~~~~~~~~~~~~~~~~~~~
+
+Integer constants that represent the slot and button types in the beast of burden interface.
+
+*)
+const
+  SLOTS_FAMILIAR   = 0;
+  SLOTS_PLAYER     = 1;
+
+const
+  BUTTON_GIVE_ITEMS = 0;
+  BUTTON_TAKE_ITEMS = 1;
+
+(*
+type TRSBeastOfBurden
+~~~~~~~~~~~~~~~~~~~~~
+
+A type that stores the collection box interface properties.
+*)
+type
+  TRSBeastOfBurden = type TRSInterface;
+
+(*
+var Internal
+~~~~~~~~~~~~~~
+
+Internal beast of burden screen variables.
+
+*)
+var
+  maximumSlots: integer = 30;
+
+(*
+var beastOfBurden
+~~~~~~~~~~~~~~~~~
+
+The variable used to call collect box functions, procedures and attributes.
+
+Example:
+
+.. code-block:: pascal
+
+    if (beastOfBurden.isOpen()) then
+      writeln('beastOfBurden is open');
+*)
+var
+  beastOfBurden: TRSBeastOfBurden;
+
+{*
+TRSBeastOfBurden.__init
+~~~~~~~~~~~~~~~~~~~~
+
+.. code-block:: pascal
+
+    procedure TRSBeastOfBurden.__init
+
+Initializes the TRSBeastOfBurden.
+
+.. note::
+
+    - by Clarity
+    - Last Updated: 03 October 2014 by Clarity
+
+Example:
+
+.. code-block:: pascal
+
+    beastOfBurden.__init();
+
+*}
+{$IFNDEF CODEINSIGHT}
+procedure TRSBeastOfBurden.__init();
+begin
+  with (self) do
+  begin
+    name := 'Beast of Burden';
+    ID := ID_INTERFACE_BEASTOFBURDEN;
+    parentID := -1;
+    static := false;
+  end;
+end;
+{$ENDIF}
+
+(*
+TRSBeastOfBurden.__find
+~~~~~~~~~~~~~~~~~~~~
+
+.. code-block:: pascal
+
+    function TRSBeastOfBurden.__find(): boolean;
+
+Returns true if the familiar inventory is detected, and sets the bounds of the
+interface.
+
+.. note::
+
+    - by Ashaman88 & Clarity
+    - Last Updated: 03 October 2014 by Clarity
+
+Example:
+
+.. code-block:: pascal
+
+    if (beastOfBurden.__find()) then
+      writeln('Bounds are set!');
+*)
+function TRSBeastOfBurden.__find(): boolean;
+var
+  i: integer;
+  bounds: TBox;
+  TPA, TPA2 : TPointArray;
+  ATPA : T2DPointArray;
+begin
+  result := false;
+
+  if (not findColors(TPA, FAMILIAR_BACKGROUND, getClientBounds())) then
+    exit();
+
+  ATPA := TPA.cluster(5);
+  for i := 0 to high(ATPA) do
+    if (length(ATPA[i]) > 3000) then
+    begin
+      bounds := getTPABounds(ATPA[i]);
+      if (getColor(bounds.x2 + 15, bounds.y2 - 5) = PLAYER_BACKGROUND) then
+      begin
+        self.setBounds([bounds.x1 - 8, bounds.y1 - 29, bounds.x2 + 240, bounds.y2 + 8]);
+        exit(true);
+      end;
+    end;
+end;
+
+(*
+TRSBeastOfBurden.isOpen
+~~~~~~~~~~~~~~~~~~~~~~~
+
+.. code-block:: pascal
+
+    function TRSBeastOfBurden.isOpen(waitTime: integer = 0): boolean;
+
+Returns true if the beast of burden screen is open. Includes an optional parameter
+'waitTime' (default 0) which will search for the beast of burden screen until
+'waitTime' is reached.
+
+.. note::
+
+    - by Olly
+    - Last Updated: 03 October 2014 by Clarity
+
+Example:
+
+.. code-block:: pascal
+
+    if (beastOfBurden.isOpen()) then
+      writeln('The beast of burden screen is open!');
+
+*)
+function TRSBeastOfBurden.isOpen(waitTime: integer = 0): boolean;
+var
+  t: UInt64;
+begin
+  t := (getSystemTime() + waitTime);
+
+  repeat
+    result := self.__find();
+    wait(20 + random(20));
+  until (getTickCount64() >= t) or (result);
+end;
+
+(*
+TRSBeastOfBurden.open
+~~~~~~~~~~~~~~~~~~~~~
+
+.. code-block:: pascal
+
+    function TRSBeastOfBurden.open(): boolean;
+
+Opens the beast of burden interface via the actionbar.
+
+.. note::
+
+    - by Clarity
+    - Last Updated: 04 October 2014 by Clarity
+
+Example:
+
+.. code-block:: pascal
+
+    beastOfBurden.open();
+*)
+function TRSBeastOfBurden.open(): boolean;
+var
+  i: integer;
+  timer: UInt64;
+  options: TOptionArray;
+begin
+  if (self.isOpen()) then
+    exit(true);
+
+  actionbar.mouseIcon(AB_Bar_SUMMONING, MOUSE_RIGHT);
+  wait(randomRange(100, 250));
+
+  if (not chooseOption.optionsExist(['Interact'])) then
+  begin
+    print('beastOfBurden.open(): chooseOption menu failed to open', TDebug.SUB);
+    exit(false);
+  end;
+
+  timer := getTickCount64() + randomRange(5000, 7000);
+
+  repeat
+    chooseOption.select(['Interact']);
+    wait(randomRange(300, 1100));
+  until (getTickCount64() >= timer) or (conversationBox.isOpen());
+
+  if (not conversationBox.isOpen()) then
+  begin
+    print('beastOfBurden.open(): conversation options never appeared', TDebug.SUB);
+    exit(false);
+  end;
+
+  timer := getTickCount64() + randomRange(5000, 7000);
+
+  repeat
+    conversationBox.selectOption(2);
+    wait(randomRange(300, 1100));
+  until (getTickCount64() >= timer) or (self.isOpen());
+
+  if self.isOpen then exit(true)
+    else exit(false);
+end;
+
+(*
+TRSBeastOfBurden.close
+~~~~~~~~~~~~~~~~~~~~~~
+
+.. code-block:: pascal
+
+    function TRSBeastOfBurden.close(escape: boolean = true): boolean;
+
+Closes the beast of burden screen, will return if succesful or not.
+Closes via the Escape key.
+
+.. note::
+
+    - by Olly
+    - Last Updated: 02 October 2014 by Clarity
+
+Example:
+
+.. code-block:: pascal
+
+    if (beastOfBurden.close()) then
+      writeln('Closed the beastOfBurden screen!');
+*)
+function TRSBeastOfBurden.close(escape: boolean = true): boolean;
+var
+  timeOut: UInt64;
+begin
+  result := false;
+
+  if (not self.isOpen()) then
+    exit(true);
+
+  // try ESC key first
+  if escape then
+  begin
+    timeOut := (getTickCount64() + randomRange(600, 900));
+    repeat
+      multiType(VK_ESCAPE, randomRange(30, 50), 2);
+      wait(100 + random(50));
+      result := (not self.isOpen());
+    until((getTickCount64() > timeOut) or result);
+
+    if (result) then
+      exit();
+  end;
+
+  // click the X as a failsafe
+  mouseBox(intToBox(self.x2 - 7, self.y1 - 22, self.x2 + 2, self.y1 - 12), MOUSE_MOVE);
+
+  // this is a failsafe in case the beast of burden screen closes (from the ESC key) while moving the mouse
+  if (self.isOpen()) then
+  begin
+    fastClick(MOUSE_LEFT);
+    wait(50 + random(50));
+  end else
+    exit(true);
+
+  // wait for the beast of burden screen to close
+  timeOut := (getTickCount64() + randomRange(5000, 6000));
+  while (timeOut > getTickCount64()) do
+  begin
+    if (not self.isOpen()) then
+    begin
+      result := true;
+      break;
+    end;
+
+    wait(50 + random(50));
+  end;
+
+  print('beastOfBurden.close(): result = '+boolToStr(result), TDebug.SUB);
+end;
+
+(*
+TRSBeastOfBurden.clickButton
+~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+
+.. code-block:: pascal
+
+    function TRSBeastOfBurden.clickButton: boolean;
+
+Selects the take items or give items button in the beast of burden interface,
+withdrawing or depositing all possible items into your backpack or familiar
+inventory, respectively.  Returns true after successful completion.
+
+.. note::
+
+    - by Clarity
+    - Last Updated: 03 October 2014 by Clarity
+
+Example:
+
+.. code-block:: pascal
+
+    if (beastOfBurden.clickButton(BUTTON_TAKE_ITEMS) then
+      writeln('We withdrew stored items via the take items button!');
+*)
+function TRSBeastOfBurden.clickButton(button: integer): boolean;
+begin
+  if (not self.isOpen()) then
+    exit;
+  case button of
+    BUTTON_GIVE_ITEMS: mouseBox([(self.x2 - 60), (self.y2 - 44), (self.x2 - 41), (self.y2 - 29)], MOUSE_LEFT);
+    BUTTON_TAKE_ITEMS: mouseBox([(self.x2 - 31), (self.y2 - 44), (self.x2 - 14), (self.y2 - 29)], MOUSE_LEFT);
+  end;
+  wait(50 + random(50));
+  result := true;
+end;
+
+(*
+TRSBeastOfBurden.getSlotBoxes
+~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+
+.. code-block:: pascal
+
+    function TRSBeastOfBurden.getSlotBoxes(slotType: Integer): TBoxArray;
+
+Returns a TBoxArray of all of the item slots in the familiar's or player's
+inventory, specified with SLOTS_FAMILIAR or SLOTS_PLAYER integer constants.
+
+.. note::
+
+    - by Clarity
+    - Last Updated: 04 October 2014 by Clarity
+
+Example:
+
+.. code-block:: pascal
+
+    boxArr := beastOfBurden.getSlotBoxes(SLOTS_FAMILIAR);
+    boxArr := beastOfBurden.getSlotBoxes(SLOTS_PLAYER);
+*)
+function TRSBeastOfBurden.getSlotBoxes(slotType: integer): TBoxArray;
+var
+  i, maxSlots: integer;
+  perceived: TBoxArray;
+  TPA: TPointArray;
+begin
+  if (not self.isOpen()) then
+    exit();
+
+  setLength(result, 0);
+  maxSlots := 30;
+
+  case slotType of
+    SLOTS_FAMILIAR:
+    begin
+      perceived := grid(5, 6, 35, 31, 43, 36, point(self.x1 + 28, self.y1 + 44));
+      for i := 0 to 29 do
+      begin
+        findColors(TPA, FAMILIAR_BACKGROUND, perceived[i].x1, perceived[i].y1, perceived[i].x2, perceived[i].y2);
+        if (length(TPA) > 500) then
+          maxSlots := (maxSlots - 1);
+      end;
+      for i := 29 downto (maxSlots) do
+        perceived.deleteIndex(i);
+      setlength(perceived, (maxSlots));
+      result := perceived;
+      maximumSlots := maxSlots;
+    end;
+    SLOTS_PLAYER:
+    begin
+      result := grid(5, 6, 35, 31, 43, 36, point(self.x1 + 263, self.y1 + 44));
+      setLength(result, length(result) - 2);
+    end;
+  end;
+end;
+
+(*
+TRSBeastOfBurden.getSlotBox
+~~~~~~~~~~~~~~~~~~~~~~~~~~~
+
+.. code-block:: pascal
+
+    function TRSBeastOfBurden.getSlotBox(slot, slotType: integer): TBox;
+
+Returns the TBox of the desired item slot in the beast of burden interface.
+Slots start at the top left at 1 and count across the columns.  Use SLOTS_PLAYER
+or SLOTS_FAMILIAR to specify slotTypes.
+
+.. note::
+
+    - by Coh3n & Clarity
+    - Last Updated: 04 October 2014 by Clarity
+
+Example:
+
+.. code-block:: pascal
+
+    var
+      b: TBox;
+    begin
+      b := beastOfBurden.getSlotBox(1, SLOTS_PLAYER);
+
+*)
+function TRSBeastOfBurden.getSlotBox(slot, slotType: integer): TBox;
+begin
+  if (not self.isOpen()) then
+    exit();
+  if (slotType = SLOTS_FAMILIAR) then
+  begin
+    if (not inRange(slot, FAMILIAR_SLOT_LOW, maximumSlots)) then
+    begin
+      print('beastOfBurden.getSlotBox(): Slot '+toStr(slot)+' is invalid', TDebug.WARNING);
+      exit(intToBox(-1, -1, -1, -1));
+    end;
+
+    // - 1 because the grid (array) starts at 0.
+    result := gridBox(slot -1, 5, 6, 35, 31, 43, 36, point(self.x1 + 28, self.y1 + 44));
+  end else
+  begin
+    if (not inRange(slot, PLAYER_SLOT_LOW, PLAYER_SLOT_HIGH)) then
+    begin
+      print('beastOfBurden.getSlotBox(): Slot '+toStr(slot)+' is invalid', TDebug.WARNING);
+      exit(intToBox(-1, -1, -1, -1));
+    end;
+
+    // - 1 because the grid (array) starts at 0.
+    result := gridBox(slot -1, 5, 6, 35, 31, 43, 36, point(self.x1 + 263, self.y1 + 44));
+  end;
+end;
+
+(*
+TRSBeastOfBurden.getItemCount
+~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+
+.. code-block:: pascal
+
+    function TRSBeastOfBurden.getItemCount(slotType: integer): integer;
+
+Returns the number of items in either the familiar's inventory or the player's.
+
+.. note::
+
+    - by Coh3n
+    - Last Updated: 04 October 2014 by Clarity
+
+Example:
+
+.. code-block:: pascal
+
+    var
+      c: integer;
+    begin
+      c := beastOfBurden.getItemCount();
+
+*)
+function TRSBeastOfBurden.getItemCount(slotType: integer): integer;
+var
+  b: TBoxArray := self.getSlotBoxes(slotType);
+  i: integer;
+begin
+  for i := 0 to high(b) do
+    if (isItemIn(b[i])) then
+      inc(result);
+end;
+
+(*
+TRSBeastOfBurden._isSlotValid
+~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+
+.. code-block:: pascal
+
+    function TRSBeastOfBurden._isSlotValid(slot, slotType: integer): boolean;
+
+Returns true if the familiar or player slot is valid.
+
+.. note::
+
+    - by Clarity
+    - Last Updated: 04 October 2014 by Clarity
+
+Example:
+
+.. code-block:: pascal
+
+    if (beastOfBurden._isSlotValid(25, SLOTS_PLAYER) then
+      writeln('Slot 25 is a valid player slot!');
+
+*)
+function TRSBeastOfBurden._isSlotValid(slot, slotType: integer): boolean;
+begin
+  case slotType of
+    SLOTS_FAMILIAR: result := inRange(slot, FAMILIAR_SLOT_LOW, maximumSlots);
+    SLOTS_PLAYER: result := inRange(slot, PLAYER_SLOT_LOW, PLAYER_SLOT_HIGH);
+  end;
+
+  if (not result) then
+    print('beastOfBurden._isSlotValid(): Slot '+toStr(slot)+' is invalid', TDebug.WARNING);
+end;
+
+
+(*
+TRSBeastOfBurden.isItemInSlot
+~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+
+.. code-block:: pascal
+
+    function TRSBeastOfBurden.isItemInSlot(slot, slotType: integer): boolean;
+
+Returns true if an item is in the desired beast of burden slot, works by looking for
+the black outline color in the slot.
+
+.. note::
+
+    - by Olly
+    - Last Updated: 04 October 2014 by Clarity
+
+Example:
+
+.. code-block:: pascal
+
+   if (beastOfBurden.isItemInSlot(1, SLOTS_FAMILIAR)) then
+     writeln('We have an item in familiar slot number 1');
+*)
+function TRSBeastOfBurden.isItemInSlot(slot, slotType: integer): boolean;
+begin
+  if (not self.isOpen()) or (not self._isSlotValid(slot, slotType)) then
+    exit(false);
+
+  result := isItemIn(self.getSlotBox(slot, slotType));
+end;
+
+(*
+TRSBeastOfBurden.isFull
+~~~~~~~~~~~~~~~~~~~~~~~
+
+.. code-block:: pascal
+
+    function TRSBeastOfBurden.isFull(slotType: integer): boolean;
+
+Returns true if either the familiar or player slots are full.
+
+.. note::
+
+    - by Olly & Clarity
+    - Last Updated: 04 October 2014 by Clarity
+
+Example:
+
+.. code-block:: pascal
+
+   if (beastOfBurden.isFull(SLOTS_FAMILIAR)) then
+     writeln('Beast of burden familiar is full!');
+
+*)
+function TRSBeastOfBurden.isFull(slotType: integer): boolean;
+var
+  i, slotLow, slotHigh: integer;
+begin
+  if (not self.isOpen()) then
+    exit(false);
+
+  case slotType of
+    SLOTS_FAMILIAR: begin slotLow := FAMILIAR_SLOT_LOW; slotHigh := maximumSlots; end;
+    SLOTS_PLAYER: begin slotLow := PLAYER_SLOT_LOW; slotHigh := PLAYER_SLOT_HIGH; end;
+  end;
+
+  for i := slotLow to slotHigh do
+    if (not (self.isItemInSlot(i, slotType))) then
+      exit(false);
+
+  result := true;
+end;
+
+(*
+TRSBeastOfBurden.isEmpty
+~~~~~~~~~~~~~~~~~~~~~~~~
+
+.. code-block:: pascal
+
+    function TRSBeastOfBurden.isEmpty(slotType: integer): boolean;
+
+Returns true if our either the familiar or player slots are empty.
+
+.. note::
+
+    - by Olly & Clarity
+    - Last Updated: 04 October 2014 by Clarity
+
+Example:
+
+.. code-block:: pascal
+
+   if (beastOfBurden.isEmpty(SLOTS_PLAYER)) then
+     writeln('our beastOfBurden player pack is empty!');
+
+*)
+function TRSBeastOfBurden.isEmpty(slotType: integer): boolean;
+var
+  searchBox: TBox;
+begin
+  if (not self.isOpen()) then
+    exit(false);
+
+  case slotType of
+    SLOTS_FAMILIAR: searchBox := IntToBox(self.x1 + 15, self.y1 + 31, self.x1 + 217, self.y2);
+    SLOTS_PLAYER: searchBox := IntToBox(self.x1 + 249, self.y1 + 31, self.x2, self.y2);
+  end;
+
+  result := (not (searchBox.colorExists(ITEM_OUTLINE_BLACK)));
+end;
+
+(*
+TRSBeastOfBurden.getCountDTM
+~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+
+.. code-block:: pascal
+
+    function TRSBeastOfBurden.getCountDTM(dtm, slotType: integer): integer;
+
+Searches for the dtm in each familiar or player slot and will return how many matches it finds.
+
+.. note::
+
+    - by Olly
+    - Last Updated: 04 October 2014 by Clarity
+
+Example:
+
+.. code-block:: pascal
+
+    var
+      dtm: integer;
+      i: integer;
+    begin
+      dtm := dtmFromString('lotsofstuffhere');
+      i := beastOfBurden.getCountDTM(dtm, SLOTS_FAMILIAR);
+      writeln('We counted ' + intToStr(i) + ' items in our familiar pack.');
+    end;
+*)
+function TRSBeastOfBurden.getCountDTM(dtm, slotType: integer): integer;
+var
+  i, l: integer;
+begin
+  result := 0;
+
+  if (not self.isOpen()) then
+    exit();
+
+  result := findItem(dtm, self.getSlotBoxes(slotType));
+
+  if (result = 0) then
+  begin
+    print('beastOfBurden.getCountDTM(): Found no DTM matches', TDebug.SUB);
+    exit();
+  end;
+
+  print('beastOfBurden.getCountDTM(): Counted ' + intToStr(result) + ' items');
+end;
+
+
+(*
+TRSBeastOfBurden.getCountBitmap
+~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+
+.. code-block:: pascal
+
+    function TRSBeastOfBurden.getCountBitmap(bmp, tolerance, slotType: integer): integer;
+
+Searches for the bitmap in each familiar or player slot and will return how many matches it finds.
+
+.. note::
+
+    - by Olly
+    - Last Updated: 04 October 2014 by Clarity
+
+Example:
+
+.. code-block:: pascal
+
+    var
+      bmp: integer;
+      i: integer;
+    begin
+      bmp := bitmapFromString('lotsofstuffhere');
+      i := beastOfBurden.getCountBitmap(bmp, tol, SLOTS_PLAYER);
+      writeln('We counted ' + intToStr(i) + ' items in our player pack.');
+    end;
+*)
+function TRSBeastOfBurden.getCountBitmap(bmp, tolerance, slotType: integer): integer;
+begin
+  result := 0;
+
+  if (not self.isOpen()) then
+    exit();
+
+  result := findItem(bmp, tolerance, self.getSlotBoxes(slotType));
+
+  if (result = 0) then
+  begin
+    print('beastOfBurden.getCountBitmap(): Found no bitmap matches', TDebug.SUB);
+    exit();
+  end;
+
+  print('beastOfBurden.getCountBitmap(): Counted ' + intToStr(result) + ' items');
+end;
+
+(*
+TRSBeastOfBurden.withdraw
+~~~~~~~~~~~~~~~~~~~~~~~~~
+
+.. code-block:: pascal
+
+    function TRSBeastOfBurden.withdraw(slot, amount: integer; mouseOverText: TStringArray): boolean;
+
+Withdraws the the amount 'amount' from the beast of burden slot 'slot', if the mouse-over
+text is correct, mouse-over text can also be skipped.
+
+Extra valid constants for 'amount' are:
+
+   - WITHDRAW_AMOUNT_ALL = -1;
+
+.. note::
+
+    - by Olly & Clarity
+    - Last Updated: 4 October 2014 by Clarity
+
+Example:
+
+.. code-block:: pascal
+
+    // To withdraw 28 items from slot 1 if mouseover text is valid
+    beastOfBurden.withdraw(1, 28, ['Death rune']);
+
+    // To withdraw all items from slot 10 if mouseover text is valid
+    beastOfBurden.withdraw(10, WITHDRAW_AMOUNT_ALL, ['Death rune']);
+
+    // To withdraw 28 items from slot 1 and will *ignore* mouse-over text
+    beastOfBurden.withdraw(1, 28, ['']);
+
+*)
+function TRSBeastOfBurden.withdraw(slot, amount: integer; mouseOverText: TStringArray): boolean;
+var
+  b: TBox;
+begin
+  result := false;
+  b := self.getSlotBox(slot, SLOTS_FAMILIAR);
+
+  if (b.x1 = -1) then
+  begin
+    print('beastOfBurden.withdraw(): Invalid slot '+toStr(slot), TDebug.WARNING);
+    exit(false);
+  end;
+
+  if (not isItemIn(b)) then
+  begin
+    print('beastOfBurden.withdraw(): No item in slot '+toStr(slot), TDebug.WARNING);
+    exit(false);
+  end;
+
+  mouseBox(b, MOUSE_MOVE);
+
+  if (length(mouseOverText[0]) > 0) then
+    if (not isMouseOverText(mouseOverText, 250)) then
+    begin
+      print('beastOfBurden.withdraw(): Incorrect Mouse-over text, result = false', TDebug.SUB);
+      exit(false);
+    end;
+
+  if (amount = 1) then
+  begin
+    fastClick(MOUSE_LEFT);
+    wait(400 + random(300));
+    print('beastOfBurden.withdraw(): result = true', TDebug.SUB);
+    exit(true);
+  end else
+    fastClick(MOUSE_RIGHT);
+
+  if (chooseOption.isOpen(2000)) then
+  begin
+    case (amount) of
+      WITHDRAW_AMOUNT_ALL: result := chooseOption.select(['Withdraw-All', '-All']);
+      else
+      begin
+        if (chooseOption.select(['Withdraw-X', '-X'])) then
+          result := (bankscreen._enterAmount(amount, 6000));
+      end;
+    end;
+  end else
+    print('beastOfBurden.withdraw(): chooseOption menu failed to open', TDebug.SUB);
+
+  print('beastOfBurden.withdraw(): result = ' + boolToStr(result), TDebug.SUB);
+end;
+
+(*
+TRSBeastOfBurden.store
+~~~~~~~~~~~~~~~~~~~~~~
+
+.. code-block:: pascal
+
+    function TRSBeastOfBurden.store(slots: TIntegerArray; amounts: TIntegerArray = []; oneByOne: boolean = false): boolean;
+
+Stores items from the player pack into the familiar pack.  Has the capability of storing
+all items, storing a specific amount of items, and clicking each item one by one.
+
+    * slots: The slots you want to store.
+    * amounts: The amounts of the slots to store.  Set index to -1 to store all.  Stores all of every item by default.
+    * oneByOne: Default false.  Will click items one by one to store.
+
+.. note::
+
+    - by Coh3n
+    - Last Updated: 04 October 2014 by Clarity
+
+Examples:
+
+.. code-block:: pascal
+
+    beastOfBurden.store([2..28]);
+    beastOfBurden.store([1, 2, 3, 4], [-1, 10, 15, 14]);
+    beastOfBurden.store([1..28], , true); // one by one
+*)
+function TRSBeastOfBurden.store(slots: TIntegerArray; amounts: TIntegerArray = []; oneByOne: boolean = false): boolean;
+var
+  b: TBox;
+  t, tt : UInt64;
+  i, _x, _y: integer;
+begin
+  result := false;
+
+  if (length(slots) < 1) then
+  begin
+    print('beastOfBurden.store(): No storet slots specified', TDebug.WARNING);
+    exit(false);
+  end;
+
+  if (not self.isOpen()) then
+  begin
+    print('beastOfBurden.store(): Unable to store since beast of burden interface isn''t open', TDebug.ERROR);
+    exit(false);
+  end;
+
+  if ((length(amounts) > 0) and (length(amounts) <> length(slots))) then
+  begin
+    print('beastOfBurden.store(): Slot and amount arrays are of different length, they need to be the same!', TDebug.WARNING);
+    exit(false);
+  end;
+
+  // fill the amounts array to avoid errors
+  if (length(amounts) = 0) then
+  begin
+    setLength(amounts, length(slots));
+
+    for i := 0 to high(amounts) do
+      amounts[i] := -1;
+  end;
+
+  if (not result) then
+  begin
+    result := true; // will be set to false if it fails to store a slot
+
+    for i := 0 to high(slots) do
+    begin
+      b := self.getSlotBox(slots[i], SLOTS_PLAYER);
+
+      if (isItemIn(b) = false) then
+        continue;
+
+      if (oneByOne = true) then
+      begin
+        mouseBox(b, MOUSE_LEFT);
+        wait(100 + random(200));
+      end else begin
+        mouseBox(b, MOUSE_RIGHT);
+
+        if (amounts[i] = -1) then
+        begin
+          if (chooseOption._select(['Store-All', 'ore-All', 'All'], MOUSE_LEFT, false, 1.0, 300) = false) then
+            chooseOption.select(['Store', 'tore']); // in case there's only one
+        end else begin
+          if (chooseOption._select([toStr(amounts[i])], MOUSE_LEFT, false, 1.0, 300) = false) then
+            if (chooseOption.select(['Store-X', '-X'])) then
+            begin
+              t := (getTickCount64() + 3000);
+
+              while (getTickCount64() < t) do
+              begin
+                if (findColor(_x, _y, 0, 241, 485, 286, 517)) then // box around the "Enter" text
+                begin
+                  wait(100 + random(50));
+                  typeSend(toStr(amounts[i]));
+
+                  tt := (getTickCount64() + 3000);
+                  while (self.isOpen() = false) and (getTickCount64() < tt) do
+                    wait(50);
+
+                  break;
+                end;
+
+                wait(50 + random(25));
+              end;
+            end;
+        end;
+      end;
+
+      // wait for the item to disappear
+      t := (getTickCount64() + 2000);
+      while (amounts[i] = -1) and (getTickCount64() < t) do
+      begin
+        if (isItemIn(b) = false) then
+          break;
+
+        wait(50 + random(25));
+      end;
+
+      // make sure the item is gone, return false if not
+      if (amounts[i] = -1) then
+        if (isItemIn(self.getSlotBox(slots[i], SLOTS_PLAYER))) then
+        begin
+          print('beastOfBurden.store(): Failed to store item in slot '+toStr(i), TDebug.ERROR);
+          result := false;
+        end;
+    end;
+  end;
+
+  print('beastOfBurden.store(): '+toStr(result), TDebug.SUB);
+end;
+
+begin
+  beastOfBurden.__init();
+end;
