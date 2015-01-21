@@ -1009,38 +1009,17 @@ Example:
 *)
 function browseSkillMenu(skill: integer; maxScrollAmount: integer = 10): boolean;
 var
-  t, x, y, w, h, menuBMP: integer;
-  k: UInt64;
+  t: integer;
 begin
   print('browseSkillMenu()', TDebug.HEADER);
-  result := false;
+
   t := gameTabs.getActiveTab();
-  menuBMP := BitmapFromString(53, 4, 'meJyrqaosLC6Fo9SkhOysnKjo2Oy' +
-        'YQPngem4fEOJMny9ZuVR/4h69+q1AttGkC9XH761aPn/NunWnls/s' +
-        'WrGff8ppoCxQjXr2Al6ffBFNJzFxW3EpBwlpZwXlECCSlvVBRnJKX' +
-        'nA2UA0aA1lZDarzgG6DuBDoPKAjWYInwp0HdBuQBCKg8xI3PIc4D+' +
-        'JCoALump1At/FnT5D1SBaWsxYRMwM6D9M9QDegOUNM0hpZCq4SwkB' +
-        'zGxyBHBkTCAk9oKUQh0EQMKyAzgMG2oxpU4EI6DxgOAPFgY4EMtiM' +
-        'wvkE1EXEzJGdB7Ea03ZcshAF8NADugfNeZAAtPeLAAYg0HnILgQGF' +
-        'NB5kcuvQQIQSAIVA+MUFHQW8cLaDqLi5lKyDuJSjhDrIPbCbUeLTW' +
-        'DUw6XgzoOkByAXACKyxKI=');
-  getClientDimensions(w, h);
+  gameTabs.openTab(TAB_STATS);
+  mouseBox(tabStats.getSkillBox(skill), MOUSE_LEFT);
 
-  if (t <> TAB_STATS) then
-    gameTabs.openTab(TAB_STATS);
-
-  mouseBox(tabStats.getSkillBox(skill), MOUSE_LEFT, MOUSE_HUMAN);
-
-  k := (getTickCount64() + 10000);
-
-  repeat
-    wait(random(100, 300));
-  until findBitmapIn(menuBMP, x, y, 1, 1, w-1, h-1) or (getTickCount64() > k);
-
-  if not findBitmapIn(menuBMP, x, y, 1, 1, w-1, h-1) then
-  begin
-    print('browseSkillMenu(): Skill menu never opened.', TDebug.SUB);
-  end else
+  if (not heroScreen.isOpen(4000 + random(1000))) then
+    print('browseSkillMenu(): Skill menu never opened.', TDebug.SUB)
+  else
   begin
     wait(150 + random(500));
     mouseScroll(point(492 + random(-90, 90), 364 + random(-90, 90)), random(0, maxScrollAmount));
@@ -1049,10 +1028,7 @@ begin
     result := true;
   end;
 
-  if (t <> TAB_STATS) then
-    gameTabs.openTab(t);
-
-  freeBitmap(menuBMP);
+  gameTabs.openTab(t);
   print('browseSkillMenu(): result = ' + toStr(result), TDebug.FOOTER);
 end; 
 
