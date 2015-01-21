@@ -56,10 +56,11 @@ const
   ID_INTERFACE_COLLECTBOX       = 44;
   ID_INTERFACE_GRANDEXCHANGE    = 45;
   ID_INTERFACE_HEROSCREEN       = 46;
+  ID_INTERFACE_BEASTOFBURDEN    = 47;
 
   // client - logged out
-  ID_INTERFACE_LOBBY            = 47;
-  ID_INTERFACE_LOBBY_WORLDS     = 48;
+  ID_INTERFACE_LOBBY            = 48;
+  ID_INTERFACE_LOBBY_WORLDS     = 49;
 
 (*
 type TRSInterface
