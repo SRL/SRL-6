@@ -9,9 +9,6 @@ The source for this file can be found `here <https://github.com/SRL/SRL-6/blob/m
 
 *)
 
-{$include_once interfaces.simba}
-{$include_once ../core/text.simba}
-
 {$f-}
 
 (*
@@ -26,7 +23,6 @@ const
   PLAYER_SLOT_LOW = 1;
   PLAYER_SLOT_HIGH = 28;
   FAMILIAR_BACKGROUND = 2433824;
-  PLAYER_BACKGROUND = 3088905;
 
 (*
 const Slot & Button Types
@@ -47,7 +43,7 @@ const
 type TRSBeastOfBurden
 ~~~~~~~~~~~~~~~~~~~~~
 
-A type that stores the collection box interface properties.
+A type that stores the beast of burden interface properties.
 *)
 type
   TRSBeastOfBurden = type TRSInterface;
@@ -137,6 +133,9 @@ Example:
       writeln('Bounds are set!');
 *)
 function TRSBeastOfBurden.__find(): boolean;
+const
+
+  PLAYER_BACKGROUND = 3088905;
 var
   i: integer;
   bounds: TBox;
@@ -190,7 +189,7 @@ function TRSBeastOfBurden.isOpen(waitTime: integer = 0): boolean;
 var
   t: UInt64;
 begin
-  t := (getSystemTime() + waitTime);
+  t := (getTickCount64() + waitTime);
 
   repeat
     result := self.__find();
@@ -225,10 +224,10 @@ var
   timer: UInt64;
   options: TOptionArray;
 begin
-  if (self.isOpen()) then
+  if self.isOpen() then
     exit(true);
 
-  actionbar.mouseIcon(AB_Bar_SUMMONING, MOUSE_RIGHT);
+  actionbar.mouseIcon(AB_BAR_SUMMONING, MOUSE_RIGHT);
   wait(randomRange(100, 250));
 
   if (not chooseOption.optionsExist(['Interact'])) then
@@ -257,8 +256,8 @@ begin
     wait(randomRange(300, 1100));
   until (getTickCount64() >= timer) or (self.isOpen());
 
-  if self.isOpen then exit(true)
-    else exit(false);
+  if self.isOpen() then
+    exit(true);
 end;
 
 (*
@@ -303,7 +302,7 @@ begin
       result := (not self.isOpen());
     until((getTickCount64() > timeOut) or result);
 
-    if (result) then
+    if result then
       exit();
   end;
 
@@ -311,7 +310,7 @@ begin
   mouseBox(intToBox(self.x2 - 7, self.y1 - 22, self.x2 + 2, self.y1 - 12), MOUSE_MOVE);
 
   // this is a failsafe in case the beast of burden screen closes (from the ESC key) while moving the mouse
-  if (self.isOpen()) then
+  if self.isOpen() then
   begin
     fastClick(MOUSE_LEFT);
     wait(50 + random(50));
@@ -325,13 +324,13 @@ begin
     if (not self.isOpen()) then
     begin
       result := true;
-      break;
+      break();
     end;
 
     wait(50 + random(50));
   end;
 
-  print('beastOfBurden.close(): result = '+boolToStr(result), TDebug.SUB);
+  print('beastOfBurden.close(): result = ' + boolToStr(result), TDebug.SUB);
 end;
 
 (*
@@ -340,7 +339,7 @@ TRSBeastOfBurden.clickButton
 
 .. code-block:: pascal
 
-    function TRSBeastOfBurden.clickButton: boolean;
+    function TRSBeastOfBurden.clickButton(button: integer): boolean;
 
 Selects the take items or give items button in the beast of burden interface,
 withdrawing or depositing all possible items into your backpack or familiar
@@ -361,11 +360,13 @@ Example:
 function TRSBeastOfBurden.clickButton(button: integer): boolean;
 begin
   if (not self.isOpen()) then
-    exit;
+    exit(false);
+
   case button of
     BUTTON_GIVE_ITEMS: mouseBox([(self.x2 - 60), (self.y2 - 44), (self.x2 - 41), (self.y2 - 29)], MOUSE_LEFT);
     BUTTON_TAKE_ITEMS: mouseBox([(self.x2 - 31), (self.y2 - 44), (self.x2 - 14), (self.y2 - 29)], MOUSE_LEFT);
   end;
+
   wait(50 + random(50));
   result := true;
 end;
@@ -417,7 +418,7 @@ begin
       end;
       for i := 29 downto (maxSlots) do
         perceived.deleteIndex(i);
-      setlength(perceived, (maxSlots));
+      setlength(perceived, maxSlots);
       result := perceived;
       maximumSlots := maxSlots;
     end;
@@ -460,11 +461,12 @@ function TRSBeastOfBurden.getSlotBox(slot, slotType: integer): TBox;
 begin
   if (not self.isOpen()) then
     exit();
+
   if (slotType = SLOTS_FAMILIAR) then
   begin
     if (not inRange(slot, FAMILIAR_SLOT_LOW, maximumSlots)) then
     begin
-      print('beastOfBurden.getSlotBox(): Slot '+toStr(slot)+' is invalid', TDebug.WARNING);
+      print('beastOfBurden.getSlotBox(): Slot ' + toStr(slot) + ' is invalid', TDebug.WARNING);
       exit(intToBox(-1, -1, -1, -1));
     end;
 
@@ -474,7 +476,7 @@ begin
   begin
     if (not inRange(slot, PLAYER_SLOT_LOW, PLAYER_SLOT_HIGH)) then
     begin
-      print('beastOfBurden.getSlotBox(): Slot '+toStr(slot)+' is invalid', TDebug.WARNING);
+      print('beastOfBurden.getSlotBox(): Slot ' + toStr(slot) + ' is invalid', TDebug.WARNING);
       exit(intToBox(-1, -1, -1, -1));
     end;
 
@@ -514,7 +516,7 @@ var
   i: integer;
 begin
   for i := 0 to high(b) do
-    if (isItemIn(b[i])) then
+    if isItemIn(b[i]) then
       inc(result);
 end;
 
@@ -537,7 +539,7 @@ Example:
 
 .. code-block:: pascal
 
-    if (beastOfBurden._isSlotValid(25, SLOTS_PLAYER) then
+    if beastOfBurden._isSlotValid(25, SLOTS_PLAYER) then
       writeln('Slot 25 is a valid player slot!');
 
 *)
@@ -603,7 +605,7 @@ Example:
 
 .. code-block:: pascal
 
-   if (beastOfBurden.isFull(SLOTS_FAMILIAR)) then
+   if beastOfBurden.isFull(SLOTS_FAMILIAR) then
      writeln('Beast of burden familiar is full!');
 
 *)
@@ -620,7 +622,7 @@ begin
   end;
 
   for i := slotLow to slotHigh do
-    if (not (self.isItemInSlot(i, slotType))) then
+    if (not self.isItemInSlot(i, slotType)) then
       exit(false);
 
   result := true;
@@ -661,7 +663,7 @@ begin
     SLOTS_PLAYER: searchBox := IntToBox(self.x1 + 249, self.y1 + 31, self.x2, self.y2);
   end;
 
-  result := (not (searchBox.colorExists(ITEM_OUTLINE_BLACK)));
+  result := (not searchBox.colorExists(ITEM_OUTLINE_BLACK));
 end;
 
 (*
@@ -711,7 +713,6 @@ begin
 
   print('beastOfBurden.getCountDTM(): Counted ' + intToStr(result) + ' items');
 end;
-
 
 (*
 TRSBeastOfBurden.getCountBitmap
@@ -961,7 +962,7 @@ begin
       t := (getTickCount64() + 2000);
       while (amounts[i] = -1) and (getTickCount64() < t) do
       begin
-        if (isItemIn(b) = false) then
+        if (not isItemIn(b)) then
           break;
 
         wait(50 + random(25));
@@ -983,3 +984,5 @@ end;
 begin
   beastOfBurden.__init();
 end;
+
+{$f+}
