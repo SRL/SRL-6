@@ -2161,7 +2161,7 @@ begin
     BANK_CHEST_CW: begin col1:= [8088922, 16, [2, [0.06, 0.17, 0.00]]]; col2:= [4808312, 17, [2, [0.03, 0.17, 0.00]]]; avelen:= 90; end;
     BANK_CHEST_GROTTO: begin col1:= [6842737, 6, [2, [0.31, 0.08, 0.00]]]; col2:= [2570316, 4, [2, [0.15, 1.35, 0.00]]]; avelen:= 90; end;
     BANK_CHEST_LUMBRIDGE: begin col1:= [5599380, 7, [2, [0.10, 0.43, 0.00]]]; col2:= [10786444, 6, [2, [0.24, 0.53, 0.00]]]; avelen:= 90; end;
-    BANK_TABLE_BURTHORPE: begin col1:= [14547176, 8, [2, [1.24, 4.52, 0.00]]]; col2:= [6460329, 11, [2, [0.11, 1.29, 0.00]]]; avelen:= 90; end;
+    BANK_TABLE_BURTHORPE: begin col1:= [14478056, 4, [2, [1.29, 1.64, 0.00]]]; col2:= [6391451, 4, [2, [0.17, 0.63, 0.00]]]; avelen:= 90; end;
     BANK_CHEST_PRIFDDINAS: begin col1:= [1022461, 2, [2, [0.08, 0.83, 0.00]]]; col2:= [10350335, 3, [2, [0.75, 0.00, 0.00]]]; avelen:= 90; end;
   end;
 
@@ -2231,13 +2231,13 @@ begin
     else
       mouse(atpa[i].getMiddle().randRange(-6, 6));
 
-    if (isMouseOverText(['Open Shantay chest', 'Open S', 'pen Shant', 'n Shantay','Bank Bank', 'ank Banker', 'ank Bank', 'Use Bank', 'Bank chest'])) then
+    if isMouseOverText(['ank Gn', 'Open S', 'pen Shant', 'Bank Bank', 'ank Banker', 'ank Bank', 'Use Bank', 'Bank chest']) then
     begin
       if (random(3) = 1) then
       begin
         fastClick(MOUSE_RIGHT);
 
-        if (not chooseOption.select(['Open Shantay chest', 'Open S', 'pen Shant', 'n Shantay','Bank Bank', 'ank Banker', 'ank Bank', 'Use Bank', 'Bank chest'])) then
+        if (not chooseOption.select(['ank Gn', 'Open S', 'pen Shant', 'Bank Bank', 'ank Banker', 'ank Bank', 'Use Bank', 'Bank chest'])) then
           continue;
       end else
         fastClick(MOUSE_LEFT);
