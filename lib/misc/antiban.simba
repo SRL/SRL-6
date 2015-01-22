@@ -42,8 +42,7 @@ var
 begin
   t := gameTabs.getActiveTab();
 
-  if (t <> TAB_BACKPACK) then
-    gameTabs.openTab(TAB_BACKPACK);
+  gameTabs.openTab(TAB_BACKPACK);
 
   if (tabBackpack.count() > 0) then
   begin
@@ -61,8 +60,7 @@ begin
     wait(50 + random(3000));
   end;
 
-  if (t <> TAB_BACKPACK) then
-    gameTabs.openTab(t);
+  gameTabs.openTab(t);
 end;
 
 (*
@@ -229,7 +227,7 @@ begin
   GetMousePos(X,Y);
 
   if (X < 0) or (X > W) or (Y < 0) or (Y > H) then
-    exit;
+    exit();
 
   SetLength(B, 4);
 
@@ -497,10 +495,10 @@ begin
   // collecting full and empty inv slots
   for i := BACKPACK_SLOT_LOW to BACKPACK_SLOT_HIGH do
   begin
-    if (excludeSlots.isInArray(i)) then
+    if excludeSlots.isInArray(i) then
       continue;
 
-    if (tabBackpack.isItemInSlot(i)) then
+    if tabBackpack.isItemInSlot(i) then
     begin
       setLength(fullSlots, length(fullSlots) + 1);
       fullSlots[fullL] := i;
@@ -546,7 +544,7 @@ var
   b: TBox;
 begin
   if (not isLoggedIn()) then
-    exit;
+    exit();
 
   boxes := mainscreen.getBounds().split(30, 30);
   tia := getPixelShift(boxes, 50 + random(50));
@@ -567,7 +565,7 @@ begin
   mouseBox(b, MOUSE_MOVE);
 
   if (random(2) = 0) then
-    if (isMouseOverMenuOpen(b)) then
+    if isMouseOverMenuOpen(b) then
     begin
       fastClick(MOUSE_RIGHT);
       chooseOption.close();
@@ -644,28 +642,12 @@ begin
   print('exitTreasure(): result = ' + toStr(result), TDebug.FOOTER);
 end;
 
-
 (*
 exitSquealOfFortune
 ~~~~~~~~~~~~~~~~~~~
 
-.. code-block:: pascal
+  NOTE: This is depreciated, use exitTreasure(); instead.
 
-    function exitSquealOfFortune(): boolean;
-
-Finds and exits the annoying Treasure Chest pop up that can be dragged
-anywhere on the screen. This version kept for legacy. To be removed
-
-.. note::
-
-    - by Coh3n & Ashaman88
-    - Last Updated: 4 February 2014 by Ashaman88
-
-Example:
-
-.. code-block:: pascal
-
-    exitSquealOfFortune();
 *)
 function exitSquealOfFortune(): boolean;
 begin
@@ -724,86 +706,80 @@ end;
 findSpinTicket
 ~~~~~~~~~~~~~~
 
-.. code-block:: pascal
+  NOTE: This is depreciated, use findTicket(); instead.
 
-    function findSpinTicket(var p: TPoint): boolean;
-
-Depreciated.  Use findTicket().
-
-.. note::
-
-    - by Coh3n
-    - Last Updated: 06 February 2014 by Coh3n
-
-Example:
-
-.. code-block:: pascal
-
-    findSpinTicket(p);
 *)
+
 function findSpinTicket(var p: TPoint): boolean;
 begin
   result := findTicket(p);
 end;
 
 (*
-closeAdWindow
-~~~~~~~~~~~~~
+closePopup
+~~~~~~~~~~
 
 .. code-block:: pascal
 
-    function closeAdWindow(): boolean;
+    function closePopup(): boolean;
 
-Finds and exits the wicked hood and dwarven army axe pop up ads.
+Finds and closes most popup windows and buttons.
 
 .. note::
 
-    - by litoris
-    - Last Updated: 17 August 2013 by Coh3n
+    - by The Mayor
+    - Last Updated: 22 January 2015 by The Mayor
 
 Example:
 
 .. code-block:: pascal
 
-    closeAdWindow();
+    closepopup();
 *)
-function closeAdWindow(): boolean;
+function closePopup(): boolean;
 var
-  x, y, wid, hei, i: integer;
-  bmps: array [0..1] of integer;
+  i, x, y: Integer;
+  DTMs: Array [0..2] of Integer;
 begin
-  getClientDimensions(wid, hei);
+  DTMs :=           // Low level achievement popups
+    [DTMFromString('mbQAAAHicY2VgYGBmYmD4y8jAwMkEwSC2PVDcEopdofjPFlOGTB52MLYE' +
+                    'qgFhEOBnQAWMWDAYAAD0gAa9'),
 
-  // red cross color
-  if (not findColorTolerance(x, y, 725899, 0, 0, wid - 1, hei - 1, 25)) then
-    exit(false);
+                    // "Task Complete" popups
+     DTMFromString('mbQAAAHicY2VgYNjHyMBwBIgPA/FOKPYAijsDsT8UOwHx1/0ODE9SvBga' +
+                   'WBjAeJMUM4MkUFwEDTNiwWAAACbVCvg='),
 
-  bmps[0] := BitmapFromString(15, 15, 'meJxjYMACuIW7sQljATyik/kk5w' +
-             'BJIlXySy4gqB5oO1ABj/BsoEpB6UVAEpd7ZFSmBM+57dRyBqJFTG4' +
-             'ekB04+xqXYDOmmRqG8wMnXcu69A+iHkgC2fZNp4BsZPOBeoFcGeXZ' +
-             'ptYL3fuuhh7/67b8OZA0qT0FsQVIQszn4M2GKAapV5kCVG81/6X9r' +
-             'r+mc55yCVTBpYAMoEqgek7eUoigiFS3Yv4pjbW/Vac8A5LSWYc5eC' +
-             'u5+JvBKivhLgGqB6qUzTklsvCXcPJRedV+xaKzQDZ/wl6gFBCh+VF' +
-             'RtUm07Bp3LMg0Eck2I9Mp4hknOLPPsXFmYw09adlaoEp2HhCSlG4C' +
-             'aoe4ExcAmsPOVQRBuMxEBqxsyUBlQJKgSghgZgnGKg4Aa3dqTg==');
+                    // Generic Yellow Buttons
+     DTMFromString('mggAAAHicY2NgYFBiY2AQA2J9IDYHYl4gVgbi+4wMDJeh+D4UvwZiEPjz' +
+                   'sAWMf+0yZvi13ZBhkjdEQhILZsSBIQAA2QQQGQ==')];
 
-  bmps[1] := BitmapFromString(8, 8, 'meJzj5Ing4K9FR9zhQDLl6i+runMQ' +
-        'ESADyEVmA0k4A64RyLY++heIkAWBSDzrOEQcyEAWlFz/B0jCGUBBH' +
-        'vMlcDZcDVCQS6AYSCKbCRLkLwQApS1D+w==');
 
-  for i := 0 to high(bmps) do
-    if (findBitmapToleranceIn(bmps[i], x, y, 0, 0, wid - 1, hei - 1, 5)) then
+  for i := 0 to high(DTMs) do
+    if findDTM(DTMs[i], x, y, getClientBounds())  then
     begin
-      mouse(point(x, y).rand(3), MOUSE_LEFT);
+      mouse(x + 3, y + 3, 3, 3, MOUSE_LEFT);
+      wait(randomRange(1500, 2500));
       result := true;
     end;
 
-  freeBitmaps(bmps);
+  freeDTMs(DTMs);
+end;
+
+(*
+closeAdWindow
+~~~~~~~~~~~~~
+
+  NOTE: This is depreciated, use closePopup(); instead.
+
+*)
+function closeAdWindow(): boolean;
+begin
+  result := closePopup();
 end;
 
 (*
 closePollButton
-~~~~~~~~~~~~~
+~~~~~~~~~~~~~~~
 
 .. code-block:: pascal
 
@@ -935,16 +911,10 @@ var
   t: integer;
 begin
   t := gameTabs.getActiveTab();
-
-  if (t <> TAB_STATS) then
-    gameTabs.openTab(TAB_STATS);
-
+  gameTabs.openTab(TAB_STATS);
   mouseBox(tabStats.getSkillBox(skill), MOUSE_MOVE);
-
   wait(50 + random(4500));
-
-  if (t <> TAB_STATS) then
-    gameTabs.openTab(t);
+  gameTabs.openTab(t);
 end;
 
 (*
@@ -969,20 +939,8 @@ Example:
     hoverSkill(SKILL_ATTACK);
 *)
 procedure hoverRandomSkill();
-var
-  t: integer;
 begin
-  t := gameTabs.getActiveTab();
-
-  if (t <> TAB_STATS) then
-    gameTabs.openTab(TAB_STATS);
-
-  mouseBox(tabStats.getSkillBox(randomRange(SKILL_ATTACK, SKILL_COUNT-1)), MOUSE_MOVE);
-
-  wait(50 + random(4500));
-
-  if (t <> TAB_STATS) then
-    gameTabs.openTab(t);
+  hoverSkill(randomRange(SKILL_ATTACK, SKILL_COUNT-1));
 end;
 
 (*
@@ -1061,9 +1019,7 @@ var
   b: TBox;
 begin
   t := gameTabs.getActiveTab();
-
-  if (t <> TAB_FRIENDS) then
-    gameTabs.openTab(TAB_FRIENDS);
+  gameTabs.openTab(TAB_FRIENDS);
 
   if (findColorsTolerance(tpa, 5301219, gameTabs.tabArea, 10, colorSetting(2, 0.02, 2.76))) then
   begin
@@ -1087,8 +1043,7 @@ begin
     end;
   end;
 
-  if (t <> TAB_FRIENDS) then
-    gameTabs.openTab(t);
+  gameTabs.openTab(t);
 end;
 
 (*
@@ -1168,13 +1123,13 @@ Example:
 function claimTicket(): boolean;
 var
   p: TPoint;
-  t: LongWord;
+  t: UInt64;
 begin
-  if (findTicket(p)) then
+  if findTicket(p) then
   begin
     tabBackpack.mouseSlot(tabBackpack.pointToSlot(p), MOUSE_LEFT);
 
-    t := (getSystemTime() + randomRange(2000, 3000));
+    t := (getTickCount64() + randomRange(2000, 3000));
     repeat
       if not (tabBackpack.isItemInSlot(tabBackpack.pointToSlot(p))) then
         result := true;
@@ -1183,10 +1138,10 @@ begin
         break;
 
       wait(20 + random(20));
-    until (getSystemTime() >= t) or (result);
+    until (getTickCount64() >= t) or result;
   end;
 
-  if (result) then
+  if result then
   begin
     print('claimTicket(): Successfully claimed spin ticket', TDebug.SUB);
     wait(200 + random(400))
@@ -1199,23 +1154,8 @@ end;
 claimSpinTicket
 ~~~~~~~~~~~~~~~
 
-.. code-block:: pascal
+  NOTE: This is depreciated, use claimTicket(); instead.
 
-    function claimSpinTicket(): boolean;
-
-Claims a spin tick if found in the backpack.
-Temporary to be replaced with claimTicket.
-
-.. note::
-
-    - by Olly
-    - Last Updated: 4 February 2014 by Ashaman88
-
-Example:
-
-.. code-block:: pascal
-
-    claimSpinTicket();
 *)
 function claimSpinTicket(): boolean;
 begin
