@@ -2161,7 +2161,7 @@ begin
     BANK_CHEST_CW: begin col1:= [8088922, 16, [2, [0.06, 0.17, 0.00]]]; col2:= [4808312, 17, [2, [0.03, 0.17, 0.00]]]; avelen:= 90; end;
     BANK_CHEST_GROTTO: begin col1:= [6842737, 6, [2, [0.31, 0.08, 0.00]]]; col2:= [2570316, 4, [2, [0.15, 1.35, 0.00]]]; avelen:= 90; end;
     BANK_CHEST_LUMBRIDGE: begin col1:= [5599380, 7, [2, [0.10, 0.43, 0.00]]]; col2:= [10786444, 6, [2, [0.24, 0.53, 0.00]]]; avelen:= 90; end;
-    BANK_TABLE_BURTHORPE: begin col1:= [14478056, 4, [2, [1.29, 1.64, 0.00]]]; col2:= [6391451, 4, [2, [0.17, 0.63, 0.00]]]; avelen:= 90; end;
+    BANK_TABLE_BURTHORPE: begin col1:= [14609385, 5, [2, [1.07, 1.41, 0.00]]]; col2:= [6457502, 5, [2, [0.15, 0.56, 0.00]]]; avelen:= 90; end;
     BANK_CHEST_PRIFDDINAS: begin col1:= [2729983, 12, [1, [0.07, 0.00, 0.00]]]; col2:= [7528447, 16, [2, [0.24, 0.00, 0.00]]]; avelen:= 90; end;
   end;
 
