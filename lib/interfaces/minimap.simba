@@ -1787,14 +1787,28 @@ begin
         color := 2574498;
       end;
 
-    MM_SYMBOL_WHEEL:
+    MM_SYMBOL_WHEEL: // 27 January 2015
       with result do
       begin
         name := 'Spinning Wheel';
-        bmp := BitmapFromString(15, 5, 'beNpjYGRgYDwABtn' +
-          '+gvPnz28I1wGygSQaG8gAqoQoDrIQAJIQQbgauMiEWGs0xenWokAE0QVXD0dA' +
-          'XciK58MAUAvIVcHaEJMh7kFWDAQQNZgk3D0MAH8HZ/A=');
-        color := -1;
+        bmp := BitmapFromString(14, 20, 'meJxjYEABS/vq3x9d+/bI2qW9tQ' +
+        'w4QG1u8tWNc+9um1+bGg5ET7bNvbZxdl1OIrKa9csWPDu05t2BFUt' +
+        'bixSkJdhYWIBIUVpieXvJh0Ornh5cs27xHKCyJb21Lw6sPDa/K9LL' +
+        'UUpGzsLRK7miPam8DciQlpFL8HU+Pr/rzf5lx1fPfn9oZVdBopayv' +
+        'IaecWnfwuzmqUnVvQkV3UBGUc98ZW1DoNTE0rQ3e5e83rPYykBLWF' +
+        'S0sGtOw6Ld+tauZk5eQGRs61a3cHd6y0whEVE7Y91Xuxe93L3QUl9' +
+        'Tx8w2rWm6iaNP67IDsbmVEZnldUsOAbmpjdM0DSyAKl/sXPB021xL' +
+        'PY3o/NrY0g4VXWPfuJz6xfvqF+1zjcxU1TWOL+vwT6+2MdJ5snXO4' +
+        '82zrAw0I/ObEupnesXlJtVOzOtfmdO3MqqsF8hNaZrln1lnb6L3aN' +
+        'PMhxum2xnpmDn7Rpd165hYJ7UsDCvuAiIgQ9fUJqKk28TR18nc8P6' +
+        '6qXfWTAaqlJFTyOlbnTNhg5GDl6mTLxABGUXTtqR3rZSWlXc0M7iz' +
+        'etK9NZPTAt00VVXMXQKTO5Y7haR4xmR7RmcBGckdK8xcgzRVlDJDv' +
+        'W+u6F/ZlH92dsv0igw/RysLJx/vlKqoyimRFZOBDHMnXz9n+5lVWW' +
+        'fmtC6uywFGU36k35kZDUem1ueGesnJK2rrGQARkFEYHXh0RtPJaXW' +
+        '5Yd7Isb+4KuPo5Gp1VRUVZSUgAjJOzWyaW5aKNTntn1RXnxCkqqwE' +
+        'RG3ZsWsacnElvAXt1Uf6yu1NDRwtTE5Mb8gN9cSlEghOT64BGtuSE' +
+        'X2svwyPMiDozY452Ft2oKesLs4fv0og2NVesKE2HVMcAF/BCX4=');
+        color := 7048357;
       end;
 
     MM_SYMBOL_GUIDE:
@@ -2211,13 +2225,27 @@ begin
         color := -1;
       end;
 
-    MM_SYMBOL_AGILITY:
+    MM_SYMBOL_AGILITY: // 27 January 2015
       with result do
       begin
         name := 'Agility';
-        bmp := BitmapFromString(15, 5, 'beNpjYGRgYDwABkAGEM2fPx' +
-          '+NAWHDFRyAAbgssgIIA1Mxsnq4GjyK0czHFMcUmQ8G6I4EAIrAWyc=');
-        color := -1;
+        bmp := BitmapFromString(14, 18, 'meJxjYAADRkYgwcTEtHLWxN0blu' +
+        'cdvuly5B0TCytUihEEGGCAhZ0jZdn2msVrsirKPVcfUpp/KaKxn4m' +
+        'NHaSWiQliDpBk5+SM6pnpvOqsy/Yb1ie/Ol3+bbT6WnNLU/y0lRDT' +
+        'GCEmMzFN7GjKWrU/vTgvJtJTZ/F5x/M/LPa81O/f6rV4f3JlPdhyR' +
+        'mYWltWzJ21Yuzxy7rqSdL/8aHurTbf01t9xzytW6NriNWXN6vnT18' +
+        '6bCjR25axJJzcsWtRe3Jjk0JxoE1VSYLXnheHco/EBlkURljVxNkv' +
+        'bi4AKVs6edHLjkmVdZW1J1p0pNjXRZo5Ljtkdfme29ZFqz9bkaPeW' +
+        'RKv2FHugAqCydXMnLWrN6ki1a0+2yQ23MVl/U6t7o/v8nXabbhu2L' +
+        'MqPcWhPsQUqACoD+n37wmlL2vOqIs1CstMd9r7SjMxPjXYLTEuyXH' +
+        'Y2MDluUWvujkXT+AQEWVjZmJiZ5/Q0JSzY6nL4g2Tt4ugIj7poi1w' +
+        '/A4tl54OrOtfN6GZhZWVhY+cWFIYHvnlpf0KAZWWEaX2MGZCMKiwG' +
+        'hiDQKFBAMrOwc3LBY2pWR930qsS6GIuGGIs5tUn9Hc2QAAdFEDMzF' +
+        'y8fJLKAoL22bPuc3rl1qUAEZDRXlUBjBxjXLKwcPLxwldNbKlf21O' +
+        '9eNBmIVvXUT2kohauE2A7hAtU3lhcu7aieWJE7uTIXyCjJSEAkD2Z' +
+        'mJiZmIBsSs0DGks6anIiArHD/xR3VkMQD9wXQWLjtQNHG0vwpdcVA' +
+        'VJgay4iqEjmJAnlAPK+pbEFLBZogEAAAW17b9g==');
+        color := 4379643;
       end;
 
     MM_SYMBOL_TRAINING_DUMMY: // 12 October 2014
