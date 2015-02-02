@@ -1129,9 +1129,38 @@ begin
   result := chooseOption.select(['Set quick-inventory '+ s, 'ventory ' + s], 300);
 end;
 
+(*
+TRSTabBackpack.isLocked
+~~~~~~~~~~~~~~~~~~~~~~~
+
+.. code-block:: pascal
+
+    function TRSTabBackpack.isLocked(): boolean;
+
+Returns true if the backpack is locked (i.e. after closing the bank)
+.. note::
+
+    - by Olly
+    - Last Updated: 2nd February 2015 by The Mayor
+
+Example:
+
+.. code-block:: pascal
+
+   if tabBackpack.isLocked() then
+     writeLn('It''s locked');
+
+*)
 function TRSTabBackpack.isLocked(): boolean;
+var
+  i: Integer;
+  b: TBox := self.getBounds();
 begin
-  result := (getColor(gameTabs.tabArea.x1 + 92, gameTabs.tabArea.y2 -35) = 1906963);
+  if gameTabs.areMultiOpen() then
+    i := 27;
+
+  b.edit(10, 8 + i, -10, -282 + i);
+  result := (pos('CURRENTLY', upperCase(tesseract_GetText(b, TESS_FILTER_SMALL_CHARS))) > 0)
 end;
 
 (*
@@ -1140,34 +1169,36 @@ TRSTabBackpack.waitWhileLocked
 
 .. code-block:: pascal
 
-    procedure TRSTabBackpack.waitWhileLocked();
+    function TRSTabBackpack.waitWhileLocked(maxWait: integer = 10000): boolean;
 
 Waits while the backpack tab is locked
 
 .. note::
 
     - by Olly
-    - Last Updated: 26 November 2013 by Olly
+    - Last Updated: 2nd February 2015 by The Mayor
 
 Example:
 
 .. code-block:: pascal
 
-   tabBackpack.waitWhileLocked();
+   tabBackpack.waitWhileLocked(5000);
 *)
-procedure TRSTabBackpack.waitWhileLocked();
+function TRSTabBackpack.waitWhileLocked(maxWait: integer = 10000): boolean;
 var
   t: LongWord;
 begin
-  t := (getSystemTime() + 10000);
+  t := (getSystemTime() + maxWait);
 
   if (not self.isLocked()) then
-    exit();
+    exit(true);
 
   while (self.isLocked()) and (t > getSystemTime()) do
+  begin
     wait(50 + random(50));
-
-  print('TRSBackpack.waitUnlocked(): Backpack is now unlocked');
+    if (not self.isLocked()) then
+      exit(true);
+  end;
 end;
 
 begin
