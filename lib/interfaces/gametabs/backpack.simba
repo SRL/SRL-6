@@ -1141,7 +1141,7 @@ Returns true if the backpack is locked (i.e. after closing the bank)
 .. note::
 
     - by Olly
-    - Last Updated: 2nd February 2015 by The Mayor
+    - Last Updated: 4th February 2015 by The Mayor
 
 Example:
 
@@ -1153,14 +1153,17 @@ Example:
 *)
 function TRSTabBackpack.isLocked(): boolean;
 var
-  i: Integer;
   b: TBox := self.getBounds();
 begin
-  if gameTabs.areMultiOpen() then
-    i := 27;
+  b.edit(168, 8, -10, -282);
 
-  b.edit(10, 8 + i, -10, -282 + i);
-  result := (pos('CURRENTLY', upperCase(tesseract_GetText(b, TESS_FILTER_SMALL_CHARS))) > 0)
+  for 0 to 1 do
+  begin
+    if (pos('ble', tesseract_GetText(b, TESS_FILTER_SMALL_CHARS)) > 0) then
+      exit(true);
+    b.edit(0, 27, 0, 27);
+  end;
+
 end;
 
 (*
@@ -1176,7 +1179,7 @@ Waits while the backpack tab is locked
 .. note::
 
     - by Olly
-    - Last Updated: 2nd February 2015 by The Mayor
+    - Last Updated: 4th February 2015 by The Mayor
 
 Example:
 
@@ -1186,16 +1189,16 @@ Example:
 *)
 function TRSTabBackpack.waitWhileLocked(maxWait: integer = 10000): boolean;
 var
-  t: LongWord;
+  timeOut: UInt64;
 begin
-  t := (getSystemTime() + maxWait);
+  timeOut := (getTickCount64() + maxWait);
 
   if (not self.isLocked()) then
     exit(true);
 
-  while (self.isLocked()) and (t > getSystemTime()) do
+  while (timeOut > GetTickCount64()) do
   begin
-    wait(50 + random(50));
+    wait(150 + random(50));
     if (not self.isLocked()) then
       exit(true);
   end;
