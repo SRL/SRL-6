@@ -686,7 +686,7 @@ Example:
      writeln('our bankscreen pack is full!');
 
 *)
-function TRSBankScreen.isPackFull: boolean;
+function TRSBankScreen.isPackFull(): boolean;
 var
   i: integer;
 begin
@@ -713,7 +713,7 @@ Returns true if our bankscreen pack is empty.
 .. note::
 
     - by Olly
-    - Last Updated: 02 January 2013 by Ashaman88
+    - Last Updated: 5 February 2015 by HKbotz
 
 Example:
 
@@ -723,12 +723,12 @@ Example:
      writeln('our bankscreen pack is empty!');
 
 *)
-function TRSBankScreen.isPackEmpty: boolean;
+function TRSBankScreen.isPackEmpty(): boolean;
 begin
   if (not self.isOpen()) then
     exit(false);
 
-  result := (not (self.getBounds().colorExists(ITEM_OUTLINE_BLACK)));
+  result := (not self.getPackSlotBoxes().getBounds().colorExists(ITEM_OUTLINE_BLACK));
 end;
 
 (*
