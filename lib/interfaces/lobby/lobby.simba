@@ -191,7 +191,7 @@ lobby interface to change.
 .. note::
 
     - by Coh3n & Olly
-    - Last updated: 29th July by Ashaman88
+    - Last updated: 8th February 2015 by The Mayor
 
 Example:
 
@@ -208,12 +208,12 @@ begin
   result := false;
   getClientDimensions(width, height);
 
-  if (findColorsTolerance(tpa, 3850483, 0, 0, width -1, height -1, 10)) then
+  if findColorsTolerance(tpa, 3850483, 0, 0, width -1, height -1, 10) then
   begin
     atpa := tpa.cluster(30, 10);
 
     for i := 0 to high(atpa) do
-      if (inRange(length(atpa[i]), 280, 375)) then
+      if inRange(atpa[i].getBounds().getWidth(), 140, 160) then
       begin
         res := atpa[i].getMiddle();
         result := true;

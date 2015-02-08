@@ -244,7 +244,7 @@ after the tab is clicked to compensate for lag.
 .. note::
 
     - by Bionicle1800 & Coh3n
-    - Last Updated: 8th August 2014 by The Mayor
+    - Last Updated: 8th February 2015 by The Mayor
 
 Example:
 
@@ -255,26 +255,23 @@ Example:
 *)
 function TRSLobbyWorlds.open(): boolean;
 var
-  yellow, white: integer;
+  cols: array [0..1] of integer := [635358, 14737374]; // Yellow/White
+  i, count: integer;
   t : LongWord;
-  p: TPoint;
 begin
   result := lobby.openTab(self.lobbyID);
 
   if (not self.isOpen()) then
-    exit(false);
-
-  // needed to compensate for lag
-  if (result) then
-  begin
+    exit(false)
+  else begin  // needed to compensate for lag
     t := (getSystemTime() + randomRange(7500, 11000));
 
     while (getSystemTime() < t) do
     begin
-      yellow := countColor(379903, self.worldNumArea);
-      white := countColor(16777215, self.worldNumArea);
+      for i := 0 to high(cols) do
+        count += countColorTolerance(cols[i], self.worldNumArea, 63);
 
-      if ((white + yellow) > 80) then
+      if (count > 80) then
         exit(true);
 
       wait(50);
