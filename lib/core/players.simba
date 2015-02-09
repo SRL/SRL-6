@@ -1478,13 +1478,13 @@ TPlayer.switchToWorld
 
     function TPlayer.switchToWorld(newWorld: integer = 0): boolean;
 
-Switches the TPlayer to the new world (newWorld). Returns true if successful. Will
-choose a random world by default.
+Switches the TPlayer to the new world (newWorld) via the ingame hop menu. Returns true if successful.
+Will choose a random world by default.
 
 .. note::
 
-    - by Coh3n
-    - Last updated: 22 June 2013 by Coh3n
+    - by Clarity
+    - Last updated: 09 February 2015 by Clarity
 
 Example:
 
@@ -1493,23 +1493,78 @@ Example:
     players[currentPlayer].switchToWorld(115);
 *)
 function TPlayer.switchToWorld(newWorld: integer = 0): boolean;
+var
+  t: UInt64;
+  x, y, interfaceBMP, loadingBMP: integer;
 begin
   result := false;
 
   print('Switching to world '+toStr(newWorld), TDebug.SUB);
 
-  if (self.exitToLobby()) then
+  if (options.open()) then
   begin
+    options.selectOption(['Hop','op wor', 'orlds']);
+
+    interfaceBMP := BitmapFromString(34, 3, 'meJxjPf2fZepudnYRMSkXKRkfIBI' +
+        'StmYFCm64y8LKJyziBERAEaAskASyefwqWPe+Aypgm34YIghRD0Ib' +
+        '77NvfsbVuFFI2A4oxQo2mY1dCKgLwmZh4QeygVaANCr4QwSZmTkhh' +
+        'kDMByKIsTxqHixT94CMdU8UlfKGumrqbgYGBiYBCebgbA4uObjJQP' +
+        'fDFQBt4ROwEpW0AcryBTYCBZlcQiHOgPgFwgBK8fNZARn8Mo4gNfH' +
+        'lvLw6cENYWQWAzuDjNeMV0IX7BSIIAJXwTpk=');
+
+    t := (getTickCount64() + (7000));
+
+    while (not result) and (getSystemTime() < t) do
+    begin
+      print('Waiting for world hop screen...', TDebug.SUB);
+      result := findBitmapIn(interfaceBMP, x, y, mainscreen.getBounds());
+      wait(700 + random(300));
+    end;
+
+    if (not findBitmapIn(interfaceBMP, x, y, mainscreen.getBounds())) then
+    begin
+      print('Hop screen never opened!', TDebug.ERROR);
+      freeBitmap(interfaceBMP);
+      exit(false);
+    end;
+
     self.world := -1;
 
     if (newWorld = 0) then
-      result := lobbyWorlds.selectRandomWorld(self.isMember);
+      result := lobbyWorlds.selectRandomWorld(self.isMember, true, [], true)
+    else
+      result := lobbyWorlds.selectWorld(newWorld, true);
 
-    if (not result) then
-      result := lobbyWorlds.selectWorld(newWorld);
+    if result then
+    begin
+      wait(150 + random(450));
+      mouseBox(lobbyWorlds.confirmButton, MOUSE_LEFT, MOUSE_HUMAN);
 
-    if (result) then
-      result := self.login();
+      t := (getTickCount64() + (30000));
+      result := false;
+
+      loadingBMP := BitmapFromString(53, 4, 'meJyTFRMStQ5kmvmeP7xRWl5JVkw' +
+          'IiDhqDzAs+g9HbG0XIOJwBFQA1CXoV8iXOIGl/z5QI5ABNAEiCxSH' +
+          'myCpaQQUAaqBMNDYxCOg4UBHAi0FsrmKNwi7JuJRDJTlyVoAdLa4k' +
+          'SNQI0Qv3BygdqA4kA1UQLnzIE6CWAr0NUQEHmJAo7CaBnQPxEnAoE' +
+          'MOYaAJEK8BdWENPYJ+xww3eDxCfA2JIIgI0GS4IFr8AgMQHiDwmAU' +
+          'qhmsEuh/iKngwQpwNFIfoBSpDI9EQADOKhy8=');
+
+      wait(2000 + random(1500));
+
+      while (not result) and (getSystemTime() < t) do
+      begin
+        print('Waiting for world to switch...', TDebug.SUB);
+        result := not findBitmapIn(loadingBMP, x, y, mainscreen.getBounds());
+        wait(1000 + random(500));
+      end;
+
+      wait(1000 + random(1500));
+      print('Hopped to world ' + toStr(newWorld) + ' successfully.', TDebug.SUB);
+      self.world := newWorld;
+      freeBitmap(loadingBMP);
+    end;
+    freeBitmap(interfaceBMP);
   end;
 end;
 
