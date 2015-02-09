@@ -2,7 +2,7 @@
 Worlds
 ======
 
-The worlds file is used to represent the world tab interface in the RS lobby. It
+The worlds file is used to represent the world tab interface in the RS lobby and ingame. It
 stores the functions needed to switch players between servers.
 
 The source for this file can be found `here <https://github.com/SRL/SRL-6/blob/master/lib/interfaces/lobby/worlds.simba>`_.
@@ -67,7 +67,7 @@ type
   TRSLobbyWorlds = record(TRSInterface)
     lobbyID: integer;
     worlds: array of __TRSWorld;
-    worldNumArea, worldFavArea: TBox;
+    worldNumArea, worldFavArea, hopNumArea, hopScrollArea, confirmButton: TBox;
   end;
 
 (*
@@ -149,7 +149,7 @@ Initiates the TRSLobbyWorlds variable.  Called at the end of this file.
 .. note::
 
     - by Coh3n
-    - Last Updated: 26 June 2013 by Coh3n
+    - Last Updated: 09 February 2015 by Clarity
 
 Example:
 
@@ -171,6 +171,9 @@ begin
     __loadFromINI();
     worldNumArea := [x1 + 35, y1 + 125, x1 + 100, y2 - 62];
     worldFavArea := [x1 + 538, y1 + 429, x2 - 42, y2 - 18];
+    hopNumArea := [x1 + 44, y1 - 29, x1 + 106, y2 - 268];
+    hopScrollArea := [x1 + 44, y1 - 29, x1 + 475, y2 - 268];
+    confirmButton := [x1 + 98, y1 + 155, x1 + 225, y2 - 305];
   end;
 end;
 {$ENDIF}
@@ -320,14 +323,14 @@ TRSLobbyWorlds.getCurrentWorld
 
 .. code-block:: pascal
 
-    function TRSLobbyWorlds.getCurrentWorld(): integer;
+    function TRSLobbyWorlds.getCurrentWorld(ingame: boolean = false): integer;
 
 Returns the currently selected world.
 
 .. note::
 
     - by Home & Coh3n
-    - Last Updated: 8th August 2014 by The Mayor
+    - Last Updated: 09 February 2015 by Clarity
 
 Example:
 
@@ -336,14 +339,19 @@ Example:
     if (not lobbyWorlds.getCurrentWorld() = 115) then
       lobbyWorlds.selectWorld(115);
 *)
-function TRSLobbyWorlds.getCurrentWorld(): Integer;
+function TRSLobbyWorlds.getCurrentWorld(ingame: boolean = false): Integer;
 var
   TPA: TPointArray;
-  Box: TBox;
+  Box, search: TBox;
 begin
   Result := -1;
-  if (not Self.isOpen()) then
+  if (not Self.isOpen()) and (not ingame) then
     Exit();
+
+  if ingame then
+    search := self.hopScrollArea
+  else
+    search := self.getBounds();
 
   if (FindColors(TPA, 3088905, Self.getBounds())) then
   begin
@@ -484,7 +492,7 @@ TRSLobbyWorlds._findWorldNumber
 
 .. code-block:: pascal
 
-    function TRSLobbyWorlds._findWorldNumber(var res: TPoint; wo: integer): boolean;
+    function TRSLobbyWorlds._findWorldNumber(var res: TPoint; wo: integer; ingame: boolean = false): boolean;
 
 Searches for the text of the world 'wo'. Returns true if found. Returns it's
 coordinates in 'res'.
@@ -492,7 +500,7 @@ coordinates in 'res'.
 .. note::
 
     - by Coh3n
-    - Last Updated: 9th August 2014 by The Mayor
+    - Last Updated: 09 February 2015 by Clarity
 
 Example:
 
@@ -501,7 +509,7 @@ Example:
     if (lobbyWorlds._findWorldNumber(p, 115)) then
       mouse(p.rand(5), MOUSE_LEFT);
 *}
-function TRSLobbyWorlds._findWorldNumber(var res: TPoint; wo: integer): boolean;
+function TRSLobbyWorlds._findWorldNumber(var res: TPoint; wo: integer; ingame: boolean = false): boolean;
 const
   Colors = [827845, 13093322];
   fFilter: TTesseractFilter = [4, 4, [False, 20, TM_Mean]];
@@ -516,11 +524,15 @@ var
   TPA: TPointArray;
   ATPA: T2DPointArray;
   i, j, n: Integer;
-  b: TBox;
+  b, search: TBox;
 begin
 
+  if ingame then
+    search := self.hopNumArea
+  else search := self.worldNumArea;
+
   for i := 0 to High(Colors) do
-    if (FindColorsTolerance(TPA, Colors[i], self.worldNumArea, 100, ColorSetting(1))) then
+    if (FindColorsTolerance(TPA, Colors[i], search, 100, ColorSetting(1))) then
     begin
       ATPA := ClusterTPAEx(TPA, 10, 4);
 
@@ -558,7 +570,7 @@ TRSLobbyWorlds._scrollToWorld
 
 .. code-block:: pascal
 
-    function TRSLobbyWorlds._scrollToWorld(var res: TPoint; wo: integer): boolean;
+    function TRSLobbyWorlds._scrollToWorld(var res: TPoint; wo: integer; ingame: boolean = false): boolean;
 
 Uses mouseScroll to find the world 'wo'.  Returns it's coordinates in 'res'.
 Function is internal.  Use TRSLobbyWorlds.selectWorld instead.
@@ -566,7 +578,7 @@ Function is internal.  Use TRSLobbyWorlds.selectWorld instead.
 .. note::
 
     - by Coh3n
-    - Last Updated: 9th October 2014 by Clarity
+    - Last Updated: 09 February 2015 by Clarity
 
 Example:
 
@@ -575,38 +587,53 @@ Example:
     if (lobbyWorlds._scrollToWorld(p, 115)) then
       mouse(p, MOUSE_LEFT);
 *}
-function TRSLobbyWorlds._scrollToWorld(var res: TPoint; wo: integer): boolean;
+function TRSLobbyWorlds._scrollToWorld(var res: TPoint; wo: integer; ingame: boolean = false): boolean;
 const
   __COLOR_SCROLL_BAR = 3455991;
+  __COLOR_SCROLL_BAR_INGAME = 1610968;
 var
-  favs, modY2: integer;
+  favs, lobbyModY2, ingameModX, ingameModY1, ingameModY2, colorCheck: integer;
   t: LongWord;
   down: boolean;
   p: TPoint;
 begin
-  if (not self.isOpen()) then
+  if (not self.isOpen()) and (not ingame) then
     exit(false);
 
-  p := self.getCenterPoint().rand(randomRange(-200, 200), randomRange(-50, 50));
+  if ingame then
+  begin
+    p := middleBox(self.hopScrollArea).rand(randomRange(-150, 150), randomRange(-40, 40));
+    ingameModX := -233;
+    ingameModY1 := -176;
+    ingameModY2 := -213;
+    colorCheck := __COLOR_SCROLL_BAR_INGAME;
+  end else
+  begin
+    p := self.getCenterPoint().rand(randomRange(-200, 200), randomRange(-50, 50));
+    colorCheck := __COLOR_SCROLL_BAR;
+  end;
+
   t := (getSystemTime() + 20000);
 
-  favs := self._getFavoriteCount();
-
-  case favs of
-    0: modY2 := 0;
-    1: modY2 := 20;
-    2: modY2 := 35;
-    3: modY2 := 54;
+  if (not ingame) then
+  begin
+    favs := self._getFavoriteCount();
+    case favs of
+      0: lobbyModY2 := 0;
+      1: lobbyModY2 := 20;
+      2: lobbyModY2 := 35;
+      3: lobbyModY2 := 54;
+    end;
   end;
 
   repeat
-    if (self._findWorldNumber(res, wo)) then
+    if (self._findWorldNumber(res, wo, ingame)) then
       break;
 
-    if (getColor(self.x2 - 25, self.y2 - 308 + modY2) = __COLOR_SCROLL_BAR) then
+    if (getColor(self.x2 - 25 + ingameModX, self.y2 - 308 + lobbyModY2 + ingameModY1) = colorCheck) then
       down := true;
 
-    if (getColor(self.x2 - 25, self.y2 - 79) = __COLOR_SCROLL_BAR) then
+    if (getColor(self.x2 - 25 + ingameModX, self.y2 - 79 + ingameModY2) = colorCheck) then
       down := false;
 
     mouseScroll(p, 4 + random(3), down);
@@ -615,7 +642,7 @@ begin
   until(getSystemTime() > t);
 
   Wait(Random(200, 300));
-  Result := self._findWorldNumber(res, wo);
+  Result := self._findWorldNumber(res, wo, ingame);
 end;
 
 (*
@@ -624,7 +651,7 @@ TRSLobbyWorlds.selectWorld
 
 .. code-block:: pascal
 
-    function TRSLobbyWorlds.selectWorld(wo: integer): boolean;
+    function TRSLobbyWorlds.selectWorld(wo: integer; ingame: boolean = false): boolean;
 
 Selects the world 'wo'.  Will open the worlds interface and scroll if needed.
 Does NOT log the player in.  Will just click the world on the list.
@@ -632,7 +659,7 @@ Does NOT log the player in.  Will just click the world on the list.
 .. note::
 
     - by Narcle, ZephyrsFury, Ashaman88, and Coh3n
-    - Last Updated: 9th October 2014 by Clarity
+    - Last Updated: 09 February 2015 by Clarity
 
 Example:
 
@@ -640,7 +667,7 @@ Example:
 
     lobbyWorlds.selectWorld(115);
 *)
-function TRSLobbyWorlds.selectWorld(wo: integer): boolean;
+function TRSLobbyWorlds.selectWorld(wo: integer; ingame: boolean = false): boolean;
 var
   p: TPoint;
   tpa: TPointArray;
@@ -649,7 +676,7 @@ begin
   result := false;
 
   // make sure the worlds screen is open
-  if (not self.isOpen()) then
+  if (not self.isOpen()) and (not ingame) then
     if (not self.open()) then
       exit(false);
 
@@ -660,7 +687,7 @@ begin
   print('TRSLobbyWorlds.selectWorld()', TDebug.HEADER);
 
   // check to see if we're already on the right world
-  if (self.getCurrentWorld() = wo) then
+  if (self.getCurrentWorld(ingame) = wo) then
   begin
     print('Already on world '+toStr(wo));
     result := true;
@@ -669,10 +696,10 @@ begin
   if (not result) then
   begin
     p := [-1, -1];
-    if (self._findWorldNumber(p, wo)) then // check to see if the worlds already visible (or if it's favorited)
+    if (self._findWorldNumber(p, wo, ingame)) then // check to see if the worlds already visible (or if it's favorited)
       print('Found world '+toStr(wo))
     else
-      if (self._scrollToWorld(p, wo)) then
+      if (self._scrollToWorld(p, wo, ingame)) then
         print('Scrolled to and found world '+toStr(wo));
 
     if (not p.isInvalid()) then
@@ -692,7 +719,7 @@ TRSLobbyWorlds.selectRandomWorld
 
 .. code-block:: pascal
 
-    function TRSLobbyWorlds.selectRandomWorld(members: boolean; standardAvoid: boolean = true; personalAvoid: TIntegerArray = [0]): boolean;
+    function TRSLobbyWorlds.selectRandomWorld(members: boolean; standardAvoid: boolean = true; personalAvoid: TIntegerArray = [0]; ingame: boolean = false): boolean;
 
 Selects a random world. P2P or F2P depends on the value of 'members'.  Will by default
 avoid worlds that are marked as exceptions in worlds.ini.  The default exceptions are:
@@ -719,7 +746,7 @@ friends freqently visit.  This is [0] by default.
 .. note::
 
     - by Narcle, Mixter, and Coh3n
-    - Last Updated: 9th October 2014 by Clarity
+    - Last Updated: 09 February 2015 by Clarity
 
 Example:
 
@@ -734,7 +761,7 @@ Example:
     //To select a random P2P world, not selecting from "avoid" worlds, also avoiding worlds 99 and 100
     lobbyWorlds.selectRandomWorld(players[currentPlayer].isMember, [99, 100]);
 *)
-function TRSLobbyWorlds.selectRandomWorld(members: boolean; standardAvoid: boolean = true; personalAvoid: TIntegerArray = []): boolean;
+function TRSLobbyWorlds.selectRandomWorld(members: boolean; standardAvoid: boolean = true; personalAvoid: TIntegerArray = []; ingame: boolean = false): boolean;
 var
   i, l, wo: integer;
   wArray: TIntegerArray;
@@ -771,7 +798,7 @@ begin
 
   print('TRSLobbyWorlds.selectRandomWorld(): Random world is '+toStr(wArray[wo]), TDebug.SUB);
 
-  result := self.selectWorld(wArray[wo]);
+  result := self.selectWorld(wArray[wo], ingame);
 end;
 
 (*
