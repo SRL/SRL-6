@@ -88,15 +88,16 @@ const
   BANK_NPC_GREEN = 2;
   BANK_NPC_DRAYNOR = 3;
   BANK_BOOTH = 4;
-  BANK_CHEST_SW = 5;
-  BANK_CHEST_SHANTAY = 6;
-  BANK_CHEST_DUEL = 7;
-  BANK_CHEST_CW = 8;
-  BANK_CHEST_GROTTO = 9;
-  BANK_CHEST_LUMBRIDGE = 10; //chest in lumbridge field
-  BANK_TABLE_BURTHORPE = 11;
-  BANK_GE = 12;
+  BANK_GE = 5;
+  BANK_CHEST_SW = 6;
+  BANK_CHEST_SHANTAY = 7;
+  BANK_CHEST_DUEL = 8;
+  BANK_CHEST_CW = 9;
+  BANK_CHEST_GROTTO = 10;
+  BANK_CHEST_LUMBRIDGE = 11; //chest in lumbridge field
+  BANK_TABLE_BURTHORPE = 12;
   BANK_CHEST_PRIFDDINAS = 13;
+  BANK_CHEST_BARB_OUTPOST = 14;
 
 (*
 type TRSBankScreen
@@ -2135,7 +2136,7 @@ Internal function that attempts to open the bank chest at bankType.
 .. note::
 
     - by Olly
-    - Last Updated: 03 October 2014 by Clarity
+    - Last Updated: 17 February 2014 by Turpinator
 
 Example:
 
@@ -2163,6 +2164,7 @@ begin
     BANK_CHEST_LUMBRIDGE: begin col1:= [5599380, 7, [2, [0.10, 0.43, 0.00]]]; col2:= [10786444, 6, [2, [0.24, 0.53, 0.00]]]; avelen:= 90; end;
     BANK_TABLE_BURTHORPE: begin col1:= [14609385, 5, [2, [1.07, 1.41, 0.00]]]; col2:= [6457502, 5, [2, [0.15, 0.56, 0.00]]]; avelen:= 90; end;
     BANK_CHEST_PRIFDDINAS: begin col1:= [2729983, 12, [1, [0.07, 0.00, 0.00]]]; col2:= [7528447, 16, [2, [0.24, 0.00, 0.00]]]; avelen:= 90; end;
+    BANK_CHEST_BARB_OUTPOST: begin col1:= [10258280, 19, [2, [0.06, 0.49, 0.00]]]; col2:= [3424082, 8, [2, [0.12, 0.21, 0.00]]]; avelen:= 300; end;
   end;
 
   print('TRSBankscreen.__openChest()', TDebug.HEADER);
@@ -2374,6 +2376,7 @@ Opens the desired bank, current vaild 'bankType' constants are:
     * BANK_NPC_GREEN
     * BANK_NPC_DRAYNOR
     * BANK_BOOTH
+    * BANK_GE
     * BANK_CHEST_SW
     * BANK_CHEST_SHANTAY
     * BANK_CHEST_DUEL
@@ -2381,11 +2384,12 @@ Opens the desired bank, current vaild 'bankType' constants are:
     * BANK_CHEST_GROTTO
     * BANK_TABLE_BURTHORPE
     * BANK_CHEST_LUMBRIDGE
-    * BANK_CHEST_PRIFDDINAS    * BANK_GE
+    * BANK_CHEST_PRIFDDINAS
+    * BANK_CHEST_BARB_OUTPOST
 .. note::
 
     - by Olly
-    - Last Updated: 03 October 2014 by Clarity
+    - Last Updated: 17 February 2014 by Turpinator
 
 Example:
 
@@ -2401,8 +2405,8 @@ begin
   case bankType of
     BANK_NPC_BLUE..BANK_NPC_DRAYNOR: result := self.__openNPC(bankType);
     BANK_BOOTH: result := self.__openBankBooth();
-    BANK_CHEST_SW..BANK_CHEST_PRIFDDINAS: result := self.__openChest(bankType);
     BANK_GE: Result := Self.__openGE();
+    BANK_CHEST_SW..BANK_CHEST_BARB_OUTPOST: result := self.__openChest(bankType);
   end;
 end;
 
