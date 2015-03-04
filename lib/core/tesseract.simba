@@ -219,7 +219,7 @@ function Tesseract_GetText(const bmp: integer; const Whitelist: String = TESS_WH
 var
   w, h, i: integer;
   textLen: UInt32;
-  textPtr: PChar;
+  textPtr: PChar = nil;
 begin
   if (not __tesseractIsSetup) then
     _Tesseract_Setup();
@@ -230,21 +230,34 @@ begin
   result := '';
   getBitmapSize(bmp, w, h);
 
+  if (w < 10) or (h < 10) then
+    Exit;
+
   try
     Tesseract_SetImage(__tesseractPtr, getMufasaBitmap(bmp).getData(), w, h, 4, Integer(w * 4));
-    textPtr := Tesseract_GetUTF8Text(__tesseractPtr, textLen);
+    try
+      textPtr := Tesseract_GetUTF8Text(__tesseractPtr, textLen);
+    except
+      TextPtr := nil;
+    end;
 
-    setLength(result, textLen);
-    if (textLen > 0) then
+    if (TextPtr <> nil) then
     begin
-      for i := 1 to textLen do
-        result[i] := textPtr[i - 1]^;
+      setLength(result, textLen);
+      if (textLen > 0) then
+      begin
+        for i := 1 to textLen do
+          result[i] := textPtr[i - 1]^;
 
-      result := trim(stringReplace(result, #10, #13#10, [rfReplaceAll]));
+        result := trim(stringReplace(result, #10, #13#10, [rfReplaceAll]));
+      end;
     end;
   finally
-    Tesseract_FreeUTF8Text(textPtr);
-    Tesseract_Clear(__tesseractPtr);
+    if (textPtr <> nil) then
+    begin
+      Tesseract_FreeUTF8Text(textPtr);
+      Tesseract_Clear(__tesseractPtr);
+    end;
 
     if (Whitelist <> TESS_WHITELIST_NONE) then // reset to default
     begin

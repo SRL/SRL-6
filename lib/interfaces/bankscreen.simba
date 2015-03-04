@@ -2265,6 +2265,36 @@ end;
 
 {$IFNDEF CODEINSIGHT}
 function TRSBankScreen.__openGE(): Boolean;
+
+  function findBankerAreas(): TBoxArray;
+  var
+    TPA: TPointArray;
+    ATPA: T2DPointArray;
+    i: Integer;
+    b: TBox;
+  begin
+    FindColorsTolerance(TPA, 6580588, MainScreen.GetBounds(), 5, ColorSetting(2, 2.09, 0.55));
+    ATPA := ClusterTPAEx(TPA, 5, 5);
+
+    for i := 0 to High(ATPA) do
+    begin
+      if (Length(ATPA[i]) < 100) then
+        Continue;
+
+      b := GetTPABounds(ATPA[i]);
+
+      if (b.getWidth() < 15) or (b.getHeight() < 15) or
+         (b.getWidth() > 220) or (b.getHeight() > 220) or
+         (ATPA[i].getDensity() < 0.10) then
+        Continue;
+
+      b.Expand(10);
+      b.setLimit(MainScreen.getBounds());
+
+      Result := Result + b;
+    end;
+  end;
+
   function findBanker(const Area: TBox): Boolean;
   var
     tFace, TPA: TPointArray;
@@ -2312,52 +2342,22 @@ function TRSBankScreen.__openGE(): Boolean;
         end;
       end;
   end;
+
 var
-  tPiller, tPillerEdge, tEdge, tFloor, tFloorEdge, TPA: TPointArray;
-  aPiller, aSearchArea, ATPA: T2DPointArray;
-  i, j: Integer;
-  b: TBox;
+  i: Integer;
+  Boxes: TBoxArray;
 begin
-  FindColorsTolerance(tPiller, 7437434, mainScreen.getBounds(), 12, ColorSetting(2, 0.38, 0.15));
-  aPiller := ClusterTPAEx(tPiller, 8, 8);
+  Result := False;
+  Boxes := findBankerAreas();
 
-  FindColorsTolerance(tFloor, 6646636, mainScreen.getBounds(), 12, ColorSetting(2, 1.20, 0.29));
-  tFloorEdge := FindTPAEdges(tFloor);
+  if (Length(Boxes) = 0) then
+    Exit(print('bankScreen.__openGE(): Found no possible area''s for a banker to be in', False));
 
-  if (Length(tFloor) < 20) or (Length(tPiller) < 20) then
-    Exit(False);
+  SortBoxesFromMidPoint(Boxes, MainScreen.playerPoint);
 
-  for i := 0 to High(aPiller) do
-  begin
-    b := GetTPABounds(aPiller[i]);
-    if (b.getWidth() > 100) and (b.getHeight() > 100) then
-      Continue();
-
-    tPillerEdge := FindTPAEdges(aPiller[i]);
-
-    for j := 0 to High(tPillerEdge) do
-      if (NearbyPointInArrayEx(tPillerEdge[j], 2, 2, tFloorEdge)) then
-        tEdge := tEdge + tPillerEdge[j];
-  end;
-
-  if (Length(tEdge) < 20) then
-    Exit(False);
-
-  aSearchArea := ClusterTPAEx(tEdge, 13, 13);
-
-  for i := 0 to High(aSearchArea) do
-  begin
-    b := GetTPABounds(aSearchArea[i]);
-
-    if (inRange(b.getWidth(), 15, 90)) and (inRange(b.getHeight(), 15, 90)) then
-    begin
-      Dec(b.X1, 15); Inc(b.X2, 15); Inc(b.Y2, 30);
-      b.SetLimit(mainScreen.getBounds());
-
-      if (FindBanker(b)) then
-        Exit(True);
-    end;
-  end;
+  for i := 0 to High(Boxes) do
+    if (FindBanker(Boxes[i])) then
+      Exit(print('bankScreen.__openGE(): Succesfully opened the GE bank', True, '', TDebug.DEBUG));
 end;
 {$ENDIF}
 
