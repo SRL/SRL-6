@@ -774,7 +774,7 @@ Internal function which enters the item name into the search box, and clicks it.
 .. note::
 
     - by The Mayor
-    - Last Updated: 15 January 2015 by The Mayor
+    - Last Updated: 10 March 2015 by The Mayor
 
 Example:
 
@@ -784,6 +784,8 @@ Example:
 
 *)
 procedure TRSGrandExchange._enterName(itemName: string);
+const
+  TESS_FILTER_GE_CHARS: TTesseractFilter = [3, 3, [true, -38, TM_Mean]];
 var
   x, y: integer;
   b: TBox;
@@ -794,18 +796,21 @@ begin
   if not self.__findTypeBox(b) then
     exit();
 
+  b.edit(61, 0, -15, -115); // Isolate the results box
   typeSend(itemName, false);
-  b.edit(60, 0, 0, -115);
 
   if waitColorCountRange(482978, 9, b, 5000, 10) then
-  begin
-    mouseBox(b, MOUSE_LEFT);
-    timeOut := getTickCount64() + randomRange(3000, 4000);
+    for 1 to 7 do
+      if stringMatch(trim(tesseractGetText(b, TESS_FILTER_GE_CHARS)), itemName) >= 0.8 then
+      begin
+        mouseBox(b, MOUSE_LEFT);
+        timeOut := getTickCount64() + randomRange(3000, 4000);
 
-    while getTickCount64() < timeOut do
-      if (not self.__findTypeBox(b, 100)) then
-        break();
-  end;
+        while getTickCount64() < timeOut do
+          if (not self.__findTypeBox(b, 100)) then
+            break();
+      end else
+        b.offset([0, 15]);
 end;
 
 (*
