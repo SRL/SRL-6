@@ -1339,11 +1339,10 @@ TRSGrandExchange.getPrice
 
 .. code-block:: pascal
 
-    TRSGrandExchange.getPrice(item: variant): integer;
+    TRSGrandExchange.getPrice(item: integer): integer;
 
 Returns the current market price of any item in the Grand Exchange. The 'item'
-parameter can be the name of the item (string), or it's ID (integer). Using the
-ID is recommended as it's slightly faster.
+parameter must be the item's ID (integer).
 
 ID's can be found on the Grand Exchange website at the end of the URL.
 
@@ -1353,45 +1352,31 @@ ID's can be found on the Grand Exchange website at the end of the URL.
 .. note::
 
     - by The Mayor
-    - Last Updated: 15 January 2015 by The Mayor
+    - Last Updated: 10 March 2015 by The Mayor
 
 Example:
 
 .. code-block:: pascal
 
-    grandExchange.getPrice('Swamp toad');
-    grandExchange.getPrice(2150);        // The ID for Swamp toads
+    grandExchange.getPrice(2150);  // The ID for Swamp toads
 
 *)
-function TRSGrandExchange.getPrice(item: variant): integer;
+function TRSGrandExchange.getPrice(ID: integer): integer;
 var
-  i: integer;
-  str: string;
-  TSA, lines: TStringArray;
+  webPage: string;
+  TSA: TStringArray;
 begin
-  result := -1;
-  str := replace(item, ' ', '%20', [rfReplaceAll]);
-  TSA := explode(#10, getPage('http://rscript.org/lookup.php?type=ge&search=' + toStr(str)));
+  webPage := getPage('http://services.runescape.com/m=itemdb_rs/viewitem.ws?obj=' + toStr(ID));
+  TSA := multiBetween(webPage, 'average180.daily.push(',');');
 
-  for i := 0 to high(TSA) do
-    if (pos('ITEM:', TSA[i]) > 0) and (not (pos('MULTIITEM:', TSA[i]) > 0)) then
-        lines.append(TSA[i]);
-
-  if length(lines) < 1 then
+  if length(TSA) < 1 then
   begin
-    print('TRSGrandExchange.getPrice(): Search returned no matches', TDebug.ERROR);
-    exit();
+    print('TRSGrandExchange.getPrice(): Unable to retrieve price for ID: ' + toStr(ID), TDebug.ERROR);
+    exit(-1);
   end;
 
-  if length(lines) > 1 then
-    print('TRSGrandExchange.getPrice(): Search returned multiple items, returning the first one', TDebug.WARNING);
-
-  TSA := explode(' ', lines[0]);
-
-  if length(TSA) = 5 then
-    result := strToIntDef(extractFromStr(TSA[3], numbers), -1);
-
-  print('TRSGrandExchange.getPrice(): ' + TSA[2] + ' = ' + toStr(result));
+  result := strToInt(TSA[high(TSA)]);
+  print('TRSGrandExchange.getPrice(): ' + toStr(result));
 end;
 
 begin
