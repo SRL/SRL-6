@@ -591,7 +591,7 @@ to low, and the minimap compass angle set to north.
 .. note::
 
     - by Olly
-    - Last Modified: 10th October 2014 by Justin
+    - Last Modified: 12th March 2015 by The Mayor
 
 Example:
 
@@ -599,28 +599,25 @@ Example:
 
     minimap.clickCompass();
 *)
-procedure TRSMinimap.clickCompass();
+procedure TRSMinimap.clickCompass(faceSouth: boolean = false);
 begin
   mouseCircle(self.button[MM_BUTTON_COMPASS].center.x, self.button[MM_BUTTON_COMPASS].center.y,
               self.button[MM_BUTTON_COMPASS].radius, MOUSE_MOVE);
 
-  if (random(4) = 2) then
+  if faceSouth or (random(4) = 2) then
   begin
     fastClick(MOUSE_RIGHT);
-    if (not chooseOption.select(['Face North', 'ace N', 'Face NoMh', 'orth'], 500)) then
-      begin
-        chooseOption.close();  //Move the mouse away to close the chooseOption dropdown
-        mouseCircle(self.button[MM_BUTTON_COMPASS].center.x, self.button[MM_BUTTON_COMPASS].center.y,
-                    self.button[MM_BUTTON_COMPASS].radius, MOUSE_MOVE);  //Move the mouse back to the compass
-        fastClick(MOUSE_LEFT); // failsafe
-      end;
+    wait(random(100, 200));
+
+    case faceSouth of
+      true: chooseOption.select(['Face So']);
+      false: chooseOption.select(['Face No']);
+    end;
   end else
     fastClick(MOUSE_LEFT);
 
   self.mouseOffCompass();
-
   wait(150 + random(300));
-
   print('TRSMinimap.clickCompass(): Clicked compass', TDebug.SUB);
 end;
 
