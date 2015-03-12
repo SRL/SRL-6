@@ -620,7 +620,7 @@ TRSGrandExchange.__findTypeBox
 
     TRSGrandExchange.__findTypeBox(var box: TBox; waitTime: integer = 4000): boolean;
 
-Internal function which aits for the typing box to appear, and returns it's
+Internal function which waits for the typing box to appear, and returns it's
 bounds in 'box' variable.
 
 .. note::
@@ -868,7 +868,7 @@ Collects items and/or money from a completed or aborted offer slot.
 .. note::
 
     - by The Mayor
-    - Last Updated: 16 January 2015 by The Mayor
+    - Last Updated: 12 March 2015 by The Mayor
 
 Example:
 
@@ -888,7 +888,7 @@ begin
   begin
     self._returnToSummary();
 
-    if self._isSlotEmpty(geSlot) then
+    if (not self._isSlotActive(geSlot)) or self._isSlotEmpty(geSlot) then
     begin
       print('TRSGrandExchange.collectSlot(): Cannot collect as offer slot ' + toStr(geSlot) + ' is empty', TDebug.ERROR);
       exit(false);
@@ -904,17 +904,18 @@ begin
   end;
 
   for i := 0 to high(collectBox) do
-    if isItemIn(collectBox[i]) then
-    begin
-      mouseBox(collectBox[i], MOUSE_LEFT);
-      wait(randomRange(750, 1250));
-
-      if not self._isProgressOpen() then
+    for  0 to 2 do // Attempt up to 3 times in case of lag
+      if isItemIn(collectBox[i]) then
       begin
-        result := true;
-        break();
+        mouseBox(collectBox[i], MOUSE_LEFT);
+        wait(randomRange(1750, 2500));
+
+        if not self._isProgressOpen() then
+        begin
+          result := true;
+          break(2);
+        end;
       end;
-    end;
 
   self._returnToSummary();
 
@@ -935,7 +936,7 @@ will collect the items and/or money from th 'geSlot'.
 .. note::
 
     - by The Mayor
-    - Last Updated: 16 January 2015 by The Mayor
+    - Last Updated: 12 March 2015 by The Mayor
 
 Example:
 
@@ -951,7 +952,7 @@ var
 begin
   self._returnToSummary();
 
-  if self._isSlotEmpty(geSlot) then
+  if (not self._isSlotActive(geSlot)) or self._isSlotEmpty(geSlot) then
   begin
     print('TRSGrandExchange.waitCollectSlot(): Cannot collect as offer slot ' + toStr(geSlot) + ' is empty', TDebug.ERROR);
     exit(false);
@@ -987,7 +988,7 @@ have to be completed.
 .. note::
 
     - by The Mayor
-    - Last Updated: 16 January 2015 by The Mayor
+    - Last Updated: 12 March 2015 by The Mayor
 
 Example:
 
@@ -1002,7 +1003,7 @@ var
   TBA: TBoxArray := self._getSlotBoxes();
 begin
   for i := 1 to length(TBA) do
-    if not self._isSlotEmpty(i) then
+    if self._isSlotActive(i) and (not self._isSlotEmpty(i)) then
       self.collectSlot(i);
 end;
 
@@ -1020,7 +1021,7 @@ will also collect the items/gold from the aborted offer slot.
 .. note::
 
     - by The Mayor
-    - Last Updated: 16 January 2015 by The Mayor
+    - Last Updated: 12 March 2015 by The Mayor
 
 Example:
 
@@ -1044,7 +1045,7 @@ begin
 
   self._returnToSummary();
 
-  if self._isSlotEmpty(geSlot) then
+  if self._isSlotEmpty(geSlot) or (not self._isSlotActive(geSlot)) then
   begin
     print('TRSGrandExchange.abortSlot(): Cannot abort as offer slot ' + toStr(geSlot) + ' is empty', TDebug.ERROR);
     exit(false);
@@ -1095,7 +1096,7 @@ will also collect all items/gold.
 .. note::
 
     - by The Mayor
-    - Last Updated: 16 January 2015 by The Mayor
+    - Last Updated: 12 March 2015 by The Mayor
 
 Example:
 
@@ -1104,13 +1105,13 @@ Example:
     grandExchange.abortAllSlots();
 
 *)
-function TRSGrandExchange.abortAllSlots(collect: boolean): boolean;
+function TRSGrandExchange.abortAllSlots(collect: boolean = true): boolean;
 var
   i: integer;
   TBA: TBoxArray := self._getSlotBoxes();
 begin
   for i := 1 to length(TBA) do
-    if not self._isSlotEmpty(i) then
+    if (not self._isSlotEmpty(i)) and self._isSlotActive(i) then
       self.abortSlot(i, collect);
 end;
 
@@ -1182,7 +1183,7 @@ The 'quantity' parameter is a string; valid options are:
 .. note::
 
     - by The Mayor
-    - Last Updated: 16 January 2015 by The Mayor
+    - Last Updated: 12 March 2015 by The Mayor
 
 Example:
 
@@ -1212,7 +1213,7 @@ begin
   self._returnToSummary();
 
   for i := 1 to 6 do
-    if self._isSlotEmpty(i) then
+    if self._isSlotEmpty(i) and self._isSlotActive(i) then
     begin
       nextSlot := i;
       break();
@@ -1276,7 +1277,7 @@ The 'quantity' parameter is a string; valid options are:
 .. note::
 
     - by The Mayor
-    - Last Updated: 16 January 2015 by The Mayor
+    - Last Updated: 12 March 2015 by The Mayor
 
 Example:
 
@@ -1308,7 +1309,7 @@ begin
   self._returnToSummary();
 
   for i := 1 to 6 do
-    if self._isSlotEmpty(i) then
+    if self._isSlotEmpty(i) and self._isSlotActive(i) then
     begin
       nextSlot := i;
       break();
