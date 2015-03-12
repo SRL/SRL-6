@@ -2654,11 +2654,24 @@ begin
       with result do
       begin
         name := 'Divination';
-        bmp := BitmapFromString(11, 9, 'meJw7cAAFtLE4rOHP+P3nF5ABEQF' +
-        'y//gfMGWWYWRgAApCEJALRGgKgOL/+NZDELIaoCzQQCAbqBIo9S1s' +
-        'LlAEogyiAKISogAoC0QvLxyGqIHbgmwXUBZo4K+JFyC2YLofqAZoC' +
-        'JABcS3Q5chqgFyIdUAGsjMwAVAv0CigRUAFAPKplbk=');
-        color := -1;
+        bmp := BitmapFromString(16, 19, 'meJxjYECArqrWi4t3X1i8q7O6va' +
+        'K8oay0vrO8YVZtGwMOUBeT8Xzapo+LDxcHJwa4ePWm5zVGJc5Mz8e' +
+        'qWF1dS1VBudzWs9EvxkrXIMzRTU1JRU5WTklBeVFWAZpiR0c3c1NL' +
+        'dSUVbUXlWLeALfWTNzZM7k0vjLJ39jS1mJeRz8HGDleckZGXFpuU4' +
+        'OLub2m7sqLz+8YL/zZe+rfl8ved16fl1/tb2vRGJywsqpxZUgVRP6' +
+        'miYWFmvrORaaSd86t5e/71r/9XNQOEJmx4Nmt7pruvq5Gpibbu3b5' +
+        'pQMXlmflPJszQUtXQVlMvcvV7Wjnpd0LVP484IAIyPjQvqPSProxM' +
+        'nV/WcbtrUk5CWl953dW2Pms9I1dj83BTm8NRmbd8oh86BQERkHE4L' +
+        'DXf0eti96Jvq0/MzajMzylKTk6fW1Y7MTZ5emKap7FZprHVDkePgz' +
+        'YuQARk5BqY2Wlo19i5zfWLSvMOjk9KBzopP7swNSTySNu0LJ8QFz0' +
+        'DZyWVDE0dIDKXkVOUlVdWVJIVlzRQ10qMS4X419c/eHfr7N/br+1q' +
+        'nG6sqaOnpmGlo6eprCIjK6eioqqqpq6jo5udnpeaiYiF+uC4HYkFM' +
+        '4Lj8zz9sr39LA2MQOo0NIFIS0s7IjSqoaoROb70DI2DbRzstPXNdf' +
+        'QgKjU1tYEkkG1tZVtRXB0en4wWxQnxKcV5peXFVS5OrhD1Lk5uDTX' +
+        'NTbWtlWU1WJOQmbl1ZUl1cV4J0MH62nqleSV1FXVRsQm40icENNU0' +
+        'e3t4A1FLbRN+lRBQXlxZXlAKQsWVxKgHgobq+o4GnNkEEwQGhmRm5' +
+        'WGVAgABkeXb');
+        color := 12663876;
       end;
     MM_SYMBOL_SEASONAL_EVENT:
       with result do
