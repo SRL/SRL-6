@@ -125,7 +125,7 @@ Returns true if the production screen is detected, if detected will set the boun
 .. note::
 
     - by Olly
-    - Last Updated: 20 May 2014 by Olly
+    - Last Updated: 13 March 2015 by The Mayor
 
 Example:
 
@@ -151,7 +151,7 @@ begin
   freeze();
   // debugBitmap(self.__bmp);
   try
-    if (findBitmapTolerance(self.__bmp, fx, fy, 18, colorSetting(1))) then
+    if (findBitmapTolerance(self.__bmp, fx, fy, 43, colorSetting(1))) then
       if (countColor(clWhite, TBox([fx + 270, fy + 20, fx + 450, fy + 40])) > 15) then  // look for white item text to verify
       begin
         self.setBounds([fx - 8, fy - 28, fx + 495, fy + 297]);
