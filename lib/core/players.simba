@@ -17,15 +17,11 @@ const Internal
 
 File's internal constants.
 
-    * __PATH_PLAYER: The file army files are saved to.
     * __LOGIN_COLOR_TEXT: The color of the login screen text.
 
 *}
-{$IFNDEF CODEINSIGHT}
 const
-  __PATH_PLAYER = IncludePath + 'Players/';
   __LOGIN_COLOR_TEXT = 12378347;
-{$ENDIF}
 
 {*
 var Internal
@@ -41,15 +37,13 @@ File's internal variables.
 var
   _boxUsername: TBox = [-1, -1, -1, -1];
   _boxPassword: TBox = [-1, -1, -1, -1];
-  {$IFNDEF CODEINSIGHT}
   __areDynamicInterfacesSet: boolean = false;
-  {$ENDIF}
 
 (*
 type TPlayer
 ~~~~~~~~~~~~
 
-A record that stores useful information about the current players.  It is up to
+A record that stores useful information about the current players. It is up to
 the scripter to set most these attributes in their scripts.
 
 Example:
@@ -97,15 +91,14 @@ type
 
   PF_TPlayerArray = array of PF_TPlayer;
 
-
 (*
 Player Variables
 ~~~~~~~~~~~~~~~~
 
 All the variables associated with players.simba.
 
-  * players: TPlayerArray; Used to store player information.
-  * currentPlayer: integer; The player currently running.
+  * players: TPlayerArray; Used to store information for all players.
+  * currentPlayer: integer; The index of the player currently running.
   * disableIPScreenshots: booelean; Disables the screenshots taken in the lobby screen.
 
 *)
@@ -265,7 +258,7 @@ Returns the number of players that are still active in the TPlayerArray.
 .. note::
 
     - by ss23 & Coh3n
-    - Last updated: Dec. 22nd, 2012 by Coh3n
+    - Last updated: 22 December 2012 by Coh3n
 
 Example:
 
@@ -299,7 +292,7 @@ Adds the player with 'info' to the TPlayerArray.
 .. note::
 
     - by Zyt3x & Coh3n
-    - Last updated: Dec. 22nd, 2012 by Coh3n
+    - Last updated: 22 December 2012 by Coh3n
 
 Example:
 
@@ -354,7 +347,7 @@ army file 'army'. Loads 'default' by default.
 .. note::
 
     - by Bart (masterBB)
-    - Last updated: Apr. 4th, 2013 by Bart
+    - Last updated: 4 April 2013 by Bart
 
 Example:
 
@@ -424,26 +417,26 @@ TPlayerArray.switchTo
 
 .. code-block:: pascal
 
-    function TPlayerArray.switchTo(player: integer; active: boolean = true): boolean;
+    function TPlayerArray.switchTo(player: integer; active: boolean = true; login: boolean = true): boolean;
 
-Switches to the 'player' element in the TPlayerArray. Sets the previous player
-to optional parameter 'active'. Sets previous player to true by default.
+Switches to the 'player' index in the TPlayerArray. Sets the previous player's
+activity to 'active'. It will login the new player if 'login' is true.
 
 .. note::
 
     - by Dankness, Ron, Raymond, ZephyrsFury & Coh3n
-    - Last updated: Feb. 10, 2013 by Coh3n
+    - Last updated: 15 March 2015 by The Mayor
 
 Example:
 
 .. code-block:: pascal
 
     players.switchTo(3);
-    // or
     players.switchTo(3, false);
+    players.switchTo(3, false, false); // To switch but not login
 
 *)
-function TPlayerArray.switchTo(player: integer; active: boolean = true): boolean;
+function TPlayerArray.switchTo(player: integer; active: boolean = true; login: boolean = true): boolean;
 begin
   self[currentPlayer].isActive := active;
   self[currentPlayer].logout();
@@ -460,7 +453,8 @@ begin
   if (SRL_Events[EVENT_PLAYER_NEXT] <> nil) then
     SRL_Events[EVENT_PLAYER_NEXT]();
 
-  result := self[currentPlayer].login();
+  result := true;
+  if login then result := self[currentPlayer].login()
 end;
 
 (*
@@ -469,26 +463,26 @@ TPlayerArray.next
 
 .. code-block:: pascal
 
-    function TPlayerArray.next(active: boolean = true): boolean;
+    function TPlayerArray.next(active: boolean = true; login: boolean = true): boolean;
 
-Switches to the next active player in the TPlayerArray. Sets the previous player
-to the optional parameter 'active'. Sets the previous player to true by default.
+Switches to the next active player in the TPlayerArray. Sets the previous
+player's activity to 'active'. It will login the new player if 'login' is true.
 
 .. note::
 
     - by ZephyrsFury & Coh3n
-    - Last updated: Feb. 10, 2013 by Coh3n
+    - Last updated: 15 March 2015 by The Mayor
 
 Example:
 
 .. code-block:: pascal
 
     players.next();
-    // or
     players.next(false);
+    players.next(false, false);
 
 *)
-function TPlayerArray.next(active: boolean = true): boolean;
+function TPlayerArray.next(active: boolean = true; login: boolean = true): boolean;
 var
   nP: integer;
 begin
@@ -498,7 +492,7 @@ begin
   while (not self[nP].isActive) do
     nP := (nP + 1) mod length(self);
 
-  result := self.switchTo(nP, active);
+  result := self.switchTo(nP, active, login);
 end;
 
 (*
@@ -509,24 +503,24 @@ TPlayerArray.randomNext
 
     function TPlayerArray.randomNext(active: boolean = true): boolean;
 
-Switches to a random active player in the TPlayerArray. Sets the previous player
-to the optional parameter 'active'. Sets the previous player to true by default.
+Switches to a random active player in the TPlayerArray. Sets the previous
+player's activity to 'active'. It will login the new player if 'login' is true..
 
 .. note::
 
     - by ZephyrsFury & Coh3n
-    - Last updated: Feb. 10, 2013 by Coh3n
+    - Last updated: 15 March 2015 by The Mayor
 
 Example:
 
 .. code-block:: pascal
 
     players.randomNext();
-    // or
     players.randomNext(false);
+    players.randomNext(false, false);
 
 *)
-function TPlayerArray.randomNext(active: boolean = true): boolean;
+function TPlayerArray.randomNext(active: boolean = true; login: boolean = true): boolean;
 var
   nP: integer;
 begin
@@ -541,7 +535,7 @@ begin
     nP := random(length(self));
   end;
 
-  result := self.switchTo(nP, active);
+  result := self.switchTo(nP, active, login);
 end;
 
 (*
@@ -552,12 +546,12 @@ TPlayer.write
 
     procedure TPlayer.write();
 
-Writes the standard information about the player to the Simba debug box.
+Writes the standard information about the player to the debug box.
 
 .. note::
 
     - by Coh3n
-    - Last updated: Dec. 22nd, 2012 by Zyt3x
+    - Last updated: 22 December 2012 by Zyt3x
 
 Example:
 
@@ -594,7 +588,7 @@ Sets the dynamic interfaces upon login.
 .. note::
 
     - by Coh3n
-    - Last updated: Dec. 22nd, 2012 by Zyt3x
+    - Last updated: 22 December 2012 by Zyt3x
 
 Example:
 
@@ -602,10 +596,9 @@ Example:
 
     players[currentPlayer].write();
 *)
-{$IFNDEF CODEINSIGHT}
 procedure __setDynamicInterfaces();
 begin
-  if (actionBar.__find()) then
+  if actionBar.__find() then
   begin
     chatBox.__setup();
     mainScreen.__setup();
@@ -615,11 +608,10 @@ begin
     print('Dynamic interfaces have been set.', TDebug.SUB);
   end;
 end;
-{$ENDIF}
 
 (*
-isLoggedIn()
-~~~~~~~~~~~~
+isLoggedIn
+~~~~~~~~~~
 
 .. code-block:: pascal
 
@@ -646,20 +638,20 @@ const
 begin
   result := (getColor(796, 3) = LOGOUT_BUTTON_COLOUR);
 
-  if (result) and (not __areDynamicInterfacesSet) then
+  if result and (not __areDynamicInterfacesSet) then
     __setDynamicInterfaces();
 end;
 
 {*
-__setInputBoxes()
-~~~~~~~~~~~~~~~~~
+__setInputBoxes
+~~~~~~~~~~~~~~~
 
 .. code-block:: pascal
 
     function __setInputBoxes(): boolean;
 
-Finds and sets the username and password box parameters.  This function is
-designed to work with any screen size.  Returns true if both boxes are found.
+Finds and sets the username and password box parameters. Returns true if
+both boxes are found.
 
 .. note::
 
@@ -672,7 +664,6 @@ Example:
 
     __setInputBoxes();
 *}
-{$IFNDEF CODEINSIGHT}
 function __setInputBoxes(): boolean;
 const
   __BORDER_LENGTH = 524;
@@ -709,73 +700,58 @@ begin
     end;
   end;
 end;
-{$ENDIF}
 
 {*
-__enterLoginInfo()
-~~~~~~~~~~~~~~~~~~
+__enterLoginInfo
+~~~~~~~~~~~~~~~~
 
 .. code-block:: pascal
 
     function __enterLoginInfo(const inputBox: TBox; const info: string; clickBox: boolean = true; pressEnter: boolean = true): boolean;
 
-Used to enter a players username and password to login to RS. Input box can be
-any text box, but the username and password boxes are what it was designed for.
-The input text (info) is the username/password.  It will click the text box if
-clickBox is set to true. Will press enter after text as been entered if
-pressEnter is set to true. See TPlayer.loginToLobby for usage.
+Types the player's info (username/password) into the input box. It can optionally
+click the box to make it active, and press enter after typing.
 
 .. note::
 
-    - by Starblaster100, Raymond, IceFire908, Tarajunky, NCDS & Coh3n
-    - Last updated: 3 January 2015 by The Mayor
+    - by The SRL Development Team
+    - Last updated: 14 March 2015 by The Mayor
 
 Example:
 
 .. code-block:: pascal
 
-    __enterLoginInfo(self.loginName);
+    __enterLoginInfo(_boxUsername, self.loginName);
 *}
-{$IFNDEF CODEINSIGHT}
-function __enterLoginInfo(const inputBox: TBox; const info: string; clickBox: boolean = true; pressEnter: boolean = true): boolean;
+function __enterLoginInfo(inputBox: TBox; const info: string; clickBox: boolean = true; pressEnter: boolean = true): boolean;
 var
-  tpa: TPointArray;
+  TPA: TPointArray;
   p: TPoint;
   c: integer;
   t : LongWord;
-  tmpBox: TBox;
 begin
   t := (getSystemTime() + (60000 * 2));
-  tmpBox := inputBox;
-  tmpBox.offset(point(8, 0)); // to remove the cursor so it doesn't interfere
+  inputBox.offset(point(8, 0));
 
   repeat
-    // check to see if there is already text in the input box
-    findColors(tpa, __LOGIN_COLOR_TEXT, tmpBox);
-
-    // click input box; clicks to the right of existing text
-    if (length(tpa) > 0) then // if there's text in the box
+    if findColors(TPA, __LOGIN_COLOR_TEXT, inputBox) then
     begin
-      sortTPAFrom(tpa, point(tmpBox.x2, (tmpBox.y1 + tmpBox.y2 div 2))); // the middle right of the input box
-      p := point(tpa[0].x + 20, tpa[0].y);
+      sortTPAFrom(TPA, point(inputBox.x2, (inputBox.y1 + inputBox.y2 div 2)));
+      p := point(TPA[0].x + 20, TPA[0].y);
 
-      // make sure the point is in the inputBox
-      if (not pointInBox(p, tmpBox)) then
-        p := point(tmpBox.x2 - 12, p.y);
+      if (not pointInBox(p, inputBox)) then
+        p := point(inputBox.x2 - 12, p.y);
 
-      // failsafe if the box isn't active (color 6774863) then we click it
-      if (clickBox) or (not findColors(tpa, 6774863, tmpBox)) then
+      if clickBox or (not findColors(TPA, 6774863, inputBox)) then
         mouse(p.rand(3), MOUSE_LEFT);
     end else
-    begin
-      if (clickBox) or (not findColors(tpa, 6774863, tmpBox)) then
-        mouseBox(tmpBox, MOUSE_LEFT);
-      break();
-    end;
+      if findColors(TPA, 6774863, inputBox) or (not clickBox) then
+        break()
+      else
+        mouseBox(inputBox, MOUSE_LEFT);
 
-    // delete any existing text
     c := 0;
-    while (countColor(__LOGIN_COLOR_TEXT, tmpBox) > 0) and (c < 31) do
+    while (countColor(__LOGIN_COLOR_TEXT, inputBox) > 0) and (c < 20) do
     begin
       inc(c);
       typeByte(VK_BACK);
@@ -788,376 +764,209 @@ begin
   typeSend(info, pressEnter);
   result := true;
 end;
-{$ENDIF}
 
 {*
-__secureEnterInfo
+__respondToPopup
+~~~~~~~~~~~~~~~~
+
+.. code-block:: pascal
+
+    procedure __respondToPopup(errorMessage: TVariantArray; tries: integer);
+
+Internal procedure which responds to the login popup message. If the the max
+number of attempts has been reached, it will perform the appropriate action
+(action is index 3 of the passed errorMessage array). If not, it will wait
+the appropriate amount time (time = index 1 of errorMessage array).
+
+.. note::
+
+    - by The Mayor
+    - Last updated: 15 March 2015 by The Mayor
+
+Example:
+
+.. code-block:: pascal
+
+*}
+procedure __respondToPopup(errorMessage: TVariantArray; tries: integer);
+begin
+  typeByte(VK_ESCAPE);
+
+  if tries > errorMessage[2] then
+  begin
+    print('Responding with action: ' + errorMessage[3], TDebug.SUB);
+
+    case errorMessage[3] of
+      'Next_Player_F': players.next(false, false);
+      'Next_Player_T': players.next(true, false);
+      'Terminate': terminateScript();
+      'Set_World': players[currentPlayer].world := 0;
+
+      'Set_Member':
+        begin
+          players[currentPlayer].isMember := true;
+          players[currentPlayer].world := 0;
+        end;
+
+      'Set_Non-Member':
+        begin
+          players[currentPlayer].isMember := false;
+          players[currentPlayer].world := 0;
+        end;
+
+      'Reload_Client':
+        begin
+          if (@SRL_Events[EVENT_RS_UPDATE] <> nil) then
+          begin
+            print('RS Update: Going to call EVENT_RS_UPDATE procedure', TDebug.WARNING);
+            SRL_Events[EVENT_RS_UPDATE]();
+          end;
+        end;
+    end;
+
+  if (players.getActive() < 1) then
+    print('No other active players, terminating script', TDebug.FATAL);
+
+  end;
+
+  wait(errorMessage[1] + random(2000, 4000));
+end;
+
+{*
+__getPopupMessage
 ~~~~~~~~~~~~~~~~~
 
 .. code-block:: pascal
 
-    function __secureEnterInfo(user, pass: string): boolean;
+    function __getPopupMessage(): string;
 
-An alternative to the standard login procedure. Will enter in only a few
-characters of the username and password at a time. This will add security
-against keyloggers.
+Internal function which looks for the login popup box. If found, it will isolate
+the message text, and return it as the result.
 
 .. note::
 
-    - by Coh3n & Flight
-    - Last updated: Feb. 12, 2013 by Coh3n
+    - by The Mayor
+    - Last updated: 15 March 2015 by The Mayor
 
 Example:
 
 .. code-block:: pascal
 
-    See __loginResponse();
 *}
-{$IFNDEF CODEINSIGHT}
-function __secureEnterInfo(user, pass: string): boolean;
+function __getPopupMessage(): string;
 var
-  i, j, uL, pL, uH, pH, uLen, pLen, tmp: integer;
-  uTextExists, pTextExists: boolean;
-  uTPA, pTPA: TPointArray;
+  TPA: TPointArray;
+  ATPA: T2DPointArray;
+  b: TBox;
+  yDiff: integer;
 begin
-  result := true;
-  tmp := mouseSpeed;
-  mouseSpeed := 13;
-
-  // remove existing text from the input boxes
-  uTextExists := findColors(uTPA, __LOGIN_COLOR_TEXT, _boxUsername);
-  pTextExists := findColors(pTPA, __LOGIN_COLOR_TEXT, _boxPassword);
-
-  if (uTextExists) then
-    __enterLoginInfo(_boxUsername, '', true, pTextExists);
-
-  if (pTextExists) then
-    __enterLoginInfo(_boxPassword, '', (not uTextExists), true);
-
-  if (not uTextExists) then
-    mouseBox(intToBox(_boxUsername.x2 - 15, _boxUsername.y1, _boxUsername.x2, _boxUsername.y2), MOUSE_LEFT);
-
-  uL := 0;
-  pL := 0;
-  uLen := length(user);
-  pLen := length(pass);
-
-  repeat
-    if (not (uH = uLen)) then
+  if findColorsTolerance(TPA, 3286022, getClientBounds(), 12) then
+    if (length(TPA) > 1000) then
     begin
-      // prevents "Out of string range" errors
-      uH := (uL + randomRange(1, 3));
-      if (uH > uLen) then
-        uH := uLen;
+      ATPA := TPA.cluster(8);
+      ATPA.filterBetween(1, 1000);
+      if (length(ATPA) < 1) then exit();
+      ATPA.sortBySize(true);
 
-      for i := uL to uH do
+      b := ATPA[0].getBounds();
+
+      if findColorsTolerance(TPA, 16504921, b, 30) then
       begin
-        wait(100 + random(100));
-        typeSend(user[i], false);
-      end;
+        yDiff := b.Y2 - TPA.getBounds().Y1; // Limit Y2 to the top of the blue buttons
+        b.edit(7, 85, -7, -yDiff);
 
-      uL := (uH + 1);
-
-      // press enter if entering the password isn't complete
-      if (not (pH = pLen)) then
-        typeByte(VK_ENTER);
-    end;
-
-    if (not (pH = pLen)) then
-    begin
-      // prevents "Out of string range" errors
-      pH := (pL + randomRange(1, 3));
-      if (pH > pLen) then
-        pH := pLen;
-
-      for j := pL to pH do
-      begin
-        wait(100 + random(100));
-        typeSend(pass[j], false);
-      end;
-
-      pL := (pH + 1);
-
-      // click the end of the username box only if entering the username isn't complete
-      if (not (uH = uLen)) then
-      begin
-        wait(250 + random(250));
-        mouseBox(intToBox(_boxUsername.x2 - 15, _boxUsername.y1, _boxUsername.x2, _boxUsername.y2), MOUSE_LEFT);
+        if inRange(b.getWidth(), 200, 260) and (b.getHeight() > 24) then
+          result := trim(tesseract_GetText(b, TESS_FILTER_SMALL_CHARS_2));
       end;
     end;
-
-  until((uH = uLen) and (pH = pLen));
-
-  typeByte(VK_ENTER);
-  wait(100 + random(200));
-  typeByte(VK_ENTER); // in case we were in the username box
-
-  mouseSpeed := tmp;
 end;
-{$ENDIF}
 
 {*
-__loginActions
-~~~~~~~~~~~~~~
-
-.. code-block:: pascal
-
-    function __loginActions(const action: string): boolean;
-
-Used to perform different actions depending on which type of login message
-appears (if any) when a player is logged in.
-
-.. note::
-
-    - by Starblaster100, Raymond, IceFire908, Tarajunky, NCDS & Coh3n
-    - Last updated: Feb. 10, 2013 by Coh3n
-
-Example:
-
-.. code-block:: pascal
-
-    See __loginResponse();
-*}
-{$IFNDEF CODEINSIGHT}
-function __loginActions(const action: string): boolean;
-begin
-  result := true;
-
-  case (action) of
-    'false':
-      result := players.next(false);
-
-    'true':
-      result := players.next(true);
-
-    'halt':
-      terminateScript();
-
-    'update':
-      begin
-        if (@SRL_Events[EVENT_RS_UPDATE] <> nil) then
-        begin
-          print('RS Update: Going to call EVENT_RS_UPDATE procedure', TDebug.WARNING);
-          SRL_Events[EVENT_RS_UPDATE]();
-          exit(false);
-        end;
-
-        terminateScript();
-      end;
-  end;
-end;
-{$ENDIF}
-
-{*
-__getLoginResponse
+__handleLoginPopup
 ~~~~~~~~~~~~~~~~~~
 
 .. code-block:: pascal
 
-    function __getLoginResponse(colorCount, timer: integer): TVariantArray;
+    function __handleLoginPopup(tries: integer; inLobby: boolean): boolean;
 
-Returns login response information depending on the login text color count.
+Waits for the login popup message to appear (or logged in successfully). If a
+popup message is found, it will pass the details array to __respondToPopup();
+The inLobby boolean should be true if it is handling popups from the lobby.
 
 .. note::
 
-    - by Starblaster100, Raymond, IceFire908, Tarajunky, NCDS & Coh3n
-    - Last updated: Sept. 26, 2014 by Justin
+    - by The Mayor
+    - Last updated: 15 March 2015 by The Mayor
 
 Example:
 
 .. code-block:: pascal
 
-    See TPlayer.__loginResponse();
 *}
-{$IFNDEF CODEINSIGHT}
-const
-  __RES_DEBUG  = 0;
-  __RES_WAIT   = 1;
-  __RES_TRIES  = 2;
-  __RES_ACTION = 3;
-  // compares this string to what's read on the screen
-  // make sure string value (or part of it) is in the actual Runescape message
-  __LOGIN_INVALID_INFO   = 'For accounts created after';
-  __LOGIN_DISABLED       = 'Your account has been disabled';
-  __LOGIN_TEMP_DISABLED  = 'Your ban will be lifted in';
-  __LOGIN_LOGGED_IN      = 'Your account has not logged out';
-  __LOGIN_NOT_MEMBER     = 'Not a RS member';
-  __LOGIN_ERROR_CONNECT  = 'Error connecting';
-  __LOGIN_TOO_MANY       = 'Too many incorrect logins';
-  __LOGIN_UPDATE         = 'Runescape has been updated';
-  __LOGIN_TOKEN          = 'Client token changed';
-  __LOGIN_EXPIRE         = 'Your game session has now ended';
-  __LOGIN_EXCEED_LIMIT   = 'Login limit exceeded';
-  __LOGIN_SKILL_LEVEL    = 'Skill level 1000+ required';
-  __LOGIN_MEMBER_ONLY    = 'Player in member-only area';
-  __LOGIN_CANNOT_CONNECT = 'Cannot connect to world';
-  __LOGIN_UNAVAILABLE    = 'Our systems are currently unavailable';
-
-  __LOGIN_ERROR_COUNT    = 15;
-
-function __getLoginResponse(txt: string; timer, timer2: LongWord): TVariantArray;
+function __handleLoginPopup(tries: integer; inLobby: boolean): boolean;
 var
-  msg: string;
-  responses: array [0..(__LOGIN_ERROR_COUNT - 1)] of TVariantArray;
   i: integer;
+  timeOut: TTimeMarker;
+  popupMessage: string;
+  errorMessage: TVariantArray;
+  messages: array [0..15] of TVariantArray;
 begin
-  result := [];
+  timeOut.start();
 
-  if (players.getActive() < 1) then
-    print('No other active players, terminating', TDebug.FATAL);
-
-  //                  const          wait time    tries  action
-  responses := [[__LOGIN_INVALID_INFO,   0,         2,  'false' ],
-                [__LOGIN_DISABLED,       0,         0,  'false' ],
-                [__LOGIN_TEMP_DISABLED,  0,         0,  'false' ],
-                [__LOGIN_LOGGED_IN,      5000,      5,  'true'  ],
-                [__LOGIN_NOT_MEMBER,     0,         1,  'true'  ],
-                [__LOGIN_ERROR_CONNECT,  20000,     9,  'halt'  ],
-                [__LOGIN_TOO_MANY,       5 * 60000, 2,  'false' ],
-                [__LOGIN_UPDATE,         0,         0,  'update'],
-                [__LOGIN_TOKEN,          0,         0,  'update'],
-                [__LOGIN_EXPIRE,         0,         0,  'update'],
-                [__LOGIN_EXCEED_LIMIT,   20000,     10, ''      ],
-                [__LOGIN_SKILL_LEVEL,    0,         9,  'true'  ],
-                [__LOGIN_MEMBER_ONLY,    0,         1,  'false' ],
-                [__LOGIN_CANNOT_CONNECT, 2000,      5,  'true'  ],
-                [__LOGIN_UNAVAILABLE,    3 * 60000, 10, 'halt'  ]];
-
-  for i := 0 to high(responses) do
-    if (pos(responses[i][0], txt) > 0) then
-      result := responses[i];
-
-  if (length(result) = 0) then
-    if ((getSystemTime() > timer) and (timer > 0)) then
-    begin
-      result :=   ['One minute as passed...',    0,         0,  'false',  'Login failed'];
-      print('Unknown login string: "'+txt+'"', TDebug.WARNING);
-      print('Please report this issue in the SRL bugs section of the forum', TDebug.HINT);
-
-      takeScreenshot('unknown_login_count.png');
-    end else
-      if ((getSystemTime() > timer2) and (timer2 > 0)) then
-        if (pos('Please Wait', txt) > 0) then
-        begin
-          result := [__LOGIN_UPDATE,         0,         0,  'update'];
-          print('Loading screen present for too long, restarting smart');
-        end;
-  end;
-{$ENDIF}
-
-{*
-TPlayer.__loginResponse
-~~~~~~~~~~~~~~~~~~~~~~~
-
-.. code-block:: pascal
-
-    function TPlayer.__loginResponse(const tries: integer; const timer: integer): boolean;
-
-Handles the login response pop ups that sometimes show when a player logs in.
-Called in loops waiting for the lobby and login screens. Results are as follows:
-
-    * __RES_NOTHING: Nothing happens; everything is successful.
-    * __RES_POPUP: Popup was found, need to retry.
-    * __RES_TERMINATE: Exceeded maximum number of tries, terminate.
-
-.. note::
-
-    - by Starblaster100, Raymond, IceFire908, Tarajunky, NCDS & Coh3n
-    - Last updated: Feb. 10, 2013 by Coh3n
-
-Example:
-
-.. code-block:: pascal
-
-    See TPlayer.loginToLobby();
-*}
-{$IFNDEF CODEINSIGHT}
-const
-  __RES_NOTHING   = -1;
-  __RES_POPUP     = 0;
-  __RES_TERMINATE = 1;
-
-function getLoginResponseText(): string;
-var
-  wid, hei: integer;
-  tpa: TPointArray;
-  atpa: T2DPointArray;
-  b: TBox;
-  getText: boolean;
-begin
-  result := '';
-  getText := false;
-
-  getClientDimensions(wid, hei);
-
-  if (findColorsTolerance(tpa, 3023110, 0, 0, wid-1, hei-1, 6)) then
-    if (length(tpa) > 1000) then
-    begin
-      atpa := clusterTPAEx(tpa, 20, 20);
-      sortATPASize(atpa, true);
-
-      b := getTPABounds(atpa[low(atpa)]);
-
-      if (b.x2 - b.x1 > 50) and (b.y2 - b.y1 > 50) then
-        getText := true;
+  repeat // Wait until the popup appears, or we hit the lobby/isLoggedIn
+    case inLobby of
+      true: if isLoggedIn() then exit(true);
+      false: if lobby.isOpen() then exit(true);
     end;
 
-  if (getText) then
-    result := tesseractGetText(b.x1, b.y1, b.x2, b.y2, FILTER_SMALL_CHARS);
-end;
+    popupMessage := __getPopupMessage();
 
-function TPlayer.__loginResponse(const tries: integer; const timer, timer2: integer): integer;
-var
-  c: integer;
-  arr: TVariantArray;
-begin
-  result := __RES_NOTHING;
+    if (timeOut.getTime() > 60000) then
+    begin
+      print('Took too long to find login popup or login - respawning SMART');
+      popupMessage := 'Your game session has now ended'; // Trick it to restart
+    end;
 
-  // get the text on the login error message
-  arr := __getLoginResponse(getLoginResponseText(), timer, timer2);
+    wait(random(500, 750));
+  until (length(popupMessage) > 0);
 
-  if (length(arr) > 0) then // if there was an error logging in
+  messages := [
+      {Popup Text                         Wait time  MaxTries  Action}
+    ['Invalid username or password',          0,         2,  'Next_Player_F'],
+    ['Your account has been disabled',        0,         0,  'Next_Player_F'],
+    ['Your ban will be lifted in',            0,         0,  'Next_Player_F'],
+    ['Your account has not logged out',       10000,     5,  'Next_Player_T'],
+    ['You need a member''s account',          0,         1,  'Set_Non-Member'],
+    ['Error connecting',                      20000,     4,  'Terminate'],
+    ['Unable to connect',                     20000,     4,  'Terminate'],
+    ['Too many incorrect logins',             5 * 60000, 2,  'Next_Player_F'],
+    ['Runescape has been updated',            0,         0,  'Reload_Client'],
+    ['Client token changed',                  0,         0,  'Reload_Client'],
+    ['Your game session has now ended',       0,         0,  'Reload_Client'],
+    ['Login limit exceeded',                  20000,     8,  'Set_World'],
+    ['Skill level 1000+ required',            0,         0,  'Set_World'],
+    ['Player in member-only area',            0,         0,  'Set_Member'],
+    ['Cannot connect to world',               10000,     0,  'Set_World'],
+    ['Our systems are currently unavailable', 3 * 60000, 8,  'Reload_Client']];
+
+  for i := 0 to high(messages) do
+    if (pos(messages[i][0], popupMessage) > 0) then
+    begin
+      errorMessage := messages[i];
+      print('Login message: ' + errorMessage[0], TDebug.SUB);
+      break();
+    end;
+
+  if length(errorMessage) < 1 then
   begin
-    print('Login response: '+arr[__RES_DEBUG]);
-    wait(2000 + arr[__RES_WAIT] + randomRange(-200, 200));
-    typeByte(VK_ESCAPE); // exit response window
-
-    case arr[__RES_DEBUG] of
-      __LOGIN_NOT_MEMBER:
-        begin
-          self.isMember := false;
-          self.world := 0;
-        end;
-
-      __LOGIN_SKILL_LEVEL:
-        begin
-          self.world := 0;
-        end;
-
-      __LOGIN_MEMBER_ONLY:
-        begin
-          self.isMember := true;
-          self.world := 0;
-        end;
-
-      __LOGIN_CANNOT_CONNECT:
-        begin
-          self.world := 0;
-        end;
-    end;
-
-    result := __RES_POPUP;
-
-    if (tries >= arr[__RES_TRIES]) then
-    begin
-      wait(500 + random(500));
-      self.location := arr[__RES_DEBUG];
-      __loginActions(arr[__RES_ACTION]);
-      exit(__RES_TERMINATE);
-    end;
+    print('Unknown login popup message: ' + popupMessage, TDebug.WARNING);
+    takeScreenshot('unknown_login_popup.png');
+    print('PLEASE report this in the SRL-6 bugs section: https://villavu.com/forum/project.php?projectid=10', TDebug.HINT);
+    exit(false);
   end;
+
+  __respondToPopup(errorMessage, tries);
 end;
-{$ENDIF}
 
 (*
 TPlayer.loginToLobby
@@ -1173,7 +982,7 @@ visible.
 .. note::
 
     - by The SRL Developers Team
-    - Last updated: Feb. 10, 2013 by Coh3n
+    - Last updated: 15 March 2015 by The Mayor
 
 Example:
 
@@ -1184,10 +993,14 @@ Example:
 *)
 function TPlayer.loginToLobby(): boolean;
 var
-  arr: TVariantArray;
-  c, tries, popup: integer;
-  t, t2 : LongWord;
+  tries: integer = 1;
 begin
+  if (not self.isActive) then
+  begin
+    print('TPlayer.loginToLobby(): Player ' + self.nickname + ' is not active...');
+    exit(false);
+  end;
+
   if (isLoggedIn() or lobby.isOpen()) then
     exit(true);
 
@@ -1202,62 +1015,30 @@ begin
 
   print('TPlayer.loginToLobby()', TDebug.HEADER);
 
-  // check player activity
-  if (not self.isActive) then
-  begin
-    print('Player '+self.nickname+' is not active...');
-    print('TPlayer.loginToLobby(): '+toStr(result), TDebug.FOOTER);
-    exit(false);
-  end;
-
-  if not isLoggedIn() then
-    typeByte(VK_ESCAPE); // exit any existing windows
-  t := (getSystemTime() + 60000);
-  t2 := (getSystemTime() + 30000);
-
   repeat
-    print(capitalize(self.loginName)+' ('+capitalize(self.displayName)+')');
-
-    if (not self.secureLogin) then
-    begin
-      print('Entering username...');
-      __enterLoginInfo(_boxUsername, self.loginName, true, true);
-
-      wait(250 + random(200));
-
-      print('Entering password...');
-      __enterLoginInfo(_boxPassword, self.password, false, true);
-    end else begin
-      print('Entering info. using a secure method...');
-      __secureEnterInfo(self.loginName, self.password);
+    if (self.loginName <> players[currentPlayer].loginName) then
+    begin         // Reinitialise self in case __respondToPopup is called
+      self := players[currentPlayer];
+      tries := 1;
     end;
 
-    wait(800 + random(50));	// fixes the login spam recoveries bug
+    print('Attempt ' + toStr(tries) + ': ' + capitalize(self.loginName) + ' (' + capitalize(self.displayName) + ')');
 
-    repeat
-      popup := self.__loginResponse(tries, t, t2);
+    print('Entering username...', TDebug.SUB);
+    __enterLoginInfo(_boxUsername, self.loginName, true, true);
+    wait(500 + random(200));
 
-      // if exceeded maximum tries, break, otherwise terminate
-      if (popup = __RES_TERMINATE) then
-        break(2)
-      else
-        if (popup = __RES_POPUP) then
-          break;
+    print('Entering password...', TDebug.SUB);
+    __enterLoginInfo(_boxPassword, self.password, false, true);
+    wait(800 + random(200));
 
-      wait(100 + random(100));
-      result := lobby.isOpen() or isLoggedIn();
-    until(result);
+    result := __handleLoginPopup(inc(tries), false);
+  until result;
 
-    inc(tries);
-  until(result);
-
-  if (result) and (not disableIPScreenshots) then
+  if result and (not disableIPScreenshots) then
     takeScreenshot('IP_address.png');
 
-  if (result) then
-    print('Found lobby screen');
-
-  print('TPlayer.loginToLobby(): '+toStr(result), TDebug.FOOTER);
+  print('TPlayer.loginToLobby(): ' + toStr(result), TDebug.FOOTER);
 end;
 
 (*
@@ -1274,7 +1055,7 @@ logged in.
 .. note::
 
     - by The SRL Developers Team
-    - Last updated: 20 August 2013 by Coh3n
+    - Last updated: 15 March 2015 by The Mayor
 
 Example:
 
@@ -1285,32 +1066,29 @@ Example:
 *)
 function TPlayer.login(): boolean;
 var
-  tries, popup: integer;
-  t, t2 : LongWord;
+  tries: integer;
   p: TPoint;
   skipPlay: boolean;
 begin
   print('TPlayer.login()', TDebug.HEADER);
 
   repeat
-    if (isLoggedIn()) then
+    if isLoggedIn() then
     begin
       print('Already logged in');
       result := true;
       break;
     end;
 
-    if (self.loginToLobby()) then
+    if self.loginToLobby() then
     begin
-      // by default (-1) does nothing, random world if set to 0, otherwise selected world
       if (self.world <> -1) then
         if (self.world = 0) then
           lobbyWorlds.selectRandomWorld(self.isMember)
+        else if lobby.quickSelectWorld(self.world) then
+          skipPlay := true
         else
-          if (lobby.quickSelectWorld(self.world)) then
-            skipPlay := true
-          else
-            lobbyWorlds.selectWorld(self.world);
+          lobbyWorlds.selectWorld(self.world);
 
       if (not skipPlay) then
       begin
@@ -1318,42 +1096,23 @@ begin
         mouse(p.rand(randomRange(-50, 50), randomRange(-10, 10)), MOUSE_LEFT);
       end;
 
-      t := (getSystemTime() + 60000);
-      t2 := (getSystemTime() + 30000);
-
-      repeat
-        skipPlay := false;
-        popup := self.__loginResponse(tries, t, t2);
-
-        // if exceeded maximum tries, break, otherwise terminate
-        if (popup = __RES_TERMINATE) then
-          break(2)
-        else
-          if (popup = __RES_POPUP) then
-            break;
-
-        wait(500 + random(500));
-        result := (isLoggedIn());
-
-      until(result or (getSystemTime() > (t + 5000)));
+      result := __handleLoginPopup(inc(tries), true);
     end;
 
-    inc(tries);
-  until (result) or (not self.isActive);
+    if (self.loginName <> players[currentPlayer].loginName) or (self.world <> players[currentPlayer].world) then
+    begin         // Reinitialise self in case __respondToPopup is called
+      self := players[currentPlayer];
+      tries := 1;
+    end;
+  until result;
 
-  if (result) then
-  begin
-    print('Logged in: '+self.nickname);
+  if self.worked.paused then
+    self.worked.start();
 
-    if (self.worked.paused) then
-      self.worked.start();
+  if (SRL_Events[EVENT_LOGIN] <> nil) then
+    SRL_Events[EVENT_LOGIN]();
 
-    if (SRL_Events[EVENT_LOGIN] <> nil) then
-      SRL_Events[EVENT_LOGIN]();
-  end;
-
-  wait(300 + random(500));
-  print('TPlayer.login(): '+toStr(result), TDebug.FOOTER);
+  print('TPlayer.login(): ' + toStr(result), TDebug.FOOTER);
 end;
 
 (*
@@ -1384,10 +1143,7 @@ var
   p: TPoint;
 begin
   if (not isLoggedIn()) then
-  begin
-    result := true;
-    exit;
-  end;
+    exit(true);
 
   print('TPlayer.logout()', TDebug.HEADER);
 
@@ -1397,24 +1153,23 @@ begin
     SRL_Events[EVENT_LOGOUT]();
   end;
 
-  if (options.open()) then
+  if options.open() then
   begin
     options.selectOption(['Logout', 'ogout', 'gout']);
 
     t := (getSystemTime() + (7000));
 
-    while (not result) and (getSystemTime() < t) do
-    begin
+    repeat
       print('Waiting for login screen...');
       result := (not isLoggedIn());
       wait(700 + random(500));
-    end;
+    until result or (getSystemTime() > t);
 
     self.worked.pause();
   end else
     print('Failed to click logout text', TDebug.ERROR);
 
-  print('TPlayer.logout(): '+toStr(result), TDebug.FOOTER);
+  print('TPlayer.logout(): ' + toStr(result), TDebug.FOOTER);
 end;
 
 (*
@@ -1430,7 +1185,7 @@ Logs the player out to the lobby.
 .. note::
 
     - by Coh3n
-    - Last updated: Mar. 1, 2013 by Coh3n
+    - Last updated: 14 March 2015 by The Mayor
 
 Example:
 
@@ -1440,8 +1195,7 @@ Example:
 *)
 function TPlayer.exitToLobby(): boolean;
 begin
-  if (lobby._open()) then
-    result := true;
+  result := lobby._open();
 end;
 
 (*
@@ -1457,7 +1211,7 @@ Leaves the lobby; goes to the login screen.
 .. note::
 
     - by Coh3n
-    - Last updated: Mar. 3, 2013 by Coh3n
+    - Last updated: 3 March 2013 by Coh3n
 
 Example:
 
@@ -1496,19 +1250,18 @@ function TPlayer.switchToWorld(newWorld: integer = 0): boolean;
 begin
   result := false;
 
-  print('Switching to world '+toStr(newWorld), TDebug.SUB);
+  print('Switching to world ' + toStr(newWorld), TDebug.SUB);
 
-  if (self.exitToLobby()) then
+  if self.exitToLobby() then
   begin
     self.world := -1;
 
     if (newWorld = 0) then
-      result := lobbyWorlds.selectRandomWorld(self.isMember);
-
-    if (not result) then
+      result := lobbyWorlds.selectRandomWorld(self.isMember)
+    else
       result := lobbyWorlds.selectWorld(newWorld);
 
-    if (result) then
+    if result then
       result := self.login();
   end;
 end;
