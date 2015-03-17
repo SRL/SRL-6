@@ -305,11 +305,13 @@ Example:
 
     __freeMinimapMask();
 *}
+{$IFNDEF CODEINSIGHT}
 procedure __freeMinimapMask();
 begin
   if (bitmapExists(minimap.bmpMask)) then
     freeBitmap(minimap.bmpMask);
 end;
+{$ENDIF}
 
 (*
 TRSMinimap.getAngleRadians
@@ -583,10 +585,10 @@ TRSMinimap.clickCompass
 
 .. code-block:: pascal
 
-    procedure TRSMinimap.clickCompass();
+    procedure TRSMinimap.clickCompass(faceSouth: boolean = false);
 
 Clicks the Runescape compass, resulting in the mainscreen camera angle to be set
-to low, and the minimap compass angle set to north.
+to low, and the minimap compass angle set to north (or south if faceSouth = true).
 
 .. note::
 
@@ -646,6 +648,7 @@ Example:
 
     searches := __createSearchAngles(90.0, 25.0);
 *)
+{$IFNDEF CODEINSIGHT}
 function __createSearchAngles(angle, range: extended): T2DExtendedArray;
 var
   startA, endA: extended;
@@ -668,6 +671,7 @@ begin
   if (length(result) < 1) then
     insert(TExtendedArray([startA, endA]), result);
 end;
+{$ENDIF}
 
 (*
 TRSMinimap.isPointOn
@@ -3140,7 +3144,8 @@ Example:
 
     __GridCoords16(point(50, 50));
 *)
-Function __GridCoords16(Grid16: TPoint): TPoint;
+{$IFNDEF CODEINSIGHT}
+function __GridCoords16(Grid16: TPoint): TPoint;
 var
   Yh, yM, x, y: Extended;
   p: TPoint;
@@ -3158,6 +3163,7 @@ begin
   if (not pointInBox(result, mainScreen.getBounds())) then
     result := [-1, -1];
 end;
+{$ENDIF}
 
 (*
 TRSMinimap.pointToMainscreen

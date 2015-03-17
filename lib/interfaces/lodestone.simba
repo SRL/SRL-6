@@ -133,6 +133,7 @@ Example:
     if (LodestoneScreen.__find()) then
       writeln('bounds are set!');
 *)
+{$IFNDEF CODEINSIGHT}
 function TRSLodestoneScreen.__find(): boolean;
 const
   TOP_COLOR = 855595;    //red color behind lodestone
@@ -164,6 +165,7 @@ begin
       end;
     end;
 end;
+{$ENDIF}
 
 (*
 TRSLodestoneScreen.isOpen

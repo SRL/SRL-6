@@ -98,12 +98,12 @@ end;
 {$ENDIF}
 
 {*
-TRSLobby._skipEmailScreen
-~~~~~~~~~~~~~~~~~~~~~~~~~
+TRSLobby.__skipEmailScreen
+~~~~~~~~~~~~~~~~~~~~~~~~~~
 
 .. code-block:: pascal
 
-    procedure TRSLobby._skipEmailScreen();
+    procedure TRSLobby.__skipEmailScreen();
 
 Handles the validate email screen that comes up when you enter to lobby.
 
@@ -116,10 +116,10 @@ Example:
 
 .. code-block:: pascal
 
-    lobby._skipEmailScreen();
+    lobby.__skipEmailScreen();
 *}
 {$IFNDEF CODEINSIGHT}
-procedure TRSLobby._skipEmailScreen();
+procedure TRSLobby.__skipEmailScreen();
 var
   TPA: TPointArray;
   b: TBox;
@@ -171,7 +171,7 @@ begin
   t := (getSystemTime() + randomRange(7500, 8500));
   result := false;
 
-  self._skipEmailScreen();
+  self.__skipEmailScreen();
 
   result := (getColor(lobby.x1 + 41, lobby.y1 - 105) = COLOR); // color of top/left lobby sword symbol
 end;
@@ -237,7 +237,7 @@ Gets current lobby tab.
 .. note::
 
     - by Bionicle1800, NCDS & Cohen
-    - Last Updated: 9th September by The Mayor
+    - Last Updated: 9 September  2014 by The Mayor
 
 Example:
 

@@ -71,12 +71,14 @@ Internal SMART variables used only in smart.simba.
     * smartClientWidth, smartClientHeight - The dimensions of the smart client
     * smartImage: TMufasaBitmap that is displayed onto smart.
 *}
+{$IFNDEF CODEINSIGHT}
   __smartCurrentPid: integer := 0;
   __smartCurrentTarget: integer := 0;
   __smartIsDrawingSetup: boolean := False;
   __smartNativeDebugButtonID: integer := 101;
   __smartClientWidth: integer := 800;
   __smartClientHeight: integer := 600;
+{$ENDIF}
   smartImage: TMufasaBitmap;
 
 (*
@@ -761,6 +763,7 @@ begin
   end;
 end;
 
+{$IFNDEF CODEINSIGHT}
 procedure __smartCheckPlugins();
 var
   dx, ogl: boolean;
@@ -777,6 +780,7 @@ begin
   if (dx = false) and (ogl = true) then
     print('Only found the OpenGL plugin, you must be in OpenGL mode');
 end;
+{$ENDIF}
 
 begin
   SRL_Events[EVENT_RS_UPDATE] := sixHourFix;

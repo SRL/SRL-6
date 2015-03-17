@@ -184,6 +184,7 @@ Example:
     if (bankScreen.__find()) then
       writeln('bounds are set!');
 *)
+{$IFNDEF CODEINSIGHT}
 function TRSBankScreen.__find(): boolean;
 const
   TOP_DIMENSIONS: TPoint = [479, 31];
@@ -235,6 +236,7 @@ begin
     unFreeze();
   end;
 end;
+{$ENDIF}
 
 (*
 TRSBankScreen.isOpen

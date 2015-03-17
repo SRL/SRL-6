@@ -53,8 +53,10 @@ Internal SRL debug variables:
     * __debugLevel: Used for debug indenting. Makes it easier to read & follow.
 *}
 var
+{$IFNDEF CODEINSIGHT}
   __logFile = -1;
   __debugLevel = 1;
+{$ENDIF}
 
 (*
 var External Debug

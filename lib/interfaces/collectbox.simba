@@ -9,9 +9,6 @@ The source for this file can be found `here <https://github.com/SRL/SRL-6/blob/m
 
 *)
 
-{$include_once interfaces.simba}
-{$include_once ../core/text.simba}
-
 {$f-}
 
 (*
@@ -107,6 +104,7 @@ Example:
     if (collectbox.__find()) then
       writeln('bounds are set!');
 *)
+{$IFNDEF CODEINSIGHT}
 function TRSCollectBox.__find(): boolean;
 const
   BACKGROUND_COLOR = 4208939;
@@ -138,6 +136,7 @@ begin
       end;
     end;
 end;
+{$ENDIF}
 
 (*
 TRSCollectBox.isOpen

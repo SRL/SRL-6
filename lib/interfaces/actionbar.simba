@@ -124,7 +124,6 @@ Example:
 {$IFNDEF CODEINSIGHT}
 procedure TRSActionBar.__init();
 begin
-
   with (self) do
   begin
     name := 'RS Action Bar';

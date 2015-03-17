@@ -89,6 +89,7 @@ Example:
     if (heroScreene.__find()) then
       writeln('bounds are set!');
 *)
+{$IFNDEF CODEINSIGHT}
 function TRSHeroScreen.__find(): boolean;
 const
   BURGUNDY_COLOR = [1448256, 26]; // [Col, Tol] background of "HERO"
@@ -123,6 +124,7 @@ begin
   end;
 
 end;
+{$ENDIF}
 
 (*
 TRSHeroScreen.isOpen

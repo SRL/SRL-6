@@ -9,16 +9,20 @@ type
     clbPlayers: TCheckListBox;
     btnStart: TButton;
     debugProc: procedure(const s: string);
+
+   {$IFNDEF CODEINSIGHT}
     __btnBmps: array [0..1] of TBitmap;
     __loadedArmy: PF_TPlayerArray;
     __loadedArmyName: string;
     __currPlayer: integer;
+    {$ENDIF}
 
     editBoxLabels, editBoxDefaults, editBoxHints: TStringArray;
     checkBoxLabels, checkBoxDefaults, checkBoxHints: TStringArray;
     comboBoxLabels, comboBoxDefaults, comboBoxHints: TStringArray;
     comboBoxItems: array of TStringArray;
 
+    {$IFNDEF CODEINSIGHT}
     __scriptEditBoxes: array of TEdit;
     __scriptEditLabels: array of TLabel;
     __scriptCheckBoxes: array of TCheckBox;
@@ -29,6 +33,7 @@ type
     __btnApplyAll: TButton;
     __lbDebug: TListBox;
     __debugGroupBox, __cmpGroupBox: TGroupBox;
+    {$ENDIF}
 
     // user should change
     name, scriptHelpThread, scriptSettingsPath: string; // form title.
@@ -425,6 +430,7 @@ begin
   end;
 end;
 
+{$IFNDEF CODEINSIGHT}
 procedure __PF_Writeln(const s: string);
 var
   i: integer;
@@ -444,6 +450,7 @@ begin
     setScrollWidth(MaxA(a) + 5);
   end;
 end;
+{$ENDIF}
 
 procedure PF_OnNotifyEvent(Sender: TObject); native;
 var

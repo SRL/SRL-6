@@ -33,7 +33,9 @@ const Internal
 Internal constants of the SRL stats file.
 *}
 const
+{$IFNDEF CODEINSIGHT}
   __STATS_SETTING = 'stats_ShowStatsDialog'; // name for the setting that will be set
+{$ENDIF}
 
 {*
 const Internal
@@ -42,8 +44,10 @@ const Internal
 Internal variables of the SRL stats file.
 *}
 var
+{$IFNDEF CODEINSIGHT}
   __statsVars: array of __TStatsVar;
   __statsTimer: LongWord;
+{$ENDIF}
 
 (*
 var User-set Variables
@@ -57,7 +61,6 @@ The variables that need to be set in any script that uses the SRL stats system.
 *)
 var
   statsUsername, statsPassword, statsScriptID: string;
-
 
 (*
 statsSetup
@@ -135,6 +138,7 @@ internally.
     __statsInitVariable('coal', 0);
 
 *)
+{$IFNDEF CODEINSIGHT}
 procedure __statsInitVariable(VarName: String; InitValue: Integer);
 var
   len: Integer;
@@ -145,7 +149,7 @@ begin
   __statsVars[len].Name := LowerCase(VarName);
   __statsVars[len].Value := InitValue;
 end;
-
+{$ENDIF}
 
 (*
 statsSetVariable

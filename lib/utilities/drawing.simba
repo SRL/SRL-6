@@ -21,7 +21,10 @@ Integer constant that stores the shadow color for adding a shadow for text drawi
 
 *}
 const
+
+{$IFNDEF CODEINSIGHT}
   __SHADOW_COLOR = 65536;
+{$ENDIF}
 
 (*
 TMufasaBitmap.clear

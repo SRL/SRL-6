@@ -90,6 +90,7 @@ Example:
 
     chatbox.__setup();
 *}
+{$IFNDEF CODEINSIGHT}
 procedure TRSChatbox.__setup();
 var
   b, chatBounds: TBox;
@@ -113,6 +114,7 @@ begin
     insert(b, self.lineBoxes, high(self.lineBoxes)+1);
   end;
 end;
+{$ENDIF}
 
 (*
 TRSChatbox.getChatArea

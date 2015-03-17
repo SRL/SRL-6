@@ -120,7 +120,7 @@ Example:
     if (depositBox.__find()) then
       writeln('bounds are set!');
 *)
-
+{$IFNDEF CODEINSIGHT}
 function TRSDepositBox.__find(): boolean;
 const
   GREEN_ARROW_COLOR = 4578368;
@@ -146,6 +146,7 @@ begin
     result := true;
   end;
 end;
+{$ENDIF}
 
 (*
 TRSDepositBox.isOpen

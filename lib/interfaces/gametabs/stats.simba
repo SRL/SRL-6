@@ -30,7 +30,9 @@ Integer constants that represent the color of the skill text.
 
 *}
 const
+{$IFNDEF CODEINSIGHT}
   __COLOR_STATS = 36095;
+{$ENDIF}
 
 {*
 Constant: Skill info type
@@ -188,7 +190,7 @@ function TRSTabStats.getSkillBox(skill: integer): TBox;
 var
   offSet: TPoint;
 begin
-  if (gameTabs.areMultiOpen()) then
+  if gameTabs.areMultiOpen() then
     offset := [0, 45]
   else
     offset := [3, 17];

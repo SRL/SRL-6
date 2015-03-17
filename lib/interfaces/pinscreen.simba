@@ -97,6 +97,7 @@ Example:
     if (pinScreen.__find()) then
       writeln('bounds are set!');
 *)
+{$IFNDEF CODEINSIGHT}
 function TRSPinScreen.__find(): boolean;
 const
   TEXT_COLOR = 13417886;
@@ -136,6 +137,7 @@ begin
       end;
     end;
 end;
+{$ENDIF}
 
 (*
 TRSPinScreen.isOpen
@@ -278,6 +280,7 @@ begin
   print('pinScreen.enter(): result = ' + toStr(res), TDebug.FOOTER);
   exit(res);
 end;
+{$ENDIF}
 
 {*
 TRSPinScreen.__findNumber
@@ -300,6 +303,7 @@ Example:
 
     pinScreen.__findNumber('1', b);
 *}
+{$IFNDEF CODEINSIGHT}
 function TRSPinScreen.__findNumber(number: char; out b: TBox): boolean;
 var
   numberSlots: TBoxArray;
