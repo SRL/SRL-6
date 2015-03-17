@@ -94,8 +94,8 @@ Returns true if the collectbox is detected, and sets the bounds
 
 .. note::
 
-    - by Ashaman88
-    - Last Updated: 15 March 2014 by Ashaman88
+    - by The Mayor
+    - Last Updated: 17 March 2015 by The Mayor
 
 Example:
 
@@ -107,34 +107,36 @@ Example:
 {$IFNDEF CODEINSIGHT}
 function TRSCollectBox.__find(): boolean;
 const
-  BACKGROUND_COLOR = 4208939;
-  EYE_LENGTH = 2502;
-  OFFSET_COLOR = 1316170;
+  BURGUNDY_COLOR = [1448256, 26]; // [Col, Tol] background of "COLLECTION BOX"
 var
-  tpa : TPointArray;
-  atpa : T2DPointArray;
-  i, hh: integer;
+  i: Integer;
+  TPA: TPointArray;
+  ATPA: T2DPointArray;
   b: TBox;
 begin
-  result := false;
+  findColorsTolerance(TPA, BURGUNDY_COLOR[0], mainScreen.getBounds(), BURGUNDY_COLOR[1]);
 
-  if (not findColors(tpa, BACKGROUND_COLOR, getClientBounds())) then
-    exit();
+  if length(TPA) < 20 then
+  begin
+    print('TRSCollectBox.__find(): Didn''t find enough BURGUNDY_COLOR', TDebug.WARNING);
+    exit(false);
+  end;
 
-  atpa := tpa.cluster(3);
-  hh := high(atpa);
+  ATPA := TPA.cluster(5);
+  ATPA.sortBySize(true);
 
-  for i := 0 to hh do
-    if (length(atpa[i]) = EYE_LENGTH) then
+  for i := 0 to high(ATPA) do
+  begin
+    b := ATPA[i].getBounds();
+    if (b.getWidth() < 140) or (b.getHeight() > 30) then continue();
+
+    if (pos('COLLECTION BOX', upperCase(tesseract_GetText(b, TESS_FILTER_SMALL_CHARS))) > 0) then
     begin
-      b := getTPABounds(atpa[i]);
-
-      if (getColor(b.x2, b.y1 - 30) = OFFSET_COLOR) then
-      begin
-        self.setBounds([b.x1 - 9, b.y1 - 39, b.x2 + 243, b.y2 + 179]);
-        exit(true);
-      end;
+      b.edit(-2, -2, 198, 268);
+      self.setBounds(b);
+      exit(true);
     end;
+  end;
 end;
 {$ENDIF}
 
@@ -222,7 +224,7 @@ begin
   end;
 
   // click the X as a failsafe
-  mouseBox(intToBox(self.x1 + 345, self.y1 + 8, self.x2 - 4, self.y1 + 14), MOUSE_MOVE);
+  mouseBox(intToBox(self.x1 + 346, self.y1 + 6, self.x2 - 3, self.y1 + 13), MOUSE_MOVE);
 
   // this is a failsafe in case the bankscreen closes (from the ESC key) while moving the mouse
   if (self.isOpen()) then
@@ -250,11 +252,11 @@ end;
 
 (*
 TRSCollectBox.collectButton
-~~~~~~~~~~~~~~~~~~~
+~~~~~~~~~~~~~~~~~~~~~~~~~~~
 
 .. code-block:: pascal
 
-    function TRSCollectBox.collectButton(slot: integer): boolean;
+    function TRSCollectBox.collectButton(button: integer): boolean;
 
 Selects one of the two collect buttons, either to collect to bank or
 inventory, based upon parameter slot.
@@ -262,7 +264,7 @@ inventory, based upon parameter slot.
 .. note::
 
     - by Ashaman88
-    - Last Updated: 15 March 2014 by Ashaman88
+    - Last Updated: 17 March 2015 by The Mayor
 
 Example:
 
@@ -271,16 +273,15 @@ Example:
     if (collectbox.collectButton(COLLECT_BUTTON_BANK)) then
       writeln('collected to the bank');
 *)
-function TRSCollectBox.collectButton(slot: integer): boolean;
-const
-  BUTTON_OFFSET = 40;
+function TRSCollectBox.collectButton(button: integer): boolean;
+var
+  TBA: TBoxArray;
 begin
   if (not self.isOpen()) then
-    exit;
+    exit(false);
 
-  mouseBox([(self.x1 + 140), self.y1 + 226 + (slot * BUTTON_OFFSET), (self.x2 - 26), (self.y2 - 52) + (slot * BUTTON_OFFSET)], MOUSE_LEFT);
-
-  wait(50 + random(50));
+  TBA := grid(1, 2, 200, 17, 0, 37, point(self.x1 + 236, self.y1 + 231));
+  mouseBox(TBA[button]);
 
   result := true;
 end;

@@ -119,7 +119,7 @@ begin
     if (pos('HERO', upperCase(tesseract_GetText(b, TESS_FILTER_SMALL_CHARS))) > 0) then
     begin
       self.setBounds([b.x1 - 68, b.y1 - 5, b.x2 + 549, b.y2 + 511]);
-      result := true;
+      exit(true);
     end;
   end;
 

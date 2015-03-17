@@ -118,7 +118,7 @@ begin
     if (pos('GRAND EXCHANGE', upperCase(tesseract_GetText(b, TESS_FILTER_SMALL_CHARS))) > 0) then
     begin
       self.setBounds([b.x1 - 2, b.y1 - 5, b.x2 + 535, b.y2 + 300]);
-      result := true;
+      exit(true);
     end;
   end;
 
