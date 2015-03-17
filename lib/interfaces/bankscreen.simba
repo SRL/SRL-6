@@ -174,8 +174,8 @@ Returns true if the bank screen is detected, and sets the bounds (fully dynamic)
 
 .. note::
 
-    - by The Mayor
-    - Last Updated: 17 March 2015 by The Mayor
+    - by Olly
+    - Last Updated: 30 November 2014 by Serajin
 
 Example:
 
@@ -186,41 +186,54 @@ Example:
 *)
 {$IFNDEF CODEINSIGHT}
 function TRSBankScreen.__find(): boolean;
+const
+  TOP_DIMENSIONS: TPoint = [479, 31];
+  LINE_COLOR = 4932919;
 var
-  TPA: TPointArray;
-  ATPA, ATPA2: T2DPointArray;
-  i, w, h: integer;
+  tpa, tpa2: TPointArray;
+  atpa, atpa2: T2DPointArray;
+  i, hh, wid, hei, j, c: integer;
   b: TBox;
+  p: TPoint;
 begin
-  getClientDimensions(w, h);
-                          // Black box around "BANK OF RUNESCAPE"
-  if findColors(TPA, 65536, 0, 0, w-1, 50) then
-  begin
-    ATPA := TPA.cluster(5);
-    ATPA.sortBySize(true);
+  result := false;
 
-    for i := 0 to high(ATPA) do
+  getClientDimensions(wid, hei);
+  freeze();
+
+  try
+    if (findColors(tpa, 65536, 0, 0, wid -1, 300)) then // top can only be at the top of the screen!
     begin
-      b := ATPA[i].getBounds();
+      atpa := clusterTPAEx(tpa, 6, 5);
+      hh := high(atpa);
 
-      if (b.getWidth() = 479) and (b.getHeight() = 31) then
+      for i := 0 to hh do
       begin
-        b.offset(point(0, 554)); // Offset to buttons at bottom
+        b := getTPABounds(atpa[i]);
 
-        if findColors(TPA, 4578368, b) then // Green arrow colour
+        if (((b.x2 - b.x1) + 1) = TOP_DIMENSIONS.x) and (((b.y2 - b.y1) + 1) = TOP_DIMENSIONS.y) then // check size if correct
         begin
-          ATPA2 := TPA.cluster(5);
+          c := countColorTolerance(1343121, b, 19, colorSetting(2, 0.06, 1.28));  // count yellow text color
 
-          if length(ATPA2) = 6 then // 6 green arrows
-          begin
-            b.edit(-8, -562, 8, 8);
-            self.setBounds(b);
-            result := true;
-            break();
-          end;
+          if (c > 500) then  // check we have enough text points
+            if (findColors(tpa, LINE_COLOR, b.x1, b.y2, b.x2, hei - 1)) then // search for line color under the top we just found
+            begin
+              atpa2 := findTPARows(tpa);
+
+              for j := 0 to high(atpa2) do
+                if (length(atpa2[j]) > 160) then  // check the line is big enough to be the bottom
+                begin
+                  self.setBounds([b.x1 - 8, b.y1 - 8, b.x2 + 200, atpa2[j][0].y + 9]); // set the bounds based on the top we found, and the line we found.
+                  result := true;
+                  break(2);
+                end;
+              print('TRSBankscreen.__find(): Found the top of the bankscreen, but failed to find the bottom', TDebug.WARNING);
+            end;
         end;
       end;
     end;
+  finally
+    unFreeze();
   end;
 end;
 {$ENDIF}
@@ -239,7 +252,7 @@ x amount of ms for the bankscreen to be open.
 .. note::
 
     - by Olly
-    - Last Updated: 17 March 2015 by The Mayor
+    - Last Updated: 08 December 2013 by Olly
 
 Example:
 
@@ -251,23 +264,24 @@ Example:
 function TRSBankScreen.isOpen(waitTime: integer = 0): boolean;
 var
   t, itemTimer: longWord;
-  b: TBox;
+  box: TBox;
   tpa: TPointArray;
 begin
-  t := (getSystemTime() + waitTime);
+  result := false;
+  t := (getTimeRunning() + waitTime);
 
   repeat
-    if self.__find() then
+    if (self.__find()) then
     begin
       result := true;
 
       // now we attempt to wait for items to load
-      b := gridBox(0, 10, 10, 35, 31, 44, 44, point(self.x + _BANK_SLOTS_OFFSET.x, self.y + _BANK_SLOTS_OFFSET.y));
-      itemTimer := (getSystemTime() + randomRange(1200, 1600));
+      itemTimer := (getTimeRunning() + randomRange(1200, 1600));
+      box := gridBox(0, 10, 10, 35, 31, 44, 44, point(self.x + _BANK_SLOTS_OFFSET.x, self.y + _BANK_SLOTS_OFFSET.y)); // box around where the first item should be in the bank
 
-      while (getSystemTime() < itemTimer) do
+      while (getTimeRunning() >= itemTimer) do
       begin
-        if (countColor(ITEM_OUTLINE_BLACK, b) > 5) then
+        if (countColor(ITEM_OUTLINE_BLACK, box) > 5) then
           break();
 
         wait(randomRange(30, 60));
@@ -277,7 +291,7 @@ begin
     if (waitTime > 0) then
       wait(randomRange(30, 60));
 
-  until result or (getSystemTime() >= t);
+  until (getTimeRunning() >= t) or (result);
 end;
 
 (*
