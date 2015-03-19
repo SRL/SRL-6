@@ -281,7 +281,7 @@ begin
     exit(false);
 
   TBA := grid(1, 2, 200, 17, 0, 37, point(self.x1 + 236, self.y1 + 231));
-  mouseBox(TBA[button]);
+  mouseBox(TBA[button], MOUSE_LEFT);
 
   result := true;
 end;
