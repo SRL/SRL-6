@@ -776,12 +776,12 @@ end;
 {$ENDIF}
 
 {*
-__respondToPopup
-~~~~~~~~~~~~~~~~
+TPlayer.__respondToPopup
+~~~~~~~~~~~~~~~~~~~~~~~~
 
 .. code-block:: pascal
 
-    procedure __respondToPopup(errorMessage: TVariantArray; tries: integer);
+    procedure TPlayer.__respondToPopup(errorMessage: TVariantArray; tries: integer; out reachedMax: boolean);
 
 Internal procedure which responds to the login popup message. If the the max
 number of attempts has been reached, it will perform the appropriate action
@@ -791,7 +791,7 @@ the appropriate amount time (time = index 1 of errorMessage array).
 .. note::
 
     - by The Mayor
-    - Last updated: 15 March 2015 by The Mayor
+    - Last updated: 19 March 2015 by The Mayor
 
 Example:
 
@@ -799,30 +799,40 @@ Example:
 
 *}
 {$IFNDEF CODEINSIGHT}
-procedure __respondToPopup(errorMessage: TVariantArray; tries: integer);
+procedure TPlayer.__respondToPopup(errorMessage: TVariantArray; tries: integer; out reachedMax: boolean);
 begin
   typeByte(VK_ESCAPE);
 
-  if tries > errorMessage[2] then
+  if (tries > errorMessage[2]) then
   begin
     print('Responding with action: ' + errorMessage[3], TDebug.SUB);
 
     case errorMessage[3] of
-      'Next_Player_F': players.next(false, false);
-      'Next_Player_T': players.next(true, false);
       'Terminate': terminateScript();
-      'Set_World': players[currentPlayer].world := 0;
+      'Set_World': self.world := 0;
+
+      'Next_Player_F':
+        begin
+          players.next(false, false);
+          self := players[currentPlayer];
+        end;
+
+      'Next_Player_T':
+        begin
+          players.next(true, false);
+          self := players[currentPlayer];
+        end;
 
       'Set_Member':
         begin
-          players[currentPlayer].isMember := true;
-          players[currentPlayer].world := 0;
+          self.isMember := true;
+          self.world := 0;
         end;
 
       'Set_Non-Member':
         begin
-          players[currentPlayer].isMember := false;
-          players[currentPlayer].world := 0;
+          self.isMember := false;
+          self.world := 0;
         end;
 
       'Reload_Client':
@@ -835,12 +845,17 @@ begin
         end;
     end;
 
-  if (players.getActive() < 1) then
-    print('No other active players, terminating script', TDebug.FATAL);
+    if (players.getActive() < 1) then
+      print('No other active players, terminating script', TDebug.FATAL);
 
+    reachedMax := true;
   end;
 
-  wait(errorMessage[1] + random(2000, 4000));
+  if (errorMessage[1] > 0) then
+  begin
+    print('Waiting ' + toStr(errorMessage[1]) + 'ms before next attempt', TDebug.SUB);
+    wait(errorMessage[1] + random(2000, 4000));
+  end;
 end;
 {$ENDIF}
 
@@ -896,12 +911,12 @@ end;
 {$ENDIF}
 
 {*
-__handleLoginPopup
-~~~~~~~~~~~~~~~~~~
+TPlayer.__handleLoginPopup
+~~~~~~~~~~~~~~~~~~~~~~~~~~
 
 .. code-block:: pascal
 
-    function __handleLoginPopup(tries: integer; inLobby: boolean): boolean;
+    function TPlayer.__handleLoginPopup(tries: integer; inLobby: boolean; out reachedMax: boolean): boolean;
 
 Waits for the login popup message to appear (or logged in successfully). If a
 popup message is found, it will pass the details array to __respondToPopup();
@@ -910,7 +925,7 @@ The inLobby boolean should be true if it is handling popups from the lobby.
 .. note::
 
     - by The Mayor
-    - Last updated: 15 March 2015 by The Mayor
+    - Last updated: 19 March 2015 by The Mayor
 
 Example:
 
@@ -918,13 +933,14 @@ Example:
 
 *}
 {$IFNDEF CODEINSIGHT}
-function __handleLoginPopup(tries: integer; inLobby: boolean): boolean;
+function TPlayer.__handleLoginPopup(tries: integer; inLobby: boolean; out reachedMax: boolean): boolean;
 var
+  p: TPoint;
   i: integer;
   timeOut: TTimeMarker;
   popupMessage: string;
   errorMessage: TVariantArray;
-  messages: array [0..15] of TVariantArray;
+  messages: array [0..17] of TVariantArray;
 begin
   timeOut.start();
 
@@ -939,7 +955,13 @@ begin
     if (timeOut.getTime() > 60000) then
     begin
       print('Took too long to find login popup or login - respawning SMART');
-      popupMessage := 'Your game session has now ended'; // Trick it to restart
+      popupMessage := 'Your game session has now ended'; // Trick it to reload
+    end;
+
+    if (timeOut.getTime() > 15000) then // If nothing after 10s, check we actually
+    case inLobby of                     // clicked the Login button
+      true: if lobby.findPlayButton(p) then exit(false);
+      false: if __setInputBoxes() then exit(false);
     end;
 
     wait(random(500, 750));
@@ -947,10 +969,12 @@ begin
 
   messages := [
       {Popup Text                         Wait time  MaxTries  Action}
+    ['Unknown login popup',                   0,         2,  'Next_Player_F'],
     ['Invalid username or password',          0,         2,  'Next_Player_F'],
     ['Your account has been disabled',        0,         0,  'Next_Player_F'],
     ['Your ban will be lifted in',            0,         0,  'Next_Player_F'],
-    ['Your account has not logged out',       10000,     5,  'Next_Player_T'],
+    ['Your account has been involved in',     0,         0,  'Next_Player_F'],
+    ['Your account has not logged out',       15000,     5,  'Next_Player_T'],
     ['You need a member''s account',          0,         1,  'Set_Non-Member'],
     ['Error connecting',                      20000,     4,  'Terminate'],
     ['Unable to connect',                     20000,     4,  'Terminate'],
@@ -977,10 +1001,10 @@ begin
     print('Unknown login popup message: ' + popupMessage, TDebug.WARNING);
     takeScreenshot('unknown_login_popup.png');
     print('PLEASE report this in the SRL-6 bugs section: https://villavu.com/forum/project.php?projectid=10', TDebug.HINT);
-    exit(false);
+    errorMessage := ['Unknown login popup', 0, 3, 'Next_Player_F'];
   end;
 
-  __respondToPopup(errorMessage, tries);
+  self.__respondToPopup(errorMessage, tries, reachedMax);
 end;
 {$ENDIF}
 
@@ -998,7 +1022,7 @@ visible.
 .. note::
 
     - by The SRL Developers Team
-    - Last updated: 15 March 2015 by The Mayor
+    - Last updated: 19 March 2015 by The Mayor
 
 Example:
 
@@ -1010,6 +1034,7 @@ Example:
 function TPlayer.loginToLobby(): boolean;
 var
   tries: integer = 1;
+  reachedMaxTries: boolean;
 begin
   if (not self.isActive) then
   begin
@@ -1032,12 +1057,6 @@ begin
   print('TPlayer.loginToLobby()', TDebug.HEADER);
 
   repeat
-    if (self.loginName <> players[currentPlayer].loginName) then
-    begin         // Reinitialise self in case __respondToPopup is called
-      self := players[currentPlayer];
-      tries := 1;
-    end;
-
     print('Attempt ' + toStr(tries) + ': ' + capitalize(self.loginName) + ' (' + capitalize(self.displayName) + ')');
 
     print('Entering username...', TDebug.SUB);
@@ -1048,7 +1067,9 @@ begin
     __enterLoginInfo(_boxPassword, self.password, false, true);
     wait(800 + random(200));
 
-    result := __handleLoginPopup(inc(tries), false);
+    result := self.__handleLoginPopup(inc(tries), false, reachedMaxTries);
+
+    if reachedMaxTries then tries := 1; //'reachedMaxTries' is passed down from __respondToPopup()
   until result;
 
   if result and (not disableIPScreenshots) then
@@ -1071,7 +1092,7 @@ logged in.
 .. note::
 
     - by The SRL Developers Team
-    - Last updated: 15 March 2015 by The Mayor
+    - Last updated: 19 March 2015 by The Mayor
 
 Example:
 
@@ -1084,7 +1105,7 @@ function TPlayer.login(): boolean;
 var
   tries: integer;
   p: TPoint;
-  skipPlay: boolean;
+  skipPlay, reachedMaxTries: boolean;
 begin
   print('TPlayer.login()', TDebug.HEADER);
 
@@ -1112,14 +1133,11 @@ begin
         mouse(p.rand(randomRange(-50, 50), randomRange(-10, 10)), MOUSE_LEFT);
       end;
 
-      result := __handleLoginPopup(inc(tries), true);
+      result := self.__handleLoginPopup(inc(tries), true, reachedMaxTries);
+
+      if reachedMaxTries then tries := 1;
     end;
 
-    if (self.loginName <> players[currentPlayer].loginName) or (self.world <> players[currentPlayer].world) then
-    begin         // Reinitialise self in case __respondToPopup is called
-      self := players[currentPlayer];
-      tries := 1;
-    end;
   until result;
 
   if self.worked.paused then
