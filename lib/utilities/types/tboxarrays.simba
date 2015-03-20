@@ -1,6 +1,6 @@
 (*
 Box Arrays
-==============
+==========
 
 A file that stores type functions to manipulate TBoxArrays.
 
@@ -12,7 +12,7 @@ The source for this file can be found `here <https://github.com/SRL/SRL-6/blob/m
 
 (*
 TBoxArray.toATPA
-~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+~~~~~~~~~~~~~~~~
 
 .. code-block:: pascal
 
@@ -43,7 +43,7 @@ end;
 
 (*
 TBoxArray.toTPA
-~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+~~~~~~~~~~~~~~~
 
 .. code-block:: pascal
 
@@ -75,7 +75,7 @@ end;
 
 (*
 TBoxArray.copy
-~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+~~~~~~~~~~~~~~
 
 .. code-block:: pascal
 
@@ -153,7 +153,7 @@ end;
 
 (*
 TBoxArray.equals
-~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+~~~~~~~~~~~~~~~~
 
 .. code-block:: pascal
 
@@ -188,7 +188,7 @@ end;
 
 (*
 TBoxArray.offset
-~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+~~~~~~~~~~~~~~~~
 
 .. code-block:: pascal
 
@@ -218,7 +218,7 @@ end;
 
 (*
 TBoxArray.getMiddle
-~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+~~~~~~~~~~~~~~~~~~~
 
 .. code-block:: pascal
 
@@ -247,7 +247,7 @@ end;
 
 (*
 TBoxArray.setLimit
-~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+~~~~~~~~~~~~~~~~~~
 
 .. code-block:: pascal
 
@@ -277,7 +277,7 @@ end;
 
 (*
 TBoxArray.expand
-~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+~~~~~~~~~~~~~~~~
 
 .. code-block:: pascal
 
@@ -307,7 +307,7 @@ end;
 
 (*
 TBoxArray.shrink
-~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+~~~~~~~~~~~~~~~~
 
 .. code-block:: pascal
 
@@ -337,7 +337,7 @@ end;
 
 (*
 TBoxArray.pixelShiftAverage
-~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+~~~~~~~~~~~~~~~~~~~~~~~~~~~
 
 .. code-block:: pascal
 
@@ -364,7 +364,7 @@ end;
 
 (*
 TBoxArray.pixelShift
-~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+~~~~~~~~~~~~~~~~~~~~
 
 .. code-block:: pascal
 
@@ -391,7 +391,7 @@ end;
 
 (*
 TBoxArray.getColors
-~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+~~~~~~~~~~~~~~~~~~~
 
 .. code-block:: pascal
 
@@ -425,7 +425,7 @@ end;
 
 (*
 TBoxArray.colorExists
-~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+~~~~~~~~~~~~~~~~~~~~~
 
 .. code-block:: pascal
 
