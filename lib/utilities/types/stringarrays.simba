@@ -6,350 +6,12 @@ A file that stores type functions to manipulate TStringArrays.
 
 The source for this file can be found `here <https://github.com/SRL/SRL-6/blob/master/lib/utilities/types/stringarrays.simba>`_.
 
+Contributers:
+  - Zyt3x
+
 *)
 
 {$f-}
-
-(*
-TStringArray.addIndex
-~~~~~~~~~~~~~~~~~~~~~
-
-.. code-block:: pascal
-
-    procedure TStringArray.addIndex(const str : String; const index : Integer);
-
-Used to add a value to a TStringArray at a chosen index larger than the array's lowest index.
-
-.. note::
-
-    - by Zyt3x
-
-Example:
-
-.. code-block:: pascal
-
-    TSA.addIndex('new entry', 0);
-
-*)
-procedure TStringArray.addIndex(const str : String; const index : Integer);
-var
-  I : Integer;
-begin
-  if not inRange(index, low(self), length(self)) then
-  begin
-    WriteLn('ERROR: addIndex: index larger than array length.');
-    Exit;
-  end;
-
-  setLength(self, length(self)+1);
-  for I := high(self)-1 downto index do
-    self[I+1] := self[I];
-  self[index] := str;
-end;
-
-(*
-TStringArray.deleteIndex
-~~~~~~~~~~~~~~~~~~~~~~~~
-
-.. code-block:: pascal
-
-    procedure TStringArray.deleteIndex(const index : Integer);
-
-Used to delete a value of a TStringArray at a chosen index larger than the array's lowest index.
-
-.. note::
-
-    - by Zyt3x
-
-Example:
-
-.. code-block:: pascal
-
-    TSA.deleteIndex(0);
-
-*)
-procedure TStringArray.deleteIndex(const index : Integer);
-var
-  I : Integer;
-begin
-  if not inRange(index, low(self), high(self)) then
-  begin
-    WriteLn('ERROR: deleteIndex: index larger than array length.');
-    Exit;
-  end;
-
-  for I := index to high(self)-1 do
-    self[I] := self[I+1];
-  setLength(self, length(self)-1);
-end;
-
-(*
-TStringArray.append
-~~~~~~~~~~~~~~~~~~~
-
-.. code-block:: pascal
-
-    procedure TStringArray.append(const str : String);
-
-Used to append a value to a TStringArray.
-
-.. note::
-
-    - by Zyt3x
-
-Example:
-
-.. code-block:: pascal
-
-    TSA.append('new entry');
-
-*)
-procedure TStringArray.append(const str : String);
-begin
-  self.addIndex(str, length(self));
-end;
-
-(*
-TStringArray.combine
-~~~~~~~~~~~~~~~~~~~~
-
-.. code-block:: pascal
-
-    procedure TStringArray.combine(const arr : TStringArray);
-
-Used to combine two TStringArray variables.
-
-.. note::
-
-    - by Zyt3x
-
-Example:
-
-.. code-block:: pascal
-
-    TSA.combine(TSA2);
-
-*)
-procedure TStringArray.combine(const arr : TStringArray);
-var
-  I : Integer;
-begin
-  for I := 0 to high(arr) do
-    self.append(arr[I]);
-end;
-
-(*
-TStringArray.returnInArray
-~~~~~~~~~~~~~~~~~~~~~~~~~~
-
-.. code-block:: pascal
-
-    function TStringArray.returnInArray(const str : String) : Integer;
-
-Returns the index of where the value was found in a TStringArray.  Returns -1 if not found.
-
-.. note::
-
-    - by Zyt3x
-
-Example:
-
-.. code-block:: pascal
-
-    writeLn(TSA.returnInArray('new entry'));
-
-*)
-function TStringArray.returnInArray(const str : String) : Integer;
-var
-  I : Integer;
-begin
-  result := -1;
-  for I := 0 to high(self) do
-    if self[I] = str then
-    begin
-      result := I;
-      exit;
-    end;
-end;
-
-(*
-TStringArray.isInArray
-~~~~~~~~~~~~~~~~~~~~~~
-
-.. code-block:: pascal
-
-    function TStringArray.isInArray(const str : String) : Boolean;
-
-Returns True if the value is present in the TStringArray.
-
-.. note::
-
-    - by Zyt3x
-
-Example:
-
-.. code-block:: pascal
-
-    writeLn(TSA.returnInArray('new entry'));
-
-*)
-function TStringArray.isInArray(const str : String) : Boolean;
-begin
-  result := self.returnInArray(str) > -1;
-end;
-
-(*
-TStringArray.include
-~~~~~~~~~~~~~~~~~~~~
-
-.. code-block:: pascal
-
-    function TStringArray.include(const arr : TStringArray) : TStringArray;
-
-Returns a TStringArray which contains values that are present in both arrays.
-
-.. note::
-
-    - by Zyt3x
-
-Example:
-
-.. code-block:: pascal
-
-    TSA := TSA2.include(TSA);
-
-*)
-function TStringArray.include(const arr : TStringArray) : TStringArray;
-var
-  I : Integer;
-begin
-  for I := 0 to high(arr) do
-    if self.isInArray(arr[I]) then
-      result.append(arr[I]);
-end;
-
-(*
-TStringArray.exclude
-~~~~~~~~~~~~~~~~~~~~
-
-.. code-block:: pascal
-
-    function TStringArray.exclude(const arr : TStringArray) : TStringArray;
-
-Returns a TStringArray which contains values that are not present in both arrays.
-
-.. note::
-
-    - by Zyt3x
-
-Example:
-
-.. code-block:: pascal
-
-    TSA := TSA2.exclude(TSA);
-
-*)
-function TStringArray.exclude(const arr : TStringArray) : TStringArray;
-var
-  I : Integer;
-begin
-  for I := 0 to high(arr) do
-    if not self.isInArray(arr[I]) then
-      result.append(arr[I]);
-end;
-
-(*
-TStringArray.swap
-~~~~~~~~~~~~~~~~~
-
-.. code-block:: pascal
-
-    procedure TStringArray.swap(var arr : TStringArray);
-
-Used to swap two TStringArray variables.
-
-.. note::
-
-    - by Zyt3x
-
-Example:
-
-.. code-block:: pascal
-
-    TSA.swap(TSA2);
-
-*)
-procedure TStringArray.swap(var arr : TStringArray);
-var
-  arr2 : TStringArray;
-begin
-  arr2 := self;
-  self := arr;
-  arr := arr2;
-end;
-
-(*
-TStringArray.clearEquals
-~~~~~~~~~~~~~~~~~~~~~~~~
-
-.. code-block:: pascal
-
-    procedure TStringArray.clearEquals();
-
-Used to clear duplicates in a TStringArray.
-
-.. note::
-
-    - by Zyt3x
-
-Example:
-
-.. code-block:: pascal
-
-    TSA.clearEquals();
-
-*)
-procedure TStringArray.clearEquals();
-var
-  I : Integer;
-  arr : TStringArray;
-begin
-  for I := 0 to high(self) do
-    if not arr.isInArray(self[I]) then
-      arr.append(self[I]);
-  self := arr;
-end;
-
-(*
-TStringArray.invert
-~~~~~~~~~~~~~~~~~~~
-
-.. code-block:: pascal
-
-    procedure TStringArray.invert();
-
-Used to invert the TStringArray.
-
-.. note::
-
-    - by Zyt3x
-
-Example:
-
-.. code-block:: pascal
-
-    TSA.invert();
-
-*)
-procedure TStringArray.invert();
-var
-  I : Integer;
-  arr : TStringArray;
-begin
-  for I := high(self) downto 0 do
-    arr.append(self[I]);
-  self := arr;
-end;
 
 (*
 TStringArray.explodeArr
@@ -364,7 +26,6 @@ Used to explode the TStringArray using different del strings.
 
 .. note::
 
-    - by Zyt3x
     Rename this to "TStringArray.explode" once lape requires "self" for internal things.
 
 Example:
@@ -401,7 +62,6 @@ Used to explode the TStringArray.  Uses a string instead of an array of strings.
 
 .. note::
 
-    - by Zyt3x
     Rename this to "TStringArray.explode" once lape requires "self" for internal things.
 
 Example:
@@ -435,7 +95,6 @@ Used to implode the TStringArray.
 
 .. note::
 
-    - by Zyt3x
     Rename this to "TStringArray.implode" once lape requires "self" for internal things.
 
 Example:
@@ -459,10 +118,6 @@ TStringArray.toLowerCase
     procedure TStringArray.toLowerCase();
 
 Used to lowercase a TStringArray.
-
-.. note::
-
-    - by Zyt3x
 
 Example:
 
@@ -489,10 +144,6 @@ TStringArray.toUpperCase
 
 Used to uppercase a TStringArray.
 
-.. note::
-
-    - by Zyt3x
-
 Example:
 
 .. code-block:: pascal
@@ -517,10 +168,6 @@ TStringArray.toCapitalize
     procedure TStringArray.toCapitalize();
 
 Used to capitalize a TStringArray.
-
-.. note::
-
-    - by Zyt3x
 
 Example:
 
@@ -547,10 +194,6 @@ TStringArray.toString
 
 Used to turn a TStringArray into a string.
 
-.. note::
-
-    - by Zyt3x
-
 Example:
 
 .. code-block:: pascal
@@ -561,6 +204,32 @@ Example:
 function TStringArray.toString() : String;
 begin
   result := self.implodeArr('');
+end;
+
+(*
+TStringArray.toCharArray
+~~~~~~~~~~~~~~~~~~~~~~~~
+
+.. code-block:: pascal
+
+    function TStringArray.toCharArray() : String;
+
+Used to turn a TStringArray into a TCharArray.
+
+Example:
+
+.. code-block:: pascal
+
+    TCA := TSA.toCharArray();
+
+*)
+function TStringArray.toCharArray() : TCharArray;
+var
+  I : Integer;
+begin
+  setLength(result, length(self));
+  for I := 0 to high(self) do
+    result[I] := Char(self[I][1]);
 end;
 
 (*
@@ -576,7 +245,6 @@ Used to implode the T2DStringArray.
 
 .. note::
 
-    - by Zyt3x
     Rename this to "T2DStringArray.implode" once lape requires "self" for internal things.
 
 Example:
@@ -613,7 +281,6 @@ Used to implode the T2DStringArray using glue strings.  Uses a string instead of
 
 .. note::
 
-    - by Zyt3x
     Rename this to "T2DStringArray.implode" once lape requires "self" for internal things.
 
 Example:

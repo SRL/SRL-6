@@ -895,8 +895,7 @@ Example:
 *)
 function replicate(const str : String; const times : Integer): String; overload;
 begin
-  for 1 to times do
-    Result := Result + str;
+  for 1 to times do result += str;
 end;
 
 (*
@@ -925,16 +924,9 @@ Example:
 function explode(const del : TStringArray; str : String): TStringArray; overload;
 var
   I : Integer;
-  delSTR : String;
+  delSTR := '/*SRL*/';
 begin
-  delSTR := '/*DEL*/';
-  while pos(delSTR, str) > 0 do
-    delSTR := delSTR + toStr(random(10));
-  delSTR := delSTR + '/';
-
-  for I := 0 to high(del) do
-    str := replace(str, del[I], delSTR, [rfReplaceAll]);
-
+  for I := 0 to high(del) do str := replace(str, del[I], delSTR, [rfReplaceAll]);
   result := explode(delSTR, str);
 end;
 

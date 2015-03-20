@@ -1,0 +1,42 @@
+{$include_once stringarrays.simba}
+
+{$f-}
+
+(*
+String.multiBetween
+~~~~~~~~~~~~~~~~~~~
+
+.. code-block:: pascal
+
+    function String.multiBetween(str : String; const startStr, endStr : String): TStringArray;
+
+Used to return all matches between startStr and endStr.
+
+.. note::
+
+    by Zyt3x
+
+Example:
+
+.. code-block:: pascal
+
+    print(chatText.multiBetween('Welcome', 'RuneScape'));
+    // Prints "to"
+
+*)
+
+function String.multiBetween(const startStr, endStr : String): TStringArray;
+var
+  curPos : Integer;
+  S : String;
+begin
+  while not execRegExpr('{' + startStr + '}' + '.*', + '{' + endStr + '}') do
+  begin
+    S := between(startStr, endStr, self);
+    curPos := pos(startStr + S + endStr, self);
+    if curPos = 0 then Break;
+    delete(self, curPos, curPos+length(S));
+
+    result.append(S);
+  end;
+end;
