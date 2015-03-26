@@ -85,27 +85,27 @@ Example:
 *)
 procedure TStringArray.remove(const index : Integer);
 begin
-  delete(self, index);
+  delete(self, index, 1);
 end;
 
 procedure TIntegerArray.remove(const index : Integer);
 begin
-  delete(self, index);
+  delete(self, index, 1);
 end;
 
 procedure TExtendedArray.remove(const index : Integer);
 begin
-  delete(self, index);
+  delete(self, index, 1);
 end;
 
 procedure TPointArray.remove(const index : Integer);
 begin
-  delete(self, index);
+  delete(self, index, 1);
 end;
 
 procedure TBoxArray.remove(const index : Integer);
 begin
-  delete(self, index);
+  delete(self, index, 1);
 end;
 
 (*
