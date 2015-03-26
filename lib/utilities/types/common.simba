@@ -177,27 +177,27 @@ Example:
 *)
 procedure TStringArray.push(const str : String);
 begin
-  self.new(str);
+  insert(str, self, length(self));
 end;
 
 procedure TIntegerArray.push(const int : Integer);
 begin
-  self.new(int);
+  insert(int, self, length(self));
 end;
 
 procedure TExtendedArray.push(const ext : Extended);
 begin
-  self.new(ext);
+  insert(ext, self, length(self));
 end;
 
 procedure TPointArray.push(const p : TPoint);
 begin
-  self.new(p);
+  insert(p, self, length(self));
 end;
 
 procedure TBoxArray.push(const box : TBox);
 begin
-  self.new(box);
+  insert(box, self, length(self));
 end;
 
 (*
@@ -248,50 +248,49 @@ begin
 end;
 
 (*
-array.slice
-~~~~~~~~~~~
+array.copy
+~~~~~~~~~~
 
 .. code-block:: pascal
 
-    function TStringArray.slice(const sindex, eindex : Integer): TStringArray;
-    function TIntegerArray.slice(const sindex, eindex : Integer): TIntegerArray;
-    function TExtendedArray.slice(const sindex, eindex : Integer): TExtendedArray;
-    function TPointArray.slice(const sindex, eindex : Integer): TPointArray;
-    function TBoxArray.slice(const sindex, eindex : Integer): TBoxArray;
+    function TStringArray.copy(const sindex, eindex : Integer): TStringArray;
+    function TIntegerArray.copy(const sindex, eindex : Integer): TIntegerArray;
+    function TExtendedArray.copy(const sindex, eindex : Integer): TExtendedArray;
+    function TPointArray.copy(const sindex, eindex : Integer): TPointArray;
+    function TBoxArray.copy(const sindex, eindex : Integer): TBoxArray;
 
-Returns the elements [sindex..eindex] of an array.
+Copies the elements [sindex..eindex] of an array.
 
 Example:
 
 .. code-block:: pascal
 
-    A := A.slice(1, high(A));
+    A := A.copy(0, 1);
 
 *)
-
-function TStringArray.slice(const sindex, eindex : Integer): TStringArray;
+function TStringArray.copy(const sindex, eindex : Integer): TStringArray;
 begin
-  result := copy(self, sindex, eindex-1);
+  result := System.copy(self, sindex, eindex-sindex+1);
 end;
 
-function TIntegerArray.slice(const sindex, eindex : Integer): TIntegerArray;
+function TIntegerArray.copy(const sindex, eindex : Integer): TIntegerArray;
 begin
-  result := copy(self, sindex, eindex-1);
+  result := System.copy(self, sindex, eindex-sindex+1);
 end;
 
-function TExtendedArray.slice(const sindex, eindex : Integer): TExtendedArray;
+function TExtendedArray.copy(const sindex, eindex : Integer): TExtendedArray;
 begin
-  result := copy(self, sindex, eindex-1);
+  result := System.copy(self, sindex, eindex-sindex+1);
 end;
 
-function TPointArray.slice(const sindex, eindex : Integer): TPointArray;
+function TPointArray.copy(const sindex, eindex : Integer): TPointArray;
 begin
-  result := copy(self, sindex, eindex-1);
+  result := System.copy(self, sindex, eindex-sindex+1);
 end;
 
-function TBoxArray.slice(const sindex, eindex : Integer): TBoxArray;
+function TBoxArray.copy(const sindex, eindex : Integer): TBoxArray;
 begin
-  result := copy(self, sindex, eindex-1);
+  result := System.copy(self, sindex, eindex-sindex+1);
 end;
 
 (*
@@ -377,7 +376,6 @@ Example:
     writeLn(A.element('example'));
 
 *)
-
 function TStringArray.elements(const str : String): TIntegerArray;
 var
   I : Integer;
@@ -467,6 +465,68 @@ end;
 function TBoxArray.inArray(const box : TBox): Boolean;
 begin
   result := self.element(box) > -1;
+end;
+
+(*
+array.equals
+~~~~~~~~~~~~
+
+.. code-block:: pascal
+
+    function TStringArray.equals(const arr : TStringArray): Boolean;
+    function TIntegerArray.equals(const arr : TIntegerArray): Boolean;
+    function TExtendedArray.equals(const arr : TExtendedArray): Boolean;
+    function TPointArray.equals(const arr : TPointArray): Boolean;
+    function TBoxArray.equals(const arr : TBoxArray): Boolean;
+
+Used to check if arrays are equal.
+
+Example:
+
+.. code-block:: pascal
+
+    if A.equals(arr) then exit();
+
+*)
+function TStringArray.equals(const arr : TStringArray) : Boolean;
+var
+  I : Integer;
+begin
+  if length(self) <> length(arr) then exit(False);
+  for I := 0 to high(self) do if not (self[I] = arr[I]) then exit(False);
+  result := True;
+end;
+
+function TIntegerArray.equals(const arr : TIntegerArray) : Boolean;
+var
+  I : Integer;
+begin
+  if length(self) <> length(arr) then exit(False);
+  for I := 0 to high(self) do if not (self[I] = arr[I]) then exit(False);
+  result := True;
+end;
+
+function TExtendedArray.equals(const arr : TExtendedArray) : Boolean;
+var
+  I : Integer;
+begin
+  if length(self) <> length(arr) then exit(False);
+  for I := 0 to high(self) do if not (self[I] = arr[I]) then exit(False);
+  result := True;
+end;
+
+function TPointArray.equals(const arr : TPointArray) : Boolean;
+begin
+  result := sameTPA(self, arr);
+end;
+
+function TBoxArray.equals(const arr : TBoxArray) : Boolean;
+var
+  I : Integer;
+begin
+  if length(self) <> length(arr) then exit(False);
+  for I := 0 to high(self) do if not self[I].equals(arr[I]) then exit(False);
+  result := True;
 end;
 
 (*
@@ -662,7 +722,6 @@ begin
   self := arr;
   arr := tmp;
 end;
-
 
 (*
 array.clearEquals

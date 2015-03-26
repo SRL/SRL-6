@@ -169,32 +169,6 @@ begin
 end;
 
 (*
-TPointArray.equals
-~~~~~~~~~~~~~~~~~~
-
-.. code-block:: pascal
-
-    function TPointArray.equal() : Boolean;
-
-Returns true if both TPointArrays are equal.
-
-.. note::
-
-    - by Zyt3x
-
-Example:
-
-.. code-block:: pascal
-
-    b := TPA.equals(TPA2);
-
-*)
-function TPointArray.equals(const arr : TPointArray) : Boolean;
-begin
-  result := sameTPA(self, arr);
-end;
-
-(*
 TPointArray.isPointNear
 ~~~~~~~~~~~~~~~~~~~~~~~
 
