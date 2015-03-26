@@ -925,7 +925,7 @@ The inLobby boolean should be true if it is handling popups from the lobby.
 .. note::
 
     - by The Mayor
-    - Last updated: 19 March 2015 by The Mayor
+    - Last updated: 23 March 2015 by The Mayor
 
 Example:
 
@@ -958,7 +958,7 @@ begin
       popupMessage := 'Your game session has now ended'; // Trick it to reload
     end;
 
-    if (timeOut.getTime() > 15000) then // If nothing after 10s, check we actually
+    if (timeOut.getTime() > 15000) then // If nothing after 15s, check we actually
     case inLobby of                     // clicked the Login button
       true: if lobby.findPlayButton(p) then exit(false);
       false: if __setInputBoxes() then exit(false);
@@ -968,25 +968,25 @@ begin
   until (length(popupMessage) > 0);
 
   messages := [
-      {Popup Text                         Wait time  MaxTries  Action}
+    {Popup Text                         Wait time  MaxTries  Action}
     ['Unknown login popup',                   0,         2,  'Next_Player_F'],
     ['Invalid username or password',          0,         2,  'Next_Player_F'],
     ['Your account has been disabled',        0,         0,  'Next_Player_F'],
     ['Your ban will be lifted in',            0,         0,  'Next_Player_F'],
     ['Your account has been involved in',     0,         0,  'Next_Player_F'],
+    ['Too many incorrect logins',             5 * 60000, 2,  'Next_Player_F'],
     ['Your account has not logged out',       15000,     5,  'Next_Player_T'],
     ['You need a member''s account',          0,         1,  'Set_Non-Member'],
+    ['Player in member-only area',            0,         0,  'Set_Member'],
     ['Error connecting',                      20000,     4,  'Terminate'],
     ['Unable to connect',                     20000,     4,  'Terminate'],
-    ['Too many incorrect logins',             5 * 60000, 2,  'Next_Player_F'],
     ['Runescape has been updated',            0,         0,  'Reload_Client'],
     ['Client token changed',                  0,         0,  'Reload_Client'],
     ['Your game session has now ended',       0,         0,  'Reload_Client'],
+    ['Our systems are currently unavailable', 3 * 60000, 8,  'Reload_Client'],
     ['Login limit exceeded',                  20000,     8,  'Set_World'],
-    ['Skill level 1000+ required',            0,         0,  'Set_World'],
-    ['Player in member-only area',            0,         0,  'Set_Member'],
-    ['Cannot connect to world',               10000,     0,  'Set_World'],
-    ['Our systems are currently unavailable', 3 * 60000, 8,  'Reload_Client']];
+    ['You must have a total skill level of',  0,         0,  'Set_World'],
+    ['Cannot connect to world',               10000,     0,  'Set_World']];
 
   for i := 0 to high(messages) do
     if (pos(messages[i][0], popupMessage) > 0) then
