@@ -248,6 +248,53 @@ begin
 end;
 
 (*
+array.slice
+~~~~~~~~~~~
+
+.. code-block:: pascal
+
+    function TStringArray.slice(const sindex, eindex : Integer): TStringArray;
+    function TIntegerArray.slice(const sindex, eindex : Integer): TIntegerArray;
+    function TExtendedArray.slice(const sindex, eindex : Integer): TExtendedArray;
+    function TPointArray.slice(const sindex, eindex : Integer): TPointArray;
+    function TBoxArray.slice(const sindex, eindex : Integer): TBoxArray;
+
+Returns the elements [sindex..eindex] of an array.
+
+Example:
+
+.. code-block:: pascal
+
+    A := A.slice(1, high(A));
+
+*)
+
+function TStringArray.slice(const sindex, eindex : Integer): TStringArray;
+begin
+  result := copy(self, sindex, eindex-1);
+end;
+
+function TIntegerArray.slice(const sindex, eindex : Integer): TIntegerArray;
+begin
+  result := copy(self, sindex, eindex-1);
+end;
+
+function TExtendedArray.slice(const sindex, eindex : Integer): TExtendedArray;
+begin
+  result := copy(self, sindex, eindex-1);
+end;
+
+function TPointArray.slice(const sindex, eindex : Integer): TPointArray;
+begin
+  result := copy(self, sindex, eindex-1);
+end;
+
+function TBoxArray.slice(const sindex, eindex : Integer): TBoxArray;
+begin
+  result := copy(self, sindex, eindex-1);
+end;
+
+(*
 array.element
 ~~~~~~~~~~~~~
 
@@ -259,7 +306,7 @@ array.element
     function TPointArray.element(const p : TPoint): Integer;
     function TBoxArray.element(const box : TBox): Integer;
 
-Returns the index of where the value was found in a TStringArray.  Returns -1 if not found.
+Returns the first index of where the value was found in an array.  Returns -1 if not found.
 
 Example:
 
@@ -307,6 +354,73 @@ begin
   result := -1;
   for I := 0 to high(self) do
     if (self[i].equals(box)) then exit(I);
+end;
+
+(*
+array.elements
+~~~~~~~~~~~~~~
+
+.. code-block:: pascal
+
+    function TStringArray.elements(const str : String): TIntegerArray;
+    function TIntegerArray.elements(const int : Integer): TIntegerArray;
+    function TExtendedArray.elements(const ext : Extended): TIntegerArray;
+    function TPointArray.elements(const p : TPoint): TIntegerArray;
+    function TBoxArray.elements(const box : TBox): TIntegerArray;
+
+Returns the indexes of where the value was found in an array.  Returns -1 if not found.
+
+Example:
+
+.. code-block:: pascal
+
+    writeLn(A.element('example'));
+
+*)
+
+function TStringArray.elements(const str : String): TIntegerArray;
+var
+  I : Integer;
+begin
+  for I := high(self) downto 0 do
+    if self.element(str) > -1 then
+      insert(I, result);
+end;
+
+function TIntegerArray.elements(const int : Integer): TIntegerArray;
+var
+  I : Integer;
+begin
+  for I := high(self) downto 0 do
+    if self.element(int) > -1 then
+      insert(I, result);
+end;
+
+function TExtendedArray.elements(const ext : Extended): TIntegerArray;
+var
+  I : Integer;
+begin
+  for I := high(self) downto 0 do
+    if self.element(ext) > -1 then
+      insert(I, result);
+end;
+
+function TPointArray.elements(const p : TPoint): TIntegerArray;
+var
+  I : Integer;
+begin
+  for I := high(self) downto 0 do
+    if self.element(p) > -1 then
+      insert(I, result);
+end;
+
+function TBoxArray.elements(const box : TBox): TIntegerArray;
+var
+  I : Integer;
+begin
+  for I := high(self) downto 0 do
+    if self.element(box) > -1 then
+      insert(I, result);
 end;
 
 (*
