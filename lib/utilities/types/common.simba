@@ -268,6 +268,31 @@ Example:
     A := A.copy(0, 1);
 
 *)
+function TStringArray.copy(): TStringArray;
+begin
+  result := System.copy(self);
+end;
+
+function TIntegerArray.copy(): TIntegerArray;
+begin
+  result := System.copy(self);
+end;
+
+function TExtendedArray.copy(): TExtendedArray;
+begin
+  result := System.copy(self);
+end;
+
+function TPointArray.copy(): TPointArray;
+begin
+  result := System.copy(self);
+end;
+
+function TBoxArray.copy(): TBoxArray;
+begin
+  result := System.copy(self);
+end;
+
 function TStringArray.copy(const sindex, eindex : Integer): TStringArray;
 begin
   result := System.copy(self, sindex, eindex-sindex+1);
@@ -367,7 +392,7 @@ array.elements
     function TPointArray.elements(const p : TPoint): TIntegerArray;
     function TBoxArray.elements(const box : TBox): TIntegerArray;
 
-Returns the indexes of where the value was found in an array.  Returns -1 if not found.
+Returns the indexes of where the value was found in an array.
 
 Example:
 
