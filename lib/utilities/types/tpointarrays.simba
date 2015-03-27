@@ -11,32 +11,6 @@ The source for this file can be found `here <https://github.com/SRL/SRL-6/blob/m
 {$f-}
 
 (*
-TPointArray.copy
-~~~~~~~~~~~~~~~~
-
-.. code-block:: pascal
-
-    function TPointArray.copy(): TPointArray;
-
-Returns a copy of the array
-
-.. note::
-
-    - by Coh3n
-
-Example:
-
-.. code-block:: pascal
-
-    TPA.copy(A2);
-
-*)
-function TPointArray.copy(): TPointArray;
-begin
-  result := copyTPA(self);
-end;
-
-(*
 TPointArray.copy; overload
 ~~~~~~~~~~~~~~~~~~~~~~~~~~
 
