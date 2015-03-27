@@ -11,6 +11,32 @@ The source for this file can be found `here <https://github.com/SRL/SRL-6/blob/m
 {$f-}
 
 (*
+TPointArray.copy
+~~~~~~~~~~~~~~~~
+
+.. code-block:: pascal
+
+    function TPointArray.copy(): TPointArray;
+
+Returns a copy of the array
+
+.. note::
+
+    - by Coh3n
+
+Example:
+
+.. code-block:: pascal
+
+    TPA.copy(A2);
+
+*)
+function TPointArray.copy(): TPointArray;
+begin
+  result := copyTPA(self);
+end;
+
+(*
 TPointArray.copy; overload
 ~~~~~~~~~~~~~~~~~~~~~~~~~~
 
@@ -140,6 +166,32 @@ var
   b := tmp.getBounds();
 begin
   result := (extended(length(tmp)) / (((b.x2 - b.x1) + 1) * ((b.x2 - b.x1) + 1)));
+end;
+
+(*
+TPointArray.equals
+~~~~~~~~~~~~~~~~~~
+
+.. code-block:: pascal
+
+    function TPointArray.equal() : Boolean;
+
+Returns true if both TPointArrays are equal.
+
+.. note::
+
+    - by Zyt3x
+
+Example:
+
+.. code-block:: pascal
+
+    b := TPA.equals(TPA2);
+
+*)
+function TPointArray.equals(const arr : TPointArray) : Boolean;
+begin
+  result := sameTPA(self, arr);
 end;
 
 (*

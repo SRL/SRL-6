@@ -74,6 +74,37 @@ begin
 end;
 
 (*
+TBoxArray.copy
+~~~~~~~~~~~~~~
+
+.. code-block:: pascal
+
+    function TBoxArray.copy() : TBoxArray;
+
+Copies a TBoxArray
+
+.. note::
+
+    - by bonsai
+    - Last Updated: 10 October 2014 by bonsai
+
+Example:
+
+.. code-block:: pascal
+
+    newTba := tba.copy();
+
+*)
+function TBoxArray.copy() : TBoxArray;
+var
+  i : integer;
+begin
+  setLength(result, length(self));
+  for i := 0 to high(self) do
+    result[i] := self[i];
+end;
+
+(*
 TBoxArray.getBounds
 ~~~~~~~~~~~~~~~~~~~
 
@@ -118,6 +149,41 @@ begin
     end;
   end else
     Result := e;
+end;
+
+(*
+TBoxArray.equals
+~~~~~~~~~~~~~~~~
+
+.. code-block:: pascal
+
+    function TBoxArray.equals() : boolean;
+
+Compares two TBoxArrays
+
+.. note::
+
+    - by bonsai
+    - Last Updated: 10 October 2014 by bonsai
+
+Example:
+
+.. code-block:: pascal
+
+    if (tba.equals(otherTBA)) then ... ;
+
+*)
+function TBoxArray.equals(const tba: TBoxArray) : boolean;
+var
+  i : integer;
+begin
+  result := false;
+  if (length(self) <> length(tba)) then exit;
+
+  for i := 0 to high(tba) do
+    if (not self.isInArray(tba[i])) then exit;
+
+  result := true;
 end;
 
 (*
