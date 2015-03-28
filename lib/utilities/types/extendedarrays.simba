@@ -6,12 +6,350 @@ A file that stores type functions to manipulate TExtendedArrays.
 
 The source for this file can be found `here <https://github.com/SRL/SRL-6/blob/master/lib/utilities/types/extendedarrays.simba>`_.
 
-Contributers:
-  - Zyt3x
-
 *)
 
 {$f-}
+
+(*
+TExtendedArray.addIndex
+~~~~~~~~~~~~~~~~~~~~~~~
+
+.. code-block:: pascal
+
+    procedure TExtendedArray.addIndex(const ext : Extended; const index : Integer);
+
+Used to add a value to a TExtendedArray at a chosen index larger than the array's lowest index.
+
+.. note::
+
+    - by Zyt3x
+
+Example:
+
+.. code-block:: pascal
+
+    TEA.addIndex(1337.0, 0);
+
+*)
+procedure TExtendedArray.addIndex(const ext : Extended; const index : Integer);
+var
+  I : Integer;
+begin
+  if not inRange(index, low(self), length(self)) then
+  begin
+    WriteLn('ERROR: addIndex: index larger than array length.');
+    Exit;
+  end;
+
+  setLength(self, length(self)+1);
+  for I := high(self)-1 downto index do
+    self[I+1] := self[I];
+  self[index] := ext;
+end;
+
+(*
+TExtendedArray.deleteIndex
+~~~~~~~~~~~~~~~~~~~~~~~~~~
+
+.. code-block:: pascal
+
+    procedure TExtendedArray.deleteIndex(const index : Integer);
+
+Used to delete a value of a TExtendedArray at a chosen index larger than the array's lowest index.
+
+.. note::
+
+    - by Zyt3x
+
+Example:
+
+.. code-block:: pascal
+
+    TEA.deleteIndex(0);
+
+*)
+procedure TExtendedArray.deleteIndex(const index : Integer);
+var
+  I : Integer;
+begin
+  if not inRange(index, low(self), high(self)) then
+  begin
+    WriteLn('ERROR: deleteIndex: index larger than array length.');
+    Exit;
+  end;
+
+  for I := index to high(self)-1 do
+    self[I] := self[I+1];
+  setLength(self, length(self)-1);
+end;
+
+(*
+TExtendedArray.append
+~~~~~~~~~~~~~~~~~~~~~
+
+.. code-block:: pascal
+
+    procedure TExtendedArray.append(const ext : Extended);
+
+Used to append a value to a TExtendedArray.
+
+.. note::
+
+    - by Zyt3x
+
+Example:
+
+.. code-block:: pascal
+
+    TEA.append(1337.0);
+
+*)
+procedure TExtendedArray.append(const ext : Extended);
+begin
+  self.addIndex(ext, length(self));
+end;
+
+(*
+TExtendedArray.combine
+~~~~~~~~~~~~~~~~~~~~~~
+
+.. code-block:: pascal
+
+    procedure TExtendedArray.combine(const arr : TExtendedArray);
+
+Used to combine two TExtendedArray variables.
+
+.. note::
+
+    - by Zyt3x
+
+Example:
+
+.. code-block:: pascal
+
+    TEA.combine(TEA2);
+
+*)
+procedure TExtendedArray.combine(const arr : TExtendedArray);
+var
+  I : Integer;
+begin
+  for I := 0 to high(arr) do
+    self.append(arr[I]);
+end;
+
+(*
+TExtendedArray.returnInArray
+~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+
+.. code-block:: pascal
+
+    function TExtendedArray.returnInArray(const ext : Extended) : Integer;
+
+Returns the index of where the value was found in a TExtendedArray.  Returns -1 if not found.
+
+.. note::
+
+    - by Zyt3x
+
+Example:
+
+.. code-block:: pascal
+
+    writeLn(TEA.returnInArray(1337.0));
+
+*)
+function TExtendedArray.returnInArray(const ext : Extended) : Integer;
+var
+  I : Integer;
+begin
+  result := -1;
+  for I := 0 to high(self) do
+    if self[I] = ext then
+    begin
+      result := I;
+      exit;
+    end;
+end;
+
+(*
+TExtendedArray.isInArray
+~~~~~~~~~~~~~~~~~~~~~~~~
+
+.. code-block:: pascal
+
+    function TExtendedArray.isInArray(const ext : Extended) : Boolean;
+
+Returns True if the value is present in the TExtendedArray.
+
+.. note::
+
+    - by Zyt3x
+
+Example:
+
+.. code-block:: pascal
+
+    writeLn(TEA.returnInArray(1337.0));
+
+*)
+function TExtendedArray.isInArray(const ext : Extended) : Boolean;
+begin
+  result := returnInArray(ext) > -1;
+end;
+
+(*
+TExtendedArray.include
+~~~~~~~~~~~~~~~~~~~~~~
+
+.. code-block:: pascal
+
+    function TExtendedArray.include(const arr : TExtendedArray) : TExtendedArray;
+
+Returns a TExtendedArray which contains values that are present in both arrays.
+
+.. note::
+
+    - by Zyt3x
+
+Example:
+
+.. code-block:: pascal
+
+    TEA := TEA2.include(TEA);
+
+*)
+function TExtendedArray.include(const arr : TExtendedArray) : TExtendedArray;
+var
+  I : Integer;
+begin
+  for I := 0 to high(arr) do
+    if self.isInArray(arr[I]) then
+      result.append(arr[I]);
+end;
+
+(*
+TExtendedArray.exclude
+~~~~~~~~~~~~~~~~~~~~~~
+
+.. code-block:: pascal
+
+    function TExtendedArray.exclude(const arr : TExtendedArray) : TExtendedArray;
+
+Returns a TExtendedArray which contains values that are not present in both arrays.
+
+.. note::
+
+    - by Zyt3x
+
+Example:
+
+.. code-block:: pascal
+
+    TEA := TEA2.exclude(TEA);
+
+*)
+function TExtendedArray.exclude(const arr : TExtendedArray) : TExtendedArray;
+var
+  I : Integer;
+begin
+  for I := 0 to high(arr) do
+    if not self.isInArray(arr[I]) then
+      result.append(arr[I]);
+end;
+
+(*
+TExtendedArray.swap
+~~~~~~~~~~~~~~~~~~~
+
+.. code-block:: pascal
+
+    procedure TExtendedArray.swap(var arr : TExtendedArray);
+
+Used to swap two TExtendedArray variables.
+
+.. note::
+
+    - by Zyt3x
+
+Example:
+
+.. code-block:: pascal
+
+    TEA.swap(TEA2);
+
+*)
+procedure TExtendedArray.swap(var arr : TExtendedArray);
+var
+  arr2 : TExtendedArray;
+begin
+  arr2 := self;
+  self := arr;
+  arr := arr2;
+end;
+
+(*
+TExtendedArray.clearEquals
+~~~~~~~~~~~~~~~~~~~~~~~~~~
+
+.. code-block:: pascal
+
+    procedure TExtendedArray.clearEquals();
+
+Used to clear duplicates in a TExtendedArray.
+
+.. note::
+
+    - by Zyt3x
+
+Example:
+
+.. code-block:: pascal
+
+    TEA.clearEquals();
+
+*)
+procedure TExtendedArray.clearEquals();
+var
+  I : Integer;
+  arr : TExtendedArray;
+begin
+  for I := 0 to high(self) do
+    if not arr.isInArray(self[I]) then
+      arr.append(self[I]);
+  self := arr;
+end;
+
+(*
+TExtendedArray.invert
+~~~~~~~~~~~~~~~~~~~~~
+
+.. code-block:: pascal
+
+    procedure TExtendedArray.invert();
+
+Used to invert the TExtendedArray.
+
+.. note::
+
+    - by Zyt3x
+
+Example:
+
+.. code-block:: pascal
+
+    TEA.invert();
+
+*)
+procedure TExtendedArray.invert();
+var
+  I : Integer;
+  arr : TExtendedArray;
+begin
+  for I := high(self) downto 0 do
+    arr.append(self[I]);
+  self := arr;
+end;
 
 (*
 TExtendedArray.sum
@@ -22,6 +360,10 @@ TExtendedArray.sum
     function TExtendedArray.sum() : Extended;
 
 Returns the sum of all values in a TExtendedArray.
+
+.. note::
+
+    - by Zyt3x
 
 Example:
 
@@ -47,6 +389,10 @@ TExtendedArray.average
     function TExtendedArray.average() : Extended;
 
 Returns the average of all values in a TExtendedArray.
+
+.. note::
+
+    - by Zyt3x
 
 Example:
 
