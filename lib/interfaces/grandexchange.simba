@@ -274,7 +274,7 @@ Internal function which returns a TBoxArray of the 6 Grand Exchange slots.
 .. note::
 
     - by The Mayor
-    - Last Updated: 14 January 2015 by The Mayor
+    - Last Updated: 12 April 2015 by The Mayor
 
 Example:
 
@@ -285,7 +285,7 @@ Example:
 *)
 function TRSGrandExchange._getSlotBoxes(): TBoxArray;
 const
-  __GE_SLOT_OFFSET: TPoint = [95, 124]; // From self(x1, y1) to middle of first GE slot
+  __GE_SLOT_OFFSET: TPoint = [95, 111]; // From self(x1, y1) to middle of first GE slot
 begin
   result := grid(3, 2, 149, 109, 156, 120, point(self.x1 + __GE_SLOT_OFFSET.x, self.y1 + __GE_SLOT_OFFSET.y));
 end;
@@ -303,7 +303,7 @@ Internal function which returns a TBoxArray of the Grand Exchange buy boxes.
 .. note::
 
     - by The Mayor
-    - Last Updated: 14 January 2015 by The Mayor
+    - Last Updated: 12 April 2015 by The Mayor
 
 Example:
 
@@ -314,7 +314,7 @@ Example:
 *)
 function TRSGrandExchange._getBuyBoxes(): TBoxArray;
 const
-  __BUY_OFFSET: TPoint = [65, 134]; // From self(x1, y1) to middle of first buy button
+  __BUY_OFFSET: TPoint = [65, 121]; // From self(x1, y1) to middle of first buy button
 begin
   result := grid(3, 2, 44, 44, 156, 120, point(self.x1 + __BUY_OFFSET.x, self.y1 + __BUY_OFFSET.y));
 end;
@@ -332,7 +332,7 @@ Internal function which returns a TBoxArray of the Grand Exchange sell boxes.
 .. note::
 
     - by The Mayor
-    - Last Updated: 14 January 2015 by The Mayor
+    - Last Updated: 12 April 2015 by The Mayor
 
 Example:
 
@@ -343,7 +343,7 @@ Example:
 *)
 function TRSGrandExchange._getSellBoxes(): TBoxArray;
 const
-  __SELL_OFFSET: TPoint = [125, 134]; // From self(x1, y1) to middle of first sell button
+  __SELL_OFFSET: TPoint = [125, 121]; // From self(x1, y1) to middle of first sell button
 begin
   result := grid(3, 2, 44, 44, 156, 120, point(self.x1 + __SELL_OFFSET.x, self.y1 + __SELL_OFFSET.y));
 end;
@@ -984,31 +984,33 @@ TRSGrandExchange.collectAllSlots
 
 .. code-block:: pascal
 
-    function TRSGrandExchange.collectAllSlots(): boolean;
+    function TRSGrandExchange.collectAllSlots(ToInventory: boolean = true): boolean;
 
-Collects all items/gold from each slot that isn't empty. The offer does not
-have to be completed.
+Collects all items/gold to either the inventory or the bank (via the buttons).
 
 .. note::
 
     - by The Mayor
-    - Last Updated: 12 March 2015 by The Mayor
+    - Last Updated: 12 April 2015 by The Mayor
 
 Example:
 
 .. code-block:: pascal
 
-    grandExchange.collectAllSlots();
+    grandExchange.collectAllSlots(false); // collect all to bank
 
 *)
-procedure TRSGrandExchange.collectAllSlots();
+procedure TRSGrandExchange.collectAllSlots(ToInventory: boolean = true);
+const
+  _OFFSET: TPoint = [130, 307];
 var
-  i: integer;
-  TBA: TBoxArray := self._getSlotBoxes();
+  TBA: TBoxArray;
 begin
-  for i := 1 to length(TBA) do
-    if self._isSlotActive(i) and (not self._isSlotEmpty(i)) then
-      self.collectSlot(i);
+  TBA := grid(2, 1, 180, 20, 240, 0, point(self.x1 + _OFFSET.x, self.y1 + _OFFSET.y));
+  case ToInventory of
+    true: multiClick(TBA[0].getMiddle().rand(5), 25, 3);
+    false: multiClick(TBA[1].getMiddle().rand(5), 25, 3);
+  end;
 end;
 
 (*
