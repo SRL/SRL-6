@@ -1323,7 +1323,7 @@ TRSActionBar.mouseIcon
 
 .. code-block:: pascal
 
-    procedure TRSActionBar.mouseIcon(icon, button: integer= MOUSE_MOVE);
+    procedure TRSActionBar.mouseIcon(icon, button: integer = MOUSE_MOVE);
 
 Returns the players summoning percent
 
@@ -1338,7 +1338,7 @@ Example:
 
      mouseIcon(AB_Bar_HP, MOUSE_LEFT);
 *)
-procedure TRSActionBar.mouseIcon(icon, button: integer= MOUSE_MOVE);
+procedure TRSActionBar.mouseIcon(icon, button: integer = MOUSE_MOVE);
 begin
   if not inRange(icon, 1, 4) then
     exit;
@@ -1402,16 +1402,17 @@ var
   t: LongWord;
 begin
   if enabled then
-    result := (self._isRetaliateEnabled())
+    result := self._isRetaliateEnabled()
   else
-    result := not (self._isRetaliateEnabled());
-
-  print('actionBar.setRetaliate(): result = '+boolToStr(result), TDebug.SUB);
+    result := (not self._isRetaliateEnabled());
 
   if result then
+  begin
+    print('actionBar.setRetaliate(): result = '+boolToStr(result), TDebug.SUB);
     exit();
+  end
 
-  self.mouseIcon(AB_Bar_ADRENALINE, MOUSE_LEFT);
+  self.mouseIcon(AB_BAR_ADRENALINE, MOUSE_LEFT);
 
   t := getSystemTime() + randomRange(3500, 5000);
 
@@ -1426,6 +1427,46 @@ begin
   end;
 
   print('actionBar.setRetaliate(): result = '+boolToStr(result), TDebug.SUB);
+end;
+
+function TRSActionBar._isQuickPrayerEnabled(): boolean;
+const
+  ENABLED_COLOR = 9060948;
+begin
+  result := getColor(self.x1 + 315, self.y1 + 23) = ENABLED_COLOR;
+  print('actionBar._isQuickPrayerEnabled(): result = ' + boolToStr(result), TDebug.SUB);
+end;
+
+function TRSActionBar.setQuickPrayer(enabled: boolean): boolean;
+var
+  t: LongWord;
+begin
+  if enabled then
+    result := self._isQuickPrayerEnabled()
+  else
+    result := (not self._isQuickPrayerEnabled());
+
+  if result then
+  begin
+    print('actionBar.setQuickPrayer(): result = ' + boolToStr(result), TDebug.SUB);
+    exit();
+  end;
+
+  self.mouseIcon(AB_BAR_PRAYER, MOUSE_LEFT);
+
+  t := getSystemTime() + randomRange(3500, 5000);
+
+  while (t > getSystemTime()) and (not result) do
+  begin
+    if enabled then
+      result := self._isQuickPrayerEnabled()
+    else
+      result := (not self._isQuickPrayerEnabled());
+
+    wait(1000 + random(1000));
+  end;
+
+  print('actionBar.setQuickPrayer(): result = ' + boolToStr(result), TDebug.SUB);
 end;
 
 begin
