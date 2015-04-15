@@ -282,7 +282,7 @@ var
 begin
   page := getPage(SMART_URL);
 
-  params := explode(',', between('worldLink=''', ';', page));
+  params := explode(',', between('worldLink=''', '''', page));
 
   result := (length(params) = 2);
 
