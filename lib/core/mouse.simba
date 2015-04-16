@@ -728,4 +728,45 @@ begin
   until(clicks >= maxClicks);
 end;
 
+(*
+getRealMousePos
+~~~~~~~~~~~~~~~
+
+.. code-block:: pascal
+
+    procedure getRealMousePos(var x, y : Integer);
+
+Retrives the position of the real (not smart) mouse relative to the
+desktop client.  Can be used to create an interactive GUI drawn on smart.
+
+.. note::
+
+    - Author: Zyt3x
+
+Example:
+
+.. code-block:: pascal
+
+    getRealMousePos(P);
+    if isPointInBox(P, GUIclickityBox) then
+      writeLn('You pressed the button! Filthy presser...');
+
+*)
+procedure getRealMousePos(var X, Y : Integer);
+var
+  KMTarget, ITarget : Integer;
+begin
+  KMTarget := getKeyMouseTarget();
+  ITarget := getImageTarget();
+  setDesktopAsClient();
+  system.getMousePos(X, Y);
+  setKeyMouseTarget(KMTarget);
+  setImageTarget(ITarget);
+end;
+
+procedure getRealMousePos(var P : TPoint); overload;
+begin
+  getRealMousePos(P.X, P.Y);
+end;
+
 {$f+}
