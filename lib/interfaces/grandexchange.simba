@@ -378,7 +378,7 @@ begin
   timeOut := getTickCount64() + waitTime;
 
   while getTickCount64() < timeOut do
-    if (countColorTolerance(4501731, b, 72) > 100) then
+    if (countColorTolerance(4501731, b, 72) > 1800) then
       exit(true);
 end;
 
