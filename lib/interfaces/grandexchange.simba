@@ -361,7 +361,7 @@ Internal function which returns if the offer screen is open or not.
 .. note::
 
     - by The Mayor
-    - Last Updated: 14 January 2015 by The Mayor
+    - Last Updated: 27 April 2015 by BMWxi
 
 Example:
 
@@ -378,7 +378,7 @@ begin
   timeOut := getTickCount64() + waitTime;
 
   while getTickCount64() < timeOut do
-    if (countColorTolerance(4501731, b, 72) > 100) then
+    if (countColorTolerance(4501731, b, 72) > 1800) then
       exit(true);
 end;
 
