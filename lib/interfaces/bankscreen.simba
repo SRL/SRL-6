@@ -1193,7 +1193,7 @@ extremely similar to the convo box, but is different.
 .. note::
 
     - by Olly
-    - Last Updated: 20 October 2013 by Olly
+    - Last Updated: 20 October 2015 by BMWxi
 
 Example:
 
@@ -1203,8 +1203,8 @@ Example:
 *)
 function TRSBankScreen._enterAmount(amount, waitTime: integer): boolean;
 const
-  clBackground = 8825531;
-  clBackgroundTol = 22;
+  clBackground = 8955317;
+  clBackgroundTol = 68;
   boxDimensions: TPoint = [506, 130];
 var
   tpa: TPointArray;
