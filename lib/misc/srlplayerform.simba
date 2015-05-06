@@ -842,6 +842,7 @@ begin
   PF_LoadSettings();
 
   try
+    playerForm.mainForm.setActiveControl(playerForm.btnStart);
     playerForm.mainForm.showModal();
   except
     print('Uh-oh failed to show playerform', TDebug.ERROR);
