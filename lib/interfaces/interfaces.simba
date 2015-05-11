@@ -57,10 +57,11 @@ const
   ID_INTERFACE_GRANDEXCHANGE    = 45;
   ID_INTERFACE_HEROSCREEN       = 46;
   ID_INTERFACE_BEASTOFBURDEN    = 47;
+  ID_INTERFACE_LOOTSCREEN       = 48;
 
   // client - logged out
-  ID_INTERFACE_LOBBY            = 48;
-  ID_INTERFACE_LOBBY_WORLDS     = 49;
+  ID_INTERFACE_LOBBY            = 49;
+  ID_INTERFACE_LOBBY_WORLDS     = 50;
 
 (*
 type TRSInterface
