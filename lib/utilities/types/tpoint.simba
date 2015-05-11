@@ -214,7 +214,7 @@ TPoint.offset
 
 .. code-block:: pascal
 
-    procedure TPoint.offSet(p: TPoint);
+    function TPoint.offSet(p: TPoint);
 
 Offsets the TPoint by p.
 
@@ -229,10 +229,11 @@ Example:
     p.offset(point(50, 50));
 
 *)
-procedure TPoint.offSet(p: TPoint);
+function TPoint.offSet(p: TPoint): TPoint;
 begin
   self.x := self.x + p.x;
   self.y := self.y + p.y;
+  result := self;
 end;
 
 (*
