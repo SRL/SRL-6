@@ -372,7 +372,7 @@ Loots the item in the selected slot.
 .. note::
 
     - by BMWxi
-    - Last Updated: 6 May 2015 by BMWxi
+    - Last Updated: 12 May 2015 by BMWxi
 
 Example:
 
@@ -389,8 +389,9 @@ begin
     exit(false);
   end;
 
-  result := true;
-  mouseBox(self.getSlotBox(slot), MOUSE_LEFT);
+  result := self.isItemInSlot(slot);
+  if result then
+    mouseBox(self.getSlotBox(slot), MOUSE_LEFT);
 
   print('TRSLootScreen.lootSlot(): Result = ' + boolToStr(result));
 end;
@@ -408,7 +409,7 @@ Loots the items in the selected slots.
 .. note::
 
     - by BMWxi
-    - Last Updated: 6 May 2015 by BMWxi
+    - Last Updated: 12 May 2015 by BMWxi
 
 Example:
 
@@ -426,8 +427,8 @@ begin
     print('TRSLootScreen.lootSlot(): lootscreen is not open.', TDebug.WARNING);
     exit(false);
   end;
-
-  for i := 0 to high(slots) do
+  Quicksort(slots);
+  for i := high(slots) downto 0 do
     if (self.lootSlot(slots[i])) then
       result := true;
 
@@ -447,7 +448,7 @@ Loots the items that match the DTMs in the array.
 .. note::
 
     - by BMWxi
-    - Last Updated: 6 May 2015 by BMWxi
+    - Last Updated: 12 May 2015 by BMWxi
 
 Example:
 
@@ -470,8 +471,13 @@ begin
   for i := 0 to high(DTMs) do
   begin
     slots := findItem(DTMs[i], self.getSlotBoxes(), true);
+    if (length(slots) = 0) then
+      continue();
     for c := 0 to high(slots) do
-      self.lootSlot(slots[1]);
+    begin
+      self.lootSlot(slots[0] + 1);
+      wait(500 + random(250));
+    end;
     if (length(slots) > 0) then
       result := true;
   end;
