@@ -496,30 +496,25 @@ Example:
 *)
 function TIntegerArray.getMostCommon(): LongInt;
 var
-  H, I, Cur, Count, HighCount: LongInt;
+  cur, count, hi, I : Integer;
+  tmp := copy(self);
 begin
-  QuickSort(self);
+  QuickSort(tmp);
+  cur := tmp[0];
 
-  Cur := self[0] - 1;
-  Count := 0;
-  HighCount := 0;
-
-  H := High(self);
-  for I := 0 to H do
+  for I := 0 to high(tmp) do
   begin
-    if (Cur <> self[I]) then
+    inc(count);
+    if tmp[I] > cur then
     begin
-      if (Count > HighCount) then
-      begin
-        HighCount := Count;
-        Result := Cur;
-      end;
-
-      Count := 0;
-      Cur := self[I];
+      cur := tmp[I];
+      count := 1;
     end;
-
-    Inc(Count);
+    if count >= hi then
+    begin
+      result := cur;
+      hi := count;
+    end;
   end;
 end;
 
