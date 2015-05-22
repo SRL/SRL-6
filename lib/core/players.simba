@@ -37,8 +37,7 @@ File's internal variables.
 
 *}
 var
-  _boxUsername: TBox = [-1, -1, -1, -1];
-  _boxPassword: TBox = [-1, -1, -1, -1];
+  _boxUsername, _boxPassword: TBox;
 {$IFNDEF CODEINSIGHT}
   __areDynamicInterfacesSet: boolean = false;
 {$ENDIF}
@@ -678,6 +677,9 @@ var
   tpaActive, tpaInactive: TPointArray;
   bdsActive, bdsInactive: TBox;
 begin
+  _boxUsername := [-1, -1, -1, -1];
+  _boxPassword := [-1, -1, -1, -1];
+
   findColors(tpaActive, 6774863, 247, 229, 547, 379); // active box border color
   findColors(tpaInactive, 6906451, 247, 229, 547, 379); // inactive box border color
 
@@ -739,6 +741,9 @@ var
   c: integer;
   t : LongWord;
 begin
+  if (inputBox.x1 < 1) then
+    exit(false);
+
   t := (getSystemTime() + (60000 * 2));
   inputBox.offset(point(8, 0));
 
