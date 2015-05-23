@@ -37,7 +37,9 @@ File's internal variables.
 
 *}
 var
-  _boxUsername, _boxPassword: TBox;
+  _boxUsername: TBox = [-1, -1, -1, -1];
+  _boxPassword: TBox = [-1, -1, -1, -1];
+
 {$IFNDEF CODEINSIGHT}
   __areDynamicInterfacesSet: boolean = false;
 {$ENDIF}
@@ -677,9 +679,6 @@ var
   tpaActive, tpaInactive: TPointArray;
   bdsActive, bdsInactive: TBox;
 begin
-  _boxUsername := [-1, -1, -1, -1];
-  _boxPassword := [-1, -1, -1, -1];
-
   findColors(tpaActive, 6774863, 247, 229, 547, 379); // active box border color
   findColors(tpaInactive, 6906451, 247, 229, 547, 379); // inactive box border color
 
@@ -741,13 +740,12 @@ var
   c: integer;
   t : LongWord;
 begin
-  if (inputBox.x1 < 1) then
-    exit(false);
-
-  t := (getSystemTime() + (60000 * 2));
+  t := (getSystemTime() + 30000);
   inputBox.offset(point(8, 0));
 
   repeat
+    if (isLoggedIn() or lobby.isOpen()) then exit(true);
+
     if findColors(TPA, __LOGIN_COLOR_TEXT, inputBox) then
     begin
       sortTPAFrom(TPA, point(inputBox.x2, (inputBox.y1 + inputBox.y2 div 2)));
@@ -1027,7 +1025,7 @@ visible.
 .. note::
 
     - by The SRL Developers Team
-    - Last updated: 19 March 2015 by The Mayor
+    - Last updated: 23 May 2015 by The Mayor
 
 Example:
 
@@ -1047,19 +1045,16 @@ begin
     exit(false);
   end;
 
-  if (isLoggedIn() or lobby.isOpen()) then
-    exit(true);
+  if (isLoggedIn() or lobby.isOpen()) then exit(true);
 
-  __areDynamicInterfacesSet := false;
-
-  if ((_boxUsername.x1 = -1) or (_boxPassword.x1 = -1)) then
-    if (not __setInputBoxes()) then
-    begin
-      print('TPlayer.loginToLobby(): Failed to find username and/or password box', TDebug.ERROR);
-      exit(false);
-    end;
+  if not __setInputBoxes() then
+  begin
+    print('TPlayer.loginToLobby(): Failed to find username and/or password box', TDebug.ERROR);
+    exit(false);
+  end;
 
   print('TPlayer.loginToLobby()', TDebug.HEADER);
+  __areDynamicInterfacesSet := false;
 
   repeat
     print('Attempt ' + toStr(tries) + ': ' + capitalize(self.loginName) + ' (' + capitalize(self.displayName) + ')');
@@ -1077,8 +1072,7 @@ begin
     if reachedMaxTries then tries := 1; //'reachedMaxTries' is passed down from __respondToPopup()
   until result;
 
-  if result and (not disableIPScreenshots) then
-    takeScreenshot('IP_address.png');
+  if (not disableIPScreenshots) then takeScreenshot('IP_address.png');
 
   print('TPlayer.loginToLobby(): ' + toStr(result), TDebug.FOOTER);
 end;
