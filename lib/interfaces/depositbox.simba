@@ -675,7 +675,7 @@ var
   i, _x, _y: integer;
   tt,t : LongWord;
 begin
-  result := false;
+  result := true;
 
   if (length(slots) < 1) then
   begin
@@ -683,15 +683,15 @@ begin
     exit(false);
   end;
 
-  if (not self.isOpen()) then
-  begin
-    print('depositBox.deposit(): Unable to deposit since depositBox isn''t open', TDebug.ERROR);
-    exit(false);
-  end;
-
   if ((length(amounts) > 0) and (length(amounts) <> length(slots))) then
   begin
     print('depositBox.deposit(): Slot and amount arrays are of different length, they need to be the same!', TDebug.WARNING);
+    exit(false);
+  end;
+
+  if (not self.isOpen()) then
+  begin
+    print('depositBox.deposit(): Unable to deposit since depositBox isn''t open', TDebug.ERROR);
     exit(false);
   end;
 
@@ -702,80 +702,52 @@ begin
 
     for i := 0 to high(amounts) do
       amounts[i] := -1;
-  end;
 
-  if (not result) then
+    if (not oneByOne) then slots.shuffle(); // So the first slot isn't always clicked first
+  end;                                      // Only shuffle if the amounts array is empty
+                                            // and not oneByOne
+  for i := 0 to high(slots) do
   begin
-    result := true; // will be set to false if it fails to deposit a slot
-    slots.shuffle(); // so it doesn't always start from slot 1
+    b := self.getSlotBox(slots[i]);
 
-    for i := 0 to high(slots) do
+    if (not isItemIn(b)) then
+      continue;
+
+    if oneByOne then
     begin
-      b := self.getSlotBox(slots[i]);
+      mouseBox(b, MOUSE_LEFT);
+      wait(100 + random(200));
+    end else
+    begin
+      mouseBox(b, MOUSE_RIGHT);
 
-      if (not isItemIn(b)) then
-        continue;
-
-      if oneByOne then
-      begin
-        mouseBox(b, MOUSE_LEFT);
-        wait(100 + random(200));
-      end else
-      begin
-        mouseBox(b, MOUSE_RIGHT);
-
-        if (amounts[i] = -1) then
-        begin
-          if (not chooseOption._select(['Deposit-All', 'sit-All', 'All'], MOUSE_LEFT, false, 1.0, 300)) then
-            chooseOption.select(['Deposit', 'osit']); // in case there's only one
-        end else
-        begin
-          if (not chooseOption._select([toStr(amounts[i])], MOUSE_LEFT, false, 1.0, 300)) then
-            if (chooseOption.select(['Deposit-X', '-X'])) then
-            begin
-              t := (getSystemTime() + 3000);
-
-              while (getSystemTime() < t) do
-              begin
-                if findColor(_x, _y, 0, 241, 485, 286, 517) then // box around the "Enter" text
-                begin
-                  wait(100 + random(50));
-                  typeSend(toStr(amounts[i]));
-
-                  tt := (getSystemTime() + 3000);
-                  while (not self.isOpen()) and (getSystemTime() < tt) do
-                    wait(50);
-
-                  break;
-                end;
-
-                wait(50 + random(25));
-              end;
-            end;
-        end;
-      end;
-
-      // wait for the item to disappear
-      t := (getSystemTime() + 2000);
-      while (amounts[i] = -1) and (getSystemTime() < t) do
-      begin
-        if (not isItemIn(b)) then
-          break;
-
-        wait(50 + random(25));
-      end;
-
-      // make sure the item is gone, return false if not
       if (amounts[i] = -1) then
-        if isItemIn(self.getSlotBox(slots[i])) then
-        begin
-          print('bankScreen.deposit(): Failed to deposit item in slot '+toStr(i), TDebug.ERROR);
-          result := false;
-        end;
+      begin
+        if (not chooseOption._select(['Deposit-All', 'sit-All', 'All'], MOUSE_LEFT, false, 1.0, 300)) then
+          chooseOption.select(['Deposit', 'osit']); // in case there's only one
+      end else
+        if (not chooseOption._select([toStr(amounts[i])], MOUSE_LEFT, false, 1.0, 300)) then
+          if (chooseOption.select(['Deposit-X', '-X'])) then
+            bankScreen._enterAmount(amounts[i], 5000);
     end;
-  end;
 
-  print('depositBox.deposit(): '+toStr(result), TDebug.SUB);
+    t := (getSystemTime() + 2500);
+
+    while (getSystemTime() < t) do // Wait for the item to disappear
+      if (not isItemIn(b)) then
+        break
+      else
+        wait(50 + random(25));
+
+    if isItemIn(b) then
+    begin
+      print('depositBox.deposit(): Failed to deposit item in slot ' + toStr(slots[i]), TDebug.ERROR);
+      result := false;
+    end;
+
+  end
+
+  print('depositBox.deposit(): ' + toStr(result), TDebug.SUB);
 end;
 
 begin

@@ -319,18 +319,15 @@ begin
     repeat
       multiType(VK_ESCAPE, randomRange(30, 50), 2);
       wait(100 + random(50));
-      result := (not self.isOpen());
-    until((getSystemTime() > timeOut) or result);
-
-    if (result) then
-      exit();
+      if not self.isOpen() then exit(true);
+    until ((getSystemTime() > timeOut) or result);
   end;
 
   // click the X as a failsafe
   mouseBox(intToBox(self.x1 + 465, self.y1 + 15, self.x2 - 207, self.y1 + 30), MOUSE_MOVE);
 
   // this is a failsafe in case the bankscreen closes (from the ESC key) while moving the mouse
-  if (self.isOpen()) then
+  if self.isOpen() then
   begin
     fastClick(MOUSE_LEFT);
     wait(50 + random(50));
@@ -585,7 +582,7 @@ var
   i: integer;
 begin
   for i := 0 to high(b) do
-    if (isItemIn(b[i])) then
+    if isItemIn(b[i]) then
       inc(result);
 end;
 
@@ -767,7 +764,6 @@ begin
 
   print('bankScreen.packCountDTM(): Counted ' + intToStr(result) + ' items');
 end;
-
 
 (*
 TRSBankScreen.getPackCountBitmap
@@ -1153,17 +1149,14 @@ begin
                      self.y2 + BUTTON_OFFSET.y));
 
   // try ESC key first
-  if (useKey) and ((button = BANK_BUTTON_PRESET_1) or (button = BANK_BUTTON_PRESET_2)) then
+  if useKey and ((button = BANK_BUTTON_PRESET_1) or (button = BANK_BUTTON_PRESET_2)) then
   begin
     timeOut := (getSystemTime() + randomRange(1500, 2000));
     repeat
       multiType(toStr(button - 2), randomRange(30, 50), 2, false);
       wait(100 + random(50));
-      result := (not self.isOpen());
+     if (not self.isOpen()) then exit(true);
     until((getSystemTime() > timeOut) or result);
-
-    if (result) then
-      exit();
   end;
 
   mouseBox(b, MOUSE_MOVE);
@@ -1193,7 +1186,7 @@ extremely similar to the convo box, but is different.
 .. note::
 
     - by Olly
-    - Last Updated: 20 October 2015 by BMWxi
+    - Last Updated: 20 October 2014 by BMWxi
 
 Example:
 
@@ -1215,7 +1208,7 @@ begin
    t := (getTimeRunning() + waitTime);
 
   repeat
-    if (findColorsTolerance(tpa, clBackground, getClientBounds(), clBackgroundTol, colorSetting(0))) then
+    if findColorsTolerance(tpa, clBackground, getClientBounds(), clBackgroundTol, colorSetting(0)) then
     begin
       atpa := clusterTPAEx(tpa, 6, 6);
       sortATPASize(atpa, true);
@@ -1257,7 +1250,7 @@ all items, depositing a specific amount of items, and clicking each item one by 
 .. note::
 
     - by Coh3n
-    - Last Updated: 20 November 2013 by Coh3n
+    - Last Updated: 24 May 2015 by The Mayor
 
 Examples:
 
@@ -1273,11 +1266,17 @@ var
   t, tt : LongWord;
   i, _x, _y: integer;
 begin
-  result := false;
+  result := true;
 
   if (length(slots) < 1) then
   begin
     print('bankScreen.deposit(): No deposit slots specified', TDebug.WARNING);
+    exit(false);
+  end;
+
+  if (length(amounts) > 0) and (length(amounts) <> length(slots)) then
+  begin
+    print('bankScreen.deposit(): Slot and amount arrays are of different length, they need to be the same!', TDebug.WARNING);
     exit(false);
   end;
 
@@ -1287,93 +1286,60 @@ begin
     exit(false);
   end;
 
-  if ((length(amounts) > 0) and (length(amounts) <> length(slots))) then
-  begin
-    print('bankScreen.deposit(): Slot and amount arrays are of different length, they need to be the same!', TDebug.WARNING);
-    exit(false);
-  end;
-
-  // fill the amounts array to avoid errors
-  if (length(amounts) = 0) then
+  if (length(amounts) = 0) then // Fill the amounts array to avoid errors
   begin
     setLength(amounts, length(slots));
 
     for i := 0 to high(amounts) do
       amounts[i] := -1;
-  end;
 
-  if ((slots[0] = 1) and (slots[high(slots)] = 28) and (oneByOne = false) and (length(amounts) = 0)) then
-    result := self.quickDeposit(QUICK_DEPOSIT_INVENTORY);
-
-  if (not result) then
+    if (not oneByOne) then slots.shuffle(); // So the first slot isn't always clicked first
+  end;                                      // Only shuffle if the amounts array is empty
+                                            // and not oneByOne
+  for i := 0 to high(slots) do
   begin
-    result := true; // will be set to false if it fails to deposit a slot
+    b := self.getPackSlotBox(slots[i]);
 
-    for i := 0 to high(slots) do
+    if (not isItemIn(b))then
+      continue;
+
+    if oneByOne then
     begin
-      b := self.getPackSlotBox(slots[i]);
+      mouseBox(b, MOUSE_LEFT);
+      wait(100 + random(200));
+    end else
+    begin
+      mouseBox(b, MOUSE_RIGHT);
 
-      if (isItemIn(b) = false) then
-        continue;
-
-      if (oneByOne = true) then
-      begin
-        mouseBox(b, MOUSE_LEFT);
-        wait(100 + random(200));
-      end else begin
-        mouseBox(b, MOUSE_RIGHT);
-
-        if (amounts[i] = -1) then
-        begin
-          if (chooseOption._select(['Deposit-All', 'sit-All', 'All'], MOUSE_LEFT, false, 1.0, 300) = false) then
-            chooseOption.select(['Deposit', 'osit']); // in case there's only one
-        end else begin
-          if (chooseOption._select([toStr(amounts[i])], MOUSE_LEFT, false, 1.0, 300) = false) then
-            if (chooseOption.select(['Deposit-X', '-X'])) then
-            begin
-              t := (getSystemTime() + 3000);
-
-              while (getSystemTime() < t) do
-              begin
-                if (findColor(_x, _y, 0, 241, 485, 286, 517)) then // box around the "Enter" text
-                begin
-                  wait(100 + random(50));
-                  typeSend(toStr(amounts[i]));
-
-                  tt := (getSystemTime() + 3000);
-                  while (self.isOpen() = false) and (getSystemTime() < tt) do
-                    wait(50);
-
-                  break;
-                end;
-
-                wait(50 + random(25));
-              end;
-            end;
-        end;
-      end;
-
-      // wait for the item to disappear
-      t := (getSystemTime() + 2000);
-      while (amounts[i] = -1) and (getSystemTime() < t) do
-      begin
-        if (isItemIn(b) = false) then
-          break;
-
-        wait(50 + random(25));
-      end;
-
-      // make sure the item is gone, return false if not
       if (amounts[i] = -1) then
-        if (isItemIn(self.getPackSlotBox(slots[i]))) then
-        begin
-          print('bankScreen.deposit(): Failed to deposit item in slot '+toStr(i), TDebug.ERROR);
-          result := false;
-        end;
+      begin
+        writeLn(slots);
+        writeLn(amounts);
+        if (not chooseOption._select(['Deposit-All', 'sit-All', 'All'], MOUSE_LEFT, false, 1.0, 300)) then
+          chooseOption.select(['Deposit', 'osit']); // In case there's only one
+      end else
+        if (not chooseOption._select([toStr(amounts[i])], MOUSE_LEFT, false, 1.0, 300)) then
+          if chooseOption.select(['Deposit-X', '-X']) then
+            self._enterAmount(amounts[i], 5000);
     end;
+
+    t := (getSystemTime() + 2500);  // Wait for the item to disappear
+
+    while (getSystemTime() < t) do
+      if (not isItemIn(b)) then
+        break
+      else
+        wait(50 + random(25));
+
+    if isItemIn(b) then
+    begin
+      print('bankScreen.deposit(): Failed to deposit item in slot ' + toStr(slots[i]), TDebug.ERROR);
+      result := false;
+    end;
+
   end;
 
-  print('bankScreen.deposit(): '+toStr(result), TDebug.SUB);
+  print('bankScreen.deposit(): ' + toStr(result), TDebug.SUB);
 end;
 
 (*
@@ -1543,7 +1509,7 @@ begin
   hi := high(slots);
 
   for i := 0 to hi do
-    if (pointInBox(pnt, slots[i])) then
+    if pointInBox(pnt, slots[i]) then
       exit(i + 1); // +1 since array starts at 0.
 end;
 
@@ -1880,7 +1846,7 @@ begin
 
   while (t > getSystemTime()) do
   begin
-    if (bankScreen.isOpen()) or (pinScreen.isOpen()) then
+    if (bankScreen.isOpen() or pinScreen.isOpen()) then
       exit(true);
 
     wait(25 + random(25));
@@ -2433,7 +2399,7 @@ begin
     exit();
 
   repeat
-  result:= (countColorTolerance(9021887, self.getBounds(), 35) > 5000); // color of the paper like background.
+    result:= (countColorTolerance(9021887, self.getBounds(), 35) > 5000); // color of the paper like background.
   until (getTimeRunning() >= t) or (result);
 end;
 
