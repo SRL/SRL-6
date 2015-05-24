@@ -759,6 +759,7 @@ begin
       t := (getSystemTime() + 2000);
       while (amounts[i] = -1) and (getSystemTime() < t) do
       begin
+        if (not isItemIn(b)) then
           break;
 
         wait(50 + random(25));
