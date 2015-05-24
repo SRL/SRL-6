@@ -518,4 +518,69 @@ begin
   end;
 end;
 
+(*
+TIntegerArray.exchange
+~~~~~~~~~~~~~~~~~~~~~~
+
+.. code-block:: pascal
+
+    procedure TIntegerArray.exchange(a, b: Integer);
+
+Exchanges the values of 2 elements in the array
+
+.. note::
+
+    - by The Mayor
+
+Example:
+
+.. code-block:: pascal
+
+    TIA.exchange(2, 8);
+
+*)
+procedure TIntegerArray.exchange(a, b: Integer);
+var
+  i: Integer;
+begin
+  if (length(self) - 1) < max(a, b) then
+  begin
+    print('TIntegerArray.exchange(): Index larger than array length', TDebug.ERROR);
+    exit;
+  end;
+
+  i := self[a];
+  self[a] := self[b];
+  self[b] := i;
+end;
+
+(*
+TIntegerArray.shuffle
+~~~~~~~~~~~~~~~~~~~~~
+
+.. code-block:: pascal
+
+    procedure TIntegerArray.shuffle
+
+Shuffles (randomly sorts) all of the elements in the array.
+
+.. note::
+
+    - by The Mayor
+
+Example:
+
+.. code-block:: pascal
+
+    TIA.shuffle();
+
+*)
+procedure TIntegerArray.shuffle();
+var
+  i: Integer;
+begin
+  for i := (length(self) - 1) downto 0 do
+    self.exchange(i, random(i + 1));
+end;
+
 {$f+}
