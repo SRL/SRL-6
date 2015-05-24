@@ -1263,8 +1263,8 @@ Examples:
 function TRSBankScreen.deposit(slots: TIntegerArray; amounts: TIntegerArray = []; oneByOne: boolean = false): boolean;
 var
   b: TBox;
-  t, tt : LongWord;
-  i, _x, _y: integer;
+  i: integer;
+  t: LongWord;
 begin
   result := true;
 

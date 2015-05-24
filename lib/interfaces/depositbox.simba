@@ -672,8 +672,8 @@ Examples:
 function TRSDepositBox.deposit(slots: TIntegerArray; amounts: TIntegerArray = []; oneByOne: boolean = false): boolean;
 var
   b: TBox;
-  i, _x, _y: integer;
-  tt,t : LongWord;
+  i: integer;
+  t : LongWord;
 begin
   result := true;
 
