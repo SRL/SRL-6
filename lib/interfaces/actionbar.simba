@@ -1431,7 +1431,7 @@ end;
 
 function TRSActionBar._isQuickPrayerEnabled(): boolean;
 const
-  ENABLED_COLOR = 9060948;
+  ENABLED_COLOR = 9123919;
 begin
   result := getColor(self.x1 + 315, self.y1 + 23) = ENABLED_COLOR;
   print('actionBar._isQuickPrayerEnabled(): result = ' + boolToStr(result), TDebug.SUB);
