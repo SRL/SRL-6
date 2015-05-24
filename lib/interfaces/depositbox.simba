@@ -414,7 +414,7 @@ begin
   end;
 
   for i := 0 to high(b) do
-    if (isItemIn(b[i])) then
+    if isItemIn(b[i]) then
       inc(result);
 
   print('depositBox.count(): result = '+intToStr(result), TDebug.SUB);
@@ -547,7 +547,7 @@ begin
     exit(false);
   end;
 
-  result := (not (self.getBounds().colorExists(ITEM_OUTLINE_BLACK)));
+  result := (not self.getBounds().colorExists(ITEM_OUTLINE_BLACK));
   print('depositBox.isEmpty: result = '+boolToStr(result), TDebug.SUB);
 end;
 
@@ -582,7 +582,7 @@ begin
     exit(false);
 
   for i := DEPOSITBOX_SLOT_LOW to DEPOSITBOX_SLOT_HIGH do
-    if (not (self.isItemInSlot(i))) then
+    if (not self.isItemInSlot(i)) then
       exit(false);
 
   result := true;
@@ -628,7 +628,7 @@ begin
     exit(false);
   end;
 
-  if (self.isEmpty()) then
+  if self.isEmpty() then
     exit(false);
 
   b := gridBox(depositType, 4, 1, 34, 23, 40, 0,
@@ -659,7 +659,7 @@ all items, depositing a specific amount of items, and clicking each item one by 
 .. note::
 
     - by Coh3n
-    - Last Updated: 20 November 2013 by Coh3n
+    - Last Updated: 24 May 2015 by The Mayor
 
 Examples:
 
@@ -704,46 +704,46 @@ begin
       amounts[i] := -1;
   end;
 
-  if ((slots[0] = 1) and (slots[high(slots)] = 28) and (oneByOne = false) and (length(amounts) = 0)) then
-    result := self.quickDeposit(QUICK_DEPOSITBOX_INVENTORY);
-
   if (not result) then
   begin
     result := true; // will be set to false if it fails to deposit a slot
+    slots.shuffle(); // so it doesn't always start from slot 1
 
     for i := 0 to high(slots) do
     begin
       b := self.getSlotBox(slots[i]);
 
-      if (isItemIn(b) = false) then
+      if (not isItemIn(b)) then
         continue;
 
-      if (oneByOne = true) then
+      if oneByOne then
       begin
         mouseBox(b, MOUSE_LEFT);
         wait(100 + random(200));
-      end else begin
+      end else
+      begin
         mouseBox(b, MOUSE_RIGHT);
 
         if (amounts[i] = -1) then
         begin
-          if (chooseOption._select(['Deposit-All', 'sit-All', 'All'], MOUSE_LEFT, false, 1.0, 300) = false) then
+          if (not chooseOption._select(['Deposit-All', 'sit-All', 'All'], MOUSE_LEFT, false, 1.0, 300)) then
             chooseOption.select(['Deposit', 'osit']); // in case there's only one
-        end else begin
-          if (chooseOption._select([toStr(amounts[i])], MOUSE_LEFT, false, 1.0, 300) = false) then
+        end else
+        begin
+          if (not chooseOption._select([toStr(amounts[i])], MOUSE_LEFT, false, 1.0, 300)) then
             if (chooseOption.select(['Deposit-X', '-X'])) then
             begin
               t := (getSystemTime() + 3000);
 
               while (getSystemTime() < t) do
               begin
-                if (findColor(_x, _y, 0, 241, 485, 286, 517)) then // box around the "Enter" text
+                if findColor(_x, _y, 0, 241, 485, 286, 517) then // box around the "Enter" text
                 begin
                   wait(100 + random(50));
                   typeSend(toStr(amounts[i]));
 
                   tt := (getSystemTime() + 3000);
-                  while (self.isOpen() = false) and (getSystemTime() < tt) do
+                  while (not self.isOpen()) and (getSystemTime() < tt) do
                     wait(50);
 
                   break;
@@ -759,7 +759,6 @@ begin
       t := (getSystemTime() + 2000);
       while (amounts[i] = -1) and (getSystemTime() < t) do
       begin
-        if (isItemIn(b) = false) then
           break;
 
         wait(50 + random(25));
@@ -767,7 +766,7 @@ begin
 
       // make sure the item is gone, return false if not
       if (amounts[i] = -1) then
-        if (isItemIn(self.getSlotBox(slots[i]))) then
+        if isItemIn(self.getSlotBox(slots[i])) then
         begin
           print('bankScreen.deposit(): Failed to deposit item in slot '+toStr(i), TDebug.ERROR);
           result := false;
