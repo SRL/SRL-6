@@ -18,7 +18,7 @@ TIntegerArray.addIndex
 
     procedure TIntegerArray.addIndex(const int : Integer; const index : Integer);
 
-Used to add a value to a TIntegerArray at a chosen index larger than the array's lowest index.
+Used to add a value to a TIntegerArray at a chosen index.
 
 .. note::
 
@@ -32,19 +32,8 @@ Example:
 
 *)
 procedure TIntegerArray.addIndex(const int : Integer; const index : Integer);
-var
-  I : Integer;
 begin
-  if not inRange(index, low(self), length(self)) then
-  begin
-    WriteLn('ERROR: addIndex: index larger than array length.');
-    Exit;
-  end;
-
-  setLength(self, length(self)+1);
-  for I := high(self)-1 downto index do
-    self[I+1] := self[I];
-  self[index] := int;
+  insert(int, self, index);
 end;
 
 (*
@@ -55,7 +44,7 @@ TIntegerArray.deleteIndex
 
     procedure TIntegerArray.deleteIndex(const index : Integer);
 
-Used to delete a value of a TIntegerArray at a chosen index larger than the array's lowest index.
+Used to delete a value of a TIntegerArray at a chosen index.
 
 .. note::
 
@@ -74,13 +63,11 @@ var
 begin
   if not inRange(index, low(self), high(self)) then
   begin
-    WriteLn('ERROR: deleteIndex: index larger than array length.');
+    WriteLn('ERROR: deleteIndex: index out of bounds.');
     Exit;
   end;
 
-  for I := index to high(self)-1 do
-    self[I] := self[I+1];
-  setLength(self, length(self)-1);
+  delete(self, index, 1);
 end;
 
 (*
@@ -106,7 +93,7 @@ Example:
 *)
 procedure TIntegerArray.append(const int : Integer);
 begin
-  self.addIndex(int, length(self));
+  insert(int, self, length(self));
 end;
 
 (*
@@ -131,8 +118,6 @@ Example:
 
 *)
 procedure TIntegerArray.combine(const arr : TIntegerArray);
-var
-  I : Integer;
 begin
   combineIntArrayWrap(self, arr, self);
 end;
@@ -214,9 +199,9 @@ function TIntegerArray.include(const arr : TIntegerArray) : TIntegerArray;
 var
   I : Integer;
 begin
-  for I := 0 to high(arr) do
+  for I := high(arr) downto 0 do
     if self.isInArray(arr[I]) then
-      result.append(arr[I]);
+      insert(arr[I], result);
 end;
 
 (*
@@ -244,9 +229,9 @@ function TIntegerArray.exclude(const arr : TIntegerArray) : TIntegerArray;
 var
   I : Integer;
 begin
-  for I := 0 to high(arr) do
+  for I := high(arr) downto 0 do
     if not self.isInArray(arr[I]) then
-      result.append(arr[I]);
+      insert(arr[I], result);
 end;
 
 (*
@@ -271,12 +256,8 @@ Example:
 
 *)
 procedure TIntegerArray.swap(var arr : TIntegerArray);
-var
-  arr2 : TIntegerArray;
 begin
-  arr2 := self;
-  self := arr;
-  arr := arr2;
+  System.swap(self, arr);
 end;
 
 (*
@@ -305,9 +286,9 @@ var
   I : Integer;
   arr : TIntegerArray;
 begin
-  for I := 0 to high(self) do
+  for I := high(self) downto 0 do
     if not arr.isInArray(self[I]) then
-      arr.append(self[I]);
+      insert(self[I], arr);
   self := arr;
 end;
 
@@ -469,7 +450,7 @@ var
 begin
   setLength(result, length(self));
   for I := 0 to high(self) do
-    result[I] := self[I] * 1.0;
+    result[I] := self[I];
 end;
 
 (*

@@ -74,7 +74,7 @@ TPointArray.addIndex
 
     procedure TPointArray.addIndex(const p : TPoint; const index : Integer);
 
-Used to add a point to a TPointArray at a chosen index larger than the array's lowest index.
+Used to add a point to a TPointArray at a chosen index.
 
 .. note::
 
@@ -88,19 +88,8 @@ Example:
 
 *)
 procedure TPointArray.addIndex(const p : TPoint; const index : Integer);
-var
-  I : Integer;
 begin
-  if not inRange(index, low(self), length(self)) then
-  begin
-    WriteLn('ERROR: addIndex: index larger than array length.');
-    Exit;
-  end;
-
-  setLength(self, length(self)+1);
-  for I := high(self)-1 downto index do
-    self[I+1] := self[I];
-  self[index] := p;
+  insert(p, self, index);
 end;
 
 (*
@@ -111,7 +100,7 @@ TPointArray.deleteIndex
 
     procedure TPointArray.deleteIndex(const index : Integer);
 
-Used to delete a point of a TPointArray at a chosen index larger than the array's lowest index.
+Used to delete a point of a TPointArray at a chosen index.
 
 .. note::
 
@@ -125,18 +114,14 @@ Example:
 
 *)
 procedure TPointArray.deleteIndex(const index : Integer);
-var
-  I : Integer;
 begin
   if not inRange(index, low(self), length(self)) then
   begin
-    WriteLn('ERROR: deleteIndex: index larger than array length.');
+    WriteLn('ERROR: deleteIndex: index out of bounds.');
     Exit;
   end;
 
-  for I := index to high(self)-1 do
-    self[I] := self[I+1];
-  setLength(self, length(self)-1);
+  delete(self, index, 1);
 end;
 
 (*
@@ -162,7 +147,7 @@ Example:
 *)
 procedure TPointArray.append(const p : TPoint);
 begin
-  self.addIndex(p, length(self));
+  insert(p, self, length(self));
 end;
 
 (*
@@ -192,12 +177,12 @@ begin
 end;
 
 (*
-TPointArray.returnInArray
-~~~~~~~~~~~~~~~~~~~~~~~~~
+TPointArray.returnPosInArray
+~~~~~~~~~~~~~~~~~~~~~~~~~~~~
 
 .. code-block:: pascal
 
-    function TPointArray.returnInArray(const p : TPoint) : Integer;
+    function TPointArray.returnPosInArray(const p : TPoint) : Integer;
 
 Returns the index of where the point was found in a TPointArray.  Returns -1 if not found.
 
@@ -209,7 +194,7 @@ Example:
 
 .. code-block:: pascal
 
-    writeLn(TPA.returnInArray(point(13, 37)));
+    writeLn(TPA.returnPosInArray(point(13, 37)));
 
 *)
 function TPointArray.returnPosInArray(const p : TPoint) : Integer;
@@ -243,7 +228,7 @@ Example:
 
 .. code-block:: pascal
 
-    writeLn(TPA.returnInArray(point(13, 37)));
+    writeLn(TPA.isInArray(point(13, 37)));
 
 *)
 function TPointArray.isInArray(const p : TPoint) : Boolean;
@@ -276,9 +261,9 @@ function TPointArray.include(const arr : TPointArray) : TPointArray;
 var
   I : Integer;
 begin
-  for I := 0 to high(arr) do
+  for I := high(arr) downto 0 do
     if self.isInArray(arr[I]) then
-      result.append(arr[I]);
+      insert(arr[I], result);
 end;
 
 (*
@@ -306,9 +291,9 @@ function TPointArray.exclude(const arr : TPointArray) : TPointArray;
 var
   I : Integer;
 begin
-  for I := 0 to high(arr) do
+  for I := high(arr) downto 0 do
     if not self.isInArray(arr[I]) then
-      result.append(arr[I]);
+      insert(arr[I], result);
 end;
 
 (*
@@ -918,12 +903,12 @@ end;
 
 
 (*
-TPointArray.findText
-~~~~~~~~~~~~~~~~~~~~
+TPointArray.findTextIn
+~~~~~~~~~~~~~~~~~~~~~~
 
 .. code-block:: pascal
 
-    function TPointArray.findText(const height : Integer; const searchTPA : TPointArray; var matches : TPointArray): Boolean;
+    function TPointArray.findTextIn(const height : Integer; const searchTPA : TPointArray; var matches : TPointArray): Boolean;
 
 Returns True if the text TPA is found within TPointArray.  Also returns the matching points in the variable matches.
 
@@ -935,7 +920,7 @@ Example:
 
 .. code-block:: pascal
 
-    TPA.findText(13.0, 13, sTPA, mTPA);
+    TPA.findTextIn(13.0, sTPA, mTPA);
 
 *)
 function TPointArray.findTextIn(const height : Integer; const searchTPA : TPointArray; var matches : TPointArray): Boolean;
@@ -970,8 +955,8 @@ begin
 end;
 
 (*
-TPointArray.split overload
-~~~~~~~~~~~~~~~~~~~~~~~~~~
+TPointArray.split; overload
+~~~~~~~~~~~~~~~~~~~~~~~~~~~
 
 .. code-block:: pascal
 
@@ -1527,7 +1512,7 @@ end;
 
 (*
 T2DPointArray.deleteIndex
-~~~~~~~~~~~~~~~~~~~~~~~
+~~~~~~~~~~~~~~~~~~~~~~~~~
 
 .. code-block:: pascal
 
@@ -1551,15 +1536,13 @@ procedure T2DPointArray.deleteIndex(const index: Integer);
 var
   i : Integer;
 begin
-  if not inRange(index, low(self), length(self)) then
+  if not inRange(index, low(self), high(self)) then
   begin
-    print('T2DPointArray.deleteIndex(): index is larger than the array length', TDebug.ERROR);
-    Exit;
+    print('T2DPointArray.deleteIndex(): index is out of bounds', TDebug.ERROR);
+    exit();
   end;
 
-  for i := index to high(self)-1 do
-    self[i] := self[i+1];
-  setLength(self, length(self)-1);
+  delete(self, index, 1);
 end;
 
 (*

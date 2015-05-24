@@ -18,7 +18,7 @@ TStringArray.addIndex
 
     procedure TStringArray.addIndex(const str : String; const index : Integer);
 
-Used to add a value to a TStringArray at a chosen index larger than the array's lowest index.
+Used to add a value to a TStringArray at a chosen index.
 
 .. note::
 
@@ -32,19 +32,8 @@ Example:
 
 *)
 procedure TStringArray.addIndex(const str : String; const index : Integer);
-var
-  I : Integer;
 begin
-  if not inRange(index, low(self), length(self)) then
-  begin
-    WriteLn('ERROR: addIndex: index larger than array length.');
-    Exit;
-  end;
-
-  setLength(self, length(self)+1);
-  for I := high(self)-1 downto index do
-    self[I+1] := self[I];
-  self[index] := str;
+  insert(str, self, index);
 end;
 
 (*
@@ -55,7 +44,7 @@ TStringArray.deleteIndex
 
     procedure TStringArray.deleteIndex(const index : Integer);
 
-Used to delete a value of a TStringArray at a chosen index larger than the array's lowest index.
+Used to delete a value of a TStringArray at a chosen index.
 
 .. note::
 
@@ -74,13 +63,11 @@ var
 begin
   if not inRange(index, low(self), high(self)) then
   begin
-    WriteLn('ERROR: deleteIndex: index larger than array length.');
+    WriteLn('ERROR: deleteIndex: index out of bounds.');
     Exit;
   end;
 
-  for I := index to high(self)-1 do
-    self[I] := self[I+1];
-  setLength(self, length(self)-1);
+  delete(self, index, 1);
 end;
 
 (*
@@ -106,7 +93,7 @@ Example:
 *)
 procedure TStringArray.append(const str : String);
 begin
-  self.addIndex(str, length(self));
+  insert(str, self, length(self));
 end;
 
 (*
@@ -135,7 +122,7 @@ var
   I : Integer;
 begin
   for I := 0 to high(arr) do
-    self.append(arr[I]);
+    insert(arr[I], self, length(self));
 end;
 
 (*
@@ -223,9 +210,9 @@ function TStringArray.include(const arr : TStringArray) : TStringArray;
 var
   I : Integer;
 begin
-  for I := 0 to high(arr) do
+  for I := high(arr) downto 0 do
     if self.isInArray(arr[I]) then
-      result.append(arr[I]);
+      insert(arr[I], result);
 end;
 
 (*
@@ -253,9 +240,9 @@ function TStringArray.exclude(const arr : TStringArray) : TStringArray;
 var
   I : Integer;
 begin
-  for I := 0 to high(arr) do
+  for I := high(arr) downto 0 do
     if not self.isInArray(arr[I]) then
-      result.append(arr[I]);
+      insert(arr[I], result);
 end;
 
 (*
@@ -314,9 +301,9 @@ var
   I : Integer;
   arr : TStringArray;
 begin
-  for I := 0 to high(self) do
+  for I := high(self) downto 0 do
     if not arr.isInArray(self[I]) then
-      arr.append(self[I]);
+      insert(self[I], arr);
   self := arr;
 end;
 
@@ -346,8 +333,8 @@ var
   I : Integer;
   arr : TStringArray;
 begin
-  for I := high(self) downto 0 do
-    arr.append(self[I]);
+  for I := 0 to high(self) do
+    insert(self[I], arr);
   self := arr;
 end;
 

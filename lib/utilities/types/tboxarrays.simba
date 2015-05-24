@@ -12,18 +12,17 @@ The source for this file can be found `here <https://github.com/SRL/SRL-6/blob/m
 
 (*
 TBoxArray.addIndex
-~~~~~~~~~~~~~~~~~~~~~~
+~~~~~~~~~~~~~~~~~~
 
 .. code-block:: pascal
 
     procedure TBoxArray.addIndex(const b : TBox; const index : Integer);
 
-Used to add a value to a TBoxArray at a chosen index larger than the array's lowest index.
+Used to add a value to a TBoxArray at a chosen index.
 
 .. note::
 
-    - by Zyt3x (tintegerarray)
-    - Last Updated: 10 October 2014 by bonsai
+    - by Zyt3x
 
 Example:
 
@@ -33,35 +32,23 @@ Example:
 
 *)
 procedure TBoxArray.addIndex(const b : TBox; const index : Integer);
-var
-  I : Integer;
 begin
-  if not inRange(index, low(self), length(self)) then
-  begin
-    WriteLn('ERROR: addIndex: index larger than array length.');
-    Exit;
-  end;
-
-  setLength(self, length(self)+1);
-  for I := high(self)-1 downto index do
-    self[I+1] := self[I];
-  self[index] := b;
+  insert(b, self, index);
 end;
 
 (*
 TBoxArray.deleteIndex
-~~~~~~~~~~~~~~~~~~~~~~~~~
+~~~~~~~~~~~~~~~~~~~~~
 
 .. code-block:: pascal
 
     procedure TBoxArray.deleteIndex(const index : Integer);
 
-Used to delete a value of a TBoxArray at a chosen index larger than the array's lowest index.
+Used to delete a value of a TBoxArray at a chosen index.
 
 .. note::
 
     - by Zyt3x
-    - Last Updated: 10 October 2014 by bonsai
 
 Example:
 
@@ -71,23 +58,19 @@ Example:
 
 *)
 procedure TBoxArray.deleteIndex(const index : Integer);
-var
-  I : Integer;
 begin
   if not inRange(index, low(self), high(self)) then
   begin
-    WriteLn('ERROR: deleteIndex: index larger than array length.');
+    WriteLn('ERROR: deleteIndex: index out of bounds.');
     Exit;
   end;
 
-  for I := index to high(self)-1 do
-    self[I] := self[I+1];
-  setLength(self, length(self)-1);
+  delete(self, index, 1);
 end;
 
 (*
 TBoxArray.append
-~~~~~~~~~~~~~~~~~~~~
+~~~~~~~~~~~~~~~~
 
 .. code-block:: pascal
 
@@ -98,7 +81,6 @@ Used to append a value to a TBoxArray.
 .. note::
 
     - by Zyt3x
-    - Last Updated: 10 October 2014 by bonsai
 
 Example:
 
@@ -109,12 +91,12 @@ Example:
 *)
 procedure TBoxArray.append(const b : TBox);
 begin
-  self.addIndex(b, length(self));
+  insert(b, self, length(self));
 end;
 
 (*
 TBoxArray.combine
-~~~~~~~~~~~~~~~~~~~~~
+~~~~~~~~~~~~~~~~~
 
 .. code-block:: pascal
 
@@ -125,7 +107,7 @@ Used to combine two TBoxArray variables.
 .. note::
 
     - by bonsai
-    - Last Updated: 10 October 2014 by bonsai
+    - Last Updated: 25 May 2015 by Zyt3x
 
 Example:
 
@@ -138,13 +120,13 @@ procedure TBoxArray.combine(const arr : TBoxArray);
 var
   i : integer;
 begin
-  for i := 0 to high(arr) do
-    self.append(arr[i]);
+  for i := high(arr) downto 0 do
+    insert(arr[I], self);
 end;
 
 (*
 TBoxArray.returnInArray
-~~~~~~~~~~~~~~~~~~~~~~~~~~~
+~~~~~~~~~~~~~~~~~~~~~~~
 
 .. code-block:: pascal
 
@@ -175,7 +157,7 @@ end;
 
 (*
 TBoxArray.isInArray
-~~~~~~~~~~~~~~~~~~~~~~~
+~~~~~~~~~~~~~~~~~~~
 
 .. code-block:: pascal
 
@@ -186,7 +168,7 @@ Returns True if the value is present in the TBoxArray.
 .. note::
 
     - by bonsai
-    - Last Updated: 10 October 2014 by bonsai
+    - Last Updated: 15 May 2016 by Zyt3x
 
 Example:
 
@@ -197,15 +179,12 @@ Example:
 *)
 function TBoxArray.isInArray(const b : TBox) : Boolean;
 begin
-  if (self.returnInArray(b) <> -1) then
-    result := true
-  else
-    result := false;
+  result := self.returnInArray(b) > -1;
 end;
 
 (*
 TBoxArray.include
-~~~~~~~~~~~~~~~~~~~~~
+~~~~~~~~~~~~~~~~~
 
 .. code-block:: pascal
 
@@ -216,7 +195,6 @@ Returns a TBoxArray which contains values that are present in both arrays.
 .. note::
 
     - by Zyt3x
-    - Last Updated: 10 October 2014 by bonsai
 
 Example:
 
@@ -229,14 +207,14 @@ function TBoxArray.include(const arr : TBoxArray) : TBoxArray;
 var
   I : Integer;
 begin
-  for I := 0 to high(arr) do
+  for I := high(arr) downto 0 do
     if self.isInArray(arr[I]) then
-      result.append(arr[I]);
+      insert(arr[I], result);
 end;
 
 (*
 TBoxArray.exclude
-~~~~~~~~~~~~~~~~~~~~~
+~~~~~~~~~~~~~~~~~
 
 .. code-block:: pascal
 
@@ -247,7 +225,6 @@ Returns a TBoxArray which contains values that are not present in both arrays.
 .. note::
 
     - by Zyt3x
-    - Last Updated: 10 October 2014 by bonsai
 
 Example:
 
@@ -260,18 +237,14 @@ function TBoxArray.exclude(const arr : TBoxArray) : TBoxArray;
 var
   I : Integer;
 begin
-  for I := 0 to high(arr) do
+  for I := high(arr) downto 0 do
     if not self.isInArray(arr[I]) then
-      result.append(arr[I]);
-
-  for I := 0 to high(self) do
-    if not arr.isInArray(self[I]) then
-      result.append(self[I]);
+      insert(arr[I], result);
 end;
 
 (*
 TBoxArray.swap
-~~~~~~~~~~~~~~~~~~
+~~~~~~~~~~~~~~
 
 .. code-block:: pascal
 
@@ -302,7 +275,7 @@ end;
 
 (*
 TBoxArray.clearEquals
-~~~~~~~~~~~~~~~~~~~~~~~~~
+~~~~~~~~~~~~~~~~~~~~~
 
 .. code-block:: pascal
 
@@ -327,15 +300,15 @@ var
   I : Integer;
   arr : TBoxArray;
 begin
-  for I := 0 to high(self) do
+  for I := high(self) downto 0 do
     if not arr.isInArray(self[I]) then
-      arr.append(self[I]);
+      insert(self[I], arr);
   self := arr;
 end;
 
 (*
 TBoxArray.invert
-~~~~~~~~~~~~~~~~~~~~
+~~~~~~~~~~~~~~~~
 
 .. code-block:: pascal
 
@@ -357,21 +330,17 @@ Example:
 *)
 procedure TBoxArray.invert();
 var
-  i, len: integer;
-  tmp: TBox;
+  I : integer;
+  tmp : TBoxArray;
 begin
-  len := length(self);
-  for i := 0 to floor(len/2) do
-  begin
-    tmp := self[i];
-    self[i] := self[len - 1 - i];
-    self[len - 1 - i] := tmp;
-  end;
+  for I := high(self) downto 0 do
+    insert(self[I], tmp);
+  self := tmp;
 end;
 
 (*
 TBoxArray.toATPA
-~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+~~~~~~~~~~~~~~~~
 
 .. code-block:: pascal
 
@@ -402,7 +371,7 @@ end;
 
 (*
 TBoxArray.toTPA
-~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+~~~~~~~~~~~~~~~
 
 .. code-block:: pascal
 
@@ -434,7 +403,7 @@ end;
 
 (*
 TBoxArray.copy
-~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+~~~~~~~~~~~~~~
 
 .. code-block:: pascal
 
@@ -455,12 +424,8 @@ Example:
 
 *)
 function TBoxArray.copy() : TBoxArray;
-var
-  i : integer;
 begin
-  setLength(result, length(self));
-  for i := 0 to high(self) do
-    result[i] := self[i];
+  result := System.copy(self);
 end;
 
 (*
@@ -512,7 +477,7 @@ end;
 
 (*
 TBoxArray.equals
-~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+~~~~~~~~~~~~~~~~
 
 .. code-block:: pascal
 
@@ -547,7 +512,7 @@ end;
 
 (*
 TBoxArray.offset
-~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+~~~~~~~~~~~~~~~~
 
 .. code-block:: pascal
 
@@ -577,7 +542,7 @@ end;
 
 (*
 TBoxArray.getMiddle
-~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+~~~~~~~~~~~~~~~~~~~
 
 .. code-block:: pascal
 
@@ -606,7 +571,7 @@ end;
 
 (*
 TBoxArray.setLimit
-~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+~~~~~~~~~~~~~~~~~~
 
 .. code-block:: pascal
 
@@ -636,7 +601,7 @@ end;
 
 (*
 TBoxArray.expand
-~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+~~~~~~~~~~~~~~~~
 
 .. code-block:: pascal
 
@@ -666,7 +631,7 @@ end;
 
 (*
 TBoxArray.shrink
-~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+~~~~~~~~~~~~~~~~
 
 .. code-block:: pascal
 
@@ -696,7 +661,7 @@ end;
 
 (*
 TBoxArray.pixelShiftAverage
-~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+~~~~~~~~~~~~~~~~~~~~~~~~~~~
 
 .. code-block:: pascal
 
@@ -723,7 +688,7 @@ end;
 
 (*
 TBoxArray.pixelShift
-~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+~~~~~~~~~~~~~~~~~~~~
 
 .. code-block:: pascal
 
@@ -750,7 +715,7 @@ end;
 
 (*
 TBoxArray.getColors
-~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+~~~~~~~~~~~~~~~~~~~
 
 .. code-block:: pascal
 
@@ -784,7 +749,7 @@ end;
 
 (*
 TBoxArray.colorExists
-~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+~~~~~~~~~~~~~~~~~~~~~
 
 .. code-block:: pascal
 

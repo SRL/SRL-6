@@ -18,7 +18,7 @@ TExtendedArray.addIndex
 
     procedure TExtendedArray.addIndex(const ext : Extended; const index : Integer);
 
-Used to add a value to a TExtendedArray at a chosen index larger than the array's lowest index.
+Used to add a value to a TExtendedArray at a chosen index.
 
 .. note::
 
@@ -32,19 +32,8 @@ Example:
 
 *)
 procedure TExtendedArray.addIndex(const ext : Extended; const index : Integer);
-var
-  I : Integer;
 begin
-  if not inRange(index, low(self), length(self)) then
-  begin
-    WriteLn('ERROR: addIndex: index larger than array length.');
-    Exit;
-  end;
-
-  setLength(self, length(self)+1);
-  for I := high(self)-1 downto index do
-    self[I+1] := self[I];
-  self[index] := ext;
+  insert(ext, self, index);
 end;
 
 (*
@@ -55,7 +44,7 @@ TExtendedArray.deleteIndex
 
     procedure TExtendedArray.deleteIndex(const index : Integer);
 
-Used to delete a value of a TExtendedArray at a chosen index larger than the array's lowest index.
+Used to delete a value of a TExtendedArray at a chosen index.
 
 .. note::
 
@@ -69,18 +58,14 @@ Example:
 
 *)
 procedure TExtendedArray.deleteIndex(const index : Integer);
-var
-  I : Integer;
 begin
   if not inRange(index, low(self), high(self)) then
   begin
-    WriteLn('ERROR: deleteIndex: index larger than array length.');
+    WriteLn('ERROR: deleteIndex: index out of bounds.');
     Exit;
   end;
 
-  for I := index to high(self)-1 do
-    self[I] := self[I+1];
-  setLength(self, length(self)-1);
+  delete(self, index, 1);
 end;
 
 (*
@@ -106,7 +91,7 @@ Example:
 *)
 procedure TExtendedArray.append(const ext : Extended);
 begin
-  self.addIndex(ext, length(self));
+  insert(ext, self, length(self));
 end;
 
 (*
@@ -134,8 +119,8 @@ procedure TExtendedArray.combine(const arr : TExtendedArray);
 var
   I : Integer;
 begin
-  for I := 0 to high(arr) do
-    self.append(arr[I]);
+  for I := high(arr) downto 0 do
+    insert(arr[I], self);
 end;
 
 (*
@@ -166,10 +151,7 @@ begin
   result := -1;
   for I := 0 to high(self) do
     if self[I] = ext then
-    begin
-      result := I;
-      exit;
-    end;
+      exit(I);
 end;
 
 (*
@@ -223,9 +205,9 @@ function TExtendedArray.include(const arr : TExtendedArray) : TExtendedArray;
 var
   I : Integer;
 begin
-  for I := 0 to high(arr) do
+  for I := high(arr) downto 0 do
     if self.isInArray(arr[I]) then
-      result.append(arr[I]);
+      insert(arr[I], result);
 end;
 
 (*
@@ -253,9 +235,9 @@ function TExtendedArray.exclude(const arr : TExtendedArray) : TExtendedArray;
 var
   I : Integer;
 begin
-  for I := 0 to high(arr) do
+  for I := high(arr) downto 0 do
     if not self.isInArray(arr[I]) then
-      result.append(arr[I]);
+      insert(arr[I], result);
 end;
 
 (*
@@ -314,9 +296,9 @@ var
   I : Integer;
   arr : TExtendedArray;
 begin
-  for I := 0 to high(self) do
+  for I := high(self) downto 0 do
     if not arr.isInArray(self[I]) then
-      arr.append(self[I]);
+      insert(self[I], arr);
   self := arr;
 end;
 
@@ -347,7 +329,7 @@ var
   arr : TExtendedArray;
 begin
   for I := high(self) downto 0 do
-    arr.append(self[I]);
+    insert(self[I], arr);
   self := arr;
 end;
 
