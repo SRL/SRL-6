@@ -544,7 +544,7 @@ var
   i: Integer;
 begin
   for i := (length(self) - 1) downto 0 do
-    system.swap(i, random(i + 1));
+    system.swap(self[i], self[random(i + 1)]);
 end;
 
 {$f+}
