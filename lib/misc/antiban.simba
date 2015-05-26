@@ -728,7 +728,7 @@ Finds and closes most popup windows and buttons.
 .. note::
 
     - by The Mayor
-    - Last Updated: 22 January 2015 by The Mayor
+    - Last Updated: 26 May 2015 by The Mayor
 
 Example:
 
@@ -739,7 +739,7 @@ Example:
 function closePopup(): boolean;
 var
   i, x, y: Integer;
-  DTMs: Array [0..2] of Integer;
+  DTMs: Array [0..3] of Integer;
 begin
   DTMs :=           // Low level achievement popups
     [DTMFromString('mbQAAAHicY2VgYGBmYmD4y8jAwMkEwSC2PVDcEopdofjPFlOGTB52MLYE' +
@@ -749,9 +749,13 @@ begin
      DTMFromString('mbQAAAHicY2VgYNjHyMBwBIgPA/FOKPYAijsDsT8UOwHx1/0ODE9SvBga' +
                    'WBjAeJMUM4MkUFwEDTNiwWAAACbVCvg='),
 
-                    // Generic Yellow Buttons
+                    // Generic Yellow Buttons (i.e., Poll button on login)
      DTMFromString('mggAAAHicY2NgYFBiY2AQA2J9IDYHYl4gVgbi+4wMDJeh+D4UvwZiEPjz' +
-                   'sAWMf+0yZvi13ZBhkjdEQhILZsSBIQAA2QQQGQ==')];
+                   'sAWMf+0yZvi13ZBhkjdEQhILZsSBIQAA2QQQGQ=='),
+
+                   // Generic Blue Buttons (i.e., Macroing detected warning)
+     DTMFromString('mbQAAAHicY2VgYFjDxMCQCcQfgHgtEK8HYgMg1gFiXSDWBmJ7IFba/Joh' +
+                   '+NpvBruzPxhS7/5lYE2YyiAJ1C+ChEF8RiwYDACqWw4B')];
 
 
   for i := 0 to high(DTMs) do
