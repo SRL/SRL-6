@@ -985,7 +985,7 @@ begin
     ['Unable to connect',                     20000,     4,  'Terminate'],
     ['Runescape has been updated',            0,         0,  'Reload_Client'],
     ['Client token changed',                  0,         0,  'Reload_Client'],
-    ['Your game session has now ended',       0,         0,  'Reload_Client'],
+    ['session has now ended',                 0,         0,  'Reload_Client'],
     ['Our systems are currently unavailable', 3 * 60000, 8,  'Reload_Client'],
     ['Login limit exceeded',                  20000,     8,  'Set_World'],
     ['You must have a total skill level of',  0,         0,  'Set_World'],
