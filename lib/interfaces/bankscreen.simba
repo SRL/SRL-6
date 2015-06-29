@@ -1067,7 +1067,7 @@ Will click the quick deposit button 'depositType', vaild deposit types are:
 .. note::
 
     - by Olly
-    - Last Updated: 10 April 2014 by Olly
+    - Last Updated: 29 June 2015 by Turpinator
 
 Example:
 
@@ -1077,7 +1077,7 @@ Example:
 *)
 function TRSBankScreen.quickDeposit(depositType: integer): boolean;
 const
-  DEPOSIT_BUTTON_OFFSET: TPoint = [-334, -25];
+  DEPOSIT_BUTTON_OFFSET: TPoint = [-320, -24];
 var
   b: TBox;
   tba: TBoxArray;
@@ -1093,7 +1093,7 @@ begin
     exit(false);
   end;
 
-  b := gridBox(depositType, 4, 1, 30, 21, 39, 0,
+  b := gridBox(depositType, 4, 1, 29, 25, 34, 0,
                point(self.x2 + DEPOSIT_BUTTON_OFFSET.x,
                      self.y2 + DEPOSIT_BUTTON_OFFSET.y));
 
@@ -1123,7 +1123,7 @@ Will click the quick deposit button 'button', vaild button types are:
 .. note::
 
     - by Olly
-    - Last Updated: 10 April 2014 by Olly
+    - Last Updated: 29 June 2015 by Turpinator
 
 Example:
 
@@ -1133,7 +1133,7 @@ Example:
 *)
 function TRSBankScreen.clickButton(button: integer; useKey: boolean = true): boolean;
 const
-  BUTTON_OFFSET: TPoint = [-662, -25];
+  BUTTON_OFFSET: TPoint = [-661, -24];
 var
   b: TBox;
   timeOut: LongWord;
@@ -1144,7 +1144,7 @@ begin
     exit(false);
   end;
 
-  b := gridBox(button, 6, 1, 30, 21, 39, 0,
+  b := gridBox(button, 6, 1, 29, 25, 34, 0,
                point(self.x2 + BUTTON_OFFSET.x,
                      self.y2 + BUTTON_OFFSET.y));
 
@@ -2419,7 +2419,7 @@ Will check if a bank button 'button', is activated, valid button types are:
 .. note::
 
     - by Serajin
-    - Last Updated: 17 December 2014 by akarigar
+    - Last Updated: 29 June 2015 by Turpinator
 
 Example:
 
@@ -2429,7 +2429,7 @@ Example:
 *)
 function TRSBankScreen.isButtonActive(button: integer): boolean;
 const
-  BUTTON_OFFSET: TPoint = [-662, -25];
+  BUTTON_OFFSET: TPoint = [-661, -24];
 var
   b: TBox;
   timeOut: LongWord;
@@ -2440,11 +2440,11 @@ begin
     exit(false);
   end;
 
-  b := gridBox(button, 6, 1, 30, 21, 39, 0,
+  b := gridBox(button, 6, 1, 29, 25, 34, 0,
                point(self.x2 + BUTTON_OFFSET.x,
                      self.y2 + BUTTON_OFFSET.y));
 
-  result:= (countColorTolerance(7756586, b, 23) > 250);
+  result:= (countColorTolerance(5133403, b, 84) > 450);
 end;
 
 (*
