@@ -544,7 +544,7 @@ begin
   smartSetDebug(false);
   addOnTerminate('smartFreeCurrentClient');
 
-  print('initSmart()', TDebug.FOOTER);
+  print('initSmart() result = ' + boolToStr(result), TDebug.FOOTER);
 end;
 
 (*
@@ -674,6 +674,7 @@ procedure smartReloadClient(waitTime: integer);
 var
   img, r, h, m, s: integer;
 begin
+  print('smartReloadClient():', TDebug.HEADER);
   img := -999;
   ConvertTime(waitTime, h, m, s);
 
@@ -688,7 +689,7 @@ begin
   smartFreeCurrentClient();
   smartKillClient(__smartCurrentPID);
 
-  print('Killed our current client. Waiting ' + intToStr(m) + 'm & ' + intToStr(s) + 's before reloading');
+  print('Killed current client. Waiting ' + intToStr(m) + 'm & ' + intToStr(s) + 's before reloading SMART');
   wait(waitTime);
 
   if initSmart(true) then
@@ -723,7 +724,7 @@ Kills the current client, and spawns a new one.
 .. note::
 
     - By: Olly
-    - Last Updated: 11 January 2014 by The Mayor
+    - Last Updated: 1 July 2015 by The Mayor
 
 Example:
 
@@ -734,24 +735,24 @@ procedure sixHourFix();
 var
   i: integer;
 begin
+  print('sixHourFix():', TDebug.HEADER);
+
   for i := 1 to smartResetAttempts do
   begin
-    print('sixHourFix():', TDebug.HEADER);
-    print('Reset attempt #' + toStr(i));
+    print('SMART Reload Attempt ' + toStr(i) + '/' + toStr(smartResetAttempts));
 
     if (players.getActive() < 1) then
       print('No active players, no use in reloading the client!', TDebug.FATAL);
 
-    smartReloadClient((5 * 60000) + random(15000));
+    smartReloadClient((4 * 60000) + random(60000));
 
-    if (waitClientReady()) then
+    if waitClientReady() then
     begin
       print('Client succesfully loaded after reload');
 
       if (players[currentPlayer].login()) then
       begin
-        print('Succesfully logged in after client was reloaded');
-        print('sixHourFix()', TDebug.FOOTER);
+        print('sixHourFix(): Succesfully logged in after reload', TDebug.FOOTER);
         exit();
       end else
         print('Failed to login player after restart attempt ' + toStr(i), TDebug.ERROR);

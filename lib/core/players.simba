@@ -950,7 +950,7 @@ begin
   repeat // Wait until the popup appears, or we hit the lobby/isLoggedIn
     case inLobby of
       true: if isLoggedIn() then exit(true);
-      false: if lobby.isOpen() then exit(true);
+      false: if (lobby.isOpen() or isLoggedIn()) then exit(true);
     end;
 
     popupMessage := __getPopupMessage();
@@ -1039,25 +1039,29 @@ var
   tries: integer = 1;
   reachedMaxTries: boolean;
 begin
+  print('TPlayer.loginToLobby(): ', TDebug.HEADER);
+  __areDynamicInterfacesSet := false;
+
   if (not self.isActive) then
   begin
-    print('TPlayer.loginToLobby(): Player ' + self.nickname + ' is not active...');
+    print('TPlayer.loginToLobby(): Player ' + self.nickname + ' is not active...', TDebug.FOOTER);
     exit(false);
   end;
-
-  if (isLoggedIn() or lobby.isOpen()) then exit(true);
 
   if not __setInputBoxes() then
   begin
-    print('TPlayer.loginToLobby(): Failed to find username and/or password box', TDebug.ERROR);
+    print('TPlayer.loginToLobby(): Failed to find username and/or password box', TDebug.FOOTER);
     exit(false);
   end;
 
-  print('TPlayer.loginToLobby()', TDebug.HEADER);
-  __areDynamicInterfacesSet := false;
-
   repeat
-    print('Attempt ' + toStr(tries) + ': ' + capitalize(self.loginName) + ' (' + capitalize(self.displayName) + ')');
+    if (isLoggedIn() or lobby.isOpen()) then
+    begin
+      result := true;
+      break;
+    end;
+
+    print('Login Attempt ' + toStr(tries) + ': ' + capitalize(self.loginName) + ' (' + capitalize(self.displayName) + ')');
 
     print('Entering username...', TDebug.SUB);
     __enterLoginInfo(_boxUsername, self.loginName, true, true);
