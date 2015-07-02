@@ -2,7 +2,7 @@
 Debug
 =====
 
-The debug file holds any files used for SRL debugging and logging. Debug usage
+The Debug file holds any files used for SRL debugging and logging. Debug usage
 guidelines are as follows:
 
     * Use print('TRSMinimap.getDots()', TDebug.HEADER) to initilize a function header.
@@ -67,7 +67,6 @@ External SRL debug variables that can be set scripts:
     * logPath: string; The path the save the SRL log file. Default path is SRL-6/logs/.
     * disableSRLLog: boolean; Disables saving debug to a log file.  Default false.
     * disableSRLDebug: boolean; Disables SRL functions from printing to the debug box.  Default false.
-    * addTimeStamp: boolean; if enabled will add the time before all debug messages.
 *)
 var
   logPath = includePath + 'SRL-6/logs/';
@@ -87,7 +86,7 @@ Creates the SRL log file.
 .. note::
 
     - by Coh3n
-    - Last Modified: Feb. 20th, 2012 by Coh3n
+    - Last Modified: 20 February 2012 by Coh3n
 
 Example:
 
@@ -102,16 +101,16 @@ var
   fileName, start: string;
   i: integer;
 begin
-  if (disableSRLLog) then
-    exit;
+  if disableSRLLog then
+    exit();
 
   if (not directoryExists(logPath)) then
     forceDirectories(logPath);
 
-  start := replace(theDate(DATE_DAY)+' at '+theTime(), ':', '.', [rfReplaceAll]);
-  fileName := logPath + 'SRL log ('+start+').txt';
+  start := replace(theDate(DATE_DAY) + ' at ' + theTime(), ':', '.', [rfReplaceAll]);
+  fileName := logPath + 'SRL log (' + start + ').txt';
 
-  writeln(Format('SRL: Logfile = %s', [fileName]));
+  writeLn(Format('SRL: Logfile = %s', [fileName]));
 
   try
     i := createFile(fileName);
@@ -123,10 +122,10 @@ begin
       result := (__logFile <> -1);
     end;
   except
-    writeln('Could not open/create log file');
+    writeLn('Could not open/create log file');
   end;
 
-  if (result) then
+  if result then
     addOnTerminate('__closeLogFile');
 end;
 {$ENDIF}
@@ -144,7 +143,7 @@ Writes the string 's' to the SRL log file.
 .. note::
 
     - by Markus
-    - Last Modified: Feb. 20th, 2012 by Coh3n
+    - Last Modified: 20 February 2012 by Coh3n
 
 Example:
 
@@ -156,14 +155,14 @@ Example:
 {$IFNDEF CODEINSIGHT}
 procedure __printToLog(s: string);
 begin
-  if (disableSRLLog) then
-    exit;
+  if disableSRLLog then
+    exit();
 
   if (__logFile >= 0) then
     try
-      writeFileString(__logFile, '['+msToTime(getTimeRunning(), TIME_BARE)+']: '+s+#13+#10);
+      writeFileString(__logFile, '[' + msToTime(getTimeRunning(), TIME_BARE) + ']: ' + s + #13 + #10);
     except
-      writeln('Could not write to log file');
+      writeLn('Could not write to log file');
     end;
 end;
 {$ENDIF}
@@ -193,14 +192,14 @@ Example:
 {$IFNDEF CODEINSIGHT}
 procedure __closeLogFile();
 begin
-  if (disableSRLLog) then
-    exit;
+  if disableSRLLog then
+    exit();
 
   try
     closeFile(__logFile);
     disableSRLLog := true; //disable logging so we can debug any things that also get called on terminate
   except
-    writeln('Error closing log file');
+    writeLn('Error closing log file');
   end;
 end;
 {$ENDIF}
@@ -284,15 +283,15 @@ begin
   // print the fatal error and terminate the script
   if (debugType = TDebug.FATAL) then
   begin
-    writeln(debugMSG);
+    writeLn(debugMSG);
     terminateScript();
   end;
 
-  if (disableSRLDebug) then
-    exit;
+  if disableSRLDebug then
+    exit();
 
   if (debugType <> TDebug.LOG) then
-    writeln(debugMSG);
+    writeLn(debugMSG);
 end;
 
 function print(txt: string; _result: variant; footerTxt: string = ''; debugType: TDebug = TDebug.WARNING): variant; overload;
@@ -340,12 +339,8 @@ debugATPA
 
     procedure debugATPA(atpa: T2DPointArray; bmpName: string);
 
-Plots the points of a T2DPointArray to the debug image window.  Will plot each
-element of the array in a different color.  Has the option to save the window
-to a file.
-
-    * atpa: The T2DPointArray to be drawn.
-    * bmpName: The name of the file to be saved.  If bmpName = '', no file is saved.
+Draws the points of a T2DPointArray in the debug image window. It will plot each
+element of the array in a different color.
 
 .. note::
 
@@ -356,7 +351,7 @@ Example:
 
 .. code-block:: pascal
 
-    debugATPA(atpa, 'Example');
+    debugATPA(atpa);
 *)
 procedure debugATPA(const atpa: T2DPointArray);
 var
@@ -388,13 +383,9 @@ debugATPABounds
 
 .. code-block:: pascal
 
-    procedure debugATPABounds(ATPA: T2DPointArray; bmpName: string);
+    procedure debugATPABounds(const ATPA: T2DPointArray);
 
-Plots the founds of each element of a T2DPointArray to the debug image window.
-Has the option to save the window's display to a file.
-
-    * ATPA: The T2DPointArray to be drawn.
-    * bmpName: The name of the file to be saved.  If bmpName = '', no file is saved.
+Draws the bounds of each element of a T2DPointArray in the debug image window.
 
 .. note::
 
@@ -405,9 +396,9 @@ Example:
 
 .. code-block:: pascal
 
-    debugATPABounds(atpa, 'Example');
+    debugATPABounds(atpa);
 *)
-procedure debugATPABounds(const atpa: T2DPointArray);
+procedure debugATPABounds(const ATPA: T2DPointArray);
 var
   tmb: TMufasaBitmap;
   b: TBox;
@@ -430,11 +421,7 @@ debugTPA
 
     procedure debugTPA(tpa: TPointArray; bmpName: string);
 
-Shows a TPointArray on the debug image window. Has the option to save the
-window to a file.
-
-    * tpa: The TPointArray to be displayed.
-    * bmpName: The name of the file to be saved.  If bmpName = '' nothing is saved.
+Draws a TPointArray on the debug image window.
 
 .. note::
 
@@ -445,7 +432,7 @@ Example:
 
 .. code-block:: pascal
 
-    debugTPA(tpa, 'Example');
+    debugTPA(tpa);
 *)
 procedure debugTPA(const tpa: TPointArray);
 var
@@ -470,12 +457,13 @@ takeScreenshot
 
     procedure takeScreenshot(fileName: string);
 
-Saves a screenshot to fileName, and adds the time to avoid replacing images.
+Saves a screenshot 'fileName' to the SRL log directory. It also adds the
+script's run time to avoid replacing images.
 
 .. note::
 
     - by Harry & Coh3n
-    - Last updated: Feb. 09, 2013 by Coh3n
+    - Last updated: 9 February, 2013 by Coh3n
 
 Example:
 
@@ -486,9 +474,30 @@ Example:
 procedure takeScreenshot(fileName: string);
 begin
   saveScreenshot(logPath + timeRunning() + '_' + fileName);
-  print('Saving screenshot: '+fileName, TDebug.SUB);
+  print('Saving screenshot: ' + fileName, TDebug.SUB);
 end;
 
+(*
+debugBitmap
+~~~~~~~~~~~
+
+.. code-block:: pascal
+
+    procedure debugBitmap(bmp: integer);
+
+Draws a bitmap on the debug image window.
+
+.. note::
+
+    - by Olly
+    - Last Updated: 24 July 2014 by Olly
+
+Example:
+
+.. code-block:: pascal
+
+    debugTPA(tpa);
+*)
 procedure debugBitmap(bmp: integer);
 begin
   getMufasaBitmap(bmp).debug();

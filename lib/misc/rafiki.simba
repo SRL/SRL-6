@@ -1,3 +1,13 @@
+(*
+Rafiki Player Manager
+=====================
+
+The Rafiki file stores the functions related to the Rafiki Player Manager. This
+file is undocumented because scripters do not need to use any methods directly.
+
+The source for this file can be found `here <https://github.com/SRL/SRL-6/blob/master/lib/misc/rafiki.simba>`_.
+
+*)
 const
   RAFIKI_VERSION = '2.00';
 

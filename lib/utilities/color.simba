@@ -38,7 +38,7 @@ Creates and returns a colorSetting record with the given CTS method.
 .. note::
 
     - by Janilabo
-    - Last Updated: Apr. 20, 2013 by Janilabo
+    - Last Updated: 20 April 2013 by Janilabo
 
 Example:
 
@@ -67,7 +67,7 @@ Creates and returns a colorSetting record with the given CTS method and the CTS 
 .. note::
 
     - by Janilabo
-    - Last Updated: Apr. 20, 2013 by Janilabo
+    - Last Updated: 20 April 2013 by Janilabo
 
 Example:
 
@@ -96,7 +96,7 @@ Creates and returns a colorSetting record with the given CTS method and the CTS 
 .. note::
 
     - by Janilabo
-    - Last Updated: Apr. 20, 2013 by Janilabo
+    - Last Updated: 20 April 2013 by Janilabo
 
 Example:
 
@@ -125,7 +125,7 @@ Creates and colorSetting record with the given CTS method and the CTS 2 modifier
 .. note::
 
     - by Janilabo
-    - Last Updated: Apr. 20, 2013 by Janilabo
+    - Last Updated: 20 April 2013 by Janilabo
 
 Example:
 
@@ -154,7 +154,7 @@ Creates and ColorSetting record with the given CTS method and the CTS 3 modifier
 .. note::
 
     - by Janilabo
-    - Last Updated: Apr. 20, 2013 by Janilabo
+    - Last Updated: 20 April 2013 by Janilabo
 
 Example:
 
@@ -182,7 +182,7 @@ Gets the current CTS settings used by simba, and stores them into the record.
 .. note::
 
     - by Janilabo
-    - Last Updated: Apr. 20, 2013 by Janilabo
+    - Last Updated: 20 April 2013 by Janilabo
 
 Example:
 
@@ -213,7 +213,7 @@ Applies the CTS settings from the record to the simba client.
 .. note::
 
     - by Janilabo
-    - Last Updated: Apr. 20, 2013 by Janilabo
+    - Last Updated: 20 April 2013 by Janilabo
 
 Example:
 
@@ -246,7 +246,7 @@ Calls the simba find function with an additional color settings parameter. Sets 
 .. note::
 
     - by Janilabo
-    - Last Updated: Apr. 20, 2013 by Janilabo
+    - Last Updated: 20 April 2013 by Janilabo
 
 Example:
 
@@ -278,7 +278,7 @@ Calls the simba find function with an additional color settings parameter. Sets 
 .. note::
 
     - by Janilabo
-    - Last Updated: Apr. 20, 2013 by Janilabo
+    - Last Updated: 20 April 2013 by Janilabo
 
 Example:
 
@@ -310,7 +310,7 @@ Calls the simba find function with an additional color settings parameter. Sets 
 .. note::
 
     - by Janilabo
-    - Last Updated: Apr. 20, 2013 by Janilabo
+    - Last Updated: 20 April 2013 by Janilabo
 
 Example:
 
@@ -342,7 +342,7 @@ Calls the simba find function with an additional color settings parameter. Sets 
 .. note::
 
     - by Janilabo
-    - Last Updated: Apr. 20, 2013 by Janilabo
+    - Last Updated: 20 April 2013 by Janilabo
 
 Example:
 

@@ -49,7 +49,7 @@ type TPlayer
 ~~~~~~~~~~~~
 
 A record that stores useful information about the current players. It is up to
-the scripter to set most these attributes in their scripts.
+the scripter to set most of these attributes in their scripts.
 
 Example:
 
@@ -61,6 +61,8 @@ Example:
       displayName := 'Sir Example III';
       nickname := 'fighter1';
       password := 'thisismypassword12345';
+      isActive := true;
+      bankPin := '1234';
     end;
 *)
 type
@@ -104,7 +106,7 @@ All the variables associated with players.simba.
 
   * players: TPlayerArray; Used to store information for all players.
   * currentPlayer: integer; The index of the player currently running.
-  * disableIPScreenshots: booelean; Disables the screenshots taken in the lobby screen.
+  * disableIPScreenshots: boolean; Disables the screenshots taken in the lobby screen.
 
 *)
 var
@@ -112,6 +114,26 @@ var
   currentPlayer: integer;
   disableIPScreenshots: boolean;
 
+(*
+function Raf_GetArmyNames
+~~~~~~~~~~~~~~~~~~~~~~~~~
+
+.. code-block:: pascal
+
+    function Raf_GetArmyNames(out names: TStringArray): boolean;
+
+Returns the army names saved by the Rafiki Player Manager as a TStringArray.
+
+.. note::
+
+    - by Olly
+
+Example:
+
+.. code-block:: pascal
+
+  Raf_GetArmyNames(tsa);
+*)
 function Raf_GetArmyNames(out names: TStringArray): boolean;
 var
   s: string := Settings.getPrefix();
@@ -124,6 +146,27 @@ begin
   end;
 end;
 
+(*
+function Raf_FindArmy
+~~~~~~~~~~~~~~~~~~~~~
+
+.. code-block:: pascal
+
+    function Raf_FindArmy(const name: string): boolean;
+
+Returns true if the army 'name' is saved in the Rafiki Player Manager.
+
+.. note::
+
+    - by Olly
+
+Example:
+
+.. code-block:: pascal
+
+  if Raf_FindArmy('default') then
+    writeLn('The army exists');
+*)
 function Raf_FindArmy(const name: string): boolean;
 var
   strings: TStringArray;
@@ -131,12 +174,32 @@ var
 begin
   result := false;
 
-  if (Raf_GetArmyNames(strings)) then
+  if Raf_GetArmyNames(strings) then
     for i := 0 to high(strings) do
       if (SameText(Replace(Name, ' ', '_', [rfReplaceAll]), Strings[i])) then
         Exit(True);
 end;
 
+(*
+function Raf_IsArmyEncrypted
+~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+
+.. code-block:: pascal
+
+    function Raf_IsArmyEncrypted(const armyName: string): boolean;
+
+Returns true if the army 'armyName' is encripted in the Rafiki Player Manager.
+
+.. note::
+
+    - by Olly
+
+Example:
+
+.. code-block:: pascal
+
+  writeLn(Raf_IsArmyEncripted('default'));
+*)
 function Raf_IsArmyEncrypted(const armyName: string): boolean;
 var
   s: string := Settings.getPrefix();
@@ -152,6 +215,25 @@ begin
   end;
 end;
 
+(*
+function Raf_DecryptArmy
+~~~~~~~~~~~~~~~~~~~~~~~~
+
+.. code-block:: pascal
+
+    function Raf_DecryptArmy(const armyName: string; var data: string): boolean;
+
+Decrypts the army 'armyName' if the player inputs the correct password.
+
+.. note::
+
+    - by Olly
+
+Example:
+
+.. code-block:: pascal
+
+*)
 function Raf_DecryptArmy(const armyName: string; var data: string): boolean;
 var
   pass, dataCopy: string;
@@ -180,6 +262,25 @@ begin
       print('Ok clicked');
 end;
 
+(*
+function Raf_GetPlayers
+~~~~~~~~~~~~~~~~~~~~~~~
+
+.. code-block:: pascal
+
+    function Raf_GetPlayers(ArmyName: String; out _Players: TPlayerArray): Boolean;
+
+Returns all the players in 'ArmyName' as a TPlayerArray.
+
+.. note::
+
+    - by Olly
+
+Example:
+
+.. code-block:: pascal
+
+*)
 function Raf_GetPlayers(ArmyName: String; out _Players: TPlayerArray): Boolean;
 var
   Data, Pref: String;
@@ -200,7 +301,7 @@ begin
     Print('Army exists, reading the players...');
     Data := DeCompressString(Base64Decode(Settings.GetKeyValueDef(ArmyName + '/Player_Data', '')));
 
-    if (Raf_IsArmyEncrypted(ArmyName)) then
+    if Raf_IsArmyEncrypted(ArmyName) then
       if (not Raf_DecryptArmy(ArmyName, Data)) then
         Exit(Print('Failed to decrpyt army', False, 'Raf_GetPlayers: Result = false'));
 
@@ -215,7 +316,7 @@ begin
     SetLength(_Players, Length(TSA));
 
     for i := 0 to High(_Players) do
-      with (_Players[i]) do
+      with _Players[i] do
        begin
          loginName := Between('<loginName>', '</loginName>', TSA[i]);
          nickName := Between('<nickName>', '</nickName>', TSA[i]);
@@ -231,6 +332,26 @@ begin
   Printf('Raf_GetPlayers: Result = %s', [toString(Result)], TDebug.FOOTER);
 end;
 
+(*
+function Raf_GetPlayers
+~~~~~~~~~~~~~~~~~~~~~~~
+
+.. code-block:: pascal
+
+    function Raf_GetPlayers(const armyName: string; out __players: PF_TPlayerArray): boolean; overload;
+
+As above, but returns the players as a PF_TPlayerArray. This is used to load
+an army inside the SRL Player Form.
+
+.. note::
+
+    - by Olly
+
+Example:
+
+.. code-block:: pascal
+
+*)
 function Raf_GetPlayers(const armyName: string; out __players: PF_TPlayerArray): boolean; overload;
 var
   tmp: TPlayerArray;
@@ -274,13 +395,10 @@ Example:
 *)
 function TPlayerArray.getActive(): integer;
 var
-  i, h: integer;
+  i: integer;
 begin
-  result := 0;
-  h := high(self);
-
-  for i := 0 to h do
-    if (self[i].isActive) then
+  for i := 0 to high(self) do
+    if self[i].isActive then
       inc(result);
 end;
 
@@ -307,10 +425,8 @@ Example:
       P: TPlayer;
       Players: TPlayerArray;
     begin
-      with P do
-      begin
-        loginName := 'example@example.com';
-        password := 'examplepassword123';
+        P.loginName := 'example@example.com';
+        P.password := 'examplepassword123';
       end;
 
       Players._add(P);
@@ -322,7 +438,29 @@ begin
   self[high(self)] := info;
 end;
 
-procedure TPlayerArray.setDefaults();
+(*
+TPlayerArray._setDefaults
+~~~~~~~~~~~~~~~~~~~~~~~~~
+
+.. code-block:: pascal
+
+    procedure TPlayerArray._setDefaults();
+
+Initialises the main TPlayer variables for all players in the TPlayerArray
+
+.. note::
+
+    - by Bart (masterBB)
+    - Last updated: 4 April 2013 by Bart
+
+Example:
+
+.. code-block:: pascal
+
+   players._setDefaults();
+
+*)
+procedure TPlayerArray._setDefaults();
 var
   i: integer;
 begin
@@ -395,10 +533,29 @@ begin
     print('TPlayerArray.setup(): Failure', TDebug.FATAL);
   end;
 
-  self.setDefaults();
+  self._setDefaults();
   print('TPlayerArray.setup(): Success', TDebug.FOOTER);
 end;
 
+(*
+TPlayerArray.setup
+~~~~~~~~~~~~~~~~~~
+
+.. code-block:: pascal
+
+    procedure TPlayerArray.setup(const players: PF_TPlayerArray); overload;
+
+Same as above, except the list of players is passed from the SRL Player Form.
+
+.. note::
+
+    - by Olly
+
+Example:
+
+.. code-block:: pascal
+
+*)
 procedure TPlayerArray.setup(const players: PF_TPlayerArray); overload;
 var
   i: integer;
@@ -413,7 +570,7 @@ begin
     p.isMember := players[i].isMember;
     self._add(p);
   end;
-  self.setDefaults();
+  self._setDefaults();
 end;
 
 (*
@@ -506,10 +663,10 @@ TPlayerArray.randomNext
 
 .. code-block:: pascal
 
-    function TPlayerArray.randomNext(active: boolean = true): boolean;
+    function TPlayerArray.randomNext(active: boolean = true; login: boolean = true): boolean;
 
 Switches to a random active player in the TPlayerArray. Sets the previous
-player's activity to 'active'. It will login the new player if 'login' is true..
+player's activity to 'active'. It will login the new player if 'login' is true.
 
 .. note::
 
@@ -599,7 +756,7 @@ Example:
 
 .. code-block:: pascal
 
-    players[currentPlayer].write();
+    __setDynamicInterfaces();
 *)
 {$IFNDEF CODEINSIGHT}
 procedure __setDynamicInterfaces();
@@ -636,7 +793,7 @@ Example:
 
 .. code-block:: pascal
 
-    if (isLoggedIn()) then
+    if isLoggedIn() then
       writeln('We are logged in!');
 *)
 function isLoggedIn(): boolean;
@@ -730,7 +887,7 @@ Example:
 
 .. code-block:: pascal
 
-    __enterLoginInfo(_boxUsername, self.loginName);
+    __enterLoginInfo(_boxUsername, players[currentPlayer].loginName);
 *}
 {$IFNDEF CODEINSIGHT}
 function __enterLoginInfo(inputBox: TBox; const info: string; clickBox: boolean = true; pressEnter: boolean = true): boolean;
@@ -789,7 +946,7 @@ TPlayer.__respondToPopup
 Internal procedure which responds to the login popup message. If the the max
 number of attempts has been reached, it will perform the appropriate action
 (action is index 3 of the passed errorMessage array). If not, it will wait
-the appropriate amount time (time = index 1 of errorMessage array).
+the appropriate amount time (time is index 1 of errorMessage array).
 
 .. note::
 
@@ -958,7 +1115,7 @@ begin
     if (timeOut.getTime() > 60000) then
     begin
       print('Took too long to find login popup or login - respawning SMART');
-      popupMessage := 'Your game session has now ended'; // Trick it to reload
+      popupMessage := 'session has now ended'; // Trick it to reload
     end;
 
     if (timeOut.getTime() > 15000) then // If nothing after 15s, check we actually
@@ -1032,7 +1189,6 @@ Example:
 .. code-block:: pascal
 
     players[currentPlayer].loginToLobby();
-
 *)
 function TPlayer.loginToLobby(): boolean;
 var
@@ -1102,7 +1258,6 @@ Example:
 .. code-block:: pascal
 
     players[currentPlayer].login();
-
 *)
 function TPlayer.login(): boolean;
 var
@@ -1172,7 +1327,6 @@ Example:
 .. code-block:: pascal
 
     players[currentPlayer].logout();
-
 *)
 function TPlayer.logout(): boolean;
 var
@@ -1281,6 +1435,7 @@ Example:
 
 .. code-block:: pascal
 
+    players[currentPlayer].switchToWorld();
     players[currentPlayer].switchToWorld(115);
 *)
 function TPlayer.switchToWorld(newWorld: integer = 0): boolean;

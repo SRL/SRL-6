@@ -1,3 +1,12 @@
+(*
+Tesseract OCR
+=============
+
+The Tesseract file stores the functions related tesseract OCR
+
+The source for this file can be found `here <https://github.com/SRL/SRL-6/blob/master/lib/core/tesseract.simba>`_.
+
+*)
 {$loadlib libtesseract2_}
 
 {$f-}
@@ -93,13 +102,13 @@ _Tesseract_Setup
 
     procedure _Tesseract_Setup();
 
-Setups our instance of tesseract-ocr. Is automaticly called if using functions
+Setups our instance of tesseract-ocr. Automaticlly called if using functions
 from this file.
 
 .. note::
 
     - by Olly
-    - Last updated: July. 26th, 2014 by Olly
+    - Last updated: 26 July 2014 by Olly
 
 Example:
 
@@ -109,7 +118,7 @@ Example:
 *)
 procedure _Tesseract_Setup();
 begin
-  if (__tesseractIsSetup) then
+  if __tesseractIsSetup then
     exit();
 
   __tesseractPtr := Tesseract_Create();
@@ -138,7 +147,7 @@ _Tesseract_Setup() has been called.
 .. note::
 
     - by Olly
-    - Last updated: July. 26th, 2014 by Olly
+    - Last updated: 26 July 2014 by Olly
 
 Example:
 
@@ -170,7 +179,7 @@ Applys the tesseract filter onto the bitmap.
 .. note::
 
     - by Olly
-    - Last updated: September. 9th, 2014 by Olly
+    - Last updated: 9 September 2014 by Olly
 
 Example:
 
@@ -207,7 +216,7 @@ Runs tesseract on the bitmap 'bmp'.
 .. note::
 
     - by Olly
-    - Last updated: July. 26th, 2014 by Olly
+    - Last updated: 26 July 2014 by Olly
 
 Example:
 
@@ -280,7 +289,7 @@ Overloaded method that searches on the client with a filter to read text.
 .. note::
 
     - by Olly
-    - Last updated: July. 26th, 2014 by Olly
+    - Last updated: 26 July 2014 by Olly
 
 Example:
 
@@ -334,7 +343,7 @@ as an area parameter rather than x1, y1, x2, y2.
 .. note::
 
     - by Olly
-    - Last updated: July. 26th, 2014 by Olly
+    - Last updated: 26 July 2014 by Olly
 
 Example:
 

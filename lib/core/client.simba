@@ -17,10 +17,9 @@ isClientReady
 
 .. code-block:: pascal
 
-    function isClientReady: Boolean;
+    function isClientReady(): Boolean;
 
-Returns true if we are ready to auto (on loginscreen or logged in).
-Useful for waiting until RS has fully loaded.
+Returns true if the client is ready (i.e., login screen, lobby, or logged in).
 
 .. note::
 
@@ -32,7 +31,7 @@ Example:
 .. code-block:: pascal
 
     while (not isClientReady()) do
-      SleepAndMoveMouse(100 + Random(500));
+      sleepAndMoveMouse(100 + Random(500));
 *)
 function isClientReady(): boolean;
 begin
@@ -47,8 +46,7 @@ waitClientReady
 
     function waitClientReady(): boolean;
 
-Waits until the client is ready.  Will terminate the script if the client loaded
-isn't set to fixed size.
+Waits up to 5 minutes until the client is ready.
 
 .. note::
 
@@ -59,7 +57,7 @@ Example:
 
 .. code-block:: pascal
 
-    if (waitClientReady()) then
+    if waitClientReady() then
       writeln('Client is ready!');
 
 *)
@@ -82,7 +80,7 @@ begin
 
   while ((getSystemTime() - t) < (5 * 60000)) do // 5 minutes
   begin
-    if (isClientReady()) then
+    if isClientReady() then
       exit(true);
 
     if ((getSystemTime() - t) > (i * 60000)) then // each minute

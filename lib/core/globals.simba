@@ -2,7 +2,7 @@
 Globals
 =======
 
-The globals file holds any variables used throughout multiple files in SRL.
+The Globals file holds any variables used throughout multiple files in SRL.
 
 The source for this file can be found `here <https://github.com/SRL/SRL-6/blob/master/lib/core/globals.simba>`_.
 
@@ -17,7 +17,25 @@ const
 var Colors
 ~~~~~~~~~~
 
-Convenient colors for scripters to use.  Used mainly for SMART debugging.
+Convenient colors for scripters to use. Mainly used for SMART debugging.
+
+      * clWhite
+      * clBlack
+      * clRed
+      * clGreen
+      * clBlue
+      * clPurple
+      * clYellow
+      * clAqua
+      * clOrange
+      * clFuchsia
+      * clTeal
+      * clNavy
+      * clGray
+      * clLime
+      * clMaroon
+      * clSilver
+      * clPink
 
 Example:
 
@@ -54,8 +72,6 @@ Example:
 
 .. code-block:: pascal
 
-    SRL_Events[RS_UPDATE] := @SixHourFix;
-
 *)
 const
   EVENT_COUNT = 6;
@@ -72,11 +88,17 @@ Variable: SRL_Events
 Events that are called throuhgout SRL. These events can be set in any script
 so custom procedures can be called in certain areas of SRL.
 
+    * EVENT_RS_UPDATE
+    * EVENT_LOGOUT
+    * EVENT_LOGIN
+    * EVENT_PLAYER_NEXT
+    * EVENT_ANTIBAN
+
 Example:
 
 .. code-block:: pascal
 
-    SRL_Events[RS_UPDATE] := reloadCurrentClient;
+    SRL_Events[RS_ANTIBAN] := myAntiBanProcedure();
 
 *)
 var

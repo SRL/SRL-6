@@ -1,3 +1,13 @@
+(*
+SRL Player Form
+===============
+
+The Srlplayerform file stores the functions related to the SRL Player Form.
+This file is undocumented because scripters do not need to use any methods directly.
+
+The source for this file can be found `here <https://github.com/SRL/SRL-6/blob/master/lib/misc/srlplayerform.simba>`_.
+*)
+
 {$f+} // native keyword reqiures it on.
 
 type

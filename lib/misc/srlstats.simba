@@ -6,10 +6,7 @@ The Stats include contains wrapper functions provided by the SRL Stats API.
 The functions contained are meant for ease of use for implementation into
 scripts.
 
-The source for this file can be found
-`here <https://github.com/SRL/SRL-6/blob/master/lib/misc/srlstats.simba>`_.
-
-
+The source for this file can be found `here <https://github.com/SRL/SRL-6/blob/master/lib/misc/srlstats.simba>`_.
 *)
 
 {$f-}

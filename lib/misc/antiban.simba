@@ -2,7 +2,7 @@
 Antiban
 =======
 
-The antiban include contains some useful functions that can be used for antiban.
+The antiban file contains some useful functions that can be used for antiban.
 Antiban is a term used for human-like script behavior, and antiban functions are
 used throughout scripts to lessen the chance of a ban.
 
@@ -47,7 +47,7 @@ begin
   if (tabBackpack.count() > 0) then
   begin
     for i := BACKPACK_SLOT_LOW to BACKPACK_SLOT_HIGH do
-      if (tabBackpack.isItemInSlot(i)) then
+      if tabBackpack.isItemInSlot(i) then
         insert(i, slots);
 
     tabBackpack.mouseSlot(slots[random(high(slots))], MOUSE_RIGHT);
@@ -71,7 +71,7 @@ sleepAndMoveMouse
 
     procedure sleepAndMoveMouse(Time: Integer);
 
-Moved the mouse around for the specified "Time". Moves the mouse like a bored
+Moves the mouse around for the specified "Time". Moves the mouse like a bored
 human would.
 
 .. note::
@@ -191,14 +191,14 @@ mouseOffClient
 
     procedure mouseOffClient(Direction: Integer);
 
-Moves the mouse off the client in a specified direction.  Valid arguments for
-'Direction':
+Moves the mouse off the client in a specified direction. Valid arguments for
+'Direction' are:
 
-    - OFF_CLIENT_TOP
-    - OFF_CLIENT_BOTTOM
-    - OFF_CLIENT_LEFT
-    - OFF_CLIENT_RIGHT
-    - OFF_CLIENT_RANDOM
+    * OFF_CLIENT_TOP
+    * OFF_CLIENT_BOTTOM
+    * OFF_CLIENT_LEFT
+    * OFF_CLIENT_RIGHT
+    * OFF_CLIENT_RANDOM
 
 .. note::
 
@@ -294,12 +294,11 @@ randomMouseSpeed
     procedure randomMouseSpeed(Amount, MinMS, MaxMS: Integer);
 
 Randomly changes the mousespeed by the amount (+/-) within the min and max
-mouse speed limit.
+mousespeed limit.
 
 .. note::
 
     - by Ollybest
-    - Last Updated: Unknown
 
 Example:
 
@@ -334,25 +333,24 @@ randomCompass
 
     function randomCompass(MinMovement, MaxMovement: Integer; Return: Boolean): Boolean;
 
-Rotates the compass somewhere between MinMovement and MaxMovement.  Will return
-to original angle if Return is set to true.
+Rotates the compass somewhere between MinMovement and MaxMovement. It will
+return to original angle if 'Return' is set to true.
 
 .. note::
 
     - by Nebula
-    - Last Updated: Mar. 6th, 2011 by Nebula
+    - Last Updated: 6 March 2011 by Nebula
 
 Example:
 
 .. code-block:: pascal
 
-    CompassMovement(10, 30, true);
+    randomCompass(10, 30, true);
 *)
 function randomCompass(MinMovement, MaxMovement: Integer; Return: Boolean): Boolean;
 var
-  StartAngle, Movement : Integer;
+  StartAngle, Movement: Integer;
 begin
-  Result := False;
   StartAngle := round(minimap.getAngleDegrees());
 
   case Random(2) of
@@ -362,7 +360,7 @@ begin
 
   minimap.setAngle(StartAngle + Movement);
 
-  if (Return = true) then
+  if Return then
   begin
     wait(RandomRange(100,350));
     minimap.setAngle(StartAngle);
@@ -428,8 +426,8 @@ randomGameTab
 
     procedure randomGameTab(returnToOriginal: boolean = false);
 
-Switches to a random gametab, Will return to the original tab if 'returnToOriginal'
- is set to true (set to false by default).
+Switches to a random gametab, Will return to the original tab if
+'returnToOriginal' is set to true (false by default).
 
 .. note::
 
@@ -458,7 +456,7 @@ begin
   gameTabs.openTab(tab);
   wait(randomRange(300, 1000));
 
-  if (returnToOriginal) then
+  if returnToOriginal then
     gameTabs.openTab(t);
 end;
 
@@ -489,7 +487,7 @@ var
   i, fullL, emptyL: integer;
   fullSlots, emptySlots: TIntegerArray;
 begin
-  if (not isLoggedIn()) or (tabBackpack.isFull()) or (tabBackpack.isEmpty()) then
+  if (not isLoggedIn()) or tabBackpack.isFull() or tabBackpack.isEmpty() then
     exit();
 
   // collecting full and empty inv slots
@@ -575,147 +573,6 @@ begin
 end;
 
 (*
-exitTreasure
-~~~~~~~~~~~~
-
-.. code-block:: pascal
-
-    function exitTreasure(): boolean;
-
-Finds and exits the annoying Treasure Chest pop up that can be dragged
-anywhere on the screen.
-
-.. note::
-
-    - by Coh3n & Ashaman88
-    - Last Updated: 4 February 2014 by Ashaman88
-
-Example:
-
-.. code-block:: pascal
-
-    exitTreasure();
-*)
-function exitTreasure(): boolean;
-const
-  CLOSE_BORDER_COLOR = 9145232;
-  CLOSE_BORDER_COLOR_HOVER = 12500676;
-  CLOSE_BORDER_LENGTH = 10;
-  CHEST_COLOR = 1716311;
-  CHEST_COLOR_COUNT = 90;
-var
-  w, h, i: integer;
-  b, clientArea: TBox;
-  tpa, tpa2: TPointArray;
-  atpa: T2DPointArray;
-begin
-  result := false;
-
-  getClientDimensions(w, h);
-  clientArea := [0, 0, w-1, h-1];
-
-  // "x" button (if mouse hovers "x" it changes colors, that's why there are two)
-  if (not findColorsTolerance(tpa, CLOSE_BORDER_COLOR, clientArea, 0, colorSetting(1))) and (not findColorsTolerance(tpa2, CLOSE_BORDER_COLOR_HOVER, clientArea, 0, colorSetting(1))) then
-    exit(false);
-
-  print('exitTreasure()', TDebug.HEADER);
-
-  tpa.combine(tpa2);
-
-  atpa := tpa.cluster(1);
-
-  for i := 0 to high(atpa) do
-  begin                //border length - top of "x" button
-    if (length(atpa[i]) = CLOSE_BORDER_LENGTH) then
-    begin
-      b := getTPABounds(atpa[i]);     //color of the chest
-      if countColorTolerance(CHEST_COLOR, intToBox(b.x1 - 67, b.y1 - 16, b.x2 - 23, b.y2 + 27), 10) > CHEST_COLOR_COUNT then
-      begin
-        mouseBox([b.x1, b.y1, b.x2, b.y2 + 15], MOUSE_LEFT);
-        wait(2000 + random(1000));
-        print('exitTreasure(): result = ' + toStr(result), TDebug.FOOTER);
-        exit(true);
-      end;
-    end;
-  end;
-
-  print('exitTreasure(): result = ' + toStr(result), TDebug.FOOTER);
-end;
-
-(*
-exitSquealOfFortune
-~~~~~~~~~~~~~~~~~~~
-
-  NOTE: This is depreciated, use exitTreasure(); instead.
-
-*)
-function exitSquealOfFortune(): boolean;
-begin
-  result := exitTreasure();
-end;
-
-(*
-findTicket
-~~~~~~~~~~
-
-.. code-block:: pascal
-
-    function findTicket(var p: TPoint): boolean;
-
-Returns true if the Treasure spin ticket it found. Returns its
-coordinates in a TPoint 'p'.
-
-.. note::
-
-    - by Kyle Undefined
-    - Last Updated: 4 February 2014 by Ashaman88
-
-Example:
-
-.. code-block:: pascal
-
-    findTicket(p);
-*)
-function findTicket(var p: TPoint): boolean;
-var
-  oneFreeSpin: integer;
-begin
-  result := false;
-
-  if (not tabBackpack.isOpen()) then
-  begin
-    print('findTicket(): Backpack is not open, consider calling tabBackpack.open() first', TDebug.HINT);
-    exit();
-  end;
-
-  oneFreeSpin := DTMFromString('m1gAAAHic42JgYOABYjYgFodiTiAWAmJhIOZngACQPAuUD8JcUHFGqDg3kjk7Flsy3N+cDMZ9KfZgvGuJFcOcLkMUPg9UDyHMSCRGAAA8PBAn');
-
-  if (findDTM(oneFreeSpin, p.x, p.y, tabBackpack.getBounds())) then
-  begin
-    tabBackpack.mouseSlot(tabBackpack.pointToSlot(p), MOUSE_MOVE);
-    result := (isMouseOverText(['Claim', 'laim', 'Key', 'key', 'token'], 300));
-  end;
-
-  if not (result) then
-    p := [-1, -1];
-
-  freeDTM(oneFreeSpin);
-end;
-
-(*
-findSpinTicket
-~~~~~~~~~~~~~~
-
-  NOTE: This is depreciated, use findTicket(); instead.
-
-*)
-
-function findSpinTicket(var p: TPoint): boolean;
-begin
-  result := findTicket(p);
-end;
-
-(*
 closePopup
 ~~~~~~~~~~
 
@@ -723,7 +580,7 @@ closePopup
 
     function closePopup(): boolean;
 
-Finds and closes most popup windows and buttons.
+Finds and closes most popup windows and buttons, so be careful where it's used.
 
 .. note::
 
@@ -768,126 +625,6 @@ begin
 
   freeDTMs(DTMs);
 end;
-
-(*
-closeAdWindow
-~~~~~~~~~~~~~
-
-  NOTE: This is depreciated, use closePopup(); instead.
-
-*)
-function closeAdWindow(): boolean;
-begin
-  result := closePopup();
-end;
-
-(*
-closePollButton
-~~~~~~~~~~~~~~~
-
-.. code-block:: pascal
-
-    function closePollButton(): boolean;
-
-Finds and exits the community poll button pop up window.
-
-.. note::
-
-    - by slushpuppy
-    - Last Updated: 29 September 2014 by slushpuppy
-
-Example:
-
-.. code-block:: pascal
-
-    closePollWindow();
-*)
-function closePollWindow : Boolean;
-var Bmp,wid, hei,tmpX,tmpY,x,y : Integer;
-begin
-getClientDimensions(wid, hei);
-  Bmp := BitmapFromString(110, 32, 'meJztWm1wVOUVznc2IcnuZnezu' +
-        '/nabEJEA1j5LKQUCuhoRJliwKEUKmD4UKQUwmdEahkjRQMOCeKEYE' +
-        'tBai0w2KmVlgBWIhiIWEqYUorWIi2daadj63T6Y+mPPrvP5XBy7+5' +
-        'yw/izmWfeOfe8zznvOc/93tygt6CkyBUu8QJBb0F5sBCbRYV5NOis' +
-        'rgjQhlMzaWBKMjAWfNrgkAAP/OTT4MhYnRxMvQrAKfBp31VVIoXRk' +
-        'HAGsnIuygz0sx5ZVNu6BpnV9cDDdUUWGSWP1CxSSAsmDttnhZLQ1L' +
-        'juUQKpJyqhIamkcWYT0aQLiZXWZE8JXxRgJXTKIcFGdLhsalsfFZy' +
-        'SdQWmPcKjRdYi2KMUrwXXnZr2l2il945IzSOZI0XTu5jCivIiqegs' +
-        'e0oy6wK0yCKC6Cky6mNPkpNDHcSWFvQRhdmBFX59bsq6Wnx9sOkTg' +
-        'd1VlHh97ryKYk+xzxkq9pQF3BgDnnxswva5B8CgDcDAVChGJoebEs' +
-        'gk4sFmVbkfSSQEm8JkLEc4YYgNkIlY2WQexmKT5EHhYpanF2UICNZ' +
-        'RMphGCSSngrCcuaaLm1zHEHjniHvm7D383Yv/eu7Kf/8PAQSZu+9X' +
-        'lXcPgbw8p0zXH32UDgz57xg+7PGzn6366Dqw7uM+0E4a9GjAyXXX/' +
-        '9EcbhNrP76++kY2GGtvxbFCR6GM7/3JkAJG8qWtXVuTLz//WfXwYT' +
-        'g45ZjU1wc5/Uv97nt/2DmrN7Lo4vXbBldc8vvbz/AFAmUsv3xDhMt' +
-        'fTM663Z1Br1OutLz+y0MOD06va0DdqX/W/zYCQE87IFkge2HOBYMw' +
-        'szcy47wxC2OmvbR2oDNbwbVQRsPvDAVg6Jpvr0Fg5tnP5UFL3/4op' +
-        'nEJ9Tknn4lM+TA+rDmT06adizz8m4TZEgEhCEykT38zW7MlIdtsEI' +
-        'BQlA73d3mElnsNUDOo4t53/gYx40LymGwrDWPd2T5LY/O+nvhpTQA' +
-        'tbmwiv51skiFJ2TYb/NqpCCSCUMadpcJvfSaHc11jQ+32w6Pe+jv4' +
-        'X+kyAmHIps5sWgscodnBpNORie9HJpyMjHsv8tWTkYndUcCgrRWwo' +
-        'zNnmQEJkVZnjlsAqu1XgyCMP/EfiAOJIBTvL3z3Iagq7fsmjHpmzW' +
-        'KKiSjEmiCrWBXTNKqqwb6sCRPBqoDWOdHeIceajdpKMaZqbTYoMkI' +
-        'iCKXfquSpXt6MUlNStJhjjtvqWitpM8SEQRtf906sd42c7CgOE6HF' +
-        'zXoWnpSUlKpVO+gBMyPfXflE88ifXtIq6f019t3I6GNRwLiNkuSQk' +
-        'FFkrJs0GkLJGa3fjuXFDQQAzKaVC0xiwhjZeQuhyAH6VS1Egyxf2t' +
-        'XN3hHum9IA3Yoeahj7TqT2RJRDJckf/NJh8hMlRAgCv3wsMuqoUY8' +
-        'dPZM3aJIR0K+i+vcQGsuWzCUNR6aIyWKs4BJcPRHnlqh65nVIVNrQ' +
-        'bPK7x9drf3YwqiSMwa90Q1XKSOUhF0TTuvULSYqXBikjBKGMjuwsS' +
-        'CrPPKZf0rgJMsTMyc2xKaYV97zdv0YKhk+GREP3XDL5Q9/ZAX9u9X' +
-        'CtZM2ObhgY7WQecSQy7HAUMG57R4uMvDZCFoiz6dmlO7as0D+IyUk' +
-        'tv2BMrq0Eht4VQojbmYddUFs7auiP/jH0rX+btMIYVzTxJ+lC95gS' +
-        '+4vbAqfIpJIQtmjGKuS3ow9XYT3kA6aaE7UgjaDxmgOfQwRI4XU5I' +
-        'Mv0B2rWLBi34NHh+vc0/VMVX8kri3PIh/IzH3lgzIia4ulPl2ztqe' +
-        'j4c9WeaxhNgFPDSrglKJdOUrn7WvhVYyot10lahq8cm/njv4nRXd8' +
-        'EAmim1a0ZbCJ5/QNbP6xYtAlSQBCerVBpxB158vSoX3bCN34bN8no' +
-        '+voK3/J9weaeko4rTFvWdoWo3P5XOuMqiVlwyl/+NNR+FYBB2yC0/' +
-        'yW841p4+7XytquOQeMgTuE3vn9zNoaS5pPwY5bLZXijSsLIKh9KMc' +
-        'GxoydXl7IBdqHrlE1pEH42OLDjfLD1bHnjQUhhElM/AsnbIh8vMfJ' +
-        '283DdJJzglNG74QiULG27LCjeeklvYjki2n7M0LNRtF4ueekPAAyr' +
-        '3/3YNiiTWTbENOucugp+z7xWxmZ4yqI3IKy++YOssiE4VotWHyp9+' +
-        'aOS9k+kgOjSHZ+GOq4CMAxn+yegmUrSLcA2dWTaDLRdgAiQAoJAFo' +
-        'hDlSCXPPbIP1zk2ZI3GpOMgeZe69Imj1m9tqhKwgT6KBnTMLjlor/' +
-        'lgv+F87mjp0evgWMeje6yGAcqQSuISSbC02NKgh/YcsG/4ShmAc/8' +
-        '1mR7yopWc/Ewil48n7xBEFCYFpO3Hh578vyj/+UEYSF4VSjgrFsaW' +
-        'tGO2MLnziAPgV1DiOfmVHOviWbl+Lf0Brb1Gkm29WJTzzrntGRVj0' +
-        'n3lAJZg8Y6ht3vmr9FmK6FO1NzCqLXyfoNvo3vgV+47CcZpTVR/Sf' +
-        'Ody/YGdjUC2Cn2F/RWmfyBt0bT0IQyAIxIRGEMv0rhCO1xQhO9oSG' +
-        '7IXt7sY3EVvY0sNUkFSrCj89hrH+VBQ3CFFnS4/n+Q8MDvH8mcIXe' +
-        'jwtZ30vntNFYhNOhoAAGgJ9m+NxYrPMRg4QXWXj6cIN7xs1wNh42p' +
-        'rByLP5nK68Tzsxvyb3aTDWI5SELBAHRxqEkocfXid5ssvPQXk5Wam' +
-        'PtKXOfy1/xTGKY04oYOXrTxU0dbkazxSsehcwc3SPGrF+zWSbUDnd' +
-        'TSeda044V3a5VnajhihWdmPTua7L/Wx3wgy6kiQNKiYbhCZA2pMHI' +
-        'BGEEiXlVyD5/xpGZ54jdVZHzqKfZy09AjAWoFBRNHVFEbPhJw1wNB' +
-        'wFDCY5wLqugtUnjMCVv85vPD5g+VHHtzsBGJI8isbjIJBj2Ahcd4s' +
-        '8sjqQvaTTsbCTZeQsPpq37FicPFJ8UxeLt98gNKEsGHGked15covh' +
-        'hVFOcKrqc+elz/oBo4i0JW9mzd6vPYKMx/cDmBXQz9pyn3ybm47Fv' +
-        '8h+6pcADGsSx8KfZTYcBGDEXSUuP2Pe/sxv9VlaI/uxg44GIxvKyF' +
-        'vWyZJgaEEE9hsE4Mmc92OPcwAfeOTzBv3PXIweZ27u/WslQ3r9HoG' +
-        'kSpu9F9BTQoAfgRCfGdhv5twD6YsOwQnAwGbmrDcyZrxmzQAnpnTZ' +
-        'mbPfSJ+9jyumzdqbPsMckiQDlkYBGQsOpD9xCIAhfbEY2Kb6jdnED' +
-        'Ro6PPh0qd+tPwbQShqeUp8rEMqYtgshqfU70x7q0BAPDCGIEx5jZC' +
-        'Xxu96dWr8rddrOtKkdpuQ3MbUDhD4ceupR1e4+Gaa+mj5tNwDjBlN' +
-        '5aM/Yg11wc1+oYqwNagiBfYkBcdzFYa9rgJzR8qMQL5V8OvJ78nFY' +
-        'esuqs2uXpj/4Sh8Zp7QKdH5rATehO9L9xkF76pTteom+2A6CvTx6j' +
-        '8T4lr2pVepfg3VbM8c+5QyGcQ0Mep36S5iw5YsgcEr8Lhy6uA6UBT' +
-        '2FBbmlgUJ3QS5QXOTyFxYA7pgTBNyeZBMjbTHAB2CASQ+S08DIWHg' +
-        '4CwNAHvhJkygYyMNNJgRAo8GlGc4oTumS4GTBBMnaRgj5yK/DpWVW' +
-        'CDWCPifEgUQVxR556Zbzmh/zyLdY/B6DnnDfb8D0ZUH/XCxvoLyLy' +
-        'UVYj/q+Jpt8+pJ/EwtTPisSD/9jQr7s+qD60E4+fpP/94lff8jEzP' +
-        'KFFW05Se++s1w+BjD9T4Efy+lRvx7KWtKL5Nct82ci/bGB/owt0eE' +
-        'tb0+6cfknJneThvVbNflgSchSgH6tCKtPAcWWtYYNrqwOBXTB1tH0' +
-        'eaHcOPTHFayKh5l8OabD/wcM628c');
-
-  if (findBitmapToleranceIn(Bmp, x, y, 0, 0, wid - 1, hei - 1, 5)) then
-    begin
-      GetBitmapSize(Bmp,tmpX,tmpY);
-      mouse(point(x, y).rand(tmpX,tmpY), MOUSE_LEFT);
-	  Result := true;
-    end;
-    FreeBitmap(Bmp);
-end;    
 
 (*
 hoverSkill
@@ -961,7 +698,7 @@ Specify the maximum scroll amount via maxScrollAmount.
 .. note::
 
     - by Clarity
-    - Last Updated: 20th January 2015 by Clarity
+    - Last Updated: 20 January 2015 by Clarity
 
 Example:
 
@@ -1051,6 +788,190 @@ begin
 end;
 
 (*
+boredHuman
+~~~~~~~~~~
+
+.. code-block:: pascal
+
+    procedure boredHuman(returnToStartAngle: boolean = true);
+
+Performs 3-11 times:
+    * Rotates the camera
+    * Moves the mouse around MainScreen,
+    * If it finds mouseOverText it will randomly interact with chooseoption menu.
+
+It will return to the start angle if 'returnToStartAngle' is set to true.
+
+.. note::
+
+    - by WT-Fakawi
+    - Last Updated: 08 December 2013 by Olly
+
+Example:
+
+.. code-block:: pascal
+
+    boredHuman();
+*)
+procedure boredHuman(returnToStartAngle: boolean = true);
+var
+  startAngle: extended;
+  i, r: integer;
+  b: TBox;
+begin
+  startAngle := minimap.getAngleDegrees();
+  r := randomRange(3, 11);
+
+  for i := 0 to r do
+  begin
+    mouse(mainScreen.getBounds().getRandomPoint());
+
+    case random(2) of
+      0: typeByteWait(VK_LEFT, 35 + random(1155));
+      1: typeByteWait(VK_RIGHT, 35 + random(1155));
+    end;
+
+    if (random(15) = 5) then
+    begin
+      fastClick(MOUSE_RIGHT);
+      wait(random(600));
+
+      if (chooseOption.isOpen()) then
+        chooseOption.close();
+
+      continue;
+    end;
+
+    if isMouseOverMenuOpen(b, random(50)) then
+    begin
+      fastClick(MOUSE_RIGHT);
+      wait(random(500));
+
+      chooseOption.close();
+    end;
+  end;
+
+  if returnToStartAngle then
+    minimap.setAngle(round(startAngle));
+end;
+
+(*
+exitTreasure
+~~~~~~~~~~~~
+
+.. code-block:: pascal
+
+    function exitTreasure(): boolean;
+
+Finds and exits the annoying Treasure Chest pop up that can be dragged
+anywhere on the screen.
+
+.. note::
+
+    - by Coh3n & Ashaman88
+    - Last Updated: 4 February 2014 by Ashaman88
+
+Example:
+
+.. code-block:: pascal
+
+    exitTreasure();
+*)
+function exitTreasure(): boolean;
+const
+  CLOSE_BORDER_COLOR = 9145232;
+  CLOSE_BORDER_COLOR_HOVER = 12500676;
+  CLOSE_BORDER_LENGTH = 10;
+  CHEST_COLOR = 1716311;
+  CHEST_COLOR_COUNT = 90;
+var
+  w, h, i: integer;
+  b, clientArea: TBox;
+  tpa, tpa2: TPointArray;
+  atpa: T2DPointArray;
+begin
+  result := false;
+
+  getClientDimensions(w, h);
+  clientArea := [0, 0, w-1, h-1];
+
+  // "x" button (if mouse hovers "x" it changes colors, that's why there are two)
+  if (not findColorsTolerance(tpa, CLOSE_BORDER_COLOR, clientArea, 0, colorSetting(1))) and (not findColorsTolerance(tpa2, CLOSE_BORDER_COLOR_HOVER, clientArea, 0, colorSetting(1))) then
+    exit(false);
+
+  print('exitTreasure()', TDebug.HEADER);
+
+  tpa.combine(tpa2);
+
+  atpa := tpa.cluster(1);
+
+  for i := 0 to high(atpa) do
+  begin                //border length - top of "x" button
+    if (length(atpa[i]) = CLOSE_BORDER_LENGTH) then
+    begin
+      b := getTPABounds(atpa[i]);     //color of the chest
+      if countColorTolerance(CHEST_COLOR, intToBox(b.x1 - 67, b.y1 - 16, b.x2 - 23, b.y2 + 27), 10) > CHEST_COLOR_COUNT then
+      begin
+        mouseBox([b.x1, b.y1, b.x2, b.y2 + 15], MOUSE_LEFT);
+        wait(2000 + random(1000));
+        print('exitTreasure(): result = ' + toStr(result), TDebug.FOOTER);
+        exit(true);
+      end;
+    end;
+  end;
+
+  print('exitTreasure(): result = ' + toStr(result), TDebug.FOOTER);
+end;
+
+(*
+findTicket
+~~~~~~~~~~
+
+.. code-block:: pascal
+
+    function findTicket(var p: TPoint): boolean;
+
+Returns true if the Treasure spin ticket it found. Returns its
+coordinates in a TPoint 'p'.
+
+.. note::
+
+    - by Kyle Undefined
+    - Last Updated: 4 February 2014 by Ashaman88
+
+Example:
+
+.. code-block:: pascal
+
+    findTicket(p);
+*)
+function findTicket(var p: TPoint): boolean;
+var
+  oneFreeSpin: integer;
+begin
+  result := false;
+
+  if (not tabBackpack.isOpen()) then
+  begin
+    print('findTicket(): Backpack is not open, consider calling tabBackpack.open() first', TDebug.HINT);
+    exit();
+  end;
+
+  oneFreeSpin := DTMFromString('m1gAAAHic42JgYOABYjYgFodiTiAWAmJhIOZngACQPAuUD8JcUHFGqDg3kjk7Flsy3N+cDMZ9KfZgvGuJFcOcLkMUPg9UDyHMSCRGAAA8PBAn');
+
+  if findDTM(oneFreeSpin, p.x, p.y, tabBackpack.getBounds()) then
+  begin
+    tabBackpack.mouseSlot(tabBackpack.pointToSlot(p), MOUSE_MOVE);
+    result := (isMouseOverText(['Claim', 'laim', 'Key', 'key', 'token'], 300));
+  end;
+
+  if (not result) then
+    p := [-1, -1];
+
+  freeDTM(oneFreeSpin);
+end;
+
+(*
 destroyTicket
 ~~~~~~~~~~~~~
 
@@ -1099,7 +1020,7 @@ begin
       end;
     end;
 
-  if (result) then
+  if result then
     print('destroyTicket(): Successfully destroyed spin ticket', TDebug.SUB);
 end;
 
@@ -1111,7 +1032,8 @@ claimTicket
 
     function claimTicket(): boolean;
 
-Claims a spin tick if found in the backpack.
+Claims a spin ticket if found in the backpack. If it can't be claimed, it will
+destroy it instead.
 
 .. note::
 
@@ -1135,7 +1057,7 @@ begin
 
     t := (getTickCount64() + randomRange(2000, 3000));
     repeat
-      if not (tabBackpack.isItemInSlot(tabBackpack.pointToSlot(p))) then
+      if (not tabBackpack.isItemInSlot(tabBackpack.pointToSlot(p))) then
         result := true;
 
       if conversationBox.continue(true, true) then
@@ -1149,87 +1071,38 @@ begin
   begin
     print('claimTicket(): Successfully claimed spin ticket', TDebug.SUB);
     wait(200 + random(400))
-  end
+  end else
     if (p.x <> -1) then
       destroyTicket(tabBackpack.pointToSlot(p));
 end;
 
-(*
-claimSpinTicket
-~~~~~~~~~~~~~~~
 
-  NOTE: This is depreciated, use claimTicket(); instead.
+{NOTE: The following 5 methods are depreciated, but have been retained
+       for compatability. You should use the newer methods instead             }
 
-*)
-function claimSpinTicket(): boolean;
+function exitSquealOfFortune(): boolean;  //use exitTreasure(); instead.
+begin
+  result := exitTreasure();
+end;
+
+function findSpinTicket(var p: TPoint): boolean; //use findTicket(); instead.
+begin
+  result := findTicket(p);
+end;
+
+function claimSpinTicket(): boolean; // use claimTicket(); instead.
 begin
   result := claimTicket();
 end;
 
-(*
-boredHuman
-~~~~~~~~~~
-
-.. code-block:: pascal
-
-    procedure boredHuman(returnToStartAngle: boolean = true);
-
-Performs 3-11 times:
-    * Rotates the cam,
-    * Moves the mouse around MainScreen,
-    * If it finds mouse-over text it will randomly interact with chooseoption menu.
-
-.. note::
-
-    - by WT-Fakawi
-    - Last Updated: 08 December 2013 by Olly
-
-Example:
-
-.. code-block:: pascal
-
-    boredHuman();
-*)
-procedure boredHuman(returnToStartAngle: boolean = true);
-var
-  startAngle: extended;
-  i, r: integer;
-  b: TBox;
+function closeAdWindow(): boolean; // use closePopup(); instead.
 begin
-  startAngle := minimap.getAngleDegrees();
-  r := randomRange(3, 11);
+  result := closePopup();
+end;
 
-  for i := 0 to r do
-  begin
-    mouse(mainScreen.getBounds().getRandomPoint());
-
-    case random(2) of
-      0: typeByteWait(VK_LEFT, 35 + random(1155));
-      1: typeByteWait(VK_RIGHT, 35 + random(1155));
-    end;
-
-    if (random(15) = 5) then
-    begin
-      fastClick(MOUSE_RIGHT);
-      wait(random(600));
-
-      if (chooseOption.isOpen()) then
-        chooseOption.close();
-
-      continue;
-    end;
-
-    if (isMouseOverMenuOpen(b, random(50))) then
-    begin
-      fastClick(MOUSE_RIGHT);
-      wait(random(500));
-
-      chooseOption.close();
-    end;
-  end;
-
-  if (returnToStartAngle) then
-    minimap.setAngle(round(startAngle));
+function closePollWindow(): boolean; // use closePopup(); instead.
+begin
+  result := closePopup();
 end;
 
 {$f+}

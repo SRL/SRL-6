@@ -2,7 +2,7 @@
 Mouse
 =====
 
-The Mouse include contains all Mouse movement and clicking functions.
+The Mouse file contains all mouse movement and clicking functions.
 
 The source for this file can be found `here <https://github.com/SRL/SRL-6/blob/master/lib/core/mouse.simba>`_.
 
@@ -14,7 +14,7 @@ The source for this file can be found `here <https://github.com/SRL/SRL-6/blob/m
 var mouseSpeed
 ~~~~~~~~~~~~~~
 
-Adjustable mouse speed variable. Default set to 20.
+Adjustable global mouse speed variable. Default set to 20.
 
 Example
 
@@ -31,11 +31,11 @@ _brakeWindMouse
 
 .. code-block:: pascal
 
-    procedure _brakeWindMouse(xs, ys, xe, ye, gravity, wind, minWait,
-      maxWait, targetArea: extended; reverse: boolean);
+    procedure _brakeWindMouse(xs, ys, xe, ye, gravity, wind, minWait, maxWait,
+          targetArea: extended; double: boolean);
 
 Mouse movement based on distance to determine speed. Default slowed
-speed at 20% from destination, if Double is set to true then slowed
+speed at 20% from destination, if 'double' is set to true then slowed
 speed also starts at origin and ends 80% to destination.
 
 .. note::
@@ -47,7 +47,6 @@ Example:
 .. code-block:: pascal
 
     See mouse().
-
 *}
 procedure _brakeWindMouse(xs, ys, xe, ye, gravity, wind, minWait, maxWait,
           targetArea: extended; double: boolean);
@@ -185,7 +184,7 @@ _humanWindMouse
     procedure _humanWindMouse(xs, ys, xe, ye, gravity, wind, minWait,
       maxWait, targetArea: extended);
 
-Description: FLIGHT YOU NEED TO GIVE ME SOMETHING FOR THIS! ;)
+Moves the mouse like a human
 
 .. note::
 
@@ -306,7 +305,7 @@ var
   x, y: integer;
 begin
   if (button = MOUSE_MOVE) then
-    Exit;
+    exit();
 
   getMousePos(x, y);
   holdMouse(x, y, button);
@@ -344,7 +343,7 @@ var
   x,y: integer;
 begin
   if (button = MOUSE_NONE) then
-    exit;
+    exit();
 
   randSpeed := (random(mouseSpeed) / 2.0 + mouseSpeed) / 10.0;
   getMousePos(x,y);
@@ -390,8 +389,8 @@ mouse overload
 
     procedure mouse(x, y, randX, randY, button: integer = MOUSE_MOVE);
 
-Moves the mouse to x, y, coords adding random randX, and randY onto x and y,
-button is a default parameter and by default is set to MOUSE_MOVE.
+Moves the mouse to x, y, coords adding random randX and randY onto x and y.
+The 'button' parameter is set to MOUSE_MOVE by default.
 
 .. note::
 
@@ -418,7 +417,7 @@ missMouse
     procedure missMouse(pnt: TPoint; correct: boolean = true);
 
 Moves the mouse, but initially misses the target point (miss area determined by dist & speed)
-then if correct = true will corrects itself.
+then if correct = true it will correct itself.
 
 .. note::
 
@@ -449,7 +448,7 @@ begin
   _humanWindMouse(x, y, x2, y2, MOUSE_HUMAN, 5, 10.0/randSpeed, 15.0/randSpeed, 10.0*randSpeed);
   getMousePos(x, y);
 
-  if (correct) then
+  if correct then
     mouse(pnt);
 
   mouseSpeed := a;
@@ -499,7 +498,7 @@ mouseScroll()
 
 Moves the mouse to "pnt", and scrolls the mouse wheel in a human way.  Will
 scroll the number of times declared by "scrolls".  Will scroll up or down depending
-on the "down" parameter (set to true by default).
+on the 'down' parameter (set to true by default).
 
 .. note::
 
@@ -511,6 +510,7 @@ Example:
 .. code-block:: pascal
 
     mouseScroll(p, 50);
+    mouseScroll(p, 10, false);
 *)
 procedure mouseScroll(pnt: TPoint; scrolls: integer; down: boolean = true);
 var
@@ -520,7 +520,7 @@ begin
   getMousePos(x, y);
 
   repeat
-    if (down) then
+    if down then
       scrollMouse(x, y, 1)
     else
       scrollMouse(x, y, -1);
@@ -538,14 +538,13 @@ mouseBox
 
     procedure mouseBox(b: TBox; button: integer = MOUSE_MOVE);
 
-Moves the mouse somewhere inside the box b. Will just move my default. Click
-depends on what button is set to.  It is more likely to click around the middle
-of the box.
+Moves the mouse somewhere inside the box 'b', with more change of being around
+the middle of the box. The 'button' is set to MOUSE_MOVE by default.
 
 .. note::
 
     - by Coh3n
-    - Last Updated: Mar. 17, 2013 by Coh3n
+    - Last Updated: 17 March 2013 by Coh3n
 
 Example:
 
@@ -584,7 +583,7 @@ Clicks a random point within an oval shape.
 .. note::
 
     - by mixster
-    - Last Updated: Mar. 16, 2013 by Coh3n
+    - Last Updated: 16 March 2013 by Coh3n
 
 Example:
 
@@ -611,12 +610,12 @@ mouseCircle
 
     procedure mouseCircle(MidX, MidY, Radius, mouseAction: Integer = MOUSE_MOVE);
 
-Same as mouseOval, but mouses within a circle instead.
+Same as mouseOval, but within a circle instead.
 
 .. note::
 
     - by mixster
-    - Last Updated: Mar. 21st, 2012 by Coh3n
+    - Last Updated: 21 March 2012 by Coh3n
 
 Example:
 
@@ -637,8 +636,8 @@ didClick
 
     function didClick(Red: Boolean; Time: Integer = 1000): boolean;
 
-Clicks the current mouse position and looks for the colored X. Times out after
-Time.  Time default set to 1000.
+Left clicks the current mouse position and looks for the colored X. Times out
+after 'Time'. The 'Time' is set to 1000 by default.
 
 .. note::
 
@@ -649,8 +648,8 @@ Example:
 
 .. code-block:: pascal
 
-    if (didClick(true)) then
-      writeln('Clicked object!');
+    if didClick(true) then
+      writeLn('Clicked an object!');
 *)
 function didClick(red: Boolean; time: Integer = 1000): boolean;
 var
@@ -668,8 +667,8 @@ begin
 
   while (getSystemTime() < timeOut) and (not result) do
   begin
-    R := CountColorTolerance(395403, b, 25);
-    G := CountColorTolerance(1558685, b, 35);
+    R := countColorTolerance(395403, b, 25);
+    G := countColorTolerance(1558685, b, 35);
 
     if red then
     begin
@@ -695,9 +694,9 @@ multiClick
 
     function multiClick(p: TPoint; chance, maxClicks: integer): boolean;
 
-Will simulate "spam" clicking on the point, p.  Will do it a random amount
-between 1 and 'maxClicks'.  Will always click once, then has a percent
-'chance' of clicking again.  Will not exceed 'maxClicks'.
+Will simulate "spam" clicking on the point 'p'.  It will click random amount of
+times between 1 and 'maxClicks'. It will always click once, then has a percent
+'chance' of clicking again. Will not exceed 'maxClicks'.
 
 .. note::
 
@@ -708,8 +707,8 @@ Example:
 
 .. code-block:: pascal
 
-    if (mainscreen.isUptext('Tree')) then
-      multiClick(p, 35, 5, true);
+    if isMouseOverText('Tree') then
+      multiClick(p, 35, 5);
 *)
 function multiClick(p: TPoint; chance, maxClicks: integer): boolean;
 var
@@ -722,7 +721,7 @@ begin
     mouse(p, MOUSE_LEFT);
 
     if (random(100) > chance) or (not result) then
-      break;
+      break();
 
     wait(50 + random(50));
   until(clicks >= maxClicks);
@@ -737,7 +736,7 @@ getRealMousePos
     procedure getRealMousePos(var x, y : Integer);
 
 Retrives the position of the real (not smart) mouse relative to the
-desktop client.  Can be used to create an interactive GUI drawn on smart.
+desktop client. Can be used to create an interactive GUI drawn on smart.
 
 .. note::
 
@@ -747,10 +746,7 @@ Example:
 
 .. code-block:: pascal
 
-    getRealMousePos(P);
-    if isPointInBox(P, GUIclickityBox) then
-      writeLn('You pressed the button! Filthy presser...');
-
+    getRealMousePos(x, y);
 *)
 procedure getRealMousePos(var X, Y : Integer);
 var
@@ -764,6 +760,28 @@ begin
   setImageTarget(ITarget);
 end;
 
+(*
+getRealMousePos
+~~~~~~~~~~~~~~~
+
+.. code-block:: pascal
+
+    procedure getRealMousePos(var P : TPoint); overload;
+
+An averload of the above method, which takes a TPoint instead
+
+.. note::
+
+    - Author: Zyt3x
+
+Example:
+
+.. code-block:: pascal
+
+    getRealMousePos(P);
+    if isPointInBox(P, GUIclickBox) then
+      writeLn('You pressed the button!);
+*)
 procedure getRealMousePos(var P : TPoint); overload;
 begin
   getRealMousePos(P.X, P.Y);

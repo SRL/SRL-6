@@ -3,7 +3,7 @@ Smart
 =====
 
 The Smart file stores all the functions and procedures used to initiate SMART
-in scripts.  To use SMART in a script, simply add the following code before SRL is
+in scripts. To use SMART in a script, simply add the following code before SRL is
 included.
 
 .. code-block:: pascal
@@ -45,7 +45,7 @@ Variables that can be used in scripts.
   * smartForceNewClient - If enabled will skip attempting to pair to a previously spawned client
   * smartEnableDrawing - If enabled will allow drawing on smart.
   * smartInitSeq - Key that smart will press while smart is loading.
-  * smartUserAgent -
+  * smartUserAgent - The userAgent header (i.e, the 'browser' information sent to the RS server)
   * smartResetAttempts - The max attempts to respawn SMART during sixHourFix()
 
 *)
@@ -68,7 +68,7 @@ Internal SMART variables used only in smart.simba.
     * __smartCurrentTarget: Keeps track of the current smart target.
     * __smartIsDrawingSetup: Keeps track if smart drawing is setup or not.
     * __smartNativeDebugButtonID: The id of the debug button (if not using a native button) set as -1.
-    * smartClientWidth, smartClientHeight - The dimensions of the smart client
+    * __smartClientWidth, __smartClientHeight - The dimensions of the smart client
     * smartImage: TMufasaBitmap that is displayed onto smart.
 *}
 {$IFNDEF CODEINSIGHT}
@@ -89,12 +89,12 @@ findJavaPath
 
      Function findJavaPath(out res: string): boolean;
 
-Attempts to locate the users java path, will return if succesfull or not
+Attempts to locate the users java path, will return if successful or not
 
 .. note::
 
     - By: Brandon
-    - Last Updated: August 26, 2013 by Olly
+    - Last Updated: 26 August 2013 by Olly
 
 Example:
 
@@ -181,13 +181,13 @@ Will return the Java path needed for the first parameter of SmartSpawnClient.
 .. note::
 
     - By: Olly
-    - Last Updated: August 26, 2013 by Olly
+    - Last Updated: 26 August 2013 by Olly
 
 Example:
 
 .. code-block:: pascal
 
-   getJavaPath();
+   s := getJavaPath();
 *)
 function getJavaPath(): string;
 begin
@@ -231,13 +231,13 @@ smartSetDebug; overload
 
      procedure smartSetDebug(enable: boolean); overload;
 
-Overloaded function that toggles the debug image on smart without need the target
-parameter.
+Overloaded function that toggles the debug image on smart without needing the
+target parameter.
 
 .. note::
 
     - By: Olly
-    - Last Updated: August 26, 2013 by Olly
+    - Last Updated: 26 August 2013 by Olly
 
 Example:
 
@@ -269,12 +269,13 @@ succesfull or not.
 .. note::
 
     - By: Brandon, Mormanman, Benland100
-    - Last Updated: May. 26, 2013 by Olly
+    - Last Updated: 26 May 2013 by Olly
 
 Example:
 
 .. code-block:: pascal
 
+    smartGetParameters(tsa);
 *)
 function smartGetParameters(out params: TStringArray): boolean;
 var
@@ -309,7 +310,7 @@ Pairs Simba to the smart client via EIOS.
 .. note::
 
     - By: Olly
-    - Last Updated: August 28, 2013 by Olly
+    - Last Updated: 28 August 2013 by Olly
 
 Example:
 
@@ -342,11 +343,13 @@ Creates a smart client using the dimensions "w" and "h".
 .. note::
 
     - By: Olly
-    - Last Updated: August 28, 2013 by Olly
+    - Last Updated: 28 August 2013 by Olly
 
 Example:
 
 .. code-block:: pascal
+
+    smartCreateClient(800, 600);
 
 *)
 function smartCreateClient(w, h: integer): boolean;
@@ -407,6 +410,7 @@ Example:
 
 .. code-block:: pascal
 
+    tia := smartGetPIDs();
 *)
 function smartGetPIDs(): TIntegerArray;
 var
@@ -429,7 +433,7 @@ smartPairToExistingClient
      function smartPairToExistingClient(): boolean;
 
 Attempts to pair us to a previously spawned smart client, will result true if
-succesfull or not.
+succesfull.
 
 .. note::
 
@@ -503,14 +507,13 @@ initSmart
 
     procedure initSmart();
 
-Initializes us to a SMART client, will attempt to pair to a existing client, if
-that fails we will attempt to spawn a client, will terminate the script if anything
-goes wrong.
+Initializes a SMART client. If it cannot pair to an existing client, it will
+attempt to spawn a client. It will terminate the script if anything goes wrong.
 
 .. note::
 
     - By: Olly
-    - Last Updated: August 26, 2013 by Olly
+    - Last Updated: 26 August 2013 by Olly
 
 Example:
 
@@ -555,12 +558,12 @@ smartFreeCurrentClient
 
      procedure smartFreeCurrentClient();
 
-Free's our current smart client.
+Frees our current smart client.
 
 .. note::
 
     - By: Olly
-    - Last Updated: August 28, 2013 by Olly
+    - Last Updated: 28 August 2013 by Olly
 
 Example:
 
@@ -585,12 +588,12 @@ smartSetupDrawing
 
      procedure smartSetupDrawing();
 
-Setups SMART so its ready to be drawn on-to.
+Setups SMART so it's ready to be drawn on-to.
 
 .. note::
 
     - By: Olly
-    - Last Updated: August 28, 2013 by Olly
+    - Last Updated: 28 August 2013 by Olly
 
 Example:
 
@@ -599,7 +602,7 @@ Example:
 *)
 procedure smartSetupDrawing();
 begin
-  if (__smartIsDrawingSetup) then
+  if __smartIsDrawingSetup then
     exit();
 
   smartSetDebug(true);
@@ -632,7 +635,7 @@ Frees the TMufasaBitmap used for smart drawing.
 .. note::
 
     - By: Olly
-    - Last Updated: August 28, 2013 by Olly
+    - Last Updated: 28 August 2013 by Olly
 
 Example:
 
@@ -657,18 +660,19 @@ smartReloadClient
 
      procedure smartReloadClient();
 
-Kills the current client, and spawns a new one, parameter 'waitTime' is how long
-we will wait before spawning a new client after killing our current.
+Kills the current client, and spawns a new one. The 'waitTime' parameter is
+how long to wait after killing the client before spawning a new one.
 
 .. note::
 
     - By: Olly
-    - Last Updated: September 20, 2013 by Olly
+    - Last Updated: 20 September 2013 by Olly
 
 Example:
 
 .. code-block:: pascal
 
+    smartReloadClient(60000);
 *)
 procedure smartReloadClient(waitTime: integer);
 var
@@ -678,7 +682,7 @@ begin
   img := -999;
   ConvertTime(waitTime, h, m, s);
 
-  if (__smartIsDrawingSetup) then
+  if __smartIsDrawingSetup then
   begin
     img := copyBitmap(smartImage.getIndex());
     smartFreeDrawing();
@@ -697,7 +701,7 @@ begin
     print('Setting refresh rate back to ' + intToStr(r));
     SmartSetRefresh(__smartCurrentTarget, r);
 
-    if (bitmapExists(img)) then
+    if bitmapExists(img) then
     begin
       smartSetupDrawing();
 
@@ -719,7 +723,8 @@ sixHourFix
 
      procedure sixHourFix();
 
-Kills the current client, and spawns a new one.
+Kills the current client, spawns a new one, and then logs the currentPlayer back
+into the game.
 
 .. note::
 
@@ -764,6 +769,26 @@ begin
   end;
 end;
 
+(*
+__smartCheckPlugins
+~~~~~~~~~~~~~~~~~~~
+
+.. code-block:: pascal
+
+     procedure __smartCheckPlugins();
+
+Checks what plugins are present in the plugins folder and warns the user if the
+directX of OpenGL ones are missing.
+
+.. note::
+
+    - By: Olly
+
+Example:
+
+.. code-block:: pascal
+
+*)
 {$IFNDEF CODEINSIGHT}
 procedure __smartCheckPlugins();
 var
