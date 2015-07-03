@@ -1204,7 +1204,10 @@ begin
     exit(false);
   end;
 
-  if not __setInputBoxes() then
+  if lobby.isOpen() then
+    exit(true);
+
+  if (not __setInputBoxes()) then
   begin
     print('TPlayer.loginToLobby(): Failed to find username and/or password box', TDebug.FOOTER);
     exit(false);
