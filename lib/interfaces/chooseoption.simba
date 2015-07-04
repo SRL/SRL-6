@@ -219,20 +219,20 @@ TRSChooseOption.getOptions
 
 .. code-block:: pascal
 
-    function TRSChooseOption.getOptions(): TOptionArray;
+    function TRSChooseOption.getOptions(useTesseract: boolean = false): TOptionArray;
 
-Returns a TOptionArray of all the options
+Returns a TOptionArray of all the options.
 
 .. note::
 
     - by Olly
-    - Last Modified: 4 July 2015 by Thomas (credits should go to Turpinator)
+    - Last Modified: 4 July 2015 by Thomas
 
 Example:
 
 .. code-block:: pascal
 
-    if (chooseOption.isOpen()) then
+    if chooseOption.isOpen() then
       chooseOption.close();
 *)
 function TRSChooseOption.getOptions(useTesseract: boolean = false): TOptionArray;
@@ -334,11 +334,12 @@ function TRSChooseOption._select(txt: TStringArray; mouseAction: integer; aclose
   * matchPercent - The min percentage that will we count as match (if using stringmatch) if not using stringmatch
                    and want the old the method of finding txt anywhere in the string set it as 1.00.
   * waitTime - how long will we wait for the chooseoptions menu to appear?.
+  * useTesseract - Do you want to use Tesseract to find the text (default false)
 
 .. note::
 
     - by Olly
-    - Last Modified: 04 March 2014 by Coh3n
+    - Last Modified: 4 July 2015 by The Mayor
 
 Example:
 
@@ -350,7 +351,7 @@ Example:
     // to use string match
     chooseOption._select(['Walk To'], MOUSE_LEFT, true, 0.85, 150);
 *}
-function TRSChooseOption._select(txt: TStringArray; mouseAction: integer; aclose: boolean; matchPercent: extended; waitTime: integer): boolean;
+function TRSChooseOption._select(txt: TStringArray; mouseAction: integer; aclose: boolean; matchPercent: extended; waitTime: integer; useTesseract: boolean = false): boolean;
 var
   optionArr: TOptionArray;
   l, i, j: integer;
@@ -369,7 +370,7 @@ begin
     exit();
   end;
 
-  optionArr := self.getOptions();
+  optionArr := self.getOptions(useTesseract);
 
   l := length(optionArr);
 
@@ -378,7 +379,7 @@ begin
     print('Failed to find any options', TDebug.ERROR);
     print('TRSChooseOption.select() result = false', TDebug.FOOTER);
 
-    if (aclose) then
+    if aclose then
       close();
 
     exit();
@@ -405,7 +406,7 @@ begin
           if (mouseAction <> MOUSE_NONE) then
             mouseBox(optionArr[i].bounds, mouseAction)
           else // if it's mouse none lets see if we need to close
-            if (aclose) then
+            if aclose then
               self.close();
 
           exit(true);
@@ -426,7 +427,7 @@ begin
           b.edit(2, 2, -2, -2); // shrink the box so there's no chance of clicking the wrong option
           mouseBox(b, mouseAction)
         end else // if it's mouse none lets see if we need to close
-          if (aclose) then
+          if aclose then
             self.close();
 
         exit(true);
@@ -434,7 +435,7 @@ begin
    end;
 
   // close the menu since we found no matches
-  if (aclose) then
+  if aclose then
     close();
 
   print('Failed to find any text matches');
@@ -501,14 +502,43 @@ begin
 end;
 
 (*
+TRSChooseOption.select; overload
+~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+
+.. code-block:: pascal
+
+    function TRSChooseOption.select(txt: TStringArray; matchPercent: extended; waitTime: integer = 150): boolean; overload;
+
+A overloaded function that takes a tesseract boolean as the second parameter
+
+   * txt: The txt will try and match against in any of the options.
+   * useTesseract: use tesseract to find text?
+
+.. note::
+
+    - by The Mayor
+    - Last Modified: 4 July 2015 by The Mayor
+
+Example:
+
+.. code-block:: pascal
+
+    chooseOption.select(['Walk here'], 0.80);
+*)
+function TRSChooseOption.select(txt: TStringArray; useTesseract: boolean): boolean; overload;
+begin
+  result := self._select(txt, MOUSE_LEFT, true, 1.00, 250, useTesseract);
+end;
+
+(*
 TRSChooseOption.debugOptions
 ~~~~~~~~~~~~~~~~~~~~~~~~~~~~
 
 .. code-block:: pascal
 
-   procedure TRSChooseOption.debugOptions();
+   procedure TRSChooseOption.debugOptions(useTesseract: boolean = false);
 
-Debugs all the found options.
+Debugs all the found options. Can optionally use tesseract.
 
 .. note::
 
@@ -521,7 +551,7 @@ Example:
 
     chooseOption.debugOptions();
 *)
-procedure TRSChooseOption.debugOptions();
+procedure TRSChooseOption.debugOptions(useTesseract: boolean = false);
 var
   i: integer;
   options: TOptionArray;
@@ -530,7 +560,7 @@ begin
 
   if (self.isOpen()) then
   begin
-    options := self.getOptions();
+    options := self.getOptions(useTesseract);
 
     for i := 0 to high(options) do
       print(intToStr(i)+') '+options[i].str);
