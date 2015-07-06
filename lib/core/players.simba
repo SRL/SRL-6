@@ -1205,7 +1205,10 @@ begin
   end;
 
   if lobby.isOpen() then
+  begin
+    print('TPlayer.loginToLobby(): Player ' + self.nickname + ' is already in lobby.', TDebug.FOOTER);
     exit(true);
+  end;
 
   if (not __setInputBoxes()) then
   begin
