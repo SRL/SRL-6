@@ -56,7 +56,7 @@ Example:
 {$IFNDEF CODEINSIGHT}
 procedure TRSGrandExchange.__init();
 begin
-  with (self) do
+  with self do
   begin
     name := 'Grand Exchange';
     ID := ID_INTERFACE_GRANDEXCHANGE;
@@ -80,7 +80,7 @@ the interface's bounds (fully dynamic).
 .. note::
 
     - by The Mayor
-    - Last Updated: 14 January 2015 by The Mayor
+    - Last Updated: 6 July 2015 by The Mayor
 
 Example:
 
@@ -92,18 +92,18 @@ Example:
 {$IFNDEF CODEINSIGHT}
 function TRSGrandExchange.__find(): boolean;
 const
-  BURGUNDY_COLOR = [1448256, 26]; // [Col, Tol] background of "GRAND EXCHANGE"
+  PINK_COLOR = [14581920, 0]; // [Col, Tol] pink item in the balance scale.
 var
   i: Integer;
   TPA: TPointArray;
   ATPA: T2DPointArray;
   b: TBox;
 begin
-  findColorsTolerance(TPA, BURGUNDY_COLOR[0], mainScreen.getBounds(), BURGUNDY_COLOR[1]);
+  findColorsTolerance(TPA, PINK_COLOR[0], getClientBounds(), PINK_COLOR[1]);
 
-  if length(TPA) < 20 then
+  if length(TPA) < 10 then
   begin
-    print('TRSGrandExchange.__find(): Didn''t find enough BURGUNDY_COLOR', TDebug.WARNING);
+    print('TRSGrandExchange.__find(): Didn''t find enough PINK_COLOR', TDebug.WARNING);
     exit(false);
   end;
 
@@ -112,16 +112,22 @@ begin
 
   for i := 0 to high(ATPA) do
   begin
+    writeLn(atpa[i].getBounds());
+
     b := ATPA[i].getBounds();
-    if b.getWidth() < 150 then continue();
 
-    if (pos('GRAND EXCHANGE', upperCase(tesseract_GetText(b, TESS_FILTER_SMALL_CHARS))) > 0) then
+    if inRange(b.getWidth(), 10, 20) and (b.getHeight() < 20) then
     begin
-      self.setBounds([b.x1 - 2, b.y1 - 5, b.x2 + 535, b.y2 + 300]);
-      exit(true);
-    end;
-  end;
+      b.edit(21, -10, 114, 12);
 
+      if (pos('GRAND', upperCase(tesseract_GetText(b, TESS_FILTER_SMALL_CHARS))) > 0) then
+      begin
+        self.setBounds([b.x1 - 88, b.y1 - 8, b.x2 + 570, b.y2 + 515]);
+        exit(true);
+      end;
+    end;
+
+  end;
 end;
 {$ENDIF}
 
@@ -181,7 +187,7 @@ interface with the escape button first. It will return if succesful or not.
 .. note::
 
     - by The Mayor
-    - Last Updated: 14 January 2015 by The Mayor
+    - Last Updated: 6 July 2015 by The Mayor
 
 Example:
 
@@ -193,7 +199,7 @@ Example:
 *)
 function TRSGrandExchange.close(escape: boolean = true): boolean;
 const
-  __CLOSE_OFFSET: TPoint = [495, 11]; // From self(x1, y1) to middle of 'X'
+  __CLOSE_OFFSET: TPoint = [756, 22]; // From self(x1, y1) to middle of 'X'
 var
   timeOut: UInt64;
 begin
@@ -245,7 +251,7 @@ Returns a TBox of the pack slot 'slot' in the Grand Exchange interface.
 .. note::
 
     - by The Mayor
-    - Last Updated: 14 January 2015 by The Mayor
+    - Last Updated: 6 July 2015 by The Mayor
 
 Example:
 
@@ -256,9 +262,9 @@ Example:
 *)
 function TRSGrandExchange.getPackSlotBox(slot: integer): TBox;
 const
-  __PACK_OFFSET: TPoint = [535, 55]; // From self(x1, y1) to middle of first pack slot
+  __PACK_OFFSET: TPoint = [582, 183]; // From self(x1, y1) to middle of first pack slot
 begin
-  result := gridBox(slot - 1, 4, 7, 35, 31, 46, 36, point(self.x1 + __PACK_OFFSET.x, self.y1 + __PACK_OFFSET.y));
+  result := gridBox(slot - 1, 4, 7, 36, 32, 46, 36, point(self.x1 + __PACK_OFFSET.x, self.y1 + __PACK_OFFSET.y));
 end;
 
 (*
@@ -274,7 +280,7 @@ Internal function which returns a TBoxArray of the 6 Grand Exchange slots.
 .. note::
 
     - by The Mayor
-    - Last Updated: 12 April 2015 by The Mayor
+    - Last Updated: 6 July 2015 by The Mayor
 
 Example:
 
@@ -285,9 +291,15 @@ Example:
 *)
 function TRSGrandExchange._getSlotBoxes(): TBoxArray;
 const
-  __GE_SLOT_OFFSET: TPoint = [95, 111]; // From self(x1, y1) to middle of first GE slot
+  __GE_SLOT_OFFSET: TPoint = [100, 207]; // From self(x1, y1) to middle of first GE slot
+var
+  tba: TBoxArray;
 begin
-  result := grid(3, 2, 149, 109, 156, 120, point(self.x1 + __GE_SLOT_OFFSET.x, self.y1 + __GE_SLOT_OFFSET.y));
+  tba := grid(3, 3, 169, 121, 181, 127, point(self.x1 + __GE_SLOT_OFFSET.x, self.y1 + __GE_SLOT_OFFSET.y));
+  tba.deleteIndex(8);
+  tba[6].offset([90, 0]);
+  tba[7].offset([91, 0]);
+  result := tba;
 end;
 
 (*
@@ -303,7 +315,7 @@ Internal function which returns a TBoxArray of the Grand Exchange buy boxes.
 .. note::
 
     - by The Mayor
-    - Last Updated: 12 April 2015 by The Mayor
+    - Last Updated: 6 July 2015 by The Mayor
 
 Example:
 
@@ -314,9 +326,15 @@ Example:
 *)
 function TRSGrandExchange._getBuyBoxes(): TBoxArray;
 const
-  __BUY_OFFSET: TPoint = [65, 121]; // From self(x1, y1) to middle of first buy button
+  __BUY_OFFSET: TPoint = [70, 217]; // From self(x1, y1) to middle of first buy button
+var
+  tba: TBoxArray;
 begin
-  result := grid(3, 2, 44, 44, 156, 120, point(self.x1 + __BUY_OFFSET.x, self.y1 + __BUY_OFFSET.y));
+  tba := grid(3, 3, 44, 44, 181, 127, point(self.x1 + __BUY_OFFSET.x, self.y1 + __BUY_OFFSET.y));
+  tba.deleteIndex(8);
+  tba[6].offset([90, 0]);
+  tba[7].offset([91, 0]);
+  result := tba;
 end;
 
 (*
@@ -332,7 +350,7 @@ Internal function which returns a TBoxArray of the Grand Exchange sell boxes.
 .. note::
 
     - by The Mayor
-    - Last Updated: 12 April 2015 by The Mayor
+    - Last Updated: 6 July 2015 by The Mayor
 
 Example:
 
@@ -343,9 +361,15 @@ Example:
 *)
 function TRSGrandExchange._getSellBoxes(): TBoxArray;
 const
-  __SELL_OFFSET: TPoint = [125, 121]; // From self(x1, y1) to middle of first sell button
+  __SELL_OFFSET: TPoint = [130, 217]; // From self(x1, y1) to middle of first sell button
+var
+  tba: TBoxArray;
 begin
-  result := grid(3, 2, 44, 44, 156, 120, point(self.x1 + __SELL_OFFSET.x, self.y1 + __SELL_OFFSET.y));
+  tba := grid(3, 3, 44, 44, 181, 127, point(self.x1 + __SELL_OFFSET.x, self.y1 + __SELL_OFFSET.y));
+  tba.deleteIndex(8);
+  tba[6].offset([90, 0]);
+  tba[7].offset([91, 0]);
+  result := tba;
 end;
 
 (*
