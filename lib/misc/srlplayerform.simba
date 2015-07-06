@@ -767,8 +767,8 @@ begin
     end;
 
     // Now know what these should be.
-    __cmpGroupBox.setWidth(maxA(widths) + 9);
-    __cmpGroupBox.setHeight((cmpTop) + (cmpTopInc div 2));
+    __cmpGroupBox.setWidth(max((maxA(widths) + 9), 220));
+    __cmpGroupBox.setHeight(max((cmpTop + (cmpTopInc div 2)), 150));
 
     __btnPrevPlayer.init(mainForm);
     with (__btnPrevPlayer) do
