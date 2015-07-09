@@ -19,7 +19,9 @@ A type that stores the Grand Exchange interface properties.
 *)
 
 type
-  TRSGrandExchange = type TRSInterface;
+  TRSGrandExchange = record(TRSInterface)
+    tabBoxes: TBoxArray;
+end;
 
 (*
 var grandExchange
@@ -123,6 +125,7 @@ begin
       if (pos('GRAND', upperCase(tesseract_GetText(b, TESS_FILTER_SMALL_CHARS))) > 0) then
       begin
         self.setBounds([b.x1 - 88, b.y1 - 8, b.x2 + 570, b.y2 + 515]);
+        self.tabBoxes := grid(2, 1, 60, 22, 125, 0, point(x1 + 92, y1 + 113));
         exit(true);
       end;
     end;
@@ -236,6 +239,72 @@ begin
     result := true;
 
   print('TRSGrandExchange.close(): result = ' + boolToStr(result), TDebug.SUB);
+end;
+
+(*
+TRSGrandExchange.getActiveTab
+~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+
+.. code-block:: pascal
+
+    function TRSGrandExchange.getActiveTab(): Integer;
+
+Returns the current tab number (0 - Grand Exchange | 1 - Sale History).
+
+.. note::
+
+    - by The Mayor
+    - Last Updated: 9 July 2015 by The Mayor
+
+Example:
+
+.. code-block:: pascal
+
+    writeLn(grandExchange.getActiveTab());
+
+*)
+function TRSGrandExchange.getActiveTab(): Integer;
+var
+  i: Integer;
+begin
+  for i := 0 to high(self.tabBoxes) do
+    if (not (getColor(self.tabBoxes[i].X2, self.tabBoxes[i].Y2) = 9078134)) then
+      exit(i);
+end;
+
+(*
+TRSGrandExchange.openTab
+~~~~~~~~~~~~~~~~~~~~~~~~
+
+.. code-block:: pascal
+
+    function TRSGrandExchange.openTab(tab: Integer): Boolean;
+
+Opens the 'tab' tab (0 - Grand Exchange | 1 - Sale History).
+
+.. note::
+
+    - by The Mayor
+    - Last Updated: 9 July 2015 by The Mayor
+
+Example:
+
+.. code-block:: pascal
+
+    grandExchange.openTab(0);
+
+*)
+function TRSGrandExchange.openTab(tab: Integer): Boolean;
+begin
+  if (self.getActiveTab() = tab) then
+    exit(true);
+
+  for 0 to 2 do
+  begin
+    mouseBox(self.tabBoxes[tab], MOUSE_LEFT);
+    wait(random(1000, 1500));
+    if (self.getActiveTab() = tab) then exit(true);
+  end;
 end;
 
 (*
@@ -367,6 +436,7 @@ var
 begin
   tba := grid(3, 3, 44, 44, 181, 127, point(self.x1 + __SELL_OFFSET.x, self.y1 + __SELL_OFFSET.y));
   tba.deleteIndex(8);
+  writeLn(length(tba));
   tba[6].offset([90, 0]);
   tba[7].offset([91, 0]);
   result := tba;
