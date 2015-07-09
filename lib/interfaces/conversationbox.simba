@@ -2,12 +2,11 @@
 Conversation Box
 ================
 
-The converstaion box file holds any functions that manipulate and/or gather
+The Converstaion Box file holds any functions that manipulate and/or gather
 information from a conversation between the player and NPC's or the player and
 "the game" (i.e. destroying an item).
 
-The source for this file can be found
-`here <https://github.com/SRL/SRL-6/blob/master/lib/interfaces/conversationbox.simba>`_.
+The source for this file can be found `here <https://github.com/SRL/SRL-6/blob/master/lib/interfaces/conversationbox.simba>`_.
 
 *)
 
@@ -366,71 +365,62 @@ TRSConversationBox.getOptions
 
 .. code-block:: pascal
 
-    function TRSConversationBox.getOptions(onlyLength: boolean=false): TStringArray;
+    function TRSConversationBox.getOptions(out optionBoxes: TBoxArray): TStringArray;
 
-Returns the selectable options from NPC chat. If 'onlyLength' is set to true, it will
-only gather the number of options available (length of TStringArray), otherwise and by
-default, it will use the text finding.
+Returns the selectable options from NPC chat as a TStringArray. The 'optionBoxes'
+parameter is also passed by reference, and contains the bounds for each of the
+option buttons.
 
 .. note::
 
     - by Ashaman88
-    - Last Updated: 17 January 2014 by Ashaman88
+    - Last Updated: 9 July 2015 by HKbotz
 
 Example:
 
 .. code-block:: pascal
 
-    s := conversationBox.getOptions();
+    s := conversationBox.getOptions(tba);
 *)
-function TRSConversationBox.getOptions(onlyLength: boolean=false): TStringArray;
+function TRSConversationBox.getOptions(out optionBoxes: TBoxArray): TStringArray;
 var
   b: TBox;
-  bb: TBoxArray;
-  tpa : TPointArray;
-  atpa : T2DPointArray;
+  TPA: TPointArray;
+  ATPA: T2DPointArray;
   i: Integer;
 begin
-  if not self.isOpen() then
-    exit;
-
-  if self.continue(false,false,false) then
-    exit;
+  if (not self.isOpen()) or self.continue(false,false,false) then
+    exit();
 
   b := self.getBounds();
   b.edit(+5, +5, -5, 0);
 
+  findColorsTolerance(TPA, 2301204, b, 17);
 
-  findColorsTolerance(tpa, 2301204, b, 17);
-
-  if length(tpa) < 2 then
+  if (length(TPA) < 2) then
   begin
     print('conversationBox.getOptions(): No Options found', TDebug.SUB);
-    Exit;
+    exit();
   end;
 
-  atpa := tpa.cluster(1);
+  ATPA := TPA.cluster(1);
 
-  for i := 0 to High(atpa) do
+  for i := 0 to high(ATPA) do
   begin
-    b := gettpaBounds(atpa[i]);
-    if ((b.x2-b.x1) > 19) and ((b.y2-b.y1) > 4) then
+    b := ATPA[i].getBounds();
+    if (b.getWidth() > 19) and (b.getHeight() > 4) then
     begin
-      setLength(bb,length(bb)+1);
       b.edit(+14, +1, -5, -1);
-      bb[high(bb)] := b;
+      optionBoxes.append(b);
     end;
   end;
 
-  setLength(result,length(bb));
+  setLength(result, length(optionBoxes));
 
-  for i := 0 to High(bb) do
-  begin
-    if not onlyLength then
-      result[i]:=tesseractgettext(bb[i].x1,bb[i].y1,bb[i].x2,bb[i].y2, FILTER_SMALL_CHARS);
-  end;
+  for i := 0 to high(optionBoxes) do
+    result[i]:= Tesseract_GetText(optionBoxes[i], TESS_FILTER_SMALL_CHARS);
 
-  print('conversationBox.getOptions(): Options found: ' + tostr(result), TDebug.SUB);
+  print('conversationBox.getOptions(): Options found: ' + toStr(result), TDebug.SUB);
 end;
 
 (*
@@ -457,18 +447,19 @@ Example:
 *)
 function TRSConversationBox.findOption(txt: TStringArray): boolean;
 var
-  i,j: Integer;
+  i, j: Integer;
   text: TStringArray;
+  TBA: TBoxArray;
 begin
   if (not self.isOpen()) then
     exit();
 
-  text:= self.getOptions();
+  text:= self.getOptions(TBA);
 
   for i:= 0 to high(text) do
     for j := 0 to high(txt) do
     begin
-      result:= (pos(txt[j], text[i]) > 0);
+      result := (pos(txt[j], text[i]) > 0);
       if result then
         exit;
     end;
@@ -480,14 +471,16 @@ TRSConversationBox.selectOption
 
 .. code-block:: pascal
 
-    function TRSConversationBox.findOption(txt: TStringArray): boolean;
+    function TRSConversationBox.selectOption(txt: TStringArray; useKeyboard: boolean = true): boolean;
 
-Returns true if 'txt' is found in the selectable options from NPC chat, and if said option is selected via typesend.
+Returns true if 'txt' is found in the selectable options from NPC chat. If 'useKeyboard'
+is false, then it will click the option with the mouse, else it will use the
+keyboard (which is default).
 
 .. note::
 
     - by Ashaman88
-    - Last Updated: December 22, 2013 by Ashaman88
+    - Last Updated: 9 July 2015 by HKbotz
 
 Example:
 
@@ -496,24 +489,29 @@ Example:
     if (conversationBox.selectOption(['One'])) then
        writeln('Selected option One!');
 *)
-function TRSConversationBox.selectOption(txt: TStringArray): boolean;
+function TRSConversationBox.selectOption(txt: TStringArray; useKeyboard: boolean = true): boolean;
 var
-  i,j: Integer;
+  i, j: Integer;
   text: TStringArray;
+  TBA: TBoxArray;
 begin
   if (not self.isOpen()) then
     exit();
 
-  text:= self.getOptions();
+  text:= self.getOptions(TBA);
 
   for i:= 0 to high(text) do
     for j := 0 to high(txt) do
     begin
       if (pos(txt[j], text[i]) > 0) then
       begin
-        typesend(tostr(i+1),false);
-        result:=true;
-        exit;
+        if useKeyboard then
+          typeSend(toStr(i + 1), false)
+        else
+          mouseBox(TBA[i], MOUSE_LEFT);
+
+        print('conversationBox.selectOption(): Selected option ' + intToStr(i + 1), TDebug.SUB);
+        exit(true);
       end;
     end;
 end;
@@ -526,12 +524,14 @@ TRSConversationBox.selectOption
 
     function TRSConversationBox.selectOption(number: integer): boolean;
 
-Will select the option number if its available, will return if succesful or not.
+Returns true if the option 'number' is found in the selectable options from
+the NPC chat. If 'useKeyboard' is false, then it will click the option with the
+mouse, else it will use the keyboard (which is default).
 
 .. note::
 
     - by Olly
-    - Last Updated: 17 January 2014 by Ashaman88
+    - Last Updated: 9 July 2015 by HKbotz
 
 Example:
 
@@ -540,18 +540,22 @@ Example:
      if (conversationBox.selectOption(2)) then
        writeln('Selected option two');
 *)
-function TRSConversationBox.selectOption(number: integer): boolean; overload;
+function TRSConversationBox.selectOption(number: integer; useKeyboard: boolean = true): boolean; overload;
+var
+  TBA: TBoxArray;
 begin
   if (not self.isOpen()) then
     exit();
 
-  result := (number <= length(self.getOptions(true)));
-
-  if (result) then
+  if (number <= length(self.getOptions(TBA))) then
   begin
-    print('conversationBox.selectOption(): Selected option ' + intToStr(number), TDebug.SUB);
-    typesend(toStr(number), false);
+    if useKeyboard then
+      typeSend(toStr(number), false)
+    else
+      mouseBox(TBA[number - 1], MOUSE_LEFT);
+
     wait(100 + random(250));
+    print('conversationBox.selectOption(): Selected option ' + intToStr(number), TDebug.SUB);
   end;
 end;
 
