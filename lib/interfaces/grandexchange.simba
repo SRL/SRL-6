@@ -296,13 +296,16 @@ Example:
 *)
 function TRSGrandExchange.openTab(tab: Integer): Boolean;
 begin
+  if (not self.isOpen()) then
+    exit(false);
+
   if (self.getActiveTab() = tab) then
     exit(true);
 
   for 0 to 2 do
   begin
-    mouseBox(self.tabBoxes[tab], MOUSE_LEFT);
-    wait(random(1000, 1500));
+    multiClick(self.tabBoxes[tab].getGaussPoint(), 30, 3);
+    wait(random(800, 1200));
     if (self.getActiveTab() = tab) then exit(true);
   end;
 end;
@@ -436,10 +439,22 @@ var
 begin
   tba := grid(3, 3, 44, 44, 181, 127, point(self.x1 + __SELL_OFFSET.x, self.y1 + __SELL_OFFSET.y));
   tba.deleteIndex(8);
-  writeLn(length(tba));
   tba[6].offset([90, 0]);
   tba[7].offset([91, 0]);
   result := tba;
+end;
+
+function TRSGrandExchange.__getInputBoxes(): TBoxArray;
+var
+  TPA: TPointArray;
+  ATPA: T2DPointArray;
+  i: integer;
+begin
+  if findColors(TPA, 1388125, self.getBounds()) then
+  begin
+    ATPA := TPA.cluster(1);
+    result := ATPA.getEachBounds();
+  end;
 end;
 
 (*
@@ -455,7 +470,7 @@ Internal function which returns if the offer screen is open or not.
 .. note::
 
     - by The Mayor
-    - Last Updated: 27 April 2015 by BMWxi
+    - Last Updated: 10 July 2015 by The Mayor
 
 Example:
 
@@ -466,14 +481,19 @@ Example:
 *)
 function TRSGrandExchange._isOfferOpen(waitTime: integer = 500): boolean;
 var
-  timeOut: UInt64;                // "Confirm Offer" button
-  b: TBox := [self.x1 + 177, self.y1 + 285, self.x1 + 326, self.y1 + 309];
+  timeOut: UInt64;
+  TPA: TPointArray;
+  ATPA: T2DPointArray;
 begin
   timeOut := getTickCount64() + waitTime;
 
-  while getTickCount64() < timeOut do
-    if (countColorTolerance(4501731, b, 72) > 1800) then
-      exit(true);
+  while (getTickCount64() < timeOut) do
+    if findColors(TPA, 9998984, self.getBounds()) then
+    begin
+      ATPA := TPA.cluster(1);
+      if (length(ATPA) = 6) then
+        exit(true);
+    end;
 end;
 
 (*
@@ -489,7 +509,7 @@ Internal function which returns if the GE progress screen is open or not.
 .. note::
 
     - by The Mayor
-    - Last Updated: 14 January 2015 by The Mayor
+    - Last Updated: 10 July 2015 by The Mayor
 
 Example:
 
@@ -501,16 +521,13 @@ Example:
 function TRSGrandExchange._isProgressOpen(waitTime: integer = 500): boolean;
 var
   timeOut: integer;
-  TPA: TPointArray;
 begin
   timeOut := getTickCount64() + waitTime;
 
   while getTickCount64() < timeOut do
-  begin           // Colour at the top of the price/quanity boxes
-    findColors(TPA, 6445643, self.getBounds());
-    if length(TPA) = 465 then
-      exit(true);
-  end;
+    if (not self._isOfferOpen(100)) then
+      if (length(self.__getInputBoxes()) = 2) then
+        exit(true);
 end;
 
 (*
@@ -527,7 +544,7 @@ because slots 3 to 5 are inactive when you are not a member.
 .. note::
 
     - by The Mayor
-    - Last Updated: 14 January 2015 by The Mayor
+    - Last Updated: 10 July 2015 by The Mayor
 
 Example:
 
@@ -541,7 +558,7 @@ var
   TPA: TPointArray;
   TBA : TBoxArray := self._getSlotBoxes();
 begin
-  findColors(TPA, 4671044, TBA[geSlot - 1]);
+  findColors(TPA, 5063989, TBA[geSlot - 1]);
   result := length(TPA) < 5000;
 end;
 
@@ -558,7 +575,7 @@ Internal function which returns true if an offer slot is empty (and it's active)
 .. note::
 
     - by The Mayor
-    - Last Updated: 15 January 2015 by The Mayor
+    - Last Updated: 10 July 2015 by The Mayor
 
 Example:
 
@@ -569,14 +586,14 @@ Example:
 *)
 function TRSGrandExchange._isSlotEmpty(geSlot: integer): boolean;
 var
-  TBA: TBoxArray := self._getSlotBoxes();
-  b: TBox;
+  TPA: TPointArray;
+  TBA : TBoxArray := self._getSlotBoxes();
 begin
   if self._isSlotActive(geSlot) then
   begin
-    b := TBA[geSlot - 1];
-    b.edit(50, 1, -50, -88);
-    result := (pos('EMPTY', upperCase(tesseract_GetText(b, TESS_FILTER_SMALL_CHARS))) > 0);
+    findColors(TPA, 3088905, TBA[geSlot - 1]);
+    writeLn(length(TPA));
+    result := length(TPA) > 10000;
   end;
 
   print('TRSGrandExchange._isSlotEmpty(): Slot ' + toStr(geSlot) + ' = ' + boolToStr(result), TDebug.SUB);
@@ -595,7 +612,7 @@ Internal function which returns true if an item is currently buying in 'geSlot'.
 .. note::
 
     - by The Mayor
-    - Last Updated: 15 January 2015 by The Mayor
+    - Last Updated: 10 July 2015 by The Mayor
 
 Example:
 
@@ -607,11 +624,12 @@ Example:
 function TRSGrandExchange._isSlotBuying(geSlot: integer): boolean;
 var
   TBA: TBoxArray := self._getSlotBoxes();
-  b: TBox;
+  TPA, TPA2: TPointArray;
 begin
-  b := TBA[geSlot - 1];
-  b.edit(50, 1, -50, -88);
-  result := (pos('BUY', upperCase(tesseract_GetText(b, TESS_FILTER_SMALL_CHARS))) > 0);
+  findColors(TPA, 2433824, TBA[geSlot - 1]);
+  findColors(TPA2, 3815734, TBA[geSlot - 1]); // If hovering the box
+  TPA.combine(TPA2);
+  result := (length(TPA) > 10000);
   print('TRSGrandExchange.isSlotBuying(): Slot ' + toStr(geSlot) + ' = ' + boolToStr(result), TDebug.SUB);
 end;
 
@@ -628,7 +646,7 @@ Internal function which returns true if an item is currently selling in 'geSlot'
 .. note::
 
     - by The Mayor
-    - Last Updated: 15 January 2015 by The Mayor
+    - Last Updated: 10 July 2015 by The Mayor
 
 Example:
 
@@ -640,11 +658,12 @@ Example:
 function TRSGrandExchange._isSlotSelling(geSlot: integer): boolean;
 var
   TBA: TBoxArray := self._getSlotBoxes();
-  b: TBox;
+  TPA, TPA2: TPointArray;
 begin
-  b := TBA[geSlot - 1];
-  b.edit(50, 1, -50, -88);
-  result := (pos('SELL', upperCase(tesseract_GetText(b, TESS_FILTER_SMALL_CHARS))) > 0);
+  findColors(TPA, 3287837, TBA[geSlot - 1]);
+  findColors(TPA2, 4603955, TBA[geSlot - 1]); // If hovering the box
+  TPA.combine(TPA2);
+  result := (length(TPA) > 10000);
   print('TRSGrandExchange.isSlotSelling(): Slot ' + toStr(geSlot) + ' = ' + boolToStr(result), TDebug.SUB);
 end;
 
