@@ -598,6 +598,8 @@ var
   i, x, y: Integer;
   DTMs: Array [0..3] of Integer;
 begin
+  if not isLoggedIn() then
+    exit(false);
   DTMs :=           // Low level achievement popups
     [DTMFromString('mbQAAAHicY2VgYGBmYmD4y8jAwMkEwSC2PVDcEopdofjPFlOGTB52MLYE' +
                     'qgFhEOBnQAWMWDAYAAD0gAa9'),
