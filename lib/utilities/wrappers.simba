@@ -730,6 +730,13 @@ begin
   result := findDTM(dtm, x, y, searchBox.x1, searchBox.y1, searchBox.x2, searchBox.y2);
 end;
 
+function findDTM(DTM: Integer; searchBox: TBox): Boolean; overload;
+var
+  x, y: Integer;
+begin
+  result := findDTM(dtm, x, y, searchBox.x1, searchBox.y1, searchBox.x2, searchBox.y2);
+end;
+
 (*
 getTextAtEx: overload;
 ~~~~~~~~~~~~~~~~~~~~~~
