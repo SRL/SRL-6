@@ -602,6 +602,11 @@ begin
   mouse(p, mouseAction);
 end;
 
+procedure mouseOval(P: Tpoint; rx, ry, mouseAction: Integer = MOUSE_MOVE); overload;
+begin
+  mouseOval(P.X, P.Y, rx, ry, mouseAction);
+end;
+
 (*
 mouseCircle
 ~~~~~~~~~~~
@@ -626,6 +631,11 @@ Example:
 procedure mouseCircle(MidX, MidY, Radius, mouseAction: Integer = MOUSE_MOVE);
 begin
   mouseOval(MidX, MidY, Radius, Radius, mouseAction);
+end;
+
+procedure mouseCircle(P: Tpoint; Radius, mouseAction: Integer = MOUSE_MOVE); overload;
+begin
+  mouseOval(P.X, P.Y, Radius, Radius, mouseAction);
 end;
 
 (*
