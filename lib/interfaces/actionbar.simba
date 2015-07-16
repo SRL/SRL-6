@@ -222,7 +222,7 @@ Returns true if the action bar is found.  Sets its coordinates in the process.
 .. note::
 
     - by Olly
-    - Last Updated: 5th July 2014 by The Mayor
+    - Last Updated: 4th July 2015 by Thomas
 
 Example:
 
@@ -238,6 +238,10 @@ const
 var
   topY, bottomY, i: integer;
   p: TPoint;
+  BAR_BORDER_COLOR: TColorData := [4997944, 11, [2, [0.27, 0.44, 0.00]]];
+  TPA: TPointArray;
+  ATPA: T2DPointArray;
+  barBox: TBox; 
 begin
   result := false;
   bottomY := -1;
@@ -266,7 +270,22 @@ begin
       __slots := grid(14, 1, 29, 29, 36, 0, point(self.x1 + 67, self.y1 + 53));
       setSlots := true;
     end;
-  end;
+  end
+  else
+    begin
+      BAR_BORDER_COLOR.gatherIn(TPA, getClientBounds());
+      if length(TPA) < 1000 then
+        exit();
+      ATPA := TPA.cluster(2);
+      ATPA.filterBetween(0, 50);
+      if length(ATPA) < 1 then
+        exit();
+      ATPA.sortBySize();
+      barBox := ATPA[0].getBounds();
+      result := (barBox.getWidth() > 570);
+      if result then
+        self.setBounds([0, barBox.y1, gameTabs.tabArea.x1-1, barBox.y2]);
+    end;
 
   if (result) then
     print('TRSActionBar.__find(): result = true (height = '+intToStr(height)+')', TDebug.SUB)
