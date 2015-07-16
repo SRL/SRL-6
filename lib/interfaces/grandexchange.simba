@@ -1477,7 +1477,7 @@ ID's can be found on the Grand Exchange website at the end of the URL.
 .. note::
 
     - by The Mayor
-    - Last Updated: 10 March 2015 by The Mayor
+    - Last Updated: 16 July 2015 by The Mayor
 
 Example:
 
@@ -1492,7 +1492,7 @@ var
   TSA: TStringArray;
 begin
   webPage := getPage('http://services.runescape.com/m=itemdb_rs/viewitem.ws?obj=' + toStr(ID));
-  TSA := multiBetween(webPage, 'average180.daily.push(',');');
+  TSA := multiBetween(webPage, 'average30.push([new Date(',']);');
 
   if length(TSA) < 1 then
   begin
@@ -1500,8 +1500,8 @@ begin
     exit(-1);
   end;
 
-  result := strToInt(TSA[high(TSA)]);
-  print('TRSGrandExchange.getPrice(): ' + toStr(result));
+  result := strToInt(Between('), ', ',', TSA[High(TSA)]));
+  print('TRSGrandExchange.getPrice(' + toStr(ID) + '): ' + toStr(result));
 end;
 
 begin
