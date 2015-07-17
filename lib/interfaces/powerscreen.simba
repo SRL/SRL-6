@@ -19,9 +19,9 @@ Internal powersScreen constants
 
 *}
 const
-  _MAIN_TAB_OFFSET: TPoint = [54, 116];
-  _SUB_TAB_OFFSET: TPoint = [35, 184];
-  _ABILITY_OFFSET: TPoint = [34, 217];
+  _MAIN_TAB_OFFSET: TPoint = [58, 115];
+  _SUB_TAB_OFFSET: TPoint = [40, 184];
+  _ABILITY_OFFSET: TPoint = [41, 219];
   _ACTIONBAR_OFFSET: TPoint = [557, 43];
 
 {*
@@ -307,8 +307,58 @@ begin
     name := 'RS Powers Screen';
     ID := ID_INTERFACE_POWERSSCREEN;
     parentID := -1;
-    static := true;
-    setBounds([18, 12, 795, 562]);
+    static := False;
+  end;
+end;
+{$ENDIF}
+
+(*
+TRSPowersScreen.__find
+~~~~~~~~~~~~~~~~~~~~~~
+
+.. code-block:: pascal
+
+    function TRSPowersScreen.__find(): boolean;
+
+Finds the Powers Screen and sets its bounds (Dynamic).
+
+.. note::
+
+    - by The Mayor
+    - Last Updated: 17th July 2015 by The Mayor
+
+Example:
+
+.. code-block:: pascal
+
+*)
+{$IFNDEF CODEINSIGHT}
+function TRSPowersScreen.__find(): Boolean;
+var
+  i: Integer;
+  b: TBox;
+  TPA: TPointArray;
+  ATPA: T2DPointArray;
+  HandColor: TColorData = [4612803, 15, [2, [0.08, 0.64, 0.00]]];
+begin
+  if HandColor.gatherIn(TPA, getClientBounds()) then
+  begin
+    ATPA := TPA.cluster(3);
+
+    for i := 0 to high(ATPA) do
+    begin
+      b := ATPA[i].getBounds();
+
+      if inRange(b.getWidth(), 35, 45) then
+      begin
+        b.edit(50, -15, 127, -6);
+        if (pos('POWER', upperCase(tesseract_GetText(b, TESS_FILTER_SMALL_CHARS))) > 0) then
+        begin
+          self.setBounds([b.x1 - 88, b.y1 - 9, b.x2 + 578, b.y2 + 512]);
+          exit(true);
+        end;
+      end;
+    end
   end;
 end;
 {$ENDIF}
@@ -328,7 +378,7 @@ Returns true if the Powers screen is open. Includes an optional parameter
 .. note::
 
     - by Olly
-    - Last Updated: 30 January 2014 by The Mayor
+    - Last Updated: 17 July 2015 by The Mayor
 
 Example:
 
@@ -339,20 +389,20 @@ Example:
 
 *)
 function TRSPowersScreen.isOpen(waitTime: integer = 0): boolean;
-const
-  TEXT_COLOR = 379903;
-  POWERS_TAB_COLOR = 1317690;
-  POWERS_TAB_TOLERANCE = 28;
 var
-  t: LongWord;
+  t: UInt64;
 begin
-  t := (getSystemTime() + waitTime);
+  t := (getTickCount64() + waitTime);
 
   repeat
-    if (getColor(self.x1 + 95, self.y1 + 16) = TEXT_COLOR) then
-      if (countColorTolerance(POWERS_TAB_COLOR, intToBox(self.x1 + 20, self.y1, self.x1 + 255, self.y1 + 42), POWERS_TAB_TOLERANCE) > 3000) then
-        exit(true);
+    if self.__find() then
+    begin
+      result := true;
+      break();
+    end;
   until (getSystemTime() >= t);
+
+  print('PowersScreen.isOpen(): Result = ' + boolToStr(result));
 end;
 
 (*
@@ -452,13 +502,13 @@ begin
 end;
 
 {*
-TRSPowersScreen._getTabBounds
-~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+TRSPowersScreen.__getTabBounds
+~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
 
 .. code-block:: pascal
 
     function TRSPowersScreen._getTabBounds(tab: integer): TBox;
-
+                              _
 Returns the TBox of the desired Main Tab in the Powers screen. These are the
 combat style and prayer tabs. This function is only used in openTab below.
 
@@ -466,76 +516,50 @@ combat style and prayer tabs. This function is only used in openTab below.
 .. note::
 
     - by Coh3n
-    - Last Updated: 4th April 2014 by The Mayor
+    - Last Updated: 17th July 2015 by The Mayor
 
 Example:
 
 .. code-block:: pascal
 
-    var
-      b: TBox;
-    begin
-      b := powersScreen._getTabBounds(POWERS_TAB_MELEE);
-
 *}
-function TRSPowersScreen._getTabBounds(tab: integer): TBox;
+{$IFNDEF CODEINSIGHT}
+function TRSPowersScreen.__getTabBounds(tab: integer): TBox;
 begin
-  if (not self.open()) then
-  begin
-    print('Can''t get tab bounds as the powers screen isn''t open', TDebug.ERROR);
-    exit;
-  end;
-
   result := gridBox(tab -1, 6, 1, 45, 20, 80, 0, point(self.x1 + _MAIN_TAB_OFFSET.x, self.y1 + _MAIN_TAB_OFFSET.y));
 end;
+{$ENDIF}
 
 (*
-TRSPowersScreen._isTabActive
-~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+TRSPowersScreen.__getActiveTab
+~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
 
 .. code-block:: pascal
 
-    function TRSPowersScreen._isTabActive(tab: integer): boolean;
+    function TRSPowersScreen.__getActiveTab(): Integer;
 
-Returns true if the Main Tab 'tab' is the active tab.
+Returns the number of the main tab that is currently active
 
 .. note::
 
     - by The Mayor
-    - Last Updated: 6th July 2014 by The Mayor
+    - Last Updated: 17th July 2015 by The Mayor
 
 Example:
 
 .. code-block:: pascal
 
-    if powersScreen._isTabActive(POWERS_TAB_MELEE) then
-      writeLn('The Melee tab is open!');
 *)
-function TRSPowersScreen._isTabActive(tab: integer): boolean;
+{$IFNDEF CODEINSIGHT}
+function TRSPowersScreen.__getActiveTab(): Integer;
 var
-  col, t: integer;
-  p: TPoint;
+  i: integer;
 begin
-  if not self.open() then
-  begin
-    print('powersScreen._isTabActive(): Can''t get active tab as powers screen isn''t open', TDebug.ERROR);
-    exit(false);
-  end;
-
-  if tab = 4 then t := 2 else t := 1; // Tab4(subTab1) didn't work on both openGL/directX
-
-  p := self._getSubTabBounds(t).getMiddle();
-  col := getColor(p);
-  case tab of
-    1: result := (col = 3168876);
-    2: result := (col = 1459751);
-    3: result := (col = 10048045);
-    4: result := (col = 5000103);
-    5: result := (getColor(self.x1 + 27, self.y1 + 152) = 15922936); // Middle of the prayer symbol
-    6: result := (getColor(self.x1 + 544, self.y1 + 151) = 379903); // Top corner of 'P' in XP Selection
-  end;
-  print('powersScreen._isTabActive() tab ' + toStr(tab) + ' result: ' + boolToStr(result));
+  for i := 1 to 6 do
+    if (getColor(self.__getTabBounds(i).x2, self.__getTabBounds(i).y2) <> 9078134) then
+     exit(i);
 end;
+{$ENDIF}
 
 (*
 TRSPowersScreen.openTab
@@ -550,7 +574,7 @@ Opens one of the Main Tabs in the Powers screen. Returns whether successful or n
 .. note::
 
     - by The Mayor
-    - Last Updated: 6th July 2014 by The Mayor
+    - Last Updated: 17th July 2015 by The Mayor
 
 Example:
 
@@ -560,39 +584,37 @@ Example:
 
 *)
 function TRSPowersScreen.openTab(tab: integer): boolean;
-var
-  t: LongWord;
 begin
-  if not self.open() then
+  if (not self.open()) then
   begin
     print('powersScreen.openTab(): Can''t open the tab as powers screen isn''t open', TDebug.ERROR);
     exit(false);
   end;
 
-  if self._isTabActive(tab) then
+  if (self.__getActiveTab() = tab) then
     exit(true);
 
-  mouseBox(powersScreen._getTabBounds(tab), MOUSE_LEFT);
-  t := getSystemTime() + randomRange(2500, 4500);
-  repeat
-    wait(250);
-    if self._isTabActive(tab) then
+  for 0 to 2 do
+  begin
+    mouseBox(powersScreen.__getTabBounds(tab), MOUSE_LEFT);
+    wait(Random(500, 750));
+    if (self.__getActiveTab() = tab) then
     begin
       result := true;
       break;
     end;
-  until (getSystemTime() > t);
+  end;
 
   print('powersScreen.openTab() result: ' + boolToStr(result));
 end;
 
 (*
-TRSPowersScreen._getAbilitySlotBox
+TRSPowersScreen.getAbilitySlotBox
 ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
 
 .. code-block:: pascal
 
-    function TRSPowersScreen._getAbilitySlotBox(slot: integer): TBox;
+    function TRSPowersScreen.getAbilitySlotBox(slot: integer): TBox;
 
 Returns the TBox around the desired ability. Slots start at the top left at 1
 and count across the columns.
@@ -606,27 +628,21 @@ Example:
 
 .. code-block:: pascal
 
-    box := powersScreen._getAbilitySlotBox(10);
+    box := powersScreen.getAbilitySlotBox(10);
 end;
 *)
-function TRSPowersScreen._getAbilitySlotBox(slot: integer): TBox;
+function TRSPowersScreen.getAbilitySlotBox(slot: integer): TBox;
 begin
-  if (not self.open()) then
-  begin
-    print('powersScreen._getAbilitySlotBox(): Can''t return slot as powers screen isn''t open', TDebug.ERROR);
-    exit;
-  end;
-
   result := gridBox(slot -1, 6, 6, 26, 26, 36, 34, point(self.x1 + _ABILITY_OFFSET.x, self.y1 + _ABILITY_OFFSET.y));
 end;
 
 (*
-TRSPowersScreen._getSubTabBounds
-~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+TRSPowersScreen.__getSubTabBounds
+~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
 
 .. code-block:: pascal
 
-    function TRSPowersScreen._getSubTabBounds(subTab: integer): TBox;
+    function TRSPowersScreen.__getSubTabBounds(subTab: integer): TBox;
 
 Returns the TBox of the desired Sub Tab.
 
@@ -639,27 +655,22 @@ Example:
 
 .. code-block:: pascal
 
-    mouseBox(powersScreen._getSubTabBounds(2));
 end;
 *)
-function TRSPowersScreen._getSubTabBounds(subTab: integer): TBox;
+{$IFNDEF CODEINSIGHT}
+function TRSPowersScreen.__getSubTabBounds(subTab: integer): TBox;
 begin
-  if (not self.open()) then
-  begin
-    print('powersScreen._getSubTabBounds(): Can''t get Sub Tab bounds as Powers screen isn''t open', TDebug.ERROR);
-    exit;
-  end;
-
   result := gridBox(subTab -1, 4, 1, 19, 19, 26, 0, point(self.x1 + _SUB_TAB_OFFSET.x, self.y1 + _SUB_TAB_OFFSET.y));
 end;
+{$ENDIF}
 
 (*
-TRSPowersScreen._isSubTabActive
+TRSPowersScreen.__isSubTabActive
 ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
 
 .. code-block:: pascal
 
-    function TRSPowersScreen._isSubTabActive(tab: integer): boolean;
+    function TRSPowersScreen.__isSubTabActive(tab: integer): boolean;
 
 Returns true if the Sub Tab 'tab' is active.
 
@@ -672,21 +683,17 @@ Example:
 
 .. code-block:: pascal
 
-    if powersScreen._isSubTabActive(SUB_TAB_ATTACK) then
+    if powersScreen.__isSubTabActive(SUB_TAB_ATTACK) then
       writeLn('The Attack Sub Tab is open!');
 *)
-function TRSPowersScreen._isSubTabActive(tab: integer): boolean;
-begin
-  if not self.open() then
-  begin
-    print('powersScreen._isSubTabActive(): Can''t get active Sub Tab as Powers screen isn''t open', TDebug.ERROR);
-    exit(false);
-  end;
-                      // the white color at (x1, y1) of the Sub Tab box.
-  result := (getColor(self._getSubTabBounds(tab).x1, self._getSubTabBounds(tab).y1) = 16777215) or
-            (getColor(self._getSubTabBounds(tab).x1, self._getSubTabBounds(tab).y1) = 14934752);
+{$IFNDEF CODEINSIGHT}
+function TRSPowersScreen.__isSubTabActive(tab: integer): boolean;
+begin                 // the white color at (x1, y1) of the Sub Tab box.
+  result := (getColor(self.__getSubTabBounds(tab).x1, self.__getSubTabBounds(tab).y1) = 16777215) or
+            (getColor(self.__getSubTabBounds(tab).x1, self.__getSubTabBounds(tab).y1) = 14934752);
   print('powersScreen._isSubTabActive() tab ' + toStr(tab) + ' result: ' + boolToStr(result));
 end;
+{$ENDIF}
 
 (*
 TRSPowersScreen.openSubTab
@@ -720,7 +727,7 @@ begin
     exit;
   end;
 
-  if self._isSubTabActive(tab) then
+  if self.__isSubTabActive(tab) then
   begin
     print('powersScreen.openSubTab(): The Sub Tab is already open!', TDebug.HINT);
     exit(true);
@@ -728,13 +735,13 @@ begin
 
   t := getSystemTime() + randomRange(2500, 4500);
   repeat
-    mouseBox(powersScreen._getSubTabBounds(tab), MOUSE_LEFT);
-    wait(RandomRange(232, 567));
-    if self._isSubTabActive(tab) then
+    mouseBox(powersScreen.__getSubTabBounds(tab), MOUSE_LEFT);
+    if self.__isSubTabActive(tab) then
     begin
       result := true;
       break;
-    end;
+    end else
+      wait(random(1250, 2000));
   until (getSystemTime() > t);
 
   print('powersScreen.openSubTab() result: ' + boolToStr(result));
@@ -764,12 +771,6 @@ Example:
 *)
 function TRSPowersScreen.getActionBarSlotBoxes(): TBoxArray;
 begin
-  if (not self.open()) then
-  begin
-    print('powersScreen.getActionBarSlotBoxes(): Can''t return slot boxes as Powers screen isn''t open', TDebug.ERROR);
-    exit;
-  end;
-
   result := grid(14, 1, 31, 31, 38, 0, point(self.x2 - _ACTIONBAR_OFFSET.x, self.y2 - _ACTIONBAR_OFFSET.y));
 end;
 
@@ -797,12 +798,6 @@ Example:
 *)
 function TRSPowersScreen.getActionBarSlotBox(slot: integer): TBox;
 begin
-  if (not self.open()) then
-  begin
-    print('powersScreen.getActionBarSlot(): Can''t return slot as Powers screen isn''t open', TDebug.ERROR);
-    exit;
-  end;
-
   result := gridBox(slot -1, 14, 1, 31, 31, 38, 0, point(self.x2 - _ACTIONBAR_OFFSET.x, self.y2 - _ACTIONBAR_OFFSET.y));
 end;
 
@@ -831,14 +826,7 @@ Example:
 *)
 function TRSPowersScreen.isActionBarSlotEmpty(slot: integer): boolean;
 begin
-  if (not self.open()) then
-  begin
-    print('powersScreen.isActionBarSlotEmpty(): Can''t return result as Powers screen isn''t open', TDebug.ERROR);
-    exit(false);
-  end;
-
   result := (getColor(self.getActionBarSlotBox(slot).getMiddle().x, self.getActionBarSlotBox(slot).getMiddle().y) = 2761233);
-
   print('powersScreen.isActionBarSlotEmpty() slot ' + toStr(slot) + ' result: ' + boolToStr(result));
 end;
 
@@ -870,18 +858,11 @@ var
   i: integer;
   b: TBoxArray := self.getActionBarSlotBoxes();
 begin
-  if (not self.open()) then
-  begin
-    print('powersScreen.isActionBarEmpty(): Can''t return result as Powers screen isn''t open', TDebug.ERROR);
-    exit(false);
-  end;
-
   for i := 1 to high(b) do
     if not self.isActionBarSlotEmpty(i) then
       exit(false);
 
   result := true;
-  print('powersScreen.isActionBarEmpty() result: ' + boolToStr(result));
 end;
 
 (*
@@ -911,12 +892,6 @@ function TRSPowersScreen.clearActionBar(): boolean;
 var
   t: LongWord;
 begin
-  if (not self.open()) then
-  begin
-    print('powersScreen.clearActionBar(): Can''t clear as Powers screen isn''t open', TDebug.ERROR);
-    exit(false);
-  end;
-
   if self.isActionBarEmpty() then
   begin
     print('powersScreen.clearActionBar(): Action Bar is already empty!', TDebug.HINT);
@@ -1056,7 +1031,7 @@ begin
   while (not result) and (i < 3) do
   begin
     gaussBox(p, self.getActionBarSlotBox(slot));
-    mouseBox(self._getAbilitySlotBox(ability[2]));
+    mouseBox(self.getAbilitySlotBox(ability[2]));
     wait(randomRange(176, 387));
     dragMouse(p);
     t := getSystemTime() + randomRange(1788, 2895);
@@ -1075,8 +1050,8 @@ begin
 end;
 
 (*
-TRSPowersScreen._getExperienceBox
-~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+TRSPowersScreen.__getExperienceBox
+~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
 
 .. code-block:: pascal
 
@@ -1094,27 +1069,22 @@ Example:
 
 .. code-block:: pascal
 
-    box := powersScreen._getExperienceBox(TYPE_RANGED_AND_DEFENCE);
+    box := powersScreen.__getExperienceBox(TYPE_RANGED_AND_DEFENCE);
 
 *)
-function TRSPowersScreen._getExperienceBox(combatStyle, experienceType: integer): TBox;
+{$IFNDEF CODEINSIGHT}
+function TRSPowersScreen.__getExperienceBox(combatStyle, experienceType: integer): TBox;
 var
   startPoint: TPoint;
 begin
-  if (not self.open()) then
-  begin
-    print('powersScreen._getExperienceBox(): Can''t return box as powers screen isn''t open', TDebug.ERROR);
-    exit;
-  end;
-
   case combatStyle of
-    1: startPoint := point(self.x1 + 569, self.y1 + 216);
-    2: startPoint := point(self.x1 + 569, self.y1 + 299);
-    3: startPoint := point(self.x1 + 569, self.y1 + 380);
+    1: startPoint := point(self.x1 + 573, self.y1 + 213);
+    2: startPoint := point(self.x1 + 573, self.y1 + 295);
+    3: startPoint := point(self.x1 + 573, self.y1 + 375);
   end;
-
   result := gridBox(experienceType - 1, 2, 2, 60, 13, 110, 20, startPoint);
 end;
+{$ENDIF}
 
 (*
 TRSPowersScreen.getCombatExperience
@@ -1144,12 +1114,6 @@ function TRSPowersScreen.getCombatExperience(combatStyle: integer): integer;
 var
   i: integer;
 begin
-  if (not self.open()) then
-  begin
-    print('powersScreen.getCombatExperience(): Can''t get experience type as powers screen isn''t open', TDebug.ERROR);
-    exit;
-  end;
-
   if (not self.openTab(POWERS_TAB_SETTINGS)) then
   begin
     print('powersScreen.getCombatExperience(): Can''t open the Settings Tab', TDebug.ERROR);
@@ -1157,7 +1121,7 @@ begin
   end;
 
   for i := 1 to 4 do                   // the yellow circular button
-    if (countColorTolerance(6341348, self._getExperienceBox(combatStyle, i), 72) > 10) then
+    if (countColorTolerance(6341348, self.__getExperienceBox(combatStyle, i), 72) > 10) then
     begin
       result := i;
       break;
@@ -1219,7 +1183,7 @@ begin
 
   t := getSystemTime() + randomRange(3500, 4500);
   repeat
-    mouseBox(self._getExperienceBox(combatStyle, experienceType), MOUSE_LEFT);
+    mouseBox(self.__getExperienceBox(combatStyle, experienceType), MOUSE_LEFT);
     wait(randomRange(987, 1668));
     if self.getCombatExperience(combatStyle) = experienceType then
     begin
@@ -1232,12 +1196,12 @@ begin
 end;
 
 (*
-TRSPowersScreen._getCombatModeBox
-~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+TRSPowersScreen.__getCombatModeBox
+~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
 
 .. code-block:: pascal
 
-    function TRSPowersScreen.getCombatModeBox(combatMode: integer): TBox;
+    function TRSPowersScreen.__getCombatModeBox(combatMode: integer): TBox;
 
 Returns the TBox of the desired Combat Mode. This function is only really
 used in the functions below.
@@ -1254,18 +1218,12 @@ Example:
     box := powersScreen._getCombatModeBox(MODE_REVOLUTION);
 
 *)
-function TRSPowersScreen._getCombatModeBox(combatMode: integer): TBox;
-var
-  startPoint: TPoint;
+{$IFNDEF CODEINSIGHT}
+function TRSPowersScreen.__getCombatModeBox(combatMode: integer): TBox;
 begin
-  if (not self.open()) then
-  begin
-    print('powersScreen._getExperienceBox(): Can''t return box as powers screen isn''t open', TDebug.ERROR);
-    exit;
-  end;
-
   result := gridBox(combatMode - 1, 1, 3, 140, 40, 0, 60, point(self.x + 170, self.y + 205));
 end;
+{$ENDIF}
 
 (*
 TRSPowersScreen.getCombatMode()
@@ -1294,12 +1252,6 @@ function TRSPowersScreen.getCombatMode(): integer;
 var
   i: integer;
 begin
-  if (not self.open()) then
-  begin
-    print('powersScreen.getCombatExperience(): Can''t get experience type as powers screen isn''t open', TDebug.ERROR);
-    exit;
-  end;
-
   if (not self.openTab(POWERS_TAB_SETTINGS)) then
   begin
     print('powersScreen.getCombatExperience(): Can''t open the Settings Tab', TDebug.ERROR);
@@ -1307,7 +1259,7 @@ begin
   end;
 
   for i := 1 to 3 do                   // the yellow slider button
-    if (countColorTolerance(4044260, self._getCombatModeBox(i), 59) > 15) then
+    if (countColorTolerance(4044260, self.__getCombatModeBox(i), 59) > 15) then
     begin
       result := i;
       break;
@@ -1362,7 +1314,7 @@ begin
 
   t := getSystemTime() + randomRange(3500, 4500);
   repeat
-    mouseBox(self._getCombatModeBox(combatMode), MOUSE_LEFT);
+    mouseBox(self.__getCombatModeBox(combatMode), MOUSE_LEFT);
     wait(randomRange(987, 1668));
     if self.getCombatMode() = combatMode then
     begin
