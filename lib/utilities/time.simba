@@ -517,4 +517,38 @@ begin
     Result := getTickCount64() - Self.startTime;
 end;
 
+(* 
+tCountDown
+~~~~~~~~~~
+
+.. code-block:: pascal
+    
+    type
+        tCountDown = uInt32;
+
+Timer type which is usefull for loops, timing and writing progress reports.
+
+.. note::
+
+    - by Obscurity
+*)
+type
+  tCountDown = uInt32;
+
+function tCountDown.setTime(funcTime: uInt32): uInt32;
+begin
+  exit(self := getSystemTime() + funcTime);
+end;
+
+function tCountDown.timeRemaining(): uInt32;
+begin
+  if not self.isFinished() then
+    exit(self - getSystemTime());
+end;
+
+function tCountDown.isFinished(): boolean;
+begin
+  exit(getSystemTime() >= self);
+end;
+
 {$f+}
