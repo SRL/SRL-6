@@ -114,7 +114,7 @@ begin
 
   for i := 0 to high(ATPA) do
   begin
-    writeLn(atpa[i].getBounds());
+    //writeLn(atpa[i].getBounds());
 
     b := ATPA[i].getBounds();
 
@@ -172,7 +172,6 @@ begin
       break();
     end;
   until (getSystemTime() >= t);
-
   print('TRSGrandExchange.isOpen(): Result = ' + boolToStr(result));
 end;
 
@@ -352,7 +351,7 @@ Internal function which returns a TBoxArray of the 6 Grand Exchange slots.
 .. note::
 
     - by The Mayor
-    - Last Updated: 6 July 2015 by The Mayor
+    - Last Updated: 27 July 2015 by Clarity
 
 Example:
 
@@ -363,14 +362,12 @@ Example:
 *)
 function TRSGrandExchange._getSlotBoxes(): TBoxArray;
 const
-  __GE_SLOT_OFFSET: TPoint = [100, 207]; // From self(x1, y1) to middle of first GE slot
+  __GE_SLOT_OFFSET: TPoint = [104, 213]; // From self(x1, y1) to middle of first GE slot
 var
   tba: TBoxArray;
 begin
-  tba := grid(3, 3, 169, 121, 181, 127, point(self.x1 + __GE_SLOT_OFFSET.x, self.y1 + __GE_SLOT_OFFSET.y));
+  tba := grid(3, 3, 169, 121, 177, 128, point(self.x1 + __GE_SLOT_OFFSET.x, self.y1 + __GE_SLOT_OFFSET.y));
   tba.deleteIndex(8);
-  tba[6].offset([90, 0]);
-  tba[7].offset([91, 0]);
   result := tba;
 end;
 
@@ -387,7 +384,7 @@ Internal function which returns a TBoxArray of the Grand Exchange buy boxes.
 .. note::
 
     - by The Mayor
-    - Last Updated: 6 July 2015 by The Mayor
+    - Last Updated: 27 July 2015 by Clarity
 
 Example:
 
@@ -398,14 +395,12 @@ Example:
 *)
 function TRSGrandExchange._getBuyBoxes(): TBoxArray;
 const
-  __BUY_OFFSET: TPoint = [70, 217]; // From self(x1, y1) to middle of first buy button
+  __BUY_OFFSET: TPoint = [74, 223]; // From self(x1, y1) to middle of first buy button
 var
   tba: TBoxArray;
 begin
-  tba := grid(3, 3, 44, 44, 181, 127, point(self.x1 + __BUY_OFFSET.x, self.y1 + __BUY_OFFSET.y));
+  tba := grid(3, 3, 44, 44, 177, 128, point(self.x1 + __BUY_OFFSET.x, self.y1 + __BUY_OFFSET.y));
   tba.deleteIndex(8);
-  tba[6].offset([90, 0]);
-  tba[7].offset([91, 0]);
   result := tba;
 end;
 
@@ -422,7 +417,7 @@ Internal function which returns a TBoxArray of the Grand Exchange sell boxes.
 .. note::
 
     - by The Mayor
-    - Last Updated: 6 July 2015 by The Mayor
+    - Last Updated: 27 July 2015 by Clarity
 
 Example:
 
@@ -431,19 +426,6 @@ Example:
     tba := grandExchange._getSellBoxes();
 
 *)
-function TRSGrandExchange._getSellBoxes(): TBoxArray;
-const
-  __SELL_OFFSET: TPoint = [130, 217]; // From self(x1, y1) to middle of first sell button
-var
-  tba: TBoxArray;
-begin
-  tba := grid(3, 3, 44, 44, 181, 127, point(self.x1 + __SELL_OFFSET.x, self.y1 + __SELL_OFFSET.y));
-  tba.deleteIndex(8);
-  tba[6].offset([90, 0]);
-  tba[7].offset([91, 0]);
-  result := tba;
-end;
-
 function TRSGrandExchange.__getInputBoxes(): TBoxArray;
 var
   TPA: TPointArray;
@@ -453,6 +435,7 @@ begin
   if findColors(TPA, 1388125, self.getBounds()) then
   begin
     ATPA := TPA.cluster(1);
+    ATPA.sortFromMidPoint(point(290, 238));
     result := ATPA.getEachBounds();
   end;
 end;
@@ -470,7 +453,7 @@ Internal function which returns if the offer screen is open or not.
 .. note::
 
     - by The Mayor
-    - Last Updated: 10 July 2015 by The Mayor
+    - Last Updated: 27 July 2015 by Clarity
 
 Example:
 
@@ -483,15 +466,13 @@ function TRSGrandExchange._isOfferOpen(waitTime: integer = 500): boolean;
 var
   timeOut: UInt64;
   TPA: TPointArray;
-  ATPA: T2DPointArray;
 begin
   timeOut := getTickCount64() + waitTime;
 
   while (getTickCount64() < timeOut) do
-    if findColors(TPA, 9998984, self.getBounds()) then
+    if findColors(TPA, 6247745, self.getBounds()) then
     begin
-      ATPA := TPA.cluster(1);
-      if (length(ATPA) = 6) then
+      if (length(TPA) = 2862) then
         exit(true);
     end;
 end;
@@ -509,7 +490,7 @@ Internal function which returns if the GE progress screen is open or not.
 .. note::
 
     - by The Mayor
-    - Last Updated: 10 July 2015 by The Mayor
+    - Last Updated: 27 July 2015 by Clarity
 
 Example:
 
@@ -521,13 +502,16 @@ Example:
 function TRSGrandExchange._isProgressOpen(waitTime: integer = 500): boolean;
 var
   timeOut: integer;
+  TPA: TPointArray;
 begin
   timeOut := getTickCount64() + waitTime;
 
-  while getTickCount64() < timeOut do
-    if (not self._isOfferOpen(100)) then
-      if (length(self.__getInputBoxes()) = 2) then
+  while (getTickCount64() < timeOut) do
+    if findColors(TPA, 6247745, self.getBounds()) then
+    begin
+      if (length(TPA) = 3501) then
         exit(true);
+    end;
 end;
 
 (*
@@ -592,7 +576,7 @@ begin
   if self._isSlotActive(geSlot) then
   begin
     findColors(TPA, 3088905, TBA[geSlot - 1]);
-    writeLn(length(TPA));
+    //writeLn(length(TPA));
     result := length(TPA) > 10000;
   end;
 
@@ -728,50 +712,41 @@ begin
 end;
 
 (*
-TRSGrandExchange.__findTypeBox
-~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+TRSGrandExchange.__findInsertionCursor
+~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
 
 .. code-block:: pascal
 
-    TRSGrandExchange.__findTypeBox(var box: TBox; waitTime: integer = 4000): boolean;
+    TRSGrandExchange.__findInsertionCursor(searchBox: TBox; waitTime: integer = 4000): boolean;
 
-Internal function which waits for the typing box to appear, and returns it's
-bounds in 'box' variable.
+Internal function which waits for the insertion cursor to appear within the given searchBox,
+returning true when found.
 
 .. note::
 
-    - by The Mayor
-    - Last Updated: 15 January 2015 by The Mayor
+    - by Clarity
+    - Last Updated: 27 July 2015 by Clarity
 
 Example:
 
 .. code-block:: pascal
 
-    grandExchange.__findTypBox(b);
+    grandExchange.__findInsertionCursor(b);
 
 *)
 {$IFNDEF CODEINSIGHT}
-function TRSGrandExchange.__findTypeBox(var box: TBox; waitTime: integer = 4000): boolean;
+function TRSGrandExchange.__findInsertionCursor(searchBox: TBox; waitTime: integer = 4000): boolean;
 var
   timeOut: UInt64;
   TPA: TPointArray;
-  ATPA: T2DPointArray;
 begin
   timeOut := getTickCount64() + waitTime;
 
   while getTickCount64() < timeOut do
   begin
-    findColorsTolerance(TPA, 9086905, getClientBounds(), 64);
-    if length(TPA) < 50 then
-      continue();
-    ATPA := TPA.cluster(6);
-    ATPA.sortBySize(true);
-
-    if inRange(ATPA[0].getBounds().getWidth(), 480, 510) then
-    begin
-      box := ATPA[0].getBounds();
+    findColors(TPA, 14606050, searchBox);
+    if length(TPA) > 0 then
       exit(true);
-    end;
   end;
 end;
 {$ENDIF}
@@ -789,7 +764,7 @@ Internal function which enters the desired item quantity into the input box.
 .. note::
 
     - by The Mayor
-    - Last Updated: 15 January 2015 by The Mayor
+    - Last Updated: 27 July 2015 by Clarity
 
 Example:
 
@@ -802,9 +777,9 @@ Example:
 procedure TRSGrandExchange._enterQuantity(quantity: string);
 var
   i: integer;
-  b: TBox;
   strArr : TStringArray;
-  amountBox: TboxArray := grid(5, 1, 34, 24, 41, 0, point(self.x1 + 65, self.y1 + 214));
+  inputBox: TBoxArray;
+  amountBox: TBoxArray := grid(4, 1, 34, 24, 44, 0, point(self.x1 + 84, self.y1 + 308));
 begin
   strArr := ['1', '10', '100', 'all'];
 
@@ -812,14 +787,18 @@ begin
     if lowerCase(quantity) = strArr[i] then
       break();
 
-  mouseBox(amountBox[i], MOUSE_LEFT);
-
-  if i = 4 then
-    if self.__findTypeBox(b) then
+  if i <> 4 then
+    mouseBox(amountBox[i], MOUSE_LEFT)
+  else
+  begin
+    inputBox := self.__getInputBoxes();
+    mouseBox(inputBox[0], MOUSE_LEFT);
+    if self.__findInsertionCursor(inputBox[0]) then
     begin
       typeSend(toStr(quantity), true);
       wait(randomRange(1000, 1500));
     end;
+  end;
 end;
 
 (*
@@ -835,7 +814,7 @@ Internal function which enters the desired buy or sell price into the input box.
 .. note::
 
     - by The Mayor
-    - Last Updated: 15 January 2015 by The Mayor
+    - Last Updated: 27 July 2015 by Clarity
 
 Example:
 
@@ -848,34 +827,31 @@ Example:
 *)
 procedure TRSGrandExchange._enterPrice(price: string);
 var
-  i, j: integer;
+  i: integer;
   b: TBox;
   strArr : TStringArray;
-  priceBox, tmp: TboxArray;
+  priceBox, inputBox: TBoxArray;
 begin
-  priceBox := grid(2, 1, 34, 24, 56, 0, point(self.x1 + 282, self.y1 + 214));
-  tmp := priceBox.copy();   // Copying the first 2 price boxes due to offset
-  tmp.offset([97, 0]);
-  priceBox.combine(tmp);
+  priceBox := grid(3, 1, 34, 24, 45, 0, point(self.x1 + 367, self.y1 + 309));
 
-  strArr := ['-5', 'mid', price, '+5'];
+  strArr := ['-5', 'mid', '+5'];
 
-  for j := 0 to high(strArr) do
-    if lowerCase(price) = strArr[j] then
-    begin
-      i := j;
-      if j <> 2 then break();
-    end;
+  for i := 0 to high(strArr) do
+    if lowerCase(price) = strArr[i] then
+      break();
 
-  if i <> 1 then      // Don't click mid button as it's set by default
-    mouseBox(priceBox[i], MOUSE_LEFT);
-
-  if i = 2 then
-    if self.__findTypeBox(b) then
+  if (i <> 3) and (i <> 1) then  // Don't click mid button as it's set by default
+    mouseBox(priceBox[i], MOUSE_LEFT)
+  else
+  begin
+    inputBox := self.__getInputBoxes();
+    mouseBox(inputBox[1], MOUSE_LEFT);
+    if self.__findInsertionCursor(inputBox[1]) then
     begin
       typeSend(toStr(price), true);
       wait(randomRange(1000, 1500));
     end;
+  end;
 end;
 
 (*
@@ -891,7 +867,7 @@ Internal function which enters the item name into the search box, and clicks it.
 .. note::
 
     - by The Mayor
-    - Last Updated: 10 March 2015 by The Mayor
+    - Last Updated: 27 July 2015 by Clarity
 
 Example:
 
@@ -902,32 +878,35 @@ Example:
 *)
 procedure TRSGrandExchange._enterName(itemName: string);
 const
-  TESS_FILTER_GE_CHARS: TTesseractFilter = [3, 3, [true, -38, TM_Mean]];
+  TESS_FILTER_GE_CHARS: TTesseractFilter = [4, 4, [False, 20, TM_Mean]];
 var
-  x, y: integer;
-  b: TBox;
+  i: integer;
   timeOut: UInt64;
+  resultsBox, resultsTextBox, inputBox: TBoxArray;
 begin
   timeOut := getTickCount64() + randomRange(3000, 4000);
+  inputBox := self.__getInputBoxes();
+  resultsBox := grid(3, 2, 166, 49, 172, 55, point(self.x1 + 104, self.y1 + 415));
+  resultsTextBox := grid(3, 2, 122, 16, 172, 55, point(self.x1 + 121, self.y1 + 406));
 
-  if not self.__findTypeBox(b) then
-    exit();
+  if not self.__findInsertionCursor(inputBox[2]) then
+    mouseBox(inputBox[2], MOUSE_LEFT);
 
-  b.edit(61, 0, -15, -115); // Isolate the results box
-  typeSend(itemName, false);
+  if self.__findInsertionCursor(inputBox[2]) then
+    typeSend(itemName, false);
 
-  if waitColorCountRange(482978, 9, b, 5000, 10) then
-    for 1 to 7 do
-      if stringMatch(trim(tesseractGetText(b, TESS_FILTER_GE_CHARS)), itemName) >= 0.8 then
+  if waitColorCountRange(9214319, 10, resultsTextBox[0], 5000, 10) then
+    for i := 0 to 5 do
+    begin
+    writeln(trim(tesseractGetText(resultsTextBox[i], TESS_FILTER_GE_CHARS)));
+    writeln(stringMatch(trim(tesseractGetText(resultsTextBox[i], TESS_FILTER_GE_CHARS)), itemName));
+      if stringMatch(trim(tesseractGetText(resultsTextBox[i], TESS_FILTER_GE_CHARS)), itemName) >= 0.7 then
       begin
-        mouseBox(b, MOUSE_LEFT);
-        timeOut := getTickCount64() + randomRange(3000, 4000);
-
-        while getTickCount64() < timeOut do
-          if (not self.__findTypeBox(b, 100)) then
-            break();
-      end else
-        b.offset([0, 15]);
+        mouseBox(resultsBox[i], MOUSE_LEFT);
+        waitColorCountRange(16777215, 3, inputBox[2], 5000, 507, 509);
+        break();
+      end;
+    end;
 end;
 
 (*
@@ -944,7 +923,7 @@ the back arrow to return to the summary screen.
 .. note::
 
     - by The Mayor
-    - Last Updated: 16 January 2015 by The Mayor
+    - Last Updated: 27 July 2015 by Clarity
 
 Example:
 
@@ -955,7 +934,7 @@ Example:
 *)
 procedure TRSGrandExchange._returnToSummary();
 var
-  backButton: TPoint := [self.x1 + 40, self.y1 + 290];
+  backButton: TPoint := [self.x1 + 33, self.y1 + 515];
   timeOut: UInt64;
 begin
   if self._isOfferOpen() or self._isProgressOpen() then
@@ -985,7 +964,7 @@ Collects items and/or money from a completed or aborted offer slot.
 .. note::
 
     - by The Mayor
-    - Last Updated: 12 March 2015 by The Mayor
+    - Last Updated: 27 July 2015 by Clarity
 
 Example:
 
@@ -997,7 +976,7 @@ Example:
 function TRSGrandExchange.collectSlot(geSlot: integer): boolean;
 var
   TBA: TBoxArray := self._getSlotBoxes();
-  collectBox: TBoxArray := grid(2, 1, 37, 32, 49, 0, point(self.x1 + 418, self.y1 + 297));
+  collectBox: TBoxArray := grid(2, 1, 37, 32, 49, 0, point(self.x1 + 465, self.y1 + 394));
   timeOut: UInt64;
   i: integer;
 begin
@@ -1104,7 +1083,7 @@ Collects all items/gold to either the inventory or the bank (via the buttons).
 .. note::
 
     - by The Mayor
-    - Last Updated: 12 April 2015 by The Mayor
+    - Last Updated: 27 July 2015 by Clarity
 
 Example:
 
@@ -1115,11 +1094,11 @@ Example:
 *)
 procedure TRSGrandExchange.collectAllSlots(ToInventory: boolean = true);
 const
-  _OFFSET: TPoint = [130, 307];
+  _OFFSET: TPoint = [653, 481];
 var
   TBA: TBoxArray;
 begin
-  TBA := grid(2, 1, 180, 20, 240, 0, point(self.x1 + _OFFSET.x, self.y1 + _OFFSET.y));
+  TBA := grid(1, 2, 180, 20, 0, 36, point(self.x1 + _OFFSET.x, self.y1 + _OFFSET.y));
   case ToInventory of
     true: multiClick(TBA[0].getMiddle().rand(5), 25, 3);
     false: multiClick(TBA[1].getMiddle().rand(5), 25, 3);
@@ -1140,7 +1119,7 @@ will also collect the items/gold from the aborted offer slot.
 .. note::
 
     - by The Mayor
-    - Last Updated: 12 March 2015 by The Mayor
+    - Last Updated: 27 July 2015 by Clarity
 
 Example:
 
@@ -1153,8 +1132,8 @@ Example:
 function TRSGrandExchange.abortSlot(geSlot: integer; collect: boolean = true): boolean;
 var
   TBA: TBoxArray := self._getSlotBoxes();
-  abortButton: TPoint := [self.x1 + 355, self.y1 + 282];
-  redBox: TBox := [self.x1 + 67, self.y1 + 300, self.x1 + 364, self.y1 + 312];
+  abortButton: TPoint := [self.x1 + 402, self.y1 + 383];
+  redBox: TBox := [self.x1 + 29, self.y1 + 404, self.x1 + 423, self.y1 + 410];
 begin
   if not self.isOpen() then
   begin
@@ -1302,7 +1281,7 @@ The 'quantity' parameter is a string; valid options are:
 .. note::
 
     - by The Mayor
-    - Last Updated: 12 March 2015 by The Mayor
+    - Last Updated: 27 July 2015 by Clarity
 
 Example:
 
@@ -1321,7 +1300,7 @@ Example:
 function TRSGrandExchange.sellItem(packSlot: integer; price, quantity: string; waitCollect: boolean = false; waitTime: integer = 10000): boolean;
 var
   i, nextSlot: integer;
-  confirm: TBox := [self.x1 + 180, self.y1 + 287, self.x1 + 323, self.y1 + 307];
+  confirm: TBox := [self.x1 + 212, self.y1 + 504, self.x1 + 350, self.y1 + 525];
 begin
   if not self.isOpen() then
   begin
@@ -1396,7 +1375,7 @@ The 'quantity' parameter is a string; valid options are:
 .. note::
 
     - by The Mayor
-    - Last Updated: 12 March 2015 by The Mayor
+    - Last Updated: 27 July 2015 by Clarity
 
 Example:
 
@@ -1417,7 +1396,7 @@ var
   i, nextSlot, x, y: integer;
   b: TBox;
   TBA : TBoxArray := self._getBuyBoxes();
-  confirm: TBox := [self.x1 + 180, self.y1 + 287, self.x1 + 323, self.y1 + 307];
+  confirm: TBox := [self.x1 + 212, self.y1 + 504, self.x1 + 350, self.y1 + 525];
 begin
   if not self.isOpen() then
   begin
