@@ -426,6 +426,17 @@ Example:
     tba := grandExchange._getSellBoxes();
 
 *)
+function TRSGrandExchange._getSellBoxes(): TBoxArray;
+const
+  __SELL_OFFSET: TPoint = [134, 223]; // From self(x1, y1) to middle of first sell button
+var
+  tba: TBoxArray;
+begin
+  tba := grid(3, 3, 44, 44, 177, 128, point(self.x1 + __SELL_OFFSET.x, self.y1 + __SELL_OFFSET.y));
+  tba.deleteIndex(8);
+  result := tba;
+end;
+
 function TRSGrandExchange.__getInputBoxes(): TBoxArray;
 var
   TPA: TPointArray;
