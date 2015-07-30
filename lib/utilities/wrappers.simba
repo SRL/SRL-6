@@ -9,6 +9,12 @@ The source for this file can be found `here <https://github.com/SRL/SRL-6/blob/m
 
 *)
 
+procedure mouseMove(p: TPoint); overload;   
+begin  
+	MouseMove(p.x, p.y);  
+end;  
+
+
 {$f-}
 
 (*
