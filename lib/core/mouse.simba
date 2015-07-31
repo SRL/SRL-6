@@ -431,7 +431,7 @@ Example:
 *)
 procedure moveMouse(p: TPoint); overload;
 begin
-  moveMouse(p.x p.y);
+  moveMouse(p.x, p.y);
 end;
 
 (*
