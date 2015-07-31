@@ -409,6 +409,32 @@ begin
 end;
 
 (*
+moveMouse overload
+~~~~~~~~~~~~~~~~~~
+
+.. code-block:: pascal
+
+    procedure moveMouse(p: TPoint);
+
+An overloaded MoveMouse which takes a TPoint. Useful for when you want to teleport
+the mouse.
+
+.. note::
+
+    - by Thomas
+
+Example:
+
+.. code-block:: pascal
+
+    moveMouse(p)
+*)
+procedure moveMouse(p: TPoint); overload;
+begin
+  moveMouse(p.x p.y);
+end;
+
+(*
 missMouse
 ~~~~~~~~~
 
