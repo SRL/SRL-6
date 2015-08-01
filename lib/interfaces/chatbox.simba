@@ -33,7 +33,7 @@ var
   chatbox: TRSChatbox;
 
 const
-  CHATBOX_TESSERACT_FILTER: TTesseractFilter = [3, 3, [false, 35, TM_Mean]];
+  CHATBOX_TESSERACT_FILTER: TTesseractFilter = [3, 3, [False, 35, TM_Mean]];
 
 {*
 TRSChatbox.__init
@@ -82,7 +82,7 @@ Sets up the chat box variables.
 .. note::
 
     - by Olly
-    - Last Updated: 17 October 2013 by Olly
+    - Last Updated: 1 August 2013 by The Mayor
 
 Example:
 
@@ -106,7 +106,7 @@ begin
   for i := 0 to 10 do
   begin
     p.y := 568 - (i * 14);
-    b := [chatBounds.x1, p.y-9, chatBounds.x2, p.y+9];
+    b := [chatBounds.x1, p.y - 7, chatBounds.x2, p.y + 7];
 
     if (b.y1 < chatBox.getChatArea().y1) then
       break();
