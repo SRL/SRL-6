@@ -3,9 +3,9 @@ HeroScreen
 =============
 
 The heroscreen file holds functions and procedures that are used to interact
-with the Runescape Hero Screen
+with the Runescape Hero Screen.
 
-The source for this file can be found here <https://github.com/SRL/SRL-6/blob/master/lib/interfaces/heroscreen.simba>
+The source for this file can be found `here <https://github.com/SRL/SRL-6/blob/master/lib/interfaces/heroscreen.simba>`_.
 
 *)
 
@@ -22,8 +22,8 @@ type
   TRSHeroScreen = type TRSInterface;
 
 (*
-var grandExchange
-~~~~~~~~~~~~~~~~~
+var heroScreen
+~~~~~~~~~~~~~~
 
 Variable that stores functions and properties of the Runescape Hero Screen interface.
 *)
@@ -32,19 +32,19 @@ var
   heroScreen: TRSHeroScreen;
 
 {*
-TRSHeroScreen.__init
-~~~~~~~~~~~~~~~~~~~~~~~
+.__init
+~~~~~~~
 
 .. code-block:: pascal
 
-    procedure TRSHeroScreen.__init();;
+    procedure TRSHeroScreen.__init();
 
 Initializes the TRSHeroScreen.
 
 .. note::
 
     - by The Mayor
-    - Last Updated: 17th January 2015 by The Mayor
+    - Last Updated: 17 January 2015 by The Mayor
 
 Example:
 
@@ -67,15 +67,15 @@ end;
 {$ENDIF}
 
 (*
-TRSHeroScreen.__find
-~~~~~~~~~~~~~~~~~~~~~~~
+.__find
+~~~~~~~
 
 .. code-block:: pascal
 
     function TRSHeroScreen.__find(): boolean;
 
 Returns true if the Hero Screen interface is detected, and sets
-the interface's bounds (fully dynamic).
+the interface's bounds.
 
 .. note::
 
@@ -86,7 +86,7 @@ Example:
 
 .. code-block:: pascal
 
-    if (heroScreene.__find()) then
+    if heroScreen.__find() then
       writeln('bounds are set!');
 *)
 {$IFNDEF CODEINSIGHT}
@@ -127,8 +127,8 @@ end;
 {$ENDIF}
 
 (*
-TRSHeroScreen.isOpen
-~~~~~~~~~~~~~~~~~~~~~~~
+.isOpen
+~~~~~~~
 
 .. code-block:: pascal
 
@@ -147,7 +147,7 @@ Example:
 
 .. code-block:: pascal
 
-    if (heroScreen.isOpen()) then
+    if heroScreen.isOpen() then
       writeln('It''s open!');
 
 *)
@@ -169,8 +169,8 @@ begin
 end;
 
 (*
-TRSHeroScreen.open
-~~~~~~~~~~~~~~~~~~~~
+.open
+~~~~~
 
 .. code-block:: pascal
 
@@ -187,7 +187,7 @@ Example:
 
 .. code-block:: pascal
 
-    if (heroScreen.open()) then
+    if heroScreen.open() then
       writeln('We opened the hero screen');
 
 *)
@@ -216,8 +216,8 @@ begin
 end;
 
 (*
-TRSHeroScreen.close
-~~~~~~~~~~~~~~~~~~~~~~
+.close
+~~~~~~
 
 .. code-block:: pascal
 

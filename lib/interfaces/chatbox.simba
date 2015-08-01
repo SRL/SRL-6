@@ -117,8 +117,8 @@ end;
 {$ENDIF}
 
 (*
-TRSChatbox.getChatArea
-~~~~~~~~~~~~~~~~~~~~~~
+.getChatArea
+~~~~~~~~~~~~
 
 .. code-block:: pascal
 
@@ -135,7 +135,7 @@ Example:
 
 .. code-block:: pascal
 
-    area := chatbox.getCharArea();
+    area := chatbox.getChatArea();
 *)
 function TRSChatbox.getChatArea(): TBox;
 begin
@@ -143,14 +143,14 @@ begin
 end;
 
 (*
-TRSChatbox.findAnyText
-~~~~~~~~~~~~~~~~~~~~~~
+.findAnyText
+~~~~~~~~~~~~
 
 .. code-block:: pascal
 
     function TRSChatbox.findAnyText(txt: TStringArray): boolean;
 
-Initiates the chatbox variable.
+Returns true is any of the text in 'txt' is found anywhere in the chat box.
 
 .. note::
 
@@ -166,15 +166,33 @@ Example:
 function TRSChatbox.findText(txt: TStringArray; const Filter: TTesseractFilter = CHATBOX_TESSERACT_FILTER): boolean;
 var
   s: string;
-  b: TBox;
 begin
-  b := Self.getChatArea();
-  s := Tesseract_GetText(b.x1, b.y1, b.x2, b.y2, Filter);
-
-  if (length(s) > 1) then
-    result := IsArrInStr(txt, s);
+  s := Tesseract_GetText(Self.getChatArea(), Filter);
+  if (length(s) > 1) then result := IsArrInStr(txt, s);
 end;
 
+(*
+.getTextOnLine
+~~~~~~~~~~~~~~
+
+.. code-block:: pascal
+
+    function TRSChatbox.getTextOnLine(Line: Integer; Filter: TTesseractFilter = CHATBOX_TESSERACT_FILTER): String;
+
+Returns the string of text on chatbox line 'Line'. Has the option to change the
+tesseract filter. The bottom line is 0, working upwards.
+
+.. note::
+
+    - by Olly
+    - Last Updated: 17 October 2013 by Olly
+
+Example:
+
+.. code-block:: pascal
+
+    writeLn(chatbox.getTextOnLine(0));
+*)
 function TRSChatbox.getTextOnLine(Line: Integer; Filter: TTesseractFilter = CHATBOX_TESSERACT_FILTER): String;
 begin
   if (not inRange(Line, Low(Self.lineBoxes), High(Self.lineBoxes))) then
@@ -185,15 +203,15 @@ begin
 end;
 
 (*
-TRSChatbox.findTextOnLines
-~~~~~~~~~~~~~~~~~~~~~~~~~~
+.findTextOnLines
+~~~~~~~~~~~~~~~~
 
 .. code-block:: pascal
 
     function TRSChatbox.findTextOnLines(txt: TStringArray; lines: TIntegerArray): boolean;
 
-Returns true if the text in 'txt' is found on the 'lines' of the chatbox.  The
-lines start with 0 being the bottom chat line.
+Returns true if the text in 'txt' is found on the lines 'lines' of the chatbox.
+The bottom line is 0, working upwards.
 
 .. note::
 
@@ -225,6 +243,28 @@ begin
   end;
 end;
 
+(*
+.getXPBar
+~~~~~~~~~
+
+.. code-block:: pascal
+
+    function TRSChatbox.getXPBar(): Integer;
+
+Returns the XP from the XP bar when it is placed in the top right corner of
+the chatbox.
+
+.. note::
+
+    - by Ashaman88
+    - Last Updated: Some time in 2014 by Olly
+
+Example:
+
+.. code-block:: pascal
+
+    startXP := chatbox.getXPBar();
+*)
 function TRSChatbox.getXPBar(): Integer;
 const
   Filter: TTesseractFilter = [5, 5, [False, 30, TM_Mean]];

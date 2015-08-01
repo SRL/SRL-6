@@ -17,6 +17,9 @@ const Collect Buttons
 
 Integer constants that represent the order of the collect buttons.
 
+    * COLLECT_BUTTON_BANK
+    * COLLECT_BUTTON_INV
+
 *)
 const
   COLLECT_BUTTON_BANK = 0;
@@ -36,24 +39,17 @@ var collectbox
 ~~~~~~~~~~~~~~
 
 The variable used to call collect box functions, procedures and attributes.
-
-Example:
-
-.. code-block:: pascal
-
-    if (collectbox.isOpen()) then
-      writeln('Collectionbox is open');
 *)
 var
   collectbox: TRSCollectBox;
 
 {*
-TRSCollectBox.__init
-~~~~~~~~~~~~~~~~~~~~
+.__init
+~~~~~~~
 
 .. code-block:: pascal
 
-    procedure TRSCollectBox.__init
+    procedure TRSCollectBox.__init;
 
 Initializes the TRSCollectBox.
 
@@ -67,7 +63,6 @@ Example:
 .. code-block:: pascal
 
     collectbox.__init();
-
 *}
 {$IFNDEF CODEINSIGHT}
 procedure TRSCollectBox.__init();
@@ -83,8 +78,8 @@ end;
 {$ENDIF}
 
 (*
-TRSCollectBox.__find
-~~~~~~~~~~~~~~~~~~~~
+.__find
+~~~~~~~
 
 .. code-block:: pascal
 
@@ -101,7 +96,7 @@ Example:
 
 .. code-block:: pascal
 
-    if (collectbox.__find()) then
+    if collectbox.__find() then
       writeln('bounds are set!');
 *)
 {$IFNDEF CODEINSIGHT}
@@ -141,8 +136,8 @@ end;
 {$ENDIF}
 
 (*
-TRSCollectBox.isOpen
-~~~~~~~~~~~~~~~~~~~~
+.isOpen
+~~~~~~~
 
 .. code-block:: pascal
 
@@ -161,9 +156,8 @@ Example:
 
 .. code-block:: pascal
 
-    if (collectbox.isOpen()) then
+    if collectbox.isOpen() then
       writeln('The collectbox screen is open!');
-
 *)
 function TRSCollectBox.isOpen(waitTime: integer = 0): boolean;
 var
@@ -178,15 +172,15 @@ begin
 end;
 
 (*
-TRSCollectBox.close
-~~~~~~~~~~~~~~~~~~~
+.close
+~~~~~~
 
 .. code-block:: pascal
 
     function TRSCollectBox.close(escape: boolean = true): boolean;
 
-Closes the collectbox, will return if succesful or not.  Closes via the Escape
-key.
+Closes the collectbox and returns if succesful. Option to close via clicking
+or pressing the ESC key (default).
 
 .. note::
 
@@ -197,7 +191,7 @@ Example:
 
 .. code-block:: pascal
 
-    if (collectbox.close()) then
+    if collectbox.close() then
       writeln('closed the collectbox');
 *)
 function TRSCollectBox.close(escape: boolean = true): boolean;
@@ -251,15 +245,15 @@ begin
 end;
 
 (*
-TRSCollectBox.collectButton
-~~~~~~~~~~~~~~~~~~~~~~~~~~~
+.collectButton
+~~~~~~~~~~~~~~
 
 .. code-block:: pascal
 
     function TRSCollectBox.collectButton(button: integer): boolean;
 
 Selects one of the two collect buttons, either to collect to bank or
-inventory, based upon parameter slot.
+inventory.
 
 .. note::
 
@@ -270,7 +264,7 @@ Example:
 
 .. code-block:: pascal
 
-    if (collectbox.collectButton(COLLECT_BUTTON_BANK)) then
+    if collectbox.collectButton(COLLECT_BUTTON_BANK) then
       writeln('collected to the bank');
 *)
 function TRSCollectBox.collectButton(button: integer): boolean;
