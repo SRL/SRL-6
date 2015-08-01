@@ -17,40 +17,66 @@ const Locations
 
 All possible locations to teleport on the lodestone network.
 
+    LOCATION_LUNAR_ISLE
+    LOCATION_EAGLES_PEAK
+    LOCATION_TIRANNWN
+    LOCATION_FREMENNIK
+    LOCATION_SEERS_VILLAGE
+    LOCATION_ARDOUGNE
+    LOCATION_YANILLE
+    LOCATION_OOGLOG
+    LOCATION_BURTHORPE
+    LOCATION_CATHERBY
+    LOCATION_TAVERLEY
+    LOCATION_KARAMJA
+    LOCATION_WILDERNESS
+    LOCATION_EDGEVILLE
+    LOCATION_FALADOR
+    LOCATION_PORT_SARIM
+    LOCATION_VARROCK
+    LOCATION_DRAYNOR_VILLAGE
+    LOCATION_LUMBRIDGE
+    LOCATION_BANDIT_CAMP
+    LOCATION_AL_KHARID
+    LOCATION_CANIFIS
+    LOCATION_ASHDALE
+    LOCATION_PRIFDDINAS
+    LOCATION_PREVIOUS
+
+
 Example:
 
 .. code-block:: pascal
 
     lodestoneScreen.teleportTo(LOCATION_LUNAR_ISLE);
-
 *)
 const
-  LOCATION_LUNAR_ISLE      = 0;
-  LOCATION_EAGLES_PEAK     = 1;
-  LOCATION_TIRANNWN        = 2;
-  LOCATION_FREMENNIK       = 3;
-  LOCATION_SEERS_VILLAGE   = 4;
-  LOCATION_ARDOUGNE        = 5;
-  LOCATION_YANILLE         = 6;
-  LOCATION_OOGLOG          = 7;
-  LOCATION_BURTHORPE       = 8;
-  LOCATION_CATHERBY        = 9;
-  LOCATION_TAVERLEY       = 10;
-  LOCATION_TRAVERLEY       = 10;
-  LOCATION_KARAMJA         = 11;
-  LOCATION_WILDERNESS      = 12;
-  LOCATION_EDGEVILLE       = 13;
-  LOCATION_FALADOR         = 14;
-  LOCATION_PORT_SARIM      = 15;
-  LOCATION_VARROCK         = 16;
-  LOCATION_DRAYNOR_VILLAGE = 17;
-  LOCATION_LUMBRIDGE       = 18;
-  LOCATION_BANDIT_CAMP     = 19;
-  LOCATION_AL_KHARID       = 20;
-  LOCATION_CANIFIS         = 21;
-  LOCATION_ASHDALE         = 22;
-  LOCATION_PRIFDDINAS      = 23;
-  LOCATION_PREVIOUS        = 1337;
+    LOCATION_LUNAR_ISLE      = 0;
+    LOCATION_EAGLES_PEAK     = 1;
+    LOCATION_TIRANNWN        = 2;
+    LOCATION_FREMENNIK       = 3;
+    LOCATION_SEERS_VILLAGE   = 4;
+    LOCATION_ARDOUGNE        = 5;
+    LOCATION_YANILLE         = 6;
+    LOCATION_OOGLOG          = 7;
+    LOCATION_BURTHORPE       = 8;
+    LOCATION_CATHERBY        = 9;
+    LOCATION_TAVERLEY       = 10;
+    LOCATION_TRAVERLEY       = 10;
+    LOCATION_KARAMJA         = 11;
+    LOCATION_WILDERNESS      = 12;
+    LOCATION_EDGEVILLE       = 13;
+    LOCATION_FALADOR         = 14;
+    LOCATION_PORT_SARIM      = 15;
+    LOCATION_VARROCK         = 16;
+    LOCATION_DRAYNOR_VILLAGE = 17;
+    LOCATION_LUMBRIDGE       = 18;
+    LOCATION_BANDIT_CAMP     = 19;
+    LOCATION_AL_KHARID       = 20;
+    LOCATION_CANIFIS         = 21;
+    LOCATION_ASHDALE         = 22;
+    LOCATION_PRIFDDINAS      = 23;
+    LOCATION_PREVIOUS        = 1337;
 
 (*
 type TRSLodestoneScreen
@@ -78,25 +104,25 @@ var
   lodestoneScreen: TRSLodestoneScreen;
 
 {*
-TRSLodestoneScreen.__init
+__init
 ~~~~~~~~~~~~~~~~~~~~~~~~~
 
 .. code-block:: pascal
 
-    procedure TRSLodestoneScreen.__init();
+    procedure lodestoneScreen.__init();
 
-Initializes the TRSLodestoneScreen.
+Initializes the TRSLodestoneScreen. Internal method.
 
 .. note::
 
     - by Olly
-    - Last Updated: 16 November 2013 by Olly
+    - Last Updated: 1 August 2015 by Swag Bag
 
 Example:
 
 .. code-block:: pascal
 
-    TRSLodestoneScreen.__init();
+    lodestoneScreen.__init();
 *}
 {$IFNDEF CODEINSIGHT}
 procedure TRSLodestoneScreen.__init();
@@ -112,26 +138,26 @@ end;
 {$ENDIF}
 
 (*
-TRSLodestoneScreen.__find
+__find
 ~~~~~~~~~~~~~~~~~~~~~~~~~
 
 .. code-block:: pascal
 
-    function TRSLodestoneScreen.__find(): boolean;
+    function lodestoneScreen.__find(): boolean;
 
-Returns true if the lodestone screen is detected, and sets the bounds
+Returns true if the lodestone screen is detected, and sets the bounds. Internal method used by isOpen.
 
 .. note::
 
     - by Ashaman88
-    - Last Updated: 27 February 2014 by Ashaman88
+    - Last Updated: 1 August 2015 by Swag Bag
 
 Example:
 
 .. code-block:: pascal
 
-    if (LodestoneScreen.__find()) then
-      writeln('bounds are set!');
+    if (lodestoneScreen.__find()) then
+      writeln('The lodestone Screen is open, and the bounds are set!');
 *)
 {$IFNDEF CODEINSIGHT}
 function TRSLodestoneScreen.__find(): boolean;
@@ -168,20 +194,20 @@ end;
 {$ENDIF}
 
 (*
-TRSLodestoneScreen.isOpen
+isOpen
 ~~~~~~~~~~~~~~~~~~~~~~~~~
 
 .. code-block:: pascal
 
-    function TRSLodestoneScreen.isOpen(waitTime: integer = 0): boolean;
+    function lodestoneScreen.isOpen(waitTime: integer = 0): boolean;
 
 Returns true if the lodestone sceen is open, has a optional parameter 'waitTime'
-which is the max time of how long we will wait for the screen to appear.
+which is the max time of how long we will wait for the screen to appear. The default time is 0.
 
 .. note::
 
     - by Olly
-    - Last Updated: 16 November 2013 by Olly
+    - Last Updated: 1 August 2015 by Swag Bag
 
 Example:
 
@@ -209,25 +235,26 @@ begin
 end;
 
 (*
-TRSLodestoneScreen.close
+close
 ~~~~~~~~~~~~~~~~~~~~~~~~
 
 .. code-block:: pascal
 
-    function TRSLodestoneScreen.close(): boolean;
+    function lodestoneScreen.close(): boolean;
 
 Closes the lodestone screen.
 
 .. note::
 
     - by Olly
-    - Last Updated: 16 November 2013 by Olly
+    - Last Updated: 1 August 2015 by Swag Bag
 
 Example:
 
 .. code-block:: pascal
 
-    lodestoneScreen.close();
+    if lodestoneScreen.close() then
+      writeln('The lodestone screen has been closed.');
 *)
 function TRSLodestoneScreen.close(): boolean;
 var
@@ -260,19 +287,19 @@ begin
 end;
 
 {*
-TRSLodestoneScreen._isLocationVaild
+_isLocationVaild
 ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
 
 .. code-block:: pascal
 
-    function TRSLodestoneScreen._isLocationVaild(location: integer): boolean;
+    function lodestoneScreen._isLocationVaild(location: integer): boolean;
 
-Returns true if the location is vaild.
+Returns true if the location is vaild. Internal method used by _getTeleportBox.
 
 .. note::
 
     - by Olly
-    - Last Updated: 16 November 2013 by Olly
+    - Last Updated: 1 August 2015 by Swag Bag
 
 Example:
 
@@ -290,19 +317,19 @@ begin
 end;
 
 {*
-TRSLodestoneScreen._getTeleportBox
+_getTeleportBox
 ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
 
 .. code-block:: pascal
 
-    function TRSLodestoneScreen._getTeleportBox(location: integer): TBox;
+    function lodestoneScreen._getTeleportBox(location: integer): TBox;
 
-Returns the TBox of the location.
+Returns the TBox of the location. Used by __isLocked and teleportTo.
 
 .. note::
 
     - by Olly
-    - Last Updated: 16 November 2013 by Olly
+    - Last Updated: 1 August 2015 by Swag Bag
 
 Example:
 
@@ -328,20 +355,19 @@ begin
 end;
 
 (*
-TRSLodestoneScreen._isLocked
+_isLocked
 ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
 
 .. code-block:: pascal
 
-    function TRSLodestoneScreen._isLocked(location: integer): boolean;
+    function lodestoneScreen._isLocked(location: integer): boolean;
 
-Checks if the lodestone is unlocked (actually locked or members only).
-This is only used internally in lodestoneScreen.teleportTo(location).
+Checks if the lodestone is unlocked (actually locked or members only). Used by teleportTo.
 
 .. note::
 
     - by The Mayor
-    - Last Updated: 16 December 2014 by The Mayor
+    - Last Updated: 1 August 2015 by Swag Bag
 
 Example:
 
@@ -373,26 +399,26 @@ begin
 end;
 
 (*
-TRSLodestoneScreen.teleportTo
+teleportTo
 ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
 
 .. code-block:: pascal
 
-    function TRSLodestoneScreen.teleportTo(location: integer): boolean;
+    function lodestoneScreen.teleportTo(location: integer): boolean;
 
 Will teleport to location 'location'. Use integer constants at the top of the file.
 
 .. note::
 
     - by Olly
-    - Last Updated: 16 December 2014 by The Mayor
+    - Last Updated: 1 August 2015 by Swag Bag
 
 Example:
 
 .. code-block:: pascal
 
     if (lodestoneScreen.teleportTo(LOCATION_LUMBRIDGE) then
-      writeln('We just teleported to Lumbrodge');
+      writeln('We just teleported to Lumbridge');
 *)
 function TRSLodestoneScreen.teleportTo(location: integer): boolean;
 var
