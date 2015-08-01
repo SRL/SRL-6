@@ -16,7 +16,7 @@ SRL Utilities Reference
     integerarrays
     stringarrays
     tbox
-	tboxarrays
+    tboxarrays
     tpoint
     tpointarrays
     types

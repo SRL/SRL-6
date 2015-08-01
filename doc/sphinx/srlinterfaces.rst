@@ -8,13 +8,13 @@ SRL Interfaces Reference
     actionbar
     bankscreen    
     beastofburden
-	chatbox
+    chatbox
     chooseoption
-	collectbox
+    collectbox
     conversationbox
-	depositbox
-	grandexchange
-	heroscreen
+    depositbox
+    grandexchange
+    heroscreen
     interfaces
     lodestone
     mainscreen

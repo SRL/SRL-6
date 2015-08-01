@@ -6,6 +6,10 @@
 Welcome to SRL 6's documentation!
 =================================
 
+Note:
+
+The SRL-6 include is organised into 4 sections: Core, Interfaces, Misc, and Utilities. Methods that begin with a double underscore are strictly internal methods and shouldn't be used outside of the SRL-6 include. Methods that begin with a single underscore may be used within scripts without consequence, but it isn't advised.  
+
 Contents:
 
 .. toctree::
@@ -18,10 +22,8 @@ Contents:
 
 
 
-Indices and tables
-==================
+Search Page
+===========
 
-* :ref:`genindex`
-* :ref:`modindex`
 * :ref:`search`
 
