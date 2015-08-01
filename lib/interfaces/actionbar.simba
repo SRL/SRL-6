@@ -150,7 +150,7 @@ for determining if the ActionBar is minimised.
 .. note::
 
     - by The Mayor
-    - Last Updated: 16 July 2015 by The Mayor
+    - Last Updated: 1 August 2015 by The Mayor
 
 Example:
 
@@ -161,12 +161,54 @@ Example:
 *}
 {$IFNDEF CODEINSIGHT}
 function TRSActionBar.__find(out height: integer): boolean;
+label
+  LegacyBar;
+const
+  BUTTON_COL = [462872, 6];
+  BORDER_COL = 3945514;
 var
-  I: Integer;
-  borderColor: TColorData := [4997944, 11, [2, [0.27, 0.44, 0.00]]];
+  i, j: Integer;
+  p: TPoint;
   TPA: TPointArray;
   ATPA: T2DPointArray;
+  borderColor: TColorData := [4997944, 10, [2, [0.10, 0.29, 0.00]]];
 begin
+  if findColorsTolerance(TPA, BUTTON_COL[0], getClientBounds(), BUTTON_COL[1]) then
+  begin
+    ATPA := TPA.cluster(1);
+    ATPA.filterBetween(1, 10);
+
+    if (length(ATPA) < 1) then
+    begin
+       print('TRSActionBar.__find(): Didn''t find button border colors');
+       goto LegacyBar;
+    end;
+
+    for i := 0 to high(ATPA) do
+      if (ATPA[i].getBounds().getWidth() = 13) and (ATPA[i].getBounds().getHeight() = 13)  then
+      begin
+        p := ATPA[i].getBounds().getMiddle();
+
+        for j := (p.y + 70) downto p.y do
+          if getColor(p.x, j) = BORDER_COL then
+          begin
+            height := abs((p.Y - 9) - j);
+            self.setBounds([0, (p.Y - 9), gameTabs.tabArea.x1-1, (p.Y - 9) + height]);
+            result := true;
+
+            if (not self.setSlots) then
+            begin
+              __slots := grid(14, 1, 29, 29, 36, 0, point(self.x1 + 67, self.y1 + 53));
+              self.setSlots := true;
+            end;
+
+            print('TRSActionBar.__find(): EOC bar height = ' + toStr(height));
+            exit(true);
+          end;
+      end;
+  end;
+
+  LegacyBar:
   if borderColor.gatherIn(TPA, getClientBounds()) then
   begin
     ATPA := TPA.cluster(2);
@@ -174,29 +216,21 @@ begin
 
     if (length(ATPA) < 1) then
     begin
-       print('TRSActionBar.__find(): Didn''t find enough ActionBar border colors');
+       print('TRSActionBar.__find(): Didn''t find enough border colors');
        exit();
     end;
 
     ATPA.sortBySize(True);
 
     for i := 0 to high(ATPA) do
-      if ATPA[i].getBounds().getWidth() = 577 then
+      if inRange(ATPA[i].getBounds().getWidth(), 576, 577) then
       begin
         height := ATPA[i].getBounds().getHeight();
         self.setBounds(ATPA[i].getBounds());
-        result := true;
-
-        if (not self.setSlots) then
-        begin
-          __slots := grid(14, 1, 29, 29, 36, 0, point(self.x1 + 67, self.y1 + 53));
-          self.setSlots := true;
-        end;
-        break();
+        print('TRSActionBar.__find(): Legacy bar height = ' + toStr(height));
+        exit(true);
       end;
-  end
-
-  print('TRSActionBar.__find(): result = ' + toStr(result) + ' (height = '+intToStr(height)+')', TDebug.SUB)
+  end;
 end;
 {$ENDIF}
 
@@ -256,7 +290,6 @@ Example:
 {$IFNDEF CODEINSIGHT}
 function TRSActionBar.__isSlotValid(var slot: integer): boolean;
 begin
-
   if (inRange(slot, ACTION_BAR_SLOT_LOW, ACTION_BAR_SLOT_HIGH)) then
     exit(true);
 
