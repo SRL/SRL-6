@@ -309,6 +309,7 @@ begin
   cs.apply();
 
   TPA := ATPA.merge();
+  filterPointsPlayer(TPA);
   if (length(TPA) <= 0) then
   begin
     print('No colors found');
