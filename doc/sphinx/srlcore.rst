@@ -11,3 +11,4 @@ SRL Core Reference
     mouse
     players
     text
+	tesseract

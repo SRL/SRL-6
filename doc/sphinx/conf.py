@@ -41,7 +41,7 @@ master_doc = 'index'
 
 # General information about the project.
 project = u'SRL 6'
-copyright = u'2013, SRL Developers'
+copyright = u'2015, SRL Developers'
 
 # The version info for the project you're documenting, acts as replacement for
 # |version| and |release|, also used in various other places throughout the
@@ -248,7 +248,7 @@ texinfo_documents = [
 epub_title = u'SRL 6'
 epub_author = u'SRL Developers'
 epub_publisher = u'SRL Developers'
-epub_copyright = u'2013, SRL Developers'
+epub_copyright = u'2015, SRL Developers'
 
 # The language of the text. It defaults to the language option
 # or en if the language is not set.

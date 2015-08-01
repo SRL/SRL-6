@@ -1,20 +1,16 @@
 .PHONY:    default clean tarball
 
-core = client debug globals mouse players text
+core = client debug globals mouse players text tesseract
 
-interfaces = actionbar bankscreen chatbox chooseoption conversationbox interfaces lodestone mainscreen minimap options pinscreen production progressscreen toolscreen
+interfaces = actionbar bankscreen beastofburden chatbox chooseoption collectbox conversationbox depositbox grandexchange heroscreen interfaces lodestone lootscreen mainscreen minimap options pinscreen production progressscreen toolscreen
 
 gametabs = backpack gametab stats
 lobby = lobby worlds
 
 misc = antiban items smart srlplayerform srlstats
 
-tesseract = tesseract
-
 utilities = color drawing math pixelshift time wrappers
-types = extendedarrays integerarrays stringarrays tbox tpoint tpointarrays types
-
-
+types = extendedarrays integerarrays stringarrays tbox tboxarrays tpoint tpointarrays types
 
 all:
 	@python docgen.py `echo $(core) | sed -r \
@@ -27,8 +23,6 @@ all:
 		's/(\w+)/..\/lib\/interfaces\/lobby\/\1.simba/g'` > /dev/null
 	@python docgen.py `echo $(misc) | sed -r \
 		's/(\w+)/..\/lib\/misc\/\1.simba/g'` > /dev/null
-	@python docgen.py `echo $(tesseract) | sed -r \
-		's/(\w+)/..\/lib\/tesseract\/\1.simba/g'` > /dev/null
 	@python docgen.py `echo $(utilities) | sed -r \
 		's/(\w+)/..\/lib\/utilities\/\1.simba/g'` > /dev/null
 	@python docgen.py `echo $(types) | sed -r \
