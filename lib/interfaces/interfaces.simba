@@ -2,21 +2,70 @@
 Interfaces
 ==========
 
-The interfaces file stores any global interface functions, including TRSInterface
-and all its functions.  All interface files should import this file.
+The interfaces file stores any global interface functions, that are shared by
+all TRSInterfaces.
 
-The source for this file can be found
-`here <https://github.com/SRL/SRL-6/blob/master/lib/interfaces/interfaces.simba>`_.
+The source for this file can be found `here <https://github.com/SRL/SRL-6/blob/master/lib/interfaces/interfaces.simba>`_.
 
 *)
 
 {$f-}
 
 (*
-const IDs
-~~~~~~~~~
+Consts, Types, Vars
+~~~~~~~~~~~~~~~~~~~
 
-Integer constants that represent the ID's of each global interface.
+The following constants, types and variables are used throughout the lodestoneScreen methods.
+
+**const Interface IDs**
+
+The following are integer constants that represent the ID of each global interface.
+Note: not all of the gametab IDs are currently in use.
+
+  GameTabs:
+    * ID_INTERFACE_GAMETABS
+    * ID_INTERFACE_TAB_BACKPACK
+    * ID_INTERFACE_TAB_MELEE
+    * ID_INTERFACE_TAB_MAGIC
+    * ID_INTERFACE_TAB_RANGED
+    * ID_INTERFACE_TAB_DEFENSIVE
+    * ID_INTERFACE_TAB_STATS
+    * ID_INTERFACE_TAB_EQUIPMENT
+    * ID_INTERFACE_TAB_PRAYER
+    * ID_INTERFACE_TAB_ABILITY_BOOK
+    * ID_INTERFACE_TAB_FRIENDS
+    * ID_INTERFACE_TAB_FRIENDS_CHAT
+    * ID_INTERFACE_TAB_CLAN_CHAT
+    * ID_INTERFACE_TAB_OPTIONS
+    * ID_INTERFACE_TAB_EMOTES
+    * ID_INTERFACE_TAB_MUSIC
+    * ID_INTERFACE_TAB_NOTES
+
+  Logged In:
+    * ID_INTERFACE_ACTION_BAR
+    * ID_INTERFACE_CHAT_BOX
+    * ID_INTERFACE_MINIMAP
+    * ID_INTERFACE_MAINSCREEN
+    * ID_INTERFACE_BANKSCREEN
+    * ID_INTERFACE_OPTIONS
+    * ID_INTERFACE_CONVERSATION_BOX
+    * ID_INTERFACE_PINSCREEN
+    * ID_INTERFACE_PRODUCTION
+    * ID_INTERFACE_LODESTONE
+    * ID_INTERFACE_TOOL
+    * ID_INTERFACE_PROGRESS
+    * ID_INTERFACE_DEPOSITBOX
+    * ID_INTERFACE_POWERSSCREEN
+    * ID_INTERFACE_COLLECTBOX
+    * ID_INTERFACE_GRANDEXCHANGE
+    * ID_INTERFACE_HEROSCREEN
+    * ID_INTERFACE_BEASTOFBURDEN
+    * ID_INTERFACE_LOOTSCREEN
+
+  Logged Out:
+    * ID_INTERFACE_LOBBY
+    * ID_INTERFACE_LOBBY_WORLDS
+
 *)
 const
   // gametabs
@@ -69,6 +118,24 @@ type TRSInterface
 
 A record that stores useful information about RS interfaces.
 *)
+(*
+**type TRSInterface**
+
+.. code-block:: pascal
+
+    type
+      TRSInterface = record
+        name: string;
+        ID, parentID: integer;
+        static: boolean;
+        x, y, w, h: integer;
+        x1, y1, x2, y2: integer;
+        cx, cy: integer;
+      end;
+
+A type that stores the interface generic properties.
+
+*)
 type
   TRSInterface = record
     name: string;
@@ -79,15 +146,25 @@ type
     cx, cy: integer;
   end;
 
+
 (*
-TRSInterface.getBounds
-~~~~~~~~~~~~~~~~~~~~~~
+TRSInterface methods
+~~~~~~~~~~~~~~~~~~~~~~~~~~
+
+The following methods should be called through the respective interface variables.
+For example: bankScreen, mainScreen, actionBar, chatBox.
+
+*)
+
+(*
+getBounds
+---------
 
 .. code-block:: pascal
 
     function TRSInterface.getBounds(): TBox;
 
-Returns a TBox of the TRSInterface's location.
+Returns a TBox of the TRSInterface's bounds.
 
 .. note::
 
@@ -98,7 +175,11 @@ Example:
 
 .. code-block:: pascal
 
-    b := mainscreen.getBounds();
+    var
+      b: TBox;
+    begin
+      b := mainScreen.getBounds();
+    end;
 *)
 function TRSInterface.getBounds(): TBox;
 begin
@@ -106,14 +187,14 @@ begin
 end;
 
 (*
-TRSInterface.setBounds
-~~~~~~~~~~~~~~~~~~~~~~
+setBounds
+---------
 
 .. code-block:: pascal
 
     procedure TRSInterface.getBounds(newBounds: TBox);
 
-Sets the bounds, width, height, and center point of the TRSInterface.
+Sets the TRSInterface's bounds, width, height, and center point.
 
 .. note::
 
@@ -124,7 +205,12 @@ Example:
 
 .. code-block:: pascal
 
-    mainscreen.setBounds(newBox);
+    var
+      b: TBox;
+    begin
+      b := intToBox(10, 100, 10, 100);
+      mainScreen.setBounds(b);
+    end;
 *)
 procedure TRSInterface.setBounds(newBounds: TBox);
 begin
@@ -143,8 +229,8 @@ begin
 end;
 
 (*
-TRSInterface.getCenterPoint
-~~~~~~~~~~~~~~~~~~~~~~~~~~~
+getCenterPoint
+--------------
 
 .. code-block:: pascal
 
@@ -161,7 +247,12 @@ Example:
 
 .. code-block:: pascal
 
-    mP := tabInventory.getCenterPoint();
+    var
+      p: TPoint;
+    begin
+      p := mainScreen.getCenterPoint();
+      mouse(p, MOUSE_MOVE);
+    end;
 *)
 function TRSInterface.getCenterPoint(): TPoint;
 begin

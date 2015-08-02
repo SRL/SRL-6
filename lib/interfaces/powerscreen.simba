@@ -20,7 +20,7 @@ The following constants, types and variables are used throughout the powersScree
 
 {*
 const Internal
-~~~~~~~~~~~~~~
+--------------
 
 Internal powersScreen constants
 
@@ -32,9 +32,9 @@ const
   _ACTIONBAR_OFFSET: TPoint = [557, 43];
 
 (*
-**const Main and Sub Tabs**
+**const Main Tabs and Sub Tabs**
 
-Constants that represent maintab and subtabs.
+Constants that represent the Main Tabs and Sub Tabs of the powersScreen.
 
   Main Tabs:
     * POWERS_TAB_MELEE
@@ -79,7 +79,7 @@ const
 (*
 **const Combat Modes, Combat Styles and Experience Types**
 
-Constants that represent different combat modes, styles and experience types.
+Constants that represent different Combat Modes, Styles and Experience Types.
 
   Combat Modes:
     * MODE_MANUAL
@@ -125,9 +125,8 @@ const
 
 (*
 **const Abilities and Spells**
-~~~~~~~~~~~~~~~~~~~~~~~~~~
 
-Constants that represent the location of each ability or spell.
+Constants that represent the location of each ability or spell within the powersScreen.
 
   Attack Abilities:
     * PS_SLAUGHTER
@@ -533,8 +532,8 @@ __find
 
     function TRSPowersScreen.__find(): boolean;
 
-Returns true if the collectBox interface is detected and its bounds are set.
-Scripters should use collectBox.isOpen() below.
+Returns true if the powersScreen interface is detected and its bounds are set.
+Scripters should use powersScreen.isOpen() below.
 
 .. note::
 
@@ -587,7 +586,7 @@ isOpen
 
     function TRSPowersScreen.isOpen(waitTime: integer = 0): boolean;
 
-Returns true if the collectBox interface is open. The optional **waitTime** parameter
+Returns true if the powersScreen interface is open. The optional **waitTime** parameter
 *(default = 0)* is the maximum time (in milliseconds) it will keep looking.
 
 .. note::
@@ -1501,7 +1500,7 @@ setCombatMode
 
     function TRSPowersScreen.setCombatMode(combatMode): boolean;
 
-Returns true if it successfully sets the players Combat Mode to **combatMode** .
+Returns true if it successfully sets the players Combat Mode to **combatMode**.
 *Combat Mode constants* are located at the top of this page.
 
 .. note::

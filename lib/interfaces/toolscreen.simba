@@ -1,9 +1,8 @@
 (*
-ToolScreen
-==========
+Tool Screen
+============
 
-The toolscreen file holds functions and procedures that are used in the
-Runescape toolscreen screen.
+The toolscreen file holds functions and procedures that are used in the runescape toolscreen.
 
 The source for this file can be found `here <https://github.com/SRL/SRL-6/blob/master/lib/interfaces/toolscreen.simba>`_.
 
@@ -12,33 +11,55 @@ The source for this file can be found `here <https://github.com/SRL/SRL-6/blob/m
 {$f-}
 
 (*
-type TRSToolScreen
-~~~~~~~~~~~~~~~~~~
+Consts, Types, Vars
+~~~~~~~~~~~~~~~~~~~
 
-A type that stores the tool interface properties.
+The following constants, types and variables are used throughout the toolScreen methods.
+
+**type TRSToolScreen**
+
+.. code-block:: pascal
+
+    type
+      TRSToolScreen = type TRSInterface;
+
+A type that stores the toolScreen interface properties.
+
 *)
 type
   TRSToolScreen = type TRSInterface;
 
 (*
-var toolScreen
-~~~~~~~~~~~~~~
+**var toolScreen**
 
-Variable that stores functions and properties of the Runescape toolScreen interface.
+.. code-block:: pascal
+
+    var
+      toolScreen: TRSToolScreen;
+
+A variable through which scripters can access the TRSToolScreen type methods.
+
+*)
+var
+  toolScreen: TRSToolScreen;
+
+(*
+TRSToolScreen methods
+~~~~~~~~~~~~~~~~~~~~~~~~~~
+
+The following methods should be called through the **toolScreen** variable.
 
 Example:
 
 .. code-block:: pascal
 
-    if (toolScreen.isOpen() then
+    if toolScreen.isOpen() then
       writeln('Tool screen is open!');
 *)
-var
-  toolScreen: TRSToolScreen;
 
 {*
-TRSToolScreen.__init
-~~~~~~~~~~~~~~~~~~~~
+__init
+------
 
 .. code-block:: pascal
 
@@ -70,15 +91,16 @@ begin
 end;
 {$ENDIF}
 
-(*
-TRSToolScreen.__find
-~~~~~~~~~~~~~~~~~~~~
+{*
+__find
+------
 
 .. code-block:: pascal
 
     function TRSToolScreen.__find(): boolean;
 
-Returns true if the tools screen is detected, and sets the bounds
+Returns true if the toolScreen interface is detected and its bounds are set.
+Scripters should use toolScreen.isOpen() below.
 
 .. note::
 
@@ -89,9 +111,9 @@ Example:
 
 .. code-block:: pascal
 
-    if (toolScreen.__find()) then
-      writeln('bounds are set!');
-*)
+    if toolScreen.__find() then
+      writeln('The toolScreen is open, and the bounds are set!');
+*}
 {$IFNDEF CODEINSIGHT}
 function TRSToolScreen.__find(): boolean;
 const
@@ -127,16 +149,15 @@ end;
 {$ENDIF}
 
 (*
-TRSToolScreen.isOpen
-~~~~~~~~~~~~~~~~~~~~
+isOpen
+------
 
 .. code-block:: pascal
 
     function TRSToolScreen.isOpen(waitTime: integer = 0): boolean;
 
-Returns true if the tool screen is open, includes a optional parameter
-'waitTime' (default 0) which will search for the production screen until
-'waitTime' is reached.
+Returns true if the toolScreen interface is open. The optional **waitTime** parameter
+*(default = 0)* is the maximum time (in milliseconds) it will keep looking.
 
 .. note::
 
@@ -147,8 +168,8 @@ Example:
 
 .. code-block:: pascal
 
-    if (toolScreen.isOpen()) then
-      writeln('it''s open!');
+    if toolScreen.isOpen() then
+      writeln('The toolScreen is open!');
 *)
 function TRSToolScreen.isOpen(waitTime: integer = 0): boolean;
 var
@@ -164,19 +185,20 @@ begin
     end;
   until (getSystemTime() >= t);
 
-  print('toolScreen.isOpen(): Result = ' + boolToStr(result));
+  print('TRSToolScreen.isOpen(): Result = ' + boolToStr(result));
 end;
 
 (*
-TRSToolScreen.select
-~~~~~~~~~~~~~~~~~~~~
+select
+------
 
 .. code-block:: pascal
 
     function TRSToolScreen.select(tool: string; key: boolean = true): boolean;
 
-Attempts to select the tool. Uses the corresponding key if key is true.
-Returns true if successful otherwise false.
+Returns true if it selects the tool **tool** . If the **key** parameter is set
+to true *(default = true)* then it will press the corresponding key, else it
+will use the mouse.
 
 .. note::
 
@@ -187,7 +209,7 @@ Example:
 
 .. code-block:: pascal
 
-    if (toolScreen.select('Knife')) then
+    if toolScreen.select('Knife') then
       writeln('We started making something!');
 *)
 function TRSToolScreen.select(tool: String; key: boolean = true): boolean;
@@ -222,15 +244,15 @@ begin
 end;
 
 (*
-TRSToolScreen.select; overload
-~~~~~~~~~~~~~~~~~~~~
+select (overload)
+-----------------
 
 .. code-block:: pascal
 
     function TRSToolScreen.select(tool: integer): boolean; overload;
 
-Attempts to select the tool by using the corresponding key. Returns true if
-successful otherwise false.
+Returns true if it selects the tool **tool** . This is the same as the above
+method except the **tool** parameter takes an integer instead of a string.
 
 .. note::
 
@@ -241,7 +263,7 @@ Example:
 
 .. code-block:: pascal
 
-    if (toolScreen.select(1)) then
+    if toolScreen.select(1) then
       writeln('We started making something!');
 *)
 function TRSToolScreen.select(tool: integer): boolean; overload;

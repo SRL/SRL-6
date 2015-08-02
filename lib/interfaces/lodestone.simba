@@ -309,8 +309,8 @@ _isLocationVaild
 
     function TRSLodestoneScreen._isLocationVaild(location: integer): boolean;
 
-Returns true if the lodestone **location** is one of the location
-constants at the top of this page.
+Returns true if the lodestone **location** is one of the *Location
+constants* at the top of this page.
 
 .. note::
 
@@ -422,7 +422,7 @@ teleportTo
 
     function TRSLodestoneScreen.teleportTo(location: integer): boolean;
 
-Will teleport to **location**. Use the location constants at the top of this page.
+Will teleport to **location**. Use the *Location constants* at the top of this page.
 
 .. note::
 

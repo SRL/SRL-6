@@ -561,7 +561,7 @@ clickButton
     function TRSLootScreen.clickButton(button: integer): boolean;
 
 Selects one of the two collect buttons. The **button** should be one of the two
-collect button constants at the top of this page.
+*Loot Button constants* at the top of this page.
 
 .. note::
 
