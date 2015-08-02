@@ -2,8 +2,7 @@
 BankScreen
 ==========
 
-The bankscreen file holds functions and procedures that are used in the
-Runescape bank screen.
+The bankscreen file holds functions and procedures that are used in the runescape bank screen.
 
 The source for this file can be found `here <https://github.com/SRL/SRL-6/blob/master/lib/interfaces/bankscreen.simba>`_.
 
