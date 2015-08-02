@@ -45,6 +45,7 @@ const
   INFO_CURRENT_XP = 'Current';
   INFO_REMAINDER = 'Remainder';
   INFO_NEXT_LEVEL = 'Next level';
+  INFO_BONUS_XP = 'Bonus';
 
 (*
 type TRSTabStats
@@ -193,9 +194,9 @@ begin
   if gameTabs.areMultiOpen() then
     offset := [0, 45]
   else
-    offset := [3, 17];
+    offset := [15, 17];
 
-  result := gridBox(skill, 3, 9, 58, 22, 65, 27, point(gameTabs.tabArea.x1 + 38 + offset.x, gameTabs.tabArea.y1 + offset.y));
+  result := gridBox(skill, 3, 9, 58, 24, 65, 27, point(gameTabs.tabArea.x1 + 38 + offset.x, gameTabs.tabArea.y1 + offset.y));
 end;
 
 (*
@@ -274,7 +275,7 @@ Returns the skill's info.
 .. note::
 
     - by Olly
-    - Last Updated: December 23, 2013 by Olly
+    - Last Updated: 2 August 2015 by The Mayor
 
 Example:
 
@@ -288,24 +289,24 @@ var
   i, p: integer;
   s: string;
   boxArr: TBoxArray;
+  tesseractFilter: TTesseractFilter = [3, 3, [true, 40, TM_Mean]];
 begin
   result := -1;
 
   if (not self.open()) then
     exit();
 
-  mouseBox(tabStats.getSkillBox(skill), MOUSE_MOVE);
+  if infoType = INFO_BONUS_XP then tesseractFilter := [2, 2, [true, 10, TM_Mean]];
+  mouseBox(tabStats.getSkillBox(skill));
 
-  if (isMouseOverMenuOpen(b, 1000 + random(100))) then
+  if isMouseOverMenuOpen(b, 1000 + random(100)) then
   begin
     boxArr := b.split(b.getWidth(), 14);
     wait(200 + random(300));
 
     for i := 0 to high(boxArr) do
     begin
-      with (boxArr[i]) do
-        s := tesseractGetText(x1, y1, x2, y2, FILTER_SMALL_CHARS);
-
+      s := tesseract_GetText(boxArr[i], tesseractFilter);
       p := pos(infoType, s);
 
       if (p > 0) then

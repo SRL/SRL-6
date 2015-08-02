@@ -79,6 +79,7 @@ const
 **type TRSLodestoneScreen**
 
 .. code-block:: pascal
+
     type
       TRSLodestoneScreen = type TRSInterface;
 
@@ -92,6 +93,7 @@ type
 **var lodestoneScreen**
 
 .. code-block:: pascal
+
     var
       lodestoneScreen: TRSLodestoneScreen;
 

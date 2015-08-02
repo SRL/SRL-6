@@ -19,6 +19,7 @@ The following constants, types and variables are used throughout the chatbox met
 **const Tesseract Fiter**
 
 .. code-block:: pascal
+
     const
       CHATBOX_TESSERACT_FILTER: TTesseractFilter = [3, 3, [False, 35, TM_Mean]];
 
@@ -33,6 +34,7 @@ const
 **type TRSChatbox**
 
 .. code-block:: pascal
+
     type
       TRSChatbox = type TRSInterface;
 
@@ -48,6 +50,7 @@ type
 **var chatbox**
 
 .. code-block:: pascal
+
     var
       chatbox: TRSChatbox;
 
