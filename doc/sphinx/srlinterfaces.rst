@@ -17,10 +17,12 @@ SRL Interfaces Reference
     heroscreen
     interfaces
     lodestone
+    lootscreen
     mainscreen
     minimap
     options
     pinscreen
+    powerscreen
     production
     progressscreen
     toolscreen
