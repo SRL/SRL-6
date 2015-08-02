@@ -46,6 +46,7 @@ const
 **type TRSLootScreen**
 
 .. code-block:: pascal
+
     type
       TRSLootScreen = type TRSInterface;
 
@@ -59,6 +60,7 @@ type
 **var lootScreen**
 
 .. code-block:: pascal
+
     var
       lootScreen: TRSLootScreen;
 

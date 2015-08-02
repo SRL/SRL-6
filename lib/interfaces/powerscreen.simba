@@ -1,15 +1,22 @@
 (*
-PowersScreen
-============
+Powers Screen
+=============
 
-The PowersScreen file holds functions and procedures that are used in the
-Runescape Powers screen.
+The PowersScreen file holds functions and procedures that are used in the runescape powers screen.
 
-The source for this file can be found `here <https://github.com/SRL/SRL-6/blob/master/lib/interfaces/powersscreen.simba>`_.
+The source for this file can be found `here <https://github.com/SRL/SRL-6/blob/master/lib/interfaces/powerscreen.simba>`_.
 
 *)
 
 {$f-}
+
+(*
+Consts, Types, Vars
+~~~~~~~~~~~~~~~~~~~
+
+The following constants, types and variables are used throughout the powersScreen methods.
+
+*)
 
 {*
 const Internal
@@ -24,13 +31,31 @@ const
   _ABILITY_OFFSET: TPoint = [41, 219];
   _ACTIONBAR_OFFSET: TPoint = [557, 43];
 
-{*
-const Main and Sub Tabs
-~~~~~~~~~~~~~~~~~~~~~~~
+(*
+**const Main and Sub Tabs**
 
-Integer constants that represent tab numbers.
+Constants that represent maintab and subtabs.
 
-*}
+  Main Tabs:
+    * POWERS_TAB_MELEE
+    * POWERS_TAB_RANGED
+    * POWERS_TAB_MAGIC
+    * POWERS_TAB_DEFENSIVE
+    * POWERS_TAB_PRAYERS
+    * POWERS_TAB_SETTINGS
+
+  Sub Tabs:
+    * SUB_TAB_ATTACK
+    * SUB_TAB_STRENGTH
+    * SUB_TAB_RANGED
+    * SUB_TAB_ABILITIES
+    * SUB_TAB_COMBAT_SPELLS
+    * SUB_TAB_TELEPORT_SPELLS
+    * SUB_TAB_SKILLING_SPELLS
+    * SUB_TAB_DEFENCE
+    * SUB_TAB_CONSTITUTION
+
+*)
 const
 { Main Tabs }
   POWERS_TAB_MELEE     = 1;
@@ -51,13 +76,32 @@ const
   SUB_TAB_DEFENCE         = 1;
   SUB_TAB_CONSTITUTION    = 2;
 
-{*
-const Combat Modes, Combat Styles and Experience Types
-~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+(*
+**const Combat Modes, Combat Styles and Experience Types**
 
-Integer constants that represent different combat styles and experience types.
-These are used in setCombatExperience();
-*}
+Constants that represent different combat modes, styles and experience types.
+
+  Combat Modes:
+    * MODE_MANUAL
+    * MODE_REVOLUTION
+    * MODE_MOMENTUM
+
+  Combat Styles:
+    * MELEE_STYLE
+    * RANGED_STYLE
+    * MAGIC_STYLE
+
+  Experience Types:
+    * XP_BALANCED
+    * XP_RANGED_AND_DEFENCE
+    * XP_MAGIC_AND_DEFENCE
+    * XP_ATTACK
+    * XP_STRENGTH
+    * XP_RANGED
+    * XP_MAGIC
+    * XP_DEFENCE
+
+*)
 const
 { Combat Modes }
   MODE_MANUAL     = 1;
@@ -79,19 +123,175 @@ const
   XP_MAGIC              = 3;
   XP_DEFENCE            = 4;
 
-{*
-const Abilities and Spells
+(*
+**const Abilities and Spells**
 ~~~~~~~~~~~~~~~~~~~~~~~~~~
 
-TIntegerArray constants that represent the location of each ability. Each index
-in the array represents: [Main Tab, Sub Tab, SlotBox]. By doing it this way, if
-new abilities are added, it's easy to update.
+Constants that represent the location of each ability or spell.
 
-*}
+  Attack Abilities:
+    * PS_SLAUGHTER
+    * PS_SLICE
+    * PS_OVERPOWER
+    * PS_HAVOC
+    * PS_BACKHAND
+    * PS_FORCEFUL_BACKHAND
+    * PS_SMASH
+    * PS_BARGE
+    * PS_FLURRY
+    * PS_SEVER
+    * PS_HURRICANE
+    * PS_MASSACRE
+    * PS_METEOR_STRIKE
+    * PS_BALANCED_STRIKE
+
+  Strength Abilities:
+    * PS_STOMP
+    * PS_KICK
+    * PS_PUNISH
+    * PS_DISMEMBER
+    * PS_FURY
+    * PS_DESTROY
+    * PS_QUAKE
+    * PS_BERSERK
+    * PS_CLEAVE
+    * PS_ASSAULT
+    * PS_DECIMATE
+    * PS_PULVERISE
+    * PS_FRENZY
+
+  Ranged Abilities:
+    * PS_PIERCING_SHOT
+    * PS_SNAP_SHOT
+    * PS_DEADSHOT
+    * PS_SNIPE
+    * PS_DAZING_SHOT
+    * PS_BINDING_SHOT
+    * PS_NEEDLE_STRIKE
+    * PS_TIGHT_BINDINGS
+    * PS_FRAGMENTATION_SHOT
+    * PS_ESCAPE
+    * PS_RAPID_FIRE
+    * PS_RICOCHET
+    * PS_BOMBARDMENT
+    * PS_INCENDIARY_SHOT
+    * PS_UNLOAD
+    * PS_DEATHS_SWIFTNESS
+
+  Magic Abilities:
+    * PS_ASPHYXIATE
+    * PS_WRACK
+    * PS_OMNIPOWER
+    * PS_DRAGON_BREATH
+    * PS_SONIC_WAVE
+    * PS_IMPACT
+    * PS_CONCENTRATED_BLAST
+    * PS_DEEP_IMPACT
+    * PS_COMBUST
+    * PS_SURGE
+    * PS_DETONATE
+    * PS_CHAIN
+    * PS_WILD_MAGIC
+    * PS_METAMORPHOSIS
+    * PS_TSUNAMI
+    * PS_SUNSHINE
+
+  Magic Combat Spells:
+    * PS_AIR_STRIKE
+    * PS_CONFUSE
+    * PS_WATER_STRIKE
+    * PS_EARTH_STRIKE
+    * PS_WEAKEN
+    * PS_FIRE_STRIKE
+    * PS_AIR_BOLT
+    * PS_CURSE
+    * PS_BIND
+    * PS_WATER_BOLT
+    * PS_EARTH_BOLT
+    * PS_FIRE_BOLT
+    * PS_AIR_BLAST
+    * PS_WATER_BLAST
+    * PS_SNARE
+    * PS_SLAYER_DART
+    * PS_EARTH_BLAST
+    * PS_FIRE_BLAST
+    * PS_DIVINE_STORM
+    * PS_AIR_WAVE
+    * PS_WATER_WAVE
+    * PS_VULNERABILITY
+    * PS_EARTH_WAVE
+    * PS_ENFEEBLE
+    * PS_FIRE_WAVE
+    * PS_STORM_OF_ARMADYL
+    * PS_ENTANGLE
+    * PS_POLYPORE_STRIKE
+    * PS_STAGGER
+    * PS_AIR_SURGE
+    * PS_WATER_SURGE
+    * PS_TELEPORT_BLOCK
+    * PS_EARTH_SURGE
+    * PS_FIRE_SURGE
+
+  Magic Teleport Spells:
+    * PS_HOME_TELEPORT
+    * PS_MOBILISING_ARMIES_TELEPORT
+    * PS_VARROCK_TELEPORT
+    * PS_LUMBRIDGE_TELEPORT
+    * PS_FALADOR_TELEPORT
+    * PS_HOUSE_TELEPORT
+    * PS_CAMELOT_TELEPORT
+    * PS_ARDOUGNE_TELEPORT
+    * PS_WATCHTOWER_TELEPORT
+    * PS_GOD_WARS_DUNGEON_TELEPORT
+    * PS_TROLLHEIM_TELEPORT
+    * PS_APE_ATOLL_TELEPORT
+    * PS_TELE_OTHER_LUMBRIDGE
+    * PS_TELE_OTHER_FALADOR
+    * PS_TELE_OTHER_CAMELOT
+
+  Magic Skilling Spells:
+    * PS_ENCHANT_CROSSBOW_BOLT
+    * PS_LVL_1_ENCHANT
+    * PS_BONES_TO_BANANAS
+    * PS_LOW_LEVEL_ALCHEMY
+    * PS_LVL_2_ENCHANT
+    * PS_TELEKINETIC_GRAB
+    * PS_SUPERHEAT_ITEM
+    * PS_LVL_3_ENCHANT
+    * PS_HIGH_LEVEL_ALCHEMY
+    * PS_CHARGE_WATER_ORB
+    * PS_LVL_4_ENCHANT
+    * PS_BONES_TO_PEACHES
+    * PS_CHARGE_EARTH_ORB
+    * PS_CHARGE_FIRE_ORB
+    * PS_CHARGE_AIR_ORB
+    * PS_LVL_5_ENCHANT
+    * PS_LVL_6_ENCHANT
+
+  Defensive Abilities:
+    * PS_ANTICIPATION
+    * PS_BASH
+    * PS_REVENGE
+    * PS_PROVOKE
+    * PS_IMMORTALITY
+    * PS_FREEDOM
+    * PS_REFLECT
+    * PS_RESONANCE
+    * PS_REJUVENATE
+    * PS_DEBILITATE
+    * PS_PREPARATION
+    * PS_BARRICADE
+
+  Constitution Abilities:
+    * PS_WEAPON_SPECIAL_ATTACK
+    * PS_REGENERATE
+    * PS_SIPHON
+    * PS_INCITE
+
+*)
 const
-
 { Attack Abilities }
-  PS_SLAUGHTER          = [1, 1, 1];
+  PS_SLAUGHTER          = [1, 1, 1]; // [Main Tab, Sub Tab, SlotBox].
   PS_SLICE              = [1, 1, 2];
   PS_OVERPOWER          = [1, 1, 3];
   PS_HAVOC              = [1, 1, 4];
@@ -249,41 +449,55 @@ const
   PS_SIPHON                     = [4, 2, 3];
   PS_INCITE                     = [4, 2, 4];
 
-
-
 (*
-type TRSPowersScreen
-~~~~~~~~~~~~~~~~~~~~
+**type TRSPowersScreen**
 
-A type that stores the deposit box interface properties.
+.. code-block:: pascal
+
+    type
+      TRSPowersScreen = type TRSInterface;
+
+A type that stores the powersScreen interface properties.
+
 *)
 type
   TRSPowersScreen = type TRSInterface;
 
 (*
-var powersScreen
-~~~~~~~~~~~~~~~~
-
-Variable that stores functions and properties of the Runescape Powers screen interface.
-
-Example:
+**var powersScreen**
 
 .. code-block:: pascal
 
-    if (powersScreen.isOpen() then
-      writeln('The Powers screen is open!');
+    var
+      powersScreen: TRSPowersScreen;
+
+A variable through which scripters can access the TRSPowersScreen type methods.
 
 *)
 var
   powersScreen: TRSPowersScreen;
 
-{*
-TRSPowersScreen.__init
-~~~~~~~~~~~~~~~~~~~~~~
+(*
+TRSPowersScreen methods
+~~~~~~~~~~~~~~~~~~~~~~~~~~
+
+The following methods should be called through the **powersScreen** variable.
+
+Example:
 
 .. code-block:: pascal
 
-    procedure TRSPowersScreen.__init
+    if powersScreen.isOpen() then
+      writeln('Powers screen is open!');
+*)
+
+{*
+__init
+------
+
+.. code-block:: pascal
+
+    procedure TRSPowersScreen.__init();
 
 Initializes the TRSPowersScreen.
 
@@ -297,7 +511,6 @@ Example:
 .. code-block:: pascal
 
     powersScreen.__init();
-
 *}
 {$IFNDEF CODEINSIGHT}
 procedure TRSPowersScreen.__init();
@@ -312,26 +525,29 @@ begin
 end;
 {$ENDIF}
 
-(*
-TRSPowersScreen.__find
-~~~~~~~~~~~~~~~~~~~~~~
+{*
+__find
+------
 
 .. code-block:: pascal
 
     function TRSPowersScreen.__find(): boolean;
 
-Finds the Powers Screen and sets its bounds (Dynamic).
+Returns true if the collectBox interface is detected and its bounds are set.
+Scripters should use collectBox.isOpen() below.
 
 .. note::
 
     - by The Mayor
-    - Last Updated: 17th July 2015 by The Mayor
+    - Last Updated: 17 July 2015 by The Mayor
 
 Example:
 
 .. code-block:: pascal
 
-*)
+    if powersScreen.__find() then
+      writeln('The powersScreen is open, and the bounds are set!');
+*}
 {$IFNDEF CODEINSIGHT}
 function TRSPowersScreen.__find(): Boolean;
 var
@@ -364,16 +580,15 @@ end;
 {$ENDIF}
 
 (*
-TRSPowersScreen.isOpen
-~~~~~~~~~~~~~~~~~~~~~~
+isOpen
+------
 
 .. code-block:: pascal
 
     function TRSPowersScreen.isOpen(waitTime: integer = 0): boolean;
 
-Returns true if the Powers screen is open. Includes an optional parameter
-'waitTime' (default 0) which will search for the Powers screen until
-'waitTime' is reached.
+Returns true if the collectBox interface is open. The optional **waitTime** parameter
+*(default = 0)* is the maximum time (in milliseconds) it will keep looking.
 
 .. note::
 
@@ -384,9 +599,8 @@ Example:
 
 .. code-block:: pascal
 
-    if (powersScreen.isOpen()) then
+    if powersScreen.isOpen() then
       writeln('The Powers screen is open!');
-
 *)
 function TRSPowersScreen.isOpen(waitTime: integer = 0): boolean;
 var
@@ -402,31 +616,32 @@ begin
     end;
   until (getSystemTime() >= t);
 
-  print('PowersScreen.isOpen(): Result = ' + boolToStr(result));
+    print('TRSPowersScreen.isOpen() result: ' + boolToStr(result));
 end;
 
 (*
-TRSPowersScreen.open
-~~~~~~~~~~~~~~~~~~~~
+open
+----
 
 .. code-block:: pascal
 
-    function TRSPowersScreen.open(waitTime: integer=1000): boolean;
+    function TRSPowersScreen.open(waitTime: integer = 3000): boolean;
 
-Attempts to open the powers screen. Returns whether successful or not.
+Returns true is the powersScreen is successfully opened. The optional
+**waitTime** parameter *(default = 3000)* is the maximum time (in milliseconds)
+it will keep looking.
 
 .. note::
 
     - by The Mayor
-    - Last Updated: 6th July 2014 by The Mayor
+    - Last Updated: 6 July 2014 by The Mayor
 
 Example:
 
 .. code-block:: pascal
 
-    if (powersScreen.open()) then
+    if powersScreen.open() then
       writeln('We opened the powers screen');
-
 *)
 function TRSPowersScreen.open(waitTime: integer = 3000): boolean;
 var
@@ -450,19 +665,17 @@ begin
     until (getSystemTime() > t);
     inc(i);
   end;
-
-  print('powersScreen.open() result: ' + boolToStr(result));
 end;
 
 (*
-TRSPowersScreen.close
-~~~~~~~~~~~~~~~~~~~~~
+close
+-----
 
 .. code-block:: pascal
 
     function TRSPowersScreen.close(): boolean;
 
-Attempts to close the Powers screen. Returns whether successful or not.
+Returns true if the powersScreen is successfully closed.
 
 .. note::
 
@@ -473,8 +686,8 @@ Example:
 
 .. code-block:: pascal
 
-    if (powersScreen.close()) then
-      writeln('We just closed the Powers screen');
+    if powersScreen.close() then
+      writeln('We just closed the powersScreen');
 
 *)
 function TRSPowersScreen.close(): boolean;
@@ -483,7 +696,7 @@ var
 begin
   if not self.isOpen() then
   begin
-    print('powersScreen.close(): The Powers screen is already closed!', TDebug.HINT);
+    print('TRSPowersScreen.close(): The Powers screen is already closed!', TDebug.HINT);
     exit(true);
   end;
 
@@ -498,30 +711,30 @@ begin
     end;
   until (getSystemTime() > t);
 
-  print('powersScreen.close() result: ' + boolToStr(result));
+  print('TRSPowersScreen.close() result: ' + boolToStr(result));
 end;
 
 {*
-TRSPowersScreen.__getTabBounds
-~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+__getTabBounds
+--------------
 
 .. code-block:: pascal
 
-    function TRSPowersScreen._getTabBounds(tab: integer): TBox;
-                              _
-Returns the TBox of the desired Main Tab in the Powers screen. These are the
-combat style and prayer tabs. This function is only used in openTab below.
+    function TRSPowersScreen.__getTabBounds(tab: integer): TBox;
 
+Returns the TBox of the desired Main Tab **tab**. *Main Tab constants* are at the
+top of this page.
 
 .. note::
 
     - by Coh3n
-    - Last Updated: 17th July 2015 by The Mayor
+    - Last Updated: 17 July 2015 by The Mayor
 
 Example:
 
 .. code-block:: pascal
 
+    b := powersScreen.__getTabBounds(POWERS_TAB_MELEE);
 *}
 {$IFNDEF CODEINSIGHT}
 function TRSPowersScreen.__getTabBounds(tab: integer): TBox;
@@ -530,26 +743,27 @@ begin
 end;
 {$ENDIF}
 
-(*
-TRSPowersScreen.__getActiveTab
-~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+{*
+__getActiveTab
+--------------
 
 .. code-block:: pascal
 
     function TRSPowersScreen.__getActiveTab(): Integer;
 
-Returns the number of the main tab that is currently active
+Returns the number of the Main Tab that is currently active
 
 .. note::
 
     - by The Mayor
-    - Last Updated: 17th July 2015 by The Mayor
+    - Last Updated: 17 July 2015 by The Mayor
 
 Example:
 
 .. code-block:: pascal
 
-*)
+    currentTab := powersScreen.__getActiveTab();
+*}
 {$IFNDEF CODEINSIGHT}
 function TRSPowersScreen.__getActiveTab(): Integer;
 var
@@ -562,19 +776,20 @@ end;
 {$ENDIF}
 
 (*
-TRSPowersScreen.openTab
-~~~~~~~~~~~~~~~~~~~~~~~
+openTab
+-------
 
 .. code-block:: pascal
 
     function TRSPowersScreen.openTab(tab: integer): boolean;
 
-Opens one of the Main Tabs in the Powers screen. Returns whether successful or not.
+Returns true if it successfully opens  the Main Tab **tab** . *Main Tab constants*
+are found at the top of this page.
 
 .. note::
 
     - by The Mayor
-    - Last Updated: 17th July 2015 by The Mayor
+    - Last Updated: 17 July 2015 by The Mayor
 
 Example:
 
@@ -587,7 +802,7 @@ function TRSPowersScreen.openTab(tab: integer): boolean;
 begin
   if (not self.open()) then
   begin
-    print('powersScreen.openTab(): Can''t open the tab as powers screen isn''t open', TDebug.ERROR);
+    print('TRSPowersScreen.openTab(): Can''t open the tab as powers screen isn''t open', TDebug.ERROR);
     exit(false);
   end;
 
@@ -605,19 +820,19 @@ begin
     end;
   end;
 
-  print('powersScreen.openTab() result: ' + boolToStr(result));
+  print('TRSPowersScreen.openTab() result: ' + boolToStr(result));
 end;
 
 (*
-TRSPowersScreen.getAbilitySlotBox
-~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+getAbilitySlotBox
+-----------------
 
 .. code-block:: pascal
 
     function TRSPowersScreen.getAbilitySlotBox(slot: integer): TBox;
 
-Returns the TBox around the desired ability. Slots start at the top left at 1
-and count across the columns.
+Returns the TBox around the ability slot **slot** . Slots start at 0 in the top
+left corner, and cound across the row.
 
 .. note::
 
@@ -636,15 +851,16 @@ begin
   result := gridBox(slot -1, 6, 6, 26, 26, 36, 34, point(self.x1 + _ABILITY_OFFSET.x, self.y1 + _ABILITY_OFFSET.y));
 end;
 
-(*
-TRSPowersScreen.__getSubTabBounds
-~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+{*
+__getSubTabBounds
+-----------------
 
 .. code-block:: pascal
 
     function TRSPowersScreen.__getSubTabBounds(subTab: integer): TBox;
 
-Returns the TBox of the desired Sub Tab.
+Returns the TBox of the desired Sub Tab **subTab** . *Sub Tab constants* are located
+at the top of this page.
 
 .. note::
 
@@ -655,8 +871,9 @@ Example:
 
 .. code-block:: pascal
 
+    b := powersScreen.__getSubTabBounds(SUB_TAB_ATTACK);
 end;
-*)
+*}
 {$IFNDEF CODEINSIGHT}
 function TRSPowersScreen.__getSubTabBounds(subTab: integer): TBox;
 begin
@@ -664,15 +881,16 @@ begin
 end;
 {$ENDIF}
 
-(*
-TRSPowersScreen.__isSubTabActive
-~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+{*
+__isSubTabActive
+----------------
 
 .. code-block:: pascal
 
-    function TRSPowersScreen.__isSubTabActive(tab: integer): boolean;
+    function TRSPowersScreen.__isSubTabActive(subTab: integer): boolean;
 
-Returns true if the Sub Tab 'tab' is active.
+Returns true if the Sub Tab **subTab** is active. *Sub Tab constants* are located
+at the top of this page.
 
 .. note::
 
@@ -685,25 +903,25 @@ Example:
 
     if powersScreen.__isSubTabActive(SUB_TAB_ATTACK) then
       writeLn('The Attack Sub Tab is open!');
-*)
+*}
 {$IFNDEF CODEINSIGHT}
-function TRSPowersScreen.__isSubTabActive(tab: integer): boolean;
+function TRSPowersScreen.__isSubTabActive(subTab: integer): boolean;
 begin                 // the white color at (x1, y1) of the Sub Tab box.
-  result := (getColor(self.__getSubTabBounds(tab).x1, self.__getSubTabBounds(tab).y1) = 16777215) or
-            (getColor(self.__getSubTabBounds(tab).x1, self.__getSubTabBounds(tab).y1) = 14934752);
-  print('powersScreen._isSubTabActive() tab ' + toStr(tab) + ' result: ' + boolToStr(result));
+  result := (getColor(self.__getSubTabBounds(subTab).x1, self.__getSubTabBounds(subTab).y1) = 16777215) or
+            (getColor(self.__getSubTabBounds(subTab).x1, self.__getSubTabBounds(subTab).y1) = 14934752);
 end;
 {$ENDIF}
 
 (*
-TRSPowersScreen.openSubTab
-~~~~~~~~~~~~~~~~~~~~~~~~~~
+openSubTab
+----------
 
 .. code-block:: pascal
 
-    function TRSPowersScreen.openSubTab(tab: integer): boolean;
+    function TRSPowersScreen.openSubTab(subTab: integer): boolean;
 
-Opens a Sub Tab in the Powers screen. Returns whether successful or not.
+Returns true if it successfully opens the Sub Tab **subTab** . *Sub Tab constants*
+are found at the top of this page.
 
 .. note::
 
@@ -717,26 +935,26 @@ Example:
     powersScreen.openSubTab(SUB_TAB_COMBAT_SPELLS);
 
 *)
-function TRSPowersScreen.openSubTab(tab: integer): boolean;
+function TRSPowersScreen.openSubTab(subTab: integer): boolean;
 var
   t: LongWord;
 begin
   if not self.open() then
   begin
-    print('powersScreen.openSubTab(): Can''t open Sub Tab as Powers screen isn''t open', TDebug.ERROR);
+    print('TRSPowersScreen.openSubTab(): Can''t open Sub Tab as Powers screen isn''t open', TDebug.ERROR);
     exit;
   end;
 
-  if self.__isSubTabActive(tab) then
+  if self.__isSubTabActive(subTab) then
   begin
-    print('powersScreen.openSubTab(): The Sub Tab is already open!', TDebug.HINT);
+    print('TRSPowersScreen.openSubTab(): The Sub Tab is already open!', TDebug.HINT);
     exit(true);
   end;
 
   t := getSystemTime() + randomRange(2500, 4500);
   repeat
-    mouseBox(powersScreen.__getSubTabBounds(tab), MOUSE_LEFT);
-    if self.__isSubTabActive(tab) then
+    mouseBox(powersScreen.__getSubTabBounds(subTab), MOUSE_LEFT);
+    if self.__isSubTabActive(subTab) then
     begin
       result := true;
       break;
@@ -744,23 +962,23 @@ begin
       wait(random(1250, 2000));
   until (getSystemTime() > t);
 
-  print('powersScreen.openSubTab() result: ' + boolToStr(result));
+  print('TRSPowersScreen.openSubTab() result: ' + boolToStr(result));
 end;
 
 (*
-TRSPowersScreen.getActionBarSlotBoxes
-~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+getActionBarSlotBoxes
+---------------------
 
 .. code-block:: pascal
 
     function TRSPowersScreen.getActionBarSlotBoxes(): TBoxArray;
 
-Returns a TBoxArray of all of the Action bar slot boxes.
+Returns a TBoxArray of all of the action bar slot boxes.
 
 .. note::
 
     - by Olly
-    - Last Updated: 6th July 2014 by The Mayor
+    - Last Updated: 6 July 2014 by The Mayor
 
 Example:
 
@@ -775,19 +993,19 @@ begin
 end;
 
 (*
-TRSPowersScreen.getActionBarSlot
-~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+getActionBarSlot
+----------------
 
 .. code-block:: pascal
 
     function TRSPowersScreen.getActionBarSlot(slot: integer): TBox;
 
-Returns the TBox of the desired Actin bar slot.
+Returns the TBox of the actionBar slot **slot**
 
 .. note::
 
     - by Olly
-    - Last Updated: 6th July 2014 by The Mayor
+    - Last Updated: 6 July 2014 by The Mayor
 
 Example:
 
@@ -802,19 +1020,19 @@ begin
 end;
 
 (*
-TRSPowersScreen.isActionBarSlotEmpty
-~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+isActionBarSlotEmpty
+--------------------
 
 .. code-block:: pascal
 
     function TRSPowersScreen.isActionBarSlotEmpty(slot: integer): boolean;
 
-Returns true the Action bar slot 'slot' is empty.
+Returns true the Action bar slot **slot** is empty.
 
 .. note::
 
     - by euphemism
-    - Last Updated: 6th July 2014 by The Mayor
+    - Last Updated: 6 July 2014 by The Mayor
 
 Example:
 
@@ -827,18 +1045,17 @@ Example:
 function TRSPowersScreen.isActionBarSlotEmpty(slot: integer): boolean;
 begin
   result := (getColor(self.getActionBarSlotBox(slot).getMiddle().x, self.getActionBarSlotBox(slot).getMiddle().y) = 2761233);
-  print('powersScreen.isActionBarSlotEmpty() slot ' + toStr(slot) + ' result: ' + boolToStr(result));
 end;
 
 (*
-TRSPowersScreen.isActionBarEmpty
-~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+isActionBarEmpty
+----------------
 
 .. code-block:: pascal
 
     function TRSPowersScreen.isActionBarEmpty(): boolean;
 
-Returns true if the Action bar is empty.
+Returns true if the action bar is empty.
 
 .. note::
 
@@ -866,14 +1083,14 @@ begin
 end;
 
 (*
-TRSPowersScreen.clearActionBar
-~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+clearActionBar
+--------------
 
 .. code-block:: pascal
 
     function TRSPowersScreen.clearActionBar(): boolean;
 
-Clears all abilities from the Action bar. Returns whether successful or not.
+Returns true if it clears all the abilities from the action bar.
 
 .. note::
 
@@ -894,7 +1111,7 @@ var
 begin
   if self.isActionBarEmpty() then
   begin
-    print('powersScreen.clearActionBar(): Action Bar is already empty!', TDebug.HINT);
+    print('TRSPowersScreen.clearActionBar(): Action Bar is already empty!', TDebug.HINT);
     exit(true);
   end;
 
@@ -915,19 +1132,19 @@ begin
     end;
   until (getSystemTime() > t);
 
-  print('powersScreen.clearActionBar() result: ' + boolToStr(result));
+  print('TRSPowersScreen.clearActionBar() result: ' + boolToStr(result));
 end;
 
 (*
-TRSPowersScreen.clearActionBarSlot
-~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+clearActionBarSlot
+------------------
 
 .. code-block:: pascal
 
     function TRSPowersScreen.clearActionBarSlot(slot: integer): boolean;
 
-Clears an ability from an Action bar slot. Will attempt up to 3 times to drag
-the ability to the trash can. Returns whether successful or not.
+Returns true if it clears an ability from the action bar slot **slot** . It
+will attempt up to 3 times to drag the ability to the trash can.
 
 .. note::
 
@@ -948,13 +1165,13 @@ var
 begin
   if (not self.close()) then
   begin
-    print('powersScreen.clearActionBarSlot(): Can''t clear slot as powers screen wont close', TDebug.ERROR);
+    print('TRSPowersScreen.clearActionBarSlot(): Can''t clear slot as powers screen wont close', TDebug.ERROR);
     exit(false);
   end;
 
   if actionBar.isSlotEmpty(slot) then
    begin
-    print('powersScreen.clearActionBarSlot(): Slot is already empty!', TDebug.WARNING);
+    print('TRSPowersScreen.clearActionBarSlot(): Slot is already empty!', TDebug.WARNING);
     exit(true);
   end;
 
@@ -964,20 +1181,21 @@ begin
     inc(i);
   end;
 
-  print('powersScreen.clearActionBarSlot() slot ' + toStr(slot) + ' result: ' + boolToStr(result));
+  print('TRSPowersScreen.clearActionBarSlot() slot ' + toStr(slot) + ' result: ' + boolToStr(result));
 end;
 
 (*
-TRSPowersScreen.addAbilityToActionBar
-~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+addAbilityToActionBar
+---------------------
 
 .. code-block:: pascal
 
     function TRSPowersScreen.addAbilityToActionBar(ability: TIntegerArray; slot: integer): boolean;
 
-Attempts to drag an ability (or spell) to an actionbar slot. If an ability already
-exists in the slot, it clears the slot first. It will try up to 3 times and
-return if it is successful. Ability constants are located at the top of this file.
+Returns true if it successfully drags the ability or spell **ability** to the
+action bar slot **slot** . If an ability already exists in the slot, it will
+clear the slot first. It will attempt up to 3 times. *Ability and Spell constants*
+are located at the top of this page.
 
 .. note::
 
@@ -998,23 +1216,23 @@ var
   t : LongWord;
   p: TPoint;
 begin
-  print('powersScreen.addAbilityToActionBar()', TDebug.HEADER);
+  print('TRSPowersScreen.addAbilityToActionBar()', TDebug.HEADER);
 
   if (not self.open()) then
   begin
-    print('powersScreen.addAbilityToActionBar(): Can''t add ability as powers screen isn''t open', TDebug.ERROR);
+    print('TRSPowersScreen.addAbilityToActionBar(): Can''t add ability as powers screen isn''t open', TDebug.FOOTER);
     exit(false);
   end;
 
   if not self.openTab(ability[0]) then
   begin
-    print('powersScreen.addAbilityToActionBar(): Can''t select the correct Main Tab', TDebug.ERROR);
+    print('TRSPowersScreen.addAbilityToActionBar(): Can''t select the correct Main Tab', TDebug.FOOTER);
     exit(false);
   end;
 
   if not self.openSubTab(ability[1]) then
   begin
-    print('powersScreen.addAbilityToActionBar(): Can''t select the correct Sub Tab', TDebug.ERROR);
+    print('TRSPowersScreen.addAbilityToActionBar(): Can''t select the correct Sub Tab', TDebug.FOOTER);
     exit(false);
   end;
 
@@ -1023,7 +1241,7 @@ begin
     self.clearActionBarSlot(slot);
     if (not self.open()) then
     begin
-      print('powersScreen.addAbilityToActionBar(): Can''t add ability as powers screen isn''t open', TDebug.ERROR);
+      print('TRSPowersScreen.addAbilityToActionBar(): Can''t add ability as powers screen isn''t open', TDebug.FOOTER);
       exit(false);
     end;
   end;
@@ -1046,19 +1264,18 @@ begin
     inc(i);
   end;
 
-  print('powersScreen.addAbilityToActionBar() result: ' + boolToStr(result), TDebug.FOOTER);
+  print('TRSPowersScreen.addAbilityToActionBar() result: ' + boolToStr(result), TDebug.FOOTER);
 end;
 
-(*
-TRSPowersScreen.__getExperienceBox
-~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+{*
+__getExperienceBox
+------------------
 
 .. code-block:: pascal
 
     function TRSPowersScreen.getExperienceBox(experienceType: integer): TBox;
 
-Returns the TBox of the desired experienceType. This function is only really
-used in the functions below.
+Returns the TBox of the desired Experience Type **experienceType** .
 
 .. note::
 
@@ -1071,7 +1288,7 @@ Example:
 
     box := powersScreen.__getExperienceBox(TYPE_RANGED_AND_DEFENCE);
 
-*)
+*}
 {$IFNDEF CODEINSIGHT}
 function TRSPowersScreen.__getExperienceBox(combatStyle, experienceType: integer): TBox;
 var
@@ -1087,16 +1304,17 @@ end;
 {$ENDIF}
 
 (*
-TRSPowersScreen.getCombatExperience
-~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+getCombatExperience
+-------------------
 
 .. code-block:: pascal
 
     function TRSPowersScreen.getCombatExperience(combatStyles: integer): integer;
 
-Returns the currently selected experience type for a combat style.For example,
-getCombatExperience(MELEE_STYLE) might return balanced xp (1) or defence xp (4).
-The combatStyle constants are found at the top of this file.
+Returns the integer of the currently selected Experience Type for the Combat Style
+** conbatStyle** . For example, getCombatExperience(MELEE_STYLE) might return
+balanced xp (1) or defence xp (4). The *Combat Style constants* are found at the
+top of this page.
 
 .. note::
 
@@ -1107,7 +1325,7 @@ Example:
 
 .. code-block:: pascal
 
-    currentXP := powersScreen.getCombatExperience(STYLE_MELEE);
+    currentMeleeXPType := powersScreen.getCombatExperience(STYLE_MELEE);
 
 *)
 function TRSPowersScreen.getCombatExperience(combatStyle: integer): integer;
@@ -1116,7 +1334,7 @@ var
 begin
   if (not self.openTab(POWERS_TAB_SETTINGS)) then
   begin
-    print('powersScreen.getCombatExperience(): Can''t open the Settings Tab', TDebug.ERROR);
+    print('TRSPowersScreen.getCombatExperience(): Can''t open the Settings Tab', TDebug.ERROR);
     exit;
   end;
 
@@ -1127,19 +1345,19 @@ begin
       break;
     end;
 
-  print('powersScreen.getCombatExperience() result: ' + intToStr(result));
+  print('TRSPowersScreen.getCombatExperience() result: ' + intToStr(result));
 end;
 
 (*
-TRSPowersScreen.setCombatExperience
-~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+setCombatExperience
+-------------------
 
 .. code-block:: pascal
 
     function TRSPowersScreen.setCombatExperience(combatStyle, experienceType): boolean;
 
-Sets an experienceType for a combatStyle. Constants for combatStyles and
-experienceTypes are at the top of this file.
+Sets the Experience Type **experienceType** for the Combat Style **combatStyle**.
+*Combat Style constants* and *Experience Type constants* are located at the top of this page.
 
 .. note::
 
@@ -1150,7 +1368,14 @@ Example:
 
 .. code-block:: pascal
 
+    // Setting the melee combat style to balanced XP
     powersScreen.setCombatExperience(MELEE_STYLE, XP_BALANCED);
+
+    // Setting the ranged combat style to defence XP
+    powersScreen.setCombatExperience(RANGED_STYLE, XP_DEFENCE);
+
+    // Setting the magic combat style to magic and defence XP
+    powersScreen.setCombatExperience(MAGIC_STYLE, XP_MAGIC_AND_DEFENCE);
 
 *)
 function TRSPowersScreen.setCombatExperience(combatStyle, experienceType: integer): boolean;
@@ -1159,25 +1384,25 @@ var
 begin
   if (experienceType = 2) and ((combatStyle = 2) or (combatStyle = 3)) then
   begin
-    print('powersScreen.setCombatExperience(): You can''t assign attack XP to Magic or Ranged!', TDebug.ERROR);
+    print('TRSPowersScreen.setCombatExperience(): You can''t assign attack XP to Magic or Ranged!', TDebug.ERROR);
     exit(false);
   end;
 
   if (not self.open()) then
   begin
-    print('powersScreen.setCombatExperience(): Can''t set experience type as powers screen isn''t open', TDebug.ERROR);
+    print('TRSPowersScreen.setCombatExperience(): Can''t set experience type as powers screen isn''t open', TDebug.ERROR);
     exit(false);
   end;
 
   if (not self.openTab(POWERS_TAB_SETTINGS)) then
   begin
-    print('powersScreen.getCombatExperience(): Can''t open the Settings Tab', TDebug.ERROR);
+    print('TRSPowersScreen.getCombatExperience(): Can''t open the Settings Tab', TDebug.ERROR);
     exit(false);
   end;
 
   if self.getCombatExperience(combatStyle) = experienceType then
   begin
-    print('powersScreen.setCombatExperience(): The experienceType is already set.', TDebug.HINT);
+    print('TRSPowersScreen.setCombatExperience(): The experienceType is already set.', TDebug.HINT);
     exit(true);
   end;
 
@@ -1192,19 +1417,18 @@ begin
     end;
   until (getSystemTime() > t);
 
-  print('powersScreen.setCombatExperience() result: ' + boolToStr(result));
+  print('TRSPowersScreen.setCombatExperience() result: ' + boolToStr(result));
 end;
 
-(*
-TRSPowersScreen.__getCombatModeBox
-~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+{*
+__getCombatModeBox
+------------------
 
 .. code-block:: pascal
 
     function TRSPowersScreen.__getCombatModeBox(combatMode: integer): TBox;
 
-Returns the TBox of the desired Combat Mode. This function is only really
-used in the functions below.
+Returns the TBox of the desired Combat Mode **combatMode** .
 
 .. note::
 
@@ -1217,7 +1441,7 @@ Example:
 
     box := powersScreen._getCombatModeBox(MODE_REVOLUTION);
 
-*)
+*}
 {$IFNDEF CODEINSIGHT}
 function TRSPowersScreen.__getCombatModeBox(combatMode: integer): TBox;
 begin
@@ -1226,14 +1450,15 @@ end;
 {$ENDIF}
 
 (*
-TRSPowersScreen.getCombatMode()
-~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+getCombatMode
+-------------
 
 .. code-block:: pascal
 
     function TRSPowersScreen.getCombatMode(): integer;
 
-Returns the currently selected Combat Mode.
+Returns the integer of currently selected Combat Mode. For example, it could
+return MODE_REVOLUTION (1) or MODE_MOMENTUM (4).
 
 .. note::
 
@@ -1244,8 +1469,8 @@ Example:
 
 .. code-block:: pascal
 
-    if powersScreen.getCombatMode() = 1 then
-      writeLn('We are using the Full Manual Combat Mode');
+    if powersScreen.getCombatMode() = 3 then
+      writeLn('We are using the Momentum Combat Mode');
 
 *)
 function TRSPowersScreen.getCombatMode(): integer;
@@ -1254,7 +1479,7 @@ var
 begin
   if (not self.openTab(POWERS_TAB_SETTINGS)) then
   begin
-    print('powersScreen.getCombatExperience(): Can''t open the Settings Tab', TDebug.ERROR);
+    print('TRSPowersScreen.getCombatExperience(): Can''t open the Settings Tab', TDebug.ERROR);
     exit;
   end;
 
@@ -1265,18 +1490,19 @@ begin
       break;
     end;
 
-  print('powersScreen.getCombatMode() result: ' + intToStr(result));
+  print('TRSPowersScreen.getCombatMode() result: ' + intToStr(result));
 end;
 
 (*
-TRSPowersScreen.setCombatMode
-~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+setCombatMode
+-------------
 
 .. code-block:: pascal
 
     function TRSPowersScreen.setCombatMode(combatMode): boolean;
 
-Sets a Combat Mode. Constants for the 3 combat modes are at the top of this file.
+Returns true if it successfully sets the players Combat Mode to **combatMode** .
+*Combat Mode constants* are located at the top of this page.
 
 .. note::
 
@@ -1287,6 +1513,7 @@ Example:
 
 .. code-block:: pascal
 
+    // Setting the players Combat Mode to momentum
     powersScreen.setCombatMode(MODE_MOMENTUM);
 
 *)
@@ -1296,19 +1523,19 @@ var
 begin
   if (not self.open()) then
   begin
-    print('powersScreen.setCombatMode(): Can''t set Combat Mode as powers screen isn''t open', TDebug.ERROR);
+    print('TRSPowersScreen.setCombatMode(): Can''t set Combat Mode as powers screen isn''t open', TDebug.ERROR);
     exit(false);
   end;
 
   if (not self.openTab(POWERS_TAB_SETTINGS)) then
   begin
-    print('powersScreen.setCombatMode(): Can''t open the Settings Tab', TDebug.ERROR);
+    print('TRSPowersScreen.setCombatMode(): Can''t open the Settings Tab', TDebug.ERROR);
     exit(false);
   end;
 
   if self.getCombatMode() = combatMode then
   begin
-    print('powersScreen.setCombatMode(): The Combat Mode is already set.', TDebug.HINT);
+    print('TRSPowersScreen.setCombatMode(): The Combat Mode is already set.', TDebug.HINT);
     exit(true);
   end;
 
@@ -1323,7 +1550,7 @@ begin
     end;
   until (getSystemTime() > t);
 
-  print('powersScreen.setCombatMode() result: ' + boolToStr(result));
+  print('TRSPowersScreen.setCombatMode() result: ' + boolToStr(result));
 end;
 
 begin
