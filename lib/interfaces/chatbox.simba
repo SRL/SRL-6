@@ -2,21 +2,42 @@
 Chatbox
 =======
 
-The chatbox file holds functions and procedures that are used in the
-Runescape chat box.
+The chatbox file holds functions and procedures that are used in the runescape chat box.
 
-The source for this file can be found
-`here <https://github.com/SRL/SRL-6/blob/master/lib/interfaces/chatbox.simba>`_.
+The source for this file can be found `here <https://github.com/SRL/SRL-6/blob/master/lib/interfaces/chatbox.simba>`_.
 
 *)
 
 {$f-}
 
 (*
-type TRSChatbox
-~~~~~~~~~~~~~~~
+Consts, Types, Vars
+~~~~~~~~~~~~~~~~~~~
 
-A type that stores functions and properties of the Runescape chat box interface.
+The following constants, types and variables are used throughout the chatbox methods.
+
+**const Tesseract Fiter**
+
+.. code-block:: pascal
+    const
+      CHATBOX_TESSERACT_FILTER: TTesseractFilter = [3, 3, [False, 35, TM_Mean]];
+
+The TTesseractFilter that is used by the chatbox text functions by default.
+Scripters can create and use their own filters if they wish.
+
+*)
+const
+  CHATBOX_TESSERACT_FILTER: TTesseractFilter = [3, 3, [False, 35, TM_Mean]];
+
+(*
+**type TRSChatbox**
+
+.. code-block:: pascal
+    type
+      TRSChatbox = type TRSInterface;
+
+A type that stores the chatbox interface properties.
+
 *)
 type
   TRSChatbox = record(TRSInterface)
@@ -24,26 +45,41 @@ type
   end;
 
 (*
-var chatbox
-~~~~~~~~~~~
+**var chatbox**
 
-Variable that stores functions and properties of the Runescape chatbox interface.
+.. code-block:: pascal
+    var
+      chatbox: TRSChatbox;
+
+A variable through which scripters can access the TRSChatbox type methods.
+
 *)
 var
   chatbox: TRSChatbox;
 
-const
-  CHATBOX_TESSERACT_FILTER: TTesseractFilter = [3, 3, [False, 35, TM_Mean]];
+(*
+TRSChatbox methods
+~~~~~~~~~~~~~~~~~~
+
+The following methods should be called through the **chatbox** variable.
+
+Example:
+
+.. code-block:: pascal
+
+    if chatbox.findText(['Hello']) then
+      writeln('We found Hello in the chatbox');
+*)
 
 {*
-TRSChatbox.__init
-~~~~~~~~~~~~~~~~~
+__init
+------
 
 .. code-block:: pascal
 
     procedure TRSChatbox.__init();
 
-Initiates the chatbox variable.
+Initializes the TRSChatbox.
 
 .. note::
 
@@ -70,14 +106,14 @@ end;
 {$ENDIF}
 
 {*
-TRSChatbox.__setup
-~~~~~~~~~~~~~~~~~~
+__setup
+-------
 
 .. code-block:: pascal
 
     procedure TRSChatbox.__setup();
 
-Sets up the chat box variables.
+Sets up the chatbox variables based on its size.
 
 .. note::
 
@@ -117,14 +153,14 @@ end;
 {$ENDIF}
 
 (*
-.getChatArea
-~~~~~~~~~~~~
+getChatArea
+-----------
 
 .. code-block:: pascal
 
     function TRSChatbox.getChatArea(): TBox;
 
-Returns a TBox of the chat box area.
+Returns a TBox of the area where the chat text is located.
 
 .. note::
 
@@ -135,7 +171,11 @@ Example:
 
 .. code-block:: pascal
 
-    area := chatbox.getChatArea();
+    var
+      area: TBox;
+    begin
+      area := chatbox.getChatArea();
+    end;
 *)
 function TRSChatbox.getChatArea(): TBox;
 begin
@@ -143,14 +183,15 @@ begin
 end;
 
 (*
-.findAnyText
-~~~~~~~~~~~~
+findText
+--------
 
 .. code-block:: pascal
 
-    function TRSChatbox.findAnyText(txt: TStringArray): boolean;
+    function TRSChatbox.findText(txt: TStringArray; const Filter: TTesseractFilter = CHATBOX_TESSERACT_FILTER): boolean;
 
-Returns true is any of the text in 'txt' is found anywhere in the chat box.
+Returns true is any of the text in **txt** is found anywhere in the chat box.
+The scripter has the option of using a custom TTesseractFilter **Filter** .
 
 .. note::
 
@@ -161,7 +202,8 @@ Example:
 
 .. code-block:: pascal
 
-    chatbox.findAnyText(['Hello']);
+    if chatbox.findAnyText(['Hello']) then
+      writeLn('We found Hello in the chatbox');
 *)
 function TRSChatbox.findText(txt: TStringArray; const Filter: TTesseractFilter = CHATBOX_TESSERACT_FILTER): boolean;
 var
@@ -172,15 +214,16 @@ begin
 end;
 
 (*
-.getTextOnLine
-~~~~~~~~~~~~~~
+getTextOnLine
+-------------
 
 .. code-block:: pascal
 
     function TRSChatbox.getTextOnLine(Line: Integer; Filter: TTesseractFilter = CHATBOX_TESSERACT_FILTER): String;
 
-Returns the string of text on chatbox line 'Line'. Has the option to change the
-tesseract filter. The bottom line is 0, working upwards.
+Returns the string of text on chatbox line **Line** . The scripter has the
+option of using a custom TTesseractFilter **Filter** . The bottom line in the
+chatbox is line 0.
 
 .. note::
 
@@ -203,15 +246,16 @@ begin
 end;
 
 (*
-.findTextOnLines
-~~~~~~~~~~~~~~~~
+findTextOnLines
+---------------
 
 .. code-block:: pascal
 
-    function TRSChatbox.findTextOnLines(txt: TStringArray; lines: TIntegerArray): boolean;
+    function TRSChatbox.findTextOnLines(txt: TStringArray; lines: TIntegerArray; Filter: TTesseractFilter = CHATBOX_TESSERACT_FILTER): boolean;
 
-Returns true if the text in 'txt' is found on the lines 'lines' of the chatbox.
-The bottom line is 0, working upwards.
+Returns true is any of the text in **txt** is found on any of the chatbox
+lines **lines** .The scripter has the option of using a custom TTesseractFilter
+**Filter** . The bottom line in the chatbox is line 0.
 
 .. note::
 
@@ -222,8 +266,8 @@ Example:
 
 .. code-block:: pascal
 
-    // returns true if "Hello" is found on the first 4 lines
-    chatbox.findTextOnLines(['Hello'], [0..3]);
+    // returns true if "Hello" or "Hi" is found on the first 4 lines
+    chatbox.findTextOnLines(['Hello', 'Hi'], [0..3]);
 *)
 function TRSChatbox.findTextOnLines(txt: TStringArray; lines: TIntegerArray; Filter: TTesseractFilter = CHATBOX_TESSERACT_FILTER): boolean;
 var
@@ -244,8 +288,8 @@ begin
 end;
 
 (*
-.getXPBar
-~~~~~~~~~
+getXPBar
+--------
 
 .. code-block:: pascal
 
@@ -263,7 +307,11 @@ Example:
 
 .. code-block:: pascal
 
-    startXP := chatbox.getXPBar();
+    var
+      xpGain: Integer;
+    begin
+      xpGain := chatbox.getXPBar() - StartXP;
+    end;
 *)
 function TRSChatbox.getXPBar(): Integer;
 const

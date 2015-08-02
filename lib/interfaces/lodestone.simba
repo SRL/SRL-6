@@ -14,10 +14,9 @@ The source for this file can be found `here <https://github.com/SRL/SRL-6/blob/m
 Consts, Types, Vars
 ~~~~~~~~~~~~~~~~~~~
 
-The following constants, types and variables are used in the lodestone screen methods.
+The following constants, types and variables are used throughout the lodestone screen methods.
 
-const Locations
----------------
+**const Locations**
 
 All possible locations to teleport on the lodestone network:
 
@@ -46,6 +45,7 @@ All possible locations to teleport on the lodestone network:
     * LOCATION_ASHDALE
     * LOCATION_PRIFDDINAS
     * LOCATION_PREVIOUS
+
 *)
 const
   LOCATION_LUNAR_ISLE      = 0;
@@ -76,19 +76,27 @@ const
   LOCATION_PREVIOUS        = 1337;
 
 (*
-type TRSLodestoneScreen
------------------------
+**type TRSLodestoneScreen**
+
+.. code-block:: pascal
+    type
+      TRSLodestoneScreen = type TRSInterface;
 
 A type that stores the lodestone interface properties.
+
 *)
 type
   TRSLodestoneScreen = type TRSInterface;
 
 (*
-var lodestoneScreen
--------------------
+**var lodestoneScreen**
+
+.. code-block:: pascal
+    var
+      lodestoneScreen: TRSLodestoneScreen;
 
 A variable through which scripters can access the TRSLodestoneScreen type methods.
+
 *)
 var
   lodestoneScreen: TRSLodestoneScreen;
