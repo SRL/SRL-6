@@ -1,6 +1,6 @@
 (*
-Lodestone
-=========
+Lodestone Screen
+================
 
 The lodestone file holds functions and procedures that are used in the runescape lodestone screen.
 
@@ -14,7 +14,7 @@ The source for this file can be found `here <https://github.com/SRL/SRL-6/blob/m
 Consts, Types, Vars
 ~~~~~~~~~~~~~~~~~~~
 
-The following constants, types and variables are used throughout the lodestone screen methods.
+The following constants, types and variables are used throughout the lodestoneScreen methods.
 
 **const Locations**
 
@@ -149,7 +149,7 @@ begin
 end;
 {$ENDIF}
 
-(*
+{*
 __find
 ------
 
@@ -171,7 +171,7 @@ Example:
 
     if lodestoneScreen.__find() then
       writeln('The lodestone screen is open, and the bounds are set!');
-*)
+*}
 {$IFNDEF CODEINSIGHT}
 function TRSLodestoneScreen.__find(): boolean;
 const
@@ -255,7 +255,7 @@ close
 
     function TRSLodestoneScreen.close(): boolean;
 
-Closes the lodestone screen.
+Returns true if the lodestone screen is successfully closed.
 
 .. note::
 
@@ -299,7 +299,7 @@ begin
     print('TRSLodestoneScreen.close(): Failed to close lodestone screen', TDebug.WARNING);
 end;
 
-{*
+(*
 _isLocationVaild
 ----------------
 
@@ -321,7 +321,7 @@ Example:
 
     if lodestoneScreen._isLocationVaild(LOCATION_VARROCK) then
       writeln('LOCATION_VARROCK is a valid lodestone');
-*}
+*)
 function TRSLodestoneScreen._isLocationVaild(location: integer): boolean;
 begin
   result := inRange(location, LOCATION_LUNAR_ISLE, LOCATION_PRIFDDINAS);
@@ -330,7 +330,7 @@ begin
     print('TRSLodestoneScreen._isLocationVaild(): Location isn''t vaild!');
 end;
 
-{*
+(*
 _getTeleportBox
 ---------------
 
@@ -350,7 +350,7 @@ Example:
 .. code-block:: pascal
 
     b := lodestoneScreen._getTeleportBox(LOCATION_CANIFIS);
-*}
+*)
 function TRSLodestoneScreen._getTeleportBox(location: integer): TBox;
 const
   pnts: TPointArray = [[26, 48], [94, 117], [71, 194], [183, 53], [165, 100], [156, 144], [147, 209], [139, 262], [239, 87], [198, 130], [230, 124], [198, 198], [298, 60], [281, 99], [261, 146], [262, 188], [336, 131], [299, 162], [310, 199], [310, 243], [351, 193], [393, 105], [84, 298], [51, 139]];

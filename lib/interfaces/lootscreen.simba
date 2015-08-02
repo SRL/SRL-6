@@ -1,9 +1,8 @@
 (*
-LootScreen
-==========
+Loot Screen
+===========
 
-The production file holds functions and procedures that are used in the
-Runescape loot screen.
+The loot screen file holds functions and procedures that are used in the runescape loot screen.
 
 The source for this file can be found `here <https://github.com/SRL/SRL-6/blob/master/lib/interfaces/lootscreen.simba>`_.
 
@@ -11,9 +10,17 @@ The source for this file can be found `here <https://github.com/SRL/SRL-6/blob/m
 
 {$f-}
 
+(*
+Consts, Types, Vars
+~~~~~~~~~~~~~~~~~~~
+
+The following constants, types and variables are used throughout the lootScreen methods.
+
+*)
+
 {*
 const Internal
-~~~~~~~~~~~~~~
+--------------
 
 Internal lootscreen constants.
 
@@ -22,36 +29,67 @@ const
   LOOT_SLOT_LOW = 1;
   LOOT_SLOT_HIGH = 28;
 
+(*
+**const Loot Buttons**
+
+Integer constants that represent the two loot buttons.
+
+    * LOOT_BUTTON_CUSTOM
+    * LOOT_BUTTON_ALL
+
+*)
+const
   LOOT_BUTTON_CUSTOM = 0;
   LOOT_BUTTON_ALL = 1;
 
 (*
-type TRSLootScreen
-~~~~~~~~~~~~~~~~~~
+**type TRSLootScreen**
 
-A type that stores the lootscreen interface properties.
+.. code-block:: pascal
+    type
+      TRSLootScreen = type TRSInterface;
+
+A type that stores the loot screen interface properties.
 
 *)
 type
   TRSLootScreen = type TRSInterface;
 
 (*
-var lootScreen
-~~~~~~~~~~~~~~~~~
+**var lootScreen**
 
-Variable that stores functions and properties of the Runescape lootscreen interface.
+.. code-block:: pascal
+    var
+      lootScreen: TRSLootScreen;
+
+A variable through which scripters can access the TRSLootScreen type methods.
+
 *)
 
 var
   lootScreen: TRSLootScreen;
 
-{*
-TRSLootScreen.__init
-~~~~~~~~~~~~~~~~~~~~~~~
+(*
+TRSLootScreen methods
+~~~~~~~~~~~~~~~~~~~~~
+
+The following methods should be called through the **lootScreen** variable.
+
+Example:
 
 .. code-block:: pascal
 
-    procedure TRSLootScreen.__init();;
+    if lootScreen.isOpen() then
+      writeln('Loot screen screen is open!');
+*)
+
+{*
+__init
+------
+
+.. code-block:: pascal
+
+    procedure TRSLootScreen.__init();
 
 Initializes the TRSLootScreen.
 
@@ -80,16 +118,16 @@ begin
 end;
 {$ENDIF}
 
-(*
-TRSLootScreen.__find
-~~~~~~~~~~~~~~~~~~~~~~~
+{*
+__find
+------
 
 .. code-block:: pascal
 
     function TRSLootScreen.__find(): boolean;
 
-Returns true if the lootscreen interface is detected, and sets
-the interface's bounds (fully dynamic).
+Returns true if the lootScreen interface is detected and its bounds are set.
+Scripters should use lootScreen.isOpen() below.
 
 .. note::
 
@@ -100,9 +138,9 @@ Example:
 
 .. code-block:: pascal
 
-    if (lootScreen.__find()) then
-      writeln('bounds are set!');
-*)
+    if lootScreen.__find() then
+      writeln('The loot screen is open, and the bounds are set!');
+*}
 {$IFNDEF CODEINSIGHT}
 function TRSLootScreen.__find(): boolean;
 const
@@ -143,16 +181,15 @@ end;
 {$ENDIF}
 
 (*
-TRSLootScreen.isOpen
-~~~~~~~~~~~~~~~~~~~~~~~
+isOpen
+------
 
 .. code-block:: pascal
 
     function TRSLootScreen.isOpen(waitTime: integer = 0): boolean;
 
-Returns true if the lootscreen is open, includes a optional parameter
-'waitTime' (default 0) which will search for the lootscreen interface
-until found or 'waitTime' is reached.
+Returns true if the lootScreen interface is open. The optional **waitTime** parameter
+*(default = 0)* is the maximum time (in milliseconds) it will keep looking.
 
 .. note::
 
@@ -163,8 +200,8 @@ Example:
 
 .. code-block:: pascal
 
-    if (lootScreen.isOpen()) then
-      writeln('It''s open!');
+    if lootScreen.isOpen() then
+      writeln('The lootScreen is open!');
 
 *)
 function TRSLootScreen.isOpen(waitTime: integer = 0): boolean;
@@ -185,14 +222,14 @@ begin
 end;
 
 (*
-TRSLootScreen.close
-~~~~~~~~~~~~~~~~~~~~~~
+close
+-----
 
 .. code-block:: pascal
 
     function TRSLootScreen.close(): boolean;
 
-Closes the lootscreen interface. It will return if succesful or not.
+Returns true if the lootScreen screen is successfully closed.
 
 .. note::
 
@@ -237,14 +274,14 @@ begin
 end;
 
 (*
-TRSLootScreen.getSlotBoxes
-~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+getSlotBoxes
+------------
 
 .. code-block:: pascal
 
     function TRSLootScreen.getSlotBoxes(): TBoxArray;
 
-Returns a TBoxArray of all of the loot slot boxes.
+Returns a TBoxArray of all of the lootScreen slot boxes.
 
 .. note::
 
@@ -266,14 +303,14 @@ begin
 end;
 
 (*
-TRSLootScreen._isSlotValid
-~~~~~~~~~~~~~~~~~~~~~~~~~~
+_isSlotValid
+------------
 
 .. code-block:: pascal
 
     function TRSLootScreen._isSlotValid(slot: integer): boolean;
 
-Returns if the loot slot is vaild or not.
+Returns true if the lootScreen slot **slot** is a valid slot number.
 
 .. note::
 
@@ -284,7 +321,7 @@ Example:
 
 .. code-block:: pascal
 
-    if (lootscreen._isSlotValid(25)) then
+    if lootscreen._isSlotValid(25) then
       writeln('Slot is valid!');
 *)
 function TRSLootScreen._isSlotValid(slot: integer): boolean;
@@ -296,14 +333,14 @@ begin
 end;
 
 (*
-TRSLootScreen.getSlotBox
-~~~~~~~~~~~~~~~~~~~~~~~~~
+getSlotBox
+----------
 
 .. code-block:: pascal
 
-    function TRSLootScreen.getSlotBox(slot: integer): tbox;
+    function TRSLootScreen.getSlotBox(slot: integer): TBox;
 
-Returns the TBox of the selected loot slot.
+Returns the TBox of the lootScreen slot **slot**
 
 .. note::
 
@@ -328,14 +365,14 @@ begin
 end;
 
 (*
-TRSLootScreen.isItemInSlot
-~~~~~~~~~~~~~~~~~~~~~~~~~~
+isItemInSlot
+------------
 
 .. code-block:: pascal
 
     function TRSLootScreen.isItemInSlot(slot: integer): boolean;
 
-Returns if there is an item in the selected loot slot or not.
+Returns true if there is an item in the lootScreen slot **slot**
 
 .. note::
 
@@ -346,7 +383,7 @@ Example:
 
 .. code-block:: pascal
 
-    if (lootscreen.isItemInSlot(10)) then
+    if lootscreen.isItemInSlot(10) then
       writeln('There is an item in slot 10!');
 *)
 function TRSLootScreen.isItemInSlot(slot: integer): boolean;
@@ -360,14 +397,14 @@ begin
 end;
 
 (*
-TRSLootScreen.lootSlot
-~~~~~~~~~~~~~~~~~~~~~~~~~~
+lootSlot
+--------
 
 .. code-block:: pascal
 
     function TRSLootScreen.lootSlot(slot: integer): boolean;
 
-Loots the item in the selected slot.
+Loots the item in the lootScreen slot **slot**
 
 .. note::
 
@@ -378,7 +415,7 @@ Example:
 
 .. code-block:: pascal
 
-    if (lootscreen.lootSlot(10)) then
+    if lootscreen.lootSlot(10) then
       writeln('Looted item from slot 10!');
 *)
 function TRSLootScreen.lootSlot(slot: integer): boolean;
@@ -397,14 +434,14 @@ begin
 end;
 
 (*
-TRSLootScreen.lootSlots
-~~~~~~~~~~~~~~~~~~~~~~~~~~
+lootSlots
+---------
 
 .. code-block:: pascal
 
     function TRSLootScreen.lootSlots(slots: TIntegerArray): boolean;
 
-Loots the items in the selected slots.
+Loots the items in the lootScreen slots **slots**
 
 .. note::
 
@@ -415,7 +452,7 @@ Example:
 
 .. code-block:: pascal
 
-    if (lootscreen.lootSlots([1, 3])) then
+    if lootscreen.lootSlots([1, 3]) then
       writeln('Looted items from slots 1 and 3!');
 *)
 function TRSLootScreen.lootSlots(slots: TIntegerArray): boolean;
@@ -436,14 +473,14 @@ begin
 end;
 
 (*
-TRSLootScreen.lootDTMs
-~~~~~~~~~~~~~~~~~~~~~~~~~~
+lootDTMs
+--------
 
 .. code-block:: pascal
 
     function TRSLootScreen.lootDTMs(DTMs: TIntegerArray): boolean;
 
-Loots the items that match the DTMs in the array.
+Loots all of the items that match any of the DTMs in the **DTMs** array.
 
 .. note::
 
@@ -486,14 +523,14 @@ begin
 end;
 
 (*
-TRSLootScreen.lootDTM
-~~~~~~~~~~~~~~~~~~~~~~~~~~
+lootDTM
+-------
 
 .. code-block:: pascal
 
     function TRSLootScreen.lootDTM(DTM: integer): boolean;
 
-Loots the items that match the DTM.
+Loots all of the items that match the DTM **DTM**
 
 .. note::
 
@@ -514,17 +551,15 @@ begin
 end;
 
 (*
-TRSLootScreen.clickButton
-~~~~~~~~~~~~~~~~~~~~~~~~~~
+clickButton
+-----------
 
 .. code-block:: pascal
 
     function TRSLootScreen.clickButton(button: integer): boolean;
 
-Clicks the specified button.
-
-  LOOT_BUTTON_CUSTOM = 0
-  LOOT_BUTTON_ALL = 1
+Selects one of the two collect buttons. The **button** should be one of the two
+collect button constants at the top of this page.
 
 .. note::
 
@@ -535,7 +570,7 @@ Example:
 
 .. code-block:: pascal
 
-    if (lootscreen.clickButton(LOOT_BUTTON_ALL)) then
+    if lootscreen.clickButton(LOOT_BUTTON_ALL) then
       writeln('Looted all items.');
 *)
 function TRSLootScreen.clickButton(button: integer): boolean;
