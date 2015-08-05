@@ -116,9 +116,6 @@ const
 **type TRSInterface**
 
 A record that stores useful information about RS interfaces.
-*)
-(*
-**type TRSInterface**
 
 .. code-block:: pascal
 

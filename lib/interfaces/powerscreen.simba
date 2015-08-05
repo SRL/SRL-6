@@ -626,7 +626,7 @@ open
 
     function TRSPowersScreen.open(waitTime: integer = 3000): boolean;
 
-Returns true is the powersScreen is successfully opened. The optional
+Returns true if the powersScreen is successfully opened. The optional
 **waitTime** parameter *(default = 3000)* is the maximum time (in milliseconds)
 it will keep looking.
 

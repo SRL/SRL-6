@@ -2,8 +2,7 @@
 HeroScreen
 =============
 
-The heroscreen file holds functions and procedures that are used to interact
-with the Runescape Hero Screen.
+The heroscreen file holds functions and procedures that are used to interact with the runescape Hero Screen.
 
 The source for this file can be found `here <https://github.com/SRL/SRL-6/blob/master/lib/interfaces/heroscreen.simba>`_.
 
@@ -12,28 +11,55 @@ The source for this file can be found `here <https://github.com/SRL/SRL-6/blob/m
 {$f-}
 
 (*
-type TRSHeroScreen
-~~~~~~~~~~~~~~~~~~
+Consts, Types, Vars
+~~~~~~~~~~~~~~~~~~~
+
+The following constants, types and variables are used throughout the lodestoneScreen methods.
+
+
+**type TRSHeroScreen**
+
+.. code-block:: pascal
+
+    type
+      TRSHeroScreen = type TRSInterface;
 
 A type that stores the Hero Screen interface properties.
 *)
-
 type
   TRSHeroScreen = type TRSInterface;
 
 (*
-var heroScreen
-~~~~~~~~~~~~~~
+**var heroScreen**
 
-Variable that stores functions and properties of the Runescape Hero Screen interface.
+.. code-block:: pascal
+
+    var
+      heroScreen: TRSHeroScreen;
+
+A variable through which scripters can access the TRSHeroScreen type methods.
+
 *)
-
 var
   heroScreen: TRSHeroScreen;
 
+(*
+TRSHeroScreen methods
+~~~~~~~~~~~~~~~~~~~~~~~~~~
+
+The following methods should be called through the **heroScreen** variable.
+
+Example:
+
+.. code-block:: pascal
+
+    if heroScreen.isOpen() then
+      writeln('Herostone screen is open!');
+*)
+
 {*
-.__init
-~~~~~~~
+__init
+------
 
 .. code-block:: pascal
 
@@ -66,16 +92,16 @@ begin
 end;
 {$ENDIF}
 
-(*
-.__find
-~~~~~~~
+{*
+__find
+------
 
 .. code-block:: pascal
 
     function TRSHeroScreen.__find(): boolean;
 
-Returns true if the Hero Screen interface is detected, and sets
-the interface's bounds.
+Returns true if the heroscreen interface is detected and its bounds are set.
+Scripters should use heroScreen.isOpen() below.
 
 .. note::
 
@@ -87,8 +113,8 @@ Example:
 .. code-block:: pascal
 
     if heroScreen.__find() then
-      writeln('bounds are set!');
-*)
+      writeln('The herostone screen is open, and the bounds are set!');
+*}
 {$IFNDEF CODEINSIGHT}
 function TRSHeroScreen.__find(): boolean;
 const
@@ -127,16 +153,15 @@ end;
 {$ENDIF}
 
 (*
-.isOpen
-~~~~~~~
+isOpen
+------
 
 .. code-block:: pascal
 
     function TRSHeroScreen.isOpen(waitTime: integer = 0): boolean;
 
-Returns true if the Hero Screen is open, includes a optional parameter
-'waitTime' (default 0) which will search for the Hero Screen interface
- until found or 'waitTime' is reached.
+Returns true if the heroScreen is open. The optional **waitTime** parameter
+*(default = 0)* is the maximum time (in milliseconds) it will keep looking.
 
 .. note::
 
@@ -169,14 +194,16 @@ begin
 end;
 
 (*
-.open
-~~~~~
+open
+----
 
 .. code-block:: pascal
 
-    function TRSHeroScreen.open(waitTime: integer=3000): boolean;
+    function TRSHeroScreen.open(waitTime: integer = 3000): boolean;
 
-Attempts to open the powers screen. Returns whether successful or not.
+Returns true if the heroScreen is successfully opened. The optional
+**waitTime** parameter *(default = 3000)* is the maximum time (in milliseconds)
+it will keep looking.
 
 .. note::
 
@@ -216,15 +243,15 @@ begin
 end;
 
 (*
-.close
-~~~~~~
+close
+-----
 
 .. code-block:: pascal
 
     function TRSHeroScreen.close(escape: boolean = true): boolean;
 
-Closes the Hero Screen interface. By default, it attempts to close the
-interface with the escape button first. It will return if succesful or not.
+Returns true if the heroScreen is successfully closed. It uses the ESC key
+by default, but the **escape** parameter can be set to false to close via the mouse.
 
 .. note::
 

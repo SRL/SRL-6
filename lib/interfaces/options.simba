@@ -2,8 +2,7 @@
 Options
 =======
 
-The options file holds functions and procedures that are used to interact with
-the Runescape options menu.
+The options file holds functions and procedures that are used to interact with the runescape options menu.
 
 The source for this file can be found `here <https://github.com/SRL/SRL-6/blob/master/lib/interfaces/options.simba>`_.
 
@@ -12,41 +11,60 @@ The source for this file can be found `here <https://github.com/SRL/SRL-6/blob/m
 {$f-}
 
 (*
-type TRSOptions
-~~~~~~~~~~~~~~~
+Consts, Types, Vars
+~~~~~~~~~~~~~~~~~~~
+
+The following constants, types and variables are used throughout the collectBox methods.
+
+**type TRSOptions**
+
+.. code-block:: pascal
+
+    type
+      TRSOptions = type TRSInterface;
 
 A type that stores functions and properties of the Runescape options menu.
 *)
 type
-  TRSOptions = record(TRSInterface)
-    __placeholder: byte;
-  end;
+  TRSOptions = type TRSInterface;
 
 (*
-var options
-~~~~~~~~~~~
+**var options**
 
-Variable that stores functions and properties of the Runescape options menu.
+.. code-block:: pascal
+
+    var
+      options: TRSOptions;
+
+A variable through which scripters can access the TRSOptions type methods.
+
+*)
+var
+  options: TRSOptions;
+
+(*
+TRSOptions methods
+~~~~~~~~~~~~~~~~~~~~~~~~~~
+
+The following methods should be called through the **options** variable.
 
 Example:
 
 .. code-block:: pascal
 
-    if (options.open()) then
-      writeln('Options interface opened, preparing to logout');
+    if options.isOpen() then
+      writeln('Options interface is open!');
 *)
-var
-  options: TRSOptions;
 
 {*
-TRSOptions.__init()
-~~~~~~~~~~~~~~~~~~~
+__init
+------
 
 .. code-block:: pascal
 
     procedure TRSOptions.__init();
 
-Initiates the options default values. Called at the end of this file.
+Initializes the TRSOptions.
 
 .. note::
 
@@ -74,16 +92,15 @@ end;
 {$ENDIF}
 
 {*
-TRSOptions.__find
-~~~~~~~~~~~~~~~~~
+__find
+------
 
 .. code-block:: pascal
 
     function TRSOptions.__find(): boolean;
 
-Finds and sets the bounds on the options interface. This allows the options menu
-to be interacted with on any screen size.  This function is called whenever
-TRSOptions.isOpen() is called.
+Returns true if the options interface is detected and its bounds are set.
+Scripters should use options.isOpen() below.
 
 .. note::
 
@@ -94,7 +111,8 @@ Example:
 
 .. code-block:: pascal
 
-    options.__find();
+    if options.__find() then
+      writeln('The options interface is open, and the bounds are set!');
 *}
 {$IFNDEF CODEINSIGHT}
 function TRSOptions.__find(): Boolean;
@@ -107,46 +125,61 @@ end;
 {$ENDIF}
 
 (*
-TRSOptions.isOpen()
-~~~~~~~~~~~~~~~~~~~
+isOpen
+------
 
 .. code-block:: pascal
 
-    function TRSOptions.isOpen(): boolean;
+    function TRSOptions.isOpen(waitTime: integer = 0): boolean;
 
-Returns true if the options interface is open.
+Returns true if the options interface is open. The optional **waitTime** parameter
+*(default = 0)* is the maximum time (in milliseconds) it will keep looking.
 
 .. note::
 
     - by Coh3n
-    - Last Updated: 23 July 2013 by Co3n
+    - Last Updated: 5 August 2015 by The Mayor
 
 Example:
 
 .. code-block:: pascal
 
-    if (options.isOpen()) then
-      writeln('Options menu is open!');
+    if options.isOpen() then
+      writeln('The options menu is open!');
 *)
-function TRSOptions.isOpen(): boolean;
+function TRSOptions.isOpen(waitTime: integer = 0): boolean;
+var
+  t: UInt64;
 begin
-  Result := Self.__find();
+  t := (getTickCount64() + waitTime);
+
+  repeat
+    if self.__find() then
+    begin
+      result := true;
+      break();
+    end;
+  until (getSystemTime() >= t);
+
+    print('TRSOptions.isOpen() result: ' + boolToStr(result));
 end;
 
 (*
-TRSOptions.open()
-~~~~~~~~~~~~~~~~~
+open
+----
 
 .. code-block:: pascal
 
-    function TRSOptions.open(): boolean;
+    function TRSOptions.open(waitTime: integer = 5000): boolean;
 
-Opens the in-game options menu.
+Returns true if the options interface is successfully opened. The optional
+**waitTime** parameter *(default = 5000)* is the maximum time (in milliseconds)
+it will keep looking.
 
 .. note::
 
     - by Coh3n
-    - Last Updated: 23 July 2013 by Co3n
+    - Last Updated: 5 August 2015 by The Mayor
 
 Example:
 
@@ -155,37 +188,55 @@ Example:
     if (options.open()) then
       writeln('We opened the options interface');
 *)
-function TRSOptions.open(): boolean;
+function TRSOptions.open(waitTime: integer = 5000): boolean;
 var
-  c: integer;
-  t : LongWord;
+  t: UInt64;
 begin
-  if (self.isOpen()) then
+  if self.isOpen() then
     exit(true);
 
   typeByte(VK_ESCAPE);
 
-  repeat
-    t := (getSystemTime() + (2000));
+  t := (getTickCount64() + waitTime + random(400));
 
-    while (getSystemTime() < t) do
+  while (getTickCount64() < t) do
+    if self.isOpen(2000) then
     begin
-      if (self.isOpen()) then
-      begin
-        result := true;
-        break(2);
-      end;
-
-      wait(50 + random(50));
-    end;
-
-    inc(c);
-    typeByte(VK_ESCAPE);
-
-  until(c > 3);
+      result := true;
+      break();
+    end else
+      typeByte(VK_ESCAPE);
 end;
 
-function TRSOptions._getOptions(var Button: TBoxArray; var Text: TStringArray): boolean;
+(*
+_getOptions
+-----------
+
+.. code-block:: pascal
+
+    function TRSOptions._getOptions(var Buttons: TBoxArray; var Texts: TStringArray): boolean;
+
+Passess all the buttons on the options menu as a TBoxArray **Buttons** and passes
+a TStringArray **Texts** of the text for each button. Returns true if successfull.
+
+.. note::
+
+    - by Ashaman88
+    - Last Updated: 26 February 2014 by Ashaman88
+
+Example:
+
+.. code-block:: pascal
+
+    var
+      txt: TStringArray;
+      tba: TBoxArray;
+    begin
+      if options._getOptions(tba, txt) then
+        writeLn('We have all the button bounds and text');
+    end;
+*)
+function TRSOptions._getOptions(var Buttons: TBoxArray; var Texts: TStringArray): boolean;
 var
   TPA: TPointArray;
   ATPA: T2DPointArray;
@@ -208,12 +259,36 @@ begin
 
     if ((b.X2 - b.X1) > 30) then
     begin
-      Insert(b, Button);
-      Insert(Tesseract_GetText(b.x1, b.y1, b.x2, b.y2, TESS_FILTER_SMALL_CHARS_2), Text);
+      Insert(b, Buttons);
+      Insert(Tesseract_GetText(b, TESS_FILTER_SMALL_CHARS_2), Texts);
     end;
   end;
 end;
 
+(*
+selectOption
+------------
+
+.. code-block:: pascal
+
+    function TRSOptions.selectOption(txt: TStringArray): boolean;
+
+Returns true if it successfully clicks the button on the options menu that
+matches a string in the TStringArray **txt** .
+
+.. note::
+
+    - by Ashaman88
+    - Last Updated: 26 February 2014 by Ashaman88
+
+Example:
+
+.. code-block:: pascal
+
+    if options.selectOption(['Logout', 'gout']) then
+      writeLn('Successfully clicked the logout button!');
+
+*)
 function TRSOptions.selectOption(txt: TStringArray): boolean;
 var
   texts: TStringArray;
