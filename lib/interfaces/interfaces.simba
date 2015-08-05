@@ -113,8 +113,7 @@ const
   ID_INTERFACE_LOBBY_WORLDS     = 50;
 
 (*
-type TRSInterface
-~~~~~~~~~~~~~~~~~
+**type TRSInterface**
 
 A record that stores useful information about RS interfaces.
 *)

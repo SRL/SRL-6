@@ -165,7 +165,7 @@ Scripters should use lodestoneScreen.isOpen() below.
 .. note::
 
     - by Ashaman88
-    - Last Updated: 27 February 2014 by Ashaman88
+    - Last Updated: 5 August 2015 by The Mayor
 
 Example:
 
@@ -177,34 +177,35 @@ Example:
 {$IFNDEF CODEINSIGHT}
 function TRSLodestoneScreen.__find(): boolean;
 const
-  TOP_COLOR = 855595;    //red color behind lodestone
-  MENU_LENGTH = 165;      //length of large red background
-  MENU_OFFSET_COLOR = 5333103; //p2p offset color on map
-  MENU_OFFSET_COLOR_FTP = 6250064;  //f2p offset color on map
+  RED_COLOR = [1448256, 26]; // [Col, Tol] background of 'LODESTONE NETWORK'
 var
-  tpa : TPointArray;
-  atpa : T2DPointArray;
-  i, hh: integer;
+  i: Integer;
+  TPA: TPointArray;
+  ATPA: T2DPointArray;
   b: TBox;
 begin
-  result := false;
+  findColorsTolerance(TPA, RED_COLOR[0], getClientBounds(), RED_COLOR[1]);
 
-  if (not findColors(tpa, TOP_COLOR, getClientBounds())) then
-    exit();
+  if length(TPA) < 10 then
+  begin
+    print('TRSLodestoneScreen.__find(): Didn''t find enough RED_COLOR', TDebug.WARNING);
+    exit(false);
+  end;
 
-  atpa := tpa.cluster(5);
-  hh := high(atpa);
+  ATPA := TPA.cluster(2);
+  ATPA.sortBySize(true);
 
-  for i := 0 to hh do
-    if (length(atpa[i]) = MENU_LENGTH) then
-    begin
-      b := getTPABounds(atpa[i]);
-      if (getColor(b.x2, b.y2 + 5) = MENU_OFFSET_COLOR) or (getColor(b.x2, b.y2 + 5) = MENU_OFFSET_COLOR_FTP) then
+  for i := 0 to high(ATPA) do
+  begin
+    b := ATPA[i].getBounds();
+
+    if inRange(b.getWidth(), 190, 210) and (b.getHeight() < 60) then
+      if (pos('LODE', upperCase(tesseract_GetText(b, TESS_FILTER_SMALL_CHARS))) > 0) then
       begin
-        self.setBounds([b.x1 - 13, b.y1 - 14, b.x2 + 304, b.y2 + 297]);
+        self.setBounds([b.x1 - 3, b.y1 - 5, b.x2 + 307, b.y2 + 300]);
         exit(true);
       end;
-    end;
+  end;
 end;
 {$ENDIF}
 
