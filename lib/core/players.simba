@@ -11,9 +11,16 @@ The source for this file can be found `here <https://github.com/SRL/SRL-6/blob/m
 
 {$f-}
 
+(*
+Consts, Types, Vars
+~~~~~~~~~~~~~~~~~~~
+
+The following constants, types and variables are used throughout the chatBox methods.
+
+*)
+
 {*
-const Internal
-~~~~~~~~~~~~~~
+**const Internal**
 
 File's internal constants.
 
@@ -26,44 +33,54 @@ const
 {$ENDIF}
 
 {*
-var Internal
-~~~~~~~~~~~~
+**var Internal**
 
 File's internal variables.
 
-    * _boxUsername: TBox of the username edit box.
-    * _boxPassword: TBox of the password edit box.
+    * __boxUsername: TBox of the username edit box.
+    * __boxPassword: TBox of the password edit box.
 	  * __areDynamicInterfacesSet: Used to set the bounds of dynamic interfaces.
 
 *}
 var
-  _boxUsername: TBox = [-1, -1, -1, -1];
-  _boxPassword: TBox = [-1, -1, -1, -1];
-
 {$IFNDEF CODEINSIGHT}
+  __boxUsername: TBox = [-1, -1, -1, -1];
+  __boxPassword: TBox = [-1, -1, -1, -1];
   __areDynamicInterfacesSet: boolean = false;
 {$ENDIF}
 
 (*
-type TPlayer
-~~~~~~~~~~~~
+**type TPlayer**
 
 A record that stores useful information about the current players. It is up to
 the scripter to set most of these attributes in their scripts.
 
-Example:
-
 .. code-block:: pascal
 
-    with players[0] do
-    begin
-      loginName := 'example@example.com';
-      displayName := 'Sir Example III';
-      nickname := 'fighter1';
-      password := 'thisismypassword12345';
-      isActive := true;
-      bankPin := '1234';
-    end;
+    type
+      TPlayer = record
+        loginName: string;
+        displayName: string;
+        nickname: string;
+        password: string;
+        bankPin: string;
+        location: string;
+        isActive: boolean;
+        isMember: boolean;
+        findMod: boolean;
+        findTrade: boolean;
+        reincarnate: boolean;
+        secureLogin: boolean;
+        worked: TTimeMarker; // Automatically calculated if SRL's login methods are used
+        world: integer; // -1 to click play button; 0 for random world
+        skillLevel: array[0..(SKILL_COUNT - 1)] of integer;
+        booleans: array[0..99] of boolean;
+        integers: array[0..99] of integer;
+        strings: array[0..99] of string;
+        extendeds: array[0..99] of extended;
+        variants: array[0..99] of variant;
+      end;
+
 *)
 type
   TPlayer = record
@@ -79,8 +96,8 @@ type
     findTrade: boolean;
     reincarnate: boolean;
     secureLogin: boolean;
-    worked: TTimeMarker; // automatically calculated if SRL's login methods are used
-    world: integer; // -1 just click play button; 0 for random world
+    worked: TTimeMarker; // Automatically calculated if SRL's login methods are used
+    world: integer; // -1 to click play button; 0 for random world
     skillLevel: array[0..(SKILL_COUNT - 1)] of integer;
     booleans: array[0..99] of boolean;
     integers: array[0..99] of integer;
@@ -99,14 +116,20 @@ type
   PF_TPlayerArray = array of PF_TPlayer;
 
 (*
-Player Variables
-~~~~~~~~~~~~~~~~
+**var Player Variables**
 
 All the variables associated with players.simba.
 
-  * players: TPlayerArray; Used to store information for all players.
-  * currentPlayer: integer; The index of the player currently running.
-  * disableIPScreenshots: boolean; Disables the screenshots taken in the lobby screen.
+.. code-block:: pascal
+
+    var
+      players: TPlayerArray;
+      currentPlayer: integer;
+      disableIPScreenshots: boolean;
+
+  * players: An array which contains all players
+  * currentPlayer: The index of the player currently running in the players array
+  * disableIPScreenshots: Disables the screenshots taken in the lobby screen
 
 *)
 var
@@ -114,9 +137,9 @@ var
   currentPlayer: integer;
   disableIPScreenshots: boolean;
 
-(*
-function Raf_GetArmyNames
-~~~~~~~~~~~~~~~~~~~~~~~~~
+{*
+Raf_GetArmyNames
+----------------
 
 .. code-block:: pascal
 
@@ -133,7 +156,7 @@ Example:
 .. code-block:: pascal
 
   Raf_GetArmyNames(tsa);
-*)
+*}
 function Raf_GetArmyNames(out names: TStringArray): boolean;
 var
   s: string := Settings.getPrefix();
@@ -146,9 +169,9 @@ begin
   end;
 end;
 
-(*
-function Raf_FindArmy
-~~~~~~~~~~~~~~~~~~~~~
+{*
+Raf_FindArmy
+------------
 
 .. code-block:: pascal
 
@@ -166,7 +189,7 @@ Example:
 
   if Raf_FindArmy('default') then
     writeLn('The army exists');
-*)
+*}
 function Raf_FindArmy(const name: string): boolean;
 var
   strings: TStringArray;
@@ -180,9 +203,9 @@ begin
         Exit(True);
 end;
 
-(*
-function Raf_IsArmyEncrypted
-~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+{*
+Raf_IsArmyEncrypted
+-------------------
 
 .. code-block:: pascal
 
@@ -199,7 +222,7 @@ Example:
 .. code-block:: pascal
 
   writeLn(Raf_IsArmyEncripted('default'));
-*)
+*}
 function Raf_IsArmyEncrypted(const armyName: string): boolean;
 var
   s: string := Settings.getPrefix();
@@ -215,9 +238,9 @@ begin
   end;
 end;
 
-(*
-function Raf_DecryptArmy
-~~~~~~~~~~~~~~~~~~~~~~~~
+{*
+Raf_DecryptArmy
+---------------
 
 .. code-block:: pascal
 
@@ -233,7 +256,7 @@ Example:
 
 .. code-block:: pascal
 
-*)
+*}
 function Raf_DecryptArmy(const armyName: string; var data: string): boolean;
 var
   pass, dataCopy: string;
@@ -262,9 +285,9 @@ begin
       print('Ok clicked');
 end;
 
-(*
-function Raf_GetPlayers
-~~~~~~~~~~~~~~~~~~~~~~~
+{*
+Raf_GetPlayers
+--------------
 
 .. code-block:: pascal
 
@@ -280,7 +303,7 @@ Example:
 
 .. code-block:: pascal
 
-*)
+*}
 function Raf_GetPlayers(ArmyName: String; out _Players: TPlayerArray): Boolean;
 var
   Data, Pref: String;
@@ -332,9 +355,9 @@ begin
   Printf('Raf_GetPlayers: Result = %s', [toString(Result)], TDebug.FOOTER);
 end;
 
-(*
-function Raf_GetPlayers
-~~~~~~~~~~~~~~~~~~~~~~~
+{*
+Raf_GetPlayers (overload)
+-------------------------
 
 .. code-block:: pascal
 
@@ -351,7 +374,7 @@ Example:
 
 .. code-block:: pascal
 
-*)
+*}
 function Raf_GetPlayers(const armyName: string; out __players: PF_TPlayerArray): boolean; overload;
 var
   tmp: TPlayerArray;
@@ -371,9 +394,92 @@ begin
     end;
 end;
 
-(*
-TPlayerArray.getActive
+{*
+__setDynamicInterfaces
 ~~~~~~~~~~~~~~~~~~~~~~
+
+.. code-block:: pascal
+
+    procedure __setDynamicInterfaces();
+
+Sets the dynamic interfaces upon login.
+
+.. note::
+
+    - by Coh3n
+    - Last updated: 22 December 2012 by Zyt3x
+
+Example:
+
+.. code-block:: pascal
+
+    __setDynamicInterfaces();
+*}
+{$IFNDEF CODEINSIGHT}
+procedure __setDynamicInterfaces();
+begin
+  if actionBar.__find() then
+  begin
+    chatBox.__setup();
+    mainScreen.__setup();
+
+    __areDynamicInterfacesSet := true;
+
+    print('Dynamic interfaces have been set.', TDebug.SUB);
+  end;
+end;
+{$ENDIF}
+
+(*
+isLoggedIn
+~~~~~~~~~~
+
+.. code-block:: pascal
+
+    function isLoggedIn(): boolean;
+
+Returns true if a player is logged in. It uses the top left corner of the logout
+button to return the result.
+
+.. note::
+
+    - by Olly & Coh3n
+    - Last updated: 11 August 2013 by Coh3n
+
+Example:
+
+.. code-block:: pascal
+
+    if isLoggedIn() then
+      writeln('We are logged in!');
+*)
+function isLoggedIn(): boolean;
+const
+  LOGOUT_BUTTON_COLOUR = 3446209;
+begin
+  result := (getColor(796, 3) = LOGOUT_BUTTON_COLOUR);
+
+  if result and (not __areDynamicInterfacesSet) then
+    __setDynamicInterfaces();
+end;
+
+(*
+TPlayerArray methods
+~~~~~~~~~~~~~~~~~~~~
+
+The following methods should be called through the **players** variable.
+
+Example:
+
+.. code-block:: pascal
+
+    if players.getActive() >=1 then
+      writeln('There is still active players');
+*)
+
+(*
+getActive
+---------
 
 .. code-block:: pascal
 
@@ -403,14 +509,14 @@ begin
 end;
 
 {*
-TPlayerArray._add
-~~~~~~~~~~~~~~~~~
+__add
+-----
 
 .. code-block:: pascal
 
     procedure TPlayerArray._add(info: TPlayer);
 
-Adds the player with 'info' to the TPlayerArray.
+Adds the player with **info** to the TPlayerArray.
 
 .. note::
 
@@ -432,19 +538,19 @@ Example:
       Players._add(P);
     end;
 *}
-procedure TPlayerArray._add(const info: TPlayer);
+procedure TPlayerArray.__add(const info: TPlayer);
 begin
   setLength(self, length(self) + 1);
   self[high(self)] := info;
 end;
 
-(*
-TPlayerArray._setDefaults
-~~~~~~~~~~~~~~~~~~~~~~~~~
+{*
+__setDefaults
+-------------
 
 .. code-block:: pascal
 
-    procedure TPlayerArray._setDefaults();
+    procedure TPlayerArray.__setDefaults();
 
 Initialises the main TPlayer variables for all players in the TPlayerArray
 
@@ -457,10 +563,10 @@ Example:
 
 .. code-block:: pascal
 
-   players._setDefaults();
+   players.__setDefaults();
 
-*)
-procedure TPlayerArray._setDefaults();
+*}
+procedure TPlayerArray.__setDefaults();
 var
   i: integer;
 begin
@@ -476,16 +582,16 @@ begin
 end;
 
 (*
-TPlayerArray.setup
-~~~~~~~~~~~~~~~~~~
+setup
+-----
 
 .. code-block:: pascal
 
     procedure TPlayerArray.setup(names: TStringArray; const army: string = 'default');
 
-Sets up the players with login name, display name, or nickname that match
-elements of 'names'.  Should only be called in DeclarePlayers().  Will load
-army file 'army'. Loads 'default' by default.
+Sets up the TPlayerArray with the players **names** . It will look for the
+**names** in the army **army** *(default = 'default')* . This should be used if
+you are not using the SRLPlayerForm, and your players are setup in Rafiki.
 
 .. note::
 
@@ -519,7 +625,7 @@ begin
       if (names[i] = tmp[j].loginName) or (names[i] = tmp[j].displayName) or (names[i] = tmp[j].nickname) then
       begin
         print('Loaded player: '+names[i]);
-        self._add(tmp[j]);
+        self.__add(tmp[j]);
         break;
       end;
 
@@ -533,13 +639,13 @@ begin
     print('TPlayerArray.setup(): Failure', TDebug.FATAL);
   end;
 
-  self._setDefaults();
+  self.__setDefaults();
   print('TPlayerArray.setup(): Success', TDebug.FOOTER);
 end;
 
 (*
-TPlayerArray.setup
-~~~~~~~~~~~~~~~~~~
+setup (overload)
+----------------
 
 .. code-block:: pascal
 
@@ -555,6 +661,8 @@ Example:
 
 .. code-block:: pascal
 
+    players.setup(playerForm.players);
+
 *)
 procedure TPlayerArray.setup(const players: PF_TPlayerArray); overload;
 var
@@ -568,21 +676,22 @@ begin
     p.password := players[i].password;
     p.bankPin := players[i].bankPin;
     p.isMember := players[i].isMember;
-    self._add(p);
+    self.__add(p);
   end;
-  self._setDefaults();
+  self.__setDefaults();
 end;
 
 (*
-TPlayerArray.switchTo
-~~~~~~~~~~~~~~~~~~~~~
+switchTo
+--------
 
 .. code-block:: pascal
 
     function TPlayerArray.switchTo(player: integer; active: boolean = true; login: boolean = true): boolean;
 
-Switches to the 'player' index in the TPlayerArray. Sets the previous player's
-activity to 'active'. It will login the new player if 'login' is true.
+Switches to the **player** index in the TPlayerArray. Sets the previous player's
+activity to **active** *(default = true)* . It will login the new player if
+**login** is set to true *(default = true)* .
 
 .. note::
 
@@ -620,15 +729,16 @@ begin
 end;
 
 (*
-TPlayerArray.next
-~~~~~~~~~~~~~~~~~
+next
+----
 
 .. code-block:: pascal
 
     function TPlayerArray.next(active: boolean = true; login: boolean = true): boolean;
 
-Switches to the next active player in the TPlayerArray. Sets the previous
-player's activity to 'active'. It will login the new player if 'login' is true.
+Switches to the next active player in the TPlayerArray.  Sets the previous player's
+activity to **active** *(default = true)* . It will login the new player if
+**login** is set to true *(default = true)* .
 
 .. note::
 
@@ -658,15 +768,16 @@ begin
 end;
 
 (*
-TPlayerArray.randomNext
-~~~~~~~~~~~~~~~~~~~~~~~
+randomNext
+----------
 
 .. code-block:: pascal
 
     function TPlayerArray.randomNext(active: boolean = true; login: boolean = true): boolean;
 
-Switches to a random active player in the TPlayerArray. Sets the previous
-player's activity to 'active'. It will login the new player if 'login' is true.
+Switches to a random active player in the TPlayerArray.  Sets the previous player's
+activity to **active** *(default = true)* . It will login the new player if
+**login** is set to true *(default = true)* .
 
 .. note::
 
@@ -701,8 +812,23 @@ begin
 end;
 
 (*
-TPlayer.write
-~~~~~~~~~~~~~
+TPlayer methods
+~~~~~~~~~~~~~~~
+
+The following methods should be called through the **players** array,  with the
+appropriate index *(normally currentPlayer)* .
+
+Example:
+
+.. code-block:: pascal
+
+    if players[currentPlayer].login() then
+      writeln('We just logged in the player that is currently active');
+*)
+
+(*
+write
+-----
 
 .. code-block:: pascal
 
@@ -737,78 +863,9 @@ begin
   print('TPlayer.write()', TDebug.FOOTER);
 end;
 
-(*
-__setDynamicInterfaces
-~~~~~~~~~~~~~~~~~~~~~~
-
-.. code-block:: pascal
-
-    procedure __setDynamicInterfaces();
-
-Sets the dynamic interfaces upon login.
-
-.. note::
-
-    - by Coh3n
-    - Last updated: 22 December 2012 by Zyt3x
-
-Example:
-
-.. code-block:: pascal
-
-    __setDynamicInterfaces();
-*)
-{$IFNDEF CODEINSIGHT}
-procedure __setDynamicInterfaces();
-begin
-  if actionBar.__find() then
-  begin
-    chatBox.__setup();
-    mainScreen.__setup();
-
-    __areDynamicInterfacesSet := true;
-
-    print('Dynamic interfaces have been set.', TDebug.SUB);
-  end;
-end;
-{$ENDIF}
-
-(*
-isLoggedIn
-~~~~~~~~~~
-
-.. code-block:: pascal
-
-    function isLoggedIn(): boolean;
-
-Returns true if a player is logged in, uses the top left of the logout button to
-return the result.
-
-.. note::
-
-    - by Olly & Coh3n
-    - Last updated: 11 August 2013 by Coh3n
-
-Example:
-
-.. code-block:: pascal
-
-    if isLoggedIn() then
-      writeln('We are logged in!');
-*)
-function isLoggedIn(): boolean;
-const
-  LOGOUT_BUTTON_COLOUR = 3446209;
-begin
-  result := (getColor(796, 3) = LOGOUT_BUTTON_COLOUR);
-
-  if result and (not __areDynamicInterfacesSet) then
-    __setDynamicInterfaces();
-end;
-
 {*
 __setInputBoxes
-~~~~~~~~~~~~~~~
+---------------
 
 .. code-block:: pascal
 
@@ -856,12 +913,12 @@ begin
     // sets the username box as the box that's closer to the top of the screen
     if (bdsActive.y1 < bdsInactive.y1) then
     begin
-      _boxUsername := bdsActive;
-      _boxPassword := bdsInactive;
+      __boxUsername := bdsActive;
+      __boxPassword := bdsInactive;
     end else
     begin
-      _boxUsername := bdsInactive;
-      _boxPassword := bdsActive;
+      __boxUsername := bdsInactive;
+      __boxPassword := bdsActive;
     end;
   end;
 end;
@@ -869,7 +926,7 @@ end;
 
 {*
 __enterLoginInfo
-~~~~~~~~~~~~~~~~
+----------------
 
 .. code-block:: pascal
 
@@ -887,7 +944,7 @@ Example:
 
 .. code-block:: pascal
 
-    __enterLoginInfo(_boxUsername, players[currentPlayer].loginName);
+    __enterLoginInfo(__boxUsername, players[currentPlayer].loginName);
 *}
 {$IFNDEF CODEINSIGHT}
 function __enterLoginInfo(inputBox: TBox; const info: string; clickBox: boolean = true; pressEnter: boolean = true): boolean;
@@ -936,8 +993,8 @@ end;
 {$ENDIF}
 
 {*
-TPlayer.__respondToPopup
-~~~~~~~~~~~~~~~~~~~~~~~~
+__respondToPopup
+----------------
 
 .. code-block:: pascal
 
@@ -1021,7 +1078,7 @@ end;
 
 {*
 __getPopupMessage
-~~~~~~~~~~~~~~~~~
+-----------------
 
 .. code-block:: pascal
 
@@ -1071,8 +1128,8 @@ end;
 {$ENDIF}
 
 {*
-TPlayer.__handleLoginPopup
-~~~~~~~~~~~~~~~~~~~~~~~~~~
+__handleLoginPopup
+------------------
 
 .. code-block:: pascal
 
@@ -1169,8 +1226,8 @@ end;
 {$ENDIF}
 
 (*
-TPlayer.loginToLobby
-~~~~~~~~~~~~~~~~~~~~
+loginToLobby
+------------
 
 .. code-block:: pascal
 
@@ -1226,11 +1283,11 @@ begin
     print('Login Attempt ' + toStr(tries) + ': ' + capitalize(self.loginName) + ' (' + capitalize(self.displayName) + ')');
 
     print('Entering username...', TDebug.SUB);
-    __enterLoginInfo(_boxUsername, self.loginName, true, true);
+    __enterLoginInfo(__boxUsername, self.loginName, true, true);
     wait(500 + random(200));
 
     print('Entering password...', TDebug.SUB);
-    __enterLoginInfo(_boxPassword, self.password, false, true);
+    __enterLoginInfo(__boxPassword, self.password, false, true);
     wait(800 + random(200));
 
     result := self.__handleLoginPopup(inc(tries), false, reachedMaxTries);
@@ -1244,15 +1301,15 @@ begin
 end;
 
 (*
-TPlayer.login
-~~~~~~~~~~~~~
+login
+-----
 
 .. code-block:: pascal
 
     function TPlayer.login(): boolean;
 
-Completely logs the TPlayer into the game.  Returns true when they player is
-logged in.
+Returns true if the TPlayer is logged in to the game. Works from both the login
+screen and the lobby.
 
 .. note::
 
@@ -1314,14 +1371,14 @@ begin
 end;
 
 (*
-TPlayer.logout
-~~~~~~~~~~~~~~
+logout
+------
 
 .. code-block:: pascal
 
     function TPlayer.logout(): boolean;
 
-Completely logs the player out of the game.
+Returns true if the TPlayer is logged out to the login screen
 
 .. note::
 
@@ -1370,14 +1427,14 @@ begin
 end;
 
 (*
-TPlayer.exitToLobby
-~~~~~~~~~~~~~~~~~~~
+exitToLobby
+-----------
 
 .. code-block:: pascal
 
     function TPlayer.exitToLobby(): boolean;
 
-Logs the player out to the lobby.
+Returns true if the TPlayer is logged out to the lobby
 
 .. note::
 
@@ -1396,14 +1453,14 @@ begin
 end;
 
 (*
-TPlayer.leaveLobby
-~~~~~~~~~~~~~~~~~~
+leaveLobby
+----------
 
 .. code-block:: pascal
 
     function TPlayer.leaveLobby(): boolean;
 
-Leaves the lobby; goes to the login screen.
+Returns true if it returns to the login screen from the lobby.
 
 .. note::
 
@@ -1422,15 +1479,16 @@ begin
 end;
 
 (*
-TPlayer.switchToWorld
-~~~~~~~~~~~~~~~~~~~~~
+switchToWorld
+-------------
 
 .. code-block:: pascal
 
     function TPlayer.switchToWorld(newWorld: integer = 0): boolean;
 
-Switches the TPlayer to the new world (newWorld). Returns true if successful. Will
-choose a random world by default.
+Returns true if it switches the TPlayer to the worls **newWorld**
+*(default = 0; random world)*
+
 
 .. note::
 

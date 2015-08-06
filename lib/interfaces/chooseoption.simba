@@ -31,6 +31,7 @@ const
 **type TOption**
 
 .. code-block:: pascal
+
     type
       TOption = record
         bounds: TBox;
@@ -485,7 +486,7 @@ select
 
 .. code-block:: pascal
 
-    function TRSChooseOption.select(txt: TStringArray; waitTime: integer = 250; useTesseract: boolean = false): boolean; overload;
+    function TRSChooseOption.select(txt: TStringArray; waitTime: integer = 250; useTesseract: boolean = false; filter: TTesseractFilter = TESS_FILTER_CHOOSE_OPTION): boolean; overload;
 
 Returns true if an option in **txt** is interacted with successfully.
 
@@ -556,7 +557,7 @@ an option in the menu.
 
 
     * **txt**          : An array of text you want to find in any of the options
-    * **mouseActiont** : The mouse action to perform on the option (MOUSE_MOVE, MOUSE_LEFT, MOUSE_RIGHT, MOUSE_NONE)
+    * **mouseAction** : The mouse action to perform on the option (MOUSE_MOVE, MOUSE_LEFT, MOUSE_RIGHT, MOUSE_NONE)
     * **useTesseract** : Use the tesseract ocr to find the text?
     * **filter**       : Tesseract filter *(default = TESS_FILTER_CHOOSE_OPTION)*
 
@@ -571,7 +572,7 @@ Example:
 
     chooseOption.select(['Bank'], MOUSE_MOVE, 300, false); // Will move the mouse to the option but not click
 *)
-function TRSChooseOption.select(txt: TStringArray; mouseAction: Integer; waitTime: Integer; useTesseract: Boolean;  filter: TTesseractFilter = TESS_FILTER_CHOOSE_OPTION): boolean; overload;
+function TRSChooseOption.select(txt: TStringArray; mouseAction: Integer; useTesseract: Boolean;  filter: TTesseractFilter = TESS_FILTER_CHOOSE_OPTION): boolean; overload;
 begin
   result := self.__select(txt, mouseAction, false, 1.00, 300, useTesseract, filter);
 end;

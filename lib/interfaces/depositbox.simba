@@ -1,15 +1,22 @@
 (*
-DepositBox
-==========
+Deposit Box
+===========
 
-The depositbox file holds functions and procedures that are used in the
-Runescape deposit box screen.
+The depositbox file holds functions and procedures that are used in the runescape deposit box screen.
 
 The source for this file can be found `here <https://github.com/SRL/SRL-6/blob/master/lib/interfaces/depositbox.simba>`_.
 
 *)
 
 {$f-}
+
+(*
+Consts, Types, Vars
+~~~~~~~~~~~~~~~~~~~
+
+The following constants, types and variables are used throughout the chatBox methods.
+
+*)
 
 {*
 const Internal
@@ -25,10 +32,15 @@ const
   DEPOSITBOX_SLOT_HIGH = 28;
 
 (*
-const Deposit Buttons
-~~~~~~~~~~~~~~~~~~~~~
+**const Deposit Buttons**
+-------------------------
 
-Integer constants that represent the order of the quick deposit buttons.
+Constants that represent the quick deposit buttons:
+
+  * QUICK_DEPOSITBOX_INVENTORY
+  * QUICK_DEPOSITBOX_EQUIPMENT
+  * QUICK_DEPOSITBOX_BOB
+  * QUICK_DEPOSITBOX_MONEY_POUCH
 
 *)
 const
@@ -38,8 +50,12 @@ const
   QUICK_DEPOSITBOX_MONEY_POUCH = 3;
 
 (*
-type TRSDepositBox
-~~~~~~~~~~~~~~~~~~
+**type TRSDepositBox**
+
+.. code-block:: pascal
+
+    type
+      TRSDepositBox = type TRSInterface;
 
 A type that stores the deposit box interface properties.
 *)
@@ -47,25 +63,36 @@ type
   TRSDepositBox = type TRSInterface;
 
 (*
-var depositBox
-~~~~~~~~~~~~~~
-
-Variable that stores functions and properties of the Runescape deposit box interface.
-
-Example:
+**var depositBox**
 
 .. code-block:: pascal
 
-    if (depositBox.isOpen() then
-      writeln('Deposit Box is open!');
+    var
+      depositBox: TRSDepositBox;
+
+A variable through which scripters can access the TRSDepositBox type methods.
 
 *)
 var
   depositBox: TRSDepositBox;
 
+(*
+TRSDepositBox methods
+~~~~~~~~~~~~~~~~~~
+
+The following methods should be called through the **depositBox** variable.
+
+Example:
+
+.. code-block:: pascal
+
+    if depositBox.isOpen() then
+      writeln('It''s open');
+*)
+
 {*
-TRSDepositBox.__init
-~~~~~~~~~~~~~~~~~~~~
+__init
+------
 
 .. code-block:: pascal
 
@@ -98,15 +125,16 @@ begin
 end;
 {$ENDIF}
 
-(*
-TRSDepositBox.__find
-~~~~~~~~~~~~~~~~~~~~
+{*
+__find
+------
 
 .. code-block:: pascal
 
     function TRSDepositBox.__find(): boolean;
 
-Returns true if the deposit box screen is detected, and sets the bounds (fully dynamic).
+Returns true if the depositBox interface is detected and its bounds are set.
+Scripters should use depositBox.isOpen() below.
 
 .. note::
 
@@ -117,9 +145,9 @@ Example:
 
 .. code-block:: pascal
 
-    if (depositBox.__find()) then
-      writeln('bounds are set!');
-*)
+    if depositBox.__find() then
+      riteln('The deposit box is open, and the bounds are set!');
+*}
 {$IFNDEF CODEINSIGHT}
 function TRSDepositBox.__find(): boolean;
 const
@@ -133,7 +161,7 @@ begin
 
   if length(TPA) < 10 then
   begin
-    print('depositBox.__find(): Didn''t find enough GREEN_ARROW_COLOR', TDebug.WARNING);
+    print('TRSDepositBox.__find(): Didn''t find enough GREEN_ARROW_COLOR', TDebug.WARNING);
     exit(false);
   end;
 
@@ -149,16 +177,15 @@ end;
 {$ENDIF}
 
 (*
-TRSDepositBox.isOpen
-~~~~~~~~~~~~~~~~~~~~
+isOpen
+------
 
 .. code-block:: pascal
 
     function TRSDepositBox.isOpen(waitTime: integer = 0): boolean;
 
-Returns true if the deposit box is open, includes a optional parameter
-'waitTime' (default 0) which will search for the deposit box screen until
-'waitTime' is reached.
+Returns true if the depositBox interface is open. The optional **waitTime** parameter
+*(default = 0)* is the maximum time (in milliseconds) it will keep looking.
 
 .. note::
 
@@ -169,8 +196,8 @@ Example:
 
 .. code-block:: pascal
 
-    if (depositBox.isOpen()) then
-      writeln('It''s open!');
+    if depositBox.isOpen() then
+      writeln('The deposit box interface is open!');
 
 *)
 function TRSDepositBox.isOpen(waitTime: integer = 0): boolean;
@@ -187,18 +214,18 @@ begin
     end;
   until (getSystemTime() >= t);
 
-  print('depositBox.isOpen(): Result = ' + boolToStr(result));
+  print('TRSDepositBox.isOpen(): Result = ' + boolToStr(result));
 end;
 
 (*
-TRSDepositBox.close
-~~~~~~~~~~~~~~~~~~~
+close
+-----
 
 .. code-block:: pascal
 
     function TRSDepositBox.close(): boolean;
 
-Closes the deposit box screen, will return if succesful or not.
+Returns true if the collectBox screen is successfully closed.
 
 .. note::
 
@@ -209,7 +236,7 @@ Example:
 
 .. code-block:: pascal
 
-    if (depositBox.close()) then
+    if depositBox.close() then
       writeln('Closed the deposit box');
 
 *)
@@ -236,12 +263,12 @@ begin
     wait(50 + random(50));
   end;
 
-  print('depositBox.close(): result = '+boolToStr(result), TDebug.SUB);
+  print('TRSDepositBox.close(): result = '+boolToStr(result), TDebug.SUB);
 end;
 
 (*
-TRSDepositBox.getSlotBoxes
-~~~~~~~~~~~~~~~~~~~~~~~~~~
+getSlotBoxes
+------------
 
 .. code-block:: pascal
 
@@ -258,29 +285,34 @@ Example:
 
 .. code-block:: pascal
 
-    boxArr := depositBox.getSlotBoxes();
+    var
+      boxArr: TBoxArray;
+    begin
+      boxArr := depositBox.getSlotBoxes();
+
+    end;
 
 *)
 function TRSDepositBox.getSlotBoxes(): TBoxArray;
 begin
   if (not self.isOpen()) then
   begin
-    print('depositBox.getSlotBoxes(): Unable to return deposit box slots since the deposit box isn''t open', TDebug.ERROR);
+    print('TRSDepositBox.getSlotBoxes(): Unable to return deposit box slots since the deposit box isn''t open', TDebug.ERROR);
     exit();
   end;
 
   result := grid(7, 4, 35, 31, 48, 50, point(self.x1 + _BOX_SLOTS_OFFSET.x, self.y1 + _BOX_SLOTS_OFFSET.y));
 end;
 
-(*
-TRSDepositBox._isSlotValid
-~~~~~~~~~~~~~~~~~~~~~~~~~~
+{*
+__isSlotValid
+-------------
 
 .. code-block:: pascal
 
-    function TRSDepositBox._isSlotValid(slot: integer): boolean;
+    function TRSDepositBox.__isSlotValid(slot: integer): boolean;
 
-Returns if the depositBox slot is vaild or not.
+Returns true if the depositBox slot **slot** is vaild.
 
 .. note::
 
@@ -291,26 +323,28 @@ Example:
 
 .. code-block:: pascal
 
-    if (depositBox._isSlotValid(25)) then
-      writeln('yey!');
-*)
-function TRSDepositBox._isSlotValid(slot: integer): boolean;
+    if depositBox.__isSlotValid(25) then
+      writeln('Slot 25 is valid!');
+*}
+{$IFNDEF CODEINSIGHT}
+function TRSDepositBox.__isSlotValid(slot: integer): boolean;
 begin
   result := inRange(slot, DEPOSITBOX_SLOT_LOW, DEPOSITBOX_SLOT_HIGH);
 
   if (not result) then
-    print('depositBox._isSlotValid(): Slot '+toStr(slot)+' is invalid', TDebug.WARNING);
+    print('TRSDepositBox.__isSlotValid(): Slot '+toStr(slot)+' is invalid', TDebug.WARNING);
 end;
+{$ENDIF}
 
 (*
-TRSDepositBox.getSlotBox
-~~~~~~~~~~~~~~~~~~~~~~~~
+getSlotBox
+----------
 
 .. code-block:: pascal
 
     function TRSDepositBox.getSlotBox(slot: integer): TBox;
 
-Returns the TBox of the desired deposit box slot. Slots
+Returns the TBox of the deposit box slot **slot** . Slots
 start at the top left at 1 and count across the columns.
 
 .. note::
@@ -327,15 +361,15 @@ Example:
 *)
 function TRSDepositBox.getSlotBox(slot: integer): TBox;
 begin
-  if (not self._isSlotValid(slot)) then
+  if (not self.__isSlotValid(slot)) then
   begin
-    print('depositBox.getSlotBox(): Slot '+toStr(slot)+' is invalid', TDebug.WARNING);
+    print('TRSDepositBox.getSlotBox(): Slot '+toStr(slot)+' is invalid', TDebug.WARNING);
     exit(intToBox(-1, -1, -1, -1));
   end;
 
   if (not self.isOpen()) then
   begin
-    print('DepositBox.getSlotBox(): Unable to return TBox since the deposit box isn''t open', TDebug.ERROR);
+    print('TRSDepositBox.getSlotBox(): Unable to return TBox since the deposit box isn''t open', TDebug.ERROR);
     exit();
   end;
 
@@ -343,18 +377,15 @@ begin
   result := gridBox(slot -1, 7, 4, 35, 31, 48, 50, point(self.x + _BOX_SLOTS_OFFSET.x, self.y + _BOX_SLOTS_OFFSET.y));
 end;
 
-
-
 (*
-TRSDepositBox.isItemInSlot
-~~~~~~~~~~~~~~~~~~~~~~~~~~
+isItemInSlot
+------------
 
 .. code-block:: pascal
 
     function TRSDepositBox.isItemInSlot(slot: integer): boolean;
 
-Returns true if an item is in the desired deposit box slot, works by looking for
-the black outline color in the slot.
+Returns true if an item is in the deposit box slot **slot** .
 
 .. note::
 
@@ -365,27 +396,26 @@ Example:
 
 .. code-block:: pascal
 
-   if (depositBox.isItemInSlot(1)) then
-     writeln('We have an item in deposit box pack slot number 1');
+   if depositBox.isItemInSlot(1) then
+     writeln('We have an item in deposit box slot number 1');
 *)
 function TRSDepositBox.isItemInSlot(slot: integer): boolean;
 begin
-  if (not self.isOpen()) or (not self._isSlotValid(slot))then
+  if (not self.isOpen()) or (not self.__isSlotValid(slot))then
     exit(false);
 
   result := isItemIn(self.getSlotBox(slot));
 end;
 
-
 (*
-TRSDepositBox.count
-~~~~~~~~~~~~~~~~~~~
+count
+----
 
 .. code-block:: pascal
 
     function TRSDepositBox.count(): integer;
 
-Returns the number of items in the deposit box screen.
+Returns the number of items currently in the deposit box
 
 .. note::
 
@@ -401,6 +431,8 @@ Example:
     begin
       c := depositBox.count();
 
+    end;
+
 *)
 function TRSDepositBox.count(): integer;
 var
@@ -409,7 +441,7 @@ var
 begin
   if (not self.isOpen()) then
   begin
-    print('depositBox.count(): Unable to check count since the deposit box isn''t open', TDebug.ERROR);
+    print('TRSDepositBox.count(): Unable to check count since the deposit box isn''t open', TDebug.ERROR);
     exit(-1);
   end;
 
@@ -417,18 +449,18 @@ begin
     if isItemIn(b[i]) then
       inc(result);
 
-  print('depositBox.count(): result = '+intToStr(result), TDebug.SUB);
+  print('TRSDepositBox.count(): result = '+intToStr(result), TDebug.SUB);
 end;
 
 (*
-TRSDepositBox.getCountDTM
-~~~~~~~~~~~~~~~~~~~~~~~~~
+getCountDTM
+-----------
 
 .. code-block:: pascal
 
-    function TRSDepositBox.getCountDTM(dtm: integer): integer;
+    function TRSDepositBox.getCountDTM(DTM: integer): integer;
 
-Searches for the dtm in each depositBox slot and will return how many matches it finds.
+Returns how many items match the **DTM** in the deposit box.
 
 .. note::
 
@@ -445,10 +477,10 @@ Example:
     begin
       dtm := dtmFromString('lotsofstuffhere');
       i := depositBox.getCountDTM(dtm);
-      writeln('We counted ' + intToStr(i) + ' items in our bankScreen pack.');
+      writeln('We counted ' + intToStr(i) + ' items in the deposit box.');
     end;
 *)
-function TRSDepositBox.getCountDTM(dtm: integer): integer;
+function TRSDepositBox.getCountDTM(DTM: integer): integer;
 var
   i, l: integer;
 begin
@@ -461,23 +493,23 @@ begin
 
   if (result = 0) then
   begin
-    print('depositBox.getCountDTM(): Found no DTM matches', TDebug.SUB);
+    print('TRSDepositBox.getCountDTM(): Found no DTM matches', TDebug.SUB);
     exit();
   end;
 
-  print('depositBox.getCountDTM(): Counted ' + intToStr(result) + ' items');
+  print('TRSDepositBox.getCountDTM(): Counted ' + intToStr(result) + ' items');
 end;
 
-
 (*
-TRSDepositBox.getCountBitmap
-~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+getCountBitmap
+--------------
 
 .. code-block:: pascal
 
-    function TRSDepositBox.getCountBitmap(bmp, tolerance: integer): integer;
+    function TRSDepositBox.getCountBitmap(BMP, tolerance: integer): integer;
 
-Searches for the bitmap in each depositBox slot and will return how many matches it finds.
+Returns how many items match the **BMP** with a tolerance of **tolerance**
+in the deposit box.
 
 .. note::
 
@@ -494,7 +526,7 @@ Example:
     begin
       bmp := bitmapFromString('lotsofstuffhere');
       i := depositBox.getCountBitmap(dtm);
-      writeln('We counted ' + intToStr(i) + ' items in our bankSlots.');
+      writeln('We counted ' + intToStr(i) + ' items in the deposit box');
     end;
 *)
 function TRSDepositBox.getCountBitmap(bmp, tolerance: integer): integer;
@@ -508,23 +540,23 @@ begin
 
   if (result = 0) then
   begin
-    print('depositBox.getCountBitmap(): Found no bitmap matches', TDebug.SUB);
+    print('TRSDepositBox.getCountBitmap(): Found no bitmap matches', TDebug.SUB);
     exit();
   end;
 
-  print('depositBox.getCountBitmap(): Counted ' + intToStr(result) + ' items');
+  print('TRSDepositBox.getCountBitmap(): Counted ' + intToStr(result) + ' items');
 end;
 
 
 (*
-TRSDepositBox.isEmpty
-~~~~~~~~~~~~~~~~~~~~~
+isEmpty
+-------
 
 .. code-block:: pascal
 
-    function TRSDepositBox.isEmpty: boolean;
+    function TRSDepositBox.isEmpty(): boolean;
 
-Returns true if the deposit box screen is empty.
+Returns true if the deposit box is empty.
 
 .. note::
 
@@ -535,31 +567,31 @@ Example:
 
 .. code-block:: pascal
 
-   if (depositBox.isEmpty) then
-     writeln('our inventory is empty!');
+   if depositBox.isEmpty() then
+     writeln('The deposit box is enpty');
 
 *)
 function TRSDepositBox.isEmpty: boolean;
 begin
   if (not self.isOpen()) then
   begin
-    print('depositBox.isEmpty: Unable to check is deposit box is empty since the deposit box isn''t open', TDebug.ERROR);
+    print('TRSDepositBox.isEmpty: Unable to check is deposit box is empty since the deposit box isn''t open', TDebug.ERROR);
     exit(false);
   end;
 
   result := (not self.getBounds().colorExists(ITEM_OUTLINE_BLACK));
-  print('depositBox.isEmpty: result = '+boolToStr(result), TDebug.SUB);
+  print('TRSDepositBox.isEmpty: result = '+boolToStr(result), TDebug.SUB);
 end;
 
 (*
-TRSDepositBox.isFull
-~~~~~~~~~~~~~~~~~~~~
+isFull
+------
 
 .. code-block:: pascal
 
-    function TRSDepositBox.isFull: boolean;
+    function TRSDepositBox.isFull(): boolean;
 
-Returns true if our depositBox pack is full.
+Returns true if the deposit box is full.
 
 .. note::
 
@@ -590,19 +622,15 @@ end;
 
 
 (*
-TRSDepositBox.quickDeposit
-~~~~~~~~~~~~~~~~~~~~~~~~~~
+quickDeposit
+------------
 
 .. code-block:: pascal
 
     function TRSDepositBox.quickDeposit(depositType: integer): boolean;
 
-Will click the quick deposit button 'depositType', vaild deposit types are:
-
-  * QUICK_DEPOSITBOX_INVENTORY
-  * QUICK_DEPOSITBOX_EQIUPMENT
-  * QUICK_DEPOSITBOX_BOB
-  * QUICK_DEPOSITBOX_MONEY_POUCH
+Returns true if it successfully deposits using one of the **depositType** deposit button.
+The deposit button constants can be found at the top of this file.
 
 .. note::
 
@@ -624,7 +652,7 @@ begin
 
   if (not self.isOpen()) then
   begin
-    print('depositBox.quickDeposit(): Unable to quick-deposit since deposit box isn''t open', TDebug.ERROR);
+    print('TRSDepositBox.quickDeposit(): Unable to quick-deposit since deposit box isn''t open', TDebug.ERROR);
     exit(false);
   end;
 
@@ -638,23 +666,23 @@ begin
    mouseBox(b, MOUSE_LEFT);
    wait(200 + random(300));
 
-  print('depositBox.quickDeposit(): Clicked quick deposit id ' + intToStr(depositType), TDebug.SUB);
+  print('TRSDepositBox.quickDeposit(): Clicked quick deposit id ' + intToStr(depositType), TDebug.SUB);
 end;
 
 (*
-TRSDepositBox.deposit
-~~~~~~~~~~~~~~~~~~~~~
+deposit
+-------
 
 .. code-block:: pascal
 
     function TRSDepositBox.deposit(slots: TIntegerArray; amounts: TIntegerArray = []; oneByOne: boolean = false): boolean;
 
-Deposits items from the "depositscreen pack" into the bank.  Has the capability of depositing
-all items, depositing a specific amount of items, and clicking each item one by one.
+Returns true if it deposits items into the deposit box. It can deposit all items,
+or specific slots and amounts. It can also deposit each item one by one.
 
-    * slots: The slots you want to deposit.
-    * amounts: The amounts of the slots to deposit.  Set index to -1 to deposit all.  Deposits all of every item by default.
-    * oneByOne: Default false.  Will click items one by one to deposit.
+    * **slots** : The slots you want to deposit
+    * **amounts** : The amounts of the slots to deposit. Set to -1 to deposit all. Deposits all of every item by default.
+    * **oneByOne** : Will click items one by one to deposit *(default = false)*
 
 .. note::
 
@@ -679,19 +707,19 @@ begin
 
   if (length(slots) < 1) then
   begin
-    print('depositBox.deposit(): No deposit slots specified', TDebug.WARNING);
+    print('TRSDepositBox.deposit(): No deposit slots specified', TDebug.WARNING);
     exit(false);
   end;
 
   if ((length(amounts) > 0) and (length(amounts) <> length(slots))) then
   begin
-    print('depositBox.deposit(): Slot and amount arrays are of different length, they need to be the same!', TDebug.WARNING);
+    print('TRSDepositBox.deposit(): Slot and amount arrays are of different length, they need to be the same!', TDebug.WARNING);
     exit(false);
   end;
 
   if (not self.isOpen()) then
   begin
-    print('depositBox.deposit(): Unable to deposit since depositBox isn''t open', TDebug.ERROR);
+    print('TRSDepositBox.deposit(): Unable to deposit since depositBox isn''t open', TDebug.ERROR);
     exit(false);
   end;
 
@@ -741,13 +769,13 @@ begin
 
     if isItemIn(b) then
     begin
-      print('depositBox.deposit(): Failed to deposit item in slot ' + toStr(slots[i]), TDebug.ERROR);
+      print('TRSDepositBox.deposit(): Failed to deposit item in slot ' + toStr(slots[i]), TDebug.ERROR);
       result := false;
     end;
 
   end
 
-  print('depositBox.deposit(): ' + toStr(result), TDebug.SUB);
+  print('TRSDepositBox.deposit(): ' + toStr(result), TDebug.SUB);
 end;
 
 begin

@@ -418,7 +418,7 @@ Example:
     begin
       if pinScreen.isOpen() then
         if pinScreen.enter(players[currentPlayer].bankPin) then
-          writeLn('Entered you''re bank pin!);
+          writeLn('Entered you''re bank pin!');
 
       // Other banking code
     end;

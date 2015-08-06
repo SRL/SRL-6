@@ -404,7 +404,7 @@ begin
 end;
 {$ENDIF}
 
-(*
+{*
 __getBuyBoxes
 -------------
 
@@ -425,7 +425,7 @@ Example:
 
     tba := grandExchange.__getBuyBoxes();
 
-*)
+*}
 {$IFNDEF CODEINSIGHT}
 function TRSGrandExchange.__getBuyBoxes(): TBoxArray;
 const
