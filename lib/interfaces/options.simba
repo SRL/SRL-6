@@ -44,7 +44,7 @@ var
 
 (*
 TRSOptions methods
-~~~~~~~~~~~~~~~~~~~~~~~~~~
+~~~~~~~~~~~~~~~~~~
 
 The following methods should be called through the **options** variable.
 
@@ -161,7 +161,7 @@ begin
     end;
   until (getSystemTime() >= t);
 
-    print('TRSOptions.isOpen() result: ' + boolToStr(result));
+  print('TRSOptions.isOpen() result: ' + boolToStr(result));
 end;
 
 (*
@@ -216,7 +216,7 @@ _getOptions
 
     function TRSOptions._getOptions(var Buttons: TBoxArray; var Texts: TStringArray): boolean;
 
-Passess all the buttons on the options menu as a TBoxArray **Buttons** and passes
+Passes all the buttons on the options menu as a TBoxArray **Buttons** and passes
 a TStringArray **Texts** of the text for each button. Returns true if successfull.
 
 .. note::

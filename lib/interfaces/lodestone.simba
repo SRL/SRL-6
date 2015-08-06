@@ -199,7 +199,7 @@ begin
   begin
     b := ATPA[i].getBounds();
 
-    if inRange(b.getWidth(), 190, 210) and (b.getHeight() < 60) then
+    if inRange(b.getWidth(), 190, 210) and inRange(b.getHeight(), 20, 40) then
       if (pos('LODE', upperCase(tesseract_GetText(b, TESS_FILTER_SMALL_CHARS))) > 0) then
       begin
         self.setBounds([b.x1 - 3, b.y1 - 5, b.x2 + 307, b.y2 + 300]);
@@ -454,7 +454,7 @@ begin
       fastclick(MOUSE_RIGHT);
       Wait(Random(200, 300));
 
-      Options := ChooseOption.__GetOptions();
+      Options := chooseOption.getOptions();
       Result := Length(Options) = 3;
       if (Result) then
       begin

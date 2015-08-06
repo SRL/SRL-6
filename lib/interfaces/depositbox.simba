@@ -723,10 +723,10 @@ begin
 
       if (amounts[i] = -1) then
       begin
-        if (not chooseOption._select(['Deposit-All', 'sit-All', 'All'], MOUSE_LEFT, false, 1.0, 300)) then
+        if (not chooseOption.select(['Deposit-All', 'sit-All', 'All'], MOUSE_LEFT, 300)) then
           chooseOption.select(['Deposit', 'osit']); // in case there's only one
       end else
-        if (not chooseOption._select([toStr(amounts[i])], MOUSE_LEFT, false, 1.0, 300)) then
+        if (not chooseOption.select([toStr(amounts[i])], MOUSE_LEFT, 300)) then
           if (chooseOption.select(['Deposit-X', '-X'])) then
             bankScreen._enterAmount(amounts[i], 5000);
     end;

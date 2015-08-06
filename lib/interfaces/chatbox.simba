@@ -21,14 +21,14 @@ The following constants, types and variables are used throughout the chatBox met
 .. code-block:: pascal
 
     const
-      CHATBOX_TESSERACT_FILTER: TTesseractFilter = [3, 3, [False, 35, TM_Mean]];
+      TESS_FILTER_CHATBOX: TTesseractFilter = [3, 3, [False, 35, TM_Mean]];
 
 The TTesseractFilter that is used by the chatBox text functions by default.
 Scripters can create and use their own filters if they wish.
 
 *)
 const
-  CHATBOX_TESSERACT_FILTER: TTesseractFilter = [3, 3, [False, 35, TM_Mean]];
+  TESS_FILTER_CHATBOX: TTesseractFilter = [3, 3, [False, 35, TM_Mean]];
 
 (*
 **type TRSChatBox**
@@ -191,9 +191,9 @@ findText
 
 .. code-block:: pascal
 
-    function TRSChatBox.findText(txt: TStringArray; const Filter: TTesseractFilter = CHATBOX_TESSERACT_FILTER): boolean;
+    function TRSChatBox.findText(txt: TStringArray; const Filter: TTesseractFilter = TESS_FILTER_CHATBOX): boolean;
 
-Returns true is any of the text in **txt** is found anywhere in the chat box.
+Returns true if any of the text in **txt** is found anywhere in the chat box.
 The scripter has the option of using a custom TTesseractFilter **Filter** .
 
 .. note::
@@ -208,7 +208,7 @@ Example:
     if chatBox.findAnyText(['Hello']) then
       writeLn('We found Hello in the chatBox');
 *)
-function TRSChatBox.findText(txt: TStringArray; const Filter: TTesseractFilter = CHATBOX_TESSERACT_FILTER): boolean;
+function TRSChatBox.findText(txt: TStringArray; const Filter: TTesseractFilter = TESS_FILTER_CHATBOX): boolean;
 var
   s: string;
 begin
@@ -222,7 +222,7 @@ getTextOnLine
 
 .. code-block:: pascal
 
-    function TRSChatBox.getTextOnLine(Line: Integer; Filter: TTesseractFilter = CHATBOX_TESSERACT_FILTER): String;
+    function TRSChatBox.getTextOnLine(Line: Integer; Filter: TTesseractFilter = TESS_FILTER_CHATBOX): String;
 
 Returns the string of text on chatBox line **Line** . The scripter has the
 option of using a custom TTesseractFilter **Filter** . The bottom line in the
@@ -239,7 +239,7 @@ Example:
 
     writeLn(chatBox.getTextOnLine(0));
 *)
-function TRSChatBox.getTextOnLine(Line: Integer; Filter: TTesseractFilter = CHATBOX_TESSERACT_FILTER): String;
+function TRSChatBox.getTextOnLine(Line: Integer; Filter: TTesseractFilter = TESS_FILTER_CHATBOX): String;
 begin
   if (not inRange(Line, Low(Self.lineBoxes), High(Self.lineBoxes))) then
     Exit(Print('TRSChatBox.getTextOnLine(): Invaild line', False));
@@ -254,9 +254,9 @@ findTextOnLines
 
 .. code-block:: pascal
 
-    function TRSChatBox.findTextOnLines(txt: TStringArray; lines: TIntegerArray; Filter: TTesseractFilter = CHATBOX_TESSERACT_FILTER): boolean;
+    function TRSChatBox.findTextOnLines(txt: TStringArray; lines: TIntegerArray; Filter: TTesseractFilter = TESS_FILTER_CHATBOX): boolean;
 
-Returns true is any of the text in **txt** is found on any of the chatBox
+Returns true if any of the text in **txt** is found on any of the chatBox
 lines **lines** .The scripter has the option of using a custom TTesseractFilter
 **Filter** . The bottom line in the chatBox is line 0.
 
@@ -272,7 +272,7 @@ Example:
     // returns true if "Hello" or "Hi" is found on the first 4 lines
     chatBox.findTextOnLines(['Hello', 'Hi'], [0..3]);
 *)
-function TRSChatBox.findTextOnLines(txt: TStringArray; lines: TIntegerArray; Filter: TTesseractFilter = CHATBOX_TESSERACT_FILTER): boolean;
+function TRSChatBox.findTextOnLines(txt: TStringArray; lines: TIntegerArray; Filter: TTesseractFilter = TESS_FILTER_CHATBOX): boolean;
 var
   i: integer;
   s: string;

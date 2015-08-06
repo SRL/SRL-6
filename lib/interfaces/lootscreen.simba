@@ -304,13 +304,13 @@ begin
   result := grid(6, 5, 35, 31, 41, 36, point(self.x + 31, self.y + 58));
 end;
 
-(*
-_isSlotValid
+{*
+__isSlotValid
 ------------
 
 .. code-block:: pascal
 
-    function TRSLootScreen._isSlotValid(slot: integer): boolean;
+    function TRSLootScreen.__isSlotValid(slot: integer): boolean;
 
 Returns true if the lootScreen slot **slot** is a valid slot number.
 
@@ -323,15 +323,15 @@ Example:
 
 .. code-block:: pascal
 
-    if lootscreen._isSlotValid(25) then
+    if lootscreen.__isSlotValid(25) then
       writeln('Slot is valid!');
-*)
-function TRSLootScreen._isSlotValid(slot: integer): boolean;
+*}
+function TRSLootScreen.__isSlotValid(slot: integer): boolean;
 begin
   result := inRange(slot, LOOT_SLOT_LOW, LOOT_SLOT_HIGH);
 
   if (not result) then
-    print('TRSLootScreen._isSlotValid(): Slot ' + toStr(slot) + ' is invalid', TDebug.WARNING);
+    print('TRSLootScreen.__isSlotValid(): Slot ' + toStr(slot) + ' is invalid', TDebug.WARNING);
 end;
 
 (*
@@ -360,7 +360,7 @@ Example:
 *)
 function TRSLootScreen.getSlotBox(slot: integer): TBox;
 begin
-  if (not _isSlotValid(slot)) then
+  if (not self.__isSlotValid(slot)) then
     exit(intToBox(-1, -1, -1, -1));
 
   result := self.getSlotBoxes()[slot -1];
@@ -390,7 +390,7 @@ Example:
 *)
 function TRSLootScreen.isItemInSlot(slot: integer): boolean;
 begin
-  if (not self.isOpen()) or (not self._isSlotValid(slot)) then
+  if (not self.isOpen()) or (not self.__isSlotValid(slot)) then
     exit(false);
 
   result := isItemIn(getSlotBox(slot));

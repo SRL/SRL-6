@@ -932,10 +932,10 @@ begin
 
         if (amounts[i] = -1) then
         begin
-          if (chooseOption._select(['Store-All', 'ore-All', 'All'], MOUSE_LEFT, false, 1.0, 300) = false) then
+          if (not chooseOption.select(['Store-All', 'ore-All', 'All'], MOUSE_LEFT, 300)) then
             chooseOption.select(['Store', 'tore']); // in case there's only one
         end else begin
-          if (chooseOption._select([toStr(amounts[i])], MOUSE_LEFT, false, 1.0, 300) = false) then
+          if (not chooseOption.select([toStr(amounts[i])], MOUSE_LEFT, 300)) then
             if (chooseOption.select(['Store-X', '-X'])) then
             begin
               t := (getTickCount64() + 3000);

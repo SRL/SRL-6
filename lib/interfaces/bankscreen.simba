@@ -1315,10 +1315,10 @@ begin
       begin
         writeLn(slots);
         writeLn(amounts);
-        if (not chooseOption._select(['Deposit-All', 'sit-All', 'All'], MOUSE_LEFT, false, 1.0, 300)) then
+        if (not chooseOption.select(['Deposit-All', 'sit-All', 'All'], 300)) then
           chooseOption.select(['Deposit', 'osit']); // In case there's only one
       end else
-        if (not chooseOption._select([toStr(amounts[i])], MOUSE_LEFT, false, 1.0, 300)) then
+        if (not chooseOption.select([toStr(amounts[i])], MOUSE_LEFT, 300)) then
           if chooseOption.select(['Deposit-X', '-X']) then
             self._enterAmount(amounts[i], 5000);
     end;

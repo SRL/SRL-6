@@ -1,9 +1,8 @@
 (*
-Pinscreen
-=========
+Pin Screen
+==========
 
-The pinscreen file holds functions and procedures that are used in the
-Runescape pinscreen.
+The pinscreen file holds functions and procedures that are used in the runescape pinscreen.
 
 The source for this file can be found `here <https://github.com/SRL/SRL-6/blob/master/lib/interfaces/pinscreen.simba>`_.
 
@@ -12,38 +11,55 @@ The source for this file can be found `here <https://github.com/SRL/SRL-6/blob/m
 {$f-}
 
 (*
-type TRSPinScreen
-~~~~~~~~~~~~~~~~~
+Consts, Types, Vars
+~~~~~~~~~~~~~~~~~~~
 
-A type that stores all the attributes and functions of the Runescape Pinscreen.
+The following constants, types and variables are used throughout the pinScreen methods.
 
-*)
-type
-  TRSPinScreen = record(TRSInterface)
-    __placeHolder: byte;
-  end;
-
-(*
-var pinScreen
-~~~~~~~~~~~~~
-
-The variable that holds all pinscreen information. It used when calling any functions
-in this file.
-
-Example:
+**type TRSPinScreen**
 
 .. code-block:: pascal
 
-    if (pinscreen.isOpen()) then
-      writeln('Pinscreen is open!');
+    type
+      TRSPinScreen = type TRSInterface;
+
+A type that stores the pinScreen interface properties.
+
+*)
+type
+  TRSPinScreen = type TRSInterface;
+
+(*
+**var pinScreen**
+
+.. code-block:: pascal
+
+    var
+      pinScreen: TRSPinScreen;
+
+A variable through which scripters can access the TRSPinScreen type methods.
 
 *)
 var
   pinScreen: TRSPinScreen;
 
+(*
+TRSPinScreen methods
+~~~~~~~~~~~~~~~~~~~~
+
+The following methods should be called through the **pinScreen** variable.
+
+Example:
+
+.. code-block:: pascal
+
+    if inScreen.isOpen() then
+      writeln('Pin screen is open!');
+*)
+
 {*
-TRSPinScreen.__init
-~~~~~~~~~~~~~~~~~~~
+__init
+------
 
 .. code-block:: pascal
 
@@ -75,15 +91,16 @@ begin
 end;
 {$ENDIF}
 
-(*
-TRSPinScreen.__find
-~~~~~~~~~~~~~~~~~~~
+{*
+__find
+------
 
 .. code-block:: pascal
 
     function TRSPinScreen.__find(): boolean;
 
-Returns true if the pin screen is detected, and sets the bounds
+Returns true if the pinScreen interface is detected and its bounds are set.
+Scripters should use pinScreen.isOpen() below.
 
 .. note::
 
@@ -94,9 +111,9 @@ Example:
 
 .. code-block:: pascal
 
-    if (pinScreen.__find()) then
-      writeln('bounds are set!');
-*)
+    if pinScreen.__find() then
+      writeln('The pin screen is open, and the bounds are set!');
+*}
 {$IFNDEF CODEINSIGHT}
 function TRSPinScreen.__find(): boolean;
 const
@@ -140,15 +157,15 @@ end;
 {$ENDIF}
 
 (*
-TRSPinScreen.isOpen
-~~~~~~~~~~~~~~~~~~~
+isOpen
+------
 
 .. code-block:: pascal
 
     function TRSPinScreen.isOpen(waitTime: integer = 0): boolean;
 
-Returns if the pinscreen is open or not, parameter 'waitTime' is optional and
-is default set at 0, increasing will wait x ms for the pinscreen to open.
+Returns true if the pinScreen interface is open. The optional **waitTime** parameter
+*(default = 0)* is the maximum time (in milliseconds) it will keep looking.
 
 .. note::
 
@@ -159,7 +176,7 @@ Example:
 
 .. code-block:: pascal
 
-   if (pinScreen.isOpen(1000)) then
+   if pinScreen.isOpen(1000) then
       writeln('Pinscreen is open!');
 *)
 function TRSPinScreen.isOpen(waitTime: integer = 0): boolean;
@@ -182,14 +199,14 @@ begin
 end;
 
 (*
-TRSPinScreen.close
-~~~~~~~~~~~~~~~~~~
+close
+-----
 
 .. code-block:: pascal
 
     function TRSPinScreen.close(): boolean;
 
-Will attempt to close the pinscreen if it's open, returns if succesfull or not.
+Returns true if the lodestone screen is successfully closed.
 
 .. note::
 
@@ -200,8 +217,8 @@ Example:
 
 .. code-block:: pascal
 
-   if (pinScreen.close()) then
-     writeln('closed the pinscreen!');
+   if pinScreen.close() then
+     writeln('The pinScreen has been closed');
 *)
 function TRSPinScreen.close(): boolean;
 begin
@@ -214,14 +231,14 @@ begin
 end;
 
 (*
-TRSPinScreen.waitNotOpen
-~~~~~~~~~~~~~~~~~~~~~~~~
+waitNotOpen
+-----------
 
 .. code-block:: pascal
 
     function TRSPinScreen.waitNotOpen(waitTime: integer): boolean;
 
-Waits 'waitTime' for the pinscreen not to be open.
+Returns true if the pinScreen is no longer open within**waitTime**
 
 .. note::
 
@@ -232,8 +249,8 @@ Example:
 
 .. code-block:: pascal
 
-   if (pinScreen.waitNotOpen(5000)) then
-     writeln('Pinscreen is not open anymore!');
+   if pinScreen.waitNotOpen(5000) then
+     writeln('The pinScreen is no longer open');
 *)
 function TRSPinScreen.waitNotOpen(waitTime: integer): boolean;
 var
@@ -253,14 +270,14 @@ begin
 end;
 
 {*
-TRSPinScreen.__exit
-~~~~~~~~~~~~~~~~~~~
+__exit
+------
 
 .. code-block:: pascal
 
     function TRSPinScreen.__exit(reason: string; debugType: TDebug; res: boolean): boolean;
 
-Helper function for TRSPinScreen.ener, used to tidy it up.
+Helper function for TRSPinScreen.enter. It is just used to keep it tidy.
 
 .. note::
 
@@ -283,14 +300,15 @@ end;
 {$ENDIF}
 
 {*
-TRSPinScreen.__findNumber
-~~~~~~~~~~~~~~~~~~~~~~~~~
+__findNumber
+------------
 
 .. code-block:: pascal
 
     function TRSPinScreen.__findNumber(number: char; out b: TBox): boolean;
 
-Attempts to find the number 'number' and will return it's box in 'b'.
+Returns true if it finds the pinScreen button numbered **number** . If found,
+it will pass the button bounds as the TBox **b** .
 
 .. note::
 
@@ -347,14 +365,14 @@ end;
 {$ENDIF}
 
 (*
-TRSPinScreen.isPinVaild
-~~~~~~~~~~~~~~~~~~~~~~~
+isPinVaild
+----------
 
 .. code-block:: pascal
 
     function TRSPinScreen.isPinVaild(pin: string): boolean;
 
-Returns if the pin 'pin' is vaild or not.
+Returns true if the pin **pin** is a valid 4 digit number.
 
 .. note::
 
@@ -365,7 +383,7 @@ Example:
 
 .. code-block:: pascal
 
-   if (pinScreen.isPinVaild('1234')) then
+   if pinScreen.isPinVaild('1234') then
       writeln('1234 is a vaild pin!');
 *)
 function TRSPinScreen.isPinVaild(pin: string): boolean;
@@ -377,15 +395,15 @@ begin
 end;
 
 (*
-TRSPinScreen.enter
-~~~~~~~~~~~~~~~~~~
+enter
+-----
 
 .. code-block:: pascal
 
     function TRSPinScreen.enter(pin: string): boolean;
 
-Attempts to enter the bankpin 'pin', will try twice to enter and will return
-if succesfull or not.
+Returns true if it successfully enters the bankpin **pin** . It will attempt up
+to 2 times.
 
 .. note::
 
@@ -396,8 +414,14 @@ Example:
 
 .. code-block:: pascal
 
-   if (pinScreen.enter('1234')) then
-      writeln('Entered our bank pin!');
+    if bankScreen.open(BANK_TABLE_BURTHORPE) then
+    begin
+      if pinScreen.isOpen() then
+        if pinScreen.enter(players[currentPlayer].bankPin) then
+          writeLn('Entered you''re bank pin!);
+
+      // Other banking code
+    end;
 *)
 function TRSPinScreen.enter(pin: string): boolean;
 var

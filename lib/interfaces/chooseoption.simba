@@ -1,9 +1,8 @@
 (*
-ChooseOption
-============
+Choose Option
+=============
 
-The text file holds functions and procedures that are used in the choose option
-menu.
+The text file holds functions and procedures that are used in the runescape choose option manu.
 
 The source for this file can be found `here <https://github.com/SRL/SRL-6/blob/master/lib/interfaces/chooseoption.simba>`_.
 
@@ -12,10 +11,34 @@ The source for this file can be found `here <https://github.com/SRL/SRL-6/blob/m
 {$f-}
 
 (*
-type TOption
-~~~~~~~~~~~~
+Consts, Types, Vars
+~~~~~~~~~~~~~~~~~~~
 
-A type that stores the bounds, and string of a option.
+The following constants, types and variables are used throughout the chooseOption methods.
+
+** const Tesseract Filter**
+
+.. code-block:: pascal
+
+  const
+    TESS_FILTER_CHOOSE_OPTION: TTesseractFilter = [4, 4, [False, 15, TM_Mean]];
+
+*)
+const
+  TESS_FILTER_CHOOSE_OPTION: TTesseractFilter = [4, 4, [False, 15, TM_Mean]];
+
+(*
+**type TOption**
+
+.. code-block:: pascal
+    type
+      TOption = record
+        bounds: TBox;
+        str: string;
+      end;
+
+A type that stores the bounds and string of an option in the chooseOption menu.
+
 *)
 type
   TOption = record
@@ -24,41 +47,71 @@ type
   end;
 
 (*
-type TRSChooseOption
-~~~~~~~~~~~~~~~~~~~~
-
-A type that stores the choose option interface properties.
-*)
-type
-  TOptionArray = array of TOption;
-  TRSChooseOption = type TRSInterface;
-
-(*
-var chooseOption
-~~~~~~~~~~~~~~~~
-
-Variable that stores functions and properties of the Runescape choose option menu.
-
-Example:
+**type TOptionArray**
 
 .. code-block:: pascal
 
-    if (chooseOption.select(['Mine rock')) then
-      writeln('Mining a rock!');
+    type
+      TOptionArray = array of TOption;
+
+An array of the TOption type.
+
+*)
+type
+  TOptionArray = array of TOption;
+
+(*
+**type TRSChooseOption**
+
+.. code-block:: pascal
+
+    type
+      TRSChooseOption = type TRSInterface;
+
+A type that stores the chooseOption interface properties.
+
+*)
+type
+  TRSChooseOption = type TRSInterface;
+
+(*
+**var chooseOption**
+
+.. code-block:: pascal
+
+    var
+      chooseOption: TRSChooseOption;
+
+A variable through which scripters can access the TRSChooseOption type methods.
+
 *)
 var
   chooseOption: TRSChooseOption;
 
 (*
-TRSChooseOption.isOpen
-~~~~~~~~~~~~~~~~~~~~~~
+TRSChooseOption methods
+~~~~~~~~~~~~~~~~~~~~~~~
+
+The following methods should be called through the **chooseOption** variable.
+
+Example:
 
 .. code-block:: pascal
 
-    function TRSChooseOption.isOpen(): boolean;
+    if chooseOption.isOpen() then
+      writeln('Choose option menu is open!');
+*)
 
-Returns true if the ChooseOption menu is open, if open will also set the type's
-bounds.
+{*
+__find
+------
+
+.. code-block:: pascal
+
+    function TRSChooseOption.__find(): boolean;
+
+Returns true if the chooseOption interface is detected and its bounds are set.
+Scripters should use chooseOption.isOpen() below.
 
 .. note::
 
@@ -69,10 +122,11 @@ Example:
 
 .. code-block:: pascal
 
-    if (chooseOption.isOpen()) then
-      chooseOption.close();
-*)
-function TRSChooseOption.isOpen(): boolean;
+    if chooseOption.__find() then
+      writeln('The chooseOption menu is open, and the bounds are set!');
+*}
+{$IFNDEF CODEINSIGHT}
+function TRSChooseOption.__find(): boolean;
 const
   BORDER_COLORS = [197636, 3618615, 3748386];
   CORNER_COLOR = 2368548;
@@ -113,17 +167,18 @@ begin
     end;
   end;
 end;
+{$ENDIF}
 
 (*
-TRSChooseOption.isOpen; overload
-~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+isOpen
+------
 
 .. code-block:: pascal
 
-    function TRSChooseOption.isOpen(waitTime: integer): boolean; overload;
+    function TRSChooseOption.isOpen(waitTime: integer = 0): boolean;
 
-Overloaded function. Accepts a extra parameter 'waitTime' which will wait upto
-waitTime (in ms) for the menu to appear.
+Returns true if the chooseOption menu is open. The optional **waitTime** parameter
+*(default = 0)* is the maximum time (in milliseconds) it will keep looking.
 
 .. note::
 
@@ -134,10 +189,10 @@ Example:
 
 .. code-block:: pascal
 
-    if (chooseOption.isOpen()) then
+    if chooseOption.isOpen(2000) then
       chooseOption.close();
 *)
-function TRSChooseOption.isOpen(waitTime: integer): boolean; overload;
+function TRSChooseOption.isOpen(waitTime: integer = 0): boolean;
 var
   t: longWord;
 begin
@@ -146,20 +201,20 @@ begin
 
   while (not result) and (t >= getSystemTime()) do
   begin
-    result := self.isOpen();
+    result := self.__find();
     wait(20 + random(50));
   end;
 end;
 
 (*
-TRSChooseOption.close
-~~~~~~~~~~~~~~~~~~~~~
+close
+-----
 
 .. code-block:: pascal
 
     function TRSChooseOption.close(): boolean;
 
-Closes the chooseoption menu by moving the mouse off the menu, returns true if succesfull.
+Returns true if the lodestone screen is successfully closed.
 
 .. note::
 
@@ -170,7 +225,7 @@ Example:
 
 .. code-block:: pascal
 
-    if (chooseOption.isOpen()) then
+    if chooseOption.isOpen() then
       chooseOption.close();
 *)
 function TRSChooseOption.close(): boolean;
@@ -214,14 +269,17 @@ begin
 end;
 
 (*
-TRSChooseOption.getOptions
-~~~~~~~~~~~~~~~~~~~~~~~~~~
+getOptions
+----------
 
 .. code-block:: pascal
 
-    function TRSChooseOption.getOptions(useTesseract: boolean = false): TOptionArray;
+    function TRSChooseOption.getOptions(useTesseract: boolean = false; Filter: TTesseractFilter = TESS_FILTER_CHOOSE_OPTION): TOptionArray;
 
-Returns a TOptionArray of all the options.
+Returns a TOptionArray of all the options present in the chooseOption menu. The
+**useTesseract** parameter can be set to true *(default = false)* to use the
+tesseract ocr to read the text. The scripter has the option of using a custom
+TTesseractFilter **Filter** .
 
 .. note::
 
@@ -232,10 +290,16 @@ Example:
 
 .. code-block:: pascal
 
-    if chooseOption.isOpen() then
-      chooseOption.close();
+    var
+      opts: TOptionArray;
+    begin
+      opts := chooseOption.getOptions();
+
+      if opts[0].str = 'Walk here' then
+        mouseBox(opts[0].bounds, MOUSE_LEFT);
+    end;
 *)
-function TRSChooseOption.getOptions(useTesseract: boolean = false): TOptionArray;
+function TRSChooseOption.getOptions(useTesseract: boolean = false; Filter: TTesseractFilter = TESS_FILTER_CHOOSE_OPTION): TOptionArray;
 var
   bmp, wid, hei, i, oldTarget, t: integer;
   tpa: TPointArray;
@@ -263,7 +327,7 @@ begin
       if not useTesseract then
         result[i].str := getTextAtEx(result[i].bounds, 0, 5, 5, clRed, 0, UpCharsEx)
       else
-        result[i].str := Tesseract_GetText(result[i].bounds, TESS_FILTER_SMALL_CHARS);
+        result[i].str := Tesseract_GetText(result[i].bounds, Filter);
       result[i].bounds.offset(point(self.x1, self.y1));  // offset so its back on the mainscreen
       result[i].bounds.shrink(1);
     end;
@@ -278,14 +342,14 @@ begin
 end;
 
 (*
-TRSChooseOption.optionsExist
-~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+optionsExist
+------------
 
 .. code-block:: pascal
 
     function TRSChooseOption.optionsExist(options: TStringArray): boolean;
 
-Returns true if any of the options exist.
+Returns true if any of the options in **options** exist in the chooseOption menu.
 
 .. note::
 
@@ -297,7 +361,7 @@ Example:
 .. code-block:: pascal
 
     if chooseOption.optionsExist(['alk here']) then
-      writeln('the option walk here is there!');
+      writeln('the option walk here exists!');
 *)
 function TRSChooseOption.optionsExist(options: TStringArray): boolean;
 var
@@ -321,37 +385,37 @@ begin
 end;
 
 {*
-TRSChooseOption._select
-~~~~~~~~~~~~~~~~~~~~~~~
+__select
+--------
 
 .. code-block:: pascal
 
-function TRSChooseOption._select(txt: TStringArray; mouseAction: integer; aclose: boolean; matchPercent: extended; waitTime: integer): boolean;
+    function TRSChooseOption.__select(txt: TStringArray; mouseAction: integer; closeAfter: boolean; matchPercent: extended; waitTime: integer; useTesseract: boolean;  filter: TTesseractFilter): boolean;
 
-  * txt - An array of text you want to find in any of the options.
-  * mouseAction - What to do if we succesfully find a option (MOUSE_MOVE, MOUSE_LEFT, MOUSE_RIGHT, MOUSE_NONE).
-  * aclose - Will we close the menu after we're done with it?
-  * matchPercent - The min percentage that will we count as match (if using stringmatch) if not using stringmatch
-                   and want the old the method of finding txt anywhere in the string set it as 1.00.
-  * waitTime - how long will we wait for the chooseoptions menu to appear?.
-  * useTesseract - Do you want to use Tesseract to find the text (default false)
+Returns true if an option in **txt** is interacted with successfully. Scripters
+should use one of the overload methods below instead.
+
+    * **txt**          : An array of text you want to find in any of the options
+    * **mouseAction**  : The mouse action to perform on the option (MOUSE_MOVE, MOUSE_LEFT, MOUSE_RIGHT, MOUSE_NONE)
+    * **closeAfter**   : Close the menu if no options are found?
+    * **matchPercent** : The min percentage that will we count as match. If not using
+                         the stringmatch method set this to 1.00
+    * **waitTime**     : Max time to wait for the chooseOption menu to appear
+    * **useTesseract** : Use the tesseract ocr to find the text?
+    * **filter**       : Tesseract filter
 
 .. note::
 
     - by Olly
-    - Last Modified: 4 July 2015 by The Mayor
+    - Last Modified: 6 August 2015 by The Mayor
 
 Example:
 
 .. code-block:: pascal
 
-    // to not use string match
-    chooseOption._select(['alk', 'lk To', 'Walk'], MOUSE_LEFT, true, 1.00, 150);
-
-    // to use string match
-    chooseOption._select(['Walk To'], MOUSE_LEFT, true, 0.85, 150);
+    chooseOption.__select(['alk', 'lk To'], MOUSE_LEFT, true, 1.00, 150, true);
 *}
-function TRSChooseOption._select(txt: TStringArray; mouseAction: integer; aclose: boolean; matchPercent: extended; waitTime: integer; useTesseract: boolean = false): boolean;
+function TRSChooseOption.__select(txt: TStringArray; mouseAction: integer; closeAfter: boolean; matchPercent: extended; waitTime: integer; useTesseract: boolean;  filter: TTesseractFilter): boolean;
 var
   optionArr: TOptionArray;
   l, i, j: integer;
@@ -359,101 +423,76 @@ var
   a: extended;
   b: TBox;
 begin
-  result := false;
-
-  print('TRSChooseOption._select():', TDebug.HEADER);
+  print('TRSChooseOption.__select():', TDebug.HEADER);
 
   if (not self.isOpen(waitTime)) then
   begin
     print('ChooseOption menu never appeared', TDebug.ERROR);
-    print('TRSChooseOption.select() result = false', TDebug.FOOTER);
+    print('TRSChooseOption.__select() result = false', TDebug.FOOTER);
     exit();
   end;
 
-  optionArr := self.getOptions(useTesseract);
+  optionArr := self.getOptions(useTesseract, filter);
 
-  l := length(optionArr);
-
-  if (l < 1) then
+  if (length(optionArr) > 0) then
   begin
-    print('Failed to find any options', TDebug.ERROR);
-    print('TRSChooseOption.select() result = false', TDebug.FOOTER);
-
-    if aclose then
-      close();
-
-    exit();
-  end else
-  begin
-    // format the matches so we don't spam the debug box
-    setLength(s, l);
-
-    for i := 0 to (l -1) do
-      s[i] := optionArr[i].str;
+    for i := 0 to high(optionArr) do
+      s.append(optionArr[i].str);
 
     print('Options found: ' + toStr(s));
-  end;
 
-  for i := 0 to high(optionArr) do
-    for j := 0 to high(txt) do
-    begin
-      if (matchPercent = 1.00) then // not using stringmatch
-        if (pos(txt[j], optionArr[i].str) > 0) then
+    for i := 0 to high(optionArr) do
+      for j := 0 to high(txt) do
+      begin
+        if (matchPercent = 1.00) then // If we're not using stringmatch
+          if (pos(txt[j], optionArr[i].str) > 0) then
+          begin
+            print('Found option "' + txt[j] + '" in "' + optionArr[i].str + '"');
+
+            if (mouseAction <> MOUSE_NONE) then
+              mouseBox(optionArr[i].bounds, mouseAction);
+
+            result := true;
+            break(2);
+          end else
+            continue;
+
+        // If we're using string match
+        a := stringMatch(optionArr[i].str, txt[j]);
+
+        if (a >= matchPercent) then
         begin
-          print('Found option "' + txt[j] + '" in "' + optionArr[i].str + '"');
-          print('TRSChooseOption.select() result = true', TDebug.FOOTER);
+          print('Found option "' + txt[j] + '" @ accuracy ' + floatToStr(a));
 
           if (mouseAction <> MOUSE_NONE) then
-            mouseBox(optionArr[i].bounds, mouseAction)
-          else // if it's mouse none lets see if we need to close
-            if aclose then
-              self.close();
+            mouseBox(optionArr[i].bounds, mouseAction);
 
-          exit(true);
-        end else
-          continue;
+          result := true;
+          break(2);
+        end;
+     end;
+  end else
+    print('Failed to find any text matches');
 
-      // if we're here we are using string match
-      a := stringMatch(optionArr[i].str, txt[j]);
-
-      if (a >= matchPercent) then
-      begin
-        print('Found option "' + txt[j] + '" @ accuracy ' + floatToStr(a));
-        print('TRSChooseOption.select() result = true', TDebug.FOOTER);
-
-        if (mouseAction <> MOUSE_NONE) then
-        begin
-          b := optionArr[i].bounds;
-          b.edit(2, 2, -2, -2); // shrink the box so there's no chance of clicking the wrong option
-          mouseBox(b, mouseAction)
-        end else // if it's mouse none lets see if we need to close
-          if aclose then
-            self.close();
-
-        exit(true);
-      end;
-   end;
-
-  // close the menu since we found no matches
-  if aclose then
-    close();
-
-  print('Failed to find any text matches');
-  print('TRSChooseOption._select() result = false', TDebug.FOOTER);
+  // Close the menu
+  if closeAfter then self.close();
+  print('TRSChooseOption.__select() result = ' + boolToStr(result), TDebug.FOOTER);
 end;
 
 (*
-TRSChooseOption.select; overload
-~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+select
+------
 
 .. code-block:: pascal
 
-    function TRSChooseOption.select(txt: TStringArray; waitTime: integer = 150): boolean; overload;
+    function TRSChooseOption.select(txt: TStringArray; waitTime: integer = 250; useTesseract: boolean = false): boolean; overload;
 
-A overloaded function that will use the tradional method.
+Returns true if an option in **txt** is interacted with successfully.
 
-  * txt: The text we will look for in any of the options.
-  * waitTime: How long we will wait for the chooseoption menu to appear, default set at 150ms.
+    * **txt**          : An array of text you want to find in any of the options
+    * **waitTime**     : Max time to wait for the chooseOption menu to appear *(default = 250)*
+    * **useTesseract** : Use the tesseract ocr to find the text? *(default = false)*
+    * **filter**       : Tesseract filter *(default = TESS_FILTER_CHOOSE_OPTION)*
 
 .. note::
 
@@ -464,26 +503,28 @@ Example:
 
 .. code-block:: pascal
 
-    chooseOption.select(['Walk here', 'alk he']);
+    chooseOption.select(['Walk here']);
+    chooseOption.select(['Walk here'], 250, True); // To use tesseract
 *)
-function TRSChooseOption.select(txt: TStringArray; waitTime: integer = 250): boolean; overload;
+function TRSChooseOption.select(txt: TStringArray; waitTime: integer = 250; useTesseract: boolean = false; filter: TTesseractFilter = TESS_FILTER_CHOOSE_OPTION): boolean; overload;
 begin
-  result := self._select(txt, MOUSE_LEFT, true, 1.00, waitTime);
+  result := self.__select(txt, MOUSE_LEFT, true, 1.00, waitTime, useTesseract, filter);
 end;
 
 (*
-TRSChooseOption.select; overload
-~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+select (overload) 1
+-------------------
 
 .. code-block:: pascal
 
     function TRSChooseOption.select(txt: TStringArray; matchPercent: extended; waitTime: integer = 150): boolean; overload;
 
-A overloaded function that will use the "string matching" method.
+Returns true if an option in **txt** is interacted with successfully. This overload
+uses the 'stringmatch' method.
 
-   * txt: The txt will try and match against in any of the options.
-   * matchPercent: The min percent that we will count a match.
-   * waitTime: How long we will wait for the chooseoption menu to appear, default set at 150ms.
+    * **txt**          : An array of text you want to find in any of the options
+    * **matchPercent** : Minimum percent which counts as a match
+    * **waitTime**     : Max time to wait for the chooseOption menu to appear *(default = 250)*
 
 .. note::
 
@@ -494,25 +535,30 @@ Example:
 
 .. code-block:: pascal
 
-    chooseOption.select(['Walk here'], 0.80);
+    chooseOption.select(['Walk here'], 0.80); // If 80% of 'Walk here' matches
 *)
 function TRSChooseOption.select(txt: TStringArray; matchPercent: extended; waitTime: integer = 250): boolean; overload;
 begin
-  result := self._select(txt, MOUSE_LEFT, true, matchPercent, waitTime);
+  result := self.__select(txt, MOUSE_LEFT, true, matchPercent, waitTime, false, TESS_FILTER_CHOOSE_OPTION);
 end;
 
 (*
-TRSChooseOption.select; overload
-~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+select (overload) 2
+-------------------
 
 .. code-block:: pascal
 
-    function TRSChooseOption.select(txt: TStringArray; matchPercent: extended; waitTime: integer = 150): boolean; overload;
+    function TRSChooseOption.select(txt: TStringArray; mouseAction: Integer; waitTime: Integer; useTesseract: Boolean;  filter: TTesseractFilter = TESS_FILTER_CHOOSE_OPTION): boolean; overload;
 
-A overloaded function that takes a tesseract boolean as the second parameter
+Returns true if an option in **txt** is interacted with successfully. In this
+overload method you can adjust the mouseAction, which is useful if 'hovering'
+an option in the menu.
 
-   * txt: The txt will try and match against in any of the options.
-   * useTesseract: use tesseract to find text?
+
+    * **txt**          : An array of text you want to find in any of the options
+    * **mouseActiont** : The mouse action to perform on the option (MOUSE_MOVE, MOUSE_LEFT, MOUSE_RIGHT, MOUSE_NONE)
+    * **useTesseract** : Use the tesseract ocr to find the text?
+    * **filter**       : Tesseract filter *(default = TESS_FILTER_CHOOSE_OPTION)*
 
 .. note::
 
@@ -523,22 +569,23 @@ Example:
 
 .. code-block:: pascal
 
-    chooseOption.select(['Walk here'], 0.80);
+    chooseOption.select(['Bank'], MOUSE_MOVE, 300, false); // Will move the mouse to the option but not click
 *)
-function TRSChooseOption.select(txt: TStringArray; useTesseract: boolean): boolean; overload;
+function TRSChooseOption.select(txt: TStringArray; mouseAction: Integer; waitTime: Integer; useTesseract: Boolean;  filter: TTesseractFilter = TESS_FILTER_CHOOSE_OPTION): boolean; overload;
 begin
-  result := self._select(txt, MOUSE_LEFT, true, 1.00, 250, useTesseract);
+  result := self.__select(txt, mouseAction, false, 1.00, 300, useTesseract, filter);
 end;
 
 (*
-TRSChooseOption.debugOptions
-~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+debugOptions
+------------
 
 .. code-block:: pascal
 
    procedure TRSChooseOption.debugOptions(useTesseract: boolean = false);
 
-Debugs all the found options. Can optionally use tesseract.
+Debugs all the found options. The **useTesseract** parameter can be set to true
+to use the tesseract ocr *(default = false)*
 
 .. note::
 
@@ -558,7 +605,7 @@ var
 begin
   print('TRSChooseOption.debugOptions()', TDebug.HEADER);
 
-  if (self.isOpen()) then
+  if self.isOpen() then
   begin
     options := self.getOptions(useTesseract);
 
@@ -569,27 +616,5 @@ begin
 
   print('TRSChooseOption.debugOptions()', TDebug.FOOTER);
 end;
-
-{*
-Depreciated
-~~~~~~~~~~~
-  Depreciated type / function.
-  Use TOption (type) and TRSChooseOption.getOptions().
-*}
-
-{$IFNDEF CODEINSIGHT}
-type
-  __TOption = record
-    bounds: TBox;
-    str: string;
-  end;
-
-  __TOptionArray = array of __TOption;
-
-function TRSChooseOption.__getOptions(): __TOptionArray;
-begin
-  result := __TOptionArray(self.getOptions());
-end;
-{$ENDIF}
 
 {$f+}

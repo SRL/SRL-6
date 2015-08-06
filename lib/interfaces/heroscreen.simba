@@ -1,6 +1,6 @@
 (*
-HeroScreen
-=============
+Hero Screen
+===========
 
 The heroscreen file holds functions and procedures that are used to interact with the runescape Hero Screen.
 
@@ -14,7 +14,7 @@ The source for this file can be found `here <https://github.com/SRL/SRL-6/blob/m
 Consts, Types, Vars
 ~~~~~~~~~~~~~~~~~~~
 
-The following constants, types and variables are used throughout the lodestoneScreen methods.
+The following constants, types and variables are used throughout the heroScreen methods.
 
 
 **type TRSHeroScreen**
@@ -45,7 +45,7 @@ var
 
 (*
 TRSHeroScreen methods
-~~~~~~~~~~~~~~~~~~~~~~~~~~
+~~~~~~~~~~~~~~~~~~~~~
 
 The following methods should be called through the **heroScreen** variable.
 
