@@ -206,7 +206,7 @@ close
 
     function TRSPinScreen.close(): boolean;
 
-Returns true if the lodestone screen is successfully closed.
+Returns true if the pinScreen is successfully closed.
 
 .. note::
 
@@ -238,7 +238,7 @@ waitNotOpen
 
     function TRSPinScreen.waitNotOpen(waitTime: integer): boolean;
 
-Returns true if the pinScreen is no longer open within**waitTime**
+Returns true if the pinScreen is no longer open within **waitTime**
 
 .. note::
 

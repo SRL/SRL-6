@@ -58,7 +58,7 @@ var
 
 (*
 TRSCollectBox methods
-~~~~~~~~~~~~~~~~~~~~~~~~~~
+~~~~~~~~~~~~~~~~~~~~~
 
 The following methods should be called through the **collectBox** variable.
 

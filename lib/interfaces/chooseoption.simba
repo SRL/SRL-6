@@ -16,7 +16,7 @@ Consts, Types, Vars
 
 The following constants, types and variables are used throughout the chooseOption methods.
 
-** const Tesseract Filter**
+**const Tesseract Filter**
 
 .. code-block:: pascal
 
@@ -518,7 +518,7 @@ select (overload) 1
 
 .. code-block:: pascal
 
-    function TRSChooseOption.select(txt: TStringArray; matchPercent: extended; waitTime: integer = 150): boolean; overload;
+    function TRSChooseOption.select(txt: TStringArray; matchPercent: extended; waitTime: integer = 250): boolean; overload;
 
 Returns true if an option in **txt** is interacted with successfully. This overload
 uses the 'stringmatch' method.
@@ -583,10 +583,12 @@ debugOptions
 
 .. code-block:: pascal
 
-   procedure TRSChooseOption.debugOptions(useTesseract: boolean = false);
+   procedure TRSChooseOption.debugOptions(useTesseract: boolean = false; filter: TTesseractFilter = TESS_FILTER_CHOOSE_OPTION);
 
-Debugs all the found options. The **useTesseract** parameter can be set to true
-to use the tesseract ocr *(default = false)*
+Debugs all the found options.
+
+    * **useTesseract** : Use the tesseract ocr to find the text? *(default = false)*
+    * **filter**       : Tesseract filter *(default = TESS_FILTER_CHOOSE_OPTION)*
 
 .. note::
 
@@ -597,9 +599,16 @@ Example:
 
 .. code-block:: pascal
 
-    chooseOption.debugOptions();
+    chooseOption.debugOptions(); // To use the traditional getTextAt method
+
+    var
+      myFilter: TTesseractFilter;
+    begin
+      myFilter := [3, 3, [True, 30, TM_Mean]];
+      chooseOption.debugOptions(true, myFilter); // To use a custom tesseract filter
+    end;
 *)
-procedure TRSChooseOption.debugOptions(useTesseract: boolean = false);
+procedure TRSChooseOption.debugOptions(useTesseract: boolean = false; filter: TTesseractFilter = TESS_FILTER_CHOOSE_OPTION);
 var
   i: integer;
   options: TOptionArray;
