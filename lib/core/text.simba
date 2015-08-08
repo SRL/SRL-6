@@ -235,17 +235,21 @@ Example:
     typeByte(VK_ENTER);
 
 *)
-procedure typeByte(k: byte);
+procedure typeByte(key: byte);
 begin
   {$IFDEF SMART}
-  if (k = 13) then
-    k := 10;
+  if (key = 13) then
+    key := 10;
   {$ENDIF}
 
-  KeyDown(k);
-  Wait(10 + Random(50));
-  KeyUp(k);
-end;
+  if (not isKeyDown(key)) then
+    KeyDown(key);
+
+  Wait(50 + Random(70));
+
+  if isKeyDown(key) then
+    KeyUp(key);
+end;   
 
 (*
 typeByteWait
