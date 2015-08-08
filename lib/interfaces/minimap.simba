@@ -534,6 +534,35 @@ begin
 end;
 
 (*
+TRSMinimap.setAngleRandomGauss();
+~~~~~~~~~~~~~~~~~~~
+
+.. code-block:: pascal
+
+    procedure setAngleRandomGauss();
+
+Rotates the compass angle in a random direction (50% chance of left turn and 50% right) for around 1 game tick (600ms).
+
+.. note::
+
+    - by Thomas
+
+Example:
+
+.. code-block:: pascal
+
+    minimap.setAngleRandomGauss();
+*)
+
+procedure setAngleRandomGauss();
+begin
+    case random(2) of
+      1: typeByteWait(VK_LEFT, gaussRangeInt(100, 1100));
+      2: typeByteWait(VK_RIGHT, gaussRangeInt(100, 1100));
+    end;
+end;   
+
+(*
 TRSMinimap.mouseOffCompass
 ~~~~~~~~~~~~~~~~~~~~~~~~~~
 
