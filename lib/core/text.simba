@@ -245,7 +245,7 @@ begin
   if (not isKeyDown(key)) then
     KeyDown(key);
 
-  Wait(10 + Random(50));
+  Wait(50 + Random(70));
 
   if isKeyDown(key) then
     KeyUp(key);
