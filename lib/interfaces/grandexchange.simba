@@ -59,6 +59,20 @@ A variable through which scripters can access the TRSGrandExchange type methods.
 var
   grandExchange: TRSGrandExchange;
 
+(*
+TRSGrandExchange methods
+~~~~~~~~~~~~~~~~~~~~~~~~~
+
+The following methods should be called through the **grandExchange** variable.
+
+Example:
+
+.. code-block:: pascal
+
+    if grandExchange.isOpen() then
+      writeln('It''s open');
+*)
+
 {*
 __init
 ------
