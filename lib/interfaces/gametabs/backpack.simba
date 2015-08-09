@@ -276,12 +276,12 @@ TRSTabBackpack.isItemInSlot
     function TRSTabBackpack.isItemInSlot(slot: integer): boolean;
 
 Returns true if an item is in the desired Backpack slot, works by looking for
-the black outline color in the slot.
+the black outline color in the slot. Will look for 200msec by default.
 
 .. note::
 
     - by Olly
-    - Last Updated: 29 October 2013 by Olly
+    - Last Updated: 9 August 2015 by Thomas
 
 Example:
 
@@ -290,13 +290,21 @@ Example:
    if (tabBackpack.isItemInSlot(1)) then
      writeln('We have an item in slot number 1');
 *)
-function TRSTabBackpack.isItemInSlot(slot: integer): boolean;
+function TRSTabBackpack.isItemInSlot(slot: integer; waitTime: integer = 200): boolean;
+var
+  timeOut: LongWord;
 begin
   if (not self.open()) or (not self.isSlotValid(slot))then
     exit(false);
 
-  result := isItemIn(self.getSlotBox(slot));
-end;
+  timeOut := getSystemTime() + waitTime;
+
+  while (timeOut >= getSystemTime()) do
+    if isItemIn(self.getSlotBox(slot)) then
+      exit(true)
+    else
+      wait(20 + random(50));
+end;   
 
 (*
 TRSTabBackpack.pointToSlot
