@@ -299,11 +299,12 @@ begin
 
   timeOut := getSystemTime() + waitTime;
 
-  while (timeOut >= getSystemTime()) do
+  repeat
     if isItemIn(self.getSlotBox(slot)) then
-      exit(true)
-    else
+      exit(true);
+    if (waitTime > 0) then
       wait(20 + random(50));
+  until (timeOut < getSystemTime());  
 end;   
 
 (*
