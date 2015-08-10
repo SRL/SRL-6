@@ -1,11 +1,12 @@
-SRL Interfaces Reference
-========================
+SRL Interfaces 
+==============
 
 
 .. toctree::
     :maxdepth: 2
 
     actionbar
+ 
     bankscreen    
     beastofburden
     chatbox
@@ -13,9 +14,15 @@ SRL Interfaces Reference
     collectbox
     conversationbox
     depositbox
-    grandexchange
+    
+	gametab
+    backpack
+    stats
+	 
+	grandexchange
     heroscreen
     interfaces
+    lobby
     lodestone
     lootscreen
     mainscreen
@@ -26,10 +33,10 @@ SRL Interfaces Reference
     production
     progressscreen
     toolscreen
-
-    backpack
-    gametab
-    stats
-
-    lobby
     worlds
+    
+    
+    
+
+    
+    

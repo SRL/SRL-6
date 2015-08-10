@@ -2,8 +2,7 @@
 Lobby
 =====
 
-The lobby file holds functions and procedures that are used in the Runescape
-lobby.
+The lobby file holds functions and procedures that are used in the runescape lobby.
 
 The source for this file can be found `here <https://github.com/SRL/SRL-6/blob/master/lib/interfaces/lobby/lobby.simba>`_.
 
@@ -12,44 +11,21 @@ The source for this file can be found `here <https://github.com/SRL/SRL-6/blob/m
 {$f-}
 
 (*
-type TRSLobby
-~~~~~~~~~~~~~
+Consts, Types, Vars
+~~~~~~~~~~~~~~~~~~~
 
-A type that stores functions and properties of the Runescape lobby.
-*)
-type
-  TRSLobby = record(TRSInterface)
-    tabBoxes: TBoxArray;
- end;
+The following constants, types and variables are used throughout the lobby methods.
 
-(*
-var lobby
-~~~~~~~~~
+**const Lobby Tabs**
 
-Variable that stores functions and properties of the Runescape lobby.
+Constants that represent the different lobby tabs.
 
-Example:
-
-.. code-block:: pascal
-
-    if (lobby.isOpen()) then
-      writeln('Lobby is open!');
-*)
-var
-  lobby: TRSLobby;
-
-(*
-const Lobby Tabs
-~~~~~~~~~~~~~~~~
-
-Integer constants that representing the different lobby tabs.
-
-Example:
-
-.. code-block:: pascal
-
-  if (lobby.getTab() = LOBBY_CLAN) then
-    writeln('The clan chat tab is open!');
+    * LOBBY_PLAYER
+    * LOBBY_WORLDS
+    * LOBBY_FRIENDS
+    * LOBBY_CHAT
+    * LOBBY_CLAN
+    * LOBBY_OPTIONS
 
 *)
 const
@@ -60,6 +36,50 @@ const
   LOBBY_CLAN = 4;
   LOBBY_OPTIONS = 5;
 
+(*
+**type TRSLobby**
+
+.. code-block:: pascal
+
+    type
+      TRSLobby = type TRSInterface;
+
+A type that stores the lobby interface properties.
+
+*)
+type
+  TRSLobby = record(TRSInterface)
+    tabBoxes: TBoxArray;
+ end;
+
+(*
+**var lobby**
+
+.. code-block:: pascal
+
+    var
+      lobby: TRSLobby;
+
+A variable through which scripters can access the TRSLobby type methods.
+
+*)
+var
+  lobby: TRSLobby;
+
+(*
+TRSLobby methods
+~~~~~~~~~~~~~~~~
+
+The following methods should be called through the **lobby** variable.
+
+Example:
+
+.. code-block:: pascal
+
+    if lobby.isOpen() then
+      writeln('It''s open');
+*)
+
 
 {*
 TRSLobby.__init()
@@ -69,7 +89,7 @@ TRSLobby.__init()
 
     procedure TRSLobby.__init();
 
-Initiates the lobby default values. Called at the end of this file.
+Initializes the TRSLobby.
 
 .. note::
 
@@ -98,19 +118,19 @@ end;
 {$ENDIF}
 
 {*
-TRSLobby.__skipEmailScreen
-~~~~~~~~~~~~~~~~~~~~~~~~~~
+__skipEmailScreen
+-----------------
 
 .. code-block:: pascal
 
     procedure TRSLobby.__skipEmailScreen();
 
-Handles the validate email screen that comes up when you enter to lobby.
+Closes the 'validate email screen' that appears when you enter the lobby.
 
 .. note::
 
     - by NCDS & Coh3n
-    - Last updated: 22nd August 2014 by Olly
+    - Last updated: 22 August 2014 by Olly
 
 Example:
 
@@ -129,38 +149,37 @@ begin
   if (Length(TPA) > 200) and (CountColor(1, GetClientBounds()) > 10000) then
   begin
     b := GetTPABounds(TPA);
-    if (InRange(b.x2 - b.x1, 70, 90)) then
+    if inRange(b.getWidth(), 70, 90) then
     begin
       MouseBox(b, MOUSE_LEFT);
       Wait(Random(1000, 2000));
-      print('TRSLobby._skipEmailScreen(): Closed validate email screen', TDebug.SUB);
+      print('TRSLobby.__skipEmailScreen(): Closed the validate email screen', TDebug.SUB);
     end;
   end;
 end;
 {$ENDIF}
 
 (*
-TRSLobby.isOpen()
-~~~~~~~~~~~~~~~~~
+isOpen
+------
 
 .. code-block:: pascal
 
     function TRSLobby.isOpen(): boolean;
 
-Returns true if we are at the lobby screen is loaded. Uses text recognition of
-the tabs.
+Returns true if the lobby is open.
 
 .. note::
 
     - by Coh3n
-    - Last Updated: 29th July by Ashaman88
+    - Last Updated: 29 July 2014 by Ashaman88
 
 Example:
 
 .. code-block:: pascal
 
-    while (not lobby.isOpen()) do
-      wait(100 + Random(400));
+    if lobby.isOpen() then
+      writeLn('The lobby is open');
 *)
 function TRSLobby.isOpen(): boolean;
 const
@@ -177,21 +196,20 @@ begin
 end;
 
 (*
-TRSLobby.findPlayButton()
-~~~~~~~~~~~~~~~~~~~~~~~~~~
+findPlayButton
+--------------
 
 .. code-block:: pascal
 
     function findPlayButton(var res: TPoint): boolean;
 
-Returns true if the play button is found somewhere on the client.  Used as an easier
-way to detect the lobby screen since some lobby tabs are different sizes, causing
-lobby interface to change.
+Returns true if the play button is found somewhere on the client, and passes its
+midpoint to **res** .
 
 .. note::
 
     - by Coh3n & Olly
-    - Last updated: 8th February 2015 by The Mayor
+    - Last updated: 8 February 2015 by The Mayor
 
 Example:
 
@@ -225,14 +243,14 @@ begin
 end;
 
 (*
-TRSLobby.getCurrentTab()
-~~~~~~~~~~~~~~~~~~~~~~~~
+getCurrentTab
+-------------
 
 .. code-block:: pascal
 
     function TRSLobby.getCurrentTab: integer;
 
-Gets current lobby tab.
+Returns the current lobby tab number
 
 .. note::
 
@@ -266,15 +284,15 @@ begin
 end;
 
 {*
-TRSLobby._open()
-~~~~~~~~~~~~~~~~
+_open
+-----
 
 .. code-block:: pascal
 
     function TRSLobby._open(): boolean;
 
-Exits from the game to the lobby screen. Should call players[currentPlayer].exitToLobby()
-instead of this function.
+Returns true if it exits from the game to the lobby screen. Scripters should
+call players[currentPlayer].exitToLobby() instead of this function.
 
 .. note::
 
@@ -285,7 +303,7 @@ Example:
 
 .. code-block:: pascal
 
-    if (players[currentPlayer].exitToLobby()) then
+    if lobby._open() then
       writeln('We''ve exited to the lobby!');
 *}
 function TRSLobby._open(): boolean;
@@ -294,10 +312,10 @@ var
   p: TPoint;
   b: TBox;
 begin
-  if (lobby.isOpen()) then
+  if lobby.isOpen() then
     exit(true);
 
-  if (options.open()) then
+  if options.open() then
   begin
     options.selectOption(['Lobby','xit to', 'obby']);
 
@@ -312,16 +330,16 @@ begin
   end;
 end;
 
-{*
-TRSLobby.openTab
-~~~~~~~~~~~~~~~~
+(*
+openTab
+-------
 
 .. code-block:: pascal
 
     function TRSLobby.openTab(tab: integer): boolean;
 
-Opens the lobby tab specified by 'tab'. Valied arguments for 'tab' are the
-lobby tab constants at the top of the file.
+Opens the lobby tab **tab** . The tab constants are located at the top of this
+page.
 
 .. note::
 
@@ -332,9 +350,10 @@ Example:
 
 .. code-block:: pascal
 
-    lobby.openTab(LOBBY_WORLDS);
+    if lobby.openTab(LOBBY_WORLDS) then
+      writeLn('We opened the worlds tab!');
 
-*}
+*)
 function TRSLobby.openTab(const tab: Integer): Boolean;
 var
   Timeout: UInt64;
@@ -368,8 +387,7 @@ TRSLobby._leave()
 
     function TRSLobby._leave(): boolean;
 
-Leaves the lobby screen. This instance of the function is internal.  Use
-players[currentPlayer].logout();.
+Returns true if it returns to the login screen from the lobby.
 
 .. note::
 
@@ -380,9 +398,8 @@ Example:
 
 .. code-block:: pascal
 
-    if (lobby.isOpen()) then
-      if (not players[currentPlayer].leave()) then
-        writeln('Oh no, we didn''t make it out of the Lobby Screen.');
+    lobby._leave();
+
 *}
 function TRSLobby._leave(): boolean;
 var
@@ -404,16 +421,16 @@ begin
 end;
 
 (*
-TRSLobby.quickSelectWorld
-~~~~~~~~~~~~~~~~~~~~~~~~~
+quickSelectWorld
+----------------
 
 .. code-block:: pascal
 
     function TRSLobby.quickSelectWorld(wo: integer; click: boolean = true): boolean;
 
-Returns true if the desired world appears in the quick select favorites boxes
-in the bottom right of the interface.  Will click the world if found and if
-click boolean is set to true.
+Returns true if the desired world **wo** appears in the quick select favorites boxes
+in the bottom right corner of the interface. If found, it will click the world if
+**click** is set to true *(default = true)*
 
 .. note::
 

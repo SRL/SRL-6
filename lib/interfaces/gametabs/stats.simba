@@ -1,21 +1,29 @@
 (*
-Stats
-=====
+Gametab Stats
+=============
 
-The Stats file holds functions and procedures that are used in the
-Runescape Stats gametab.
+The Gametab Stats file holds functions and procedures that are used in the runescape Stats gametab.
+
+The source for this file can be found `here <https://github.com/SRL/SRL-6/blob/master/lib/interfaces/gametabs/stats.simba>`_.
 
 *)
 
 {$f-}
 
 (*
-Constant: Skill type
-~~~~~~~~~~~~~~~~~~~~
+Consts, Types, Vars
+~~~~~~~~~~~~~~~~~~~
 
-Integer constants that represent the two different types of skill 'types' when
-reading a skill level, there is either a static skill or a dynamic skill level,
-the dynamic skill level is the level that changes when you boost a skill.
+The following constants, types and variables are used throughout the chatBox methods.
+
+**const Skill type**
+
+Constants that represent the two different stats types for a skill. When
+reading a skill level, there is either a static skill level or a dynamic skill
+level. The dynamic skill level is the level that changes when you boost a skill.
+
+    * SKILL_STATIC
+    * SKILL_DYNAMIC
 
 *)
 const
@@ -23,10 +31,10 @@ const
   SKILL_DYNAMIC = 0;
 
 {*
-Constant: Skill color
-~~~~~~~~~~~~~~~~~~~~~
+const Internal
+~~~~~~~~~~~~~~
 
-Integer constants that represent the color of the skill text.
+Internal constants. Constants that represent the color of the skill text.
 
 *}
 const
@@ -34,13 +42,18 @@ const
   __COLOR_STATS = 36095;
 {$ENDIF}
 
-{*
-Constant: Skill info type
-~~~~~~~~~~~~~~~~~~~~~~~~~
+(*
+**const Skill Info Type**
 
-String constants that represent the different skill info types.
+Constants that represent the different skill info types. These are used
+when reading the skill XP.
 
-*}
+    * INFO_CURRENT_XP
+    * INFO_REMAINDER
+    * INFO_NEXT_LEVEL
+    * INFO_BONUS_XP
+
+*)
 const
   INFO_CURRENT_XP = 'Current';
   INFO_REMAINDER = 'Remainder';
@@ -48,10 +61,14 @@ const
   INFO_BONUS_XP = 'Bonus';
 
 (*
-type TRSTabStats
-~~~~~~~~~~~~~~~~
+**type TRSTabStats**
 
-A type that stores functions and properties of the Runescape Stats gametab.
+.. code-block:: pascal
+
+    type
+      TRSTabStats = type TRSInterface;
+
+A type that stores the stats tab interface properties.
 
 *)
 type
@@ -60,24 +77,42 @@ type
   end;
 
 (*
-var tabStats
-~~~~~~~~~~~~
+**var tabStats**
 
-Variable that stores functions and properties of the Runescape Stats tab.
+.. code-block:: pascal
+
+    var
+      tacStats: TRSTabStats;
+
+A variable through which scripters can access the TRSTabStats type methods.
 
 *)
 var
   tabStats: TRSTabStats;
 
+(*
+TRSTabStats methods
+~~~~~~~~~~~~~~~~~~~
+
+The following methods should be called through the **tabStats** variable.
+
+Example:
+
+.. code-block:: pascal
+
+    if tabStats.isOpen() then
+      writeln('It''s open!');
+*)
+
 {*
-TRSTabStats.__init
-~~~~~~~~~~~~~~~~~~
+__init
+------
 
 .. code-block:: pascal
 
     procedure TRSTabStats.__init();
 
-Initiates the tabStats variable. Called at the end of this file.
+Initializes the TRSTabStats.
 
 .. note::
 
@@ -105,14 +140,14 @@ end;
 {$ENDIF}
 
 (*
-TRSTabStats.isOpen
-~~~~~~~~~~~~~~~~~~
+isOpen
+------
 
 .. code-block:: pascal
 
     function TRSTabStats.isOpen(): boolean;
 
-Will return if the stats tab is open or not.
+Returns true if the stats gametab is open.
 
 .. note::
 
@@ -123,7 +158,7 @@ Example:
 
 .. code-block:: pascal
 
-    if (tabStats.isOpen()) then
+    if tabStats.isOpen() then
       writeln('The stats tab is currently open!');
 *)
 function TRSTabStats.isOpen(): boolean;
@@ -137,14 +172,14 @@ begin
 end;
 
 (*
-TRSTabStats.open
-~~~~~~~~~~~~~~~~
+open
+----
 
 .. code-block:: pascal
 
     function TRSTabStats.open(): boolean;
 
-Attempts to open the stats gametab, will return if succesfull or not.
+Returns true if the stats gametab is successfully opened.
 
 .. note::
 
@@ -155,7 +190,7 @@ Example:
 
 .. code-block:: pascal
 
-    if (tabStats.open()) then
+    if tabStats.open() then
       writeln('We opened the stats tab');
 *)
 function TRSTabStats.open(): boolean;
@@ -167,14 +202,15 @@ begin
 end;
 
 (*
-TRSTabStats.getSkillBox
-~~~~~~~~~~~~~~~~~~~~~~~
+getSkillBox
+-----------
 
 .. code-block:: pascal
 
     function TRSTabStats.getSkillBox(skill: integer): TBox;
 
-Returns the bounds of where the skill is located.
+Returns a TBox around the skill information. The **skill** is one of the skill
+constants found in `globals.simba <https://github.com/SRL/SRL-6/blob/master/lib/core/globals.simba>`_.
 
 .. note::
 
@@ -185,7 +221,12 @@ Example:
 
 .. code-block:: pascal
 
-    b := tabStats.getSkillBox(SKILL_ATTACK);
+    var
+      b: TBox;
+    begin
+      b := tabStats.getSkillBox(SKILL_ATTACK);
+
+    end;
 *)
 function TRSTabStats.getSkillBox(skill: integer): TBox;
 var
@@ -200,17 +241,17 @@ begin
 end;
 
 (*
-TRSTabStats.getSkillLevel
-~~~~~~~~~~~~~~~~~~~~~~~~~
+getSkillLevel
+-------------
 
 .. code-block:: pascal
 
     function TRSTabStats.getSkillLevel(skill: integer; skillType: integer = SKILL_STATIC): integer;
 
-Returns the skill level of the 'skill', will return -1 if unsuccesfull.
+Returns the skill level of **skill*, if unsuccesfull it will return -1.
 
-    * skill - The skill level to get (skill constants can be found in core/players.simba.
-    * skillType - Which skill value to read, the static or dynamic (SKILL_STATIC, SKILL_DYNAMIC).
+    * **skill** : The skill level to get (skill constants are found in `globals.simba <https://github.com/SRL/SRL-6/blob/master/lib/core/globals.simba>`_).
+    * **skillType** : Which skill level to read (either SKILL_STATIC or SKILL_DYNAMIC) *(default = SKILL_STATIC)*
 
 .. note::
 
@@ -222,6 +263,8 @@ Example:
 .. code-block:: pascal
 
     writeln(tabStats.getSkillLevel(SKILL_ATTACK));
+    // To get the dymanic (boosted or weakened) skill
+    writeln(tabStats.getSkillLevel(SKILL_ATTACK, SKILL_DYNAMIC));
 *)
 function TRSTabStats.getSkillLevel(skill: integer; skillType: integer = SKILL_STATIC): integer;
 var
@@ -260,17 +303,17 @@ begin
 end;
 
 (*
-TRSTabStats.getSkillInfo
-~~~~~~~~~~~~~~~~~~~~~~~~
+getSkillInfo
+------------
 
 .. code-block:: pascal
 
     function TRSTabStats.getSkillInfo(skill: integer; infoType: string): integer;
 
-Returns the skill's info.
+Returns the XP information about the skill **skill**.
 
-  * skill - what skill? constants found in players.simba
-  * infoType - what infomation to grab? constants found at top of file
+  * **skill** - The skill XP to get (skill constants are found in `globals.simba <https://github.com/SRL/SRL-6/blob/master/lib/core/globals.simba>`_).
+  * **infoType** - What XP information to get. SKill into type constants are found at top of this page.
 
 .. note::
 
@@ -281,7 +324,14 @@ Example:
 
 .. code-block:: pascal
 
-    writeln(tabStats.getSkillInfo(SKILL_ATTACK, INFO_CURRENT_XP));
+    var
+      bonusXP, currXP, remXP, nextLvl: Integer;
+    begin
+      currXP := tabStats.getSkillInfo(SKILL_ATTACK, INFO_CURRENT_XP);
+      bonusXP := tabStats.getSkillInfo(SKILL_ATTACK, INFO_BONUS_XP);
+      remXP := tabStats.getSkillInfo(SKILL_ATTACK, INFO_REMAINDER);
+      nextLvl := tabStats.getSkillInfo(SKILL_ATTACK, INFO_NEXT_LEVEL);
+    end;
 *)
 function TRSTabStats.getSkillInfo(skill: integer; infoType: string): integer;
 var

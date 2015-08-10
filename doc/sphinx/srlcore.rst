@@ -1,5 +1,5 @@
-SRL Core Reference
-==================
+SRL Core
+========
 
 
 .. toctree::

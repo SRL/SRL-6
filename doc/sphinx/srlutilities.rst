@@ -1,5 +1,5 @@
-SRL Utilities Reference
-=======================
+SRL Utilities
+=============
 
 
 .. toctree::
@@ -7,16 +7,20 @@ SRL Utilities Reference
 
     color
     drawing
-    math
-    pixelshift
-    time
-    wrappers
-
     extendedarrays
     integerarrays
+    math
+    pixelshift
     stringarrays
     tbox
     tboxarrays
+    time
     tpoint
     tpointarrays
     types
+    wrappers
+
+    
+    
+    
+

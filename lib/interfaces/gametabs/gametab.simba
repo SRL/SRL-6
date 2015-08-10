@@ -1,6 +1,6 @@
 (*
-Gametab
-=======
+Gametabs
+========
 
 The gametab file holds any global gametab data.
 
@@ -10,6 +10,25 @@ The source for this file can be found `here <https://github.com/SRL/SRL-6/blob/m
 
 {$f-}
 
+(*
+Consts, Types, Vars
+~~~~~~~~~~~~~~~~~~~
+
+The following constants, types and variables are used throughout the chatBox methods.
+
+**const Nav Buttons**
+
+Constants that represent the buttons on the navigation pane. These buttons
+contain the individual gametab buttons.
+
+    * NAV_BUTTON_HERO
+    * NAV_BUTTON_GEAR
+    * NAV_BUTTON_POWERS
+    * NAV_BUTTON_SOCIAL
+    * NAV_BUTTON_OTHER
+
+*)
+
 const
   NAV_BUTTON_HERO = 0;
   NAV_BUTTON_GEAR = 1;
@@ -18,19 +37,25 @@ const
   NAV_BUTTON_OTHER = 4;
 
 (*
-Constant: Tabs
-~~~~~~~~~~~~~~
+**const Tabs**
 
-Integer constants that represent each gametab. DO NOT change values unless you
-know exactly what you're doing.  Each value represents a box in a grid.  The
-grid starts at the top left at 0, and counts across the rows and ends in the
-bottom right of the grid.
+Constants that represent each gametab.
 
-Example:
+    * TAB_TASK
+    * TAB_STATS
+    * TAB_BACKPACK
+    * TAB_EQUIPMENT
+    * TAB_PRAYER
+    * TAB_MAGIC
+    * TAB_MELEE
+    * TAB_RANGED
+    * TAB_DEFENSIVE
+    * TAB_FRIENDS
+    * TAB_FRIENDS_CHAT
+    * TAB_CLAN_CHAT
+    * TAB_NOTES
+    * TAB_MUSIC
 
-.. code-block:: pascal
-
-    gameTabs.openTab(TAB_FRIENDS);
 *)
 const
   TAB_TASK = 0;
@@ -53,10 +78,9 @@ const
   TAB_MUSIC = 13;
 
 {*
-type TRSGameTab
-~~~~~~~~~~~~~~~
+**type _TRSGameTab**
 
-Represents an individual gametab.
+Internal type which holds individual tab properties
 *}
 type
   _TRSGameTab = record
@@ -66,10 +90,15 @@ type
   end;
 
 (*
-type TRSGameTabs
-~~~~~~~~~~~~~~~~
+**type TRSGameTab**
 
-A single type for manipulating the entire gametab system.
+.. code-block:: pascal
+
+    type
+      TRSGameTabs = type TRSInterface;
+
+A type that stores the global gametab interface properties.
+
 *)
 type
   TRSGameTabs = record(TRSInterface)
@@ -81,21 +110,55 @@ type
   end;
 
 (*
-var gameTabs
-~~~~~~~~~~~~
+**var gameTabs**
 
-An SRL global variable used to manipulate the gametabs in very general ways.
+.. code-block:: pascal
+
+    var
+      gameTabs: TRSGameTabs;
+
+A variable through which scripters can access the TRSGameTabs type methods.
+
+*)
+var
+  gameTabs: TRSGameTabs;
+
+(*
+TRSGameTabs methods
+~~~~~~~~~~~~~~~~~~~
+
+The following methods should be called through the **gameTabs** variable.
 
 Example:
 
 .. code-block:: pascal
 
-    if (not gameTabs.isTabActive(TAB_BACKPACK)) then
-      gameTabs.openTab(TAB_BACKPACK);
+    if gameTabs.areMultiOpen() then
+      writeln('Multiple gametabs are open');
 *)
-var
-  gameTabs: TRSGameTabs;
 
+{*
+__init
+------
+
+.. code-block:: pascal
+
+    procedure TRSGameTabs.__init();
+
+Initializes the TRSGameTabs.
+
+.. note::
+
+    - by Coh3n
+    - Last Updated: 26 July 2013 by Coh3n
+
+Example:
+
+.. code-block:: pascal
+
+    gameTabs.__init();
+
+*}
 {$IFNDEF CODEINSIGHT}
 procedure TRSGameTabs.__init();
 begin
@@ -120,14 +183,15 @@ end;
 {$ENDIF}
 
 {*
-TRSGameTabs.__initTabs
-~~~~~~~~~~~~~~~~~~~~~~
+__initTabs
+----------
 
 .. code-block:: pascal
 
     procedure TRSGameTabs.__initTabs();
 
-Inits the gametabs, loads the bitmap, nav button ID and finally the nav box index.
+Initializes the individual gametabs, by loading their bitmap, nav button ID and
+nav box index.
 
 .. note::
 
@@ -138,7 +202,7 @@ Example:
 
 .. code-block:: pascal
 
-    addOnTerminate('__freeGameTabs');
+    gameTabs.__initTabs();
 *}
 {$IFNDEF CODEINSIGHT}
 procedure TRSGameTabs.__initTabs();
@@ -257,13 +321,13 @@ end;
 
 {*
 __freeGameTabs
-~~~~~~~~~~~~~~
+--------------
 
 .. code-block:: pascal
 
     procedure __freeGameTabs();
 
-Frees all the gametab's bitmaps.  Called on script termination.
+Frees all the gametab's bitmaps. Called on script termination.
 
 .. note::
 
@@ -289,14 +353,15 @@ end;
 {$ENDIF}
 
 (*
-TRSGameTabs.getActiveTabArea
-~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+getActiveTabArea
+----------------
 
 .. code-block:: pascal
 
     function TRSGameTabs.getActiveTabArea(): TBox;
 
-Returns the TBox of the active tab, will return a nil box if no tabs are active.
+Returns the TBox of the active tab. It will return [-1, -1, -1, -1] if no tabs are
+active.
 
 .. note::
 
@@ -307,8 +372,12 @@ Example:
 
 .. code-block:: pascal
 
-    if (gameTabs.areMultiOpen()) then
-      writeln('Multiple tabs are open');
+    var
+      b: TBox;
+    begin
+      b := gameTabs.getActiveTabArea()
+
+    end;
 *)
 function TRSGameTabs.getActiveTabArea(): TBox;
 const
@@ -333,8 +402,8 @@ begin
 end;
 
 (*
-TRSGameTabs.areMultiOpen
-~~~~~~~~~~~~~~~~~~~~~~~~
+areMultiOpen
+------------
 
 .. code-block:: pascal
 
@@ -351,7 +420,7 @@ Example:
 
 .. code-block:: pascal
 
-    if (gameTabs.areMultiOpen()) then
+    if gameTabs.areMultiOpen() then
       writeln('Multiple tabs are open');
 *)
 function TRSGameTabs.areMultiOpen(): boolean;
@@ -363,8 +432,8 @@ begin
 end;
 
 (*
-TRSGameTabs.getTabAreas
-~~~~~~~~~~~~~~~~~~~~~~~
+getTabAreas
+-----------
 
 .. code-block:: pascal
 
@@ -418,15 +487,15 @@ begin
 end;
 
 (*
-TRSGameTabs._findTab
-~~~~~~~~~~~~~~~~~~~~
+_findTab
+--------
 
 .. code-block:: pascal
 
     function TRSGameTabs._findTab(var p: TPoint; tab: integer; searchBox: TBox): boolean;
 
-Returns true if the gametab 'tab' is found in the 'searchBox'.  Sets it's coordinates
-to 'p'.
+Returns true if the gametab **tab** is found in the **searchBox** . The midpoint
+of the tab **p** is passed by reference.
 
 .. note::
 
@@ -437,10 +506,14 @@ Example:
 
 .. code-block:: pascal
 
-    if (gameTabs._findTab(p, TAB_BACKPACK, b)) then
+    var
+      p: TPoint;
     begin
-      writeln('Opening the backpack tab');
-      mouse(p.rand(5), MOUSE_LEFT);
+      if (gameTabs._findTab(p, TAB_BACKPACK, b)) then
+      begin
+        writeln('Opening the backpack tab');
+        mouse(p.rand(5), MOUSE_LEFT);
+      end;
     end;
 *)
 function TRSGameTabs._findTab(var p: TPoint; tab: integer; searchBox: TBox): boolean;
@@ -452,15 +525,15 @@ begin
 end;
 
 (*
-TRSGameTabs.isTabVisible
-~~~~~~~~~~~~~~~~~~~~~~~~
+isTabVisible
+------------
 
 .. code-block:: pascal
 
     function TRSGameTabs.isTabVisible(tab: integer; out tabBounds: TBox): boolean;
 
-Searches for the gametab 'tab' to see if it's visible, if found will output the bounds
-in 'tabBounds'
+Returns true if the gametab **tab** is visible. If found will store the bounds
+of the tab in **tabBounds**
 
 .. note::
 
@@ -471,7 +544,12 @@ Example:
 
 .. code-block:: pascal
 
-    writeln(gameTabs.isTabVisable(TAB_BACKPACK, b));
+    var
+      b: TBox;
+    begin
+      writeln(gameTabs.isTabVisable(TAB_BACKPACK, b));
+
+    end;
 *)
 function TRSGameTabs.isTabVisible(tab: integer; out tabBounds: TBox): boolean;
 var
@@ -492,14 +570,14 @@ begin
 end;
 
 (*
-TRSGameTabs.isTabActive
-~~~~~~~~~~~~~~~~~~~~~~~
+isTabActive
+-----------
 
 .. code-block:: pascal
 
     function TRSGameTabs.isTabActive(tab: integer): boolean;
 
-Returns true if the gametab 'tab' is active
+Returns true if the gametab **tab** is the crrently active tab.
 
 .. note::
 
@@ -526,14 +604,14 @@ begin
 end;
 
 (*
-TRSGameTabs.waitTabActive
-~~~~~~~~~~~~~~~~~~~~~~~~~
+waitTabActive
+-------------
 
 .. code-block:: pascal
 
     function TRSGameTabs.waitTabActive(tab: integer; timeOut: integer): boolean;
 
-Waits up to 'timeOut' waiting for the gametab 'tab' to be the active tab
+Returns true if the gametab **tab** is open within **timeOut**
 
 .. note::
 
@@ -563,15 +641,15 @@ begin
 end;
 
 {*
-TRSGameTabs.__openViaNavBar
-~~~~~~~~~~~~~~~~~~~~~~~~~~~
+__openViaNavBar
+---------------
 
 .. code-block:: pascal
 
     function TRSGameTabs.__openViaNavBar(tab: integer): boolean;
 
-Helper function for TRSGametabs.openTab(), Opens the tab via the navigation bar
-and moves the mouse to close the mouse-over menu.
+Helper function for TRSGametabs.openTab(). Opens the gametab **tab** via the
+navigation bar and moves the mouse to close.
 
 .. note::
 
@@ -607,14 +685,14 @@ end;
 {$ENDIF}
 
 (*
-TRSGameTabs.openTab
-~~~~~~~~~~~~~~~~~~~
+openTab
+-------
 
 .. code-block:: pascal
 
     function TRSGameTabs.openTab(tab: integer): boolean;
 
-Will attempt to open the gametab 'tab'.
+Returns true if it successfully open the gametab **tab**
 
 .. note::
 
@@ -625,11 +703,8 @@ Example:
 
 .. code-block:: pascal
 
-    if (gameTabs._findTab(p, TAB_BACKPACK, b)) then
-    begin
-      writeln('Opening the backpack tab');
-      mouse(p.rand(5), MOUSE_LEFT);
-    end;
+    if gameTabs.openTab(TAB_EQUIPMENT) then
+      writeLn('The equipment is open!);
 *)
 function TRSGameTabs.openTab(tab: integer): boolean;
 var
@@ -637,7 +712,7 @@ var
 begin
   if (not inRange(tab, TAB_TASK, TAB_MUSIC)) then // check tab is vaild
   begin
-    print('TRSGameTabs.openTab('+toStr(tab)+'): The tab isnt vaild!, result = '+toStr(result), TDebug.ERROR);
+    print('TRSGameTabs.openTab('+toStr(tab)+'): The tab isnt vaild!, result = ' + toStr(result), TDebug.ERROR);
     exit(false);
   end;
 
@@ -646,9 +721,8 @@ begin
   if (self.isTabActive(tab)) then
   begin
     print('Tab is already open, exiting');
-    result := true;
     print('TRSGameTabs.openTab('+toStr(tab)+'): = '+toStr(result), TDebug.FOOTER);
-    exit;
+    exit(true);
   end;
 
   if (self.areMultiOpen) then
@@ -658,9 +732,8 @@ begin
       mouseBox(b, MOUSE_LEFT);
 
       wait(50 + random(100));
-      result := true;
       print('TRSGameTabs.openTab('+toStr(tab)+'): = '+toStr(result), TDebug.FOOTER);
-      exit;
+      exit(true);
     end;
 
   print('Opening tab via gametab navigation bar');
@@ -672,14 +745,14 @@ begin
 end;
 
 (*
-TRSGameTabs.getActiveTab
-~~~~~~~~~~~~~~~~~~~~~~~~
+getActiveTab
+------------
 
 .. code-block:: pascal
 
     function TRSGameTabs.getActiveTab(): integer;
 
-Returns the active tab, returns the id of the constant
+Returns the active tab number.
 
 .. note::
 
@@ -691,7 +764,7 @@ Example:
 .. code-block:: pascal
 
     if (gameTabs.getActiveTab() = TAB_BACKPACK) then
-      writeln('Backpack is open');
+      writeln('The backpack is open');
 *)
 function TRSGameTabs.getActiveTab(): integer;
 var

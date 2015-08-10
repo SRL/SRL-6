@@ -77,7 +77,7 @@ var
 
 (*
 TRSDepositBox methods
-~~~~~~~~~~~~~~~~~~
+~~~~~~~~~~~~~~~~~~~~~
 
 The following methods should be called through the **depositBox** variable.
 
@@ -102,7 +102,7 @@ Initializes the TRSDepositBox.
 .. note::
 
     - by Olly
-    - Last Updated: 8th August 2014 by The Mayor
+    - Last Updated: 8 August 2014 by The Mayor
 
 Example:
 
@@ -138,7 +138,7 @@ Scripters should use depositBox.isOpen() below.
 .. note::
 
     - by The Mayor
-    - Last Updated: 8th August 2014 by The Mayor
+    - Last Updated: 8 August 2014 by The Mayor
 
 Example:
 
@@ -189,7 +189,7 @@ Returns true if the depositBox interface is open. The optional **waitTime** para
 .. note::
 
     - by Olly
-    - Last Updated: 8th August 2014 by The Mayor
+    - Last Updated: 8 August 2014 by The Mayor
 
 Example:
 

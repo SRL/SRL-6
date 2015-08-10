@@ -12,6 +12,14 @@ The source for this file can be found `here <https://github.com/SRL/SRL-6/blob/m
 
 {$f-}
 
+(*
+Consts, Types, Vars
+~~~~~~~~~~~~~~~~~~~
+
+The following constants, types and variables are used throughout the collectBox methods.
+
+*)
+
 {*
 const Internal
 ~~~~~~~~~~~~~~
@@ -24,40 +32,58 @@ const
   _COLOR_OPTION_TEXT = 13158600; // white color of conversation options
 
 (*
-type TRSConversationBox
-~~~~~~~~~~~~~~~~~~~~~~~
+**type TRSConversationtBox**
 
-The interface type for the conversation box.  Stores attributes and functions
-of the conversation box interface.
+.. code-block:: pascal
+
+    type
+      TRSConversationBox = type TRSInterface;
+
+A type that stores the conversation box interface properties.
+
 *)
 type
   TRSConversationBox = type TRSInterface;
 
 (*
-var conversationBox
-~~~~~~~~~~~~~~~~~~~
+**var conversationBox**
 
 The variable used to call conversation box functions, procedures and attributes.
+
+.. code-block:: pascal
+
+    var
+      conversationBox: TRSConversationBox;
+
+A variable through which scripters can access the TRSConversationBox type methods.
+
+*)
+var
+  conversationBox: TRSConversationBox;
+
+(*
+TRSCovnersationBox methods
+~~~~~~~~~~~~~~~~~~~~~~~~~~
+
+The following methods should be called through the **conversationBox** variable.
 
 Example:
 
 .. code-block:: pascal
 
-    if (conversationBox.areTalking()) then
-      writeln('Player is talking to something or someone');
+    if conversationBox.isOpen() then
+      writeln('Conversation box screen is open!');
 *)
-var
-  conversationBox: TRSConversationBox;
 
 {*
-TRSConversationBox.__init
-~~~~~~~~~~~~~~~~~~~~~~~~~
+__init
+------
 
 .. code-block:: pascal
 
     procedure TRSConversationBox.__init();
 
-Initializes the TRSConversationBox variable.
+Initializes the TRSConversationBox.
 
 .. note::
 
@@ -83,15 +109,16 @@ begin
 end;
 {$ENDIF}
 
-(*
-TRSConversationBox.__find
-~~~~~~~~~~~~~~~~~~~~~~~~~
+{*
+__find
+------
 
 .. code-block:: pascal
 
     function TRSConversationBox.__find(): boolean;
 
-Returns true if the conversationbox is detected, and sets the bounds
+Returns true if the conversationBox interface is detected and its bounds are set.
+Scripters should use conversationBox.isOpen() below.
 
 .. note::
 
@@ -102,9 +129,9 @@ Example:
 
 .. code-block:: pascal
 
-    if (conversationBox.__find()) then
-      writeln('bounds are set!');
-*)
+    if conversationBox.__find() then
+      writeln('The conversation box is open, and the bounds are set!');
+*}
 {$IFNDEF CODEINSIGHT}
 function TRSConversationBox.__find(): boolean;
 const
@@ -160,14 +187,15 @@ end;
 {$ENDIF}
 
 (*
-TRSConversationBox.isOpen
-~~~~~~~~~~~~~~~~~~~~~~~~~
+isOpen
+------
 
 .. code-block:: pascal
 
-    function TRSConversationBox.isOpen(): boolean;
+    function TRSConversationBox.isOpen(waitTime: integer = 0): boolean;
 
-Returns true if the conversation box is open.
+Returns true if the conversationBox interface is open. The optional **waitTime** parameter
+*(default = 0)* is the maximum time (in milliseconds) it will keep looking.
 
 .. note::
 
@@ -178,10 +206,10 @@ Example:
 
 .. code-block:: pascal
 
-    if (not conversationBox.isOpen()) then
-      exit();
+    if conversationBox.isOpen(3000) then
+      writeLn('The conversation box is open');
 *)
-function TRSConversationBox.isOpen(waitTime: integer = 200): boolean;
+function TRSConversationBox.isOpen(waitTime: integer = 0): boolean;
 var
   t: LongWord;
 begin
@@ -197,14 +225,14 @@ begin
 end;
 
 (*
-TRSConversationBox.getChatBounds
-~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+getChatBounds
+-------------
 
 .. code-block:: pascal
 
     function TRSConversationBox.getChatBounds(): TBox;
 
-Returns a TBox of where the black NPC chat is
+Returns a TBox around where the black NPC chat is located
 
 .. note::
 
@@ -215,7 +243,12 @@ Example:
 
 .. code-block:: pascal
 
-     b := conversationBox.getChatBounds();
+    var
+      b: TBox;
+    begin
+      b := conversationBox.getChatBounds();
+
+    end;
 *)
 function TRSConversationBox.getChatBounds(): TBox;
 var
@@ -234,14 +267,14 @@ begin
 end;
 
 (*
-TRSConversationBox.getSpeaker
-~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+getSpeaker
+----------
 
 .. code-block:: pascal
 
     function TRSConversationBox.getSpeaker(): string;
 
-Returns a string of the curren speaker (i.e. the title of the conversation box).
+Returns a string of the current speaker (i.e. the title of the conversation box).
 
 .. note::
 
@@ -252,8 +285,8 @@ Example:
 
 .. code-block:: pascal
 
-    if (conversationBox.getSpeaker = 'Speaker''s Name') then
-      writeln('Talking to Speaker''s Name');
+    if (conversationBox.getSpeaker() = 'Bob') then
+      writeln('We are talking Bob. Bob is cool.');
 *)
 function TRSConversationBox.getSpeaker(): string;
 begin
@@ -264,14 +297,14 @@ begin
 end;
 
 (*
-TRSConversationBox.areTalking
-~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+areTalking
+----------
 
 .. code-block:: pascal
 
     function TRSConversationBox.areTalking(): boolean;
 
-Returns true if someone or something is talking.
+Returns true if someone is talking (i.e. the conversation box has a title).
 
 .. note::
 
@@ -282,7 +315,7 @@ Example:
 
 .. code-block:: pascal
 
-    if (conversationBox.areTalking()) then
+    if conversationBox.areTalking() then
       writeln('We are talking');
 *)
 function TRSConversationBox.areTalking(): boolean;
@@ -291,14 +324,14 @@ begin
 end;
 
 (*
-TRSConversationBox.getChat
-~~~~~~~~~~~~~~~~~~~~~~~~~~
+getChat
+-------
 
 .. code-block:: pascal
 
     function TRSConversationBox.getChat(): string;
 
-Returns player or NPC chat.
+Returns a string of the current dialogue in the conversation box.
 
 .. note::
 
@@ -309,7 +342,7 @@ Example:
 
 .. code-block:: pascal
 
-    s := conversationBox.getChat();
+    writeLn(conversationBox.getChat());
 *)
 function TRSConversationBox.getChat(): string;
 var
@@ -319,25 +352,25 @@ begin
 
   if (not self.isOpen()) then
   begin
-    print('conversationBox.getChat(): Unable to read any text because we aren''t in a conversation', TDebug.ERROR);
+    print('TRSConversationBox.getChat(): Unable to read any text because we aren''t in a conversation', TDebug.ERROR);
     exit();
   end;
 
   b := self.getChatBounds();
   result := trim(tesseractGetText(b.x1, b.y1, b.x2, b.y2, FILTER_NPC_CHAT_CHARS));
 
-  print('conversationBox.getChat(): Text found: ' + result, TDebug.SUB);
+  print('TRSConversationBox.getChat(): Text found: ' + result, TDebug.SUB);
 end;
 
 (*
-TRSConversationBox.findChat
-~~~~~~~~~~~~~~~~~~~~~~~~~~~
+findChat
+--------
 
 .. code-block:: pascal
 
     function TRSConversationBox.findChat(txt: TStringArray): boolean;
 
-Returns true if 'txt' is found in the chat dialog.
+Returns true any of the strings in **txt** are found somewhere in the chat dialog.
 
 .. note::
 
@@ -348,7 +381,7 @@ Example:
 
 .. code-block:: pascal
 
-     if (conversationBox.findChat(['Well-Done'])) then
+     if conversationBox.findChat(['Well-Done']) then
        writeln('We have finished!');
 *)
 function TRSConversationBox.findChat(txt: TStringArray): boolean;
@@ -360,14 +393,14 @@ begin
 end;
 
 (*
-TRSConversationBox.getOptions
-~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+getOptions
+----------
 
 .. code-block:: pascal
 
     function TRSConversationBox.getOptions(out optionBoxes: TBoxArray): TStringArray;
 
-Returns the selectable options from NPC chat as a TStringArray. The 'optionBoxes'
+Returns the selectable options from NPC chat as a TStringArray. The **optionBoxes**
 parameter is also passed by reference, and contains the bounds for each of the
 option buttons.
 
@@ -380,7 +413,13 @@ Example:
 
 .. code-block:: pascal
 
-    s := conversationBox.getOptions(tba);
+    var
+      tsa: TStringArray;
+      tba: TBoxArray;
+    begin
+      tsa := conversationBox.getOptions(tba);
+
+    end;
 *)
 function TRSConversationBox.getOptions(out optionBoxes: TBoxArray): TStringArray;
 var
@@ -399,7 +438,7 @@ begin
 
   if (length(TPA) < 2) then
   begin
-    print('conversationBox.getOptions(): No Options found', TDebug.SUB);
+    print('TRSConversationBox.getOptions(): No Options found', TDebug.SUB);
     exit();
   end;
 
@@ -420,18 +459,19 @@ begin
   for i := 0 to high(optionBoxes) do
     result[i]:= Tesseract_GetText(optionBoxes[i], TESS_FILTER_SMALL_CHARS);
 
-  print('conversationBox.getOptions(): Options found: ' + toStr(result), TDebug.SUB);
+  print('TRSConversationBox.getOptions(): Options found: ' + toStr(result), TDebug.SUB);
 end;
 
 (*
-TRSConversationBox.findOption
-~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+findOption
+----------
 
 .. code-block:: pascal
 
     function TRSConversationBox.findOption(txt: TStringArray): boolean;
 
-Returns true if 'txt' is found in the selectable options from NPC chat.
+Returns true if a string in **txt** is found in one of the selectable options
+from NPC chat.
 
 .. note::
 
@@ -442,7 +482,7 @@ Example:
 
 .. code-block:: pascal
 
-    if (conversationBox.findOption(['One'])) then
+    if conversationBox.findOption(['One']) then
        writeln('Found option for One!');
 *)
 function TRSConversationBox.findOption(txt: TStringArray): boolean;
@@ -466,16 +506,16 @@ begin
 end;
 
 (*
-TRSConversationBox.selectOption
-~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+selectOption
+------------
 
 .. code-block:: pascal
 
     function TRSConversationBox.selectOption(txt: TStringArray; useKeyboard: boolean = true): boolean;
 
-Returns true if 'txt' is found in the selectable options from NPC chat. If 'useKeyboard'
-is false, then it will click the option with the mouse, else it will use the
-keyboard (which is default).
+Returns true if a string in **txt** is found and selected. If **useKeyboard**
+is set to true *(default = true)* is will press the corresponding number on the
+keyboard, else it will click the option with the mouse.
 
 .. note::
 
@@ -510,23 +550,24 @@ begin
         else
           mouseBox(TBA[i], MOUSE_LEFT);
 
-        print('conversationBox.selectOption(): Selected option ' + intToStr(i + 1), TDebug.SUB);
+        print('TRSConversationBox.selectOption(): Selected option ' + intToStr(i + 1), TDebug.SUB);
         exit(true);
       end;
     end;
 end;
 
 (*
-TRSConversationBox.selectOption
-~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+selectOption (overload)
+-----------------------
 
 .. code-block:: pascal
 
-    function TRSConversationBox.selectOption(number: integer): boolean;
+    function TRSConversationBox.selectOption(number: integer; useKeyboard: boolean = true): boolean; overload;
 
-Returns true if the option 'number' is found in the selectable options from
-the NPC chat. If 'useKeyboard' is false, then it will click the option with the
-mouse, else it will use the keyboard (which is default).
+Returns true if the option number **number** is avaliable and selected. This
+overload will ignore all text, and will just click the option if it is avaliable.
+If **useKeyboard** is set to true *(default = true)* is will press the
+corresponding number on the keyboard, else it will click the option with the mouse.
 
 .. note::
 
@@ -555,24 +596,26 @@ begin
       mouseBox(TBA[number - 1], MOUSE_LEFT);
 
     wait(100 + random(250));
-    print('conversationBox.selectOption(): Selected option ' + intToStr(number), TDebug.SUB);
+    print('TRSConversationBox.selectOption(): Selected option ' + intToStr(number), TDebug.SUB);
   end;
 end;
 
 (*
-TRSConversationBox.continue
-~~~~~~~~~~~~~~~~~~~~~~~~~~~
+continue
+--------
 
 .. code-block:: pascal
 
     function TRSConversationBox.continue(spaceBar, doWait: boolean; advance: boolean = true): boolean;
 
-Interacts with the "click to continue" button at the bottom of the conversation
-dialog.  If 'spaceBar' is set to true, it will continue via the space bar, otherwise
-it will click the button.  If 'doWait' is set to true it will wait until new text
-appears, otherwise return true as soon as it continues. If 'advance' is set to true
-it will perform action spacebar, otherwise return true if "click to continue" button
-is present.
+Returns true if it successfully interacts with the "click to continue" button at
+the bottom of the conversation dialog.
+
+    * **spaceBar** : Use the spacebar (false = use the mouse)
+    * ** doWait** : Wait until a new page of text appears
+    * **advance** : Interact with the button *(default = true)* . If false, the
+                    function will return true if the button is visible.
+
 
 .. note::
 
@@ -583,9 +626,16 @@ Example:
 
 .. code-block:: pascal
 
-    repeat
-      conversationBox.continue(true, true);
-    until(not conversationBox.isOpen());
+    var
+      timer: TCountDown;
+    begin
+      timer.setTime(5000);
+
+      repeat
+        conversationBox.continue(true, true);
+      until(not conversationBox.isOpen() or timer.isFinished());
+
+    end;
 *)
 function TRSConversationBox.continue(spaceBar, doWait: boolean; advance: boolean = true): boolean;
 var

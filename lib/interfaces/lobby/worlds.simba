@@ -2,8 +2,8 @@
 Worlds
 ======
 
-The worlds file is used to represent the world tab interface in the RS lobby. It
-stores the functions needed to switch players between servers.
+The worlds file holds functions and procedures that are used in the worlds tab,
+inside the runescape lobby interface.
 
 The source for this file can be found `here <https://github.com/SRL/SRL-6/blob/master/lib/interfaces/lobby/worlds.simba>`_.
 
@@ -11,9 +11,16 @@ The source for this file can be found `here <https://github.com/SRL/SRL-6/blob/m
 
 {$f-}
 
+(*
+Consts, Types, Vars
+~~~~~~~~~~~~~~~~~~~
+
+The following constants, types and variables are used throughout the chatBox methods.
+
+*)
+
 {*
-const Internal
-~~~~~~~~~~~~~~
+**const Internal**
 
 Internal constants used throughout several functions.
 *}
@@ -24,16 +31,17 @@ const
   _WORLD_SORT_AREA : TBox      = [110, 215, 751, 233]; // box around all sort buttons
 
 (*
-const Order
-~~~~~~~~~~~
+**const Order**
 
-Constants to be used with the TRSLobbyWorlds sorting functions.
+Constants which represent the different world sorting buttons
 
-Example:
-
-.. code-block:: pascal
-
-    lobbyWorlds.sort(WORLD_ORDER_WORLDS, false);
+    * WORLD_ORDER_WORLDS
+    * WORLD_ORDER_PLAYERS
+    * WORLD_ORDER_ACTIVITY
+    * WORLD_ORDER_LOCATION
+    * WORLD_ORDER_LOOT
+    * WORLD_ORDER_TYPE
+    * WORLD_ORDER_PING
 *)
 const
   WORLD_ORDER_WORLDS   = 0;
@@ -45,10 +53,9 @@ const
   WORLD_ORDER_PING     = 5;
 
 {*
-type __TRSWorld
-~~~~~~~~~~~~~~~
+**type __TRSWorld**
 
-An internal type used to store individual world information.
+An internal type used to store information about individual worlds.
 *}
 type
   __TRSWorld = record
@@ -58,10 +65,15 @@ type
   end;
 
 (*
-type TRSLobbyWorlds
-~~~~~~~~~~~~~~~~~~~
+**type TRSLobbyWorlds**
 
-The type representing the worlds interface in the RS lobby.
+.. code-block:: pascal
+
+    type
+      TRSLobbyWorlds = type TRSInterface;
+
+A type that stores the worlds interface properties.
+
 *)
 type
   TRSLobbyWorlds = record(TRSInterface)
@@ -71,33 +83,45 @@ type
   end;
 
 (*
-var lobbyWorlds
-~~~~~~~~~~~~~~~
-
-The global variable used to call any worlds interface functions/procedures.
-
-Example:
+**var lobbyWorlds**
 
 .. code-block:: pascal
 
-    lobbyWorlds.selectWorld(132);
+    var
+      lobbyWorlds: TRSLobbyWorlds;
+
+A variable through which scripters can access the TRSLobbyWorlds type methods.
+
 *)
 var
   lobbyWorlds: TRSLobbyWorlds;
 
 {*
-var Internal
-~~~~~~~~~~~~
+**var Internal**
 
-Internal worlds interface variables:
+Internal worlds interface variables
 *}
 var
   __worldsOrdered: boolean; // set to true if the worlds get ordered in the sorting functions
 
+(*
+TRSLobbyWorlds methods
+~~~~~~~~~~~~~~~~~~~~~~
+
+The following methods should be called through the **lobbyWorlds** variable.
+
+Example:
+
+.. code-block:: pascal
+
+    if lobbyWorlds.isOpen() then
+      writeln('It''s open');
+*)
+
 
 {*
-TRSLobbyWorlds.__loadFromINI
-~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+__loadFromINI
+-------------
 
 .. code-block:: pascal
 
@@ -144,7 +168,7 @@ TRSLobbyWorlds.__init
 
     procedure TRSLobbyWorlds.__init();
 
-Initiates the TRSLobbyWorlds variable.  Called at the end of this file.
+Initiates the TRSLobbyWorlds.
 
 .. note::
 
@@ -176,8 +200,8 @@ end;
 {$ENDIF}
 
 {*
-TRSLobbyWorlds._getWorldIndex
-~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+_getWorldIndex    // ~TM 10/aug/15 check if this is actually used anywhere
+--------------
 
 .. code-block:: pascal
 
@@ -204,8 +228,8 @@ begin
 end;
 
 (*
-TRSLobbyWorlds.isOpen
-~~~~~~~~~~~~~~~~~~~~~
+isOpen
+------
 
 .. code-block:: pascal
 
@@ -222,7 +246,7 @@ Example:
 
 .. code-block:: pascal
 
-    if (lobbyWorlds.isOpen()) then
+    if lobbyWorlds.isOpen() then
       lobbyWorlds.selectWorld(115);
 *)
 function TRSLobbyWorlds.isOpen(): boolean;
@@ -231,27 +255,27 @@ begin
 end;
 
 (*
-TRSLobbyWorlds.open
-~~~~~~~~~~~~~~~~~~~
+open
+----
 
 .. code-block:: pascal
 
     function TRSLobbyWorlds.open(): boolean;
 
-Returns true if the worlds interface is open.  Waits a maximum of 10 seconds
-after the tab is clicked to compensate for lag.
+Returns true if the worlds interface is sucessfully opened. Waits a maximum of
+10 seconds after the tab is clicked for the world list to load.
 
 .. note::
 
     - by Bionicle1800 & Coh3n
-    - Last Updated: 8th February 2015 by The Mayor
+    - Last Updated: 8 February 2015 by The Mayor
 
 Example:
 
 .. code-block:: pascal
 
-    if (not lobbyWorlds.isOpen()) then
-      lobbyWorlds.open();
+    if lobbyWorlds.open() then
+      writeLn('We opened the worlds tab in the lobby!);
 *)
 function TRSLobbyWorlds.open(): boolean;
 var
@@ -282,14 +306,14 @@ begin
 end;
 
 {*
-TRSLobbyWorlds._isWorldValid
-~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+_isWorldValid
+-------------
 
 .. code-block:: pascal
 
     function TRSLobbyWorlds._isWorldValid(wo: integer): boolean;
 
-Returns true if the world (wo) is valid.
+Returns true if the world **wo** is valid world.
 
 .. note::
 
@@ -315,8 +339,8 @@ begin
 end;
 
 (*
-TRSLobbyWorlds.getCurrentWorld
-~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+getCurrentWorld
+---------------
 
 .. code-block:: pascal
 
@@ -327,14 +351,13 @@ Returns the currently selected world.
 .. note::
 
     - by Home & Coh3n
-    - Last Updated: 8th August 2014 by The Mayor
+    - Last Updated: 8 August 2014 by The Mayor
 
 Example:
 
 .. code-block:: pascal
 
-    if (not lobbyWorlds.getCurrentWorld() = 115) then
-      lobbyWorlds.selectWorld(115);
+    writeLn(lobbyWorlds.getCurrentWorld()));
 *)
 function TRSLobbyWorlds.getCurrentWorld(): Integer;
 var
@@ -355,37 +378,29 @@ begin
 end;
 
 (*
-TRSLobbyWorlds.sort
-~~~~~~~~~~~~~~~~~~~
+sort
+----
 
 .. code-block:: pascal
 
-    function TRSLobbyWorlds.sort(by: integer; descending: boolean): boolean;
+    function TRSLobbyWorlds.sort(orderBy: integer; descending: boolean): boolean;
 
-Sorts the worlds list by the order specified by 'by', and 'descending'.  Setting
-'descending' to true will order the worlds with the largest at the top.  Valid
-arguements for 'by' are:
-
-    * WORLD_ORDER_WORLDS
-    * WORLD_ORDER_PLAYERS
-    * WORLD_ORDER_ACTIVITY
-    * WORLD_ORDER_LOCATION
-    * WORLD_ORDER_TYPE
-    * WORLD_ORDER_LOOT
-    * WORLD_ORDER_PING
+Sorts the worlds list by the specified order type. The **orderBy** should be one
+of the constants at the top of this page. Setting *descending* to true will order
+the worlds with the largest at the top.
 
 .. note::
 
     - by Naum & Coh3n
-    - Last Updated: 8th August 2014 by The Mayor
+    - Last Updated: 8 August 2014 by The Mayor
 
 Example:
 
 .. code-block:: pascal
 
-    lobbyWorlds.sort(WORLD_ORDER_WORLDS, false); // sorts the worlds starting with 1 at the top
+    lobbyWorlds.sort(WORLD_ORDER_PLAYERS, true); // sorts the worlds starting with lowest at the top
 *)
-function TRSLobbyWorlds.sort(by: integer; descending: boolean): boolean;
+function TRSLobbyWorlds.sort(orderBy: integer; descending: boolean): boolean;
 var
   ATPA: T2DPointArray;
   TPA: TPointArray;
@@ -412,7 +427,7 @@ begin
 
     sortATPAFromFirstPoint(ATPA, point(self.x, self.y));
 
-    TB := getTPABounds(ATPA[by]);
+    TB := getTPABounds(ATPA[orderBy]);
     TB.edit(-1, 0, 1, 14);
 
     for i := 0 to 2 do
@@ -441,28 +456,28 @@ begin
 
 end;
 
-(*
-TRSLobbyWorlds._getFavoriteCount
-~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+{*
+_getFavoriteCount
+-----------------
 
 .. code-block:: pascal
 
     function TRSLobbyWorlds._getFavoriteCount(): integer;
 
-Determines the amount of currently existing favorite worlds.  Plays a role in world scrolling
-as the favorite world count affects the position of the scrollbar.
+Determines the number of existing favorite worlds. Theis number affects the
+position of the scrollbar (and thus scrolling to worlds).
 
 .. note::
 
     - by Clarity
-    - Last Updated: 9th October 2014 by Clarity
+    - Last Updated: 9 October 2014 by Clarity
 
 Example:
 
 .. code-block:: pascal
 
     lobbyWorlds._getFavoriteCount();
-*)
+*}
 function TRSLobbyWorlds._getFavoriteCount(): integer;
 var
   TPA: TPointArray;
@@ -479,15 +494,15 @@ begin
 end;
 
 {*
-TRSLobbyWorlds._findWorldNumber
-~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+_findWorldNumber
+----------------
 
 .. code-block:: pascal
 
     function TRSLobbyWorlds._findWorldNumber(var res: TPoint; wo: integer): boolean;
 
-Searches for the text of the world 'wo'. Returns true if found. Returns it's
-coordinates in 'res'.
+Returns true if it sucessfully finds the text of the world **wo** . If successful,
+it will pass the coordinates in **res**
 
 .. note::
 
@@ -498,8 +513,12 @@ Example:
 
 .. code-block:: pascal
 
-    if (lobbyWorlds._findWorldNumber(p, 115)) then
-      mouse(p.rand(5), MOUSE_LEFT);
+    var
+      p: TPoint;
+    begin
+      if lobbyWorlds._findWorldNumber(p, 115) then
+        mouse(p.rand(5), MOUSE_LEFT);
+    end;
 *}
 function TRSLobbyWorlds._findWorldNumber(var res: TPoint; wo: integer): boolean;
 const
@@ -553,15 +572,15 @@ begin
 end;
 
 {*
-TRSLobbyWorlds._scrollToWorld
-~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+_scrollToWorld
+--------------
 
 .. code-block:: pascal
 
     function TRSLobbyWorlds._scrollToWorld(var res: TPoint; wo: integer): boolean;
 
-Uses mouseScroll to find the world 'wo'.  Returns it's coordinates in 'res'.
-Function is internal.  Use TRSLobbyWorlds.selectWorld instead.
+Returns true if it siccessfully scrolls and finds the world **wo** . If found,
+it will pass the coordinates in **res**
 
 .. note::
 
@@ -572,8 +591,12 @@ Example:
 
 .. code-block:: pascal
 
-    if (lobbyWorlds._scrollToWorld(p, 115)) then
-      mouse(p, MOUSE_LEFT);
+    var
+      p: TPoint;
+    begin
+      if lobbyWorlds._scrollToWorld(p, 115) then
+        mouse(p, MOUSE_LEFT);
+    end;
 *}
 function TRSLobbyWorlds._scrollToWorld(var res: TPoint; wo: integer): boolean;
 const
@@ -619,15 +642,15 @@ begin
 end;
 
 (*
-TRSLobbyWorlds.selectWorld
-~~~~~~~~~~~~~~~~~~~~~~~~~~
+selectWorld
+-----------
 
 .. code-block:: pascal
 
     function TRSLobbyWorlds.selectWorld(wo: integer): boolean;
 
-Selects the world 'wo'.  Will open the worlds interface and scroll if needed.
-Does NOT log the player in.  Will just click the world on the list.
+Returns true if it selects the world **wo** . It will open the worlds interface
+and scroll to the world if needed.
 
 .. note::
 
@@ -638,7 +661,8 @@ Example:
 
 .. code-block:: pascal
 
-    lobbyWorlds.selectWorld(115);
+      if players[currentPlayer].loginToLobby() then
+        lobbyWorlds.selectWorld(115);
 *)
 function TRSLobbyWorlds.selectWorld(wo: integer): boolean;
 var
@@ -687,15 +711,20 @@ begin
 end;
 
 (*
-TRSLobbyWorlds.selectRandomWorld
-~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+selectRandomWorld
+-----------------
 
 .. code-block:: pascal
 
-    function TRSLobbyWorlds.selectRandomWorld(members: boolean; standardAvoid: boolean = true; personalAvoid: TIntegerArray = [0]): boolean;
+    function TRSLobbyWorlds.selectRandomWorld(members: boolean; standardAvoid: boolean = true; personalAvoid: TIntegerArray = []): boolean;
 
-Selects a random world. P2P or F2P depends on the value of 'members'.  Will by default
-avoid worlds that are marked as exceptions in worlds.ini.  The default exceptions are:
+Returns true if it successfully selects a random world.
+
+    * **members** : Select a members world?
+    * **statdardAvoid** : Avoid the worlds listed below *(default = true)*
+    * **personalAvoid** : A custom array of worlds to avoid. Can be used separately or in addition to the standard avoid worlds.
+
+The default avoid worlds are:
 
     * World 18 - Legacy Only
     * World 30 - Skill Total (2000)
@@ -712,14 +741,10 @@ avoid worlds that are marked as exceptions in worlds.ini.  The default exception
     * World 136 - Legacy Only
     * World 137 - Legacy Only
 
-The third parameter that can be specified is a TIntegerArray of personal
-exceptions, such as a clan home world, or a world that a player's
-friends freqently visit.  This is [0] by default.
-
 .. note::
 
     - by Narcle, Mixter, and Coh3n
-    - Last Updated: 9th October 2014 by Clarity
+    - Last Updated: 9 October 2014 by Clarity
 
 Example:
 
@@ -731,8 +756,8 @@ Example:
     //To select a random P2P world, also selecting from "avoid" worlds
     lobbyWorlds.selectRandomWorld(players[currentPlayer].isMember, false);
 
-    //To select a random P2P world, not selecting from "avoid" worlds, also avoiding worlds 99 and 100
-    lobbyWorlds.selectRandomWorld(players[currentPlayer].isMember, [99, 100]);
+    //To select a random P2P world, avoiding worlds 99 and 100 in addition to the standard avoid worlds
+    lobbyWorlds.selectRandomWorld(players[currentPlayer].isMember, true, [99, 100]);
 *)
 function TRSLobbyWorlds.selectRandomWorld(members: boolean; standardAvoid: boolean = true; personalAvoid: TIntegerArray = []): boolean;
 var
@@ -775,21 +800,20 @@ begin
 end;
 
 (*
-TRSLobbyWorlds.addFavoriteWorlds
-~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+addFavoriteWorlds
+-----------------
 
 .. code-block:: pascal
 
     function TRSLobbyWorlds.addFavoriteWorlds(wArray: TIntegerArray): boolean;
 
-Adds the specified world to your list of favorites.  Returns true
-upon successful completion.  If there are already three favorite worlds,
-the function returns false.
+Returns true if it siccessfully adds worlds **wArray** to your list of favorites.
+This does not clear existing favourite worlds first.
 
 .. note::
 
     - by Clarity
-    - Last Updated: 9th October 2014 by Clarity
+    - Last Updated: 9 October 2014 by Clarity
 
 Example:
 
@@ -861,20 +885,20 @@ begin
 end;
 
 (*
-TRSLobbyWorlds.removeFavoriteWorlds
-~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+removeFavoriteWorlds
+--------------------
 
 .. code-block:: pascal
 
     function TRSLobbyWorlds.removeFavoriteWorlds(wArray: TIntegerArray): boolean;
 
-Removes the specified world from your list of favorites.  Returns true
-upon successful completion.
+Returns true if it siccessfully removes the **wArray** worlds wfrom your list of
+favorites.
 
 .. note::
 
     - by Clarity
-    - Last Updated: 9th October 2014 by Clarity
+    - Last Updated: 9 October 2014 by Clarity
 
 Example:
 

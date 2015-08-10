@@ -1,5 +1,5 @@
-SRL Misc Reference
-==================
+SRL Miscellaneous
+=================
 
 
 .. toctree::
