@@ -118,7 +118,7 @@ Scripters should use progressScreen.isOpen() below.
 .. note::
 
     - by Ashaman88
-    - Last Updated: 10 August 2014 by Ashaman88
+    - Last Updated: 12 August 2015 by The Mayor
 
 Example:
 
@@ -130,35 +130,36 @@ Example:
 {$IFNDEF CODEINSIGHT}
 function TRSProgressScreen.__find(): boolean;
 const
-  BORDER_COLOR = 5327681;
-  BORDER_COLOR_BOTTOM = 5919042;
-  BORDER_LENGTH = 226;
+  BORDER_TOP = 8684933; // Border color at the very top of the green progress bar
+  BORDER_BOTTOM = [9211788, 2]; // [Col, Tol] of the border 2px below the top border
+  BORDER_WIDTH = 304;
 var
-  tpa: TPointArray;
-  atpa: T2DPointArray;
-  i, hh: integer;
+  TPA: TPointArray;
+  ATPA: T2DPointArray;
+  i: integer;
   b: TBox;
-  p: TPoint;
 begin
-  result := false;
+  if findColors(tpa, BORDER_TOP, getClientBounds()) then
+  begin
+    ATPA := TPA.cluster(1);
 
-  if (not findColors(tpa, BORDER_COLOR, getClientBounds())) then
-    exit();
-
-  atpa := tpa.cluster(1);
-  hh := high(atpa);
-
-  for i := 0 to hh do
-    if (length(atpa[i]) = BORDER_LENGTH) then
+    for i := 0 to high(ATPA) do
     begin
-      b := atpa[i].getBounds();
+      b := ATPA[i].getBounds();
 
-      if (getColor(b.x1 - 34, b.y1 + 125) = BORDER_COLOR_BOTTOM) then
+      if (b.getWidth() = BORDER_WIDTH) then
       begin
-        self.setBounds([b.x1 - 54, b.y1 + 2, b.x2 + 58, b.y2 + 148]);
-        exit(true);
+        b.edit(-4, 0, 4, 3);
+
+        if findColorsTolerance(TPA, BORDER_BOTTOM[0], b, BORDER_BOTTOM[1]) then
+          if TPA.getBounds().getWidth() = BORDER_WIDTH then
+          begin
+            self.setBounds([b.x1 - 15, b.y1 - 83, b.x2 + 15, b.y2 + 59]);
+            exit(true);
+          end;
       end;
-    end;
+    end
+  end;
 end;
 {$ENDIF}
 
@@ -186,12 +187,8 @@ Example:
       writeln('The progressScreen is open!');
 *)
 function TRSProgressScreen.isOpen(waitTime: integer = 0): boolean;
-const
-  BORDER_COLOR = 5327681;
 var
   t: LongWord;
-  borderTPA: TPointArray;
-  borders: TIntegerArray;
 begin
   t := (getSystemTime() + waitTime);
 
@@ -228,43 +225,40 @@ Example:
 function TRSProgressScreen.getSkill(): integer;
 var
   i: Integer;
-  intskillarray: TIntegerArray;
+  intSkillArray: TIntegerArray;
   b: TBox;
   s: String;
-  skillarray: TStringArray;
-  tpa : TPointArray;
-  atpa : T2DPointArray;
+  skillArray: TStringArray;
+  TPA: TPointArray;
+  ATPA: T2DPointArray;
 begin
-  if (self.isOpen()) then
+  if self.isOpen() then
   begin
     b := [self.x1 + 109, self.y1 + 1, self.x2 - 79, self.y1 + 21];
-    findColorsTolerance(tpa, 697806, b, 63,colorSetting(0));
+    findColorsTolerance(TPA, 697806, b, 63,colorSetting(0));
 
-    if length(tpa) < 100 then
+    if length(TPA) < 100 then
     begin
       print('TRSProgressScreen.getSkill(): Unable to find enough text colors for production screen skill type', TDebug.ERROR);
-      exit;
+      exit();
     end;
 
-    skillarray := ['Crafting','Smithing','Herblore','Cooking','Fletching'];
-    intskillarray := [SKILL_CRAFTING, SKILL_SMITHING, SKILL_HERBLORE, SKILL_COOKING, SKILL_FLETCHING];
+    skillArray := ['Crafting', 'Smithing', 'Herblore', 'Cooking', 'Fletching', 'Magic'];
+    intSkillArray := [SKILL_CRAFTING, SKILL_SMITHING, SKILL_HERBLORE, SKILL_COOKING, SKILL_FLETCHING, SKILL_MAGIC];
 
-    atpa := tpa.cluster(5);
-
-    b:= atpa.getbounds();
+    ATPA := TPA.cluster(5);
+    b:= ATPA.getbounds();
     b.edit(-2, -2, +2, +2);
     b.setlimit(self.getbounds());
 
-    s:= Replace(tesseract_GetText(b, FILTER_SMALL_CHARS), ' ', '', [rfReplaceAll]);
+    s:= replace(tesseract_GetText(b, FILTER_SMALL_CHARS), ' ', '', [rfReplaceAll]);
 
-    for i:=0 to high(skillarray) do
-    begin
-      if (pos(lowercase(skillarray[i]), lowercase(s)) > 0) then
+    for i := 0 to high(skillArray) do
+      if (pos(lowerCase(skillArray[i]), lowerCase(s)) > 0) then
       begin
-        result:= intskillarray[i];
-        break;
+        result := intSkillArray[i];
+        break();
       end;
-    end;
   end;
 
   print('TRSProductionScreen.getSkill(): result = ' + toStr(result), TDebug.SUB);
@@ -284,7 +278,7 @@ The *Button constants* can be found at the top of this page.
 .. note::
 
     - by Ashaman88
-    - Last Updated: 31 October 2014 by The Mayor
+    - Last Updated: 12 August 2015 by The Mayor
 
 Example:
 
@@ -300,9 +294,9 @@ var
 begin
   result := -1;
 
-  if self.isOpen() then
+  if self.isOpen(random(2000, 4000)) then // To prevent returning -1 when you level up
   begin
-    button := [self.x1 + 124, self.y1 + 120, self.x1 + 212, self.y1 + 143];
+    button := [self.x1 + 127, self.y1 + 120, self.x1 + 216, self.y1 + 145];
 
     findColorsTolerance(redTPA, 1645023, button, 36);
     findColorsTolerance(blueTPA, 13673258, button, 63);
@@ -313,9 +307,9 @@ begin
       exit();
     end;
 
-    if (length(redTPA) > 300) then
+    if (length(redTPA) > 200) then
       result := PROGRESS_BUTTON_CANCEL
-    else if (length(blueTPA) > 300) then
+    else if (length(blueTPA) > 200) then
       result := PROGRESS_BUTTON_DONE;
   end;
 
@@ -353,13 +347,13 @@ begin
   t := (getSystemTime() + waitTime);
 
   repeat
-    if (self.isOpen()) then
+    if self.isOpen() then
     begin
       if (buttonType = -1) or (buttonType = self.getButton()) then
       begin
         if lClick then
-          mouseBox([self.x1 + 137, self.y1 + 123, self.x2 - 127, self.y2 - 5], MOUSE_LEFT);
-        result:= true;
+          mouseBox([self.x1 + 127, self.y1 + 120, self.x1 + 216, self.y1 + 145], MOUSE_LEFT);
+        result := true;
         break;
       end;
     end else
@@ -402,23 +396,21 @@ var
   tpa : TPointArray;
   atpa : T2DPointArray;
 begin
-  if (self.isOpen()) then
+  if self.isOpen() then
   begin
     b:= self.getBounds();
-    b.edit(+58, +33, -179, -94);
+    b.edit(58, 33, -58, -94);
 
-    findColorsTolerance(tpa, 16777215, b, 0,colorSetting(0));
+    if not findColors(TPA, 16777215, b) then
+      exit();
 
-    if length(tpa) < 5 then
-      exit;
+    ATPA := TPA.cluster(5);
 
-    atpa := tpa.cluster(5);
-
-    b:= atpa.getbounds();
+    b:= ATPA.getBounds();
     b.edit(-2, -2, +2, +2);
-    b.setlimit(self.getbounds());
+    b.setLimit(self.getBounds());
 
-    result:=trim(tesseractgettext(b.x1,b.y1,b.x2,b.y2, FILTER_SMALL_CHARS));
+    result := trim(tesseract_GetText(b, FILTER_SMALL_CHARS));
   end;
 
   print('TRSProgressScreen.getItem(): result = ' + (result), TDebug.SUB);

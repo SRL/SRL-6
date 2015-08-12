@@ -15,11 +15,11 @@ SRL Interfaces
     conversationbox
     depositbox
     
-	gametab
+    gametab
     backpack
     stats
 	 
-	grandexchange
+    grandexchange
     heroscreen
     interfaces
     lobby
