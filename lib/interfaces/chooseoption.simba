@@ -558,6 +558,7 @@ an option in the menu.
 
     * **txt**          : An array of text you want to find in any of the options
     * **mouseAction** : The mouse action to perform on the option (MOUSE_MOVE, MOUSE_LEFT, MOUSE_RIGHT, MOUSE_NONE)
+    * **waitTime**    : Time to wait for chooseOption menu to appear
     * **useTesseract** : Use the tesseract ocr to find the text?
     * **filter**       : Tesseract filter *(default = TESS_FILTER_CHOOSE_OPTION)*
 
@@ -572,9 +573,9 @@ Example:
 
     chooseOption.select(['Bank'], MOUSE_MOVE, 300, false); // Will move the mouse to the option but not click
 *)
-function TRSChooseOption.select(txt: TStringArray; mouseAction: Integer; useTesseract: Boolean;  filter: TTesseractFilter = TESS_FILTER_CHOOSE_OPTION): boolean; overload;
+function TRSChooseOption.select(txt: TStringArray; mouseAction, waitTime: Integer; useTesseract: Boolean;  filter: TTesseractFilter = TESS_FILTER_CHOOSE_OPTION): boolean; overload;
 begin
-  result := self.__select(txt, mouseAction, false, 1.00, 300, useTesseract, filter);
+  result := self.__select(txt, mouseAction, false, 1.00, waitTime, useTesseract, filter);
 end;
 
 (*
