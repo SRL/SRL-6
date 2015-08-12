@@ -82,7 +82,7 @@ type
 .. code-block:: pascal
 
     var
-      tacStats: TRSTabStats;
+      tabStats: TRSTabStats;
 
 A variable through which scripters can access the TRSTabStats type methods.
 

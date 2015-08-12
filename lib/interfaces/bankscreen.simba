@@ -1224,6 +1224,51 @@ begin
 end;
 
 (*
+pointToSlot
+-----------
+
+.. code-block:: pascal
+
+    function TRSBankScreen.pointToSlot(pnt: TPoint): integer;
+
+Returns the bank slot which the TPoint **pnt** fall within. If it doesn't fall
+within any slot, it returns -1.
+
+.. note::
+
+    - by Olly
+    - Last Updated: 20 October 2013 by Olly
+
+Example:
+
+.. code-block:: pascal
+
+    var
+      x, y, myDTM: Integer;
+    begin
+      myDTM := DTMFromString('heapsofstuff');
+
+      if findDTM(myDTM, x, y, getClientBounds()) then
+        writeLn(Found DTM in slot ' + toStr(bankScreen.pointToSlot([x, y]));
+    end;
+*)
+function TRSBankScreen.pointToSlot(pnt: TPoint): integer;
+var
+  i: integer;
+  slots: TBoxArray;
+  hi: integer;
+begin
+  result := -1;
+
+  slots := self.getBankSlotBoxes();
+  hi := high(slots);
+
+  for i := 0 to hi do
+    if pointInBox(pnt, slots[i]) then
+      exit(i + 1); // +1 since array starts at 0.
+end;
+
+(*
 _enterAmount
 ------------
 
@@ -1522,51 +1567,6 @@ begin
     print('bankscreen.withdraw(): chooseOption menu failed to open', TDebug.SUB);
 
   print('bankscreen.withdraw(): result = ' + boolToStr(result), TDebug.SUB);
-end;
-
-(*
-pointToSlot
------------
-
-.. code-block:: pascal
-
-    function TRSBankScreen.pointToSlot(pnt: TPoint): integer;
-
-Returns the bank slot which the TPoint **pnt** fall within. If it doesn't fall
-within any slot, it returns -1.
-
-.. note::
-
-    - by Olly
-    - Last Updated: 20 October 2013 by Olly
-
-Example:
-
-.. code-block:: pascal
-
-    var
-      x, y, myDTM: Integer;
-    begin
-      myDTM := DTMFromString('heapsofstuff');
-
-      if findDTM(myDTM, x, y, getClientBounds()) then
-        writeLn(Found DTM in slot ' + toStr(bankScreen.pointToSlot([x, y]));
-    end;
-*)
-function TRSBankScreen.pointToSlot(pnt: TPoint): integer;
-var
-  i: integer;
-  slots: TBoxArray;
-  hi: integer;
-begin
-  result := -1;
-
-  slots := self.getBankSlotBoxes();
-  hi := high(slots);
-
-  for i := 0 to hi do
-    if pointInBox(pnt, slots[i]) then
-      exit(i + 1); // +1 since array starts at 0.
 end;
 
 (*
