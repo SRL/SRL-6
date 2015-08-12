@@ -680,5 +680,138 @@ begin
   result := self.gatherIn(tpa, area.x1, area.y1, area.x2, area.y2);
 end;
 
+(*
+getCTS2Color
+~~~~~~~~~~~~
+
+.. code-block:: pascal
+
+    function getCTS2Color(cols: TIntegerArray): TColorData;
+
+Returns a CTS2 color as a TColorData type, from a TIntegerArray input of
+individual colors.
+
+.. note::
+
+    - by The Mayor, based on ACA code
+    - Last Updated: 12 August 2015 by The Mayor
+
+Example:
+
+.. code-block:: pascal
+
+    var
+      objCol: TColorData;
+      TPA: TPointArray;
+    begin
+      objCol := getCTS2Color([14067346, 15838606, 16170148, 16368555]);
+
+      if objCol.gatherIn(TPA, mainScreen.getBounds()) then
+      begin
+        // etc
+      end;
+    end;
+
+*)
+function getCTS2Color(cols: TIntegerArray): TColorData;
+  type TColorRec = record
+    h, s, l: extended;
+    r, g, b: integer;
+  end;
+
+  function __getHue(cols: TIntegerArray; out minU, maxU: extended): extended;
+  var
+    minD, maxD, h, s, l: extended;
+    i: integer;
+  begin
+    result := -1;
+    minU := 100; minD := 100;
+    maxU := -1; maxD := -1;
+    for i := high(cols) downto 0 do
+    begin
+      colorToHSL(cols[i], h, s, l);
+
+      if (h < 50) then
+      begin
+        if (h < minU) then minU := h;
+        if (h > maxU) then maxU := h;
+      end else
+      begin
+        if (h < minD) then minD := h;
+        if (h > maxD) then maxD := h;
+      end;
+    end;
+
+    if ((maxU >= 0) <> (maxD >= 0)) then
+    begin
+      if (maxU >= 0) then
+        result := (minU + maxU) / 2
+      else begin
+        result := (minD + maxD) / 2;
+        minU := minD; maxU := maxD;
+      end;
+    end else
+    begin
+      if ((100 - maxD) + minU) < (maxD - maxU) then
+        minU := minD
+      else maxU := maxD;
+        result := (minU + maxU) / 2;
+      if (minU > maxU) then result -= 50;
+    end;
+
+    result := result + 100;
+    while (result >= 100) do result -= 100;
+  end;
+
+var
+  i: Integer;
+  h, s, l, minH, maxH: extended;
+  minC, maxC, tmpCol: TColorRec;
+begin
+  result := [0, 0, [0, [0, 0, 0]]];
+
+  if (length(cols) > 0) then
+  begin
+    colorToRGB(cols[0], minC.r, minC.g, minC.b);
+    colorToHSL(cols[0], minC.h, minC.s, minC.l);
+    maxC := minC;
+
+    for i := 0 to high(cols) do
+    begin
+      colorToRGB(cols[i], tmpCol.r, tmpCol.g, tmpCol.b);
+      colorToHSL(cols[i], tmpCol.h, tmpCol.s, tmpCol.l);
+      if (tmpCol.r < minC.r) then minC.r := tmpCol.r;
+      if (tmpCol.r > maxC.r) then maxC.r := tmpCol.r;
+      if (tmpCol.g < minC.g) then minC.g := tmpCol.g;
+      if (tmpCol.g > maxC.g) then maxC.g := tmpCol.g;
+      if (tmpCol.b < minC.b) then minC.b := tmpCol.b;
+      if (tmpCol.b > maxC.b) then maxC.b := tmpCol.b;
+      if (tmpCol.h < minC.h) then minC.h := tmpCol.h;
+      if (tmpCol.h > maxC.h) then maxC.h := tmpCol.h;
+      if (tmpCol.s < minC.s) then minC.s := tmpCol.s;
+      if (tmpCol.s > maxC.s) then maxC.s := tmpCol.s;
+      if (tmpCol.l < minC.l) then minC.l := tmpCol.l;
+      if (tmpCol.l > maxC.l) then maxC.l := tmpCol.l;
+    end;
+
+    h := __getHue(cols, minH, maxH);
+    s := (minC.s + maxC.s) / 2;
+    l := (minC.l + maxC.l) / 2;
+
+    result.color := HSLToColor(h, s, l);
+    colorToHSL(result.color, h, s, l);
+    result.tolerance := ceil(maxE(maxC.l - l, l - minC.l));
+    result.settings.CTS := 2;
+
+    if (result.tolerance > 0) then
+    begin
+      result.settings.modifier.hue := maxE(minE(abs(minH - h), minH + 100 - h), minE(abs(maxH - h), maxH + 100 - h)) / result.tolerance;
+      result.settings.modifier.saturation  := maxE(maxC.s - s, s - minC.s) / result.tolerance;
+    end;
+  end;
+end;
+
+
+
 {$f+}
 
