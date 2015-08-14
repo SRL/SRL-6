@@ -441,7 +441,7 @@ begin
   result := false;
   getMousePos(p.x, p.y);
   getClientDimensions(cW, cH);
-  box := intToBox(max(p.x - 200, 0), max(p.y - 100, 0),
+  box := intToBox(max(p.x - 275, 0), max(p.y - 100, 0),
                   min(p.x + 275, cW - 1), min(p.y + 250, cH - 1));
 
   // box := [0, 0, cW - 1, cH - 1]; // incase you wanna debug on a img.
