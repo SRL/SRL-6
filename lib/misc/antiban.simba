@@ -189,10 +189,10 @@ mouseOffClient
 
 .. code-block:: pascal
 
-    procedure mouseOffClient(Direction: Integer);
+    procedure mouseOffClient(direction: integer; waitTime: integer = randomRange(200, 1000));
 
-Moves the mouse off the client in a specified direction. Valid arguments for
-'Direction' are:
+Moves the mouse off the client in a specified direction (Random direction by default).
+Waits up to waitTime (Random 1-5sec by default). Valid arguments for 'direction' are:
 
     * OFF_CLIENT_TOP
     * OFF_CLIENT_BOTTOM
@@ -203,13 +203,13 @@ Moves the mouse off the client in a specified direction. Valid arguments for
 .. note::
 
     - by Ollybest
-    - Last Updated: 21 August 2013 by Coh3n
+    - Last Updated: 16 August 2015 by Thomas
 
 Example:
 
 .. code-block:: pascal
 
-    mouseOffClient(OFF_CLIENT_RANDOM);
+    mouseOffClient(OFF_CLIENT_RANDOM, randomRange(3000, 8000));
 *)
 const
   OFF_CLIENT_TOP = 0;
@@ -217,7 +217,7 @@ const
   OFF_CLIENT_LEFT = 2;
   OFF_CLIENT_RIGHT = 3;
   OFF_CLIENT_RANDOM = 4;
-procedure mouseOffClient(Direction: Integer);
+procedure mouseOffClient(direction: integer = OFF_CLIENT_RANDOM; waitTime: integer = randomRange(1000, 5000));
 var
   B: TBoxArray;
   P: TPoint;
@@ -236,14 +236,16 @@ begin
   B[OFF_CLIENT_LEFT] := [0-300, 0, 0, H];   // left
   B[OFF_CLIENT_RIGHT] := [W, 0, W +300, H];  // right
 
-  if (Direction = OFF_CLIENT_RANDOM) then
+  if (direction = OFF_CLIENT_RANDOM) then
     i := Random(4)
   else
-    i := Direction;
+    i := direction;
 
   P := Point(RandomRange(B[i].X1, B[i].X2), RandomRange(B[i].Y1, B[i].Y2));
   Mouse(Point(P.X, P.Y), MOUSE_MOVE);
-end;
+
+  wait(waitTime);
+end;   
 
 (*
 smallRandomMouse
