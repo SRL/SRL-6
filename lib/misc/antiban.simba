@@ -189,10 +189,10 @@ mouseOffClient
 
 .. code-block:: pascal
 
-    procedure mouseOffClient(Direction: Integer);
+    procedure mouseOffClient(Direction: Integer, waitTime: integer = 0);
 
-Moves the mouse off the client in a specified direction. Valid arguments for
-'Direction' are:
+Moves the mouse off the client in a specified direction. Waits up to waitTime. 
+Valid arguments for 'Direction' are:
 
     * OFF_CLIENT_TOP
     * OFF_CLIENT_BOTTOM
@@ -209,7 +209,7 @@ Example:
 
 .. code-block:: pascal
 
-    mouseOffClient(OFF_CLIENT_RANDOM);
+    mouseOffClient(OFF_CLIENT_RANDOM, randomRange(5000, 8000));
 *)
 const
   OFF_CLIENT_TOP = 0;
@@ -243,7 +243,9 @@ begin
 
   P := Point(RandomRange(B[i].X1, B[i].X2), RandomRange(B[i].Y1, B[i].Y2));
   Mouse(Point(P.X, P.Y), MOUSE_MOVE);
-end;
+
+  wait(waitTime);
+end;  
 
 (*
 smallRandomMouse
