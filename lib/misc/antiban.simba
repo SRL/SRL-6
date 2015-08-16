@@ -189,10 +189,10 @@ mouseOffClient
 
 .. code-block:: pascal
 
-    procedure mouseOffClient(direction: integer = OFF_CLIENT_RANDOM; waitTime: integer = 0);
+    procedure mouseOffClient(direction: integer; waitTime: integer = 0);
 
-Moves the mouse off the client in a specified direction (Random direction by default).
-Waits up to waitTime (Random 1-5sec by default). Valid arguments for 'direction' are:
+Moves the mouse off the client in a specified direction.
+Waits up to waitTime. Valid arguments for 'direction' are:
 
     * OFF_CLIENT_TOP
     * OFF_CLIENT_BOTTOM
@@ -217,7 +217,7 @@ const
   OFF_CLIENT_LEFT = 2;
   OFF_CLIENT_RIGHT = 3;
   OFF_CLIENT_RANDOM = 4;
-procedure mouseOffClient(direction: integer = OFF_CLIENT_RANDOM; waitTime: integer = 0);
+procedure mouseOffClient(direction: integer; waitTime: integer = 0);
 var
   B: TBoxArray;
   P: TPoint;
