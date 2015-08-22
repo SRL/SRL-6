@@ -1272,6 +1272,32 @@ begin
   result := self.__getPercent(_AB_BAR_SUMMONING_OFFSET);
 end;
 
+{*
+iconBoxes()
+-----------
+
+.. code-block:: pascal
+
+    function TRSActionBar.iconBoxes(): TBoxArray;
+
+Returns the TBoxArray of the Action Bar icons.
+
+.. note::
+
+    - by Thomas
+
+Example:
+
+.. code-block:: pascal
+
+    smartImage.drawBoxes(actionBar.iconBoxes(), false, clRed);
+*}
+
+function TRSActionBar.iconBoxes(): TBoxArray;
+begin
+  result := grid(4, 1, 25, 25, 139, 0, [self.getbounds().x1 + 28, self.getbounds().y1 + 18]);
+end;
+
 (*
 mouseIcon
 ---------
@@ -1286,7 +1312,7 @@ button **button** *(default = MOUSE_LEFT);
 .. note::
 
     - by Ashaman88
-    - Last Updated: 4 February 2014 by Ashaman88
+    - Last Updated: 22 August 2015 by Thomas
 
 Example:
 
@@ -1298,37 +1324,94 @@ procedure TRSActionBar.mouseIcon(icon, button: integer = MOUSE_LEFT);
 begin
   if not inRange(icon, 1, 4) then
     exit();
-  mouseCircle((self.getbounds().x1 + 26) + (icon - 1) * 140, self.getbounds().y1 + 18, 10, button);
-end;
+  mouseCircle(iconBoxes()[icon - 1].getMiddle(), 9, button);
+end;       //mouseBox(iconBoxes()[icon - 1], button);
 
-{*
-__isRetaliateEnabled
---------------------
+(*
+isIconEnabled
+-------------
 
 .. code-block:: pascal
 
-    function TRSActionBar.__isRetaliateEnabled(): boolean;
+    function TRSActionBar.isIconEnabled(icon: integer): boolean;
 
-Returns true if AutoRetaliate is enabled.
+Returns true if any of the first 3 icons is enabled.
 
 .. note::
 
-    - by Ashaman88
-    - Last Updated: 5 December 2014 by The Mayor
+    - by Thomas
 
 Example:
 
 .. code-block:: pascal
 
-     if actionBar.__isRetaliateEnabled then
-        writeln('AutoRetaliate is enabled!');
-*}
-function TRSActionBar.__isRetaliateEnabled(): boolean;
-const
-  RETALIATE_COLOR = 1917801;
+     isIconEnabled(AB_BAR_PRAYER);
+*)
+
+function TRSActionBar.isIconEnabled(icon: integer): boolean;
+var
+  color: integer;
 begin
-  result := getColor(self.x1 + 175, self.y1 + 23) = RETALIATE_COLOR;
-  print('TRSActionBar.__isRetaliateEnabled(): result = ' + boolToStr(result), TDebug.SUB);
+  if not inRange(icon, 1, 3) then
+    exit();
+
+  case icon of
+    1: color := 4884648;  //Healing
+    2: color := 3442349;  //Adrenaline
+    3: color := 11751792; //Prayer
+  end;
+
+  result := countColorTolerance(color, iconBoxes()[icon - 1], 100) > 165;
+
+  print('TRSActionBar.isIconEnabled(): result = ' + boolToStr(result), TDebug.SUB);
+end;
+
+(*
+setIcon
+-------
+
+.. code-block:: pascal
+
+    function TRSActionBar.setIcon(icon: integer; enabled: boolean = true): boolean;
+
+Returns true if it successfully enables or disables the icon depending on
+the **enabled** parameter *(default = true)*
+
+.. note::
+
+    - by Thomas
+
+Example:
+
+.. code-block:: pascal
+
+     actionBar.setIcon(AB_BAR_PRAYER);
+     actionBar.setHealing(AB_BAR_PRAYER, false); // To disable it
+*)
+function TRSActionBar.setIcon(icon: integer; enabled: boolean = true): boolean;
+var
+  timeOut: LongWord;
+begin
+    if enabled then
+      result := self.isIconEnabled(icon)
+    else
+      result := (not self.isIconEnabled(icon));
+
+  if result then
+  begin
+    print('TRSActionBar.setIcon(): result = ' + boolToStr(result), TDebug.SUB);
+    exit();
+  end;
+
+  timeOut := getSystemTime() + randomRange(3500, 5000);
+
+  while (timeOut > getSystemTime()) and (not result) do
+  begin
+    self.mouseIcon(icon, MOUSE_LEFT);
+    wait(1000 + random(1000));
+  end;
+
+  print('TRSActionBar.setIcon(): result = ' + boolToStr(result), TDebug.SUB);
 end;
 
 (*
@@ -1345,7 +1428,7 @@ the **enabled** parameter *(default = true)*
 .. note::
 
     - by Ashaman88
-    - Last Updated: 5 December 2014 by The Mayor
+    - Last Updated: 22 August 2015 by Thomas
 
 Example:
 
@@ -1359,9 +1442,9 @@ var
   t: LongWord;
 begin
   if enabled then
-    result := self.__isRetaliateEnabled()
+    result := self.isIconEnabled(AB_BAR_ADRENALINE)
   else
-    result := (not self.__isRetaliateEnabled());
+    result := (not self.isIconEnabled(AB_BAR_ADRENALINE));
 
   if result then
   begin
@@ -1369,51 +1452,21 @@ begin
     exit();
   end
 
-  self.mouseIcon(AB_BAR_ADRENALINE);
+  self.mouseIcon(AB_BAR_ADRENALINE, MOUSE_LEFT);
 
   t := getSystemTime() + randomRange(3500, 5000);
 
   while (t > getSystemTime()) and (not result) do
   begin
     if enabled then
-      result := (self.__isRetaliateEnabled())
+      result := self.isIconEnabled(AB_BAR_ADRENALINE)
     else
-      result := not (self.__isRetaliateEnabled());
+      result := (not self.isIconEnabled(AB_BAR_ADRENALINE));
 
     wait(1000 + random(1000));
   end;
 
   print('TRSActionBar.setRetaliate(): result = ' + boolToStr(result), TDebug.SUB);
-end;
-
-{*
-__isQuickPrayerEnabled
-----------------------
-
-.. code-block:: pascal
-
-    function TRSActionBar.__isQuickPrayerEnabled(): boolean;
-
-Returns true if quick prayer is enabled.
-
-.. note::
-
-    - by The Mayor
-    - Last Updated: 5 December 2014 by The Mayor
-
-Example:
-
-.. code-block:: pascal
-
-     if actionBar.__isRetaliateEnabled then
-        writeln('AutoRetaliate is enabled!');
-*}
-function TRSActionBar.__isQuickPrayerEnabled(): boolean;
-const
-  ENABLED_COLOR = 9123919;
-begin
-  result := getColor(self.x1 + 315, self.y1 + 23) = ENABLED_COLOR;
-  print('TRSActionBar.__isQuickPrayerEnabled(): result = ' + boolToStr(result), TDebug.SUB);
 end;
 
 (*
@@ -1430,7 +1483,7 @@ the **enabled** parameter *(default = true)*
 .. note::
 
     - by The Mayor
-    - Last Updated: 5 December 2014 by The Mayor
+    - Last Updated: 22 August 2015 by Thomas
 
 Example:
 
@@ -1443,10 +1496,10 @@ function TRSActionBar.setQuickPrayer(enabled: boolean = true): boolean;
 var
   t: LongWord;
 begin
-  if enabled then
-    result := self.__isQuickPrayerEnabled()
-  else
-    result := (not self.__isQuickPrayerEnabled());
+    if enabled then
+      result := self.isIconEnabled(AB_BAR_PRAYER)
+    else
+      result := (not self.isIconEnabled(AB_BAR_PRAYER));
 
   if result then
   begin
@@ -1461,14 +1514,62 @@ begin
   while (t > getSystemTime()) and (not result) do
   begin
     if enabled then
-      result := self.__isQuickPrayerEnabled()
+      result := self.isIconEnabled(AB_BAR_PRAYER)
     else
-      result := (not self.__isQuickPrayerEnabled());
+      result := (not self.isIconEnabled(AB_BAR_PRAYER));
 
     wait(1000 + random(1000));
   end;
 
   print('TRSActionBar.setQuickPrayer(): result = ' + boolToStr(result), TDebug.SUB);
+end;
+
+(*
+setHealing
+----------
+
+.. code-block:: pascal
+
+    function TRSActionBar.setHealing(enabled: boolean = true): boolean;
+
+Returns true if it successfully enables or disables Healing depending on
+the **enabled** parameter *(default = true)*
+
+.. note::
+
+    - by Thomas
+
+Example:
+
+.. code-block:: pascal
+
+     actionBar.setHealing();
+     actionBar.setHealing(false); // To disable it
+*)
+function TRSActionBar.setHealing(enabled: boolean = true): boolean;
+var
+  timeOut: LongWord;
+begin
+    if enabled then
+      result := self.isIconEnabled(AB_BAR_HP)
+    else
+      result := (not self.isIconEnabled(AB_BAR_HP));
+
+  if result then
+  begin
+    print('TRSActionBar.setHealing(): result = ' + boolToStr(result), TDebug.SUB);
+    exit();
+  end;
+
+  timeOut := getSystemTime() + randomRange(3500, 5000);
+
+  while (timeOut > getSystemTime()) and (not result) do
+  begin
+    self.mouseIcon(AB_BAR_HP, MOUSE_LEFT);
+    wait(1000 + random(1000));
+  end;
+
+  print('TRSActionBar.setHealing(): result = ' + boolToStr(result), TDebug.SUB);
 end;
 
 begin
