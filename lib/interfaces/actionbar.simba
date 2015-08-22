@@ -1272,6 +1272,32 @@ begin
   result := self.__getPercent(_AB_BAR_SUMMONING_OFFSET);
 end;
 
+{*
+iconBoxes()
+-----------
+
+.. code-block:: pascal
+
+    function TRSActionBar.iconBoxes(): TBoxArray;
+
+Returns the TBoxArray of the Action Bar icons.
+
+.. note::
+
+    - by Thomas
+
+Example:
+
+.. code-block:: pascal
+
+    smartImage.drawBoxes(actionBar.iconBoxes(), false, clRed);
+*}
+
+function TRSActionBar.iconBoxes(): TBoxArray;
+begin
+  result := grid(4, 1, 20, 20, 139, 0, [actionbar.getbounds().x1 + 28, actionbar.getbounds().y1 + 18]);
+end;
+
 (*
 mouseIcon
 ---------
@@ -1324,12 +1350,10 @@ Example:
         writeln('AutoRetaliate is enabled!');
 *}
 function TRSActionBar.__isRetaliateEnabled(): boolean;
-const
-  RETALIATE_COLOR = 1917801;
 begin
-  result := getColor(self.x1 + 175, self.y1 + 23) = RETALIATE_COLOR;
+  result := countColorTolerance(3442349, iconBoxes()[1], 100) > 150;
   print('TRSActionBar.__isRetaliateEnabled(): result = ' + boolToStr(result), TDebug.SUB);
-end;
+end;       
 
 (*
 setRetaliate
