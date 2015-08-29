@@ -335,7 +335,7 @@ begin
   repeat
     if isItemIn(self.getSlotBox(slot)) then
       exit(true);
-    wait(20 + random(50));
+    if (waitTime > 0) then wait(20 + random(50));
   until (timeOut < getSystemTime());  
 end;   
 
