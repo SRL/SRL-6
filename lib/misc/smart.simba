@@ -721,22 +721,22 @@ sixHourFix
 
 .. code-block:: pascal
 
-     function sixHourFix(): boolean;
+     procedure sixHourFix();
 
 Kills the current client, spawns a new one, and then logs the currentPlayer back
-into the game. Returns true if logged in.
+into the game.
 
 .. note::
 
     - By: Olly
-    - Last Updated: 11 August 2015 by Thomas
+    - Last Updated: 1 July 2015 by The Mayor
 
 Example:
 
 .. code-block:: pascal
 
 *)
-function sixHourFix(): boolean;
+procedure sixHourFix();
 var
   i: integer;
 begin
@@ -758,7 +758,7 @@ begin
       if (players[currentPlayer].login()) then
       begin
         print('sixHourFix(): Succesfully logged in after reload', TDebug.FOOTER);
-        exit(true);
+        exit();
       end else
         print('Failed to login player after restart attempt ' + toStr(i), TDebug.ERROR);
     end else
