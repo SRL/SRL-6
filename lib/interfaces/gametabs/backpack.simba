@@ -314,7 +314,7 @@ parameter *(default = 0)* can be adjusted to extend the search time.
 .. note::
 
     - by Olly
-    - Last Updated: 9 August 2015 by Thomas
+    - Last Updated: 29 August 2015 by Justin
 
 Example:
 
@@ -323,20 +323,12 @@ Example:
    if tabBackpack.isItemInSlot(1) then
      writeln('We have an item in slot number 1');
 *)
-function TRSTabBackpack.isItemInSlot(slot: integer; waitTime: integer = 0): boolean;
-var
-  timeOut: LongWord;
+function TRSTabBackpack.isItemInSlot(slot: integer): boolean;
 begin
   if (not self.open()) or (not self.isSlotValid(slot))then
     exit(false);
 
-  timeOut := getSystemTime() + waitTime;
-
-  repeat
-    if isItemIn(self.getSlotBox(slot)) then
-      exit(true);
-    if (waitTime > 0) then wait(20 + random(50));
-  until (timeOut < getSystemTime());  
+  result := isItemIn(self.getSlotBox(slot));
 end;   
 
 (*
