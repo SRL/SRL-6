@@ -330,14 +330,16 @@ begin
   if (not self.open()) or (not self.isSlotValid(slot))then
     exit(false);
 
-  timeOut := getSystemTime() + waitTime;
+  if (waitTime = 0) then
+    exit(isItemIn(self.getSlotBox(slot)));
 
+  timeOut := getSystemTime() + waitTime;
   repeat
     if isItemIn(self.getSlotBox(slot)) then
       exit(true);
-    if (waitTime > 0) then wait(20 + random(50));
-  until (timeOut < getSystemTime());  
-end;   
+    wait(random(20, 50));
+  until timeOut >= getSystemTime();
+end;
 
 (*
 pointToSlot
