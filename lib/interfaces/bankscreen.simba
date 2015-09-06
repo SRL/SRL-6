@@ -137,14 +137,22 @@ A type that stores the bank screen interface properties.
 type
   TRSBankScreen = type TRSInterface;
 
+
+{*
+** type TBankColors **
+
+An internal type that stores the name and color information for a bank type
+
+*}
+{$IFNDEF CODEINSIGHT}
 type
   TBankColors = record
     name: String;
     color: TColorData;
   end;
 
-type
   TBankColorsArray = Array of TBankColors;
+{$ENDIF}
 
 (*
 **var bankScreen**
@@ -160,8 +168,16 @@ A variable through which scripters can access the TRSBankScreen type methods.
 var
   bankScreen: TRSBankScreen;
 
+(*
+**var bankColors**
+
+A variable which holds all the bank color information
+
+*)
+{$IFNDEF CODEINSIGHT}
 var
   bankColors: TBankColorsArray;
+{$ENDIF}
 
 (*
 TRSBankScreen methods
@@ -177,7 +193,29 @@ Example:
       writeln('Bank screen is open!');
 *)
 
+{*
+TBankColorsArray.__getProfileColor
+-----------------------------------
 
+.. code-block:: pascal
+
+    function TBankColorsArray.__getProfileColor(name: String): T2DColorData;
+
+Returns the T2DColorData for the bankType **name**
+
+.. note::
+
+    - by The Mayor
+    - Last Updated: 6 September 2015 by The Mayor
+
+Example:
+
+.. code-block:: pascal
+
+    bankColors.__getProfileColor('BANK_NPC_BLUE');
+
+*}
+{$IFNDEF CODEINSIGHT}
 function TBankColorsArray.__getProfileColor(name: String): T2DColorData;
 var
   i, j: Integer;
@@ -192,7 +230,33 @@ begin
       inc(j);
     end;
 end;
+{$ENDIF}
 
+{*
+TBankColorsArray.__load
+-----------------------
+
+.. code-block:: pascal
+
+    procedure TBankColorsArray.__load(path: String);
+
+Calculates CTS2 colors from individual colors that are in the same aca profile.
+Saves all the CTS2 colors and profile names into self. The **path** should
+direct to a .aca file, which is saved from Cynic's ACA Remake.
+
+.. note::
+
+    - by The Mayor
+    - Last Updated: 6 September 2015 by The Mayor
+
+Example:
+
+.. code-block:: pascal
+
+    bankColors.__load(IncludePath + 'srl-6\lib\interfaces\bankscreen.aca');
+
+*}
+{$IFNDEF CODEINSIGHT}
 procedure TBankColorsArray.__load(path: String);
 var
   i, j, acaFile: Integer;
@@ -219,6 +283,7 @@ begin
 
   CloseFile(acaFile);
 end;
+{$ENDIF}
 
 {*
 __init
@@ -1977,6 +2042,29 @@ begin
   end;
 end;
 
+{*
+__open
+------
+
+.. code-block:: pascal
+
+    function TRSBankScreen.__open(bankType: Integer): Boolean;
+
+Opens the bank **bankType** . Scripters should use backScreen.open() below
+instead.
+
+.. note::
+
+    - by The Mayor
+    - Last Updated: 6 September 2015 by The Mayor
+
+Example:
+
+.. code-block:: pascal
+
+    bankScreen.__open(BANK_NPC_BLUE);
+
+*}
 function TRSBankScreen.__open(bankType: Integer): Boolean;
 var
   i, x, y: Integer;
@@ -1990,17 +2078,18 @@ begin
     BANK_NPC_GREY: cols := bankColors.__getProfileColor('BANK_NPC_GREY');
     BANK_NPC_GREEN: cols := bankColors.__getProfileColor('BANK_NPC_GREEN');
     BANK_NPC_DRAYNOR: cols := bankColors.__getProfileColor('BANK_NPC_DRAYNOR');
-    BANK_BOOTH: cols := bankColors.__getProfileColor('BANK_BOOTH');
-    BANK_GE: cols := bankColors.__getProfileColor('BANK_GE');
-    BANK_CHEST_SW: cols := bankColors.__getProfileColor('BANK_CHEST_SW');
-    BANK_CHEST_SHANTAY: cols := bankColors.__getProfileColor('BANK_CHEST_SHANTAY');
-    BANK_CHEST_DUEL: cols := bankColors.__getProfileColor('BANK_CHEST_DUEL');
-    BANK_CHEST_CW: cols := bankColors.__getProfileColor('BANK_CHEST_CW');
-    BANK_CHEST_GROTTO: cols := bankColors.__getProfileColor('BANK_CHEST_GROTTO');
     BANK_TABLE_BURTHORPE: cols := bankColors.__getProfileColor('BANK_TABLE_BURTHORPE');
     BANK_CHEST_LUMBRIDGE: cols := bankColors.__getProfileColor('BANK_CHEST_LUMBRIDGE');
-    BANK_CHEST_PRIFDDINAS: cols := bankColors.__getProfileColor('BANK_CHEST_PRIFDDINAS');
-    BANK_CHEST_BARB_OUTPOST: cols := bankColors.__getProfileColor('BANK_CHEST_BARB_OUTPOST');
+
+    // I will update these ones when I have access to them
+    BANK_BOOTH: cols := [[3237496, 6, [2, [0.18, 0.68, 0.00]]]];
+    BANK_CHEST_SW: cols := [[8946555, 15, [2, [0.18, 0.18, 0.00]]], [5863053, 10, [2, [0.13, 0.10, 0.00]]]];
+    BANK_CHEST_SHANTAY: cols := [[4335674, 6, [2, [0.38, 1.96, 0.00]]], [7247287, 6, [2, [0.16, 1.41, 0.00]]]];
+    BANK_CHEST_DUEL: cols := [[11512192, 18, [2, [0.39, 0.57, 0.00]]], [6586289, 10, [2, [0.21, 1.00, 0.00]]]];
+    BANK_CHEST_CW: cols := [[8088922, 16, [2, [0.06, 0.17, 0.00]]], [4808312, 17, [2, [0.03, 0.17, 0.00]]]];
+    BANK_CHEST_GROTTO: cols := [[6842737, 6, [2, [0.31, 0.08, 0.00]]], [2570316, 4, [2, [0.15, 1.35, 0.00]]]];
+    BANK_CHEST_PRIFDDINAS: cols := [[2729983, 12, [1, [0.07, 0.00, 0.00]]], [7528447, 16, [2, [0.24, 0.00, 0.00]]]];
+    BANK_CHEST_BARB_OUTPOST: cols := [[10258280, 19, [2, [0.06, 0.49, 0.00]]], [3424082, 8, [2, [0.12, 0.21, 0.00]]]];
   end;
 
   setLength(TPA, length(cols));
@@ -2033,7 +2122,7 @@ begin
     begin
       mouse(ATPA[i].getBounds().getGaussPoint());
 
-      if isMouseOverText(['ank Ba', 'ank Co', 'pen Sh', 'Use Ba', 'hest']) then
+      if isMouseOverText(['ank Ba', 'ank Co', 'ank Gn', 'pen Sh', 'Use Ba', 'hest']) then
       begin
         if (random(3) <> 0) then
         begin
@@ -2042,7 +2131,7 @@ begin
         end else
         begin
           fastClick(MOUSE_RIGHT);
-          if not chooseOption.select(['ank Ba', 'ank Co', 'pen Sh', 'Use Ba', 'hest']) then continue();
+          if not chooseOption.select(['ank Ba', 'ank Co', 'ank Gn', 'pen Sh', 'Use Ba', 'hest']) then continue();
         end;
 
         if minimap.isFlagPresent() then minimap.waitFlag(randomRange(12, 15));

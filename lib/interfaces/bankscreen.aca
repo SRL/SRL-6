@@ -386,6 +386,14 @@
     <colordata color="10523784"/>
     <colordata color="9405305"/>
     <colordata color="9470841"/>
+    <colordata color="11510167"/>
+    <colordata color="9799549"/>
+    <colordata color="11970717"/>
+    <colordata color="11247509"/>
+    <colordata color="11049874"/>
+    <colordata color="10918544"/>
+    <colordata color="10786958"/>
+    <colordata color="11707801"/>
   </profile>
   <profile name="BANK_CHEST_LUMBRIDGE_2" cts="2">
     <colordata color="5336718"/>
@@ -415,6 +423,23 @@
     <colordata color="5928088"/>
     <colordata color="5468048"/>
     <colordata color="5533841"/>
+    <colordata color="5994135"/>
+    <colordata color="6783398"/>
+    <colordata color="6586273"/>
+    <colordata color="5797012"/>
+    <colordata color="6454944"/>
+    <colordata color="6389150"/>
+    <colordata color="6323100"/>
+    <colordata color="6586018"/>
+    <colordata color="6586274"/>
+    <colordata color="6520737"/>
+    <colordata color="5797013"/>
+    <colordata color="6520480"/>
+    <colordata color="6651555"/>
+    <colordata color="6717861"/>
+    <colordata color="6585762"/>
+    <colordata color="6914215"/>
+    <colordata color="6717348"/>
   </profile>
   <profile name="BANK_NPC_GREY" cts="2">
     <colordata color="6316393"/>
@@ -482,5 +507,74 @@
     <colordata color="7105910"/>
     <colordata color="7040374"/>
     <colordata color="6382185"/>
+  </profile>
+  <profile name="BANK_TABLE_BURTHORPE" cts="2">
+    <colordata color="10600943"/>
+    <colordata color="13428734"/>
+    <colordata color="13034494"/>
+    <colordata color="10008551"/>
+    <colordata color="9217755"/>
+    <colordata color="10271722"/>
+    <colordata color="12244730"/>
+    <colordata color="11915513"/>
+    <colordata color="10798064"/>
+    <colordata color="12705789"/>
+    <colordata color="12574204"/>
+    <colordata color="10074088"/>
+    <colordata color="7966408"/>
+    <colordata color="7900357"/>
+    <colordata color="10270697"/>
+    <colordata color="9744611"/>
+    <colordata color="12772093"/>
+    <colordata color="13165822"/>
+    <colordata color="10468588"/>
+    <colordata color="12507900"/>
+    <colordata color="12047354"/>
+    <colordata color="12244987"/>
+    <colordata color="10008295"/>
+    <colordata color="9481183"/>
+    <colordata color="10469101"/>
+    <colordata color="11390197"/>
+    <colordata color="12771325"/>
+    <colordata color="10732271"/>
+    <colordata color="10337515"/>
+    <colordata color="10271979"/>
+    <colordata color="8690387"/>
+    <colordata color="7769025"/>
+  </profile>
+  <profile name="BANK_TABLE_BURTHORPE_2" cts="2">
+    <colordata color="7695981"/>
+    <colordata color="7761774"/>
+    <colordata color="7564651"/>
+    <colordata color="7235686"/>
+    <colordata color="7301479"/>
+    <colordata color="7432808"/>
+    <colordata color="7301736"/>
+    <colordata color="7367272"/>
+    <colordata color="6775133"/>
+    <colordata color="6840669"/>
+    <colordata color="6840926"/>
+    <colordata color="6314068"/>
+    <colordata color="6840414"/>
+    <colordata color="7893360"/>
+    <colordata color="7037537"/>
+    <colordata color="6840158"/>
+    <colordata color="7695980"/>
+    <colordata color="8222586"/>
+    <colordata color="7433065"/>
+    <colordata color="7498345"/>
+    <colordata color="6642778"/>
+    <colordata color="6314326"/>
+    <colordata color="7169893"/>
+    <colordata color="6116690"/>
+    <colordata color="5787466"/>
+    <colordata color="5721673"/>
+    <colordata color="6314324"/>
+    <colordata color="5853003"/>
+    <colordata color="5129792"/>
+    <colordata color="6642777"/>
+    <colordata color="5721674"/>
+    <colordata color="7103842"/>
+    <colordata color="6314069"/>
   </profile>
 </acaprofile>
