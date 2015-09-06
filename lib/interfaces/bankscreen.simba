@@ -168,12 +168,12 @@ A variable through which scripters can access the TRSBankScreen type methods.
 var
   bankScreen: TRSBankScreen;
 
-(*
+{*
 **var bankColors**
 
 A variable which holds all the bank color information
 
-*)
+*}
 {$IFNDEF CODEINSIGHT}
 var
   bankColors: TBankColorsArray;
@@ -2246,8 +2246,8 @@ end;
 {$ENDIF}
 
 (*
-TRSBankScreen.open
-~~~~~~~~~~~~~~~~~~
+open
+~~~~
 
 .. code-block:: pascal
 
@@ -2294,6 +2294,7 @@ end;
 
 {*
 __isSearchOpen
+--------------
 
 .. code-block:: pascal
 
