@@ -3245,7 +3245,7 @@ TRSMinimap.toggleRun
 
     procedure TRSMinimap.toggleRun(minRunPercent: integer); overload;
 
-Ebables run only if the current run energy is above **minRunPercent** . This
+Enables run only if the current run energy is above **minRunPercent** . This
 procedure hasn't beed coded yet because it requires getRunEnergy (see above).
 
 .. note::
