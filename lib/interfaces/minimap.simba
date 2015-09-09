@@ -353,7 +353,7 @@ begin
     bmpMask := BitmapFromString(224, 189, 'meJzt0olhpAAAw8D03/RdA+TbwEoYTQmWPz6SJEmSJEmSJ/qXH6ArPRSd/U7oVo9DB78futiD0Knviu72CHTke6PrjaPzLqAbzqLD7qBLbqKr7qBLbqKr7qBLbqKr7qBLbqKr7qBLbqKr7qBLbqKr7qBLbqKr7qBLbqKr7qBLbqKr7qBLbqKr7qBLbqKr7qBLbqKr7qBLbqKr7qBLbqKr7qBLbqKr7qBLbqKr7qBLbqKr7qBLbqKr7qBLbqKr7qBLbqKr7qBLbqKr7qBLbqKr7qBLbqKr7qBLbqKr7qBLbqKr7qBLbqKr7qBLbqKr7qBLbqKr7qBLbqKr7qBLbqKr7qBLbqKr7qBLbqKr7qBLbqKr7qBLbqKr7qBLbqKr7qBLbqKr7qBLbqKr7qBLbqKr7qBLbqKr7qBLbqKr7qBLbqKr7qBLbqKr5jT0lS5Bj5ozdY/Idc7Idc7Idc7Idc7Idc7Idc7I9c+Y9c+Y9c+Y9c+Y9c+Y9c+Y9c+Y9c+Y9c+Y9c+Y9c+Y9c+Y9c+Y9c+Y9c+Y9c+Y9c+Y9c+Y9c+Y9c+Y9c+Y9c+Y9c+Y9c+Y9c+Y9c+Y9c+Y9c+Y9c+Y9c+Y9c+Y9c+Y9c+Y9c+Y9c+Y9c+Y9c+Y9c+Y9c+Y9c+Y9c+Y9c+Y9c+Y9c+Y9c+Y9c+Y9c+Y9c+Y9c+Y9c+Y9c+Y9c+Y9c+Y9c+Y9c+Y9c+Y9c+Y9c+Y9c+Y9c+Y/fyfXTRv9qtzdtG80wvn7KJ5j5fP2UVztT+es4vmOqecs4vmCiees4vmXKefs4vmLBeds3/mFP0zZv0zZv0zZv0zZv0zZv0zZv0zZv0zZv0zZv0zZv0zZm/4Z3/Oy67758voSXKh337g0qf9BbhhTke/6RL0qDkBfaJr0evmT+j7vAO9cV5EH+d96KXza/Rl3o3eO79An4VBr54foW+CoYfP9+iPwOj58w36IDB6/nyFfgePLpCv0O9QoCPkU/Q1FOgIOUb/woLukGP0LyzoDjlG/8KC7pBj9C8s6A45Rv/Cgu6QY/QvLOgOOUb/woLukGP0LyzoDjlG/8KC7pBj9C8s6A45Rv/Cgu6QY/QvFOgI+RR9DQU6Qr5Cv4NHF8hX6HfcDJ3rcejg90MXW0A3HEfnvTe63iPQke+K7vYgdOr7oYs9Dh38TuhWD0Vnvwe60qPR8e3oPk9H91ej4yRJkiRJkiSk/xotWe8=');
     setBitmapName(bmpMask, 'Minimap Mask');
     setBounds([577, 12, 798, 200]);
-                                      (* Bounds | Center | Radius *)
+                                      { Bounds | Center | Radius }
     button[MM_BUTTON_COMPASS]   := [[582, 18, 614, 50], [598, 34], 15];
     button[MM_BUTTON_RUN]       := [[759, 18, 793, 52], [776, 35], 16];
     button[MM_BUTTON_LODESTONE] := [[586, 161, 613, 188], [599, 174], 13];
@@ -693,6 +693,7 @@ Example:
 .. code-block:: pascal
 
     minimap.clickCompass();
+    minimap.clickCompass(true); // To face south
 *)
 procedure TRSMinimap.clickCompass(faceSouth: boolean = false);
 begin
@@ -806,7 +807,7 @@ findDTM
 
 Returns true if it finds the DTM **DTM** on the minimap. It will search
 +/- 15 degrees of the current minimap angle. It will pass the coordinates for the
-first DTM it finds in x and y.
+first DTM it finds to x and y.
 
 .. note::
 
@@ -3183,7 +3184,7 @@ Example:
 .. code-block:: pascal
 
     if minimap.isRunEnabled() then
-      writeln('Sup kid? I'm Usain Bolt. Prep2BRekt m8');
+      writeln('Sup kid? I''m Usain Bolt. Prep2BRekt m8');
 *)
 function TRSMinimap.isRunEnabled(): boolean;
 var
@@ -3238,8 +3239,8 @@ begin
 end;
 
 (*
-TRSMinimap.toggleRun
-~~~~~~~~~~~~~~~~~~~~
+toggleRun (overload)
+--------------------
 
 .. code-block:: pascal
 

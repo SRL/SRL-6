@@ -1,6 +1,6 @@
 (*
-BeastOfBurden
-=============
+Beast Of Burden
+==============
 
 The BeastofBurden file holds functions and procedures that are used in the
 Runescape beast of burden familiar inventory screen.
@@ -12,12 +12,19 @@ The source for this file can be found `here <https://github.com/SRL/SRL-6/blob/m
 {$f-}
 
 (*
-const Internal
-~~~~~~~~~~~~~~
+Consts, Types, Vars
+~~~~~~~~~~~~~~~~~~~
+
+The following constants, types and variables are used throughout the beastOfBurden methods.
+
+*)
+
+{*
+**const Internal**
 
 Internal beast of burden screen constants.
 
-*)
+*}
 const
   FAMILIAR_SLOT_LOW = 1;
   PLAYER_SLOT_LOW = 1;
@@ -25,58 +32,85 @@ const
   FAMILIAR_BACKGROUND = 2433824;
 
 (*
-const Slot & Button Types
-~~~~~~~~~~~~~~~~~~~~~~~~~
+**const Button Types**
 
-Integer constants that represent the slot and button types in the beast of burden interface.
+Integer constants that represent the button types in the beast of burden interface.
+
+    * BUTTON_GIVE_ITEMS
+    * BUTTON_TAKE_ITEMS
+
+*)
+const
+  BUTTON_GIVE_ITEMS = 0;
+  BUTTON_TAKE_ITEMS = 1;
+
+(*
+**const Slot Types**
+
+Integer constants that represent the slot types in the beast of burden interface.
+
+    * SLOTS_FAMILIAR
+    * SLOTS_PLAYER
 
 *)
 const
   SLOTS_FAMILIAR   = 0;
   SLOTS_PLAYER     = 1;
 
-const
-  BUTTON_GIVE_ITEMS = 0;
-  BUTTON_TAKE_ITEMS = 1;
-
 (*
-type TRSBeastOfBurden
-~~~~~~~~~~~~~~~~~~~~~
+**type TRSBeastOfBurden**
+
+.. code-block:: pascal
+
+    type
+      TRSBeastOfBurden = type TRSInterface;
 
 A type that stores the beast of burden interface properties.
+
 *)
 type
   TRSBeastOfBurden = type TRSInterface;
 
-(*
-var Internal
-~~~~~~~~~~~~~~
+{*
+**var Internal**
 
 Internal beast of burden screen variables.
 
-*)
+*}
 var
   maximumSlots: integer = 30;
 
 (*
-var beastOfBurden
-~~~~~~~~~~~~~~~~~
+**var beastOfBurden**
 
-The variable used to call collect box functions, procedures and attributes.
+.. code-block:: pascal
+
+    var
+      beastOfBurden: TRSBeastOfBurden;
+
+A variable through which scripters can access the TRSBeastOfBurden type methods.
+
+*)
+var
+  beastOfBurden: TRSBeastOfBurden;
+
+(*
+TRSBeastOfBurden methods
+~~~~~~~~~~~~~~~~~~~~~~~~
+
+The following methods should be called through the **beastOfBurden** variable.
 
 Example:
 
 .. code-block:: pascal
 
-    if (beastOfBurden.isOpen()) then
-      writeln('beastOfBurden is open');
+    beastOfBurden.open();
+
 *)
-var
-  beastOfBurden: TRSBeastOfBurden;
 
 {*
-TRSBeastOfBurden.__init
-~~~~~~~~~~~~~~~~~~~~
+__init
+------
 
 .. code-block:: pascal
 
@@ -109,16 +143,16 @@ begin
 end;
 {$ENDIF}
 
-(*
-TRSBeastOfBurden.__find
-~~~~~~~~~~~~~~~~~~~~
+{*
+__find
+-------
 
 .. code-block:: pascal
 
     function TRSBeastOfBurden.__find(): boolean;
 
-Returns true if the familiar inventory is detected, and sets the bounds of the
-interface.
+Returns true if the beastOfBurden interface is detected and its bounds are set.
+Scripters should use beastOfBurdeb.open() below.
 
 .. note::
 
@@ -129,9 +163,9 @@ Example:
 
 .. code-block:: pascal
 
-    if (beastOfBurden.__find()) then
+    if beastOfBurden.__find() then
       writeln('Bounds are set!');
-*)
+*}
 {$IFNDEF CODEINSIGHT}
 function TRSBeastOfBurden.__find(): boolean;
 const
@@ -163,8 +197,8 @@ end;
 {$ENDIF}
 
 (*
-TRSBeastOfBurden.isOpen
-~~~~~~~~~~~~~~~~~~~~~~~
+isOpen
+------
 
 .. code-block:: pascal
 
@@ -183,7 +217,7 @@ Example:
 
 .. code-block:: pascal
 
-    if (beastOfBurden.isOpen()) then
+    if beastOfBurden.isOpen() then
       writeln('The beast of burden screen is open!');
 
 *)
@@ -200,8 +234,8 @@ begin
 end;
 
 (*
-TRSBeastOfBurden.open
-~~~~~~~~~~~~~~~~~~~~~
+open
+----
 
 .. code-block:: pascal
 
@@ -263,15 +297,15 @@ begin
 end;
 
 (*
-TRSBeastOfBurden.close
-~~~~~~~~~~~~~~~~~~~~~~
+close
+-----
 
 .. code-block:: pascal
 
     function TRSBeastOfBurden.close(escape: boolean = true): boolean;
 
-Closes the beast of burden screen, will return if succesful or not.
-Closes via the Escape key.
+Returns true if the beast of burden interface is successfully closed. It uses the ESC key
+by default, but the **escape** parameter can be set to false to close via the mouse.
 
 .. note::
 
@@ -282,7 +316,7 @@ Example:
 
 .. code-block:: pascal
 
-    if (beastOfBurden.close()) then
+    if beastOfBurden.close() then
       writeln('Closed the beastOfBurden screen!');
 *)
 function TRSBeastOfBurden.close(escape: boolean = true): boolean;
@@ -336,16 +370,15 @@ begin
 end;
 
 (*
-TRSBeastOfBurden.clickButton
-~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+clickButton
+-----------
 
 .. code-block:: pascal
 
     function TRSBeastOfBurden.clickButton(button: integer): boolean;
 
-Selects the take items or give items button in the beast of burden interface,
-withdrawing or depositing all possible items into your backpack or familiar
-inventory, respectively.  Returns true after successful completion.
+Returns true if it successfully clicks the button **button*. The button can be one
+of the two button constants at the top of this page.
 
 .. note::
 
@@ -356,7 +389,7 @@ Example:
 
 .. code-block:: pascal
 
-    if (beastOfBurden.clickButton(BUTTON_TAKE_ITEMS) then
+    if beastOfBurden.clickButton(BUTTON_TAKE_ITEMS) then
       writeln('We withdrew stored items via the take items button!');
 *)
 function TRSBeastOfBurden.clickButton(button: integer): boolean;
@@ -374,15 +407,16 @@ begin
 end;
 
 (*
-TRSBeastOfBurden.getSlotBoxes
-~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+getSlotBoxes
+------------
 
 .. code-block:: pascal
 
     function TRSBeastOfBurden.getSlotBoxes(slotType: Integer): TBoxArray;
 
 Returns a TBoxArray of all of the item slots in the familiar's or player's
-inventory, specified with SLOTS_FAMILIAR or SLOTS_PLAYER integer constants.
+inventory, dependant on **slotType** . The slotType is one of the two slot type
+constants at the top of this page.
 
 .. note::
 
@@ -433,16 +467,16 @@ begin
 end;
 
 (*
-TRSBeastOfBurden.getSlotBox
-~~~~~~~~~~~~~~~~~~~~~~~~~~~
+getSlotBox
+----------
 
 .. code-block:: pascal
 
     function TRSBeastOfBurden.getSlotBox(slot, slotType: integer): TBox;
 
 Returns the TBox of the desired item slot in the beast of burden interface.
-Slots start at the top left at 1 and count across the columns.  Use SLOTS_PLAYER
-or SLOTS_FAMILIAR to specify slotTypes.
+Slots start at the top left at 1 and count across the columns. The ** slotType**
+is one of the two slot type constants at the top of this page.
 
 .. note::
 
@@ -488,14 +522,15 @@ begin
 end;
 
 (*
-TRSBeastOfBurden.getItemCount
-~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+getItemCount
+------------
 
 .. code-block:: pascal
 
     function TRSBeastOfBurden.getItemCount(slotType: integer): integer;
 
-Returns the number of items in either the familiar's inventory or the player's.
+Returns the number of items in either the familiar's or the player's inventory.
+The **slotType** is one of the two slot type constants at the top of this page.
 
 .. note::
 
@@ -509,7 +544,7 @@ Example:
     var
       c: integer;
     begin
-      c := beastOfBurden.getItemCount();
+      c := beastOfBurden.getItemCount(SLOTS_PLAYER);
 
 *)
 function TRSBeastOfBurden.getItemCount(slotType: integer): integer;
@@ -522,9 +557,9 @@ begin
       inc(result);
 end;
 
-(*
-TRSBeastOfBurden._isSlotValid
-~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+{*
+_isSlotValid
+------------
 
 .. code-block:: pascal
 
@@ -544,7 +579,7 @@ Example:
     if beastOfBurden._isSlotValid(25, SLOTS_PLAYER) then
       writeln('Slot 25 is a valid player slot!');
 
-*)
+*}
 function TRSBeastOfBurden._isSlotValid(slot, slotType: integer): boolean;
 begin
   case slotType of
@@ -556,17 +591,16 @@ begin
     print('beastOfBurden._isSlotValid(): Slot '+toStr(slot)+' is invalid', TDebug.WARNING);
 end;
 
-
 (*
-TRSBeastOfBurden.isItemInSlot
-~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+isItemInSlot
+------------
 
 .. code-block:: pascal
 
     function TRSBeastOfBurden.isItemInSlot(slot, slotType: integer): boolean;
 
-Returns true if an item is in the desired beast of burden slot, works by looking for
-the black outline color in the slot.
+Returns true if an item is in the slot **slot** . The **slotType** is one of the
+two slot type constants at the top of this page.
 
 .. note::
 
@@ -589,14 +623,15 @@ begin
 end;
 
 (*
-TRSBeastOfBurden.isFull
-~~~~~~~~~~~~~~~~~~~~~~~
+isFull
+------
 
 .. code-block:: pascal
 
     function TRSBeastOfBurden.isFull(slotType: integer): boolean;
 
-Returns true if either the familiar or player slots are full.
+Returns true if either the familiar or player slots are full. The **slotType**
+is one of the two slot type constants at the top of this page.
 
 .. note::
 
@@ -631,14 +666,15 @@ begin
 end;
 
 (*
-TRSBeastOfBurden.isEmpty
-~~~~~~~~~~~~~~~~~~~~~~~~
+isEmpty
+-------
 
 .. code-block:: pascal
 
     function TRSBeastOfBurden.isEmpty(slotType: integer): boolean;
 
-Returns true if our either the familiar or player slots are empty.
+Returns true if our either the familiar or player slots are empty. The **slotType**
+is one of the two slot type constants at the top of this page.
 
 .. note::
 
@@ -649,7 +685,7 @@ Example:
 
 .. code-block:: pascal
 
-   if (beastOfBurden.isEmpty(SLOTS_PLAYER)) then
+   if beastOfBurden.isEmpty(SLOTS_PLAYER) then
      writeln('our beastOfBurden player pack is empty!');
 
 *)
@@ -669,14 +705,16 @@ begin
 end;
 
 (*
-TRSBeastOfBurden.getCountDTM
-~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+getCountDTM
+-----------
 
 .. code-block:: pascal
 
     function TRSBeastOfBurden.getCountDTM(dtm, slotType: integer): integer;
 
-Searches for the dtm in each familiar or player slot and will return how many matches it finds.
+Searches for the dtm **dtm** in each familiar or player slot and returns
+how many matches it finds. The **slotType** is one of the two slot type constants
+at the top of this page.
 
 .. note::
 
@@ -717,14 +755,16 @@ begin
 end;
 
 (*
-TRSBeastOfBurden.getCountBitmap
-~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+getCountBitmap
+--------------
 
 .. code-block:: pascal
 
     function TRSBeastOfBurden.getCountBitmap(bmp, tolerance, slotType: integer): integer;
 
-Searches for the bitmap in each familiar or player slot and will return how many matches it finds.
+Searches for the bitmap **bmp** with tolerance **tolerance** in each familiar or
+player slot and returns how many matches it finds. The **slotType** is one of
+the two slot type constants at the top of this page.
 
 .. note::
 
@@ -763,19 +803,17 @@ begin
 end;
 
 (*
-TRSBeastOfBurden.withdraw
-~~~~~~~~~~~~~~~~~~~~~~~~~
+withdraw
+--------
 
 .. code-block:: pascal
 
     function TRSBeastOfBurden.withdraw(slot, amount: integer; mouseOverText: TStringArray): boolean;
 
-Withdraws the the amount 'amount' from the beast of burden slot 'slot', if the mouse-over
-text is correct, mouse-over text can also be skipped.
+Withdraws the the amount **amount** from the beast of burden slot **slot**  if
+the mouseOverText is correct. The amount can be any number or the following:
 
-Extra valid constants for 'amount' are:
-
-   - WITHDRAW_AMOUNT_ALL = -1;
+    * WITHDRAW_AMOUNT_ALL
 
 .. note::
 
@@ -850,19 +888,19 @@ begin
 end;
 
 (*
-TRSBeastOfBurden.store
-~~~~~~~~~~~~~~~~~~~~~~
+store
+-----
 
 .. code-block:: pascal
 
     function TRSBeastOfBurden.store(slots: TIntegerArray; amounts: TIntegerArray = []; oneByOne: boolean = false): boolean;
 
-Stores items from the player pack into the familiar pack.  Has the capability of storing
+Stores items from the player pack into the familiar pack. Has the capability of storing
 all items, storing a specific amount of items, and clicking each item one by one.
 
-    * slots: The slots you want to store.
-    * amounts: The amounts of the slots to store.  Set index to -1 to store all.  Stores all of every item by default.
-    * oneByOne: Default false.  Will click items one by one to store.
+    * **slots** : The slots you want to store.
+    * **amounts** : The amounts of the slots to store. Set index to -1 to store all. Stores all of every item by default.
+    * **oneByOne** : Will click items one by one to store *(default = false)*
 
 .. note::
 
@@ -873,9 +911,9 @@ Examples:
 
 .. code-block:: pascal
 
-    beastOfBurden.store([2..28]);
-    beastOfBurden.store([1, 2, 3, 4], [-1, 10, 15, 14]);
-    beastOfBurden.store([1..28], , true); // one by one
+    beastOfBurden.store([2..28]); // All of slot 2 to 28
+    beastOfBurden.store([1, 2, 3, 4], [-1, 10, 15, 14]);  // Slots and amounts
+    beastOfBurden.store([1..28], [], true); // One by one
 *)
 function TRSBeastOfBurden.store(slots: TIntegerArray; amounts: TIntegerArray = []; oneByOne: boolean = false): boolean;
 var
