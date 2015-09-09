@@ -15,7 +15,7 @@ The source for this file can be found `here <https://github.com/SRL/SRL-6/blob/m
 Consts, Types, Vars
 ~~~~~~~~~~~~~~~~~~~
 
-The following constants, types and variables are used throughout the collectBox methods.
+The following constants, types and variables are used throughout the bankScreen methods.
 
 *)
 
@@ -124,19 +124,16 @@ const
 (*
 **type TRSBankScreen**
 
-A type that stores all the attributes and functions of the Runescape bankscreen.
-
 .. code-block:: pascal
 
     type
       TRSBankScreen = type TRSInterface;
 
-A type that stores the bank screen interface properties.
+A type that stores the bankScreen interface properties.
 
 *)
 type
   TRSBankScreen = type TRSInterface;
-
 
 {*
 ** type TBankColors **
@@ -2247,7 +2244,7 @@ end;
 
 (*
 open
-~~~~
+----
 
 .. code-block:: pascal
 

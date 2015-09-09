@@ -2,8 +2,7 @@
 Minimap
 =======
 
-The minimap file holds all SRL's functions that interact with the Runescape
-minimap.
+The minimap file holds all SRL's functions that interact with the Runescape minimap.
 
 The source for this file can be found `here <https://github.com/SRL/SRL-6/blob/master/lib/interfaces/minimap.simba>`_.
 
@@ -12,17 +11,20 @@ The source for this file can be found `here <https://github.com/SRL/SRL-6/blob/m
 {$f-}
 
 (*
-const Direction
-~~~~~~~~~~~~~~~
+Consts, Types, Vars
+~~~~~~~~~~~~~~~~~~~
 
-Constants that represent the NESW directions on the compass.  Meant to be used
-with compass altering functions.
+The following constants, types and variables are used throughout the bankScreen methods.
 
-Example:
+**const Angles**
 
-.. code-block:: pascal
+Constants that represent the N, S, E, W directions on the compass.
 
-    minimap.setAngle(MM_DIRECTION_EAST);
+    * MM_DIRECTION_NORTH
+    * MM_DIRECTION_EAST
+    * MM_DIRECTION_SOUTH
+    * MM_DIRECTION_WEST
+
 *)
 const
   MM_DIRECTION_NORTH = 0;
@@ -31,24 +33,16 @@ const
   MM_DIRECTION_WEST  = 270;
 
 (*
-const Minimap Dots
-~~~~~~~~~~~~~~~~~~
+**const Minimap Dots**
 
-Constants representing the different dots that appear on the minimap.  Each value
-represents the difference between the two bottom colored pixels of each dot. DO
-NOT modify these values unless you know what you're doing.
+Constants representing the different dots that appear on the minimap.
+*Developer note: Each value represents the difference between the two bottom colored pixels of each dot.*
 
-These constants are meant to be used with functions that take a minimap dot type
-as a parameter (such as minimap.getDots).
-
-Example:
-
-.. code-block:: pascal
-
-    tpa := minimap.getDots(MM_DOT_NPC, minimap.getBounds());
-
-    if (length(tpa) > 0) then
-      writeln('Found '+toStr(length(tpa))+' NPC dots on the minimap');
+    * MM_DOT_NPC
+    * MM_DOT_ITEM
+    * MM_DOT_PLAYER
+    * MM_DOT_FRIEND
+    * MM_DOT_TEAM
 
 *)
 const
@@ -59,18 +53,94 @@ const
   MM_DOT_TEAM   = 2171941;
 
 (*
-const Symbols
-~~~~~~~~~~~~~
+**const Symbols**
 
-Constants representing all the Runescape symbols.  Each have a bitmap that can
-be found in _getSymbol and are used in the symbol finding functions.
+Constants representing all the Runescape symbols.
 
-Example:
+    *Shops*
 
-.. code-block:: pascal
+    * MM_SYMBOL_SHOP_ARCHERY
+    * MM_SYMBOL_SHOP_AXE
+    * MM_SYMBOL_SHOP_CANDLE
+    * MM_SYMBOL_SHOP_CLOTHES
+    * MM_SYMBOL_SHOP_COOKERY
+    * MM_SYMBOL_SHOP_CRAFTING
+    * MM_SYMBOL_SHOP_FARMING
+    * MM_SYMBOL_SHOP_FISHING
+    * MM_SYMBOL_SHOP_FOOD
+    * MM_SYMBOL_SHOP_HUNTER
+    * MM_SYMBOL_SHOP_KEBAB
+    * MM_SYMBOL_SHOP_MACE
+    * MM_SYMBOL_SHOP_MAGIC
+    * MM_SYMBOL_SHOP_PET
+    * MM_SYMBOL_SHOP_PLATEBODY
+    * MM_SYMBOL_SHOP_PLATESKIRT
+    * MM_SYMBOL_SHOP_SCIMITAR
+    * MM_SYMBOL_SHOP_SHIELD
+    * MM_SYMBOL_SHOP_MINING
+    * MM_SYMBOL_SHOP_SWORD
+    * MM_SYMBOL_SHOP_STAFF
+    * MM_SYMBOL_SHOP_SUMMONING
 
-    if (minimap.findSymbol(p, MM_SYMBOL_BANK, minimap.getBounds)) then
-      writeln('Found bank symbol!');
+    *Stalls*
+
+    * MM_SYMBOL_STALL_SPICE
+    * MM_SYMBOL_STALL_GEM
+    * MM_SYMBOL_STALL_SILK
+    * MM_SYMBOL_STALL_SILVER
+
+    *Skills & Objects*
+
+    * MM_SYMBOL_TREE
+    * MM_SYMBOL_FARMING
+    * MM_SYMBOL_FISHING
+    * MM_SYMBOL_RUNECRAFTING
+    * MM_SYMBOL_HUNTING
+    * MM_SYMBOL_HOUSE
+    * MM_SYMBOL_POTTERY
+    * MM_SYMBOL_MINING
+    * MM_SYMBOL_JEWELERY
+    * MM_SYMBOL_SLAYER_CONTRACT
+    * MM_SYMBOL_SLAYER_MASTER
+    * MM_SYMBOL_HERBALIST
+    * MM_SYMBOL_WHEEL
+    * MM_SYMBOL_OBELISK
+    * MM_SYMBOL_TANNER
+    * MM_SYMBOL_TRAINING_DUMMY
+    * MM_SYMBOL_STORE
+    * MM_SYMBOL_SHORTCUT
+    * MM_SYMBOL_WEAVE
+    * MM_SYMBOL_COOKING_RANGE
+    * MM_SYMBOL_AGILITY
+    * MM_SYMBOL_FURNACE
+    * MM_SYMBOL_ALTAR
+    * MM_SYMBOL_ANVIL
+    * MM_SYMBOL_APOTHECARY
+    * MM_SYMBOL_ARROW
+    * MM_SYMBOL_BAR
+    * MM_SYMBOL_BANK
+    * MM_SYMBOL_LODESTONE
+    * MM_SYMBOL_CHURN
+    * MM_SYMBOL_DUNGEON
+    * MM_SYMBOL_TRADER_FUR
+    * MM_SYMBOL_SPOT_REST
+    * MM_SYMBOL_GUIDE
+    * MM_SYMBOL_HAIR_DRESSER
+    * MM_SYMBOL_MAKEOVER_MAGE
+    * MM_SYMBOL_MILL
+    * MM_SYMBOL_MINIGAME
+    * MM_SYMBOL_OBELISK_MINI
+    * MM_SYMBOL_PORTAL
+    * MM_SYMBOL_QUEST
+    * MM_SYMBOL_WINDMILL
+    * MM_SYMBOL_SAND
+    * MM_SYMBOL_SAWMILL
+    * MM_SYMBOL_TRANSPORTATION
+    * MM_SYMBOL_UNDERGROUND
+    * MM_SYMBOL_WATER
+    * MM_SYMBOL_DIVINATION
+    * MM_SYMBOL_SEASONAL_EVENT
+
 *)
 const
   MM_SYMBOL_SHOP_ARCHERY    = 0;
@@ -125,7 +195,6 @@ const
   MM_SYMBOL_FURNACE         = 61;
   MM_SYMBOL_ALTAR           = 62;
   MM_SYMBOL_ANVIL           = 63;
-
   MM_SYMBOL_APOTHECARY      = 70;
   MM_SYMBOL_ARROW           = 71;
   MM_SYMBOL_BAR             = 72;
@@ -150,14 +219,17 @@ const
   MM_SYMBOL_UNDERGROUND     = 91;
   MM_SYMBOL_WATER           = 92;
   MM_SYMBOL_DIVINATION      = 93;
-
   MM_SYMBOL_SEASONAL_EVENT  = 94;
 
 (*
-const Buttons
-~~~~~~~~~~~~~
+**const Buttons**
 
 Constants representing the minimap buttons.
+
+    * MM_BUTTON_COMPASS
+    * MM_BUTTON_RUN
+    * MM_BUTTON_LODESTONE
+    * MM_BUTTON_MAP
 
 *)
 const
@@ -167,10 +239,10 @@ const
   MM_BUTTON_MAP = 3;
 
 {*
-type _TRSSymbol
-~~~~~~~~~~~~~~~
+**type _TRSSymbol**
 
-A type that stores minimap symbol information. Used in the symbol finding functions.
+A type that stores minimap symbol information.
+
 *}
 type
   _TRSSymbol = record
@@ -188,10 +260,10 @@ type
   TFoundSymbols = array of TFoundSymbol;
 
 {*
-type _TRSMMButton
-~~~~~~~~~~~~~~~~~
+**type _TRSMMButton**
 
 A type that stores minimap button information.
+
 *}
 type
   _TRSMMButton = record
@@ -200,12 +272,17 @@ type
     radius: byte;
   end;
 
-{*
-type TRSMinimap
-~~~~~~~~~~~~~~~
+(*
+**type TRSMinimap**
 
-A type that stores all the attributes and functions of the Runescape minimap.
-*}
+.. code-block:: pascal
+
+    type
+      TRSMinimap = type TRSInterface;
+
+A type that stores the minimap interface properties.
+
+*)
 type
   TRSMinimap = record(TRSInterface)
     symbolAccuracy: extended;
@@ -215,28 +292,36 @@ type
   end;
 
 (*
-var minimap
-~~~~~~~~~~~
+**var minimap**
 
-The variable that holds all minimap information. It used when calling any functions
-in this file.
+.. code-block:: pascal
+
+    var
+      minimap: TRSMinimap;
+
+A variable through which scripters can access the TRSMinimap type methods.
+
+*)
+var
+  minimap: TRSMinimap;
+
+(*
+TRSMinimap methods
+~~~~~~~~~~~~~~~~~~
+
+The following methods should be called through the **minimap** variable.
 
 Example:
 
 .. code-block:: pascal
 
-    while (minimap.isFlagPresent()) do
-    begin
-      writeln('Waiting for flag to disappear');
-      wait(200+random(300));
-    end;
+    a := minimap.getAngleDegrees();
+
 *)
-var
-  minimap: TRSMinimap;
 
 {*
-TRSMinimap.__init
-~~~~~~~~~~~~~~~~~
+__init
+------
 
 .. code-block:: pascal
 
@@ -286,13 +371,13 @@ end;
 
 {*
 __freeMinimapMask
-~~~~~~~~~~~~~~~~~
+-----------------
 
 .. code-block:: pascal
 
     procedure __freeMinimapMask();
 
-Free's the minimap mask bitmap.
+Frees the minimap mask bitmap.
 
 .. note::
 
@@ -314,8 +399,8 @@ end;
 {$ENDIF}
 
 (*
-TRSMinimap.getAngleRadians
-~~~~~~~~~~~~~~~~~~~~~~~~~~
+getAngleRadians
+---------------
 
 .. code-block:: pascal
 
@@ -332,7 +417,11 @@ Example:
 
 .. code-block:: pascal
 
-    ang := minimap.getAngleRadians();
+    var
+      angle: extended;
+    begin
+      angle := minimap.getAngleRadians();
+      writeLn(angle);
 *)
 function TRSMinimap.getAngleRadians(): Extended;
 
@@ -403,14 +492,14 @@ begin
 end;
 
 (*
-TRSMinimap.getAngleDegrees
-~~~~~~~~~~~~~~~~~~~~~~~~~~
+getAngleDegrees
+---------------
 
 .. code-block:: pascal
 
     function TRSMinimap.getAngleDegrees(): extended;
 
-Returns the compass angle in radians.
+Returns the compass angle in degrees.
 
 .. note::
 
@@ -421,7 +510,11 @@ Example:
 
 .. code-block:: pascal
 
-    ang := minimap.getAngleDegrees();
+    var
+      angle: extended;
+    begin
+      angle := round(minimap.getAngleDegrees());
+      writeLn(angle);
 *)
 function TRSMinimap.getAngleDegrees(): extended;
 begin
@@ -431,15 +524,15 @@ begin
 end;
 
 (*
-TRSMinimap.setAngle
-~~~~~~~~~~~~~~~~~~~
+setAngle
+--------
 
 .. code-block:: pascal
 
     function TRSMinimap.setAngle(angleDegrees: integer): boolean;
 
-Rotates the compass angle to "angleDegrees". Returns true if rotating was
-successful.
+Returns true if it rotates the compass angle to **angleDegrees** . You can use
+the angle constants at the top of this page, or any other angle.
 
 .. note::
 
@@ -534,15 +627,15 @@ begin
 end;
 
 (*
-TRSMinimap.mouseOffCompass
-~~~~~~~~~~~~~~~~~~~~~~~~~~
+mouseOffCompass
+---------------
 
 .. code-block:: pascal
 
     procedure TRSMinimap.mouseOffCompass();
 
-Moves the mouse off of the compass due to a glitch which causes the compass icon to disappear
-while mouse is over compass
+Moves the mouse off of the compass. This is because the dial vanishes when the
+mouse of on the compass.
 
 .. note::
 
@@ -580,20 +673,20 @@ begin
 end;
 
 (*
-TRSMinimap.clickCompass
-~~~~~~~~~~~~~~~~~~~~~~~
+clickCompass
+------------
 
 .. code-block:: pascal
 
     procedure TRSMinimap.clickCompass(faceSouth: boolean = false);
 
-Clicks the Runescape compass, resulting in the mainscreen camera angle to be set
-to low, and the minimap compass angle set to north (or south if faceSouth = true).
+Clicks the Runescape compass to set the angle to north. If **faceSouth** is true,
+it will right click and make the compass south *(default = false)*
 
 .. note::
 
     - by Olly
-    - Last Modified: 12th March 2015 by The Mayor
+    - Last Modified: 12 March 2015 by The Mayor
 
 Example:
 
@@ -623,9 +716,9 @@ begin
   print('TRSMinimap.clickCompass(): Clicked compass', TDebug.SUB);
 end;
 
-(*
+{*
 __createSearchAngles
-~~~~~~~~~~~~~~~~~~~~
+--------------------
 
 .. code-block:: pascal
 
@@ -640,14 +733,14 @@ Example:
 .. note::
 
     - by Olly
-    - Last Modified: 1st February 2014 by Olly
+    - Last Modified: 1 February 2014 by Olly
 
 Example:
 
 .. code-block:: pascal
 
     searches := __createSearchAngles(90.0, 25.0);
-*)
+*}
 {$IFNDEF CODEINSIGHT}
 function __createSearchAngles(angle, range: extended): T2DExtendedArray;
 var
@@ -674,14 +767,14 @@ end;
 {$ENDIF}
 
 (*
-TRSMinimap.isPointOn
-~~~~~~~~~~~~~~~~~~~~
+isPointOn
+---------
 
 .. code-block:: pascal
 
     function TRSMinimap.isPointOn(p: TPoint): boolean;
 
-Returns true if the point 'p' is on the minimap.
+Returns true if the point **p** is on the minimap
 
 .. note::
 
@@ -692,7 +785,7 @@ Example:
 
 .. code-block:: pascal
 
-    if (minimap.isPointOn(someRandomPoint)) then
+    if minimap.isPointOn(someRandomPoint) then
       writeln('Point is on the minimap!');
 *)
 function TRSMinimap.isPointOn(p: TPoint): boolean;
@@ -704,15 +797,16 @@ begin
 end;
 
 (*
-TRSMinimap.findDTM
-~~~~~~~~~~~~~~~~~~
+findDTM
+-------
 
 .. code-block:: pascal
 
     function TRSMinimap.findDTM(dtm: integer; var x, y: integer): boolean;
 
-Attempts to find a dtm on the minimap, will search for the dtm +/- 15 degrees of the
-current minimap angle.
+Returns true if it finds the DTM **DTM** on the minimap. It will search
++/- 15 degrees of the current minimap angle. It will pass the coordinates for the
+first DTM it finds in x and y.
 
 .. note::
 
@@ -723,8 +817,13 @@ Example:
 
 .. code-block:: pascal
 
-    if (minimap.findDTM(dtm, x, y)) then
-      writeln('found the dtm');
+    var
+      x, y, dtm: Integer;
+    begin
+      dtm := DTMFromString('heapsoftext');
+
+      if minimap.findDTM(dtm, x, y) then
+        mouse(point(x, y), MOUSE_LEFT);
 *)
 function TRSMinimap.findDTM(dtm: integer; var fx, fy: integer): boolean;
 var
@@ -750,15 +849,16 @@ begin
 end;
 
 (*
-TRSMinimap.findDTMs
-~~~~~~~~~~~~~~~~~~~
+findDTMs
+--------
 
 .. code-block:: pascal
 
     function TRSMinimap.findDTMs(dtm: integer; out points: TPointArray): boolean;
 
-Attempts to find dtm matches on the minimap, will search for the dtm +/- 15 degrees of the
-current minimap angle.
+Returns true if it finds the DTM **DTM** on the minimap. It will search
++/- 15 degrees of the current minimap angle. It will pass the midpoints of
+all the DTMs it finds to **points**
 
 .. note::
 
@@ -769,8 +869,8 @@ Example:
 
 .. code-block:: pascal
 
-    if (minimap.findDTMs(dtm, tpa)) then
-      writeln('Found DTM Matches!);
+    if minimap.findDTMs(dtm, tpa) then
+      writeln('Found at least one DTM match!);
 *)
 function TRSMinimap.findDTMs(dtm: integer; out points: TPointArray): boolean;
 var
@@ -796,14 +896,14 @@ begin
 end;
 
 {*
-TRSMinimap._isValidDot
-~~~~~~~~~~~~~~~~~~~~~~
+_isValidDot
+-----------
 
 .. code-block:: pascal
 
     function TRSMinimap._isValidDot(dotType: integer): boolean;
 
-Returns true if "dotType" is valid.  Compares to the minimap dot constants.
+Returns true if **dotType** is valid.  Compares to the minimap dot constants.
 
 .. note::
 
@@ -827,6 +927,28 @@ begin
   result := inIntArray(arr, dotType);
 end;
 
+{*
+getAllPossibleDots
+------------------
+
+.. code-block:: pascal
+
+    function TRSMinimap.getAllPossibleDots(const Bitmap: Integer): T2DPointArray;
+
+Returns all possible minimap dots.
+
+.. note::
+
+    - by Olly
+    - Last Updated: 4 September 2014 by Olly
+
+Example:
+
+.. code-block:: pascal
+
+    atpa := minimap.getAllPossibleDots(bmp);
+
+*}
 function TRSMinimap.getAllPossibleDots(const Bitmap: Integer): T2DPointArray;
 const
   BORDER_COL = 65536;
@@ -862,7 +984,30 @@ begin
       Swap(Result[i][0], Result[i][1]);
 end;
 
-function TRSMinimap.getDots(const dotType: Integer; const SearchBox: TBox; const Tol: Byte = 55): TPointArray;
+(*
+getDots
+-------
+
+.. code-block:: pascal
+
+    function TRSMinimap.getDots(const dotType: Integer; const searchBox: TBox; const Tol: Byte = 55): TPointArray;
+
+Returns all minimap dots inside **searchBox** that match the dot type **dotType**
+You can optionally adjust the tolerance **tol** *(default = 55)*
+
+.. note::
+
+    - by Olly
+    - Last Updated: 6 September 2014 by Olly
+
+Example:
+
+.. code-block:: pascal
+
+    atpa := minimap.getAllPossibleDots(bmp);
+
+*)
+function TRSMinimap.getDots(const dotType: Integer; const searchBox: TBox; const Tol: Byte = 55): TPointArray;
 var
   Bitmap, i, Col: Integer;
   Dots: T2DPointArray;
@@ -908,16 +1053,14 @@ begin
 end;
 
 (*
-TRSMinimap.getColorPercent
-~~~~~~~~~~~~~~~~~~~~~~~~~~
+getColorPercent
+---------------
 
 .. code-block:: pascal
 
     function TRSMinimap.getColorPercent(color, tolerance: integer): extended;
 
-Returns the percentage of the minimap occupied by "color".
-    * color: The color to look for.
-    * tol: The tolerance on "color".
+Returns the percentage of the minimap occupied by **color** with **tolerance**
 
 .. note::
 
@@ -928,9 +1071,8 @@ Example:
 
 .. code-block:: pascal
 
-    // will return true of 60% or more of the minimap is black
-    if (minimap.getColorPercent(minimap.getBlackBackground(), 0) > 60.0) then
-      writeln('more than 60% of the minimap is black');
+    per := minimap.getColorPercent(123456, 12);
+
 *)
 function TRSMinimap.getColorPercent(color, tolerance: integer): extended;
 var
@@ -945,15 +1087,15 @@ begin
 end;
 
 (*
-TRSMinimap.getBlackBackground
-~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+getBlackBackground
+------------------
 
 .. code-block:: pascal
 
     function TRSMinimap.getBlackBackground(): integer;
 
-Get's the most common black color that appears on the minimap.  Useful for dungeons
-and second+ stories of buildings.
+Get's the most common black color that appears on the minimap. Useful for dungeons
+and upper stories of buildings.
 
 .. note::
 
@@ -964,7 +1106,12 @@ Example:
 
 .. code-block:: pascal
 
-    blk := minimap.getBlackBackground();
+    var
+      blackColor: integer;
+    begin
+      blackColor := minimap.getBlackBackground();
+      if minimap.getColorPercent(blackColor, 0) > 50% then
+        writeLn('We are inside the dungeon!');
 *)
 function TRSMinimap.getBlackBackground(): integer;
 var
@@ -1005,14 +1152,14 @@ begin
 end;
 
 (*
-TRSMinimap.filterPoints
-~~~~~~~~~~~~~~~~~~~~~~~
+filterPoints
+------------
 
 .. code-block:: pascal
 
     procedure TRSMinimap.filterPoints(var tpa: TPointArray);
 
-Filters all the points in the tpa that are not on the minimap (the actual map area).
+Removes all the points in the tpa **tpa** that are not on the actual map area.
 
 .. note::
 
@@ -1041,15 +1188,15 @@ begin
 end;
 
 (*
-TRSMinimap.isFlagPresent
-~~~~~~~~~~~~~~~~~~~~~~~~
+isFlagPresent
+-------------
 
 .. code-block:: pascal
 
     function TRSMinimap.isFlagPresent(var p: TPoint): boolean;
 
-Returns true if the flag is present on the minimap. Returns it's coordinates in
-"p".
+Returns true if the flag is present on the minimap. If found, it's coordinates are
+passed to **p**
 
 .. note::
 
@@ -1060,7 +1207,7 @@ Example:
 
 .. code-block:: pascal
 
-    if (minimap.isFlagPresent(p)) then
+    if minimap.isFlagPresent(p) then
       writeln('Flag is present');
 *)
 function TRSMinimap.isFlagPresent(var p: TPoint): boolean;
@@ -1103,15 +1250,15 @@ begin
 end;
 
 (*
-TRSMinimap.isFlagPresent
-~~~~~~~~~~~~~~~~~~~~~~~~
+isFlagPresent (overload)
+------------------------
 
 .. code-block:: pascal
 
-    function TRSMinimap.isFlagPresent(): boolean; overload;
+    function TRSMinimap.isFlagPresent(waitTime: integer = 0): boolean; overload;
 
-An overload function.  Returns true if the flag is present on the minimap, has
-a optional waitTime parameter.
+This overload returns trueif the flag is present on the minimap within **waitTime**
+*(default = 0)*
 
 .. note::
 
@@ -1146,8 +1293,8 @@ begin
 end;
 
 (*
-TRSMinimap.getFlagDistance
-~~~~~~~~~~~~~~~~~~~~~~~~~~
+getFlagDistance
+---------------
 
 .. code-block:: pascal
 
@@ -1181,14 +1328,14 @@ begin
 end;
 
 (*
-TRSMinimap.waitFlag
-~~~~~~~~~~~~~~~~~~~
+waitFlag
+--------
 
 .. code-block:: pascal
 
     function TRSMinimap.waitFlag(dist: integer = 0): boolean;
 
-Returns true the player is within "dist" of the flag.
+Returns true the player is within **dist** of the flag within 20 seconds.
 
 .. note::
 
@@ -1201,7 +1348,7 @@ Example:
 
     minimap.waitFlag(10);
 *)
-function TRSMinimap.waitFlag(dist: integer = 0): boolean;
+function TRSMinimap.waitFlag(dist: integer = 0): boolean;  // Developer note: make a waitTime variable
 var
   m, t : LongWord;
   d1, d2: integer;
@@ -1250,14 +1397,15 @@ begin
 end;
 
 (*
-TRSMinimap.isPlayerMoving
-~~~~~~~~~~~~~~~~~~~~~~~~~
+isPlayerMoving
+--------------
 
 .. code-block:: pascal
 
     function TRSMinimap.isPlayerMoving(shiftInterval: integer = 500): boolean;
 
-Returns true if the player is moving (i.e. walking or running).
+Returns true if the player is moving (i.e. walking or running). If the pixel shift
+of the minimap across **shiftInterval** *(default = 500)* is > 200, it returns true.
 
 .. note::
 
@@ -1282,14 +1430,14 @@ begin
 end;
 
 (*
-TRSMinimap.waitPlayerMoving
-~~~~~~~~~~~~~~~~~~~~~~~~~~~
+waitPlayerMoving
+----------------
 
 .. code-block:: pascal
 
     function TRSMinimap.waitPlayerMoving(shiftInterval: integer; maxTime: integer = 20000): boolean;
 
-Waits while the player is moving.  Returns true if the player is not moving.
+Returns true if the player has stopped moving within **maxTime** *(default = 20000)*
 
 .. note::
 
@@ -1300,11 +1448,8 @@ Example:
 
 .. code-block:: pascal
 
-    if (minimap.tpaWalk(5647837, 10, point(minimap.x2, minimap.y1), 10)) then
-    begin
-      wait(500 + random(500));
-      minimap.waitPlayerMoving();
-    end;
+  if minimap.waitPlayerMoving() then
+    writeLn('We are no longer moving');
 *)
 function TRSMinimap.waitPlayerMoving(shiftInterval: integer = 500; maxTime: integer = 20000): boolean;
 var
@@ -1328,20 +1473,20 @@ begin
 end;
 
 (*
-TRSMinimap.radialWalk
-~~~~~~~~~~~~~~~~~~~~~
+radialWalk
+----------
 
 .. code-block:: pascal
 
     function TRSMinimap.radialWalk(theColor, tol, radius, startRadial, endRadial: integer; flagDist: integer = 0): boolean;
 
 Walks the player to the furthest point found within the given parameters.
-    * theColor: The color to look for.
-    * tol: The tolerance on "theColor".
-    * radius: The maximum radius to look for the color. Should be less than MM_RADIUS.
-    * startRadial: The degree value to start looking for the color.
-    * endRadial: The degree value to stop looking for the color.
-    * flagDist: Optional. The minimum flag distance from the player. Default set to 0.
+    * **theColor** : The color to look for.
+    * **tol** : The tolerance on "theColor".
+    * **radius** : The maximum radius to look for the color. Should be less than MM_RADIUS.
+    * **startRadial** : The degree value to start looking for the color.
+    * **endRadial** : The degree value to stop looking for the color.
+    * **flagDist** : Optional. The minimum flag distance from the player. *(Default = 0)*
 
 .. note::
 
@@ -1418,8 +1563,8 @@ begin
 end;
 
 (*
-TRSMinimap.tpaWalk
-~~~~~~~~~~~~~~~~~~
+tpaWalk
+-------
 
 .. code-block:: pascal
 
@@ -1428,11 +1573,11 @@ TRSMinimap.tpaWalk
 Uses a simple TPA sorting method to walk to a spot on the minimap. Returns true if walked
 successfully.
 
-    * color: The color to be found on the minimap.
-    * tol: The tolerance on color.
-    * sortFrom: The point on the minimap to sort found colors from.
-    * flagDist: The minimum flag distance from the player.
-    * offset: Optional. The offset coordinates on the point that's clicked.
+    * **color** : The color to be found on the minimap.
+    * **tol** : The tolerance on color.
+    * **sortFrom** : The point on the minimap to sort found colors from.
+    * **flagDist** : The minimum flag distance from the player.
+    * **offset** : Optional. The offset coordinates on the point that's clicked.
 
 .. note::
 
@@ -1487,16 +1632,17 @@ begin
 end;
 
 {*
-TRSMinimap._getSymbol
-~~~~~~~~~~~~~~~~~~~~~
+_getSymbol
+----------
 
 .. code-block:: pascal
 
     function TRSMinimap._getSymbol(sym: integer): _TRSSymbol;
 
-Symbol bitmap should be the whole symbol without the transparent parts of the blue outline.
-The color should be the most common color in the symbol, most of the time this
-is the background color.
+A symbol bitmap should be the whole symbol without the transparent parts of the
+blue outline. The color should be the most common color in the symbol, most of
+the time this is the background color. When making a bitmap, the background
+(i.e., the area not part of the symbol) should be color 0 black.
 
 .. note::
 
@@ -2705,18 +2851,19 @@ begin
 end;
 
 (*
-TRSMinimap.findSymbols
-~~~~~~~~~~~~~~~~~~~~~~
+findSymbols
+-----------
 
 .. code-block:: pascal
 
     function TRSMinimap.FindSymbols(const Symbols: TIntegerArray; const SearchArea: TBox; out FSymbols: TFoundSymbols; FindOne: Boolean = False): Boolean; overload;
 
-Searches for all of the symbols in 'Symbols' in the area 'SearchArea', Results
-True if atleast 1 symbol has been found, with the symbol data in the FSymbols param.
+Searches for multiple mumumap symbols and returns true if at least one is found.
 
-* Param FindOne is set to false on default, but if enabled the function will only
-  search for one of each symbol.
+    * **Symbols** An array of MM symbols
+    * **SearchArea** The TBox ti search
+    * **FSymbols** All symbol info (pos, accuracy, point) is stored in this
+    * **FindOne** If true, will only find 1 of each symbol *(default = false)*
 
 .. note::
 
@@ -2732,17 +2879,18 @@ Example:
       Symbols: TFoundSymbols;
       i: Integer;
     begin
-      Minimap.FindSymbols([MM_SYMBOL_BANK, MM_SYMBOL_DUNGEON, MM_SYMBOL_FISHING, MM_SYMBOL_QUEST, MM_SYMBOL_SPOT_REST], Minimap.getBounds(), Symbols, False);
+      Minimap.FindSymbols([MM_SYMBOL_BANK, MM_SYMBOL_DUNGEON, MM_SYMBOL_FISHING], Minimap.getBounds(), Symbols, False);
 
       for i := 0 to High(Symbols) do
       begin
+        WriteLn('Found symbol: ' + toStr(Symbols[i].ID));
         smartImage.drawCircle(Symbols[i].Pos, 7, False, clLime);
         smartImage.drawCross(Symbols[i].Pos, 5, clLime);
         Writeln(Symbols[i].Acc);
       end;
     end;
 *)
-function TRSMinimap.findSymbols(const Symbols: TIntegerArray; const SearchArea: TBox; out FSymbols: TFoundSymbols; FindOne: Boolean = False): Boolean; overload;
+function TRSMinimap.findSymbols(const Symbols: TIntegerArray; const SearchArea: TBox; out FSymbols: TFoundSymbols; FindOne: Boolean = False): Boolean; overload; //does this need to be overloaded?
 var
   Bitmap, i, Targ, OldTarg, Wid, Hei, bWid, bHei: Integer;
   Sym: _TRSSymbol;
@@ -2797,56 +2945,15 @@ begin
 end;
 
 (*
-TRSMinimap.findSymbol
-~~~~~~~~~~~~~~~~~~~~~
+findSymbols (overload 1)
+------------------------
 
 .. code-block:: pascal
 
-    function TRSMinimap.findSymbol(var p: TPoint; symbol: integer; searchBox: TBox): boolean;
+    function TRSMinimap.findSymbols(var tpa: TPointArray; symbol: integer; searchBox: TBox): boolean; overload;
 
-Returns true if the "symbol" is found in the "searchBox". Stores it's coordinates
-in "p".
-
-.. note::
-
-    - by Stupid3ooo
-    - Last Updated: 23 May 2013 by Coh3n
-
-Example:
-
-.. code-block:: pascal
-
-    if (minimap.findSymbol(p, MM_SYMBOL_BANK, minimap.getBounds()) then
-    begin
-      writeln('Found bank symbol');
-      mouse(p, MOUSE_LEFT);
-      wait(500 + random(500));
-      minimap.waitFlag(10);
-    end;
-*)
-function TRSMinimap.findSymbol(var p: TPoint; symbol: integer; searchBox: TBox): boolean;
-var
-  Symbols: TFoundSymbols;
-begin
-  Result := Self.FindSymbols([Symbol], SearchBox, Symbols, True);
-  if (Result) then
-  begin
-    Printf('TRSMinimap.findSymbol(): Found symbol %d at accuracy %f', [Symbol, Symbols[0].Acc], TDebug.SUB);
-    p := Symbols[0].Pos;
-  end else
-    p := Point(-1, -1);
-end;
-
-(*
-TRSMinimap.findSymbols
-~~~~~~~~~~~~~~~~~~~~~~
-
-.. code-block:: pascal
-
-    function TRSMinimap.findSymbols(var tpa: TPointArray; symbol: integer; searchBox: TBox): boolean;
-
-Returns true if one or more of the "symbol" is found.  Stores each instance's corrdinates
-in "tpa".
+Returns true if one or more of **symbol** is found within **searchBox** The
+midpoints of all symbols that are found are passed to **tpa** .
 
 .. note::
 
@@ -2857,7 +2964,13 @@ Example:
 
 .. code-block:: pascal
 
-    symbols := minimap.findSymbols(tpa, MM_SYMBOL_FISHING, intToBox(minimap.x1, minimap.cy, minimap.x2, minimap.y2));
+    var
+      tpa: TPointArray;
+    begin
+      symbols := minimap.findSymbols(tpa, MM_SYMBOL_FISHING, myCustomBox);
+      symbols.sortFromPoint(minimap.getCenterPoint());
+      mouse(tpa[high(tpa)], MOUSE_LEFT);  // Click farthest
+
 *)
 function TRSMinimap.findSymbols(var tpa: TPointArray; symbol: integer; searchBox: TBox): boolean; overload;
 var
@@ -2875,16 +2988,14 @@ begin
 end;
 
 (*
-TRSMinimap.findSymbols
-~~~~~~~~~~~~~~~~~~~~~~
+findSymbols (overload 2)
+------------------------
 
 .. code-block:: pascal
 
     function TRSMinimap.findSymbols(var tpa: TPointArray; symbols: TIntegerArray; searchBox: TBox): boolean; overload;
 
-Returns true if one of the symbols in "symbols" is found in "searchBox".  Stores
-each symbol's coordinates in "tpa".
-
+Same as overload 1, except it can take multiple symbols in **symbols**
 .. note::
 
     - by Nava2 & NCDS
@@ -2912,8 +3023,52 @@ begin
 end;
 
 (*
-TRSMinimap.isResting
-~~~~~~~~~~~~~~~~~~~~
+findSymbol
+----------
+
+.. code-block:: pascal
+
+    function TRSMinimap.findSymbol(var p: TPoint; symbol: integer; searchBox: TBox): boolean;
+
+Returns true if the **symbol** is found within **searchBox** If the symbol is
+found, its midpoint is passed to **p** .
+
+.. note::
+
+    - by Stupid3ooo
+    - Last Updated: 23 May 2013 by Coh3n
+
+Example:
+
+.. code-block:: pascal
+
+    var
+      p: TPoint;
+    begin
+      if minimap.findSymbol(p, MM_SYMBOL_BANK, minimap.getBounds()) then
+      begin
+        writeln('Found bank symbol');
+        mouse(p, MOUSE_LEFT);
+        minimap.waitFlag(10);
+      end;
+    end;
+*)
+function TRSMinimap.findSymbol(var p: TPoint; symbol: integer; searchBox: TBox): boolean;
+var
+  Symbols: TFoundSymbols;
+begin
+  Result := Self.FindSymbols([Symbol], SearchBox, Symbols, True);
+  if (Result) then
+  begin
+    Printf('TRSMinimap.findSymbol(): Found symbol %d at accuracy %f', [Symbol, Symbols[0].Acc], TDebug.SUB);
+    p := Symbols[0].Pos;
+  end else
+    p := Point(-1, -1);
+end;
+
+(*
+isResting
+---------
 
 .. code-block:: pascal
 
@@ -2930,31 +3085,26 @@ Example:
 
 .. code-block:: pascal
 
-    if (minimap.isResting()) then
-      writeln('we are resting!');
+    if minimap.isResting() then
+      writeln('We are resting!');
 *)
 function TRSMinimap.isResting(): boolean;
 var
   tpa: TPointArray;
-begin
-  result := false;
-
-  // blue color
-  if (not findColorsTolerance(tpa, 13345801, self.button[MM_BUTTON_RUN].bounds, 50)) then
-    exit();
-
-  result := inRange(length(tpa), 5, 25);
+begin                        // blue color
+  if findColorsTolerance(tpa, 13345801, self.button[MM_BUTTON_RUN].bounds, 50) then
+    result := inRange(length(tpa), 5, 25);
 end;
 
 (*
-TRSMinimap.enableRest
-~~~~~~~~~~~~~~~~~~~~
+enableRest
+----------
 
 .. code-block:: pascal
 
     function TRSMinimap.enableRest(): Boolean;
 
-Right clicks the run button and enables rest
+Returns true if it successfully right clicks the run button and enables rest.
 
 .. note::
 
@@ -2966,7 +3116,7 @@ Example:
 .. code-block:: pascal
 
     if minimap.enableRest() then
-      writeln('we are now resting');
+      writeln('We are now resting');
 *)
 function TRSMinimap.enableRest(): Boolean;
 var
@@ -2985,36 +3135,37 @@ begin
 end;
 
 (*
-TRSMinimap.getRunEnergy
-~~~~~~~~~~~~~~~~~~~~~~~
+getRunEnergy
+------------
 
 .. code-block:: pascal
 
     function TRSMinimap.getRunEnergy(): integer;
 
-Returns the players current run energy.
+Returns the players current run energy. This isn't actually coded yet, because
+it is hard AF to do in colour accuratly. If you can do it, I will give you the
+SRL Master Cup :)
 
 .. note::
 
-    - by Olly
-    - Last Updated: 08 August 2013 by Olly
+    - by -
+    - Last Updated: -
 
 Example:
 
 .. code-block:: pascal
 
-    if (minimap.isResting()) then
-      writeln('we are resting!');
+    if minimap.getRunEnergy() < 20 then
+      minimap.enableRest();
 *)
 function TRSMinimap.getRunEnergy(): integer;
 begin
- // i'll figure this out soon..
- print('TRSMinimap.getRunEnergy(): Function hasn''t been coded yet!', TDebug.WARNING);
+ writeLn('WARNING TRSMinimap.getRunEnergy(): Function hasn''t been coded yet!');
 end;
 
 (*
-TRSMinimap.isRunEnabled
-~~~~~~~~~~~~~~~~~~~~~~~
+isRunEnabled
+------------
 
 .. code-block:: pascal
 
@@ -3031,30 +3182,26 @@ Example:
 
 .. code-block:: pascal
 
-    if (minimap.isRunEnabled()) then
-      writeln('Our run is enabled!');
+    if minimap.isRunEnabled() then
+      writeln('Sup kid? I'm Usain Bolt. Prep2BRekt m8');
 *)
 function TRSMinimap.isRunEnabled(): boolean;
 var
   tpa: TPointArray;
 begin
-  result := false;
-
-  if (not findColorsTolerance(tpa, 2805490, self.button[MM_BUTTON_RUN].bounds, 20)) then
-    exit();
-
-  result := (length(tpa) > 5);
+  if findColorsTolerance(tpa, 2805490, self.button[MM_BUTTON_RUN].bounds, 20) then
+    result := (length(tpa) > 5);
 end;
 
 (*
-TRSMinimap.toggleRun
-~~~~~~~~~~~~~~~~~~~~
+toggleRun
+---------
 
 .. code-block:: pascal
 
     procedure TRSMinimap.toggleRun(enable: boolean);
 
-Will toggle run on if enable is set to true, else will turn the run off.
+Returns true if it enables of disables run, depending on the **enable** parameter.
 
 .. note::
 
@@ -3098,8 +3245,8 @@ TRSMinimap.toggleRun
 
     procedure TRSMinimap.toggleRun(minRunPercent: integer); overload;
 
-Overloaded procedure that will toggle the run on if our run is greater than
-'minRunPercent'.
+Ebables run only if the current run energy is above **minRunPercent** . This
+procedure hasn't beed coded yet because it requires getRunEnergy (see above).
 
 .. note::
 
@@ -3114,18 +3261,17 @@ Example:
 *)
 procedure TRSMinimap.toggleRun(minRunPercent: integer); overload;
 begin
-  print('TRSMinimap.toggleRun(): Procedure hasn''t been coded yet!', TDebug.WARNING);
-  // needs getRunEnergy()
-{
+  writeLn('WARNING TRSMinimap.toggleRun() overload: procedure hasn''t been coded yet');
+  exit();
+
   if (not self.isRunEnabled()) then
-    if self.getRun() > minRunPercent then
+    if self.getRunEnergy() > minRunPercent then
       self.toggleRun(true);
-}
 end;
 
-(*
+{*
 __GridCoords16
-~~~~~~~~~~~~~~
+---------------
 
 .. code-block:: pascal
 
@@ -3143,7 +3289,7 @@ Example:
 .. code-block:: pascal
 
     __GridCoords16(point(50, 50));
-*)
+*}
 {$IFNDEF CODEINSIGHT}
 function __GridCoords16(Grid16: TPoint): TPoint;
 var
@@ -3166,8 +3312,8 @@ end;
 {$ENDIF}
 
 (*
-TRSMinimap.pointToMainscreen
-~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+pointToMainscreen
+-----------------
 
 .. code-block:: pascal
 
@@ -3192,15 +3338,16 @@ begin
 end;
 
 (*
-TRSMinimap.pointsToMainscreen
-~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+pointsToMainscreen
+------------------
 
 .. code-block:: pascal
 
     function TRSMinimap.pointsToMainscreen(points: TPointArray; sortFromPlayer: boolean = true): TPointArray;
 
-Converts a tpa of points on the minimap to mainscreen points, will delete points
-that aren't on the mainscreen.
+Converts a tpa **points** on the minimap to mainscreen points. It will delete
+points that aren't on the mainscreen. The TPA that is returned is sorted from
+the player by default.
 
 .. note::
 
