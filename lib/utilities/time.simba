@@ -518,7 +518,7 @@ begin
 end;
 
 (* 
-tCountDown
+TCountDown
 ~~~~~~~~~~
 
 .. code-block:: pascal
@@ -533,22 +533,22 @@ Timer type which is usefull for loops, timing and writing progress reports.
     - by Obscurity
 *)
 type
-  tCountDown = uInt32;
+  TCountDown = uInt32;
 
-function tCountDown.setTime(funcTime: uInt32): uInt32;
+function TCountDown.setTime(funcTime: uInt32): uInt32;
 begin
   exit(self := getSystemTime() + funcTime);
 end;
 
-function tCountDown.timeRemaining(): uInt32;
+function TCountDown.timeRemaining(): uInt32;
 begin
   if not self.isFinished() then
-    exit(self - getSystemTime());
+    result := (self - getSystemTime());
 end;
 
-function tCountDown.isFinished(): boolean;
+function TCountDown.isFinished(): boolean;
 begin
-  exit(getSystemTime() >= self);
+  result := (getSystemTime() >= self);
 end;
 
 {$f+}
