@@ -442,8 +442,8 @@ begin
 
     print('Options found: ' + toStr(s));
 
-    for i := 0 to high(optionArr) do
-      for j := 0 to high(txt) do
+    for j := 0 to high(txt) do
+      for i := 0 to high(optionArr) do
       begin
         if (matchPercent = 1.00) then // If we're not using stringmatch
           if (pos(txt[j], optionArr[i].str) > 0) then
