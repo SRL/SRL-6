@@ -1576,7 +1576,7 @@ var
   end;
 begin
   if High(self) <= 2 then Exit(self);
-  pts := Copy(self);
+  pts := System.Copy(self);
   SortTPAByX(pts,True);
 
   H := High(pts);
