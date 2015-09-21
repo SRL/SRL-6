@@ -181,6 +181,7 @@ begin
       result := true;
       break();
     end;
+    wait(randomRange(20, 50));
   until t.isFinished();
 
   print('TRSTargetInfo.isOpen(): Result = ' + boolToStr(result));
