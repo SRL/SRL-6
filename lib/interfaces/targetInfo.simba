@@ -7,9 +7,7 @@ The Target Info file holds functions and procedures that are used to interact wi
 The source for this file can be found `here <https://github.com/SRL/SRL-6/blob/master/lib/interfaces/TargetInfo.simba>`_.
 
 *)
-
 {$f-}
-
 (*
 Consts, Types, Vars
 ~~~~~~~~~~~~~~~~~~~
@@ -99,7 +97,7 @@ __find
 
     function TRSTargetInfo.__find(): boolean;
 
-Returns true if the targetInfo interface is detected and its bounds are set.
+Returns true if the Target Info popup is detected and its bounds are set.
 Scripters should use targetInfo.isOpen() below.
 
 .. note::
@@ -111,35 +109,36 @@ Example:
 .. code-block:: pascal
 
     if targetInfo.__find() then
-      writeln('The herostone screen is open, and the bounds are set!');
+      writeln('The Target Info popup is open, and the bounds are set!');
 *}
 {$IFNDEF CODEINSIGHT}
 function TRSTargetInfo.__find(): boolean;
 var
+  b: TBox;
   i: Integer;
   TPA: TPointArray;
   ATPA: T2DPointArray;
-  b: TBox;
-  color: TColorData := [2564377, 6, [2, [0.09, 1.26, 0.00]]];
+  color: TColorData := [2630170, 6, [2, [0.15, 1.36, 0.00]]];
 begin
   color.gatherIn(TPA, mainScreen.getBounds());
 
-  if length(TPA) < 500 then
+  if length(TPA) < 200 then
   begin
     print('TRSTargetInfo.__find(): Didn''t find enough color', TDebug.WARNING);
     exit(false);
   end;
 
-  ATPA := TPA.cluster(3);
-  ATPA.filterBetween(0, 500);
+  ATPA := TPA.cluster(4);
+  ATPA.filterBetween(0, 200);
   ATPA.sortBySize(true);
 
   for i := 0 to high(ATPA) do
   begin
     b := ATPA[i].getBounds();
-    if inRange(b.getHeight(), 26, 28) then
+    if inRange(b.getHeight(), 25, 30) and b.getWidth() > 100 then
     begin
       self.setBounds(b);
+      print('TRSTargetInfo.__find(): Result = ' + boolToStr(result));
       exit(true);
     end;
   end;
@@ -155,7 +154,7 @@ isOpen
     function TRSTargetInfo.isOpen(waitTime: integer = 0): boolean;
 
 Returns true if the targetInfo is open. The optional **waitTime** parameter
-*(default = 50)* is the maximum time (in milliseconds) it will keep looking.
+*(default = 0)* is the maximum time (in milliseconds) it will keep looking.
 
 .. note::
 
@@ -170,7 +169,7 @@ Example:
       writeln('It''s open!');
 
 *)
-function TRSTargetInfo.isOpen(waitTime: integer = 50): boolean;
+function TRSTargetInfo.isOpen(waitTime: integer = 0): boolean;
 var
   t: TCountDown;
 begin
@@ -201,7 +200,6 @@ Returns the name of the current target, if the targetInfo is open.
 
     - by Thomas
 
-
 Example:
 
 .. code-block:: pascal
@@ -219,7 +217,9 @@ begin
 
   b := self.getBounds();
   b.edit(17, 1, -60, -12);
+
   result := Tesseract_GetText(b, TESS_FILTER_CHATBOX);
+  print('TRSTargetInfo.targetName(): ' + result);
 end;
 
 
