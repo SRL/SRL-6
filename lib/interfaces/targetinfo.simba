@@ -70,6 +70,7 @@ Initializes the TRStargetInfo.
 .. note::
 
     - by Thomas
+    - Last Updated: 22 September 2015 by Thomas
 
 Example:
 
@@ -106,6 +107,7 @@ Possible options are 'slow' (this sets the regular bounds) and 'fast' (this sets
 .. note::
 
     - by Thomas
+    - Last Updated: 22 September 2015 by Thomas
 
 Example:
 
@@ -176,6 +178,7 @@ Returns true if the targetInfo is open. The optional **waitTime** parameter
 .. note::
 
     - by Thomas
+    - Last Updated: 22 September 2015 by Thomas
 
 
 Example:
@@ -217,6 +220,7 @@ Returns the name of the current target, if the target info is open.
 .. note::
 
     - by Thomas
+    - Last Updated: 22 September 2015 by Thomas
 
 Example:
 
@@ -255,6 +259,7 @@ Returns the percentage of Health left on the target.
 .. note::
 
     - by Thomas
+    - Last Updated: 22 September 2015 by Thomas
 
 Example:
 
@@ -290,6 +295,7 @@ Returns the combat level of the target.
 .. note::
 
     - by Thomas
+    - Last Updated: 22 September 2015 by Thomas
 
 Example:
 
