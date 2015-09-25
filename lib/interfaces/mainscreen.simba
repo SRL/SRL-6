@@ -133,8 +133,8 @@ Example:
 {$IFNDEF CODEINSIGHT}
 procedure TRSMainScreen.__setup();
 const
-  PLAYER_BOX_WIDTH = 26;
-  PLAYER_BOX_HEIGHT = 38;
+  PLAYER_BOX_WIDTH = 28;
+  PLAYER_BOX_HEIGHT = 58;
 begin
   self.setBounds([0, 0, gameTabs.tabArea.x1-1, actionBar.y1-1]);
   self.playerPoint := middleBox([1, 1, 574, 387]); // the whole 3d gamescreen
