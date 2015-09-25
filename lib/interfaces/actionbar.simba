@@ -486,10 +486,10 @@ Example:
 function TRSActionBar.switchToBar(barNumber: integer; useBindKey: boolean = false): boolean;
 var
   currentBar, r, i, diff: integer;
-  timeMarker: TTimeMarker;
+  timeMarker: TCountDown;
   keys: tIntegerArray;
+  b: TBox;
 begin
-  result := false;
 
   if (not inRange(barNumber, 1, 5)) then
   begin
@@ -497,9 +497,14 @@ begin
     exit;
   end;
 
-  currentBar:= self.getCurrentBar();
+  timeMarker.setTime(randomRange(3000, 5000));
 
-  if (barNumber = currentBar) then
+  repeat
+
+  currentBar:= self.getCurrentBar();
+  result := (barNumber = currentBar);
+
+  if result then
     exit(true);
 
   if (useBindKey) then
@@ -509,7 +514,6 @@ begin
 
     for i := 0 to 1 do
     begin
-
       keyDown(keys[i]);
       wait(randomRange(10, 200 - i * 100));
     end;
@@ -525,36 +529,26 @@ begin
   begin
 
     diff := abs(currentBar - barNumber);
+    b := self.getBounds();
 
     if (inRange(diff, 2, 3)) then
     begin
-
-      intToBox(self.getBounds().x1 + 25, self.getBounds().y1 + 49,
-       self.getBounds().x1 + 35, self.getBounds().y1 + 59).mouse(MOUSE_RIGHT);
-      chooseOption.select([intToStr(barNumber)], 618);
+      intToBox(b.x1 + 25, b.y1 + 49, b.x1 + 35, b.y1 + 59).mouse(MOUSE_RIGHT);
+      chooseOption.select([intToStr(barNumber)], randomRange(750, 1000));
     end else
     begin
-
       if ((currentBar < barNumber) xor (diff > 2)) then
-        intToBox(self.getBounds().x1 + 39, self.getBounds().y1 + 50,
-         self.getBounds().x1 + 43, self.getBounds().y1 + 57).mouse(MOUSE_LEFT)
+        intToBox(b.x1 + 39, b.y1 + 50, b.x1 + 43, b.y1 + 57).mouse(MOUSE_LEFT)
       else
-        intToBox(self.getBounds().x1 + 16, self.getBounds().y1 + 50,
-         self.getBounds().x1 + 20, self.getBounds().y1 + 57).mouse(MOUSE_LEFT);
+        intToBox(b.x1 + 16, b.y1 + 50, b.x1 + 20, b.y1 + 57).mouse(MOUSE_LEFT);
     end;
   end;
+  
+  wait(randomRange(1000, 2000));
 
-  timeMarker.start();
+  until timeMarker.isFinished();
 
-  while (timeMarker.getTime() < randomRange(3000, 4000)) do
-  begin
-
-    result := (barNumber = self.getCurrentBar());
-
-    if (result) then
-      exit;
-  end;
-end;
+end; 
 
 (*
 isSlotEmpty
