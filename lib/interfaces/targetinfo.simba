@@ -1,0 +1,316 @@
+(*
+Target Info
+===========
+
+The targetinfo file holds functions and procedures that are used to interact with the runescape Target interface.
+
+The source for this file can be found `here <https://github.com/SRL/SRL-6/blob/master/lib/interfaces/targetinfo.simba>`_.
+
+*)
+{$f-}
+(*
+Consts, Types, Vars
+~~~~~~~~~~~~~~~~~~~
+
+The following constants, types and variables are used throughout the targetInfo methods.
+
+
+**type TRStargetInfo**
+
+.. code-block:: pascal
+
+    type
+      TRStargetInfo = type TRSInterface;
+
+A type that stores the Target Info interface properties.
+*)
+const
+  BACKGROUND_COLOR = 3088905;
+type
+  TRStargetInfo = type TRSInterface;
+
+(*
+**var targetInfo**
+
+.. code-block:: pascal
+
+    var
+      targetInfo: TRStargetInfo;
+
+A variable through which scripters can access the TRSTargetInfo type methods.
+
+*)
+var
+  targetInfo: TRSTargetInfo;
+
+(*
+TRSTargetInfo methods
+~~~~~~~~~~~~~~~~~~~~~
+
+The following methods should be called through the **targetInfo** variable.
+
+Example:
+
+.. code-block:: pascal
+
+    if targetInfo.isOpen() then
+      writeln('TargetInfo screen is open!');
+*)
+
+{*
+__init
+------
+
+.. code-block:: pascal
+
+    procedure TRStargetInfo.__init();
+
+Initializes the TRStargetInfo.
+
+.. note::
+
+    - by Thomas
+    - Last Updated: 22 September 2015 by Thomas
+
+Example:
+
+.. code-block:: pascal
+
+    targetInfo.__init();
+
+*}
+{$IFNDEF CODEINSIGHT}
+procedure TRSTargetInfo.__init();
+begin
+  with (self) do
+  begin
+    name := 'Target Info';
+    ID := ID_INTERFACE_TARGETINFO;
+    parentID := -1;
+    static := false;
+  end;
+end;
+{$ENDIF}
+
+{*
+__find
+------
+
+.. code-block:: pascal
+
+    function TRSTargetInfo.__find(method: string): boolean;
+
+Internale function that returns true if the Target Info popup is detected and its bounds are set.
+The 'method: string' option allows for faster, or slower detections, based on the color gathering method.
+Possible options are 'slow' (this sets the regular bounds) and 'fast' (this sets the bounds around the combat level).
+
+.. note::
+
+    - by Thomas
+    - Last Updated: 22 September 2015 by Thomas
+
+Example:
+
+.. code-block:: pascal
+
+    if targetInfo.__find(fast) then
+      writeln('The Target Info popup is open, and the bounds are set!');
+*}
+{$IFNDEF CODEINSIGHT}
+function TRSTargetInfo.__find(method: string): boolean;
+var
+  b: TBox;
+  i: Integer;
+  TPA: TPointArray;
+  ATPA: T2DPointArray;
+  color: TColorData := [2630170, 7, [2, [0.15, 1.36, 0.00]]];
+begin
+  case method of
+    'fast': findColors(TPA, BACKGROUND_COLOR, mainScreen.getBounds());
+    'slow': color.gatherIn(TPA, mainScreen.getBounds());
+  end;
+
+  if length(TPA) < 100 then
+  begin
+    print('TRSTargetInfo.__find(): Didn' 't find enough color, target info isn' 't open.', TDebug.WARNING);
+    exit();
+  end;
+
+  ATPA := TPA.cluster(2);
+  ATPA.filterBetween(0, 100);
+  ATPA.sortBySize(true);
+
+  for i := 0 to high(ATPA) do
+  begin
+    b := ATPA[i].getBounds();
+
+    case method of
+      'fast':
+        if b.getHeight() = 16 and b.getWidth() = 30 then
+        begin
+          self.setBounds(b);
+          exit(true);
+        end;
+      'slow':
+        if inRange(b.getHeight(), 25, 30) then
+        begin
+          self.setBounds(b);
+          exit(true);
+        end;
+    end;
+
+  end;
+end;
+
+{$ENDIF}
+
+(*
+isOpen
+------
+
+.. code-block:: pascal
+
+    function TRSTargetInfo.isOpen(waitTime: integer = 0): boolean;
+
+Returns true if the targetInfo is open. The optional **waitTime** parameter
+*(default = 0)* is the maximum time (in milliseconds) it will keep looking.
+
+.. note::
+
+    - by Thomas
+    - Last Updated: 22 September 2015 by Thomas
+
+
+Example:
+
+.. code-block:: pascal
+
+    if targetInfo.isOpen() then
+      writeln('It''s open!');
+
+*)
+function TRSTargetInfo.isOpen(waitTime: integer = 0): boolean;
+var
+  t: TCountDown;
+begin
+  t.setTime(waitTime);
+
+  repeat
+    if self.__find('fast') then
+    begin
+      result := true;
+      break();
+    end;
+    wait(randomRange(20, 50));
+  until t.isFinished();
+
+  print('TRSTargetInfo.isOpen(): Result = ' + boolToStr(result));
+end;
+
+(*
+getName
+-------
+
+.. code-block:: pascal
+
+    function TRSTargetInfo.getName(): string;
+
+Returns the name of the current target, if the target info is open.
+
+.. note::
+
+    - by Thomas
+    - Last Updated: 22 September 2015 by Thomas
+
+Example:
+
+.. code-block:: pascal
+
+    writeln(targetInfo.getName());
+
+*)
+
+function TRSTargetInfo.getName(): string;
+var
+  b: TBox;
+begin
+  if (not self.__find('slow')) then
+    exit();
+
+  b := self.getBounds();
+  b.edit(17, 1, -60, -12);
+
+  result := Tesseract_GetText(b, TESS_FILTER_CHATBOX);
+  print('TRSTargetInfo.getName(): ' + result);
+end;
+
+
+
+{*
+getPercent
+----------
+
+.. code-block:: pascal
+
+    function TRSActionBar.getPercent(): byte;
+
+Returns the percentage of Health left on the target.
+
+.. note::
+
+    - by Thomas
+    - Last Updated: 22 September 2015 by Thomas
+
+Example:
+
+.. code-block:: pascal
+
+    TargetInfo.getPercent();
+*}
+function TRSTargetInfo.getPercent(): byte;
+var
+  p: TPoint;
+begin
+  if (not self.__find('slow')) then
+    exit();
+
+  p := self.getCenterPoint();
+  p.offset([-51, 13]);
+
+  for result := 1 to 99 do
+    if (getColor(p.x + result, p.y) = BACKGROUND_COLOR) then
+      break();
+end;
+
+{*
+getCombat
+---------
+
+.. code-block:: pascal
+
+    function TRSActionBar.getCombat(): byte;
+
+Returns the combat level of the target.
+
+.. note::
+
+    - by Thomas
+    - Last Updated: 22 September 2015 by Thomas
+
+Example:
+
+.. code-block:: pascal
+
+    TargetInfo.getCombat();
+*}
+function TRSTargetInfo.getCombat(): byte;
+begin
+  if self.__find('fast') then
+    exit(strtoint(Tesseract_GetText(self.getBounds(), TESS_FILTER_CHATBOX)));
+end;
+
+begin
+  targetInfo.__init();
+end;
+
+{$f+}

@@ -55,7 +55,7 @@ SRL library isn't available to you.
 {$include_once lib/interfaces/heroscreen.simba}
 {$include_once lib/interfaces/beastofburden.simba}
 {$include_once lib/interfaces/lootscreen.simba}
-
+{$include_once lib/interfaces/targetinfo.simba}
 
 {$include_once lib/core/players.simba}
 
