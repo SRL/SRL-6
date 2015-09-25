@@ -449,13 +449,16 @@ Example:
       writeln('The first Action Bar setup is currently displayed.');
 *)
 function TRSActionBar.getCurrentBar(): Integer;
+var
+  b: TBox;
 begin
-  result := strToIntDef(getTextAtEx(intToBox(self.getBounds().x1 + 25,
-   self.getBounds().y1 + 49, self.getBounds().x1 + 35, self.getBounds().y1 + 59),
-    0, 0, 0, 3111603, 0, 'UpChars'), -1); //Color is of the number showing which bar is active.
+  b := self.getBounds();
+
+  result := strToIntDef(getTextAtEx(intToBox(b.x1 + 25, b.y1 + 49, b.x1 + 35,
+  b.y1 + 59), 0, 0, 0, 3111603, 0, 'UpChars'), -1); //Color is of the number showing which bar is active.
 
   print('TRSActionBar.getCurrentBar() returned ' + toStr(result), TDebug.LOG);
-end;
+end;    
 
 (*
 switchToBar
