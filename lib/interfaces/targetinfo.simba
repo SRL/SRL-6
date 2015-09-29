@@ -164,6 +164,45 @@ end;
 
 {$ENDIF}
 
+{*
+__findLock
+----------
+
+.. code-block:: pascal
+
+    function TRSTargetInfo.__findLock(): boolean;
+
+Internal function that returns true if the Target Info popup is detected and when it has a lock (differentiate it from mouse-over popup).
+
+.. note::
+
+    - by Thomas
+    - Last Updated: 29 September 2015 by Thomas
+
+
+Example:
+
+.. code-block:: pascal
+
+    if targetinfo.__findLock() then
+      writeln('The Target Info popup is open, and has a lock, we must be in combat!');
+*}
+{$IFNDEF CODEINSIGHT}
+function TRSTargetInfo.__findLock(): boolean;
+var
+  b, box: TBox;
+begin
+  if (not self.__find('slow')) then
+    exit();
+
+  box := targetinfo.getBounds();
+  b := [box.x1, box.y1, box.x1 + 15, box.y2 -15];
+
+  result := (countColorTolerance(2595536, b, 40) > 35);
+  print('TRSTargetInfo.__findLock(): ' + boolToStr(result));
+end;
+{$ENDIF}  
+
 (*
 isOpen
 ------
@@ -206,6 +245,49 @@ begin
 
   print('TRSTargetInfo.isOpen(): Result = ' + boolToStr(result));
 end;
+
+(*
+hasTarget
+---------
+
+.. code-block:: pascal
+
+    function TRSTargetInfo.hasTarget(waitTime: integer = 0): boolean;
+
+Returns true if the targetInfo is open and has a lock. The optional **waitTime** parameter
+*(default = 0)* is the maximum time (in milliseconds) it will keep looking.
+
+.. note::
+
+    - by Thomas
+    - Last Updated: 29 September 2015 by Thomas
+
+
+Example:
+
+.. code-block:: pascal
+
+    if targetInfo.isOpen() then
+      writeln('It''s open!');
+
+*)
+function TRSTargetInfo.hasTarget(waitTime: integer = 0): boolean;
+var
+  t: TCountDown;
+begin
+  t.setTime(waitTime);
+
+  repeat
+    if self.__findLock() then
+    begin
+      result := true;
+      break();
+    end;
+    wait(randomRange(30, 60));
+  until t.isFinished();
+
+  print('TRSTargetInfo.hasTarget(): Result = ' + boolToStr(result));
+end;  
 
 (*
 getName
