@@ -392,14 +392,14 @@ function TRSGameTabs.getActiveTabArea(): TBox;
 const
   COLOR_ACTIVE_TAB = 7037013;
 var
-  b: TBox;
+  b, box: TBox;
   tpa: TPointArray;
 begin
   if (not self.isSetup) then
     self.__initTabs();
-
-  b := gameTabs.__tabSelectionArea;
-  b.edit(0, 0, 0, 5);
+   
+  box := gameTabs.__tabSelectionArea;
+  b := [box.x1, box.y1, box.x2, box.y1 +5];
 
   result := [-1, -1, -1, -1];
 
