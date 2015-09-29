@@ -22,19 +22,25 @@ Constants that represent the buttons on the navigation pane. These buttons
 contain the individual gametab buttons.
 
     * NAV_BUTTON_HERO
-    * NAV_BUTTON_GEAR
+    * NAV_BUTTON_CUSTOM
+    * NAV_BUTTON_ADVENTURES
     * NAV_BUTTON_POWERS
     * NAV_BUTTON_SOCIAL
-    * NAV_BUTTON_OTHER
+    * NAV_BUTTON_EXTRAS
+    * NAV_BUTTON_GROUPING
+    * NAV_BUTTON_SETTINGS
 
 *)
 
 const
   NAV_BUTTON_HERO = 0;
-  NAV_BUTTON_GEAR = 1;
-  NAV_BUTTON_POWERS = 2;
-  NAV_BUTTON_SOCIAL = 3;
-  NAV_BUTTON_OTHER = 4;
+  NAV_BUTTON_CUSTOM = 1;
+  NAV_BUTTON_ADVENTURES = 2;
+  NAV_BUTTON_POWERS = 3;
+  NAV_BUTTON_SOCIAL = 4;
+  NAV_BUTTON_EXTRAS = 5;
+  NAV_BUTTON_GROUPING = 6;
+  NAV_BUTTON_SETTINGS = 7;
 
 (*
 **const Tabs**
@@ -173,11 +179,14 @@ begin
     isSetup := false;
 
     // TBox[0] is the actual button, the the next are the tab buttons when it's mouse-over'd
-    self.navButtons[NAV_BUTTON_HERO] := grid(1, 3, 27, 27, 50, 36, point(612, 220));
-    self.navButtons[NAV_BUTTON_GEAR] := grid(1, 3, 27, 27, 50, 36, point(662, 220));
+    self.navButtons[NAV_BUTTON_HERO] := grid(1, 5, 27, 27, 50, 36, point(612, 220));
+    self.navButtons[NAV_BUTTON_CUSTOM] := grid(1, 1, 27, 27, 50, 36, point(662, 220));
+    self.navButtons[NAV_BUTTON_ADVENTURES] := grid(1, 2, 27, 27, 50, 36, point(712, 220));
     self.navButtons[NAV_BUTTON_POWERS] := grid(1, 6, 27, 27, 50, 36, point(762, 220));
-    self.navButtons[NAV_BUTTON_SOCIAL] := grid(1, 4, 27, 27, 50, 36, point(612, 258));
-    self.navButtons[NAV_BUTTON_OTHER] := grid(1, 3, 27, 27, 50, 36, point(762, 258));
+    self.navButtons[NAV_BUTTON_SOCIAL] := grid(1, 6, 27, 27, 50, 36, point(612, 258));
+    self.navButtons[NAV_BUTTON_EXTRAS] := grid(1, 1, 27, 27, 50, 36, point(662, 258));
+    self.navButtons[NAV_BUTTON_GROUPING] := grid(1, 1, 27, 27, 50, 36, point(712, 258));
+    self.navButtons[NAV_BUTTON_SETTINGS] := grid(1, 3, 27, 27, 50, 36, point(762, 258));
   end;
 end;
 {$ENDIF}
@@ -215,7 +224,7 @@ begin
   begin
     _bmp := bitmapFromString(3, 8, 'meJyzvvPN+s439oIetex2IAlEnHwagrKuQAarewqQ5HUIATG8jQREeNmNxDk8ZTg9ZOTTRGXSHSCk/lxJIAIANFkTWA==');
     _navBarId := NAV_BUTTON_HERO;
-    _navBarBoxIndex := 2;
+    _navBarBoxIndex := 4;
   end;
 
   with self.tabs[TAB_STATS] do
@@ -228,15 +237,15 @@ begin
   with self.tabs[TAB_BACKPACK] do
   begin
     _bmp := bitmapFromString(10, 2, 'meJzjktQQlLJTdu4AIgHJICCbi1lZwsjLJnuiqGIBkAtBSq5ZQARUAyRB6lOqgIoBZmsMmA==');
-    _navBarId := NAV_BUTTON_GEAR;
-    _navBarBoxIndex := 1;
+    _navBarId := NAV_BUTTON_HERO;
+    _navBarBoxIndex := 2;
   end;
 
   with self.tabs[TAB_EQUIPMENT] do
   begin
     _bmp := bitmapFromString(3, 12, 'meJzrbKrpbKpJTEnuhDG6+ycvXjIbIrJoYmdRRTWQDWQABYFsIMNSVw8oAmQrKagBGRA2BEG4QI1wE4CM+EhvIANoLADLWjI8');
-    _navBarId := NAV_BUTTON_GEAR;
-    _navBarBoxIndex := 2;
+    _navBarId := NAV_BUTTON_HERO;
+    _navBarBoxIndex := 3;
   end;
 
   with self.tabs[TAB_PRAYER] do
@@ -298,14 +307,14 @@ begin
   with self.tabs[TAB_NOTES] do
   begin
     _bmp := bitmapFromString(6, 6, 'meJwz0VWyNlaztbPRzFgqb9Aq65AqKi6goiS/+9bj9LlnNQJbTrz+zsbLoWNoAGRA0L9///h4OICCxl5pEC6QjEvPT++YxsjAYOPsufLVT4g4EMAF1xy5BwALKjWC');
-    _navBarId := NAV_BUTTON_OTHER;
+    _navBarId := NAV_BUTTON_SETTINGS;
     _navBarBoxIndex := 1;
   end;
 
   with self.tabs[TAB_MUSIC] do
   begin
     _bmp := bitmapFromString(6, 8, 'meJyb/+Jb3bTVTi6+LlGpUZWTkzpXT9t3C8gWExOSV7UAknxc/NUrjwJFgCRQCiILVAkk57/4tu81CEUV1wBVAgWBIkAFQAOBsvJWVkA2UJeSghojAwNQDcQEiAhQPZABQfl7nkIYQO0ANDdHLQ==');
-    _navBarId := NAV_BUTTON_OTHER;
+    _navBarId := NAV_BUTTON_SETTINGS;
     _navBarBoxIndex := 2;
   end;
 
@@ -366,7 +375,7 @@ active.
 .. note::
 
     - by Coh3n
-    - Last Updated: 26 July 2013 by Coh3n
+    - Last Updated: 29 September 2015 by Thomas
 
 Example:
 
@@ -383,14 +392,14 @@ function TRSGameTabs.getActiveTabArea(): TBox;
 const
   COLOR_ACTIVE_TAB = 7037013;
 var
-  b: TBox;
+  b, box: TBox;
   tpa: TPointArray;
 begin
   if (not self.isSetup) then
     self.__initTabs();
-
-  b := [gameTabs.__tabSelectionArea.x1, gameTabs.__tabSelectionArea.y1, // top of each gametab area
-        gameTabs.__tabSelectionArea.x2, gameTabs.__tabSelectionArea.y1 + 5];
+   
+  box := gameTabs.__tabSelectionArea;
+  b := [box.x1, box.y1, box.x2, box.y1 +5];
 
   result := [-1, -1, -1, -1];
 
