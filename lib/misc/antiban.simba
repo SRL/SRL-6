@@ -981,22 +981,23 @@ destroyTicket
 
 .. code-block:: pascal
 
-    function destroyTicket(slot: integer): boolean;
+    function destroyTicket(slot: integer, continuous: boolean = false): boolean;
 
-Destroys a ticket if found in the backpack.
+Destroys a ticket if found in the backpack. Will continuously press the Y-key while doing so if the continuous parameter is set to true.
 
 .. note::
 
     - by Ashaman88
-    - Last Updated: 12 February 2014 by Ashaman88
+    - Last Updated: 3 Oktober 2015 by Thomas
 
 Example:
 
 .. code-block:: pascal
 
-    destroyTicket(slot: integer);
+    if findTicket(p) then
+        destroyTicket(tabBackpack.pointToSlot(p), true);
 *)
-function destroyTicket(slot: integer): boolean;
+function destroyTicket(slot: integer; continuous: boolean = false): boolean;
 var
   p: TPoint;
   tpa: TPointArray;
@@ -1008,9 +1009,15 @@ begin
     exit();
   end;
 
+  if continuous and (not isKeyDown(VK_y)) then
+  begin
+    wait(randomRange(50, 100));
+    KeyDown(VK_y);
+  end;
+
   tabBackpack.mouseSlot(slot, MOUSE_RIGHT);
 
-  if chooseOption.select(['Destroy', 'estr', 'stro']) then
+  if chooseOption.select(['Destroy', 'Dest', 'roy']) and (not continuous) then
     if waitColorCountRange(379903, 0, intToBox(110, 440, 475, 460), 5000, 304, 304) then
     begin
       findColorsTolerance(tpa, 1137455, intToBox(360, 482, 445, 510), 33, colorSetting(1)); // color of the green "Yes" button and a box around the button
@@ -1018,14 +1025,18 @@ begin
       atpa.sortBySize;
 
       if length(atpa) > 0 then
-      begin
         mouseBox(atpa[0].getBounds(), MOUSE_LEFT);
-        result := tabBackpack.waitForShift(randomRange(3000, 4000));
-      end;
     end;
 
+  result := tabBackpack.waitForShift(randomRange(3000, 4000));
   if result then
     print('destroyTicket(): Successfully destroyed spin ticket', TDebug.SUB);
+
+  if isKeyDown(VK_y) then
+  begin
+    wait(randomRange(50, 100));
+    KeyUp(VK_y);
+  end;
 end;
 
 (*
