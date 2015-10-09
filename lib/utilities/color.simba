@@ -417,7 +417,6 @@ Example:
 *)
 function waitCountColor(color, tol: integer; area: TBox; waitTime, minCount: integer): boolean;
 var
-  count: integer;
   timeOut: TCountDown;
 begin
   timeOut.setTime(waitTime);
