@@ -393,6 +393,44 @@ begin
 end;
 
 (*
+waitCountColor
+~~~~~~~~~~~~~~
+
+.. code-block:: pascal
+
+    function waitCountColor(color, tol: integer; area: TBox; waitTime, minCount: integer): boolean;
+
+Counts the color until waitTime is reached, if the color count is higher then
+minCount will exit and result true.
+
+.. note::
+
+    - by Thomas
+    - Last Updated: 9 October by Thomas
+
+Example:
+
+.. code-block:: pascal
+
+     // would wait until the color count is over 50 or until 2000ms has passed.
+     waitCountColor(clBlack, 5, mainScreen.getBounds(), 2000, 50);
+*)
+function waitCountColor(color, tol: integer; area: TBox; waitTime, minCount: integer): boolean;
+var
+  count: integer;
+  timeOut: TCountDown;
+begin
+  timeOut.setTime(waitTime);
+
+  repeat
+    result := (countColorTolerance(color, area, tol) > minCount);
+
+    if (not result) then
+      wait(10 + random(50));
+  until result or timeOut.isFinished();
+end; 
+
+(*
 findBitmapTolerance; overload;
 ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
 
