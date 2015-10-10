@@ -580,25 +580,27 @@ closePopup
 
 .. code-block:: pascal
 
-    function closePopup(): boolean;
+    function closePopup(useEscKey: boolean = false): boolean;
 
 Finds and closes most popup windows and buttons, so be careful where it's used.
+Will use the escape key if the useEscKey paramater is set to true.
 
 .. note::
 
     - by The Mayor
-    - Last Updated: 26 May 2015 by The Mayor
+    - Last Updated: 10 October 2015 by Thomas
 
 Example:
 
 .. code-block:: pascal
 
-    closepopup();
+    closepopup(true);
 *)
-function closePopup(): boolean;
+function closePopup(useEscKey: boolean = false): boolean;
 var
-  i, x, y: Integer;
+  i, j, x, y: Integer;
   DTMs: Array [0..3] of Integer;
+  timeOut: TCountDown;
 begin
   if not isLoggedIn() then
     exit(false);
@@ -618,17 +620,26 @@ begin
      DTMFromString('mbQAAAHicY2VgYFjDxMCQCcQfgHgtEK8HYgMg1gFiXSDWBmJ7IFba/Joh' +
                    '+NpvBruzPxhS7/5lYE2YyiAJ1C+ChEF8RiwYDACqWw4B')];
 
+  timeOut.setTime(randomRange(2500, 4000));
 
   for i := 0 to high(DTMs) do
-    if findDTM(DTMs[i], x, y, getClientBounds())  then
+  repeat
+    result := not findDTM(DTMs[i], x, y, getClientBounds());
+    if not result then
     begin
-      mouse(x + 3, y + 3, 3, 3, MOUSE_LEFT);
-      wait(randomRange(1500, 2500));
-      result := true;
+      if useEscKey and j < randomRange(2, 4) then
+        begin
+          typeByte(VK_ESCAPE);
+          inc(j);
+        end
+      else
+        mouse(x + 3, y + 3, 3, 3, MOUSE_LEFT);
+      wait(randomRange(500, 1000));
     end;
+  until result or timeOut.isFinished();
 
   freeDTMs(DTMs);
-end;
+end;     
 
 (*
 hoverSkill
