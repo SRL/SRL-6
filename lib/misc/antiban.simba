@@ -596,11 +596,12 @@ Example:
 
     closepopup(true);
 *)
-function closePopup(useEscKey: boolean = false): boolean;
+function closePopup(useEscKey: boolean = true): boolean;
 var
   i, j, x, y: Integer;
-  DTMs: Array [0..3] of Integer;
+  DTMs: Array [0..4] of Integer;
   timeOut: TCountDown;
+  timeStarted: Array [0..4] of Boolean;
 begin
   if not isLoggedIn() then
     exit(false);
@@ -616,30 +617,45 @@ begin
      DTMFromString('mggAAAHicY2NgYFBiY2AQA2J9IDYHYl4gVgbi+4wMDJeh+D4UvwZiEPjz' +
                    'sAWMf+0yZvi13ZBhkjdEQhILZsSBIQAA2QQQGQ=='),
 
+                   // Generic Big Yellow Buttons (i.e., Upgrades and Extra's)
+     DTMFromString('m6wAAAHic42ZgYPjHxMDAzMzA8BNI/wZiRiCbBYi/Adl/gZgByP7BBFE3' +
+                   'AcidDMRTgbgHivuBeBIQz4SK9wJxJxD/3GzFsEyYheFhORPDjTgLhuerb' +
+                   'RjWqYgxTOJkZGhhZGBYKMPDMEWMlWG/hTIDF1A9sZiRBIwEAMTwGYs='),
+
                    // Generic Blue Buttons (i.e., Macroing detected warning)
      DTMFromString('mbQAAAHicY2VgYFjDxMCQCcQfgHgtEK8HYgMg1gFiXSDWBmJ7IFba/Joh' +
                    '+NpvBruzPxhS7/5lYE2YyiAJ1C+ChEF8RiwYDACqWw4B')];
 
-  timeOut.setTime(randomRange(2500, 4000));
+
 
   for i := 0 to high(DTMs) do
   repeat
-    result := not findDTM(DTMs[i], x, y, getClientBounds());
-    if not result then
+
+    if (not timeStarted[i]) then
+    begin
+      timeOut.setTime(randomRange(700, 1200));
+      timeStarted[i] := true;
+    end;
+
+    result := (not findDTM(DTMs[i], x, y, getClientBounds()));
+
+    if (not result) then
     begin
       if useEscKey and j < randomRange(2, 4) then
         begin
+          print('closePopup(): Trying to close popup with Escape-key.', TDebug.SUB);
           typeByte(VK_ESCAPE);
           inc(j);
         end
       else
         mouse(x + 3, y + 3, 3, 3, MOUSE_LEFT);
-      wait(randomRange(500, 1000));
+      wait(randomRange(300, 500));
     end;
-  until result or timeOut.isFinished();
+
+  until timeOut.isFinished() or (not result);
 
   freeDTMs(DTMs);
-end;     
+end;
 
 (*
 hoverSkill
