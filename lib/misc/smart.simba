@@ -749,7 +749,7 @@ begin
     if (players.getActive() < 1) then
       print('No active players, no use in reloading the client!', TDebug.FATAL);
 
-    smartReloadClient((4 * 60000) + random(60000));
+    smartReloadClient(60 * randomRange(3000, 10000));
 
     if waitClientReady() then
     begin
