@@ -605,8 +605,13 @@ var
 begin
   if not isLoggedIn() then
     exit(false);
-  DTMs :=           // Low level achievement popups
-    [DTMFromString('mbQAAAHicY2VgYGBmYmD4y8jAwMkEwSC2PVDcEopdofjPFlOGTB52MLYE' +
+  DTMs :=          
+                    // Generic Blue Buttons (i.e., Macroing detected warning)
+    [DTMFromString('mbQAAAHicY2VgYFjDxMCQCcQfgHgtEK8HYgMg1gFiXSDWBmJ7IFba/Joh' +
+                   '+NpvBruzPxhS7/5lYE2YyiAJ1C+ChEF8RiwYDACqWw4B'),
+                   
+                    // Low level achievement popups
+     DTMFromString('mbQAAAHicY2VgYGBmYmD4y8jAwMkEwSC2PVDcEopdofjPFlOGTB52MLYE' +
                     'qgFhEOBnQAWMWDAYAAD0gAa9'),
 
                     // "Task Complete" popups
@@ -620,11 +625,7 @@ begin
                    // Generic Big Yellow Buttons (i.e., Upgrades and Extra's)
      DTMFromString('m6wAAAHic42ZgYPjHxMDAzMzA8BNI/wZiRiCbBYi/Adl/gZgByP7BBFE3' +
                    'AcidDMRTgbgHivuBeBIQz4SK9wJxJxD/3GzFsEyYheFhORPDjTgLhuerb' +
-                   'RjWqYgxTOJkZGhhZGBYKMPDMEWMlWG/hTIDF1A9sZiRBIwEAMTwGYs='),
-
-                   // Generic Blue Buttons (i.e., Macroing detected warning)
-     DTMFromString('mbQAAAHicY2VgYFjDxMCQCcQfgHgtEK8HYgMg1gFiXSDWBmJ7IFba/Joh' +
-                   '+NpvBruzPxhS7/5lYE2YyiAJ1C+ChEF8RiwYDACqWw4B')];
+                   'RjWqYgxTOJkZGhhZGBYKMPDMEWMlWG/hTIDF1A9sZiRBIwEAMTwGYs=')];
 
 
 
