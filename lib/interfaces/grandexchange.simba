@@ -396,7 +396,7 @@ Returns a TBoxArray of the 8 Grand Exchange slots.
 .. note::
 
     - by The Mayor
-    - Last Updated: 27 July 2015 by Clarity
+    - Last Updated: 19 November 2015 by SlipperyPickle
 
 Example:
 
@@ -408,7 +408,7 @@ Example:
 {$IFNDEF CODEINSIGHT}
 function TRSGrandExchange.__getSlotBoxes(): TBoxArray;
 const
-  __GE_SLOT_OFFSET: TPoint = [104, 213]; // From self(x1, y1) to middle of first GE slot
+  __GE_SLOT_OFFSET: TPoint = [121, 226]; // From self(x1, y1) to middle of first GE slot
 var
   tba: TBoxArray;
 begin
@@ -870,7 +870,7 @@ into the input box.
 .. note::
 
     - by The Mayor
-    - Last Updated: 27 July 2015 by Clarity
+    - Last Updated: 19 November 2015 by The Mayor
 
 Example:
 
@@ -890,11 +890,12 @@ var
 begin
   strArr := ['1', '10', '100', 'all'];
 
-  for i := 0 to high(strArr) do
-    if lowerCase(quantity) = strArr[i] then
-      break();
+  if strArr.isInArray(lowercase(quantity)) then
+    i := strArr.returnInArray(lowercase(quantity))
+  else
+    i := -1;
 
-  if i <> 4 then
+  if i <> 3 and (i <> -1) then
     mouseBox(amountBox[i], MOUSE_LEFT)
   else
   begin
@@ -923,7 +924,7 @@ into the input box.
 .. note::
 
     - by The Mayor
-    - Last Updated: 27 July 2015 by Clarity
+    - Last Updated: 19 November 2015 by The Mayor
 
 Example:
 
@@ -946,11 +947,12 @@ begin
 
   strArr := ['-5', 'mid', '+5'];
 
-  for i := 0 to high(strArr) do
-    if lowerCase(price) = strArr[i] then
-      break();
+  if strArr.isInArray(lowercase(price)) then
+    i := strArr.returnInArray(lowercase(price))
+  else
+    i := -1;
 
-  if (i <> 3) and (i <> 1) then  // Don't click mid button as it's set by default
+  if (i <> 1) and (i <> -1) then  // Don't click mid button as it's set by default
     mouseBox(priceBox[i], MOUSE_LEFT)
   else
   begin
@@ -1342,7 +1344,7 @@ Returns the percentage toward completion for the offer in **geSlot** .
 .. note::
 
     - by turpinator
-    - Last Updated: 1 August 2015 by The Mayor
+    - Last Updated: 19 November 2015 by SlipperyPickle
 
 Example:
 
@@ -1358,7 +1360,7 @@ Example:
 *)
 function TRSGrandExchange.getPercentDone(geSlot: integer): integer;
 const
-  BG_COLORS = [2565929, 2237482];
+  BG_COLORS = [2565929, 2039584, 2237482, 1776673];
 var
   i, x, y: integer;
   TBA: TBoxArray := self.__getSlotBoxes();
@@ -1403,7 +1405,7 @@ before collecting the resulting gold.
 .. note::
 
     - by The Mayor
-    - Last Updated: 27 July 2015 by Clarity
+    - Last Updated: 13 November 2015 by SlipperyPickle
 
 Example:
 
@@ -1422,7 +1424,7 @@ Example:
 function TRSGrandExchange.sellItem(packSlot: integer; price, quantity: string; waitCollect: boolean = false; waitTime: integer = 10000): boolean;
 var
   i, nextSlot: integer;
-  confirm: TBox := [self.x1 + 212, self.y1 + 504, self.x1 + 350, self.y1 + 525];
+  confirm: TBox := [self.x1 + 225, self.y1 + 518, self.x1 + 373, self.y1 + 543];
 begin
   if not self.isOpen() then
   begin
@@ -1432,7 +1434,7 @@ begin
 
   self.__returnToSummary();
 
-  for i := 1 to 6 do
+  for i := 1 to 8 do
     if self.__isSlotEmpty(i) and self.__isSlotActive(i) then
     begin
       nextSlot := i;
@@ -1497,7 +1499,7 @@ the resulting gold and items.
 .. note::
 
     - by The Mayor
-    - Last Updated: 27 July 2015 by Clarity
+    - Last Updated: 13 November 2015 by SlipperyPickle
 
 Example:
 
@@ -1518,7 +1520,7 @@ var
   i, nextSlot, x, y: integer;
   b: TBox;
   TBA : TBoxArray := self.__getBuyBoxes();
-  confirm: TBox := [self.x1 + 212, self.y1 + 504, self.x1 + 350, self.y1 + 525];
+  confirm: TBox := [self.x1 + 225, self.y1 + 518, self.x1 + 373, self.y1 + 543];
 begin
   if not self.isOpen() then
   begin
@@ -1528,7 +1530,7 @@ begin
 
   self.__returnToSummary();
 
-  for i := 1 to 6 do
+  for i := 1 to 8 do
     if self.__isSlotEmpty(i) and self.__isSlotActive(i) then
     begin
       nextSlot := i;
