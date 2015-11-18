@@ -299,7 +299,7 @@
     <colordata color="5352134"/>
     <colordata color="5745865"/>
   </profile>
-  <profile name="BANL_NPC_DRAYNOR_2" cts="2">
+  <profile name="BANK_NPC_DRAYNOR_2" cts="2">
     <colordata color="13156549"/>
     <colordata color="13288135"/>
     <colordata color="14408158"/>
