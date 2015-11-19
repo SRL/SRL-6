@@ -3068,6 +3068,53 @@ begin
 end;
 
 (*
+closeWorldMap
+----------
+
+.. code-block:: pascal
+
+    function TRSMinimap.closeWorldMap(): boolean;
+
+Returns true if the World Map is found on the Main Screen. This is a possible
+problem while walking using SPS.
+
+.. note::
+
+    - by Shield
+    - Last Updated: 19 Nov 2015 by Shield
+
+Example:
+
+.. code-block:: pascal
+
+
+      if minimap.closeWorldMap() then
+        writeln('The world map opened for some reason... Now it is closed!');
+
+*)
+function TRSMinimap.closeWorldMap: boolean;
+var
+  mapOpenDTM, x, y: integer;
+  dtmTimer: TTimeMarker;
+
+begin
+  mapOpenDTM := DTMFromString('mrAAAAHic42BgYLBkZWAwhGI3KDZhhYiDcDtQzSQgroViEBsk1gPETUB8czkvA4eoDAMbvwgYg9gv9xozHF9mzLCpQ4SBiQETMCFhRgIYBgCeYw1g');
+
+  if (findDTM(mapOpenDTM, x, y, getClientBounds())) then
+  begin
+    dtmTimer.start;
+    repeat
+      wait(randomrange(250, 750));
+      moveMouse(x, y);
+      fastClick(MOUSE_LEFT);
+    until(not (findDTM(mapOpenDTM, x, y, getClientBounds())) or dtmTimer.getTime > 15000);
+    result := true;
+  end else
+    result := false;
+  freeDTM(mapOpenDTM);
+end;   
+
+(*
 isResting
 ---------
 
