@@ -653,7 +653,7 @@ begin
       wait(randomRange(300, 500));
     end;
 
-  until timeOut.isFinished() or (not result);
+  until timeOut.isFinished() or result;
 
   freeDTMs(DTMs);
 end;
