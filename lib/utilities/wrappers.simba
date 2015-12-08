@@ -737,6 +737,14 @@ begin
   result := findDTM(dtm, x, y, searchBox.x1, searchBox.y1, searchBox.x2, searchBox.y2);
 end;
 
+function countDTMs(DTM: Integer; searchBox: TBox): Integer; overload;
+var
+  TPA: TPointArray;
+begin
+  findDTMs(dtm, tpa, searchBox.x1, searchBox.y1, searchBox.x2, searchBox.y2);
+  exit(length(TPA));
+end; 
+
 (*
 getTextAtEx: overload;
 ~~~~~~~~~~~~~~~~~~~~~~
