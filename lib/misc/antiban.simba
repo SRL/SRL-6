@@ -580,30 +580,38 @@ closePopup
 
 .. code-block:: pascal
 
-    function closePopup(): boolean;
+    function closePopup(useEscKey: boolean = false): boolean;
 
 Finds and closes most popup windows and buttons, so be careful where it's used.
+Will use the escape key if the useEscKey paramater is set to true.
 
 .. note::
 
     - by The Mayor
-    - Last Updated: 26 May 2015 by The Mayor
+    - Last Updated: 10 October 2015 by Thomas
 
 Example:
 
 .. code-block:: pascal
 
-    closepopup();
+    closepopup(true);
 *)
-function closePopup(): boolean;
+function closePopup(useEscKey: boolean = true): boolean;
 var
-  i, x, y: Integer;
-  DTMs: Array [0..3] of Integer;
+  i, j, x, y: Integer;
+  DTMs: Array [0..4] of Integer;
+  timeOut: TCountDown;
+  timeStarted: Array [0..4] of Boolean;
 begin
   if not isLoggedIn() then
     exit(false);
-  DTMs :=           // Low level achievement popups
-    [DTMFromString('mbQAAAHicY2VgYGBmYmD4y8jAwMkEwSC2PVDcEopdofjPFlOGTB52MLYE' +
+  DTMs :=          
+                    // Generic Blue Buttons (i.e., Macroing detected warning)
+    [DTMFromString('mbQAAAHicY2VgYFjDxMCQCcQfgHgtEK8HYgMg1gFiXSDWBmJ7IFba/Joh' +
+                   '+NpvBruzPxhS7/5lYE2YyiAJ1C+ChEF8RiwYDACqWw4B'),
+                   
+                    // Low level achievement popups
+     DTMFromString('mbQAAAHicY2VgYGBmYmD4y8jAwMkEwSC2PVDcEopdofjPFlOGTB52MLYE' +
                     'qgFhEOBnQAWMWDAYAAD0gAa9'),
 
                     // "Task Complete" popups
@@ -614,18 +622,38 @@ begin
      DTMFromString('mggAAAHicY2NgYFBiY2AQA2J9IDYHYl4gVgbi+4wMDJeh+D4UvwZiEPjz' +
                    'sAWMf+0yZvi13ZBhkjdEQhILZsSBIQAA2QQQGQ=='),
 
-                   // Generic Blue Buttons (i.e., Macroing detected warning)
-     DTMFromString('mbQAAAHicY2VgYFjDxMCQCcQfgHgtEK8HYgMg1gFiXSDWBmJ7IFba/Joh' +
-                   '+NpvBruzPxhS7/5lYE2YyiAJ1C+ChEF8RiwYDACqWw4B')];
+                   // Generic Big Yellow Buttons (i.e., Upgrades and Extra's)
+     DTMFromString('m6wAAAHic42ZgYPjHxMDAzMzA8BNI/wZiRiCbBYi/Adl/gZgByP7BBFE3' +
+                   'AcidDMRTgbgHivuBeBIQz4SK9wJxJxD/3GzFsEyYheFhORPDjTgLhuerb' +
+                   'RjWqYgxTOJkZGhhZGBYKMPDMEWMlWG/hTIDF1A9sZiRBIwEAMTwGYs=')];
+
 
 
   for i := 0 to high(DTMs) do
-    if findDTM(DTMs[i], x, y, getClientBounds())  then
+  repeat
+
+    if (not timeStarted[i]) then
     begin
-      mouse(x + 3, y + 3, 3, 3, MOUSE_LEFT);
-      wait(randomRange(1500, 2500));
-      result := true;
+      timeOut.setTime(randomRange(700, 1200));
+      timeStarted[i] := true;
     end;
+
+    result := (not findDTM(DTMs[i], x, y, getClientBounds()));
+
+    if (not result) then
+    begin
+      if useEscKey and j < randomRange(2, 4) then
+        begin
+          print('closePopup(): Trying to close popup with Escape-key.', TDebug.SUB);
+          typeByte(VK_ESCAPE);
+          inc(j);
+        end
+      else
+        mouse(x + 3, y + 3, 3, 3, MOUSE_LEFT);
+      wait(randomRange(300, 500));
+    end;
+
+  until timeOut.isFinished() or result;
 
   freeDTMs(DTMs);
 end;
