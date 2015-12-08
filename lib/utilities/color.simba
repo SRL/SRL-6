@@ -681,6 +681,98 @@ begin
 end;
 
 (*
+TColorData.waitCount
+~~~~~~~~~~~~~~~~~~~~
+
+.. code-block:: pascal
+
+    function TColorData.waitCount(area: TBox; waitTime, minCount: integer): boolean;
+
+Counts the color until waitTime is reached, if the color count is higher then
+minCount will exit and result true.
+
+.. note::
+
+    - by Thomas
+    - Last Updated: 9 October by Thomas
+
+Example:
+
+.. code-block:: pascal
+
+     // would wait until the color count is over 50 or until 2000ms has passed.
+     TColorData.waitCount(mainScreen.getBounds(), 2000, 50);
+*)
+function TColorData.waitCount(area: TBox; waitTime, minCount: integer): boolean;
+var
+  count: integer;
+  timeOut: TCountDown;
+begin
+  timeOut.setTime(waitTime);
+
+  repeat
+    count := countColorTolerance(self.color, area, self.tolerance, self.settings);
+
+    result := (count > minCount);
+
+    if not result and waitTime > 0 then
+      wait(randomRange(10, 50));
+
+  until result or timeOut.isFinished();
+
+  print('T2DColorData.waitCount: Found "' + intToStr(count) + '" matching colors.');
+end;
+
+(*
+T2DColorData.waitCount
+~~~~~~~~~~~~~~~~~~~~~~
+
+.. code-block:: pascal
+
+    function T2DColorData.waitCount(area: TBox; waitTime, minCount: integer): boolean;
+
+Counts the color until waitTime is reached, if the color count is higher then
+minCount will exit and result true.
+
+.. note::
+
+    - by Thomas
+    - Last Updated: 9 October by Thomas
+
+Example:
+
+.. code-block:: pascal
+
+     // would wait until the color count is over 50 or until 2000ms has passed.
+     T2DColorData.waitCount(mainScreen.getBounds(), 2000, 50);
+*)
+function T2DColorData.waitCount(area: TBox; waitTime, minCount: integer): boolean;
+var
+  h, i, count: integer;
+  timeOut: TCountDown;
+begin
+  timeOut.setTime(waitTime);
+
+  h := high(self);
+
+  if (h < 0) then
+    exit(false);
+
+  repeat
+    for i := 0 to h do
+      incEx(count, countColorTolerance(self[i].color, area, self[i].tolerance, self[i].settings));
+
+    result := count >= minCount;
+
+    if not result and waitTime > 0 then
+      wait(randomRange(20, 60));
+
+  until result or timeOut.isFinished();
+
+  print('T2DColorData.waitCount: Found "' + intToStr(count) + '" matching colors.');
+end;  
+
+(*
 getCTS2Color
 ~~~~~~~~~~~~
 
