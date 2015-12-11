@@ -25,11 +25,10 @@ The following constants, types and variables are used throughout the TradeScreen
 A type that stores the Trade Screen interface properties.
 *)
 const
-  CENTER_COLOR = 1513250;
-  BANK_BUTTON_ACCEPT = 0;
-  BANK_BUTTON_DECLINE = 1;
-  BANK_BUTTON_ITEMS = 2;
-  BANK_BUTTON_COINS = 3;
+  TRADE_BUTTON_ACCEPT = 0;
+  TRADE_BUTTON_DECLINE = 1;
+  TRADE_BUTTON_ITEMS = 2;
+  TRADE_BUTTON_COINS = 3;
 
 type
   TRSTradeScreen= type TRSInterface;
@@ -121,13 +120,14 @@ Example:
 *}
 {$IFNDEF CODEINSIGHT}
 function TRSTradeScreen.__find(): boolean;
+const
+  CENTER_COLOR = 1513250;
 var
   box: TBox;
-  i: Integer;
   TPA: TPointArray;
   ATPA: T2DPointArray;
 begin
-  findColors(TPA, CENTER_COLOR, mainScreen.getBounds())
+  findColors(TPA, CENTER_COLOR, mainScreen.getBounds());
 
   if length(TPA) < 2000 then
   begin
@@ -141,18 +141,18 @@ begin
   if length(ATPA) then
   begin
     ATPA.sortBySize(true);
-    for i := 0 to high(ATPA) do
-      if box.getHeight() = 41 and box.getWidth() = 110 then
-        begin
-          box := ATPA[0].getBounds();
-          box.edit(-198, -44, 198, 240);
+    box := ATPA[0].getBounds();
 
-          self.setBounds(box);
-          exit(true);
-        end;
+    if inRange(box.getHeight(), 40, 45) then
+    begin
+      box.edit( - 198, - 44, 198, 240);
+      self.setBounds(box);
+      result := true;
+    end;
+
   end;
-end;
 
+end;
 {$ENDIF}
 
 (*
@@ -233,10 +233,10 @@ begin
   box := self.getBounds();
 
   case button of
-    BANK_BUTTON_ACCEPT: box.edit(215, 105, -215, -186);
-    BANK_BUTTON_DECLINE: box.edit(215, 143, -215, -154);
-    BANK_BUTTON_ITEMS: box.edit(110, 265, -365, -34);
-    BANK_BUTTON_COINS: box.edit(143, 265, -332, -34);
+    TRADE_BUTTON_ACCEPT: box.edit(215, 105, -215, -186);
+    TRADE_BUTTON_DECLINE: box.edit(215, 143, -215, -154);
+    TRADE_BUTTON_ITEMS: box.edit(110, 265, -365, -34);
+    TRADE_BUTTON_COINS: box.edit(143, 265, -332, -34);
   end;
 
   mouseBox(box, MOUSE_LEFT);
@@ -271,10 +271,9 @@ begin
   if (not self.__find()) then
     exit();
 
-  self.clickButton(BANK_BUTTON_COINS);
+  self.clickButton(TRADE_BUTTON_COINS);
 
-  if waitColorCountRange(9086905, 64, chatBox.getBounds(), randomRange(3000, 5000), 1000) then
-      typeSend(intToStr(amount), true);
+  chatBox.enterAmount(amount, randomRange(2000, 3000));
 end;
 
 (*
