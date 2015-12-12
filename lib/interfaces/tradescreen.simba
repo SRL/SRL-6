@@ -143,11 +143,12 @@ begin
     ATPA.sortBySize(true);
     box := ATPA[0].getBounds();
 
-    if inRange(box.getHeight(), 40, 45) then
+    result := inRange(box.getHeight(), 40, 45);
+    
+    if result then
     begin
       box.edit( - 198, - 44, 198, 240);
       self.setBounds(box);
-      result := true;
     end;
 
   end;
