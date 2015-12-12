@@ -354,6 +354,43 @@ begin
   Result := StrToIntDef(ExtractFromStr(s, Numbers), 0);
 end;
 
+(*
+enterAmount
+-----------
+
+.. code-block:: pascal
+
+    function TRSChatBox.enterAmount(amount, waitTime: integer): boolean;
+
+Returns true if it enters the amount **amount** in the chatBox popup. It will
+keep trying until successful of **waitTime** is reached.
+
+.. note::
+
+    - by Thomas
+    - Last Updated: 11 December by Thomas
+
+Example:
+
+.. code-block:: pascal
+
+    chatBox.enterAmount(50, 5000);
+*)
+function TRSChatBox.enterAmount(amount, waitTime: integer): boolean;
+var
+  t: TCountDown;
+  BACKGROUND_COLOR: TColorData := [9086905, 65];
+begin
+  t.setTime(waitTime);
+
+  result := BACKGROUND_COLOR.waitCount(self.getBounds(), waitTime, 10000);
+
+  if result then
+    typeSend(intToStr(amount), true);
+
+  Print('TRSChatBox.enterAmount(): The enter amount popup never appeared', TDebug.ERROR);
+end;  
+
 begin
   chatBox.__init();
 end;
