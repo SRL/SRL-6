@@ -143,12 +143,11 @@ begin
     ATPA.sortBySize(true);
     box := ATPA[0].getBounds();
 
-    result := inRange(box.getHeight(), 40, 45);
-    
-    if result then
+    if inRange(box.getHeight(), 40, 45) then
     begin
       box.edit( - 198, - 44, 198, 240);
       self.setBounds(box);
+      result := true;
     end;
 
   end;
@@ -188,13 +187,12 @@ begin
   t.setTime(waitTime);
 
   repeat
-    if self.__find() then
-    begin
-      result := true;
-      break();
-    end;
-    wait(randomRange(20, 50));
-  until t.isFinished();
+    result := self.__find();
+
+    if (not result) and (waitTime > 0) then
+      wait(randomRange(round(waitTime/20), round(waitTime/10)));
+
+  until result or t.isFinished();
 
   print('TRSTradeScreen.isOpen(): Result = ' + boolToStr(result));
 end;
@@ -277,56 +275,105 @@ begin
   chatBox.enterAmount(amount, randomRange(2000, 3000));
 end;
 
+function TRSTradeScreen.getOfferSlotBoxes(yours: boolean): TBoxArray;
+begin
+  if (not self.__find()) then
+  begin
+    print('tradeScreen.getOfferSlotBoxes(): Unable to return result as the tradeScreen isn''t open', TDebug.ERROR);
+    exit();
+  end;
+
+  if yours then
+    result := grid(4, 7, 38, 31, 47, 32, point(self.x1 + 25, self.y1 + 51))
+  else
+    result := grid(4, 7, 38, 31, 47, 32, point(self.x1 + 335, self.y1 + 51));
+end;
+
 (*
-countItems
-----------
+TRSTradeScreen.countDTM
+-----------------------
 
 .. code-block:: pascal
 
-    function TRSTradeScreen.countItems(itemDTM: integer; yours: boolean = true): integer;
+    function TRSTradeScreen.countDTM(dtm: integer; yours: boolean): integer;
 
-Will count the **itemDTM** in both sides of the tradeScreen.
-If **yours** is set to true *(default = true)* it will check your side,
-else it will count the DTM on their part.
+Returns the number of DTMs offered in the tradeScreen. If the 'yours' parameter
+is set to true, it will return your offer count, else it will return the other
+players offer count.
 
 .. note::
 
     - by Thomas
     - Last Updated: 8 December 2015 by Thomas
 
+Example:
+
+.. code-block:: pascal
+
+      writeLn(tradeScreen.offerCount(foodDTM, true));
+
+*)
+
+function TRSTradeScreen.countDTM(dtm: integer; yours: boolean): integer;
+begin
+  if (not self.__find()) then
+    exit();
+
+  result := findItem(dtm, self.getOfferSlotBoxes(yours));
+
+  print('TRSTabBackpack.countDTM(): Counted ' + intToStr(result) + ' items');
+end;
+
+(*
+TRSTradeScreen.offerCount
+-------------------------
+
+.. code-block:: pascal
+
+    function TRSTradeScreen.offerCount(yours: boolean): integer;
+
+Returns the number of items offered in the tradeScreen. If the 'yours' parameter
+is set to true, it will return your offer count, else it will return the other
+players offer count.
+
+.. note::
+
+    - by The Mayor
+    - Last Updated: 8 December 2015 by Thomas
 
 Example:
 
 .. code-block:: pascal
 
-    writeLn(tradeScreen.countItems(foodDTM, true));
+      writeLn(tradeScreen.offerCount(true));
 
 *)
-
-function TRSTradeScreen.countItems(itemDTM: integer; yours: boolean = true): integer;
+function TRSTradeScreen.offerCount(yours: boolean = true): integer;
 var
-  box: tbox;
+  b: TBoxArray := self.getOfferSlotBoxes(yours);
+  i: integer;
 begin
   if (not self.__find()) then
-    exit();
+  begin
+    print('tradeScreen.offerCount(): Can''t return result as the tradeScreen isn''t open', TDebug.ERROR);
+    exit(-1);
+  end;
 
-  box := self.getBounds();
+  for i := 0 to high(b) do
+    if (isItemIn(b[i])) then
+      inc(result);
 
-  if yours then
-    box.edit(5, 34, -319, -64)
-  else
-    box.edit(319, 34, -5, -64);
-
-  exit(countDTMs(itemDTM, box));
+  print('tradeScreen.offerCount(): result = ' + intToStr(result), TDebug.SUB);
 end;
 
+
 (*
-waitItemCount
-----------
+waitDTMCount
+------------
 
 .. code-block:: pascal
 
-    function TRSTradeScreen.waitItemCount(itemDTM, waitTime, count: integer; yours: boolean = true): boolean;
+    function TRSTradeScreen.waitDTMCount(itemDTM, waitTime, count: integer; yours: boolean = true): boolean;
 
 Will count the **itemDTM** in either side of the tradeScreen untill a
 certain **count** is reached, or untill the **waitTime** has passed.
@@ -343,18 +390,18 @@ Example:
 
 .. code-block:: pascal
 
-    if (not tradeScreen.waitItemCount(foodDTM, randomRange(2000, 3000), 28, true)) then
+    if (not tradeScreen.waitDTMCount(foodDTM, randomRange(2000, 3000), 28, true)) then
       tradeScreen.clickButton(BANK_BUTTON_ITEMS);
 
 *)
 
-function TRSTradeScreen.waitItemCount(itemDTM, waitTime, count: integer; yours: boolean = true): boolean;
+function TRSTradeScreen.waitDTMCount(itemDTM, waitTime, count: integer; yours: boolean = true): boolean;
 var
   timer: TCountDown;
 begin
   timer.setTime(waitTime);
   while (not timer.isFinished()) and self.__find() do
-    if (self.countItems(itemDTM, yours) = count) then
+    if (self.countDTM(itemDTM, yours) >= count) then
       exit(true);
 end;
 
