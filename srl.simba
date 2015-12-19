@@ -41,10 +41,10 @@ SRL library isn't available to you.
 {$include_once lib/interfaces/minimap.simba}
 
 {$include_once lib/interfaces/pinscreen.simba}
+{$include_once lib/interfaces/chatbox.simba}
 {$include_once lib/interfaces/bankscreen.simba}
 {$include_once lib/interfaces/depositbox.simba}
 {$include_once lib/interfaces/options.simba}
-{$include_once lib/interfaces/chatbox.simba}
 {$include_once lib/interfaces/production.simba}
 {$include_once lib/interfaces/lodestone.simba}
 {$include_once lib/interfaces/toolscreen.simba}
