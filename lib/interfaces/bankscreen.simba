@@ -1387,12 +1387,12 @@ begin
 end;
 
 (*
-_enterAmount
+enterAmount
 ------------
 
 .. code-block:: pascal
 
-    function TRSBankScreen._enterAmount(amount, waitTime: integer): boolean;
+    function TRSBankScreen.enterAmount(amount, waitTime: integer): boolean;
 
 Returns true if it enters the amount **amount** when depositing or withdrawing
 a custom amount of an item. It will keep trying until successful of **waitTime**
@@ -1401,49 +1401,17 @@ is reached.
 .. note::
 
     - by Olly
-    - Last Updated: 20 October 2014 by BMWxi
+    - Last Updated: 19 December by Thomas
 
 Example:
 
 .. code-block:: pascal
 
-    bankScreen._enterAmount(50, 5000);
+    bankScreen.enterAmount(50, 5000);
 *)
-function TRSBankScreen._enterAmount(amount, waitTime: integer): boolean;
-const
-  clBackground = 8955317;
-  clBackgroundTol = 68;
-  boxDimensions: TPoint = [506, 130];
-var
-  tpa: TPointArray;
-  atpa: T2DPointArray;
-  t, i: longWord;
-  b: TBox;
+function TRSBankScreen.enterAmount(amount, waitTime: integer): boolean;
 begin
-   t := (getTimeRunning() + waitTime);
-
-  repeat
-    if findColorsTolerance(tpa, clBackground, getClientBounds(), clBackgroundTol, colorSetting(0)) then
-    begin
-      atpa := clusterTPAEx(tpa, 6, 6);
-      sortATPASize(atpa, true);
-
-      for i := 0 to high(atpa) do
-      begin
-        b := getTPABounds(atpa[i]);
-
-        if (b.getWidth() = boxDimensions.x) and (b.getHeight() = boxDimensions.y) then
-        begin
-          result := true;
-          typeSend(intToStr(amount), true);
-          break(2);
-        end;
-      end;
-    end;
-
-    wait(randomRange(100, 250));
-  until (getTimeRunning() > t);
-
+  result := chatBox.enterAmount(amount, waitTime);
   print('TRSBankScreen._enterAmount(): result = '+lowercase(boolToStr(result)), TDebug.SUB);
 end;
 
@@ -1535,7 +1503,7 @@ begin
       end else
         if (not chooseOption.select([toStr(amounts[i])], MOUSE_LEFT, 300)) then
           if chooseOption.select(['Deposit-X', '-X']) then
-            self._enterAmount(amounts[i], 5000);
+            chatBox.enterAmount(amounts[i], random(5000, 6000));
     end;
 
     t := (getSystemTime() + 2500);  // Wait for the item to disappear
@@ -1662,7 +1630,7 @@ begin
         begin
           if (chooseOption.select(['Withdraw-X to BoB', 'to', 'BoB'])) then
           begin
-            result := (self._enterAmount(amount, 6000));
+            result := chatBox.enterAmount(amount, random(5000, 6000));
             print('bankscreen.withdraw(): result = ' + boolToStr(result), TDebug.SUB);
             exit();
           end else
@@ -1676,7 +1644,7 @@ begin
         if (not chooseOption.optionsExist(['Withdraw-' + intToStr(amount), '-' + intToStr(amount), toStr(amount)])) then
         begin
           if (chooseOption.select(['Withdraw-X', '-X'])) then
-            result := (self._enterAmount(amount, 6000));
+            result := chatBox.enterAmount(amount, random(5000, 6000));
         end else
           result := chooseOption.select(['Withdraw-' + intToStr(amount), '-' + intToStr(amount), toStr(amount)]);
         end;
@@ -1908,7 +1876,7 @@ begin
           begin
             if (chooseOption.select(['Withdraw-X to BoB', 'to', 'BoB'])) then
             begin
-              result := (self._enterAmount(amount, 6000));
+              result := chatBox.enterAmount(amount, random(5000, 6000));
               print('bankscreen.withdraw(): result = ' + boolToStr(result), TDebug.SUB);
               exit();
             end else
@@ -1922,7 +1890,7 @@ begin
           if (not chooseOption.optionsExist(['Withdraw-' + intToStr(amount), '-' + intToStr(amount), toStr(amount)])) then
           begin
             if (chooseOption.select(['Withdraw-X', '-X'])) then
-              result := (self._enterAmount(amount, 6000));
+              result := chatBox.enterAmount(amount, random(5000, 6000));
           end else
             result := chooseOption.select(['Withdraw-' + intToStr(amount), '-' + intToStr(amount), toStr(amount)]);
           end;
