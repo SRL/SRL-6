@@ -39,7 +39,7 @@ const
 
 .. code-block:: pascal
 
-    tyCHATBOX_WHITEpe
+    type
       TRSChatBox = type TRSInterface;
 
 A type that stores the chatBox interface properties.
