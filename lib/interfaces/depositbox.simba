@@ -755,7 +755,7 @@ begin
       end else
         if (not chooseOption.select([toStr(amounts[i])], MOUSE_LEFT, 300)) then
           if (chooseOption.select(['Deposit-X', '-X'])) then
-            bankScreen._enterAmount(amounts[i], 5000);
+            chatBox.enterAmount(amounts[i], random(5000, 6000));
     end;
 
     t := (getSystemTime() + 2500);
