@@ -878,7 +878,7 @@ begin
       else
       begin
         if (chooseOption.select(['Withdraw-X', '-X'])) then
-          result := (bankscreen._enterAmount(amount, 6000));
+          result := chatBox.enterAmount(amount, random(5000, 6000));
       end;
     end;
   end else
