@@ -401,7 +401,7 @@ findTextBoxes
 
 .. code-block:: pascal
 
-    function TRSChatBox.findTextBoxes(search: string): TBoxArray;
+    function TRSChatBox.findTextBoxes(search: integer): TBoxArray;
 
 Returns the TBoxArray of the type/color of text it **searches** for.
 Usefull for accepting trades or adding certain players to ignore. They
