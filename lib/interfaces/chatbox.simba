@@ -30,6 +30,10 @@ Scripters can create and use their own filters if they wish.
 const
   TESS_FILTER_CHATBOX: TTesseractFilter = [3, 3, [False, 35, TM_Mean]];
 
+  CHATBOX_TRADES = 0;
+  CHATBOX_CHALLENGES = 1;
+  CHATBOX_ERRORS = 3;
+
 (*
 **type TRSChatBox**
 
@@ -389,7 +393,53 @@ begin
     typeSend(intToStr(amount), true);
 
   Print('TRSChatBox.enterAmount(): The enter amount popup never appeared', TDebug.ERROR);
-end;  
+end;
+
+(*
+findTextBoxes
+-------------
+
+.. code-block:: pascal
+
+    function TRSChatBox.findTextBoxes(search: integer): TBoxArray;
+
+Returns the TBoxArray of the type/color of text it **searches** for.
+Usefull for accepting trades or adding certain players to ignore. They
+are sorted from top to bottom (old to new). The possible types of text
+to search for can be found at the top of the chatbox.simba file.
+
+.. note::
+
+    - by Thomas
+    - Last Updated: 11 December by Thomas
+
+Example:
+
+.. code-block:: pascal
+
+    trades := chatBox.findTextBoxes(CHATBOX_TRADES);
+    if length(trades) then
+      mouseBox(trades[high(trades)], MOUSE_RIGHT);
+*)
+function TRSChatBox.findTextBoxes(search: integer): TBoxArray;
+var
+  TPA: TPointArray;
+  ATPA: T2DPointArray;
+begin
+  case search of
+    CHATBOX_CHALLENGES: FindColorsTolerance(TPA, 470116, chatBox.getChatArea(), 31);
+    CHATBOX_TRADES: FindColorsTolerance(TPA, 11953617, chatBox.getChatArea(), 66);
+    CHATBOX_ERRORS: FindColorsTolerance(TPA, 197608, chatBox.getChatArea(), 24);
+  end;
+
+  if length(TPA) then
+  begin
+    ATPA := TPA.cluster(11, 2);
+    ATPA.filterBetween(0, 40);
+    if length(ATPA) then
+      result := ATPA.getEachBounds();
+  end;
+end;
 
 begin
   chatBox.__init();
