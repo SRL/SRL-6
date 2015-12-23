@@ -278,16 +278,15 @@ begin
   t.setTime(waitTime);
 
   repeat
-    if self.__findLock() then
-    begin
-      result := true;
-      break();
-    end;
-    wait(randomRange(30, 60));
-  until t.isFinished();
+    result := self.__findLock();
+
+    if (not result) and (waitTime > 0) then
+      wait(randomRange(round(waitTime/10), round(waitTime/5)));
+
+  until result or t.isFinished();
 
   print('TRSTargetInfo.hasTarget(): Result = ' + boolToStr(result));
-end;  
+end; 
 
 (*
 getName
