@@ -523,6 +523,8 @@ begin
     ATPA.sortFromMidPoint(point(290, 238));
     result := ATPA.getEachBounds();
   end;
+
+  writeLn(result);
 end;
 {$ENDIF}
 
@@ -890,12 +892,9 @@ var
 begin
   strArr := ['1', '10', '100', 'all'];
 
-  if strArr.isInArray(lowercase(quantity)) then
-    i := strArr.returnInArray(lowercase(quantity))
-  else
-    i := -1;
+  i := strArr.returnInArray(lowercase(quantity));
 
-  if i <> 3 and (i <> -1) then
+  if inRange(i, 0, 3) then
     mouseBox(amountBox[i], MOUSE_LEFT)
   else
   begin
@@ -947,14 +946,11 @@ begin
 
   strArr := ['-5', 'mid', '+5'];
 
-  if strArr.isInArray(lowercase(price)) then
-    i := strArr.returnInArray(lowercase(price))
-  else
-    i := -1;
+  i := strArr.returnInArray(lowercase(price));
 
-  if (i <> 1) and (i <> -1) then  // Don't click mid button as it's set by default
+  if (i = 0) or (i = 2) then
     mouseBox(priceBox[i], MOUSE_LEFT)
-  else
+  else if (i <> 1) then  // Don't click mid button as it's set by default
   begin
     inputBox := self.__getInputBoxes();
     mouseBox(inputBox[1], MOUSE_LEFT);
@@ -981,7 +977,7 @@ box and clicks it.
 .. note::
 
     - by The Mayor
-    - Last Updated: 27 July 2015 by Clarity
+    - Last Updated: 24 Decenber 2015 by The Mayor
 
 Example:
 
@@ -991,18 +987,18 @@ Example:
 
 *}
 {$IFNDEF CODEINSIGHT}
-procedure TRSGrandExchange.__enterName(itemName: string);
+function TRSGrandExchange.__enterName(itemName: string): boolean;
 const
   TESS_FILTER_GE_CHARS: TTesseractFilter = [4, 4, [False, 20, TM_Mean]];
 var
   i: integer;
   timeOut: UInt64;
-  resultsBox, resultsTextBox, inputBox: TBoxArray;
+  resultsBox: TBoxArray := grid(3, 2, 166, 49, 172, 55, point(self.x1 + 104, self.y1 + 415));
+  resultsTextBox: TBoxArray := grid(3, 2, 122, 16, 172, 55, point(self.x1 + 121, self.y1 + 406));
+  inputBox: TBoxArray;
 begin
   timeOut := getTickCount64() + randomRange(3000, 4000);
   inputBox := self.__getInputBoxes();
-  resultsBox := grid(3, 2, 166, 49, 172, 55, point(self.x1 + 104, self.y1 + 415));
-  resultsTextBox := grid(3, 2, 122, 16, 172, 55, point(self.x1 + 121, self.y1 + 406));
 
   if not self.__findInsertionCursor(inputBox[2]) then
     mouseBox(inputBox[2], MOUSE_LEFT);
@@ -1012,14 +1008,14 @@ begin
 
   if waitColorCountRange(9214319, 10, resultsTextBox[0], 5000, 10) then
     for i := 0 to 5 do
-    begin
       if stringMatch(trim(tesseractGetText(resultsTextBox[i], TESS_FILTER_GE_CHARS)), itemName) >= 0.7 then
       begin
         mouseBox(resultsBox[i], MOUSE_LEFT);
         waitColorCountRange(16777215, 3, inputBox[2], 5000, 507, 509);
-        break();
+        exit(true);
       end;
-    end;
+
+  print('TRSGrandExchange.__enterName(): Found no matches for item: ' + itemName, TDebug.SUB);
 end;
 {$ENDIF}
 
@@ -1520,7 +1516,7 @@ var
   i, nextSlot, x, y: integer;
   b: TBox;
   TBA : TBoxArray := self.__getBuyBoxes();
-  confirm: TBox := [self.x1 + 225, self.y1 + 518, self.x1 + 373, self.y1 + 543];
+  confirm: TBox := [self.x1 + 210, self.y1 + 507, self.x1 + 353, self.y1 + 525];
 begin
   if not self.isOpen() then
   begin
@@ -1546,13 +1542,14 @@ begin
   mouseBox(TBA[nextSlot - 1], MOUSE_LEFT);
 
   if self.__isOfferOpen(3000) then
-  begin
-    self.__enterName(itemName);
-    self.__enterQuantity(quantity);
-    self.__enterPrice(price);
-    mouseBox(confirm, MOUSE_LEFT);
-    wait(randomRange(1000, 1500));
-  end;
+    if self.__enterName(itemName) then
+    begin
+      self.__enterQuantity(quantity);
+      self.__enterPrice(price);
+      mouseBox(confirm, MOUSE_LEFT);
+      wait(randomRange(1000, 1500));
+    end else
+      self.__returnToSummary();
 
   result := self.__isSlotBuying(nextSlot);
   print('TRSGrandExchange.buyItem(): ' + boolToStr(result), TDebug.SUB);
