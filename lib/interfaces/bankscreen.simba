@@ -390,7 +390,7 @@ isOpen
 
     function TRSBankScreen.isOpen(waitTime: integer = 0): boolean;
 
-Returns true if the collectBox interface is open. The optional **waitTime** parameter
+Returns true if the bankScreen interface is open. The optional **waitTime** parameter
 *(default = 0)* is the maximum time (in milliseconds) it will keep looking.
 
 .. note::
@@ -615,7 +615,7 @@ getBankSlotBox
 
     function TRSBankScreen.getBankSlotBox(slot: integer): TBox;
 
-Returns a TBox of the bank slot **slot**_. The layout of the slots can be seen
+Returns a TBox of the bank slot **slot** . The layout of the slots can be seen
 `here <http://i.imgur.com/9yGO1zV.png>`_.
 
 .. note::
@@ -706,6 +706,8 @@ Example:
       b: TBox;
     begin
       b := bankscreen.getPackSlotBox(1);
+      mouseBox(b, MOUSE_RIGHT);
+    end;
 
 *)
 function TRSBankScreen.getPackSlotBox(slot: integer): TBox;
@@ -948,7 +950,8 @@ getPackCountBitmap
 
     function TRSBankScreen.getPackCountBitmap(bmp, tolerance: integer): integer;
 
-Searches for the bitmap in each bankscreen pack slot and will return how many matches it finds.
+Return the number of backpack slots that contain the bitmap **bmp** inside the bank
+screen interface.
 
 .. note::
 
@@ -964,8 +967,8 @@ Example:
       i: integer;
     begin
       bmp := bitmapFromString('lotsofstuffhere');
-      i := bankScreen.getPackCountBitmap(dtm);
-      writeln('We counted ' + intToStr(i) + ' items in our bankSlots.');
+      i := bankScreen.getPackCountBitmap(bmp, 10);
+      writeln('We counted ' + intToStr(i) + ' items in our pack.');
     end;
 *)
 function TRSBankScreen.getPackCountBitmap(bmp, tolerance: integer): integer;
@@ -1072,7 +1075,7 @@ isTabActive
 
     function TRSBankScreen.isTabActive(tab: integer): boolean;
 
-Returns true if the **tab** is the currently active tab.
+Returns true if the bankScreen **tab** is the currently active tab.
 
 .. note::
 
@@ -1171,7 +1174,7 @@ scrollUp
 
     procedure TRSBankScreen.scrollUp();
 
-Scrolls the bankscreen up to the top if reqiured.
+Scrolls the bankscreen up to the top.
 
 .. note::
 
@@ -1367,7 +1370,7 @@ Example:
       myDTM := DTMFromString('heapsofstuff');
 
       if findDTM(myDTM, x, y, getClientBounds()) then
-        writeLn(Found DTM in slot ' + toStr(bankScreen.pointToSlot([x, y]));
+        writeLn('Found DTM in slot ' + toStr(bankScreen.pointToSlot([x, y]));
     end;
 *)
 function TRSBankScreen.pointToSlot(pnt: TPoint): integer;
@@ -1395,7 +1398,7 @@ enterAmount
     function TRSBankScreen.enterAmount(amount, waitTime: integer): boolean;
 
 Returns true if it enters the amount **amount** when depositing or withdrawing
-a custom amount of an item. It will keep trying until successful of **waitTime**
+a custom amount of an item. It will keep trying until successful or **waitTime**
 is reached.
 
 .. note::
@@ -1441,7 +1444,7 @@ Examples:
 
     bankScreen.deposit([2..28]);
     bankScreen.deposit([1, 2, 3, 4], [-1, 10, 15, 14]);
-    bankScreen.deposit([1..28], , true); // one by one
+    bankScreen.deposit([1..28], [], true); // one by one
 *)
 function TRSBankScreen.deposit(slots: TIntegerArray; amounts: TIntegerArray = []; oneByOne: boolean = false): boolean;
 var
@@ -2244,7 +2247,12 @@ Example:
 
 .. code-block:: pascal
 
-    bankScreen.open(BANK_NPC_BLUE);
+    if bankScreen.open(BANK_NPC_BLUE) then
+    begin
+      writeLn('The bank is open!');
+      bankScreen.quickDeposit(QUICK_DEPOSIT_INVENTORY);
+      bankScreen.close();
+    end;
 *)
 function TRSBankScreen.open(bankType: integer): boolean;
 begin
@@ -2364,7 +2372,10 @@ Example:
 .. code-block:: pascal
 
     if bankScreen.searchBank('Chaos rune') then
-      writeln('Chaos rune is in slot 1');
+    begin
+      bankscreen.withdraw(1, WITHDRAW_AMOUNT_ALL, ['']);
+      bankScreen.close();
+    end;
 *)
 function TRSBankScreen.searchBank(item: string): Boolean;
 var

@@ -33,6 +33,8 @@ SRL Interfaces
     production
     progressscreen
     toolscreen
+    tradescreen
+    targetinfo
     worlds
     
     
