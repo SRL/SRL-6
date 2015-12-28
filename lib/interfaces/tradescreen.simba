@@ -29,6 +29,7 @@ const
   TRADE_BUTTON_DECLINE = 1;
   TRADE_BUTTON_ITEMS = 2;
   TRADE_BUTTON_COINS = 3;
+  TRADE_BUTTON_CLOSE = 4;
 
 type
   TRSTradeScreen= type TRSInterface;
@@ -149,9 +150,7 @@ begin
       self.setBounds(box);
       result := true;
     end;
-
   end;
-
 end;
 {$ENDIF}
 
@@ -236,9 +235,65 @@ begin
     TRADE_BUTTON_DECLINE: box.edit(215, 143, -215, -154);
     TRADE_BUTTON_ITEMS: box.edit(110, 265, -365, -34);
     TRADE_BUTTON_COINS: box.edit(143, 265, -332, -34);
+    TRADE_BUTTON_CLOSE: box.edit(492, 4, -3, -311);
   end;
 
   mouseBox(box, MOUSE_LEFT);
+
+  if (button = TRADE_BUTTON_ITEMS) or (button = TRADE_BUTTON_COINS) then
+    mouseBox(chatBox.getBounds());
+end;
+
+(*
+close
+-----
+
+.. code-block:: pascal
+
+    function TRSTradeScreen.close(escape: boolean = true): boolean;
+
+Returns true if the TradeScreen is successfully closed. It uses the ESC key
+by default, but the **escape** parameter can be set to false to close with mouse.
+
+.. note::
+
+    - by Thomas
+    - Last Updated: 25 December 2015 by Thomas
+
+Example:
+
+.. code-block:: pascal
+
+    if tradeScreen.close() then
+      writeln('Closed the tradeScreen');
+*)
+function TRSTradeScreen.close(waitTime: integer = 0; escape: boolean = true): boolean;
+var
+  t: TCountDown;
+begin
+  t.setTime(waitTime);
+  repeat
+    result := (not self.isOpen());
+
+    if not result then
+    begin
+
+      if escape then
+      begin
+        print('close(): Trying to close Trade Screen with Escape-key.', TDebug.SUB);
+        typeByte(VK_ESCAPE);
+        escape := false;
+      end
+      else
+        self.clickButton(TRADE_BUTTON_CLOSE);
+
+      if (waitTime > 0) then
+        wait(random(round(waitTime / 10), round(waitTime / 5)));
+
+    end;
+
+  until result or t.isFinished();
+  print('tradeScreen.close(): result = ' + boolToStr(result), TDebug.SUB);
 end;
 
 (*
