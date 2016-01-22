@@ -289,7 +289,7 @@ Overloaded method that searches on the client with a filter to read text.
 .. note::
 
     - by Olly
-    - Last updated: 26 July 2014 by Olly
+    - Last updated: 22 January 2016 by Daniel
 
 Example:
 
@@ -299,13 +299,13 @@ Example:
 *)
 function Tesseract_GetText(const xs, ys, xe, ye: integer; filter: TTesseractFilter; Whitelist: String = TESS_WHITELIST_NONE): string; overload;
 var
-  bmp, w, h: Integer;
+  bmp: Integer;
   t, tt: LongWord;
 begin
-  bmp := bitmapFromClient(xs, ys, xe, ye);
-  GetBitmapSize(bmp, w, h);
-  if (w < 10) or (h < 10) then
+  if((xe - xs) < 10) or ((ye - ys) < 10) then
     Exit('');
+
+  bmp := bitmapFromClient(xs, ys, xe, ye);
 
   try
     t := getSystemTime();
@@ -325,8 +325,9 @@ begin
     displayDebugImgWindow(getMufasaBitmap(bmp).getWidth(), getMufasaBitmap(bmp).getHeight());
     drawBitmapDebugImg(bmp);
     {$ENDIF}
-    freeBitmap(bmp);
   end;
+
+  freeBitmap(bmp);
 end;
 
 (*
