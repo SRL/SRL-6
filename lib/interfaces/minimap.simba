@@ -3138,19 +3138,16 @@ end;
 (*
 getRunEnergy
 ------------
-
 .. code-block:: pascal
 
-    function TRSMinimap.getRunEnergy(): integer;
+    function TRSMinimap.getRunEnergy(): Int32;
 
-Returns the players current run energy. This isn't actually coded yet, because
-it is hard AF to do in colour accuratly. If you can do it, I will give you the
-SRL Master Cup :)
+Returns the players current run energy.
 
 .. note::
 
-    - by -
-    - Last Updated: -
+    - by slacky
+    - Last Updated: 28 Feb. 2015
 
 Example:
 
@@ -3159,9 +3156,45 @@ Example:
     if minimap.getRunEnergy() < 20 then
       minimap.enableRest();
 *)
-function TRSMinimap.getRunEnergy(): integer;
+function TRSMinimap.getRunEnergy(): Int32;
+var
+  w,h,bmp,src:Int32;
+  TPA:TPointArray;
+  tmpVar:String;
+
+  function FindColorsTolBitmap(bmp:Int32; var TPA:TPointArray; color:Int32; B:TBox; tol:Int32): Boolean;
+  var oldT,T:Int32;
+  begin
+    oldT := GetImageTarget();
+    T := SetTargetBitmap(bmp);
+    try
+      SetImageTarget(T);
+      Result := FindColorsTolerance(TPA, color, B, tol);
+    finally
+      FreeTarget(T);
+      SetImageTarget(oldT);
+    end;
+  end;
+
 begin
- writeLn('WARNING TRSMinimap.getRunEnergy(): Function hasn''t been coded yet!');
+  GetClientDimensions(w,h);
+  src := BitmapFromClient(w-38,31,w-10,38);
+  GetBitmapSize(bmp, w,h);
+  bmp := CreateBitmap(w+10,h+10);
+  FastDrawTransparent(5,5,src,bmp);
+  FreeBitmap(src);
+
+  GetBitmapSize(bmp,w,h);
+  W *= 6;
+  H *= 6;
+  ResizeBitmapEx(bmp,RM_Bilinear,w,h);
+  FindColorsTolBitmap(bmp, TPA, $FFFFFF, [0,0,w-1,h-1], Trunc(441.6*0.4));
+  FastDrawClear(bmp, 0);
+  DrawTPABitmap(bmp, TPA, $FFFFFF);
+  tmpVar := Tesseract_GetText(bmp, TESS_WHITELIST_NUMBERS+'%');
+  Result := StrToIntDef(ExtractFromStr(tmpVar, NUMBERS), -1);
+
+  FreeBitmap(bmp);
 end;
 
 (*
