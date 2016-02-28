@@ -725,15 +725,15 @@ Example:
 
 .. code-block:: pascal
 
-    writeln(getUpText());
+    writeLn(getUpText());
 *)
 function getUpText(): string;
 var
   box: TBox := intToBox(4, 5, 500, 25);
-  filter: TCompareRules := [-1, 85, true, 55];
+  filter: TCompareRules := [-1, 85, true, 60];
 begin
   ocr.clientID := exportImageTarget();
-  exit(replaceRegExpr('[^a-zA-Z\d\s]', ocr.recognize(box, filter), '', true));
+  exit(ocr.recognize(box, filter));
 end;
 
 (*
@@ -810,6 +810,7 @@ end;
 
 begin
   ocr.init(FontPath + 'UpCharsEx');
+  ocr.fontData.spaceWidth := 5;
 end;
 
 {$f+}
