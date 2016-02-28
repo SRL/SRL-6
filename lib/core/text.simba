@@ -10,7 +10,16 @@ The source for this file can be found `here <https://github.com/SRL/SRL-6/blob/m
 *)
 
 {$loadlib SimpleOCR}
+
 {$f-}
+
+(*
+var ocr
+~~~~~~~~~
+  An instance of SimpleOCR.
+*)
+var
+  ocr: TSimpleOCR;
 
 (*
 findText
@@ -720,11 +729,9 @@ Example:
 *)
 function getUpText(): string;
 var
-  ocr: TSimpleOCR;
   box: TBox := intToBox(4, 5, 500, 25);
   filter: TCompareRules := [-1, 85, true, 55];
 begin
-  ocr.init(FontPath + 'UpCharsEx');
   ocr.clientID := exportImageTarget();
   exit(replaceRegExpr('[^a-zA-Z\d\s]', ocr.recognize(box, filter), '', true));
 end;
@@ -799,6 +806,10 @@ begin
       if (pos(txt[i], getUpText()) > 0) then exit(true);
     wait(20);
   until (t.getTime() > waitTime);
+end;
+
+begin
+  ocr.init(FontPath + 'UpCharsEx');
 end;
 
 {$f+}
