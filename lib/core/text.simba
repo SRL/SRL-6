@@ -9,6 +9,7 @@ The source for this file can be found `here <https://github.com/SRL/SRL-6/blob/m
 
 *)
 
+{$loadlib SimpleOCR}
 {$f-}
 
 (*
@@ -694,6 +695,110 @@ begin
     wait(20 + random(20));
   end;
 
+end;
+
+(*
+getUpText
+~~~~~~~~~~~~~~~~
+
+.. code-block:: pascal
+
+    function getUpText(): string;
+
+Returns the current UpText (the text in the top-left corner of the screen).
+
+.. note::
+
+    - by slacky & KeepBotting
+    - Last Modified: 27 February 2016 by KeepBotting
+
+Example:
+
+.. code-block:: pascal
+
+    writeln(getUpText());
+*)
+function getUpText(): string;
+var
+  ocr: TSimpleOCR;
+  box: TBox := intToBox(4, 5, 500, 25);
+  filter: TCompareRules := [-1, 85, true, 55];
+begin
+  ocr.init(FontPath + 'UpCharsEx');
+  ocr.clientID := exportImageTarget();
+  exit(replaceRegExpr('[^a-zA-Z\d\s]', ocr.recognize(box, filter), '', true));
+end;
+
+(*
+isUpText
+~~~~~~~~~~~~~~~
+
+.. code-block:: pascal
+
+    function isUpText(txt: string; waitTime: integer = 100): boolean;
+
+Returns true if the string 'txt' is found in the current UpText.
+Will wait up to 'waitTime' to find the text before exiting the function.
+
+.. note::
+
+    - by KeepBotting
+    - Last Modified: 27 February 2016 by KeepBotting
+
+Example:
+
+.. code-block:: pascal
+
+    if isUpText('Banker') then writeLn('Found the bank!');
+*)
+function isUpText(txt: string; waitTime: integer = 100): boolean;
+var
+  t: TTimeMarker;
+begin
+  t.start();
+
+  repeat
+    if (pos(txt, getUpText()) > 0) then exit(true);
+    wait(20);
+  until (t.getTime() > waitTime);
+end;
+
+(*
+isUpText
+~~~~~~~~~~~~~~~
+
+.. code-block:: pascal
+
+    function isUpText(txt: TStringArray; waitTime: integer = 100): boolean; overload;
+
+Overloaded function. Takes a TStringArray instead of a string.
+
+Returns true if any one of the indicies in 'txt' is found in the current UpText.
+Will wait up to 'waitTime' to find the text before exiting the function.
+
+.. note::
+
+    - by KeepBotting
+    - Last Modified: 27 February 2016 by KeepBotting
+
+Example:
+
+.. code-block:: pascal
+
+    if isUpText(['Bank', 'Banker', 'Booth']) then writeLn('Found the bank!');
+*)
+function isUpText(txt: TStringArray; waitTime: integer = 100): boolean; overload;
+var
+  i: integer;
+  t: TTimeMarker;
+begin
+  t.start();
+
+  repeat
+    for i := 0 to high(txt) do
+      if (pos(txt[i], getUpText()) > 0) then exit(true);
+    wait(20);
+  until (t.getTime() > waitTime);
 end;
 
 {$f+}
