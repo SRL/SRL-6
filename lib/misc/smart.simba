@@ -19,14 +19,6 @@ The source for this file can be found `here <https://github.com/SRL/SRL-6/blob/m
 {$f-}
 
 (*
-const URL
-~~~~~~~~~
-  The Runescape web address for SMART to load.
-*)
-const
-  SMART_URL = 'http://www.runescape.com/game.ws?j=1';
-
-(*
 var SMART plugins
 ~~~~~~~~~~~~~~~~~
   A TStringArray of smart plugins
@@ -81,28 +73,8 @@ Internal SMART variables used only in smart.simba.
 {$ENDIF}
   smartImage: TMufasaBitmap;
 
-(*
-findJavaPath
-~~~~~~~~~~~~
 
-.. code-block:: pascal
-
-     Function findJavaPath(out res: string): boolean;
-
-Attempts to locate the users java path, will return if successful or not
-
-.. note::
-
-    - By: Brandon
-    - Last Updated: 26 August 2013 by Olly
-
-Example:
-
-.. code-block:: pascal
-
-   findJavaPath(s);
-*)
-function findJavaPath(out res: string): boolean;
+function _LocateJavaPath(var Res: String; x86: Boolean; Dir: char = 'A'; Recursive: Boolean = False): Boolean;
 
   function GetDirectoryName(Directory, Path: String): String;
   var
@@ -110,11 +82,23 @@ function findJavaPath(out res: string): boolean;
     Directories: TStringArray;
   begin
     Directories := GetDirectories(Path);
-
     for I := 0 To High(Directories) Do
       if ExecRegExpr(Directory, Directories[I]) then
-        if (Directories[I] > Result) then
-          Result := Directories[I];
+      begin
+        Result := Directories[I];
+        Exit;
+      end;
+  end;
+
+  function GetDirectoryNames(Directory, Path: String): TStringArray;
+  var
+    I: Integer;
+    Directories: TStringArray;
+  begin
+    Directories := GetDirectories(Path);
+    for I := 0 To High(Directories) Do
+      if ExecRegExpr(Directory, Directories[I]) then
+        Result := Result + Directories[I];
   end;
 
   function FindDirectory(Directory, Path: String): Boolean;
@@ -124,48 +108,80 @@ function findJavaPath(out res: string): boolean;
 
 var
   Drive: String;
-  CurrentPath: String;
+  CurrentPath, c: String;
+  Drives: TStringArray;
+  i: Integer;
 begin
-  result := false;
-  res := '';
+  Result := False;
+  Res := '';
 
-  drive := Copy(PluginPath, 0, 3);
-
-  if (FindDirectory('Program\sFiles\s\(x86\)', Drive)) then
+  if (Recursive) then
   begin
-    CurrentPath := Drive + 'Program Files (x86)\';
+    Drive := Dir + ':/';
   end else
-    CurrentPath := Drive + 'Program Files\';
+    Drive := Copy(PluginPath, 0, 3);
+
+  if (x86) then
+    CurrentPath := Drive + 'Program Files (x86)\'
+  else
+   CurrentPath := Drive + 'Program Files\';
 
   if (FindDirectory('Java|java', CurrentPath + '\')) then
   begin
     CurrentPath := CurrentPath + 'Java\';
   end else
-    begin
-      print('Failed To Find Path: ' + CurrentPath + 'Java\', TDebug.ERROR);
-      exit;
-    end;
+    if (Dir <> 'Z') then
+      Result := _LocateJavaPath(Res, x86, chr(ord(Dir) + 1), True);
 
-  Drive := GetDirectoryName('jre', CurrentPath);
+  if (Result) then
+    Exit();
 
-  if (length(drive) > 0) then
+  Drives := GetDirectoryNames('jre', CurrentPath);
+
+  if (Length(Drives) > 0) then
   begin
-    if (smartShowConsole) then
-      CurrentPath := CurrentPath + Drive + '\bin\java.exe'
-    else
-      CurrentPath := CurrentPath + Drive + '\bin\javaw.exe';
-  end else
+    c := CurrentPath;
+    for i := 0 to High(Drives) do
+      begin
+        CurrentPath := c;
+        if (smartShowConsole) then
+          CurrentPath := CurrentPath + Drives[i] + '\bin\java.exe'
+        else
+          CurrentPath := CurrentPath + Drives[i] + '\bin\javaw.exe';
+
+        Result := FileExists(CurrentPath);
+        if (Result) then
+          Break;
+      end;
+  end else begin
+    Drives := GetDirectoryNames('jdk', CurrentPath);
+    c := CurrentPath;
+
+    for i := 0 to High(Drives) do
     begin
-      Drive := GetDirectoryName('jdk', CurrentPath);
-
+      CurrentPath := c;
       if (smartShowConsole) then
-        CurrentPath := CurrentPath + Drive + 'jre\bin\java.exe'
+        CurrentPath := CurrentPath + Drives[i] + '\bin\java.exe'
       else
-        CurrentPath := CurrentPath + Drive + 'jre\bin\javaw.exe';
-    end;
+        CurrentPath := CurrentPath + Drives[i] + '\bin\javaw.exe';
 
-  result := FileExists(CurrentPath);
-  res := currentPath;
+      Result := FileExists(CurrentPath);
+      if (Result) then
+        Break;
+    end;
+  end;
+
+  Result := FileExists(CurrentPath);
+  Res := CurrentPath;
+end;
+
+function FindJavaPath(out Path: String): Boolean;
+begin
+  if (not _LocateJavaPath(Path, True)) then
+    if (not _LocateJavaPath(Path, False)) then
+      Exit(False);
+
+  Result := True;
 end;
 
 (*
@@ -277,24 +293,20 @@ Example:
 
     smartGetParameters(tsa);
 *)
-function smartGetParameters(out params: TStringArray): boolean;
+function SmartGetParameters(out params: TStringArray): Boolean;
 var
-  page: string;
+  WorldLink: String;
+  p: Integer;
 begin
-  page := getPage(SMART_URL);
+  WorldLink := Between('var worldLink=', ''',', GetPage('http://www.runescape.com/game-applet'));
+  if (WorldLink = '') then
+    Exit(False);
 
-  params := explode(',', between('worldLink=''', '''', page));
+  p := Pos('com/', WorldLink);
+  Params := Params + Copy(WorldLink, 2, p + 2);
+  Params := Params + Copy(WorldLink, p + 4, Length(WorldLink));
 
-  result := (length(params) = 2);
-
-  if (not result) then
-  begin
-    print('Error while grabbing parameters', TDebug.ERROR);
-    print('Make sure you can reach the RS website, and no active firewall is blocking Simba', TDebug.HINT);
-    exit(false);
-  end;
-
-  print('smartGetParameters(): Succesfully grabbed paramters', TDebug.SUB);
+  Result := True;
 end;
 
 (*
@@ -369,12 +381,13 @@ begin
   path := getJavaPath();
   plugins := implode(',', smartPlugins);
 
-  print('Using parameters ' + toStr(params));
+  print('Root: ' + params[0]);
+  print('Params: ' + params[1]);
   print('Using plugins "' + plugins + '"');
 
   __smartCurrentTarget := 0;
   __smartCurrentTarget := smartSpawnClient(path, stringReplace(PluginPath, '\', '/', [rfReplaceAll]),
-                                           params[0], ',' + params[1], w, h, smartInitSeq, smartUserAgent, '', plugins);
+                                           params[0], params[1], w, h, smartInitSeq, smartUserAgent,'', plugins);
 
   if (__smartCurrentTarget <> 0) then
   begin
@@ -647,7 +660,8 @@ begin
   try
     smartImage.resetPersistentMemory();
     smartImage.free();
-  except finally
+  except
+  finally
     __smartIsDrawingSetup := false;
   end;
 end;
