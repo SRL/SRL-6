@@ -245,7 +245,7 @@ begin
   Mouse(Point(P.X, P.Y), MOUSE_MOVE);
 
   wait(waitTime);
-end;   
+end;
 
 (*
 smallRandomMouse
@@ -599,17 +599,17 @@ Example:
 function closePopup(useEscKey: boolean = true): boolean;
 var
   i, j, x, y: Integer;
-  DTMs: Array [0..4] of Integer;
+  DTMs: Array [0..5] of Integer;
   timeOut: TCountDown;
-  timeStarted: Array [0..4] of Boolean;
+  timeStarted: Array [0..5] of Boolean;
 begin
   if not isLoggedIn() then
     exit(false);
-  DTMs :=          
+  DTMs :=
                     // Generic Blue Buttons (i.e., Macroing detected warning)
     [DTMFromString('mbQAAAHicY2VgYFjDxMCQCcQfgHgtEK8HYgMg1gFiXSDWBmJ7IFba/Joh' +
                    '+NpvBruzPxhS7/5lYE2YyiAJ1C+ChEF8RiwYDACqWw4B'),
-                   
+
                     // Low level achievement popups
      DTMFromString('mbQAAAHicY2VgYGBmYmD4y8jAwMkEwSC2PVDcEopdofjPFlOGTB52MLYE' +
                     'qgFhEOBnQAWMWDAYAAD0gAa9'),
@@ -621,6 +621,10 @@ begin
                     // Generic Yellow Buttons (i.e., Poll button on login)
      DTMFromString('mggAAAHicY2NgYFBiY2AQA2J9IDYHYl4gVgbi+4wMDJeh+D4UvwZiEPjz' +
                    'sAWMf+0yZvi13ZBhkjdEQhILZsSBIQAA2QQQGQ=='),
+
+                   // Updated Yellow Buttons (i.e., NXT Client, Protect your account popups)
+     DTMFromString('mlwAAAHicY2dgYOhlZmDoAuIJSHQvFK8Fym8A4lVQvAGJ/r3fi+FJuzDD' +
+                   'q22xDK+2xoDZfVI8DFVCHAxcQHlcmBEPhgIAXqITQA=='),
 
                    // Generic Big Yellow Buttons (i.e., Upgrades and Extra's)
      DTMFromString('m6wAAAHic42ZgYPjHxMDAzMzA8BNI/wZiRiCbBYi/Adl/gZgByP7BBFE3' +
@@ -634,7 +638,7 @@ begin
 
     if (not timeStarted[i]) then
     begin
-      timeOut.setTime(randomRange(700, 1200));
+      timeOut.setTime(randomRange(700, 900));
       timeStarted[i] := true;
     end;
 
@@ -761,7 +765,7 @@ begin
 
   gameTabs.openTab(t);
   print('browseSkillMenu(): result = ' + toStr(result), TDebug.FOOTER);
-end; 
+end;
 
 (*
 hoverOnlineFriend
@@ -1149,4 +1153,3 @@ begin
 end;
 
 {$f+}
-
