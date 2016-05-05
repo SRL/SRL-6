@@ -1338,10 +1338,10 @@ begin
         end;
     end;
     
-    reachedMax := true;
-    
     if (players.getActive() < 1) then
       print('No other active players, terminating script', TDebug.FATAL);
+      
+    reachedMax := true;
   end;
 
   if (errorMessage[1] > 0) then
