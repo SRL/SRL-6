@@ -29,7 +29,7 @@ File's internal constants.
 *}
 const
 {$IFNDEF CODEINSIGHT}
-  __LOGIN_COLOR_TEXT = 12378347;
+  __LOGIN_COLOR_TEXT = 16777215;
 {$ENDIF}
 
 {*
