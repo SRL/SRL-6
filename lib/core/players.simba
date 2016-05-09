@@ -888,7 +888,7 @@ Example:
 {$IFNDEF CODEINSIGHT}
 function __setInputBoxes(): boolean;
 const
-  __BORDER_LENGTH = 524;
+  __BORDER_LENGTH = 534;
 var
   tpaActive, tpaInactive: TPointArray;
   bdsActive, bdsInactive: TBox;
