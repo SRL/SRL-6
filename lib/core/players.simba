@@ -49,6 +49,7 @@ var
   __areDynamicInterfacesSet: boolean = false;
 {$ENDIF}
 
+
 (*
 **type TPlayer**
 
@@ -114,6 +115,7 @@ type
   end;
 
   PF_TPlayerArray = array of PF_TPlayer;
+
 
 (*
 **var Player Variables**
@@ -462,6 +464,236 @@ begin
   if result and (not __areDynamicInterfacesSet) then
     __setDynamicInterfaces();
 end;
+(*
+**type TINI**
+
+A record that stores useful information about the INI file after the setup.
+
+.. code-block:: pascal
+
+  type
+    TINI = record
+      army: string;
+      fileName: string;
+      isSetup: boolean;
+    end;
+
+*)
+type
+  TINI = record
+    army: string;
+    fileName: string;
+    isSetup: boolean;
+  end;
+
+
+(*
+**var INI Variables**
+
+All the variables associated with INI File.
+
+.. code-block:: pascal
+
+    var
+      INI: TINI;
+
+  * INI: The default **INI** variable.
+
+*)
+var
+{$IFNDEF CODEINSIGHT}
+  INI: TINI;
+{$ENDIF}
+
+(*
+TINI methods
+------------
+
+The following methods should be called through the **INI** variable.
+
+Example:
+
+.. code-block:: pascal
+
+    if INI.setState(currentplayer, 'Fishing') then
+      writeln('Set currentplayer status to Fishing in the INI file');
+*)
+
+(*
+setup
+-----
+
+.. code-block:: pascal
+
+    function TINI.setup(army: string = 'default'; fileName: string = 'Accounts'): boolean;
+
+Sets up an INI-file **fileName**.INI *(default = 'Accounts')* with the players
+from the **army** *(default = 'default')*. It will create all the players found
+in the Rafiki **army**. This will allow data about players to be stored and
+accessed from multiple scripts. Returns true if all players are found in the INI file.
+
+
+.. note::
+
+    - by Thomas
+    - Last updated: 29 April 2016 by Thomas
+
+Example:
+
+.. code-block:: pascal
+
+   INI.setup('fishers', 'myINIFile');
+
+*)
+
+function TINI.setup(army: string = 'default'; fileName: string = 'Accounts'): boolean;
+var
+  i: integer;
+begin
+  print('INI.setup()', TDebug.HEADER);
+  print('INI.setup(): Creating army: ' + army + ' in the ' + fileName + '.INI-file.', TDebug.SUB);
+  self.army := army;
+  self.fileName := fileName;
+
+  if (not Raf_GetPlayers(self.army, players)) then
+    print('INI.setup(): Unable to get players from army', TDebug.FATAL);
+
+  if length(players) then
+  begin
+    for i := 0 to high(players) do
+    begin
+      players[i].isActive := true;
+      if length(readINI(self.army, players[i].loginName, self.fileName)) = 0 then
+        writeINI(self.army, players[i].loginName, 'free', self.fileName);
+    end;
+    print('INI.setup(): Added missing players to the ' + self.fileName + '.INI-file.', TDebug.SUB);
+
+    result := true;
+    for i := 0 to high(players) do
+      if length(readINI(self.army, players[i].loginName, self.fileName)) then
+        print('Found player ' + players[i].loginName + ' in the ' + self.fileName + '.INI-file.', TDebug.SUB)
+      else
+        result := false;
+
+    print('INI.setup(): result: ' + toStr(result), TDebug.FOOTER);
+    self.isSetup := result;
+
+    if result then
+      addOnTerminate('__INIscriptTerminate');
+  end;
+end;
+
+(*
+setState
+--------
+
+.. code-block:: pascal
+
+    function TINI.setState(player: integer; state: string): boolean;
+
+Sets the state **state** for player **player** the INI-file. Returns true
+if the state has been added to the INI-file.
+
+.. note::
+
+    - by Thomas
+    - Last updated: 29 April 2016 by Thomas
+
+Example:
+
+.. code-block:: pascal
+
+   INI.setState(currentPlayer, 'Fishing');
+
+*)
+
+function TINI.setState(player: integer; state: string): boolean;
+begin
+  print('INI.setState()', TDebug.HEADER);
+
+  if (not self.isSetup) then
+  begin
+    print('INI.setState():  Please run INI.setup() first.', TDebug.WARNING);
+    exit(false);
+  end;
+
+  writeINI(self.army, players[player].loginName, state, self.fileName);
+  result := (readINI(self.army, players[player].loginName, self.fileName) = state);
+
+  print('INI.setState(): ' + players[player].loginName + ' has been set to: ' + state, TDebug.FOOTER);
+end;
+
+(*
+getState
+--------
+
+.. code-block:: pascal
+
+    function TINI.getState(player: integer): string;
+
+Returns the state for player **player** the INI-file in a string.
+
+
+.. note::
+
+    - by Thomas
+    - Last updated: 29 April 2016 by Thomas
+
+Example:
+
+.. code-block:: pascal
+
+   writeLn(INI.getState(currentPlayer));
+
+*)
+
+function TINI.getState(player: integer): string;
+begin
+  print('INI.getState()', TDebug.HEADER);
+
+  if (not self.isSetup) then
+  begin
+    print('INI.getState():  Please run INI.setup() first.', TDebug.WARNING);
+    exit();
+  end;
+
+  result := readINI(self.army, players[player].loginName, self.fileName);
+
+  print('INI.getState(): ' + players[player].loginName + ' state: ' + result, TDebug.FOOTER);
+end;
+
+(*
+__INIscriptTerminate
+--------------------
+
+.. code-block:: pascal
+
+    procedure __INIscriptTerminate();
+
+Sets the currentPlayer to 'free' on script terminate.
+
+
+.. note::
+
+    - by Thomas
+    - Last updated: 29 April 2016 by Thomas
+
+Example:
+
+.. code-block:: pascal
+
+   addOnTerminate('__INIscriptTerminate');
+
+*)
+
+{$IFNDEF CODEINSIGHT}
+procedure __INIscriptTerminate();
+begin
+  print('__INIscriptTerminate(): Terminating script. Will free the Current Player from INI file.', TDebug.SUB);
+  INI.setState(currentPlayer, 'free');
+end;
+{$ENDIF}
+
 
 (*
 TPlayerArray methods
@@ -718,14 +950,58 @@ begin
     exit(false);
   end;
 
-  print('Switching to player '+toStr(player)+' ('+self[player].nickname+')', TDebug.SUB);
+  print('Switching to player '+toStr(player)+' ('+self[player].loginName+')', TDebug.SUB);
   currentPlayer := player;
 
   if (SRL_Events[EVENT_PLAYER_NEXT] <> nil) then
     SRL_Events[EVENT_PLAYER_NEXT]();
 
   result := true;
-  if login then result := self[currentPlayer].login()
+
+  if login then
+    result := self[currentPlayer].login();
+end;
+
+(*
+setWorld
+--------
+
+.. code-block:: pascal
+
+    procedure TPlayerArray.setWorld(world: integer);
+
+Switches all the players in the TPlayerArray to the given world **World**.
+
+.. note::
+
+    - by Thomas
+    - Last updated: 22 March 2016 by Thomas
+
+Example:
+
+.. code-block:: pascal
+
+    players.setWorld(2);
+
+*)
+
+procedure TPlayerArray.setWorld(world: integer);
+var
+  i: integer;
+begin
+  print('TPlayerArray.setWorld()', TDebug.HEADER);
+
+  if length(players) = 0 then
+  begin
+    print('TPlayerArray.setWorld():  Please load your players first.', TDebug.WARNING);
+    exit()
+  end;
+
+  for i := 0 to high(players) do
+    if self[i].isActive then
+      self[i].world := world;
+
+  print('All players have been set to world '+toStr(world), TDebug.FOOTER);
 end;
 
 (*
@@ -1023,9 +1299,9 @@ begin
   if (tries > errorMessage[2]) then
   begin
     print('Responding with action: ' + errorMessage[3], TDebug.SUB);
-
+    
     case errorMessage[3] of
-      'Terminate': terminateScript();
+      'Terminate': print('Terminating script', TDebug.FATAL);
       'Set_World': self.world := 0;
 
       'Next_Player_F':
@@ -1061,10 +1337,10 @@ begin
           end;
         end;
     end;
-
+    
     if (players.getActive() < 1) then
       print('No other active players, terminating script', TDebug.FATAL);
-
+      
     reachedMax := true;
   end;
 
@@ -1157,7 +1433,7 @@ var
   timeOut: TTimeMarker;
   popupMessage: string;
   errorMessage: TVariantArray;
-  messages: array [0..17] of TVariantArray;
+  messages: array [0..18] of TVariantArray;
 begin
   timeOut.start();
 
@@ -1188,6 +1464,7 @@ begin
     {Popup Text                         Wait time  MaxTries  Action}
     ['Unknown login popup',                   0,         2,  'Next_Player_F'],
     ['Invalid username or password',          0,         2,  'Next_Player_F'],
+    ['Invalid email or password',             0,         2,  'Next_Player_F'],
     ['Your account has been disabled',        0,         0,  'Next_Player_F'],
     ['Your ban will be lifted in',            0,         0,  'Next_Player_F'],
     ['Your account has been involved in',     0,         0,  'Next_Player_F'],
@@ -1292,10 +1569,15 @@ begin
 
     result := self.__handleLoginPopup(inc(tries), false, reachedMaxTries);
 
-    if reachedMaxTries then tries := 1; //'reachedMaxTries' is passed down from __respondToPopup()
+    if reachedMaxTries then //tries := 1; //'reachedMaxTries' is passed down from __respondToPopup()
+    begin
+      print('TPlayer.loginToLobby(): Reached the maximum tries..', TDebug.ERROR);
+      exit(false);
+    end;
   until result;
 
-  if (not disableIPScreenshots) then takeScreenshot('IP_address.png');
+  if (not disableIPScreenshots) then
+    takeScreenshot('IP_address.png');
 
   print('TPlayer.loginToLobby(): ' + toStr(result), TDebug.FOOTER);
 end;
@@ -1356,7 +1638,11 @@ begin
 
       result := self.__handleLoginPopup(inc(tries), true, reachedMaxTries);
 
-      if reachedMaxTries then tries := 1;
+      if reachedMaxTries then // tries := 1;
+      begin
+        print('TPlayer.login(): Reached the maximum tries..', TDebug.ERROR);
+        exit(false);
+      end;
     end;
 
   until result;
