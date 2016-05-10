@@ -1392,7 +1392,7 @@ begin
   if (tries > errorMessage[2]) then
   begin
     print('Responding with action: ' + errorMessage[3], TDebug.SUB);
-    reachedMax := true;
+
     case errorMessage[3] of
       'Terminate': print('Terminating script', TDebug.FATAL);
       'Set_World': self.world := 0;
@@ -1433,6 +1433,7 @@ begin
 
     if (players.getActive() < 1) then
       print('No other active players, terminating script', TDebug.FATAL);
+    reachedMax := true;
   end;
 
   if (errorMessage[1] > 0) then
