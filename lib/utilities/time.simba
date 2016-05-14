@@ -289,10 +289,10 @@ Example:
 *)
 function waitFunc(Func: function: Boolean; WaitPerLoop, MaxTime: Integer): Boolean;
 var
-  T: LongWord;
+  T: UInt64;
 begin
-  T := GetSystemTime() + MaxTime;
-  while (GetSystemTime() < T) do
+  T := GetTickCount64() + MaxTime;
+  while (GetTickCount64() < T) do
   begin
     if (Func()) then
     begin
@@ -319,20 +319,20 @@ Notice the '@'.
 
 .. note::
 
-   by Olly
+    by Olly
 
 Example:
 
 .. code-block:: pascal
 
-     waitTypeFunc(@minimap.isResting, 50, 5000);
+    waitTypeFunc(@minimap.isResting, 50, 5000);
 *)
-function waitTypeFunc(Func: function: boolean of object; WaitPerLoop, MaxTime: Integer): Boolean;
+function waitTypeFunc(Func: function: Boolean of object; WaitPerLoop, MaxTime: Integer): Boolean;
 var
-  T: LongWord;
+  T: UInt64;
 begin
-  T := GetSystemTime() + MaxTime;
-  while (GetSystemTime() < T) do
+  T := GetTickCount64() + MaxTime;
+  while (GetTickCount64() < T) do
   begin
     if (Func()) then
     begin
@@ -354,7 +354,7 @@ TTimeMarker
         paused: Boolean;
     end;
 
-Timer type which is usefull for loops, timing and writing progress reports.
+Timer type which is useful for loops, timing and writing progress reports.
 
 .. note::
 
@@ -524,31 +524,32 @@ TCountDown
 .. code-block:: pascal
     
     type
-        tCountDown = uInt32;
+      TCountDown = type UInt64;
 
-Timer type which is usefull for loops, timing and writing progress reports.
+Timer type which is useful for loops, timing and writing progress reports.
 
 .. note::
 
     - by Obscurity
 *)
 type
-  TCountDown = uInt32;
+  TCountDown = type UInt64;
 
-function TCountDown.setTime(funcTime: uInt32): uInt32;
+function TCountDown.setTime(Time: UInt64): UInt64;
 begin
-  exit(self := getSystemTime() + funcTime);
+  self := GetTickCount64() + Time;
+  Result := self;
 end;
 
 function TCountDown.timeRemaining(): uInt32;
 begin
   if not self.isFinished() then
-    result := (self - getSystemTime());
+    Result := self - GetTickCount64();
 end;
 
-function TCountDown.isFinished(): boolean;
+function TCountDown.isFinished(): Boolean;
 begin
-  result := (getSystemTime() >= self);
+  result := GetTickCount64() >= self;
 end;
 
 {$f+}
