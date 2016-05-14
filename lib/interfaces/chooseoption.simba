@@ -184,7 +184,7 @@ Returns true if the chooseOption menu is open. The optional **waitTime** paramet
 .. note::
 
     - by Olly
-    - Last Modified: 16 February 2014 by Olly
+    - Last Modified: 14 May 2016 by Thomas
 
 Example:
 
@@ -195,16 +195,16 @@ Example:
 *)
 function TRSChooseOption.isOpen(waitTime: integer = 0): boolean;
 var
-  t: longWord;
+  t: TCountDown;
 begin
-  t := (getSystemTime() + waitTime);
-  result := false;
-
-  while (not result) and (t >= getSystemTime()) do
-  begin
+  t.setTime(waitTime);
+  repeat
     result := self.__find();
-    wait(20 + random(50));
-  end;
+
+    if (not result) and (waitTime > 0) then
+      wait(randomRange(round(waitTime/20), round(waitTime/10)));
+
+  until result or t.isFinished();
 end;
 
 (*
