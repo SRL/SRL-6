@@ -623,3 +623,32 @@ begin
 end;
 
 {$f+}
+
+(*
+TStringArray.shuffle
+~~~~~~~~~~~~~~~~~~~~~
+
+.. code-block:: pascal
+
+    procedure TStringArray.shuffle
+
+Shuffles (randomly sorts) all of the elements in the array.
+
+.. note::
+
+    - by The Mayor (commited by loginor from The Mayor's TIntegerArray.shuffle)
+
+Example:
+
+.. code-block:: pascal
+
+    TSA.shuffle();
+
+*)
+procedure TStringArray.shuffle();
+var
+  i: Integer;
+begin
+  for i := (length(self) - 1) downto 0 do
+    system.swap(self[i], self[random(i + 1)]);
+end;
