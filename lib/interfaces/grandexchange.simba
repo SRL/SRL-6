@@ -670,7 +670,7 @@ var
 begin
   if self.__isSlotActive(geSlot) then
   begin
-    findColors(TPA, 3088905, TBA[geSlot - 1]);
+    findColors(TPA, 2694922, TBA[geSlot - 1]);
     result := length(TPA) > 10000;
   end;
 
