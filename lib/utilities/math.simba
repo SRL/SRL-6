@@ -649,6 +649,14 @@ begin
     writeln('gaussBox', Format('Point invalid (%d, %d)', [p.x, p.y]));
 end;
 
+function gaussBox(box: TBox): TPoint; overload;
+var
+  p: TPoint;
+begin
+  gaussBox(p, box);
+  exit(p);
+end; 
+
 begin
   __gaussPoint := 0.4;
   __gaussRange := 0.3;
