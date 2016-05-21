@@ -540,16 +540,25 @@ Example:
 *)
 procedure mouseScroll(pnt: TPoint; scrolls: integer; down: boolean = true);
 var
-  x, y, c: integer;
+  x, y, c, downInt, upInt: integer;
 begin
+  {$IFDEF LINUX}
+    downInt := 1; upInt := -1;
+  {$ELSE}
+  {$IFDEF SMART}
+    downInt := 1; upInt := -1;
+  {$ELSE}
+    downInt := -1; upInt := 1;
+  {$ENDIF}
+  {$ENDIF}
   mouse(pnt, MOUSE_MOVE);
   getMousePos(x, y);
 
   repeat
     if down then
-      scrollMouse(x, y, 1)
+      scrollMouse(x, y, downInt)
     else
-      scrollMouse(x, y, -1);
+      scrollMouse(x, y, upInt);
 
     wait(16 + random(200));
     inc(c);
