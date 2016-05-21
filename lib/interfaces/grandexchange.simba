@@ -1000,10 +1000,10 @@ begin
   timeOut := getTickCount64() + randomRange(3000, 4000);
   inputBox := self.__getInputBoxes();
 
-  if not self.__findInsertionCursor(inputBox[2]) then
+  if not self.__findInsertionCursor(inputBox[3]) then
     mouseBox(inputBox[2], MOUSE_LEFT);
 
-  if self.__findInsertionCursor(inputBox[2]) then
+  if self.__findInsertionCursor(inputBox[3]) then
     typeSend(itemName, false);
 
   if waitColorCountRange(9214319, 10, resultsTextBox[0], 5000, 10) then
