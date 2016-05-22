@@ -103,9 +103,12 @@ __find
 
 .. code-block:: pascal
 
-    function TRStradeScreen.__find(method: string): boolean;
+    function TRStradeScreen.__find(): boolean;
 
-Internale function that returns true if the Trade Screen is detected and its bounds are set.
+Internale function that returns true if the (first) TradeScreen is detected
+and its bounds are set. Searches for the brown colored box in the center.
+
+This function is outdated!
 
 .. note::
 
@@ -119,8 +122,9 @@ Example:
     if tradeScreen.__find() then
       writeln('The Trade Screen is open, and the bounds are set!');
 *}
+
 {$IFNDEF CODEINSIGHT}
-function TRSTradeScreen.__find(): boolean;
+function TRSTradeScreen.__find(): boolean;     //This function is outdated!
 const
   CENTER_COLOR = 1513250;
 var
@@ -154,6 +158,54 @@ begin
 end;
 {$ENDIF}
 
+{*
+__findButtons
+-------------
+
+.. code-block:: pascal
+
+    function TRStradeScreen.__findButtons(): boolean;
+
+Internal function that returns the TradeScreen 'accept' and 'confirm'
+buttons in a TBoxArray.
+
+.. note::
+
+    - by Thomas
+    - Last Updated: 18 May 2016 by Thomas
+
+Example:
+
+.. code-block:: pascal
+
+    BoxArray := tradeScreen.__findButtons();
+*}
+
+{$IFNDEF CODEINSIGHT}
+function TRSTradeScreen.__findButtons(): TBoxArray;
+var
+  COLOR: TColorData := [5259036, 9, [2, [0.05, 1.95, 0.00]]];
+  i: integer;
+  TPA: TPointArray;
+  ATPA: T2DPointArray;
+  boxes: TBoxArray;
+begin
+  COLOR.gatherIn(TPA, getClientBounds());
+  ATPA := TPA.cluster(1);
+  ATPA.sortBySize(true);
+
+  if length(ATPA) then
+    for i := 0 to high(ATPA) do
+      if inRange(length(ATPA[i]), 1000, 1500) then
+        boxes.append(ATPA[i].getBounds());
+
+  if length(boxes) then
+    for i := 0 to high(boxes) do    //The buttons change size in the confirm screen, hence the big ranges.
+      if (inRange(boxes[i].getWidth(), 70, 77) and inrange(boxes[i].getHeight(), 23, 28)) then
+        result.append(boxes[i]);
+end;
+{$ENDIF}
+
 (*
 isOpen
 ------
@@ -164,11 +216,14 @@ isOpen
 
 Returns true if the tradeScreen is open. The optional **waitTime** parameter
 *(default = 0)* is the maximum time (in milliseconds) it will keep looking.
+The optional **confirm** parameter *(default = false)* will make the script look
+for the confirm screen if set to *true*. The function will set the bounds of
+the interface according to the **confirm** parameter.
 
 .. note::
 
     - by Thomas
-    - Last Updated: 22 September 2015 by Thomas
+    - Last Updated: 18 May 2016 by Thomas
 
 
 Example:
@@ -179,21 +234,38 @@ Example:
       writeln('It''s open!');
 
 *)
-function TRSTradeScreen.isOpen(waitTime: integer = 0): boolean;
+
+function TRSTradeScreen.isOpen(waitTime: integer = 0; confirm: boolean = false): boolean;
 var
   t: TCountDown;
+  buttons: TBoxArray;
 begin
   t.setTime(waitTime);
-
   repeat
-    result := self.__find();
+    buttons := self.__findButtons();
+
+    case length(buttons) of
+      1: mouseBox(chatBox.getBounds());
+      2:
+        if confirm then
+          result := (buttons[0].y1 = buttons[1].y1)
+        else
+          result := (buttons[0].x1 = buttons[1].x1);
+    end;
+
+    if result then
+    begin
+      if confirm then
+        buttons[0].edit(-165, -285, 250, 10)
+      else
+        buttons[0].edit(-215, -108, 215, 193);
+      self.setBounds(buttons[0]);
+    end;
 
     if (not result) and (waitTime > 0) then
-      wait(randomRange(round(waitTime/20), round(waitTime/10)));
-
+      wait(randomRange(round(waitTime / 20), round(waitTime / 10)));
   until result or t.isFinished();
-
-  print('TRSTradeScreen.isOpen(): Result = ' + boolToStr(result));
+  print('tradeScreen.isOpen(): result = ' + boolToStr(result), TDebug.SUB);
 end;
 
 (*
@@ -205,12 +277,14 @@ clickButton
     procedure TRSTradeScreen.clickButton(button: integer);
 
 Will click the trade button **button**. Valid button constants are
-located at the top of this page.
+located at the top of this page. If **moveMouseAfter** is set to *true*
+it will move the mouse over the chatBox, this is to prevent highlighting of
+buttons or items to interfere with the script.
 
 .. note::
 
     - by Thomas
-    - Last Updated: 8 December 2015 by Thomas
+    - Last Updated: 18 May 2016 by Thomas
 
 
 Example:
@@ -221,18 +295,30 @@ Example:
 
 *)
 
-procedure TRSTradeScreen.clickButton(button: integer);
+procedure TRSTradeScreen.clickButton(button: integer; moveMouseAfter: boolean = true);
 var
-  box: tbox;
+  box: TBox;
+  buttons: TBoxArray;
 begin
-  if (not self.__find()) then
+  if (not inRange(button, 0, 4)) then
+  begin
+    print('TRSTradeScreen.clickButton(): Not a valid button!', TDebug.WARNING);
+    exit();
+  end;
+
+  if moveMouseAfter then
+    mouseBox(chatBox.getBounds());
+
+  buttons := self.__findButtons();
+
+  if (length(buttons) <> 2) then
     exit();
 
   box := self.getBounds();
 
   case button of
-    TRADE_BUTTON_ACCEPT: box.edit(215, 105, -215, -186);
-    TRADE_BUTTON_DECLINE: box.edit(215, 143, -215, -154);
+    TRADE_BUTTON_ACCEPT: box := buttons[0];
+    TRADE_BUTTON_DECLINE: box := buttons[1];
     TRADE_BUTTON_ITEMS: box.edit(110, 265, -365, -34);
     TRADE_BUTTON_COINS: box.edit(143, 265, -332, -34);
     TRADE_BUTTON_CLOSE: box.edit(492, 4, -3, -311);
@@ -240,8 +326,11 @@ begin
 
   mouseBox(box, MOUSE_LEFT);
 
-  if (button = TRADE_BUTTON_ITEMS) or (button = TRADE_BUTTON_COINS) then
+  if moveMouseAfter then
+  begin
+    wait(randomRange(200, 400));
     mouseBox(chatBox.getBounds());
+  end;
 end;
 
 (*
@@ -252,13 +341,13 @@ close
 
     function TRSTradeScreen.close(escape: boolean = true): boolean;
 
-Returns true if the TradeScreen is successfully closed. It uses the ESC key
+Returns true if the TradeScreen is successfully closed. It uses the ESC key once
 by default, but the **escape** parameter can be set to false to close with mouse.
 
 .. note::
 
     - by Thomas
-    - Last Updated: 25 December 2015 by Thomas
+    - Last Updated: 18 May 2016 by Thomas
 
 Example:
 
@@ -267,33 +356,30 @@ Example:
     if tradeScreen.close() then
       writeln('Closed the tradeScreen');
 *)
+
 function TRSTradeScreen.close(waitTime: integer = 0; escape: boolean = true): boolean;
 var
   t: TCountDown;
 begin
   t.setTime(waitTime);
   repeat
-    result := (not self.isOpen());
+    if (length(self.__findButtons()) = 0) then
+      exit(true);
 
-    if not result then
+    if escape then
     begin
+      print('tradeScreen.close(): Trying to close Trade Screen with Escape-key.', TDebug.SUB);
+      typeByte(VK_ESCAPE);
+      escape := false;
+    end
+    else
+      self.clickButton(TRADE_BUTTON_CLOSE);
 
-      if escape then
-      begin
-        print('close(): Trying to close Trade Screen with Escape-key.', TDebug.SUB);
-        typeByte(VK_ESCAPE);
-        escape := false;
-      end
-      else
-        self.clickButton(TRADE_BUTTON_CLOSE);
+    if (waitTime > 0) then
+      wait(random(round(waitTime / 10), round(waitTime / 5)));
 
-      if (waitTime > 0) then
-        wait(random(round(waitTime / 10), round(waitTime / 5)));
-
-    end;
-
-  until result or t.isFinished();
-  print('tradeScreen.close(): result = ' + boolToStr(result), TDebug.SUB);
+  until t.isFinished();
+  print('tradeScreen.close(): Failed to close Trade Screen.', TDebug.SUB);
 end;
 
 (*
@@ -322,7 +408,7 @@ Example:
 
 procedure TRSTradeScreen.addCoins(amount: integer);
 begin
-  if (not self.__find()) then
+  if (not self.isOpen()) then
     exit();
 
   self.clickButton(TRADE_BUTTON_COINS);
@@ -330,9 +416,89 @@ begin
   chatBox.enterAmount(amount, randomRange(2000, 3000));
 end;
 
+(*
+getValue
+--------
+
+.. code-block:: pascal
+
+    function TRSTradeScreen.getValue(yours: boolean): integer;
+
+Returns the value of the items offered in the tradeScreen. If the 'yours'
+parameter is set to true, it will return the value of your offer, else it
+will return the other players offer value.
+
+.. note::
+
+    - by Thomas
+    - Last Updated: 18 May 2016 by Thomas
+
+
+Example:
+
+.. code-block:: pascal
+
+    if tradeScreen.getValue(true) > 1000 then
+      tradeScreen.clickButton(TRADE_BUTTON_ACCEPT);
+
+*)
+
+function TRSTradeScreen.getValue(yours: boolean): integer;
+var
+  box: TBox;
+  str: String;
+begin
+  if (not tradeScreen.isOpen()) then
+  begin
+    print('tradeScreen.getValue(): Unable to return result as the tradeScreen isn' 't open', TDebug.ERROR);
+    exit();
+  end;
+
+  box := tradeScreen.getBounds();
+  if yours then
+    box.edit(30, 303, - 325, - 7)
+  else
+    box.edit(325, 303, - 30, - 7);
+
+  str := Tesseract_GetText(box, TESS_FILTER_SMALL_CHARS);
+  print('tradeScreen.getValue(): ' + str, TDebug.ERROR);
+
+  result := StrToIntDef(ExtractFromStr(str, numbers), 0);
+  print('tradeScreen.getValue(): ' + intToStr(result), TDebug.ERROR);
+end;
+
+(*
+getOfferSlotBoxes
+-----------------
+
+.. code-block:: pascal
+
+    function TRSTradeScreen.getOfferSlotBoxes(yours: boolean): TBoxArray;
+
+
+Returns the Offer Slots in the tradeScreen as a TBoxArray. If the 'yours'
+parameter is set to true, it will return the TBoxArray of your side, else it
+will return the TBoxArray from the other players side. Perhaps more suited
+as an internal function though.
+
+.. note::
+
+    - by Thomas
+    - Last Updated: 18 May 2016 by Thomas
+
+
+Example:
+
+.. code-block:: pascal
+
+    if tradeScreen.getValue(true) > 1000 then
+      tradeScreen.clickButton(TRADE_BUTTON_ACCEPT);
+
+*)
+
 function TRSTradeScreen.getOfferSlotBoxes(yours: boolean): TBoxArray;
 begin
-  if (not self.__find()) then
+  if (not self.isOpen()) then
   begin
     print('tradeScreen.getOfferSlotBoxes(): Unable to return result as the tradeScreen isn''t open', TDebug.ERROR);
     exit();
@@ -365,14 +531,17 @@ Example:
 
 .. code-block:: pascal
 
-      writeLn(tradeScreen.offerCount(foodDTM, true));
+      writeLn(tradeScreen.countDTM(foodDTM, true));
 
 *)
 
 function TRSTradeScreen.countDTM(dtm: integer; yours: boolean): integer;
 begin
-  if (not self.__find()) then
-    exit();
+  if (not self.isOpen()) then
+  begin
+    print('tradeScreen.countDTM(): Can''t return result as the tradeScreen isn''t open', TDebug.ERROR);
+    exit(-1);
+  end;
 
   result := findItem(dtm, self.getOfferSlotBoxes(yours));
 
@@ -393,7 +562,7 @@ players offer count.
 
 .. note::
 
-    - by The Mayor
+    - by Thomas
     - Last Updated: 8 December 2015 by Thomas
 
 Example:
@@ -408,7 +577,7 @@ var
   b: TBoxArray := self.getOfferSlotBoxes(yours);
   i: integer;
 begin
-  if (not self.__find()) then
+  if (not self.isOpen()) then
   begin
     print('tradeScreen.offerCount(): Can''t return result as the tradeScreen isn''t open', TDebug.ERROR);
     exit(-1);
@@ -445,8 +614,8 @@ Example:
 
 .. code-block:: pascal
 
-    if (not tradeScreen.waitDTMCount(foodDTM, randomRange(2000, 3000), 28, true)) then
-      tradeScreen.clickButton(BANK_BUTTON_ITEMS);
+    if (not tradeScreen.waitDTMCount(foodDTM, 3000, 28, true)) then
+      tradeScreen.clickButton(TRADE_BUTTON_ITEMS);
 
 *)
 
@@ -455,7 +624,7 @@ var
   timer: TCountDown;
 begin
   timer.setTime(waitTime);
-  while (not timer.isFinished()) and self.__find() do
+  while (not timer.isFinished()) and self.isOpen() do
     if (self.countDTM(itemDTM, yours) >= count) then
       exit(true);
 end;
