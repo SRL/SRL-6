@@ -653,8 +653,7 @@ function gaussBox(box: TBox): TPoint; overload;
 var
   p: TPoint;
 begin
-  gaussBox(p, box);
-  exit(p);
+  gaussBox(Result, box);
 end; 
 
 begin
