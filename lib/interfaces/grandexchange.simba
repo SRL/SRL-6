@@ -670,7 +670,7 @@ var
 begin
   if self.__isSlotActive(geSlot) then
   begin
-    findColors(TPA, 3088905, TBA[geSlot - 1]);
+    findColors(TPA, 2694922, TBA[geSlot - 1]);
     result := length(TPA) > 10000;
   end;
 
@@ -1000,10 +1000,10 @@ begin
   timeOut := getTickCount64() + randomRange(3000, 4000);
   inputBox := self.__getInputBoxes();
 
-  if not self.__findInsertionCursor(inputBox[2]) then
+  if not self.__findInsertionCursor(inputBox[3]) then
     mouseBox(inputBox[2], MOUSE_LEFT);
 
-  if self.__findInsertionCursor(inputBox[2]) then
+  if self.__findInsertionCursor(inputBox[3]) then
     typeSend(itemName, false);
 
   if waitColorCountRange(9214319, 10, resultsTextBox[0], 5000, 10) then
@@ -1420,7 +1420,7 @@ Example:
 function TRSGrandExchange.sellItem(packSlot: integer; price, quantity: string; waitCollect: boolean = false; waitTime: integer = 10000): boolean;
 var
   i, nextSlot: integer;
-  confirm: TBox := [self.x1 + 225, self.y1 + 518, self.x1 + 373, self.y1 + 543];
+  confirm: TBox := [self.x1 + 230, self.y1 + 522, self.x1 + 369, self.y1 + 538];
 begin
   if not self.isOpen() then
   begin
@@ -1516,7 +1516,7 @@ var
   i, nextSlot, x, y: integer;
   b: TBox;
   TBA : TBoxArray := self.__getBuyBoxes();
-  confirm: TBox := [self.x1 + 210, self.y1 + 507, self.x1 + 353, self.y1 + 525];
+  confirm: TBox := [self.x1 + 230, self.y1 + 522, self.x1 + 369, self.y1 + 538];
 begin
   if not self.isOpen() then
   begin
