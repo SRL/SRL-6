@@ -196,13 +196,13 @@ begin
 
   if length(ATPA) then
     for i := 0 to high(ATPA) do
-      if inRange(length(ATPA[i]), 1000, 1500) then
+      if inRange(length(ATPA[i]), 1000, 1700) then
         boxes.append(ATPA[i].getBounds());
 
   if length(boxes) then
-    for i := 0 to high(boxes) do    //The buttons change size in the confirm screen, hence the big ranges.
-      if (inRange(boxes[i].getWidth(), 70, 77) and inrange(boxes[i].getHeight(), 23, 28)) then
-        result.append(boxes[i]);
+    for i := 0 to min(1, high(boxes)) do   //We only need the biggest two boxes as those will be our two buttons.
+      if (inRange(boxes[i].getWidth(), 70, 77) and inrange(boxes[i].getHeight(), 23, 30)) then
+        result.append(boxes[i]);            //The buttons change size in the confirm screen, hence the big ranges.
 end;
 {$ENDIF}
 
@@ -248,9 +248,9 @@ begin
       1: mouseBox(chatBox.getBounds());
       2:
         if confirm then
-          result := (buttons[0].y1 = buttons[1].y1)
+          result := (buttons[0].y1 = buttons[1].y1)   //They are next to each other in the confirm screen
         else
-          result := (buttons[0].x1 = buttons[1].x1);
+          result := (buttons[0].x1 = buttons[1].x1);  //The confirm button is above the cancel button
     end;
 
     if result then
@@ -260,11 +260,13 @@ begin
       else
         buttons[0].edit(-215, -108, 215, 193);
       self.setBounds(buttons[0]);
+      break;
     end;
 
-    if (not result) and (waitTime > 0) then
+    if (waitTime > 0) then
       wait(randomRange(round(waitTime / 20), round(waitTime / 10)));
-  until result or t.isFinished();
+  until t.isFinished();
+
   print('tradeScreen.isOpen(): result = ' + boolToStr(result), TDebug.SUB);
 end;
 
