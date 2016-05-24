@@ -183,25 +183,26 @@ Example:
 
 {$IFNDEF CODEINSIGHT}
 function TRSTradeScreen.__findButtons(): TBoxArray;
+const
+  BUTTON_COLOR = 4009229;
 var
-  COLOR: TColorData := [5259036, 9, [2, [0.05, 1.95, 0.00]]];
   i: integer;
   TPA: TPointArray;
   ATPA: T2DPointArray;
   boxes: TBoxArray;
 begin
-  COLOR.gatherIn(TPA, getClientBounds());
+  findColors(TPA, BUTTON_COLOR, getClientBounds());
   ATPA := TPA.cluster(1);
   ATPA.sortBySize(true);
 
   if length(ATPA) then
     for i := 0 to high(ATPA) do
-      if inRange(length(ATPA[i]), 1000, 1700) then
+      if inRange(length(ATPA[i]), 900, 1250) then
         boxes.append(ATPA[i].getBounds());
 
   if length(boxes) then
-    for i := 0 to min(1, high(boxes)) do   //We only need the biggest two boxes as those will be our two buttons.
-      if (inRange(boxes[i].getWidth(), 70, 77) and inrange(boxes[i].getHeight(), 23, 30)) then
+    for i := 0 to high(boxes) do   //We only need the biggest two boxes as those will be our two buttons.
+      if (inRange(boxes[i].getWidth(), 68, 75) and inrange(boxes[i].getHeight(), 19, 24)) then
         result.append(boxes[i]);            //The buttons change size in the confirm screen, hence the big ranges.
 end;
 {$ENDIF}
@@ -258,7 +259,7 @@ begin
       if confirm then
         buttons[0].edit(-165, -285, 250, 10)
       else
-        buttons[0].edit(-215, -108, 215, 193);
+        buttons[0].edit(-216, -111, 216, 194);
       self.setBounds(buttons[0]);
       break;
     end;
@@ -547,7 +548,7 @@ begin
 
   result := findItem(dtm, self.getOfferSlotBoxes(yours));
 
-  print('TRSTabBackpack.countDTM(): Counted ' + intToStr(result) + ' items');
+  print('tradeScreen.countDTM(): Counted ' + intToStr(result) + ' items');
 end;
 
 (*
