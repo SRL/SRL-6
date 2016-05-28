@@ -143,7 +143,7 @@ begin
   ATPA := TPA.cluster(1);
   ATPA.filterBetween(0, 2000);
 
-  if length(ATPA) then
+  if length(ATPA) > 0 then
   begin
     ATPA.sortBySize(true);
     box := ATPA[0].getBounds();
@@ -183,27 +183,24 @@ Example:
 
 {$IFNDEF CODEINSIGHT}
 function TRSTradeScreen.__findButtons(): TBoxArray;
-const
-  BUTTON_COLOR = 4009229;
 var
+  COLOR: TColorData := [5259036, 9, [2, [0.05, 1.95, 0.00]]];
   i: integer;
   TPA: TPointArray;
   ATPA: T2DPointArray;
   boxes: TBoxArray;
 begin
-  findColors(TPA, BUTTON_COLOR, getClientBounds());
+  COLOR.gatherIn(TPA, getClientBounds());
   ATPA := TPA.cluster(1);
   ATPA.sortBySize(true);
 
-  if length(ATPA) then
-    for i := 0 to high(ATPA) do
-      if inRange(length(ATPA[i]), 900, 1250) then
-        boxes.append(ATPA[i].getBounds());
+  for i := 0 to high(ATPA) do
+    if inRange(length(ATPA[i]), 1000, 1700) then
+      boxes.append(ATPA[i].getBounds());
 
-  if length(boxes) then
-    for i := 0 to high(boxes) do   //We only need the biggest two boxes as those will be our two buttons.
-      if (inRange(boxes[i].getWidth(), 68, 75) and inrange(boxes[i].getHeight(), 19, 24)) then
-        result.append(boxes[i]);            //The buttons change size in the confirm screen, hence the big ranges.
+  for i := 0 to high(boxes) do   //We only need the biggest two boxes as those will be our two buttons.
+    if (inRange(boxes[i].getWidth(), 70, 77) and inrange(boxes[i].getHeight(), 23, 30)) then
+      result.append(boxes[i]);            //The buttons change size in the confirm screen, hence the big ranges.
 end;
 {$ENDIF}
 
@@ -219,7 +216,8 @@ Returns true if the tradeScreen is open. The optional **waitTime** parameter
 *(default = 0)* is the maximum time (in milliseconds) it will keep looking.
 The optional **confirm** parameter *(default = false)* will make the script look
 for the confirm screen if set to *true*. The function will set the bounds of
-the interface according to the **confirm** parameter.
+the interface according to the **confirm** parameter. If the boolean
+**adaptiveWait** is set to *true* the loop time will be adapted to the waitTime.
 
 .. note::
 
@@ -236,7 +234,7 @@ Example:
 
 *)
 
-function TRSTradeScreen.isOpen(waitTime: integer = 0; confirm: boolean = false): boolean;
+function TRSTradeScreen.isOpen(waitTime: integer = 0; confirm: boolean = false; adaptiveWait: boolean = false): boolean;
 var
   t: TCountDown;
   buttons: TBoxArray;
@@ -259,13 +257,17 @@ begin
       if confirm then
         buttons[0].edit(-165, -285, 250, 10)
       else
-        buttons[0].edit(-216, -111, 216, 194);
+        buttons[0].edit(-215, -108, 215, 193);
       self.setBounds(buttons[0]);
       break;
     end;
 
     if (waitTime > 0) then
-      wait(randomRange(round(waitTime / 20), round(waitTime / 10)));
+      if adaptiveWait then
+        wait(randomRange(round(waitTime / 25), round(waitTime / 10)))
+      else
+        wait(randomRange(20, 60));
+
   until t.isFinished();
 
   print('tradeScreen.isOpen(): result = ' + boolToStr(result), TDebug.SUB);
@@ -315,7 +317,10 @@ begin
   buttons := self.__findButtons();
 
   if (length(buttons) <> 2) then
+  begin
+    print('TRSTradeScreen.clickButton(): Did not find trade screen!', TDebug.WARNING);
     exit();
+  end;
 
   box := self.getBounds();
 
@@ -346,6 +351,8 @@ close
 
 Returns true if the TradeScreen is successfully closed. It uses the ESC key once
 by default, but the **escape** parameter can be set to false to close with mouse.
+If the boolean **adaptiveWait** is set to *true* the loop time will be adapted
+to the waitTime parameter.
 
 .. note::
 
@@ -360,7 +367,7 @@ Example:
       writeln('Closed the tradeScreen');
 *)
 
-function TRSTradeScreen.close(waitTime: integer = 0; escape: boolean = true): boolean;
+function TRSTradeScreen.close(waitTime: integer = 0; escape: boolean = true; adaptiveWait: boolean = false): boolean;
 var
   t: TCountDown;
 begin
@@ -379,7 +386,10 @@ begin
       self.clickButton(TRADE_BUTTON_CLOSE);
 
     if (waitTime > 0) then
-      wait(random(round(waitTime / 10), round(waitTime / 5)));
+      if adaptiveWait then
+        wait(randomRange(round(waitTime / 20), round(waitTime / 10)))
+      else
+        wait(randomRange(20, 70));
 
   until t.isFinished();
   print('tradeScreen.close(): Failed to close Trade Screen.', TDebug.SUB);
@@ -548,7 +558,7 @@ begin
 
   result := findItem(dtm, self.getOfferSlotBoxes(yours));
 
-  print('tradeScreen.countDTM(): Counted ' + intToStr(result) + ' items');
+  print('TRSTabBackpack.countDTM(): Counted ' + intToStr(result) + ' items');
 end;
 
 (*
