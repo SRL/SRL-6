@@ -421,9 +421,10 @@ teleportTo
 
 .. code-block:: pascal
 
-    function TRSLodestoneScreen.teleportTo(location: integer): boolean;
+    function TRSLodestoneScreen.teleportTo(location: integer; waitAfter: boolean = false): boolean;
 
 Will teleport to **location**. Use the *Location constants* at the top of this page.
+Will wait untill animation is done if the **waitAfter** boolean is set to *true*.
 
 .. note::
 
@@ -437,7 +438,7 @@ Example:
     if lodestoneScreen.teleportTo(LOCATION_LUMBRIDGE) then
       writeln('We just teleported to Lumbridge');
 *)
-function TRSLodestoneScreen.teleportTo(location: integer): boolean;
+function TRSLodestoneScreen.teleportTo(location: integer; waitAfter: boolean = false): boolean;
 var
   b: TBox;
   options: TOptionArray
@@ -460,6 +461,8 @@ begin
       begin
         mouseBox(Options[1].bounds, MOUSE_LEFT);
         print('TRSLodestoneScreen.teleportTo(): Succesfully teleported to previous destination', TDebug.SUB);
+        if waitAfter then
+          wait(RandomRange(20000, 25000));
       end else
         print('TRSLodestoneScreen.teleportTo(): Failed teleport to previous destination (ChooseOption must have failed)', TDebug.SUB);
 
@@ -481,6 +484,8 @@ begin
         mouseBox(b, MOUSE_LEFT);
         result := true;
         print('TRSLodestoneScreen.teleportTo(): result = true', TDebug.SUB);
+        if waitAfter then
+          wait(RandomRange(20000, 25000));
       end;
 
     end else
