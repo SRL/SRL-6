@@ -421,7 +421,7 @@ teleportTo
 
 .. code-block:: pascal
 
-    function TRSLodestoneScreen.teleportTo(location: integer; waitAfter: boolean = false): boolean;
+    function TRSLodestoneScreen.teleportTo(location: integer): boolean;
 
 Will teleport to **location**. Use the *Location constants* at the top of this page.
 Will wait untill animation is done if the **waitAfter** boolean is set to *true*.
@@ -441,7 +441,8 @@ Example:
 function TRSLodestoneScreen.teleportTo(location: integer; waitAfter: boolean = false): boolean;
 var
   b: TBox;
-  options: TOptionArray
+  options: TOptionArray;
+  t: TCountDown;
 begin
   result := false;
 
@@ -484,8 +485,17 @@ begin
         mouseBox(b, MOUSE_LEFT);
         result := true;
         print('TRSLodestoneScreen.teleportTo(): result = true', TDebug.SUB);
+
+        t.setTime(randomRange(20000, 25000));
         if waitAfter then
-          wait(RandomRange(20000, 25000));
+        repeat
+          wait(randomRange(500, 2000));
+          if (SRL_Events[EVENT_ANTIBAN] <> nil) then
+            SRL_Events[EVENT_ANTIBAN]()
+          else
+            Mouse(gaussBox(mainScreen.getBounds()), MOUSE_MOVE);
+        until t.isFinished();
+
       end;
 
     end else
