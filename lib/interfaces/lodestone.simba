@@ -494,6 +494,14 @@ begin
         result := true;
         print('TRSLodestoneScreen.teleportTo(): result = true', TDebug.SUB);
 
+        if waitAfter then
+        repeat
+          wait(randomRange(500, 2000));
+          if (SRL_Events[EVENT_ANTIBAN] <> nil) then
+            SRL_Events[EVENT_ANTIBAN]()
+          else
+            Mouse(gaussBox(mainScreen.getBounds()), MOUSE_MOVE);
+        until t.isFinished();
       end;
 
     end else
