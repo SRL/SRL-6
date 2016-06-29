@@ -388,4 +388,67 @@ begin
   result := averageExtended(self);
 end;
 
+(*
+TExtendedArray.highestValue
+~~~~~~~~~~~~~~~~~~~~~~~~~~~
+
+.. code-block:: pascal
+
+    function TExtendedArray.highestValue(out index: integer) : Extended;
+
+Returns the highest value found in a TExtendedArray. Aswell as the index of that value.
+
+.. note::
+
+    - by Thomas
+
+Example:
+
+.. code-block:: pascal
+
+    writeLn(toStr(TEA.highestValue()));
+
+*)
+
+function TExtendedArray.highestValue(out index: integer): Extended;
+var
+  i: integer;
+begin
+  for i := 0 to high(self) do
+    if (self[i] > result) then
+    begin
+      result := self[i];
+      index := i;
+    end;
+end;
+
+(*
+TExtendedArray.highestValue
+~~~~~~~~~~~~~~~~~~~~~~~~~~~
+
+.. code-block:: pascal
+
+    function TExtendedArray.highestValue(out index: integer) : Extended; overload;
+
+Overloaded function that returns the highest value found in a TExtendedArray.
+
+.. note::
+
+    - by Thomas
+
+Example:
+
+.. code-block:: pascal
+
+    writeLn(toStr(TEA.highestValue()));
+
+*)
+
+function TExtendedArray.highestValue(): Extended; overload;
+var
+  index: integer;
+begin
+  result := self.highestValue(index);
+end;
+
 {$f+}
