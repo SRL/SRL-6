@@ -646,7 +646,7 @@ begin
 
     if (not result) then
     begin
-      if useEscKey and j < randomRange(2, 4) then
+      if useEscKey and (j < randomRange(2, 4)) then
         begin
           print('closePopup(): Trying to close popup with Escape-key.', TDebug.SUB);
           typeByte(VK_ESCAPE);

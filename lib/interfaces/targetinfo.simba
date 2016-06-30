@@ -100,7 +100,7 @@ __find
 
     function TRSTargetInfo.__find(method: string): boolean;
 
-Internale function that returns true if the Target Info popup is detected and its bounds are set.
+Internal function that returns true if the Target Info popup is detected and its bounds are set.
 The 'method: string' option allows for faster, or slower detections, based on the color gathering method.
 Possible options are 'slow' (this sets the regular bounds) and 'fast' (this sets the bounds around the combat level).
 
@@ -146,7 +146,7 @@ begin
 
     case method of
       'fast':
-        if b.getHeight() = 16 and b.getWidth() = 30 then
+        if (b.getHeight() = 16) and (b.getWidth() = 30) then
         begin
           self.setBounds(b);
           exit(true);
