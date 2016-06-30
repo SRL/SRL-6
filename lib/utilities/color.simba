@@ -715,7 +715,7 @@ begin
 
     result := (count > minCount);
 
-    if not result and waitTime > 0 then
+    if (not result) and (waitTime > 0) then
       wait(randomRange(10, 50));
 
   until result or timeOut.isFinished();
@@ -764,7 +764,7 @@ begin
 
     result := count >= minCount;
 
-    if not result and waitTime > 0 then
+    if (not result) and (waitTime > 0) then
       wait(randomRange(20, 60));
 
   until result or timeOut.isFinished();
