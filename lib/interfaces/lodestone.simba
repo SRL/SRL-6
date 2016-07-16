@@ -73,7 +73,20 @@ const
   LOCATION_CANIFIS         = 21;
   LOCATION_ASHDALE         = 22;
   LOCATION_PRIFDDINAS      = 23;
-  LOCATION_PREVIOUS        = 1337;
+
+(*
+**var previousLocation**
+
+.. code-block:: pascal
+
+    var
+      previousLocation: Integer;
+
+A variable which stores the previous location teleported to.
+
+*)
+var
+  previousLocation: Integer;
 
 (*
 **type TRSLodestoneScreen**
@@ -449,7 +462,7 @@ begin
     mouseCircle(minimap.button[MM_BUTTON_LODESTONE].center.x, minimap.button[MM_BUTTON_LODESTONE].center.y,
                 minimap.button[MM_BUTTON_LODESTONE].radius, MOUSE_MOVE);
 
-    if (location = LOCATION_PREVIOUS) then
+    if (location = previousLocation) then
     begin
       fastclick(MOUSE_RIGHT);
       Wait(Random(200, 300));
@@ -481,6 +494,7 @@ begin
         mouseBox(b, MOUSE_LEFT);
         result := true;
         print('TRSLodestoneScreen.teleportTo(): result = true', TDebug.SUB);
+        previousLocation := location;
       end;
 
     end else
