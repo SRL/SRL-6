@@ -134,7 +134,7 @@ begin
     ID := ID_INTERFACE_TAB_STATS;
     tabIndex := TAB_STATS;
     parentID := -1;
-    static := true;
+    isStatic := true;
   end;
 end;
 {$ENDIF}

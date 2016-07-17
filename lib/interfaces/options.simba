@@ -85,7 +85,7 @@ begin
     name := 'RS Options Menu';
     ID := ID_INTERFACE_OPTIONS;
     parentID := -1;
-    static := true;
+    isStatic := true;
     setBounds(IntToBox(300, 95, 499, 469));
   end;
 end;
@@ -151,7 +151,7 @@ function TRSOptions.isOpen(waitTime: integer = 0): boolean;
 var
   t: UInt64;
 begin
-  t := (getTickCount64() + waitTime);
+  t := (GetTickCount() + waitTime);
 
   repeat
     if self.__find() then
@@ -197,9 +197,9 @@ begin
 
   typeByte(VK_ESCAPE);
 
-  t := (getTickCount64() + waitTime + random(400));
+  t := (GetTickCount() + waitTime + random(400));
 
-  while (getTickCount64() < t) do
+  while (GetTickCount() < t) do
     if self.isOpen(2000) then
     begin
       result := true;

@@ -519,7 +519,7 @@ begin
     name := 'RS Powers Screen';
     ID := ID_INTERFACE_POWERSSCREEN;
     parentID := -1;
-    static := False;
+    isStatic := false;
   end;
 end;
 {$ENDIF}
@@ -605,7 +605,7 @@ function TRSPowersScreen.isOpen(waitTime: integer = 0): boolean;
 var
   t: UInt64;
 begin
-  t := (getTickCount64() + waitTime);
+  t := (GetTickCount() + waitTime);
 
   repeat
     if self.__find() then

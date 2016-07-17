@@ -30,7 +30,7 @@ Example:
 
     newTPA := TPA.copy();
 *)
-function TPointArray.copy(): TPointArray;
+function TPointArray.copy(): TPointArray; constref;
 begin
   result := copyTPA(self);
 end;
@@ -55,7 +55,7 @@ Example:
 
     newTPA := TPA.copy(b);
 *)
-function TPointArray.copy(area: TBox): TPointArray; overload;
+function TPointArray.copy(area: TBox): TPointArray; constref; overload;
 var
   tmp: TPointArray;
 begin
@@ -197,7 +197,7 @@ Example:
     writeLn(TPA.returnPosInArray(point(13, 37)));
 
 *)
-function TPointArray.returnPosInArray(const p : TPoint) : Integer;
+function TPointArray.returnPosInArray(const p : TPoint) : Integer; constref;
 var
   I : Integer;
 begin
@@ -231,7 +231,7 @@ Example:
     writeLn(TPA.isInArray(point(13, 37)));
 
 *)
-function TPointArray.isInArray(const p : TPoint) : Boolean;
+function TPointArray.isInArray(const p : TPoint) : Boolean; constref;
 begin
   result := returnPosInArray(p) > -1;
 end;
@@ -395,7 +395,7 @@ Example:
     mP := TPA.getMiddle();
 
 *)
-function TPointArray.getMiddle(): TPoint;
+function TPointArray.getMiddle(): TPoint; constref;
 begin
   result := middleTPA(self);
 end;
@@ -421,7 +421,7 @@ Example:
     b := TPA.getBounds();
 
 *)
-function TPointArray.getBounds() : TBox;
+function TPointArray.getBounds() : TBox; constref;
 begin
   result := getTPABounds(self);
 end;
@@ -446,7 +446,7 @@ Example:
 
   writeln(tpa.getDensity());
 *)
-function TPointArray.getDensity(): extended;
+function TPointArray.getDensity(): extended; constref;
 var
   tmp: TPointArray;
   b: TBox;
@@ -480,7 +480,7 @@ Example:
     b := TPA.equals(TPA2);
 
 *)
-function TPointArray.equals(const arr : TPointArray) : Boolean;
+function TPointArray.equals(const arr : TPointArray) : Boolean; constref;
 begin
   result := sameTPA(self, arr);
 end;
@@ -506,7 +506,7 @@ Example:
     TPA.isPointNear(P, 13, 37);
 
 *)
-function TPointArray.isPointNear(const P : TPoint; const W, H : Integer): Boolean;
+function TPointArray.isPointNear(const P : TPoint; const W, H : Integer): Boolean; constref;
 begin
   result := nearbyPointInArrayEx(P, W, H, self);
 end;
@@ -532,7 +532,7 @@ Example:
     TPA.isPointNear(P, 1337);
 
 *)
-function TPointArray.isPointNear(const P : TPoint; const D : Integer): Boolean; overload;
+function TPointArray.isPointNear(const P : TPoint; const D : Integer): Boolean; constref; overload;
 begin
   result := nearbyPointInArray(P, D, self);
 end;
@@ -558,7 +558,7 @@ Example:
     matches := TPA.returnInTPA(TPA2);
 
 *)
-function TPointArray.returnInTPA(const arr : TPointArray) : TPointArray;
+function TPointArray.returnInTPA(const arr : TPointArray) : TPointArray; constref;
 begin
   FindTPAinTPA(arr, self, result);
 end;
@@ -585,7 +585,7 @@ Example:
     if TPA.returnInTPA(TPA2, resultTPA) then
 
 *)
-function TPointArray.returnInTPA(const arr : TPointArray; var matches : TPointArray) : Boolean; overload;
+function TPointArray.returnInTPA(const arr : TPointArray; var matches : TPointArray) : Boolean; constref; overload;
 begin
   Result := FindTPAinTPA(arr, self, matches);
 end;
@@ -611,7 +611,7 @@ Example:
     if (TPA.returnNotInTPA(b)) then
 
 *)
-function TPointArray.returnNotInTPA(b: TBox): TPointArray;
+function TPointArray.returnNotInTPA(b: TBox): TPointArray; constref;
 begin
   result := returnPointsNotInTPA(self, b);
 end;
@@ -923,7 +923,7 @@ Example:
     TPA.findTextIn(13.0, sTPA, mTPA);
 
 *)
-function TPointArray.findTextIn(const height : Integer; const searchTPA : TPointArray; var matches : TPointArray): Boolean;
+function TPointArray.findTextIn(const height : Integer; const searchTPA : TPointArray; var matches : TPointArray): Boolean; constref;
 begin
   Result := FindTextTPAInTPA(height, searchTPA, self, matches);
 end;
@@ -949,7 +949,7 @@ Example:
     ATPA := TPA.split(5, 3);
 
 *)
-function TPointArray.split(w, h: integer): T2DPointArray;
+function TPointArray.split(w, h: integer): T2DPointArray; constref;
 begin
   result := splitTPAEx(self, w, h);
 end;
@@ -975,7 +975,7 @@ Example:
     ATPA := TPA.split(4);
 
 *)
-function TPointArray.split(const dist: integer): T2DPointArray; overload;
+function TPointArray.split(const dist: integer): T2DPointArray; constref; overload;
 begin
   result := splitTPA(self, dist);
 end;
@@ -1001,7 +1001,7 @@ Example:
 
     atpa := tpa.cluster(5);
 *)
-function TPointArray.cluster(const dist: integer): T2DPointArray;
+function TPointArray.cluster(const dist: integer): T2DPointArray; constref;
 begin
   result := clusterTPA(self, dist);
 end;
@@ -1028,7 +1028,7 @@ Example:
 
     atpa := tpa.cluster(5, 5);
 *)
-function TPointArray.cluster(const width, height: integer): T2DPointArray; overload;
+function TPointArray.cluster(const width, height: integer): T2DPointArray; constref; overload;
 begin
   result := clusterTPAEx(self, width, height);
 end;
@@ -1053,7 +1053,7 @@ Example:
 
     filteredTPA := TPA.clearTPAFrom(clearTPA);
 *)
-function TPointArray.clearTPAFrom(const tpa: TPointArray): TPointArray;
+function TPointArray.clearTPAFrom(const tpa: TPointArray): TPointArray; constref;
 begin
   result := clearTPAFromTPA(self, tpa);
 end;
@@ -1079,7 +1079,7 @@ Example:
     atpa := tpa.toATPA(10);
 
 *)
-function TPointArray.toATPA(const distance: integer): T2DPointArray;
+function TPointArray.toATPA(const distance: integer): T2DPointArray; constref;
 begin
   result := TPAToATPA(self, distance);
 end;
@@ -1105,7 +1105,7 @@ Example:
     atpa := tpa.toATPA(10, 5);
 
 *)
-function TPointArray.toATPA(const w, h: integer): T2DPointArray; overload;
+function TPointArray.toATPA(const w, h: integer): T2DPointArray; constref; overload;
 begin
   result := TPAToATPAEx(self, w, h);
 end;
@@ -1157,7 +1157,7 @@ Example:
     edgeTPA := tpa.getEdges();
 
 *)
-function TPointArray.getEdges(): TPointArray;
+function TPointArray.getEdges(): TPointArray; constref;
 begin
   result := FindTPAEdges(self);
 end;
@@ -1209,7 +1209,7 @@ Example:
     matches := atpa.getSamePoints();
 
 *)
-function T2DPointArray.getSamePoints(): TPointArray;
+function T2DPointArray.getSamePoints(): TPointArray; constref;
 begin
   getSamePointsATPA(self, result);
 end;
@@ -1235,7 +1235,7 @@ Example:
     len := atpa.getSamePoints();
 
 *)
-function T2DPointArray.getSamePoints(): integer; overload;
+function T2DPointArray.getSamePoints(): integer; constref; overload;
 var
   tmpTPA: TPointArray;
 begin
@@ -1264,7 +1264,7 @@ Example:
     boxArr := atpa.getEachBounds();
 
 *)
-function T2DPointArray.getEachBounds(): TBoxArray;
+function T2DPointArray.getEachBounds(): TBoxArray; constref;
 var
   i, l: integer;
 begin
@@ -1296,7 +1296,7 @@ Example:
     TPA := ATPA.merge();
 
 *)
-function T2DPointArray.merge(): TPointArray;
+function T2DPointArray.merge(): TPointArray; constref;
 begin
   result := mergeATPA(self);
 end;
@@ -1322,7 +1322,7 @@ Example:
     b := TPA.getBounds();
 
 *)
-function T2DPointArray.getBounds(): TBox;
+function T2DPointArray.getBounds(): TBox; constref;
 begin
   result := getATPABounds(self);
 end;
@@ -1373,7 +1373,7 @@ Example:
 
     newATPA := ATPA.copy();
 *)
-function T2DPointArray.copy(): T2DPointArray;
+function T2DPointArray.copy(): T2DPointArray; constref;
 begin
   result := copyATPA(self);
 end;
@@ -1399,7 +1399,7 @@ Example:
     txt := ATPA.getTextATPA();
 
 *)
-function T2DPointArray.getTextInATPA(const maxSpacing: integer; const font: string): string;
+function T2DPointArray.getTextInATPA(const maxSpacing: integer; const font: string): string; constref;
 begin
   result := getTextATPA(self, maxSpacing, font);
 end;
@@ -1566,7 +1566,7 @@ Example:
 
    tpa.getCovexHull(pnts);
 *)
-function TPointArray.getConvexHull(): TPointArray;
+function TPointArray.getConvexHull(): TPointArray; constref;
 var
   pts: TPointArray;
   h,i,k,u: Int32;

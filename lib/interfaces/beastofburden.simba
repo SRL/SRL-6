@@ -138,7 +138,7 @@ begin
     name := 'Beast of Burden';
     ID := ID_INTERFACE_BEASTOFBURDEN;
     parentID := -1;
-    static := false;
+    isStatic := false;
   end;
 end;
 {$ENDIF}
@@ -225,12 +225,12 @@ function TRSBeastOfBurden.isOpen(waitTime: integer = 0): boolean;
 var
   t: UInt64;
 begin
-  t := (getTickCount64() + waitTime);
+  t := (GetTickCount() + waitTime);
 
   repeat
     result := self.__find();
     wait(20 + random(20));
-  until (getTickCount64() >= t) or (result);
+  until (GetTickCount() >= t) or (result);
 end;
 
 (*
@@ -272,12 +272,12 @@ begin
     exit(false);
   end;
 
-  timer := getTickCount64() + randomRange(5000, 7000);
+  timer := GetTickCount() + randomRange(5000, 7000);
 
   repeat
     chooseOption.select(['Interact']);
     wait(randomRange(300, 1100));
-  until (getTickCount64() >= timer) or (conversationBox.isOpen());
+  until (GetTickCount() >= timer) or (conversationBox.isOpen());
 
   if (not conversationBox.isOpen()) then
   begin
@@ -285,12 +285,12 @@ begin
     exit(false);
   end;
 
-  timer := getTickCount64() + randomRange(5000, 7000);
+  timer := GetTickCount() + randomRange(5000, 7000);
 
   repeat
     conversationBox.selectOption(2);
     wait(randomRange(300, 1100));
-  until (getTickCount64() >= timer) or (self.isOpen());
+  until (GetTickCount() >= timer) or (self.isOpen());
 
   if self.isOpen() then
     exit(true);
@@ -331,12 +331,12 @@ begin
   // try ESC key first
   if escape then
   begin
-    timeOut := (getTickCount64() + randomRange(600, 900));
+    timeOut := (GetTickCount() + randomRange(600, 900));
     repeat
       multiType(VK_ESCAPE, randomRange(30, 50), 2);
       wait(100 + random(50));
       result := (not self.isOpen());
-    until((getTickCount64() > timeOut) or result);
+    until((GetTickCount() > timeOut) or result);
 
     if result then
       exit();
@@ -354,8 +354,8 @@ begin
     exit(true);
 
   // wait for the beast of burden screen to close
-  timeOut := (getTickCount64() + randomRange(5000, 6000));
-  while (timeOut > getTickCount64()) do
+  timeOut := (GetTickCount() + randomRange(5000, 6000));
+  while (timeOut > GetTickCount()) do
   begin
     if (not self.isOpen()) then
     begin
@@ -976,17 +976,17 @@ begin
           if (not chooseOption.select([toStr(amounts[i])], MOUSE_LEFT, 300)) then
             if (chooseOption.select(['Store-X', '-X'])) then
             begin
-              t := (getTickCount64() + 3000);
+              t := (GetTickCount() + 3000);
 
-              while (getTickCount64() < t) do
+              while (GetTickCount() < t) do
               begin
                 if (findColor(_x, _y, 0, 241, 485, 286, 517)) then // box around the "Enter" text
                 begin
                   wait(100 + random(50));
                   typeSend(toStr(amounts[i]));
 
-                  tt := (getTickCount64() + 3000);
-                  while (self.isOpen() = false) and (getTickCount64() < tt) do
+                  tt := (GetTickCount() + 3000);
+                  while (self.isOpen() = false) and (GetTickCount() < tt) do
                     wait(50);
 
                   break;
@@ -999,8 +999,8 @@ begin
       end;
 
       // wait for the item to disappear
-      t := (getTickCount64() + 2000);
-      while (amounts[i] = -1) and (getTickCount64() < t) do
+      t := (GetTickCount() + 2000);
+      while (amounts[i] = -1) and (GetTickCount() < t) do
       begin
         if (not isItemIn(b)) then
           break;

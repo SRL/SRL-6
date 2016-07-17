@@ -104,7 +104,7 @@ begin
     name := 'RS Conversation Box';
     ID := ID_INTERFACE_CONVERSATION_BOX;
     parentID := -1;
-    static := false;
+    isStatic := false;
   end;
 end;
 {$ENDIF}

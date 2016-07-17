@@ -1102,7 +1102,7 @@ begin
   begin
     tabBackpack.mouseSlot(tabBackpack.pointToSlot(p), MOUSE_LEFT);
 
-    t := (getTickCount64() + randomRange(2000, 3000));
+    t := (GetTickCount() + randomRange(2000, 3000));
     repeat
       if (not tabBackpack.isItemInSlot(tabBackpack.pointToSlot(p))) then
         result := true;
@@ -1111,7 +1111,7 @@ begin
         break;
 
       wait(20 + random(20));
-    until (getTickCount64() >= t) or result;
+    until (GetTickCount() >= t) or result;
   end;
 
   if result then

@@ -87,7 +87,7 @@ begin
     name := 'Hero Screen';
     ID := ID_INTERFACE_HEROSCREEN;
     parentID := -1;
-    static := false;
+    isStatic := false;
   end;
 end;
 {$ENDIF}
@@ -180,7 +180,7 @@ function TRSHeroScreen.isOpen(waitTime: integer = 0): boolean;
 var
   t: UInt64;
 begin
-  t := (getTickCount64() + waitTime);
+  t := (GetTickCount() + waitTime);
 
   repeat
     if self.__find() then
@@ -226,13 +226,13 @@ begin
   if self.isOpen() then
     exit(true);
 
-  timeOut := getTickCount64() + waitTime + random(400);
+  timeOut := GetTickCount() + waitTime + random(400);
 
   mouseBox(gameTabs.navButtons[NAV_BUTTON_HERO][0], MOUSE_LEFT);
 
   wait(randomRange(750, 1250));
 
-  while (getTickCount64() < timeOut) do
+  while (GetTickCount() < timeOut) do
     if self.isOpen(500) then
     begin
       result := true;
@@ -277,11 +277,11 @@ begin
 
   if escape then // Try the escape button first if possible
   begin
-    timeOut := (getTickCount64() + randomRange(600, 900));
+    timeOut := (GetTickCount() + randomRange(600, 900));
     repeat
       typeByte(VK_ESCAPE);
       wait(300 + random(50));
-    until (not self.isOpen()) or (getTickCount64() > timeOut);
+    until (not self.isOpen()) or (GetTickCount() > timeOut);
 
     if (not self.isOpen()) then
       exit(true);
@@ -290,9 +290,9 @@ begin
   if self.isOpen(100 + random(50)) then // Wait a bit in case it closes
   begin
     mouse(point(self.x1 + __CLOSE_OFFSET.x, self.y1 + __CLOSE_OFFSET.y).rand(3), MOUSE_LEFT);
-    timeOut := (getTickCount64() + randomRange(5000, 6000));
+    timeOut := (GetTickCount() + randomRange(5000, 6000));
 
-    while (timeOut > getTickCount64()) do
+    while (timeOut > GetTickCount()) do
     begin
       if (not self.isOpen()) then
       begin

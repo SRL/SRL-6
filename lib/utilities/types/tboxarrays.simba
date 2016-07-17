@@ -146,7 +146,7 @@ Example:
     writeLn(tba.returnInArray([5,5,100,100]));
 
 *)
-function TBoxArray.returnInArray(const b : TBox) : integer;
+function TBoxArray.returnInArray(const b : TBox) : integer; constref;
 var
   i: integer;
 begin
@@ -177,7 +177,7 @@ Example:
     if (tba.isInArray([5,5,100,100])) then ... ;
 
 *)
-function TBoxArray.isInArray(const b : TBox) : Boolean;
+function TBoxArray.isInArray(const b : TBox) : Boolean; constref;
 begin
   result := self.returnInArray(b) > -1;
 end;
@@ -203,7 +203,7 @@ Example:
     tba := tba2.include(tba);
 
 *)
-function TBoxArray.include(const arr : TBoxArray) : TBoxArray;
+function TBoxArray.include(const arr : TBoxArray) : TBoxArray; constref;
 var
   I : Integer;
 begin
@@ -233,7 +233,7 @@ Example:
     tba := tba2.exclude(tba);
 
 *)
-function TBoxArray.exclude(const arr : TBoxArray) : TBoxArray;
+function TBoxArray.exclude(const arr : TBoxArray) : TBoxArray; constref;
 var
   I : Integer;
 begin
@@ -360,7 +360,7 @@ Example:
     atpa := tba.toATPA();
 
 *)
-function TBoxArray.toATPA() : T2DPointArray;
+function TBoxArray.toATPA() : T2DPointArray; constref;
 var
   i : integer;
 begin
@@ -391,7 +391,7 @@ Example:
     atpa := tba.toTPA();
 
 *)
-function TBoxArray.toTPA() : TPointArray;
+function TBoxArray.toTPA() : TPointArray; constref;
 var
   i : integer;
   atpa: T2DPointArray;
@@ -423,7 +423,7 @@ Example:
     newTba := tba.copy();
 
 *)
-function TBoxArray.copy() : TBoxArray;
+function TBoxArray.copy() : TBoxArray; constref;
 begin
   result := System.copy(self);
 end;
@@ -449,7 +449,7 @@ Example:
 
     b := tba.getBounds();
 *)
-function TBoxArray.getBounds(): TBox;
+function TBoxArray.getBounds(): TBox; constref;
 var
   h, i: Integer;
   e: TBox;
@@ -497,7 +497,7 @@ Example:
     if (tba.equals(otherTBA)) then ... ;
 
 *)
-function TBoxArray.equals(const tba: TBoxArray) : boolean;
+function TBoxArray.equals(const tba: TBoxArray) : boolean; constref;
 var
   i : integer;
 begin
@@ -562,7 +562,7 @@ Example:
     midpoint := tba.getMiddle();
 
 *)
-function TBoxArray.getMiddle(): TPoint;
+function TBoxArray.getMiddle(): TPoint; constref;
 var
   i : integer;
 begin
@@ -681,7 +681,7 @@ Example:
     tia := tba.pixelShiftAverage(150, 5000);
 
 *)
-function TBoxArray.pixelShiftAverage(wait: integer = 200; max: integer = 850): TIntegerArray;
+function TBoxArray.pixelShiftAverage(wait: integer = 200; max: integer = 850): TIntegerArray; constref;
 begin
    result := getPixelShiftAverage(self, wait, max);
 end;
@@ -708,7 +708,7 @@ Example:
     tia := tba.pixelShift(150);
 
 *)
-function TBoxArray.pixelShift(time: integer = 200): TIntegerArray;
+function TBoxArray.pixelShift(time: integer = 200): TIntegerArray; constref;
 begin
    result := getPixelShift(self, time);
 end;
@@ -735,7 +735,7 @@ Example:
     tia := tba.getColors();
 
 *)
-function TBoxArray.getColors(clearSame: boolean = true): TIntegerArray;
+function TBoxArray.getColors(clearSame: boolean = true): TIntegerArray; constref;
 var
   i : integer;
   tia: TIntegerArray;
@@ -769,7 +769,7 @@ Example:
     if (tba.colorExists(512290, 7)) then ... ;
 
 *)
-function TBoxArray.colorExists(color: integer; tolerance: integer = 0): boolean;
+function TBoxArray.colorExists(color: integer; tolerance: integer = 0): boolean; constref;
 var
   i : integer;
   tia: TIntegerArray;

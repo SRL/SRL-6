@@ -312,7 +312,7 @@ begin
     name := 'RS Bank Screen';
     ID := ID_INTERFACE_BANKSCREEN;
     parentID := -1;
-    static := false;
+    isStatic := false;
     bankColors.__load(IncludePath + 'srl-6\lib\interfaces\bankscreen.aca');
   end;
 end;

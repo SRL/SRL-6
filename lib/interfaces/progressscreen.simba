@@ -99,7 +99,7 @@ begin
     name := 'RS Progress Screen';
     ID := ID_INTERFACE_PROGRESS;
     parentID := -1;
-    static := false;
+    isStatic := false;
   end;
 end;
 {$ENDIF}

@@ -104,7 +104,7 @@ begin
     name := 'RS Mainscreen';
     ID := ID_INTERFACE_MAINSCREEN;
     parentID := -1;
-    static := true;
+    isStatic := true;
   end;
 end;
 {$ENDIF}

@@ -127,7 +127,7 @@ A record that stores useful information about RS interfaces.
       TRSInterface = record
         name: string;
         ID, parentID: integer;
-        static: boolean;
+        isStatic: Boolean;
         x, y, w, h: integer;
         x1, y1, x2, y2: integer;
         cx, cy: integer;
@@ -140,7 +140,7 @@ type
   TRSInterface = record
     name: string;
     ID, parentID: integer;
-    static: boolean;
+    isStatic: Boolean;
     x, y, w, h: integer;
     x1, y1, x2, y2: integer;
     cx, cy: integer;

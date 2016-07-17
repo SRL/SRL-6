@@ -115,7 +115,7 @@ begin
     name := 'RS Loot Screen';
     ID := ID_INTERFACE_LOOTSCREEN;
     parentID := -1;
-    static := false;
+    isStatic := false;
   end;
 end;
 {$ENDIF}
@@ -210,7 +210,7 @@ function TRSLootScreen.isOpen(waitTime: integer = 0): boolean;
 var
   t: UInt64;
 begin
-  t := (getTickCount64() + waitTime);
+  t := (GetTickCount() + waitTime);
 
   repeat
     if self.__find() then
@@ -258,9 +258,9 @@ begin
   if self.isOpen(100 + random(50)) then // Wait a bit in case it closes
   begin
     mouse(point(self.x1 + __CLOSE_OFFSET.x, self.y1 + __CLOSE_OFFSET.y).rand(5), MOUSE_LEFT);
-    timeOut := (getTickCount64() + randomRange(5000, 6000));
+    timeOut := (GetTickCount() + randomRange(5000, 6000));
 
-    while (timeOut > getTickCount64()) do
+    while (timeOut > GetTickCount()) do
     begin
       if (not self.isOpen()) then
       begin

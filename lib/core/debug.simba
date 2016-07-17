@@ -499,8 +499,11 @@ Example:
     debugTPA(tpa);
 *)
 procedure debugBitmap(bmp: integer);
+var
+  img:TMufasaBitmap;
 begin
-  getMufasaBitmap(bmp).debug();
+  img := getMufasaBitmap(bmp);
+  img.debug();
 end;
 
 {$f+}

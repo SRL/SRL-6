@@ -146,7 +146,7 @@ begin
     name := 'RS Production Screen';
     ID := ID_INTERFACE_LODESTONE;
     parentID := -1;
-    static := false;
+    isStatic := false;
   end;
 end;
 {$ENDIF}
