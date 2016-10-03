@@ -1067,7 +1067,7 @@ begin
   if (not self.open()) then
     exit();
 
-  b := intToBox(gameTabs.TabArea.x1 + 127, gameTabs.TabArea.y2 - 30, gameTabs.TabArea.x2 - 40, gameTabs.TabArea.y2 - 10);
+  b := intToBox(gameTabs.TabArea.x1 + 147, gameTabs.TabArea.y2 - 30, gameTabs.TabArea.x2 - 25, gameTabs.TabArea.y2 - 10);
 
   s := replace(tesseract_getText(b.x1, b.y1, b.x2, b.y2, TTesseractFilter([5, 5, [false, 30, TM_Mean]])), ' ', '', [rfReplaceAll]);
   result := strToIntDef(extractFromStr(s, numbers), 0);
