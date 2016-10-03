@@ -1068,16 +1068,6 @@ begin
 end;
 {$ENDIF}
 
-function TRSGrandExchange.countFreeSlots(): integer;
-var
-  i: integer;
-  TBA: TBoxArray := self.__getSlotBoxes();
-begin
-  for i := 1 to length(TBA) do
-    if self.__isSlotEmpty(i) then
-      inc(result);
-end;
-
 (*
 collectSlot
 -----------
