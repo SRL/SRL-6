@@ -1251,8 +1251,8 @@ Example:
 function TRSGrandExchange.abortSlot(geSlot: integer; collect: boolean = true): boolean;
 var
   TBA: TBoxArray := self.__getSlotBoxes();
-  abortButton: TPoint := [self.x1 + 402, self.y1 + 383];
-  redBox: TBox := [self.x1 + 29, self.y1 + 404, self.x1 + 423, self.y1 + 410];
+  abortButton: TPoint := [self.x1 + 412, self.y1 + 373];
+  redBox: TBox := [self.x1 + 29, self.y1 + 394, self.x1 + 423, self.y1 + 400]; 
 begin
   if not self.isOpen() then
   begin
