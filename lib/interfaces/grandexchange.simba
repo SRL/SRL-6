@@ -994,7 +994,7 @@ Example:
 {$IFNDEF CODEINSIGHT}
 function TRSGrandExchange.__enterName(itemName: string): boolean;
 const
-  TESS_FILTER_GE_CHARS: TTesseractFilter = [4, 4, [False, 20, TM_Mean]];
+  TESS_FILTER_GE_CHARS: TTesseractFilter = [4, 4, [False, 18, TM_Mean]];
 var
   i: integer;
   timeOut: UInt64;
@@ -1013,7 +1013,7 @@ begin
 
   if waitColorCountRange(9214319, 10, resultsTextBox[0], 5000, 10) then
     for i := 0 to 5 do
-      if stringMatch(trim(tesseractGetText(resultsTextBox[i], TESS_FILTER_GE_CHARS)), itemName) >= 0.7 then
+      if stringMatch(trim(tesseractGetText(resultsTextBox[i], TESS_FILTER_GE_CHARS)), itemName) >= 0.75 then
       begin
         mouseBox(resultsBox[i], MOUSE_LEFT);
         waitColorCountRange(16777215, 3, inputBox[2], 5000, 507, 509);
@@ -1251,8 +1251,8 @@ Example:
 function TRSGrandExchange.abortSlot(geSlot: integer; collect: boolean = true): boolean;
 var
   TBA: TBoxArray := self.__getSlotBoxes();
-  abortButton: TPoint := [self.x1 + 402, self.y1 + 383];
-  redBox: TBox := [self.x1 + 29, self.y1 + 404, self.x1 + 423, self.y1 + 410];
+  abortButton: TPoint := [self.x1 + 412, self.y1 + 373];
+  redBox: TBox := [self.x1 + 29, self.y1 + 394, self.x1 + 423, self.y1 + 400];
 begin
   if not self.isOpen() then
   begin
