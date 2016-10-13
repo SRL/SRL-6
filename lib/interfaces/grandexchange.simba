@@ -999,7 +999,7 @@ var
   i: integer;
   timeOut: UInt64;
   resultsBox: TBoxArray := grid(3, 2, 166, 49, 172, 55, point(self.x1 + 104, self.y1 + 405));
-  resultsTextBox: TBoxArray := grid(3, 2, 122, 16, 172, 55, point(self.x1 + 121, self.y1 + 396));
+  resultsTextBox: TBoxArray := grid(3, 2, 122, 35, 172, 55, point(self.x1 + 120, self.y1 + 396));
   inputBox: TBoxArray;
 begin
   timeOut := getTickCount64() + randomRange(3000, 4000);
@@ -1067,6 +1067,40 @@ begin
   end;
 end;
 {$ENDIF}
+
+{*
+countFreeSlots
+--------------
+
+.. code-block:: pascal
+
+    function TRSGrandExchange.countFreeSlots(): integer;
+
+Returns the amount of free slots in the GE interface.
+
+.. note::
+
+    - by Thomas
+    - Last Updated: 11 October 2016 by Thomas
+
+Example:
+
+.. code-block:: pascal
+
+    if (grandExchange.countFreeSlots() > 2) then
+      sellItems();
+
+*}
+
+function TRSGrandExchange.countFreeSlots(): integer;
+var
+  i: integer;
+  TBA: TBoxArray := self.__getSlotBoxes();
+begin
+  for i := 1 to length(TBA) do
+    if self.__isSlotEmpty(i) then
+      inc(result);
+end;
 
 (*
 collectSlot
