@@ -98,67 +98,6 @@ end;
 {$ENDIF}
 
 {*
-__find
-------
-
-.. code-block:: pascal
-
-    function TRStradeScreen.__find(): boolean;
-
-Internale function that returns true if the (first) TradeScreen is detected
-and its bounds are set. Searches for the brown colored box in the center.
-
-This function is outdated!
-
-.. note::
-
-    - by Thomas
-    - Last Updated: 22 September 2015 by Thomas
-
-Example:
-
-.. code-block:: pascal
-
-    if tradeScreen.__find() then
-      writeln('The Trade Screen is open, and the bounds are set!');
-*}
-
-{$IFNDEF CODEINSIGHT}
-function TRSTradeScreen.__find(): boolean;     //This function is outdated!
-const
-  CENTER_COLOR = 1513250;
-var
-  box: TBox;
-  TPA: TPointArray;
-  ATPA: T2DPointArray;
-begin
-  findColors(TPA, CENTER_COLOR, mainScreen.getBounds());
-
-  if length(TPA) < 2000 then
-  begin
-    print('TRSTradeScreen.__find(): Didn' 't find enough color, Trade Screen isn' 't open.', TDebug.WARNING);
-    exit();
-  end;
-
-  ATPA := TPA.cluster(1);
-  ATPA.filterBetween(0, 2000);
-
-  if length(ATPA) > 0 then
-  begin
-    ATPA.sortBySize(true);
-    box := ATPA[0].getBounds();
-
-    if inRange(box.getHeight(), 40, 45) then
-    begin
-      box.edit( - 198, - 44, 198, 240);
-      self.setBounds(box);
-      result := true;
-    end;
-  end;
-end;
-{$ENDIF}
-
-{*
 __findButtons
 -------------
 
@@ -200,7 +139,7 @@ begin
         boxes.append(ATPA[i].getBounds());
 
     for i := 0 to high(boxes) do   //We only need the biggest two boxes as those will be our two buttons.
-      if (inRange(boxes[i].getWidth(), 68, 75) and inrange(boxes[i].getHeight(), 19, 24)) then
+      if (inRange(boxes[i].getWidth(), 68, 76) and inrange(boxes[i].getHeight(), 19, 25)) then
         result.append(boxes[i]);            //The buttons change size in the confirm screen, hence the big ranges.
 end;
 {$ENDIF}
