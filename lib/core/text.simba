@@ -886,17 +886,18 @@ Example:
 
     if isUpText('Banker') then writeLn('Found the bank!');
 *)
-function isUpText(txt: string; waitTime: integer = 100): boolean;
+function isUpText(txt: string; waitTime: integer = randomRange(60, 120)): boolean;
 var
-  t: TTimeMarker;
+  t: TCountDown;
 begin
-  t.start();
+  t.setTime(waitTime);
 
   repeat
-    if (pos(txt, getUpText()) > 0) then exit(true);
-    wait(20);
-  until (t.getTime() > waitTime);
-end;
+    if (pos(txt, getUpText()) > 0) then
+      exit(true);
+    wait(randomRange(10, 30));
+  until t.isFinished();
+end; 
 
 (*
 isUpText
@@ -922,19 +923,20 @@ Example:
 
     if isUpText(['Bank', 'Banker', 'Booth']) then writeLn('Found the bank!');
 *)
-function isUpText(txt: TStringArray; waitTime: integer = 100): boolean; overload;
+function isUpText(txt: TStringArray; waitTime: integer = randomRange(60, 120)): boolean; overload;
 var
   i: integer;
-  t: TTimeMarker;
+  t: TCountDown;
 begin
-  t.start();
+  t.setTime(waitTime);
 
   repeat
     for i := 0 to high(txt) do
-      if (pos(txt[i], getUpText()) > 0) then exit(true);
-    wait(20);
-  until (t.getTime() > waitTime);
-end;
+      if (pos(txt[i], getUpText()) > 0) then
+        exit(true);
+    wait(randomRange(10, 30));
+  until t.isFinished();
+end; 
 
 begin
   ocr.init(FontPath + 'UpCharsEx');
