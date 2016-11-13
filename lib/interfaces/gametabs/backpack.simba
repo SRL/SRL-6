@@ -657,6 +657,47 @@ begin
 end;
 
 (*
+mouseSlot
+---------
+
+.. code-block:: pascal
+
+    function TRSTabBackpack.mouseSlot(slot, waitTime, mouseAction: integer = MOUSE_MOVE; upText: TStringArray): boolean; overload;
+
+Overload function, additional parameters **waitTime** and **upText**.
+Returns true if it finds the correct **upText** at the desired backpack **slot**.
+The **upText** parameter is a TStringArray, and uses both the text in top left
+corner or the mouseOver popup, while the **waitTime** parameter is used to wait
+after the **mouseAction**
+
+.. note::
+
+    - by Thomas
+    - Last Updated: 13 November 2016 by Thomas
+
+Example:
+
+.. code-block:: pascal
+
+   if tabBackpack.mouseSlot(1, randomRange(100, 200), MOUSE_LEFT, ['Dragon bones', 'Big bones']) then
+     writeln('We clicked the bones in Backpack slot 1');
+
+*)
+
+function TRSTabBackpack.mouseSlot(slot, waitTime, mouseAction: integer = MOUSE_MOVE; upText: TStringArray): boolean; overload;
+begin
+  if (not self.open()) or (not self.isSlotValid(slot)) then
+    exit(false);
+
+  mouseBox(self.getSlotBox(slot), MOUSE_MOVE);
+  result := (isUpText(upText) or isMouseOverText(upText));
+
+  if result then
+    mouseBox(self.getSlotBox(slot), mouseAction);
+  wait(waitTime);
+end;
+
+(*
 isSlotActivated
 ---------------
 
