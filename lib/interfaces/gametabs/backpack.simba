@@ -647,7 +647,7 @@ Example:
      writeln('We moved the mouse to Backpack slot 1');
 
 *)
-function TRSTabBackpack.mouseSlot(slot, mouseAction: integer = MOUSE_MOVE): boolean;
+function TRSTabBackpack.mouseSlot(slot: integer; mouseAction: integer = MOUSE_MOVE): boolean;
 begin
   if (not self.open()) or (not self.isSlotValid(slot)) then
     exit(false);
@@ -662,7 +662,7 @@ mouseSlot
 
 .. code-block:: pascal
 
-    function TRSTabBackpack.mouseSlot(slot, waitTime, mouseAction: integer = MOUSE_MOVE; upText: TStringArray): boolean; overload;
+    function TRSTabBackpack.mouseSlot(slot, waitTime: integer; mouseAction: integer = MOUSE_MOVE; uptext: TStringArray): boolean; overload;
 
 Overload function, additional parameters **waitTime** and **upText**.
 Returns true if it finds the correct **upText** at the desired backpack **slot**.
