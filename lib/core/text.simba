@@ -769,7 +769,7 @@ Example:
       mouse(point(x, y), MOUSE_LEFT);
     end;
 *)
-function isMouseOverText(txt: TStringArray; waitTime: integer = 250; useTesseract: boolean = false): boolean;
+function isMouseOverText(txt: TStringArray; waitTime: integer = randomRange(200, 300); useTesseract: boolean = false): boolean;
 var
   i : integer;
   t : LongWord;
@@ -870,7 +870,7 @@ isUpText
 
 .. code-block:: pascal
 
-    function isUpText(txt: string; waitTime: integer = 100): boolean;
+    function isUpText(txt: string; waitTime: integer = randomRange(60, 150)): boolean;
 
 Returns true if the string 'txt' is found in the current UpText.
 Will wait up to 'waitTime' to find the text before exiting the function.
@@ -886,7 +886,7 @@ Example:
 
     if isUpText('Banker') then writeLn('Found the bank!');
 *)
-function isUpText(txt: string; waitTime: integer = randomRange(60, 120)): boolean;
+function isUpText(txt: string; waitTime: integer = randomRange(60, 150)): boolean;
 var
   t: TCountDown;
 begin
