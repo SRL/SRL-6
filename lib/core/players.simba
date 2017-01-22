@@ -1217,13 +1217,38 @@ begin
   begin
     print('Unknown login popup message: ' + popupMessage, TDebug.WARNING);
     takeScreenshot('unknown_login_popup.png');
-    print('PLEASE report this in the SRL-6 bugs section: https://villavu.com/forum/project.php?projectid=10', TDebug.HINT);
+     print('PLEASE report this in the SRL-6 bugs section: https://villavu.com/forum/project.php?projectid=10', TDebug.HINT);
     errorMessage := ['Unknown login popup', 0, 3, 'Next_Player_F'];
   end;
 
   self.__respondToPopup(errorMessage, tries, reachedMax);
 end;
 {$ENDIF}
+
+procedure remindLater();
+var
+  b: TBox;
+  p: TPoint;
+  TPA: TPointArray;
+  ATPA: T2DPointArray;
+  button_color: TColorData := [1087209, 19, [2, [0.12, 0.54, 0.00]]];
+begin
+  button_color.gatherIn(TPA, getClientBounds());
+  ATPA := TPA.cluster(1);
+  if length(ATPA) then
+  begin
+    ATPA.sortBySize();
+    writeLn(length(ATPA[0]));
+    if inRange(length(ATPA[0]), 2000, 2500) then
+    begin
+      b := ATPA[0].getBounds();
+      p := ATPA[0].getMiddle();
+      if inRange(b.getWidth(), 100, 200) and inRange(b.getHeight(), 10, 30) then
+        mouse(point(p.x + randomRange( - 25, 25), p.y + 30), MOUSE_LEFT);
+    end;
+  end
+  wait(randomRange(5000, 8000));
+end;
 
 (*
 loginToLobby
@@ -1288,8 +1313,9 @@ begin
 
     print('Entering password...', TDebug.SUB);
     __enterLoginInfo(__boxPassword, self.password, false, true);
-    wait(800 + random(200));
+    wait(8000 + random(3000));
 
+    remindLater();   
     result := self.__handleLoginPopup(inc(tries), false, reachedMaxTries);
 
     if reachedMaxTries then tries := 1; //'reachedMaxTries' is passed down from __respondToPopup()
