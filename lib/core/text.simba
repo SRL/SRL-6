@@ -731,7 +731,7 @@ Example:
     writeln(getMouseOverText());
 *)
 function getMouseOverText(useTesseract: boolean = false): string;
-2var
+var
   box: TBox;
 begin
   result := '';
