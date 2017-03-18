@@ -684,7 +684,7 @@ Example:
 
 *)
 
-function TRSTabBackpack.mouseSlot(slot, waitTime, mouseAction: integer = MOUSE_MOVE; upText: TStringArray): boolean; overload;
+function TRSTabBackpack.mouseSlot(slot, waitTime: integer; mouseAction: integer = MOUSE_MOVE; upText: TStringArray): boolean; overload;
 begin
   if (not self.open()) or (not self.isSlotValid(slot)) then
     exit(false);
