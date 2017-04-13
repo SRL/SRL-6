@@ -27,10 +27,10 @@ const
   ACTION_BAR_SLOT_LOW = 1;
   ACTION_BAR_SLOT_HIGH = 14;
 
-  _AB_BAR_HP_OFFSET = 46;
-  _AB_BAR_ADRENALINE_OFFSET = 185;
-  _AB_BAR_PRAYER_OFFSET = 324;
-  _AB_BAR_SUMMONING_OFFSET = 463;
+  _AB_BAR_HP_OFFSET = 84;
+  _AB_BAR_ADRENALINE_OFFSET = 203;
+  _AB_BAR_PRAYER_OFFSET = 322;
+  _AB_BAR_SUMMONING_OFFSET = 441;
 
 (*
 **const Action Bar Stat Bars**
@@ -139,14 +139,13 @@ __find
 
     function TRSActionBar.__find(out height: integer): boolean;
 
-Returns true if the action bar is found and its bounds are set. This is designed to
-work with standard EOC and the EOC-legacy ActionBar. The height is also passed to
-**height** for determining if the ActionBar is minimised.
+Returns true if the action bar is found and its bounds are set. This does not
+work with the legacy combat mode action bar as there is no minimise button.
 
 .. note::
 
     - by The Mayor
-    - Last Updated: 1 August 2015 by The Mayor
+    - Last Updated: 13 April 2017 by The Mayor
 
 Example:
 
@@ -162,76 +161,44 @@ Example:
 *}
 {$IFNDEF CODEINSIGHT}
 function TRSActionBar.__find(out height: integer): boolean;
-label
-  LegacyBar;
-const
-  BUTTON_COL = [462872, 6];
-  BORDER_COL = 3945514;
 var
-  i, j: Integer;
+  i: Integer;
   p: TPoint;
   TPA: TPointArray;
   ATPA: T2DPointArray;
-  borderColor: TColorData := [4997944, 10, [2, [0.10, 0.29, 0.00]]];
 begin
-  if findColorsTolerance(TPA, BUTTON_COL[0], getClientBounds(), BUTTON_COL[1]) then
-  begin
-    ATPA := TPA.cluster(1);
-    ATPA.filterBetween(1, 10);
-
-    if (length(ATPA) < 1) then
-    begin
-       print('TRSActionBar.__find(): Didn''t find button border colors');
-       goto LegacyBar;
-    end;
-
-    for i := 0 to high(ATPA) do
-      if (ATPA[i].getBounds().getWidth() = 13) and (ATPA[i].getBounds().getHeight() = 13)  then
-      begin
-        p := ATPA[i].getBounds().getMiddle();
-
-        for j := (p.y + 70) downto p.y do
-          if getColor(p.x, j) = BORDER_COL then
-          begin
-            height := abs((p.Y - 9) - j);
-            self.setBounds([0, (p.Y - 9), gameTabs.tabArea.x1-1, (p.Y - 9) + height]);
-            result := true;
-
-            if (not self.setSlots) then
-            begin
-              __slots := grid(14, 1, 29, 29, 36, 0, point(self.x1 + 67, self.y1 + 53));
-              self.setSlots := true;
-            end;
-
-            print('TRSActionBar.__find(): EOC bar height = ' + toStr(height));
-            exit(true);
-          end;
-      end;
-  end;
-
-  LegacyBar:
-  if borderColor.gatherIn(TPA, getClientBounds()) then
+  if findColors(TPA, 5987420, getClientBounds()) then
   begin
     ATPA := TPA.cluster(2);
-    ATPA.filterBetween(1, 250);
+    ATPA.filterBetween(8, 1000);
+                                   // Check the top/bottom of minimize button
+    if length(ATPA) then           // are the correct colors
+      if length(ATPA[0]) = 6 then
+        for i := 0 to high(ATPA[0]) do
+          if getColor(ATPA[0][i].offset([0, 7])) <> 3223592 then
+            exit(false);
 
-    if (length(ATPA) < 1) then
-    begin
-       print('TRSActionBar.__find(): Didn''t find enough border colors');
-       exit();
+    p := ATPA[0][0];
+
+    case getColor(Point(p.x, p.y + 28)) of //Bottom color of AB when minimised
+      1643534: height := 75;
+      2169620: height := 37;
+      else begin
+        print('TRSActionBar.__find(): Actionbar color needs updating! Tell a dev.', TDebug.ERROR);
+        exit(false);
+      end;
     end;
 
-    ATPA.sortBySize(True);
+    self.setBounds([(p.x - 521), (p.Y - 9), (p.x + 8), (p.Y - 9) + height]);
 
-    for i := 0 to high(ATPA) do
-      if inRange(ATPA[i].getBounds().getWidth(), 576, 577) then
-      begin
-        height := ATPA[i].getBounds().getHeight();
-        self.setBounds(ATPA[i].getBounds());
-        print('TRSActionBar.__find(): Legacy bar height = ' + toStr(height));
-        exit(true);
-      end;
+    if (not self.setSlots) then
+    begin
+      __slots := grid(14, 1, 29, 29, 36, 0, point(self.x1 + 20, self.y1 + 56));
+      self.setSlots := true;
+    end;
   end;
+
+  print('TRSActionBar.__find(): Didn''t find minimize button');
 end;
 {$ENDIF}
 
@@ -439,7 +406,7 @@ have up to five different Action Bar setups.
 .. note::
 
     - by euphemism
-    - Last Updated: 18 April 2013 by euphemism
+    - Last Updated: 13 April 2017 by acow
 
 Example:
 
@@ -454,8 +421,8 @@ var
 begin
   b := self.getBounds();
 
-  result := strToIntDef(getTextAtEx(intToBox(b.x1 + 25, b.y1 + 49, b.x1 + 35,
-  b.y1 + 59), 0, 0, 0, 3111603, 0, 'UpChars'), -1); //Color is of the number showing which bar is active.
+  result := strToIntDef(getTextAtEx(intToBox(b.x1 + 20, b.y1 + 15, b.x1 + 28,  //just changed the offsets to match the changes
+  b.y1 + 26), 0, 0, 0, 3111603, 0, 'UpChars'), -1); //Color is of the number showing which bar is active.
 
   print('TRSActionBar.getCurrentBar() returned ' + toStr(result), TDebug.LOG);
 end;    
@@ -474,7 +441,7 @@ Switches to the **barNumber** action bar setup. If **useBindKey** is set to true
 .. note::
 
     - by euphemism
-    - Last Updated: 18 April 2013 by euphemism
+    - Last Updated: 13 April 2017 by acow
 
 Example:
 
@@ -501,50 +468,50 @@ begin
 
   repeat
 
-  currentBar:= self.getCurrentBar();
-  result := (barNumber = currentBar);
+    currentBar:= self.getCurrentBar();
+    result := (barNumber = currentBar);
 
-  if result then
-    exit(true);
+    if result then
+      exit(true);
 
-  if (useBindKey) then
-  begin
-
-    keys:= [VK_LSHIFT, VK_0 + barNumber];
-
-    for i := 0 to 1 do
+    if (useBindKey) then
     begin
-      keyDown(keys[i]);
-      wait(randomRange(10, 200 - i * 100));
-    end;
 
-    r:= random(2);
-    keyUp(keys[r]);
+      keys:= [VK_LSHIFT, VK_0 + barNumber];
 
-    wait(random(60));
+      for i := 0 to 1 do
+      begin
+        keyDown(keys[i]);
+        wait(randomRange(10, 200 - i * 100));
+      end;
 
-    keyUp(keys[abs(r - 1)]);
+      r:= random(2);
+      keyUp(keys[r]);
 
-  end else
-  begin
+      wait(random(60));
 
-    diff := abs(currentBar - barNumber);
-    b := self.getBounds();
+      keyUp(keys[abs(r - 1)]);
 
-    if (inRange(diff, 2, 3)) then
-    begin
-      intToBox(b.x1 + 25, b.y1 + 49, b.x1 + 35, b.y1 + 59).mouse(MOUSE_RIGHT);
-      chooseOption.select([intToStr(barNumber)], randomRange(750, 1000));
     end else
     begin
-      if ((currentBar < barNumber) xor (diff > 2)) then
-        intToBox(b.x1 + 39, b.y1 + 50, b.x1 + 43, b.y1 + 57).mouse(MOUSE_LEFT)
-      else
-        intToBox(b.x1 + 16, b.y1 + 50, b.x1 + 20, b.y1 + 57).mouse(MOUSE_LEFT);
+
+      diff := abs(currentBar - barNumber);
+      b := self.getBounds();
+
+      if (inRange(diff, 2, 3)) then
+      begin
+        intToBox(b.x1 + 20, b.y1 + 15, b.x1 + 28, b.y1 + 26).mouse(MOUSE_RIGHT);
+        chooseOption.select([intToStr(barNumber)], randomRange(750, 1000));
+      end else
+      begin
+        if ((currentBar < barNumber) xor (diff > 2)) then
+          intToBox(b.x1 + 33, b.y1 + 17, b.x1 + 37, b.y1 + 21).mouse(MOUSE_LEFT)
+        else
+          intToBox(b.x1 + 9, b.y1 + 17, b.x1 + 13, b.y1 + 21).mouse(MOUSE_LEFT);
+      end;
     end;
-  end;
-  
-  wait(randomRange(1000, 2000));
+
+    wait(randomRange(1000, 2000));
 
   until timeMarker.isFinished();
 
@@ -1140,7 +1107,7 @@ Returns the percentage of the Action Bar stat bar **bar**
 .. note::
 
     - by Turpinator
-    - Last Updated: 12 December 2013 by Turpinator
+    - Last Updated: 13 April 2013 by acow
 
 Example:
 
@@ -1156,11 +1123,13 @@ var
   xx, yy: integer;
 begin
   xx := (self.x1 + bar);
-  yy := (self.y1 + 23);
+  yy := (self.y1 + 21);
 
-  for result := 100 downto 1 do
+  for result := 80 downto 1 do
     if (getColor(xx + result, yy) <> BACKGROUND_COLOR) then
       break();
+
+  result := round(result/0.80);
 end;
 {$ENDIF}
 
