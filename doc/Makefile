@@ -2,7 +2,7 @@
 
 core = client debug globals mouse players text tesseract
 
-interfaces = actionbar bankscreen beastofburden chatbox chooseoption collectbox conversationbox depositbox grandexchange heroscreen interfaces lodestone lootscreen mainscreen minimap options pinscreen powerscreen production progressscreen toolscreen tradescreen targetinfo
+interfaces = actionbar bankscreen beastofburden chatbox chooseoption collectbox conversationbox depositbox grandexchange heroscreen interfaces lodestone lootscreen mainscreen minimap options pinscreen powerscreen production progressscreen toolscreen tradescreen targetinfo metrics
 
 gametabs = backpack gametab stats
 lobby = lobby worlds

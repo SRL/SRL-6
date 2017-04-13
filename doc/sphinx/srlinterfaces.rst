@@ -26,6 +26,7 @@ SRL Interfaces
     lodestone
     lootscreen
     mainscreen
+    metrics
     minimap
     options
     pinscreen
