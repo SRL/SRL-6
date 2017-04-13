@@ -57,6 +57,7 @@ SRL library isn't available to you.
 {$include_once lib/interfaces/lootscreen.simba}
 {$include_once lib/interfaces/targetinfo.simba}
 {$include_once lib/interfaces/tradescreen.simba} 
+{$include_once lib/interfaces/metrics.simba}
 
 {$include_once lib/core/players.simba}
 

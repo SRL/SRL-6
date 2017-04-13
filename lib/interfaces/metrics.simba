@@ -156,7 +156,7 @@ begin
 end;
 {$ENDIF}
 
-{*
+(*
 getXP
 -----
 
@@ -165,6 +165,8 @@ getXP
     procedure TRSMetrics.getXP(n: Integer);
 
 Returns the XP amount on the xp bar **n**. The top bar is 1, the second is 2 etc.
+The metrics interface must be visible somewhere on the client, and cannot be
+in leightweight mode.
 
 .. note::
 
@@ -178,7 +180,7 @@ Example:
     metrics.getXP(1); // Returns XP for the top bar
     metrics.getXP(2); // Returns XP for the 2nd bar down
 
-*}
+*)
 function TRSMetrics.getXP(n: Integer): Integer;
 const
   filter: TTesseractFilter = [5, 5, [False, 30, TM_Mean]];
