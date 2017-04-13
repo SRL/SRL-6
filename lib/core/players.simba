@@ -422,6 +422,7 @@ begin
   begin
     chatBox.__setup();
     mainScreen.__setup();
+    metrics.__setup();
 
     __areDynamicInterfacesSet := true;
 
