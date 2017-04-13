@@ -145,7 +145,7 @@ begin
           begin
             n := floor(ATPA[0].getBounds().getHeight() / 26);
             self.bars := grid(1, n, (b.X2 - b.X1), 26, 0, 27, MiddleBox(b).offSet([0, 24]));
-            print('TRSMetrics.__setup(): Found metrics interface with ' + toStr(n) + ' visible bars', TDebug.HINT);
+            print('TRSMetrics.__setup(): Found metrics interface with ' + toStr(n) + ' visible bars');
             exit();
           end;
         end;
@@ -176,7 +176,8 @@ Example:
 .. code-block:: pascal
 
     metrics.getXP(1); // Returns XP for the top bar
-    metrics.getXP(1); // Returns XP for the 2nd bar down
+    metrics.getXP(2); // Returns XP for the 2nd bar down
+
 *}
 function TRSMetrics.getXP(n: Integer): Integer;
 const

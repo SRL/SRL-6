@@ -196,6 +196,8 @@ begin
       __slots := grid(14, 1, 29, 29, 36, 0, point(self.x1 + 20, self.y1 + 56));
       self.setSlots := true;
     end;
+
+    exit(true);
   end;
 
   print('TRSActionBar.__find(): Didn''t find minimize button');
@@ -421,7 +423,7 @@ var
 begin
   b := self.getBounds();
 
-  result := strToIntDef(getTextAtEx(intToBox(b.x1 + 20, b.y1 + 15, b.x1 + 28,  //just changed the offsets to match the changes
+  result := strToIntDef(getTextAtEx(intToBox(b.x1 + 20, b.y1 + 15, b.x1 + 28,
   b.y1 + 26), 0, 0, 0, 3111603, 0, 'UpChars'), -1); //Color is of the number showing which bar is active.
 
   print('TRSActionBar.getCurrentBar() returned ' + toStr(result), TDebug.LOG);
@@ -1107,7 +1109,7 @@ Returns the percentage of the Action Bar stat bar **bar**
 .. note::
 
     - by Turpinator
-    - Last Updated: 13 April 2013 by acow
+    - Last Updated: 13 April 2017 by acow
 
 Example:
 
