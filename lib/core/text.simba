@@ -749,7 +749,7 @@ isMouseOverText
 
 .. code-block:: pascal
 
-    function isMouseOverText(txt: TStringArray; waitTime: integer = 100): boolean;
+    function isMouseOverText(txt: TStringArray; waitTime: integer = 200): boolean;
 
 Returns true if one of the indexes in 'txt' is found in the current mouse-over text.
 Will wait up to 'waitTime' to find the text before exiting the function.
@@ -769,7 +769,7 @@ Example:
       mouse(point(x, y), MOUSE_LEFT);
     end;
 *)
-function isMouseOverText(txt: TStringArray; waitTime: integer = randomRange(200, 300); useTesseract: boolean = false): boolean;
+function isMouseOverText(txt: TStringArray; waitTime: integer = 200; useTesseract: boolean = false): boolean;
 var
   i : integer;
   t : LongWord;
@@ -790,7 +790,7 @@ begin
         break(2);
       end;
 
-    wait(20 + random(20));
+    wait(20 + random(40));
   until (getSystemTime() > t);
 
   print('isMouseOverText(): '+toStr(result), TDebug.FOOTER);
@@ -870,7 +870,7 @@ isUpText
 
 .. code-block:: pascal
 
-    function isUpText(txt: string; waitTime: integer = randomRange(60, 150)): boolean;
+    function isUpText(txt: string; waitTime: integer = 100): boolean;
 
 Returns true if the string 'txt' is found in the current UpText.
 Will wait up to 'waitTime' to find the text before exiting the function.
@@ -886,7 +886,7 @@ Example:
 
     if isUpText('Banker') then writeLn('Found the bank!');
 *)
-function isUpText(txt: string; waitTime: integer = randomRange(60, 150)): boolean;
+function isUpText(txt: string; waitTime: integer = 100): boolean;
 var
   t: TCountDown;
 begin
@@ -895,7 +895,7 @@ begin
   repeat
     if (pos(txt, getUpText()) > 0) then
       exit(true);
-    wait(randomRange(10, 30));
+    wait(randomRange(10, 40));
   until t.isFinished();
 end; 
 
@@ -923,7 +923,7 @@ Example:
 
     if isUpText(['Bank', 'Banker', 'Booth']) then writeLn('Found the bank!');
 *)
-function isUpText(txt: TStringArray; waitTime: integer = randomRange(60, 120)): boolean; overload;
+function isUpText(txt: TStringArray; waitTime: integer = 100): boolean; overload;
 var
   i: integer;
   t: TCountDown;
