@@ -886,7 +886,7 @@ Example:
 
     if isUpText('Banker') then writeLn('Found the bank!');
 *)
-function isUpText(txt: string; waitTime: integer = 100)): boolean;
+function isUpText(txt: string; waitTime: integer = 100): boolean;
 var
   t: TCountDown;
 begin
