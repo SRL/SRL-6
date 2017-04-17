@@ -606,10 +606,10 @@ Example:
 *)
 function TBox.combine(b: TBox): TBox;
 begin
-  Result.X1 := Min(Min(b.X1, b.X2), Min(b.X1, b.X2));
-  Result.Y1 := Min(Min(b.Y1, b.Y2), Min(b.Y1, b.Y2));
-  Result.X2 := Max(Max(b.X1, b.X2), Max(b.X1, b.X2));
-  Result.Y2 := Max(Max(b.Y1, b.Y2), Max(b.Y1, b.Y2));
+  Result.X1 := Min(Min(b.X1, b.X2), Min(self.X1, self.X2));
+  Result.Y1 := Min(Min(b.Y1, b.Y2), Min(self.Y1, self.Y2));
+  Result.X2 := Max(Max(b.X1, b.X2), Max(self.X1, self.X2));
+  Result.Y2 := Max(Max(b.Y1, b.Y2), Max(self.Y1, self.Y2));
 end;
 
 (*
