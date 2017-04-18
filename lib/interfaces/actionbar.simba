@@ -161,12 +161,18 @@ Example:
 *}
 {$IFNDEF CODEINSIGHT}
 function TRSActionBar.__find(out height: integer): boolean;
+label
+  LegacyBar;
 var
   i: Integer;
   p: TPoint;
+  b, bar: TBox;
   TPA: TPointArray;
   ATPA: T2DPointArray;
+  EoC: boolean;
+  barColor: TColorData := [2235669, 5, [2, [0.36, 1.29, 0.00]]];
 begin
+
   if findColors(TPA, 5987420, getClientBounds()) then
   begin
     ATPA := TPA.cluster(2);
@@ -176,17 +182,15 @@ begin
       if length(ATPA[0]) = 6 then
         for i := 0 to high(ATPA[0]) do
           if getColor(ATPA[0][i].offset([0, 7])) <> 3223592 then
-            exit(false);
+            goto LegacyBar;
 
     p := ATPA[0][0];
 
     case getColor(Point(p.x, p.y + 28)) of //Bottom color of AB when minimised
       1643534: height := 75;
       2169620: height := 37;
-      else begin
-        print('TRSActionBar.__find(): Actionbar color needs updating! Tell a dev.', TDebug.ERROR);
-        exit(false);
-      end;
+      else
+        goto LegacyBar;
     end;
 
     self.setBounds([(p.x - 521), (p.Y - 9), (p.x + 8), (p.Y - 9) + height]);
@@ -201,6 +205,45 @@ begin
   end;
 
   print('TRSActionBar.__find(): Didn''t find minimize button');
+
+  LegacyBar:
+  if barColor.gatherIn(TPA, getClientBounds()) then
+  begin
+    ATPA := TPA.cluster(1);
+    ATPA.sortBySize(True);
+    for i := 0 to high(ATPA) do
+      if inRange(length(ATPA[i]), 2000, 25000) and inRange(ATPA[i].getBounds().getWidth(), 525, 535) then
+        begin
+          bar := ATPA[i].getBounds();
+          b := [bar.x2 - 10, bar.y1, bar.x2, bar.y1 + 10];
+          EoC := (countColorTolerance(4499917, b, 80) > 10);
+
+          print('TRSActionBar.__find(): EoC = ' + toStr(EoC));     //Unsure if this changes anything?
+
+          height := bar.getHeight();
+          case bar.getHeight() of
+            37: result := true;
+            75: result := true;
+          else
+          begin
+            print('TRSActionBar.__find(): Actionbar needs updating! Tell a dev.', TDebug.ERROR);
+            exit(false);
+          end;
+          end;
+
+          if result then
+          begin
+          self.setBounds(bar);
+          print('TRSActionBar.__find(): bar height = ' + toStr(height));
+
+          if (not self.setSlots) then
+          begin
+            __slots := grid(14, 1, 29, 29, 36, 0, point(self.x1 + 20, self.y1 + 56));
+            self.setSlots := true;
+          end;
+          end;
+        end;
+  end;
 end;
 {$ENDIF}
 
@@ -427,7 +470,7 @@ begin
   b.y1 + 26), 0, 0, 0, 3111603, 0, 'UpChars'), -1); //Color is of the number showing which bar is active.
 
   print('TRSActionBar.getCurrentBar() returned ' + toStr(result), TDebug.LOG);
-end;    
+end;
 
 (*
 switchToBar
@@ -517,7 +560,7 @@ begin
 
   until timeMarker.isFinished();
 
-end; 
+end;
 
 (*
 isSlotEmpty
@@ -1264,7 +1307,7 @@ Example:
 {$IFNDEF CODEINSIGHT}
 function TRSActionBar.__iconBoxes(): TBoxArray;
 begin
-  result := grid(4, 1, 29, 29, 139, 0, [self.getbounds().x1 + 27, self.getbounds().y1 + 18]);
+  result := grid(4, 1, 29, 29, 119, 0, [self.getbounds().x1 + 65, self.getbounds().y1 + 16]);
 end;
 {$ENDIF}
 
