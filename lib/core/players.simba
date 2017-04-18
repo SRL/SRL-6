@@ -1367,6 +1367,8 @@ begin
       break;
     end;
 
+    __nxtReminder();
+
     if self.loginToLobby() then
     begin
       if (self.world <> -1) then

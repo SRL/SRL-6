@@ -110,7 +110,7 @@ interface no matter where it is placed (i.e. on the mainscreen, chatbox or gamet
 .. note::
 
     - by The Mayor
-    - Last Updated: 13 April 2017 by The Mayor
+    - Last Updated: 17 April 2017 by The Mayor
 
 Example:
 
@@ -144,8 +144,9 @@ begin
           if Length(ATPA) then
           begin
             n := floor(ATPA[0].getBounds().getHeight() / 26);
-            self.bars := grid(1, n, (b.X2 - b.X1), 26, 0, 27, MiddleBox(b).offSet([0, 24]));
+            self.bars := grid(1, n, (b.X2 - b.X1)-30, 12, 0, 27, MiddleBox(b).offSet([14, 22]));
             print('TRSMetrics.__setup(): Found metrics interface with ' + toStr(n) + ' visible bars');
+            self.setBounds(b.combine(ATPA.getBounds()));
             exit();
           end;
         end;
@@ -171,7 +172,7 @@ in leightweight mode.
 .. note::
 
     - by The Mayor
-    - Last Updated: 13 April 2017 by The Mayor
+    - Last Updated: 17 April 2017 by The Mayor
 
 Example:
 
@@ -186,7 +187,6 @@ const
   filter: TTesseractFilter = [5, 5, [False, 30, TM_Mean]];
 var
   b: TBoxArray;
-  box: TBox;
   s:String;
 begin
   b := self.bars;
@@ -194,11 +194,10 @@ begin
   if n = 0 or (n > length(b)) then
   begin
     print('TRSMetrics.getXP(): Bar number does not exist', TDebug.ERROR);
-    exit(-1);
+    exit(0);
   end;
 
-  box := intToBox(b[n-1].X1+30, b[n-1].Y1+5, b[n-1].X2-1, b[n-1].Y2-5);
-  s := Tesseract_GetText(box.x1, box.y1, box.x2, box.y2, filter);
+  s := Tesseract_GetText(b[n-1], filter);
   result := strToIntDef(extractFromStr(s, numbers), 0);
 end;
 
