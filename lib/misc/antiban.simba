@@ -1123,6 +1123,60 @@ begin
       destroyTicket(tabBackpack.pointToSlot(p));
 end;
 
+(*
+destroyAllTickets
+~~~~~~~~~~~~~~~~~
+
+.. code-block:: pascal
+
+    procedure destroyAllTickets(continuous: boolean = false);
+
+Destroys all spin tickets found in the backpack. The optional **continuous**
+parameter *(default = fault)* is the way it would destroy tickets (keeping
+the 'Y' key pressed continuously or waiting for the destroy pop-up).
+
+
+.. note::
+
+    - by Thomas
+    - Last Updated: September 30 by Thomas
+
+Example:
+
+.. code-block:: pascal
+
+    destroyAllTickets(true);
+*)
+procedure destroyAllTickets(continuous: boolean = false);
+var
+  oneFreeSpin: integer;
+  p: TPoint;
+  timeOut: TCountDown;
+begin
+  if tabBackpack.open() then
+  begin
+    timeOut.setTime(randomRange(5000, 8000));
+    oneFreeSpin := DTMFromString('m1gAAAHic42JgYOABYjYgFodiTiAWAmJhIOZngACQPAuUD8JcUHFGqDg3kjk7Flsy3N+cDMZ9KfZgvGuJFcOcLkMUPg9UDyHMSCRGAAA8PBAn');
+    while (not timeOut.isFinished()) and findDTM(oneFreeSpin, p.x, p.y, tabBackpack.getBounds()) do
+    begin
+      if continuous and (not isKeyDown(VK_y)) then
+        KeyDown(VK_y);
+      mouseCircle(p, 5);
+      if isMouseOverText(['Claim', 'key', 'Key', 'token'], randomRange(500, 1000)) then
+      begin
+        fastClick(MOUSE_RIGHT);
+        if chooseOption.select(['Destroy', 'Dest', 'roy']) and (not continuous) then
+          if waitColorCountRange(379903, 1, intToBox(110, 440, 475, 460), randomRange(2000, 3000), 250, 500) then
+            typeByte(VK_y);
+      end;
+      wait(randomRange(500, 1500));
+    end;
+    freeDTM(oneFreeSpin);
+    if isKeyDown(VK_y) then
+      KeyUp(VK_y);
+  end;
+end; 
+
 
 {NOTE: The following 5 methods are depreciated, but have been retained
        for compatability. You should use the newer methods instead             }
