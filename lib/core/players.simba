@@ -1142,7 +1142,6 @@ begin
   if length(ATPA) then
   begin
     ATPA.sortBySize();
-    writeLn(length(ATPA[0]));
     if inRange(length(ATPA[0]), 2000, 2500) then
     begin
       b := ATPA[0].getBounds();
