@@ -160,7 +160,7 @@ Example:
     end;
 *}
 {$IFNDEF CODEINSIGHT}
-function TRSActionBar.__find(out height: integer): boolean;  override;
+function TRSActionBar.__find(out height: integer): boolean;  override
 
   function __findMinimize(var p: TPoint; b: TBox): Boolean;
   var
