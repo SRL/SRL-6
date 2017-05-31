@@ -1,0 +1,208 @@
+(*
+Metrics
+========
+
+The metrics file holds functions and procedures that are used in the RuneMetrics interface.
+
+The source for this file can be found `here <https://github.com/SRL/SRL-6/blob/master/lib/interfaces/metrics.simba>`_.
+
+*)
+
+{$f-}
+
+(*
+Consts, Types, Vars
+~~~~~~~~~~~~~~~~~~~
+
+The following constants, types and variables are used throughout the chatBox methods.
+*)
+
+
+(*
+**type TRSMetrics**
+
+.. code-block:: pascal
+
+    type
+      TRSMetrics = type TRSInterface;
+
+A type that stores the metrics interface properties.
+
+*)
+type
+  TRSMetrics = record(TRSInterface)
+    bars: TBoxArray;
+  end;
+
+(*
+**var metrics**
+
+.. code-block:: pascal
+
+    var
+      metrics: TRSMetrics;
+
+A variable through which scripters can access the TRSMetrics type methods.
+
+*)
+var
+  metrics: TRSMetrics;
+
+(*
+TRSMetrics methods
+~~~~~~~~~~~~~~~~~~
+
+The following methods should be called through the **metrics** variable.
+
+Example:
+
+.. code-block:: pascal
+
+    xp := metrics.getXP(1);
+    writeLn('Xp from top bar is:', xp);
+*)
+
+{*
+__init
+------
+
+.. code-block:: pascal
+
+    procedure TRSMetrics.__init();
+
+Initializes the TRSMetrics.
+
+.. note::
+
+    - by The Mayor
+    - Last Updated: 13 April 2017 by The Mayor
+
+Example:
+
+.. code-block:: pascal
+
+    metrics.__init();
+*}
+{$IFNDEF CODEINSIGHT}
+procedure TRSMetrics.__init();
+begin
+  with self do
+  begin
+    name := 'RS Metrics';
+    ID := ID_INTERFACE_METRICS;
+    parentID := -1;
+    static := false;
+  end;
+end;
+{$ENDIF}
+
+{*
+__setup
+-------
+
+.. code-block:: pascal
+
+    procedure TRSMetrics.__setup();
+
+Sets up the metrics interface if visible. This is designed to find the
+interface no matter where it is placed (i.e. on the mainscreen, chatbox or gametabs).
+
+.. note::
+
+    - by The Mayor
+    - Last Updated: 17 April 2017 by The Mayor
+
+Example:
+
+.. code-block:: pascal
+
+    metrics.__setup();
+*}
+{$IFNDEF CODEINSIGHT}
+procedure TRSMetrics.__setup();
+var
+  i, n: Integer;
+  b: TBox;
+  TPA: TPointArray;
+  ATPA: T2DPointArray;
+begin
+  if findColors(TPA, 2103303, getClientBounds()) then //Background of 'XP' header
+  begin
+    ATPA := TPA.cluster(5);
+    ATPA.filterBetween(1, 1000);
+
+    for i := 0 to high(ATPA) do
+    begin
+      b := ATPA.getBounds();
+
+      if b.getHeight() = 18 then
+        if findColors(TPA, 3419164, intToBox(b.X1, b.Y2, b.X2, getClientBounds().Y2)) then
+        begin
+          ATPA := TPA.cluster(5);
+          ATPA.filterBetween(1, 1000);
+
+          if Length(ATPA) then
+          begin
+            n := floor(ATPA[0].getBounds().getHeight() / 26);
+            self.bars := grid(1, n, (b.X2 - b.X1)-30, 12, 0, 27, MiddleBox(b).offSet([14, 22]));
+            print('TRSMetrics.__setup(): Found metrics interface with ' + toStr(n) + ' visible bars');
+            self.setBounds(b.combine(ATPA.getBounds()));
+            exit();
+          end;
+        end;
+    end;
+  end;
+
+  print('TRSMetrics.__setup(): Unable to locate any RuneMetrics bars', TDebug.WARNING);
+end;
+{$ENDIF}
+
+(*
+getXP
+-----
+
+.. code-block:: pascal
+
+    procedure TRSMetrics.getXP(n: Integer);
+
+Returns the XP amount on the xp bar **n**. The top bar is 1, the second is 2 etc.
+The metrics interface must be visible somewhere on the client, and cannot be
+in leightweight mode.
+
+.. note::
+
+    - by The Mayor
+    - Last Updated: 17 April 2017 by The Mayor
+
+Example:
+
+.. code-block:: pascal
+
+    metrics.getXP(1); // Returns XP for the top bar
+    metrics.getXP(2); // Returns XP for the 2nd bar down
+
+*)
+function TRSMetrics.getXP(n: Integer): Integer;
+const
+  filter: TTesseractFilter = [5, 5, [False, 30, TM_Mean]];
+var
+  b: TBoxArray;
+  s:String;
+begin
+  b := self.bars;
+
+  if n = 0 or (n > length(b)) then
+  begin
+    print('TRSMetrics.getXP(): Bar number does not exist', TDebug.ERROR);
+    exit(0);
+  end;
+
+  s := Tesseract_GetText(b[n-1], filter);
+  result := strToIntDef(extractFromStr(s, numbers), 0);
+end;
+
+begin
+  metrics.__init();
+end;
+
+{$f+}

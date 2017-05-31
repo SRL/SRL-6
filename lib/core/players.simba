@@ -422,6 +422,7 @@ begin
   begin
     chatBox.__setup();
     mainScreen.__setup();
+    metrics.__setup();
 
     __areDynamicInterfacesSet := true;
 
@@ -1127,6 +1128,30 @@ begin
 end;
 {$ENDIF}
 
+// Temp procedure to close the NXT reminder (by Thomas) fixed 12th April 17
+procedure __nxtReminder();
+var
+  b: TBox;
+  p: TPoint;
+  TPA: TPointArray;
+  ATPA: T2DPointArray;
+  button_color: TColorData := [1087209, 19, [2, [0.12, 0.54, 0.00]]];
+begin
+  button_color.gatherIn(TPA, getClientBounds());
+  ATPA := TPA.cluster(1);
+  if length(ATPA) then
+  begin
+    ATPA.sortBySize();
+    if inRange(length(ATPA[0]), 2000, 2500) then
+    begin
+      b := ATPA[0].getBounds();
+      p := ATPA[0].getMiddle();
+      if inRange(b.getWidth(), 100, 200) and inRange(b.getHeight(), 10, 30) then
+        mouse(point(p.x + randomRange( - 25, 25), p.y + 30), MOUSE_LEFT);
+    end;
+  end
+end;
+
 {*
 __handleLoginPopup
 ------------------
@@ -1181,6 +1206,8 @@ begin
       false: if __setInputBoxes() then exit(false);
     end;
 
+    __nxtReminder();
+
     wait(random(500, 750));
   until (length(popupMessage) > 0);
 
@@ -1217,13 +1244,14 @@ begin
   begin
     print('Unknown login popup message: ' + popupMessage, TDebug.WARNING);
     takeScreenshot('unknown_login_popup.png');
-    print('PLEASE report this in the SRL-6 bugs section: https://villavu.com/forum/project.php?projectid=10', TDebug.HINT);
+     print('PLEASE report this in the SRL-6 bugs section: https://villavu.com/forum/project.php?projectid=10', TDebug.HINT);
     errorMessage := ['Unknown login popup', 0, 3, 'Next_Player_F'];
   end;
 
   self.__respondToPopup(errorMessage, tries, reachedMax);
 end;
 {$ENDIF}
+
 
 (*
 loginToLobby
@@ -1288,7 +1316,7 @@ begin
 
     print('Entering password...', TDebug.SUB);
     __enterLoginInfo(__boxPassword, self.password, false, true);
-    wait(800 + random(200));
+    wait(800 + random(300));
 
     result := self.__handleLoginPopup(inc(tries), false, reachedMaxTries);
 
@@ -1337,6 +1365,8 @@ begin
       result := true;
       break;
     end;
+
+    __nxtReminder();
 
     if self.loginToLobby() then
     begin

@@ -22,6 +22,134 @@ var
   ocr: TSimpleOCR;
 
 (*
+containsMatch
+~~~~~~~~~~~~~
+
+.. code-block:: pascal
+
+    function containsMatch(needle, haystack: string; match: extended; caseSensitive: boolean = true): extended;
+
+Finds a string within a string and returns the match percentage as an extended (0.00 - 1.00).
+
+    * needle: The text to look for.
+    * haystack: The string it searches in.
+    * match: Extended match treshold.
+    * caseSensitive: Optional boolean, self explanatory.
+
+.. note::
+
+    - by Thomas
+    - Last Updated: 29 June 2016 by Thomas
+
+Example:
+
+.. code-block:: pascal
+
+    var
+      option: string;
+    begin
+      option := 'Silly tesseract: Take Abyss4lWh1p from ground';
+      if containsMatch('Take Abyssal Whip', option) > 0.75 then
+        writeLn('Found a whip');
+    end.
+*)
+
+function containsMatch(needle, haystack: string; caseSensitive: boolean = true): extended;
+var
+  text: string;
+  i, j, p: integer;
+  eArray: TExtendedArray;
+begin
+  if (needle = '') or (haystack = '') then
+    exit();
+
+  if (not caseSensitive) then
+  begin
+    needle := lowercase(needle);
+    haystack := lowercase(haystack);
+  end;
+
+  j := length(haystack) - length(needle);
+
+  if j < 0 then
+  begin
+    print('containsMatch(): needle-string is longer then haystack-string! Switching them for now.', TDebug.WARNING);
+    text := haystack;
+    haystack := needle;
+    needle := text;
+    j := abs(j);
+  end;
+
+  //Let's try and look for a direct match first.
+  p := pos(needle, haystack);
+  if (p > 0) then
+    result := 1.00
+
+  //If they are same length
+  else if (j = 0) then
+    result := stringMatch(needle, haystack)
+
+  else
+  begin
+    setLength(eArray, j);
+
+    for i := 1 to j do
+    begin
+      text := Copy(haystack, i, length(needle));
+      eArray[i - 1] := stringMatch(needle, text);
+    end;
+
+    result := eArray.highestValue(i);
+  end;
+
+  p := max(p, i + 1);
+  if (result > 0.00) then
+    print(copy(haystack, min(1, p-1), p-1) + '--' + Copy(haystack, p, length(needle)) + '--' + copy(haystack, p + length(needle), length(haystack)));
+
+  print('Found a match percentage of: ' + toStr(round(result * 100)) + '%.');
+end;
+
+(*
+containsMatch
+~~~~~~~~~~~~~
+
+.. code-block:: pascal
+
+    function containsMatch(needle, haystack: string; match: extended; caseSensitive: boolean = true): boolean; overload;
+
+Overloaded function. Finds a string within a string, with a match threshold.
+Returns true if the text is found.
+
+    * needle: The text to look for.
+    * haystack: The string it searches in.
+    * caseSensitive: Optional boolean, self explanatory.
+
+.. note::
+
+    - by Thomas
+    - Last Updated: 29 June 2016 by Thomas
+
+Example:
+
+.. code-block:: pascal
+
+    var
+      option: string;
+    begin
+      option := 'Silly tesseract: Take Abyss4lWh1p from ground';
+      if containsMatch('Take Abyssal Whip', option, 0.75) then
+        writeLn('Found a whip');
+    end.
+*)
+
+function containsMatch(needle, haystack: string; caseSensitive: boolean = true;  match: extended): boolean; overload;
+begin
+  result := containsMatch(needle, haystack, caseSensitive) > match
+  if result then
+    print('Found "'+ needle +'" in string "'+ haystack +'".');
+end;
+
+(*
 findText
 ~~~~~~~~
 
@@ -621,7 +749,7 @@ isMouseOverText
 
 .. code-block:: pascal
 
-    function isMouseOverText(txt: TStringArray; waitTime: integer = 100): boolean;
+    function isMouseOverText(txt: TStringArray; waitTime: integer = 200): boolean;
 
 Returns true if one of the indexes in 'txt' is found in the current mouse-over text.
 Will wait up to 'waitTime' to find the text before exiting the function.
@@ -641,7 +769,7 @@ Example:
       mouse(point(x, y), MOUSE_LEFT);
     end;
 *)
-function isMouseOverText(txt: TStringArray; waitTime: integer = 250; useTesseract: boolean = false): boolean;
+function isMouseOverText(txt: TStringArray; waitTime: integer = 200; useTesseract: boolean = false): boolean;
 var
   i : integer;
   t : LongWord;
@@ -662,7 +790,7 @@ begin
         break(2);
       end;
 
-    wait(20 + random(20));
+    wait(20 + random(40));
   until (getSystemTime() > t);
 
   print('isMouseOverText(): '+toStr(result), TDebug.FOOTER);
@@ -760,15 +888,16 @@ Example:
 *)
 function isUpText(txt: string; waitTime: integer = 100): boolean;
 var
-  t: TTimeMarker;
+  t: TCountDown;
 begin
-  t.start();
+  t.setTime(waitTime);
 
   repeat
-    if (pos(txt, getUpText()) > 0) then exit(true);
-    wait(20);
-  until (t.getTime() > waitTime);
-end;
+    if (pos(txt, getUpText()) > 0) then
+      exit(true);
+    wait(randomRange(10, 40));
+  until t.isFinished();
+end; 
 
 (*
 isUpText
@@ -797,16 +926,17 @@ Example:
 function isUpText(txt: TStringArray; waitTime: integer = 100): boolean; overload;
 var
   i: integer;
-  t: TTimeMarker;
+  t: TCountDown;
 begin
-  t.start();
+  t.setTime(waitTime);
 
   repeat
     for i := 0 to high(txt) do
-      if (pos(txt[i], getUpText()) > 0) then exit(true);
-    wait(20);
-  until (t.getTime() > waitTime);
-end;
+      if (pos(txt[i], getUpText()) > 0) then
+        exit(true);
+    wait(randomRange(10, 30));
+  until t.isFinished();
+end; 
 
 begin
   ocr.init(FontPath + 'UpCharsEx');
@@ -814,4 +944,3 @@ begin
 end;
 
 {$f+}
-

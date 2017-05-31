@@ -63,6 +63,7 @@ Note: not all of the gametab IDs are currently in use.
     * ID_INTERFACE_LOOTSCREEN
     * ID_INTERFACE_TARGETINFO
     * ID_INTERFACE_TRADESCREEN
+    * ID_INTERFACE_METRICS
 
   Logged Out:
     * ID_INTERFACE_LOBBY
@@ -111,10 +112,11 @@ const
   ID_INTERFACE_LOOTSCREEN       = 48;
   ID_INTERFACE_TARGETINFO       = 49;
   ID_INTERFACE_TRADESCREEN      = 50;
+  ID_INTERFACE_METRICS          = 51;
 
   // client - logged out
-  ID_INTERFACE_LOBBY            = 51;
-  ID_INTERFACE_LOBBY_WORLDS     = 52;
+  ID_INTERFACE_LOBBY            = 52;
+  ID_INTERFACE_LOBBY_WORLDS     = 53;
 
 (*
 **type TRSInterface**

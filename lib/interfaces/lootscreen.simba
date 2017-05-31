@@ -163,7 +163,7 @@ begin
     exit(false);
   end;
 
-  ATPA := TPA.cluster(15);
+  ATPA := TPA.cluster(5);
   ATPA.sortBySize(true);
 
   for i := 0 to high(ATPA) do

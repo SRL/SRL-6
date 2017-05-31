@@ -267,7 +267,7 @@ Example:
 *)
 function TRSLobby.getCurrentTab(): Integer;
 const
-  INACTIVE_TAB_BOTTOM = 9078134; // Bottom line of inactive tab
+  INACTIVE_TAB_BOTTOM = 8881013; // Bottom line of inactive tab
 begin
   result := -1;
 

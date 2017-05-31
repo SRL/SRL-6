@@ -269,17 +269,18 @@ waitFunc
 
 .. code-block:: pascal
 
-    function waitFunc(Func: Function: Boolean; WaitPerLoop, MaxTime: Integer): Boolean;
+    function waitFunc(Func: Function: Boolean; WaitPerLoop, MaxTime: Integer; Value: Boolean = true): Boolean;
 
-Waits for function Func to be true. WaitPerLoop is how often you
+Waits for function Func to be true or false (default true). WaitPerLoop is how often you
 want to call "Func" function.
-Example: "WaitFunc(@BankScreen, 10 + Random(15), 750);" will check if BankScreen
+Example: "waitFunc(@BankScreen, 10 + Random(15), 750);" will check if BankScreen
 is open every 10-25th millisecond, for a maximum of 750 milliseconds.
 Notice the '@'.
 
 .. note::
 
-  by Rasta Magician, small edit by EvilChicken!
+    - by Rasta Magician, small edit by EvilChicken!
+    - Last Updated: 17 July 2016 by BMWxi
 
 Example:
 
@@ -287,19 +288,18 @@ Example:
 
      waitFunc(@funcName, 50, 5000);
 *)
-function waitFunc(Func: function: Boolean; WaitPerLoop, MaxTime: Integer): Boolean;
+function waitFunc(Func: function: Boolean; WaitPerLoop, MaxTime: Integer; Value: Boolean = True): Boolean;
 var
   T: UInt64;
 begin
   T := GetTickCount() + MaxTime;
   while (GetTickCount() < T) do
   begin
-    if (Func()) then
+    if (Func() = value) then
     begin
-      Result := True;
-      Exit;
+      exit(True);
     end;
-    Wait(WaitPerLoop);
+    wait(WaitPerLoop);
   end;
 end;
 
@@ -309,17 +309,18 @@ waitTypeFunc
 
 .. code-block:: pascal
 
-    function waitTypeFunc(Func: function: boolean of object; WaitPerLoop, MaxTime: Integer): Boolean;
+    function waitTypeFunc(Func: function: boolean of object; WaitPerLoop, MaxTime: Integer; Value: Boolean = True): Boolean;
 
-Waits for a type function Func to be true. WaitPerLoop is how often you
+Waits for a type function Func to be true or false (default true). WaitPerLoop is how often you
 want to call "Func" function.
-Example: "WaitFunc(@BankScreen, 10 + Random(15), 750);" will check if BankScreen
+Example: "waitTypeFunc(@bankScreen.isOpen, 10 + Random(15), 750);" will check if bankScreen
 is open every 10-25th millisecond, for a maximum of 750 milliseconds.
 Notice the '@'.
 
 .. note::
 
-    by Olly
+    - by Olly
+    - Last Updated: 17 July 2016 by BMWxi
 
 Example:
 
@@ -327,19 +328,18 @@ Example:
 
     waitTypeFunc(@minimap.isResting, 50, 5000);
 *)
-function waitTypeFunc(Func: function: Boolean of object; WaitPerLoop, MaxTime: Integer): Boolean;
+function waitTypeFunc(Func: function: Boolean of object; WaitPerLoop, MaxTime: Integer; Value: Boolean = True): Boolean;
 var
   T: UInt64;
 begin
   T := GetTickCount() + MaxTime;
   while (GetTickCount() < T) do
   begin
-    if (Func()) then
+    if (Func() = Value) then
     begin
-      Result := True;
-      Exit;
+      exit(True);
     end;
-    Wait(WaitPerLoop);
+    wait(WaitPerLoop);
   end;
 end;
 

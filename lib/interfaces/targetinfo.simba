@@ -303,7 +303,7 @@ begin
     result := self.__findLock();
 
     if (not result) and (waitTime > 0) then
-      wait(randomRange(round(waitTime/10), round(waitTime/5)));
+      wait(20 + random(80));
 
   until result or t.isFinished();
 
