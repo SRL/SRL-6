@@ -91,7 +91,7 @@ begin
     name := 'RS Metrics';
     ID := ID_INTERFACE_METRICS;
     parentID := -1;
-    static := false;
+    isStatic := false;
   end;
 end;
 {$ENDIF}
@@ -125,6 +125,7 @@ var
   b: TBox;
   TPA: TPointArray;
   ATPA: T2DPointArray;
+  mPt: TPoint;   
 begin
   if findColors(TPA, 2103303, getClientBounds()) then //Background of 'XP' header
   begin
@@ -144,7 +145,8 @@ begin
           if Length(ATPA) then
           begin
             n := floor(ATPA[0].getBounds().getHeight() / 26);
-            self.bars := grid(1, n, (b.X2 - b.X1)-30, 12, 0, 27, MiddleBox(b).offSet([14, 22]));
+            mPt:=MiddleBox(b);
+            self.bars := grid(1, n, (b.X2 - b.X1)-30, 12, 0, 27, mPt.offSet([14, 22]));  
             print('TRSMetrics.__setup(): Found metrics interface with ' + toStr(n) + ' visible bars');
             self.setBounds(b.combine(ATPA.getBounds()));
             exit();
@@ -191,7 +193,7 @@ var
 begin
   b := self.bars;
 
-  if n = 0 or (n > length(b)) then
+  if (n=0) or (n > length(b)) then 
   begin
     print('TRSMetrics.getXP(): Bar number does not exist', TDebug.ERROR);
     exit(0);
