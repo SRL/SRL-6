@@ -1324,7 +1324,7 @@ Example:
 {$IFNDEF CODEINSIGHT}
 function TRSActionBar.__iconBoxes(): TBoxArray;
 begin
-  result := grid(4, 1, 29, 29, 139, 0, [self.getbounds().x1 + 27, self.getbounds().y1 + 18]);
+  result := grid(4, 1, 29, 29, 119, 0, [self.getbounds().x1 + 65, self.getbounds().y1 + 16]);
 end;
 {$ENDIF}
 
