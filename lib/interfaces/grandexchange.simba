@@ -1011,12 +1011,13 @@ begin
   if self.__findInsertionCursor(inputBox[2]) then
     typeSend(itemName, false);
 
-  if waitColorCountRange(9214319, 10, resultsTextBox[0], 5000, 10) then
+  if waitColorCountRange(9214319, 11, resultsTextBox[0], randomRange(5000, 7000), 10) then
     for i := 0 to 5 do
-      if stringMatch(trim(tesseractGetText(resultsTextBox[i], TESS_FILTER_GE_CHARS)), itemName) >= 0.75 then
+      if (stringMatch(trim(tesseractGetText(resultsTextBox[i], TESS_FILTER_GE_CHARS)), itemName) >= 0.75) or
+      containsMatch(tesseractGetText(resultsTextBox[i], TESS_FILTER_GE_CHARS), itemName, false,  0.75) then
       begin
         mouseBox(resultsBox[i], MOUSE_LEFT);
-        waitColorCountRange(16777215, 3, inputBox[2], 5000, 507, 509);
+        waitColorCountRange(16777215, 3, inputBox[2], randomRange(5000, 6000), 507, 509);
         exit(true);
       end;
 
@@ -1359,11 +1360,18 @@ Example:
 procedure TRSGrandExchange.abortAllSlots(collect: boolean = true);
 var
   i: integer;
+  TIA: TIntegerArray;
   TBA: TBoxArray := self.__getSlotBoxes();
 begin
+  setlength(TIA, length(TBA));
+
   for i := 1 to length(TBA) do
-    if (not self.__isSlotEmpty(i)) and self.__isSlotActive(i) then
-      self.abortSlot(i, collect);
+    TIA[i] := i;
+  TIA.shuffle();
+  //writeLn(TIA);
+  for i := 1 to length(TBA) do
+    if (not self.__isSlotEmpty(TIA[i])) and self.__isSlotActive(TIA[i]) then
+      self.abortSlot(TIA[i], collect);
 end;
 
 (*
