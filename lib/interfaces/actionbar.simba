@@ -1313,7 +1313,7 @@ Returns the TBoxArray of the Action Bar icons.
 .. note::
 
     - by Thomas
-    - Last Updated: 2 September 2015 by Thomas
+    - Last Updated: 31 May 2017 by The Mayor
 
 Example:
 
@@ -1324,7 +1324,7 @@ Example:
 {$IFNDEF CODEINSIGHT}
 function TRSActionBar.__iconBoxes(): TBoxArray;
 begin
-  result := grid(4, 1, 29, 29, 139, 0, [self.getbounds().x1 + 27, self.getbounds().y1 + 18]);
+  result := grid(4, 1, 25, 25, 119, 0, [self.getbounds().x1 + 64, self.getbounds().y1 + 16]);
 end;
 {$ENDIF}
 
