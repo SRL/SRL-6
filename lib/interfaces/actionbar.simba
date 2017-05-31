@@ -172,7 +172,7 @@ function TRSActionBar.__find(out height: integer): boolean;
       ATPA := TPA.cluster(2);
       ATPA.filterBetween(8, 1000);
 
-      if length(ATPA) and (length(ATPA[0]) = 6) and
+      if (length(ATPA)<>0) and (length(ATPA[0]) = 6) and 
          (getColor(ATPA[0][0].offset([0, 7])) = 3223592) then
       begin
         Result := True;
