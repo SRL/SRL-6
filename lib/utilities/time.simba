@@ -292,8 +292,8 @@ function waitFunc(Func: function: Boolean; WaitPerLoop, MaxTime: Integer; Value:
 var
   T: UInt64;
 begin
-  T := GetTickCount64() + MaxTime;
-  while (GetTickCount64() < T) do
+  T := GetTickCount() + MaxTime;
+  while (GetTickCount() < T) do
   begin
     if (Func() = value) then
     begin
@@ -332,8 +332,8 @@ function waitTypeFunc(Func: function: Boolean of object; WaitPerLoop, MaxTime: I
 var
   T: UInt64;
 begin
-  T := GetTickCount64() + MaxTime;
-  while (GetTickCount64() < T) do
+  T := GetTickCount() + MaxTime;
+  while (GetTickCount() < T) do
   begin
     if (Func() = Value) then
     begin
@@ -389,12 +389,12 @@ Example:
 *)
 procedure TTimeMarker.start();
 begin
-  Self.__prevMark := getTickCount64(); // used for adding time after a pause
+  Self.__prevMark := GetTickCount(); // used for adding time after a pause
 
   // if it hasn't been started yet
   if (not Self.paused) then
   begin
-    Self.startTime := getTickCount64();
+    Self.startTime := GetTickCount();
     Self.time := 0;
   end;
 
@@ -453,7 +453,7 @@ Example:
 *)
 procedure TTimeMarker.pause();
 begin
-  Self.time := Self.time + (getTickCount64() - Self.__prevMark);
+  Self.time := Self.time + (GetTickCount() - Self.__prevMark);
   Self.paused := True;
 end;
 
@@ -484,7 +484,7 @@ Example:
 function TTimeMarker.getTime(): LongWord;
 begin
   if not Self.paused then
-    Result := Self.time + (getTickCount64() - Self.__prevMark)
+    Result := Self.time + (GetTickCount() - Self.__prevMark)
   else
     Result := Self.time;
 end; 
@@ -514,7 +514,7 @@ Example:
 function TTimeMarker.getTotalTime(): LongWord;
 begin
   if (Self.startTime > 0) then
-    Result := getTickCount64() - Self.startTime;
+    Result := GetTickCount() - Self.startTime;
 end;
 
 (* 
@@ -537,19 +537,19 @@ type
 
 function TCountDown.setTime(Time: UInt64): UInt64;
 begin
-  self := GetTickCount64() + Time;
+  self := GetTickCount() + Time;
   Result := self;
 end;
 
 function TCountDown.timeRemaining(): uInt32;
 begin
   if not self.isFinished() then
-    Result := self - GetTickCount64();
+    Result := self - GetTickCount();
 end;
 
 function TCountDown.isFinished(): Boolean;
 begin
-  result := GetTickCount64() >= self;
+  result := GetTickCount() >= self;
 end;
 
 {$f+}

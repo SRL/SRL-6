@@ -134,7 +134,7 @@ begin
     ID := ID_INTERFACE_TAB_BACKPACK;
     tabIndex := TAB_BACKPACK;
     parentID := -1;
-    static := true;
+    isStatic := true;
     setBounds(gameTabs.tabArea);
 
     __slots[0] := grid(5, 6, 33, 31, 42, 36, point(gameTabs.tabArea.x1 + 25, gameTabs.tabArea.y1 + 22));
@@ -1257,12 +1257,12 @@ function TRSTabBackpack.waitWhileLocked(maxWait: integer = 10000): boolean;
 var
   timeOut: UInt64;
 begin
-  timeOut := (getTickCount64() + maxWait);
+  timeOut := (GetTickCount() + maxWait);
 
   if (not self.isLocked()) then
     exit(true);
 
-  while (timeOut > GetTickCount64()) do
+  while (timeOut > GetTickCount()) do
   begin
     wait(150 + random(50));
     if (not self.isLocked()) then

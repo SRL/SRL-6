@@ -92,7 +92,7 @@ begin
     name := 'Trade Screen';
     ID := ID_INTERFACE_tradeScreen;
     parentID := -1;
-    static := false;
+    isStatic := false;
   end;
 end;
 {$ENDIF}

@@ -99,7 +99,7 @@ begin
     name := 'Collect Box';
     ID := ID_INTERFACE_COLLECTBOX;
     parentID := -1;
-    static := false;
+    isStatic := false;
   end;
 end;
 {$ENDIF}

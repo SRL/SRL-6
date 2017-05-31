@@ -86,7 +86,7 @@ begin
     name := 'RS Pin Screen';
     ID := ID_INTERFACE_PINSCREEN;
     parentID := -1;
-    static := false;
+    isStatic := false;
   end;
 end;
 {$ENDIF}

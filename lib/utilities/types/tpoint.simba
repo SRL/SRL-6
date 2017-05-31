@@ -59,7 +59,7 @@ Example:
     mouse(point.rand(5,5));
 
 *)
-function TPoint.rand(xx, yy : Integer): TPoint;
+function TPoint.rand(xx, yy : Integer): TPoint; constref;
 var
   nx, ny, rx, ry: integer;
 begin
@@ -97,7 +97,7 @@ Example:
     mouse(point.rand(5));
 
 *)
-function TPoint.rand(ran : Integer) : TPoint; overload;
+function TPoint.rand(ran : Integer) : TPoint; constref; overload;
 begin
   result := rand(ran, ran);
 end;
@@ -123,7 +123,7 @@ Example:
     writeLn(P.equals(P2));
 
 *)
-function TPoint.equals(const P : TPoint) : Boolean;
+function TPoint.equals(const P : TPoint) : Boolean; constref;
 begin
   result := (self.X = P.X) and (self.Y = P.Y);
 end;
@@ -151,7 +151,7 @@ Example:
       exit();
 
 *)
-function TPoint.isInvalid(invalidPoint: TPoint = point(-1, -1)): boolean;
+function TPoint.isInvalid(invalidPoint: TPoint = point(-1, -1)): boolean; constref;
 begin
   result := self.equals(invalidPoint);
 end;
@@ -229,7 +229,7 @@ Example:
     p.offset(point(50, 50));
 
 *)
-function TPoint.offSet(p: TPoint): TPoint;
+function TPoint.offset(p: TPoint): TPoint;
 begin
   self.x := self.x + p.x;
   self.y := self.y + p.y;
@@ -257,7 +257,7 @@ Example:
     tp := p.copy();
 
 *)
-function TPoint.copy(): TPoint;
+function TPoint.copy(): TPoint; constref;
 begin
   result := point(self.x, self.y);
 end;
@@ -284,7 +284,7 @@ Example:
       writeln('point P is in the box!');
 
 *)
-function TPoint.isInBox(const box: TBox): boolean;
+function TPoint.isInBox(const box: TBox): boolean; constref;
 begin
   result := pointInBox(self, box);
 end;
@@ -310,7 +310,7 @@ Example:
     writeln(p.randRange(-10, 10));
 
 *)
-function TPoint.randRange(const aFrom, aTo: integer): TPoint;
+function TPoint.randRange(const aFrom, aTo: integer): TPoint; constref;
 begin
   result.x := randomRange(self.x + aFrom, self.x + aTo);
   result.y := randomRange(self.y + aFrom, self.y + aTo);
@@ -338,7 +338,7 @@ Example:
     p.randRange(-10, 10, -10, 10);
 
 *)
-function TPoint.randRange(const xFrom, xTo, yFrom, yTo: integer): TPoint; overload;
+function TPoint.randRange(const xFrom, xTo, yFrom, yTo: integer): TPoint; constref; overload;
 begin
   result.x := randomRange(self.x + xFrom, self.x + xTo);
   result.y := randomRange(self.y + yFrom, self.y + yTo);
@@ -366,7 +366,7 @@ Example:
     p.gaussRange(-10, 10);
 
 *)
-function TPoint.gaussRange(const aFrom, aTo: integer): TPoint;
+function TPoint.gaussRange(const aFrom, aTo: integer): TPoint; constref;
 begin
   result.x := gaussRangeInt(self.x + aFrom, self.x + aTo);
   result.y := gaussRangeInt(self.y + aFrom, self.y + aTo);
@@ -394,7 +394,7 @@ Example:
     p.gaussRange(-10, 10, -5, 5);
 
 *)
-function TPoint.gaussRange(const xFrom, xTo, yFrom, yTo: integer): TPoint; overload;
+function TPoint.gaussRange(const xFrom, xTo, yFrom, yTo: integer): TPoint; constref; overload;
 begin
   result.x := gaussRangeInt(self.x + xFrom, self.x + xTo);
   result.y := gaussRangeInt(self.y + yFrom, self.y + yTo);
@@ -421,7 +421,7 @@ Example:
     writeln(point(100, 100).getAngleTo(point(150, 150));
 
 *)
-function TPoint.getAngleTo(pt2: TPoint): extended;
+function TPoint.getAngleTo(pt2: TPoint): extended; constref;
 begin
   Result := ((ArcTan2((pt2.Y - self.Y), (pt2.X - self.X)) * (180.0 / Pi)) + 90.0);
   if (Result < 0.0) then

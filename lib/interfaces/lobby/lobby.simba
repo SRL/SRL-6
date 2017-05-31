@@ -110,7 +110,7 @@ begin
     name := 'RS Lobby';
     ID := ID_INTERFACE_LOBBY;
     parentID := -1;
-    static := true;
+    isStatic := true;
     setBounds([21, 110, 782, 587]);
     tabBoxes := grid(6, 1, 45, 22, 100, 0, point(x1 + 70, y1 + 16));
   end;
@@ -368,9 +368,9 @@ begin
   p := MiddleBox(Self.tabBoxes[tab]).randRange(-9, 9, -7, 7);
 
   Mouse(p, MOUSE_LEFT);
-  Timeout := (GetTickCount64() + Random(4000, 5000));
+  Timeout := (GetTickCount() + Random(4000, 5000));
 
-  while (not Result) and (Timeout > GetTickCount64()) do
+  while (not Result) and (Timeout > GetTickCount()) do
   begin
     Result := (Self.getCurrentTab() = tab);
     Wait(Random(300, 600));

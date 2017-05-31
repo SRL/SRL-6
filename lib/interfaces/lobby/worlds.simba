@@ -189,7 +189,7 @@ begin
     name := 'RS Lobby Tab: Worlds';
     ID := ID_INTERFACE_LOBBY_WORLDS;
     parentID := ID_INTERFACE_LOBBY;
-    static := true;
+    isStatic := true;
     lobbyID := LOBBY_WORLDS;
     SetBounds(lobby.getBounds());
     __loadFromINI();

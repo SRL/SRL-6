@@ -103,7 +103,7 @@ begin
     name := 'RS Production Screen';
     ID := ID_INTERFACE_PRODUCTION;
     parentID := -1;
-    static := false;
+    isStatic := false;
     __isLoaded := false;
   end;
 end;
@@ -214,9 +214,9 @@ var
   t: UInt64;
 begin
   result := false;
-  t := (getTickCount64() + waitTime);
+  t := (GetTickCount() + waitTime);
 
-  while (not result) and (t >= getTickCount64()) do
+  while (not result) and (t >= GetTickCount()) do
   begin
     result := self.__find();
     wait(randomRange(20, 50));
@@ -399,7 +399,7 @@ begin
   if (not self.isOpen()) then
     exit(false);
 
-  t := (getTickCount64() + 3000);
+  t := (GetTickCount() + 3000);
 
   repeat
     if (slot>20) and ((getColor(self.x1 + 223, self.y1 + 285) = __COLOR_SCROLL_BAR) or (getColor(self.x1 + 223, self.y1 + 286) = __COLOR_SCROLL_BAR)) then
@@ -424,7 +424,7 @@ begin
 
     mouseScroll(p, 3 + random(5), down);
     wait(50 + random(50));
-  until(getTickCount64() > t);
+  until(GetTickCount() > t);
 
   print('TRSProductionScreen._scrollToItem(): result = ' + lowercase(boolToStr(result)), TDebug.SUB);
 end;

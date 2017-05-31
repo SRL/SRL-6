@@ -31,7 +31,7 @@ Example:
     result := box.isPointInside(point(250, 100));
 
 *)
-function TBox.isPointInside(const point: TPoint): boolean;
+function TBox.isPointInside(const point: TPoint): Boolean; constref;
 begin
   result := pointInBox(point, self);
 end;
@@ -60,7 +60,7 @@ Example:
       box.getDimensions(w, h);
 
 *)
-procedure TBox.getDimensions(var w, h: integer);
+procedure TBox.getDimensions(var w, h: integer); constref;
 begin
   w := self.x2 - self.x1 + 1;
   h := self.y2 - self.y1 + 1;
@@ -87,7 +87,7 @@ Example:
     w := box.getWidth();
 
 *)
-function TBox.getWidth(): integer;
+function TBox.getWidth(): integer; constref;
 begin
   result := self.x2 - self.x1 + 1;
 end;
@@ -114,7 +114,7 @@ Example:
     h := box.getHeight();
 
 *)
-function TBox.getHeight(): integer;
+function TBox.getHeight(): integer; constref;
 begin
   result := self.y2 - self.y1 +1;
 end;
@@ -140,7 +140,7 @@ Example:
     pt := b.getMidPoint();
 
 *)
-function TBox.getMiddle(): TPoint;
+function TBox.getMiddle(): TPoint; constref;
 begin
   result := point((self.x2 + self.x1) div 2, (self.y2 + self.y1) div 2);
 end;
@@ -167,7 +167,7 @@ Example:
     cols := b.getColors();
 
 *)
-function TBox.getColors(clearSame: boolean = true): TIntegerArray;
+function TBox.getColors(clearSame: boolean = true): TIntegerArray; constref;
 begin
   getColorsWrap(TPAFromBox(intToBox(self.x1, self.y1, self.x2, self.y2)), result);
 
@@ -197,7 +197,7 @@ Example:
     result := b.colorExists(OUTLINE_BLACK);
 
 *)
-function TBox.colorExists(color: integer; tolerance: integer = 0): Boolean;
+function TBox.colorExists(color: integer; tolerance: integer = 0): Boolean; constref;
 var
   p: TPoint;
 begin
@@ -225,7 +225,7 @@ Example:
     result := b.dtmExists(thedtm);
 
 *)
-function TBox.dtmExists(const dtm: integer): boolean;
+function TBox.dtmExists(const dtm: integer): boolean; constref;
 var
   p: TPoint;
 begin
@@ -253,7 +253,7 @@ Example:
     result := b.bitmapExists(aBitmap, 25);
 
 *)
-function TBox.bitmapExists(const bitmap, tolerance: integer): boolean;
+function TBox.bitmapExists(const bitmap, tolerance: integer): boolean; constref;
 var
   p: TPoint;
 begin
@@ -281,7 +281,7 @@ Example:
     TPA := box.createTPA;
 
 *)
-function TBox.createTPA: TPointArray;
+function TBox.createTPA: TPointArray; constref;
 begin
   result := tpaFromBox(self);
 end;
@@ -307,7 +307,7 @@ Example:
     tpa := myBox.createTPAEdge;
 
 *)
-function TBox.createTPAEdge: TPointArray;
+function TBox.createTPAEdge: TPointArray; constref;
 begin
   result := edgeFromBox(self);
 end;
@@ -333,7 +333,7 @@ Example:
     box.mouse();
 
 *)
-procedure TBox.mouse(const mouseAction: integer = MOUSE_MOVE);
+procedure TBox.mouse(const mouseAction: integer = MOUSE_MOVE); constref;
 begin
   mouseBox(self, mouseAction);
 end;
@@ -360,7 +360,7 @@ Example:
       writeln('boxes are equal.);
 
 *)
-function TBox.equals(compareBox: TBox): boolean;
+function TBox.equals(compareBox: TBox): boolean; constref;
 begin
   result := (self.x1 = compareBox.x1) and (self.x2 = compareBox.x2) and
             (self.y1 = compareBox.y1) and (self.y2 = compareBox.y2);
@@ -390,7 +390,7 @@ Example:
       writeln('box is vaild.);
 
 *)
-function TBox.isVaild(invaildBox: TBox = [-1, -1, -1, -1]): boolean;
+function TBox.isVaild(invaildBox: TBox = [-1, -1, -1, -1]): boolean; constref;
 begin
   result := (not self.equals(invaildBox));
 end;
@@ -520,7 +520,7 @@ Example:
     b := myBox.copy();
 
 *)
-function TBox.copy(): TBox;
+function TBox.copy(): TBox; constref;
 begin
   result := intToBox(self.x1, self.y1, self.x2, self.y2);
 end;
@@ -604,7 +604,7 @@ Example:
     newBox := box.combine(intToBox(50, 50, 100, 100));
 
 *)
-function TBox.combine(b: TBox): TBox;
+function TBox.combine(b: TBox): TBox; constref;
 begin
   Result.X1 := Min(Min(b.X1, b.X2), Min(self.X1, self.X2));
   Result.Y1 := Min(Min(b.Y1, b.Y2), Min(self.Y1, self.Y2));
@@ -633,7 +633,7 @@ Example:
     tba := myBox.split(25, 25);
 
 *)
-function TBox.split(const width, height: integer): TBoxArray;
+function TBox.split(const width, height: integer): TBoxArray; constref;
 var
   AreaW, AreaH: Integer;
   BoxX, BoxY: Integer;
@@ -688,7 +688,7 @@ Example:
     p := myBox.getGaussPoint();
 
 *)
-function TBox.getGaussPoint: TPoint;
+function TBox.getGaussPoint: TPoint; constref;
 begin
   gaussBox(result, self);
 end;
@@ -714,7 +714,7 @@ Example:
     p := myBox.getRandomPoint();
 
 *)
-function TBox.getRandomPoint: TPoint;
+function TBox.getRandomPoint: TPoint; constref;
 begin
   result.x := randomRange(self.x1, self.x2);
   result.y := randomRange(self.y1, self.y2);
@@ -741,7 +741,7 @@ Example:
     p := myBox.getRandomPoint(boxArr);
 
 *)
-function TBox.getRandomPoint(clearBoxes: TBoxArray): TPoint; overload;
+function TBox.getRandomPoint(clearBoxes: TBoxArray): TPoint; constref; overload;
 var
   i, h: integer;
   atpa: T2DPointArray;
@@ -792,7 +792,7 @@ Example:
     if b.overlap(box2) then
       writeln('boxes overlap');
 *)
-function TBox.overlap(b: TBox): boolean;
+function TBox.overlap(b: TBox): boolean; constref;
 begin
   Result := not ((self.X1 > b.X2) or (self.X2 < b.X1) or (self.Y1 > b.Y2) or (self.Y2 < b.Y1));
 end;
@@ -818,7 +818,7 @@ Example:
     if someBox.hasEqualDimensions(anotherBox) then
       writeln('boxes have same width and height');
 *)
-function TBox.hasEqualDimensions(other: TBox): Boolean;
+function TBox.hasEqualDimensions(other: TBox): Boolean; constref;
 begin
   Result := ((Self.X2 - Self.X1) = (other.X2 - other.X1)) and
             ((Self.Y2 - Self.Y1) = (other.Y2 - other.Y1));

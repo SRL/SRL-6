@@ -173,7 +173,7 @@ begin
     name := 'RS GameTabs (Navigation)';
     ID := ID_INTERFACE_GAMETABS;
     parentID := -1;
-    static := false;
+    isStatic := false;
     tabArea := [576, 292, 799, 599];
     __tabSelectionArea := [581, 296, 796, 319];
     isSetup := false;

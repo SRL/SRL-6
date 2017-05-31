@@ -86,7 +86,7 @@ begin
     name := 'RS Choose Tool Screen';
     ID := ID_INTERFACE_TOOL;
     parentID := -1;
-    static := false;
+    isStatic := false;
   end;
 end;
 {$ENDIF}
@@ -190,11 +190,55 @@ end;
 
 (*
 select
+-----------------
+
+.. code-block:: pascal
+
+    function TRSToolScreen.select(tool: integer): boolean;
+
+Returns true if it selects the tool **tool** . This is the same as the above
+method except the **tool** parameter takes an integer instead of a string.
+
+.. note::
+
+    - by akarigar
+    - Last Updated: 17 December 2014 by akarigar
+
+Example:
+
+.. code-block:: pascal
+
+    if toolScreen.select(1) then
+      writeln('We started making something!');
+*)
+function TRSToolScreen.select(tool: integer): boolean;
+var
+  timeout : LongWord;
+begin
+  if (tool <= 0) or (not self.isOpen()) then
+    exit(false);
+
+  timeout := getSystemTime() + randomRange(1500, 1900);
+  repeat
+    multiType(intToStr(tool), randomRange(30, 50), 2, false);
+    wait(100 + random(50));
+    result := not self.isOpen();
+  until (getSystemTime() > timeout) or result;
+
+  print('TRSToolScreen.select(): result = ' + lowercase(boolToStr(result)), TDebug.SUB);
+end;
+
+begin
+  toolScreen.__init();
+end;
+
+(*
+select (overload)
 ------
 
 .. code-block:: pascal
 
-    function TRSToolScreen.select(tool: string; key: boolean = true): boolean;
+    function TRSToolScreen.select(tool: string; key: boolean = true): boolean; overload;
 
 Returns true if it selects the tool **tool** . If the **key** parameter is set
 to true *(default = true)* then it will press the corresponding key, else it
@@ -212,7 +256,7 @@ Example:
     if toolScreen.select('Knife') then
       writeln('We started making something!');
 *)
-function TRSToolScreen.select(tool: String; key: boolean = true): boolean;
+function TRSToolScreen.select(tool: String; key: boolean = true): boolean; overload;
 const
   TEXT_COLOR = 2070783;
 var
@@ -241,50 +285,6 @@ begin
       end;
 
   print('TRSToolScreen.select(): result = ' + lowercase(boolToStr(result)), TDebug.SUB);
-end;
-
-(*
-select (overload)
------------------
-
-.. code-block:: pascal
-
-    function TRSToolScreen.select(tool: integer): boolean; overload;
-
-Returns true if it selects the tool **tool** . This is the same as the above
-method except the **tool** parameter takes an integer instead of a string.
-
-.. note::
-
-    - by akarigar
-    - Last Updated: 17 December 2014 by akarigar
-
-Example:
-
-.. code-block:: pascal
-
-    if toolScreen.select(1) then
-      writeln('We started making something!');
-*)
-function TRSToolScreen.select(tool: integer): boolean; overload;
-var
-  timeout : LongWord;
-begin
-  if (tool <= 0) or (not self.isOpen()) then
-    exit(false);
-
-  timeout := getSystemTime() + randomRange(1500, 1900);
-  repeat
-    multiType(intToStr(tool), randomRange(30, 50), 2, false);
-    wait(100 + random(50));
-    result := not self.isOpen();
-  until (getSystemTime() > timeout) or result;
-
-  print('TRSToolScreen.select(): result = ' + lowercase(boolToStr(result)), TDebug.SUB);
-end;
-
-begin
-  toolScreen.__init();
 end;
 
 {$f+}

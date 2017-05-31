@@ -17,7 +17,7 @@ getColor: overload;
 
 .. code-block:: pascal
 
-    function getColor(var p: TPoint): integer; overload;
+    function getColor(p: TPoint): integer; overload;
 
 Takes a TPoint variable instead of x, y variables.
 
@@ -33,7 +33,7 @@ Example:
      int := getColor(p);
 
 *)
-function getColor(var p: TPoint): integer; overload;
+function getColor(p: TPoint): integer; overload;
 begin
   result := getColor(p.x, p.y);
 end;

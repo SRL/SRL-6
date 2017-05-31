@@ -87,7 +87,7 @@ begin
     name := 'Target Info';
     ID := ID_INTERFACE_TARGETINFO;
     parentID := -1;
-    static := false;
+    isStatic := false;
   end;
 end;
 {$ENDIF}

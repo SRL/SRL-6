@@ -125,7 +125,7 @@ begin
     name := 'RS Action Bar';
     ID := ID_INTERFACE_ACTION_BAR;
     parentID := ID_INTERFACE_MAINSCREEN;
-    static := false;
+    isStatic := false;
     setSlots := false;
   end;
 end;

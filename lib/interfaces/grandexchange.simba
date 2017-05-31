@@ -104,7 +104,7 @@ begin
     name := 'Grand Exchange';
     ID := ID_INTERFACE_GRANDEXCHANGE;
     parentID := -1;
-    static := false;
+    isStatic := false;
   end;
 end;
 {$ENDIF}
@@ -201,7 +201,7 @@ function TRSGrandExchange.isOpen(waitTime: integer = 0): boolean;
 var
   t: UInt64;
 begin
-  t := (getTickCount64() + waitTime);
+  t := (GetTickCount() + waitTime);
 
   repeat
     if self.__find() then
@@ -248,11 +248,11 @@ begin
 
   if escape then // Try the escape button first if possible
   begin
-    timeOut := (getTickCount64() + randomRange(600, 900));
+    timeOut := (GetTickCount() + randomRange(600, 900));
     repeat
       typeByte(VK_ESCAPE);
       wait(300 + random(50));
-    until (not self.isOpen()) or (getTickCount64() > timeOut);
+    until (not self.isOpen()) or (GetTickCount() > timeOut);
 
     if (not self.isOpen()) then
       exit(true);
@@ -261,9 +261,9 @@ begin
   if self.isOpen(100 + random(50)) then // Wait a bit in case it closes
   begin
     mouse(point(self.x1 + __CLOSE_OFFSET.x, self.y1 + __CLOSE_OFFSET.y).rand(3), MOUSE_LEFT);
-    timeOut := (getTickCount64() + randomRange(5000, 6000));
+    timeOut := (GetTickCount() + randomRange(5000, 6000));
 
-    while (timeOut > getTickCount64()) do
+    while (timeOut > GetTickCount()) do
     begin
       if (not self.isOpen()) then
       begin
@@ -561,9 +561,9 @@ var
   timeOut: UInt64;
   TPA: TPointArray;
 begin
-  timeOut := getTickCount64() + waitTime;
+  timeOut := GetTickCount() + waitTime;
 
-  while (getTickCount64() < timeOut) do
+  while (GetTickCount() < timeOut) do
     if findColors(TPA, 1388125, self.getBounds()) then
     begin
       if (length(TPA) = 1532) or (length(TPA) = 492) then
@@ -600,9 +600,9 @@ var
   timeOut: integer;
   TPA: TPointArray;
 begin
-  timeOut := getTickCount64() + waitTime;
+  timeOut := GetTickCount() + waitTime;
 
-  while (getTickCount64() < timeOut) do
+  while (GetTickCount() < timeOut) do
     if findColors(TPA, 6247745, self.getBounds()) then
     begin
       if (length(TPA) = 3501) then
@@ -852,9 +852,9 @@ var
   timeOut: UInt64;
   TPA: TPointArray;
 begin
-  timeOut := getTickCount64() + waitTime;
+  timeOut := GetTickCount() + waitTime;
 
-  while getTickCount64() < timeOut do
+  while GetTickCount() < timeOut do
   begin
     findColors(TPA, 14606050, searchBox);
     if length(TPA) > 0 then
@@ -1002,7 +1002,7 @@ var
   resultsTextBox: TBoxArray := grid(3, 2, 122, 35, 172, 55, point(self.x1 + 120, self.y1 + 396));
   inputBox: TBoxArray;
 begin
-  timeOut := getTickCount64() + randomRange(3000, 4000);
+  timeOut := GetTickCount() + randomRange(3000, 4000);
   inputBox := self.__getInputBoxes();
 
   if not self.__findInsertionCursor(inputBox[2]) then
@@ -1058,8 +1058,8 @@ begin
     print('TRSGrandExchange._returnToSummary(): returning to summary screen', TDebug.SUB);
     multiClick(backButton.rand(5), 30, 3);
 
-    timeOut := getTickCount64() + randomRange(2500, 3500);
-    while getTickCount64() < timeOut do
+    timeOut := GetTickCount() + randomRange(2500, 3500);
+    while GetTickCount() < timeOut do
     begin
       if ((not self.__isOfferOpen()) and (not self.__isProgressOpen())) then
         break();
@@ -1142,13 +1142,13 @@ begin
       exit(false);
     end;
 
-    timeOut := getTickCount64() + randomRange(3000, 4000);
+    timeOut := GetTickCount() + randomRange(3000, 4000);
 
     repeat
       mouseBox(TBA[geSlot - 1], MOUSE_LEFT);
       if self.__isProgressOpen(2000 + random(500)) then
         break();
-    until (getTickCount64() < timeOut);
+    until (GetTickCount() < timeOut);
   end;
 
   for i := high(collectBox) downto 0 do
@@ -1206,9 +1206,9 @@ begin
     exit(false);
   end;
 
-  timeOut := getTickCount64() + maxTime;
+  timeOut := GetTickCount() + maxTime;
 
-  while (getTickCount64() < timeOut) do
+  while (GetTickCount() < timeOut) do
     if self.__isSlotComplete(geSlot) then
     begin
       if self.collectSlot(geSlot) then

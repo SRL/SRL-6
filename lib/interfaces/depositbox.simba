@@ -119,7 +119,7 @@ begin
     name := 'RS Deposit Box Screen';
     ID := ID_INTERFACE_DEPOSITBOX;
     parentID := -1;
-    static := false;
+    isStatic := false;
   end;
 end;
 {$ENDIF}
