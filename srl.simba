@@ -85,7 +85,7 @@ begin
   {$IFNDEF SMART}
     activateClient();
   {$ELSE}
-    for i = 1 to smartResetAttempts do
+    for i := 1 to smartResetAttempts do
     begin
       inc(j);
       print('attempting to spawn smart, attempt #: ' + toStr(j));
