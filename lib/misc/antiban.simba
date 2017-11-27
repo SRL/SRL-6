@@ -534,9 +534,9 @@ Example:
 
 .. code-block:: pascal
 
-    mouseMovingObject();
+    mouseMovingObject(false);
 *)
-procedure mouseMovingObject();
+procedure mouseMovingObject(click: boolean = true);
 var
   boxes: TBoxArray;
   i, mostShift: integer;
@@ -564,8 +564,7 @@ begin
 
   mouseBox(b, MOUSE_MOVE);
 
-  if (random(2) = 0) then
-    if isMouseOverMenuOpen(b) then
+  if click and (random(2) = 0) and isMouseOverMenuOpen(b) then
     begin
       fastClick(MOUSE_RIGHT);
       chooseOption.close();
@@ -599,15 +598,19 @@ Example:
 function closePopup(useEscKey: boolean = true): boolean;
 var
   i, j, x, y: Integer;
-  DTMs: Array [0..5] of Integer;
+  DTMs: Array [0..6] of Integer;
   timeOut: TCountDown;
-  timeStarted: Array [0..5] of Boolean;
+  timeStarted: Array [0..6] of Boolean;
 begin
   if not isLoggedIn() then
     exit(false);
   DTMs :=
-                    // Generic Blue Buttons (i.e., Macroing detected warning)
-    [DTMFromString('mbQAAAHicY2VgYFjDxMCQCcQfgHgtEK8HYgMg1gFiXSDWBmJ7IFba/Joh' +
+                       // Generic Big Yellow Button (i.e., Options menu)
+    [DTMFromString('mggAAAHicY2NgYDjOCsGngPgoEB8C4iNArMfIwGAMxDpArAHEBlD2t/0W' +
+                   'DNlcrAx3ZjkztAhyMJRws4HZXECzsGFGHBgCAHWJDRw='),
+
+                  // Generic Blue Buttons (i.e., Macroing detected warning)
+    DTMFromString('mbQAAAHicY2VgYFjDxMCQCcQfgHgtEK8HYgMg1gFiXSDWBmJ7IFba/Joh' +
                    '+NpvBruzPxhS7/5lYE2YyiAJ1C+ChEF8RiwYDACqWw4B'),
 
                     // Low level achievement popups
@@ -638,7 +641,7 @@ begin
 
     if (not timeStarted[i]) then
     begin
-      timeOut.setTime(randomRange(700, 900));
+      timeOut.setTime(randomRange(1200, 1800));
       timeStarted[i] := true;
     end;
 
@@ -654,7 +657,7 @@ begin
         end
       else
         mouse(x + 3, y + 3, 3, 3, MOUSE_LEFT);
-      wait(randomRange(300, 500));
+      wait(randomRange(600, 1200));
     end;
 
   until timeOut.isFinished() or result;
