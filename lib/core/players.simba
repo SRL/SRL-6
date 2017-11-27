@@ -1316,7 +1316,7 @@ begin
 
     print('Entering password...', TDebug.SUB);
     __enterLoginInfo(__boxPassword, self.password, false, true);
-    wait(800 + random(300));
+    wait(8000 + random(3000));
 
     result := self.__handleLoginPopup(inc(tries), false, reachedMaxTries);
 
