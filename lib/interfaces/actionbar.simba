@@ -139,13 +139,13 @@ __find
 
     function TRSActionBar.__find(out height: integer): boolean;
 
-Returns true if the action bar is found and its bounds are set. This will work
-with all action bar layouts (horizontal, vertical, etc.)
+Returns true if the action bar is found and its bounds are set. This works with
+legacy combat mode as well as minimised EoC action bar.
 
 .. note::
 
     - by The Mayor
-    - Last Updated: 8 May 2017 by The Mayor
+    - Last Updated: 28 September 2017 by Thomas
 
 Example:
 
@@ -156,111 +156,55 @@ Example:
     begin
       if (not actionbar.__find(h)) then
         writeln('Failed to find the actionbar');
-
     end;
 *}
 {$IFNDEF CODEINSIGHT}
 function TRSActionBar.__find(out height: integer): boolean;
-
-  function __findMinimize(var p: TPoint; b: TBox): Boolean;
-  var
-    TPA: TPointArray;
-    ATPA: T2DPointArray;
-  begin
-    if findColors(TPA, 5987420, b) then
-    begin
-      ATPA := TPA.cluster(2);
-      ATPA.filterBetween(8, 1000);
-
-      if (length(ATPA)<>0) and (length(ATPA[0]) = 6) and 
-         (getColor(ATPA[0][0].offset([0, 7])) = 3223592) then
-      begin
-        Result := True;
-        p := ATPA[0][0];
-      end;
-    end;
-  end;
-
-const
-  STAT_TOP = 8943453; // Top border of the stat bars
-  NUM_EDGE = 950729; // Side of diamond around AB number
 var
-  b: TBox;
-  p: TPoint;
-  Position: Byte;
-  Horizontal, Stacked: Boolean;
+  i: Integer;
+  b, bar: TBox;
   TPA: TPointArray;
   ATPA: T2DPointArray;
+  EoC: boolean;
+  barColor: TColorData := [2235669, 5, [2, [0.36, 1.29, 0.00]]];
 begin
-  if findColors(TPA, STAT_TOP, getClientBounds()) then
+  if barColor.gatherIn(TPA, getClientBounds()) then
   begin
     ATPA := TPA.cluster(1);
-
-    if Length(ATPA) then
-    begin
-      ATPA.filterBetween(1, 58);
-      ATPA.filterBetween(85, 1000);
-
-      if Length(ATPA) = 4 then
-      begin
-        Horizontal := ATPA[0].getBounds().getWidth() > ATPA[0].getBounds().getHeight();
-        Stacked := (Horizontal and (ATPA[0].getBounds().Y1 < ATPA[2].getBounds().Y1)) or
-                   ((not Horizontal) and (ATPA[0].getBounds().X1 < ATPA[1].getBounds().X1));
-
-        if Horizontal and (not Stacked) then Position := 1;
-        if (not Horizontal) and (not Stacked) then Position := 2;
-        if Horizontal and Stacked then Position := 3;
-        if (not Horizontal) and Stacked then Position := 4;
-
-        TPA := ATPA.merge();
-        b := TPA.getBounds();
-        b.Y1:= b.Y1-60;
-        b.expand(20);
-        b.setLimit(getClientBounds());
-
-        if __findMinimize(p, b) then
+    ATPA.sortBySize(True);
+    for i := 0 to high(ATPA) do
+      if inRange(length(ATPA[i]), 2000, 25000) and inRange(ATPA[i].getBounds().getWidth(), 525, 535) then
         begin
+          bar := ATPA[i].getBounds();
+          b := [bar.x2 - 10, bar.y1, bar.x2, bar.y1 + 10];
 
-          case Position of
-            1: self.setBounds([p.X-520, p.Y-9, p.X+8,p.Y+28]);
-            2: self.setBounds([p.X-29, p.Y-9, p.X+8,p.Y+520]);
-            3: self.setBounds([p.X-255, p.Y-9, p.X+8,p.Y+48]);
-            4: self.setBounds([p.X-49, p.Y-9, p.X+8,p.Y+255]);
-          end;
+          EoC := (countColorTolerance(4499917, b, 80) > 10);
+          print('TRSActionBar.__find(): EoC = ' + toStr(EoC));
 
-          if findColors(TPA, NUM_EDGE, self.getBounds()) then
+          height := bar.getHeight();
+          case bar.getHeight() of
+            37: result := true;
+            75: result := true;
+          else
           begin
-
-            case Position of
-              1:begin
-                  self.y2 += 38;
-                  self.__slots := grid(14, 1, 32, 31, 36, 0, Point(Self.x1+19, Self.y2-20));
-                end;
-              2:begin
-                  self.x1 -= 38;
-                  self.__slots := grid(1, 14, 31, 32, 0, 36, Point(Self.x1+19, Self.y1+20));
-                end;
-              3:begin
-                  self.y2 += 70;
-                  self.__slots := grid(7, 2, 31, 31, 36, 36, Point(Self.x1+20, Self.y2-56));
-                end;
-              4:begin
-                  self.x1 -= 70;
-                  self.__slots := grid(2, 7, 31, 31, 35, 35, Point(Self.x1+19, Self.y1+19));
-                end;
-            end;
-
+            print('TRSActionBar.__find(): Actionbar needs updating! Tell a dev.', TDebug.ERROR);
+            exit(false);
+          end;
           end;
 
-          exit(true);
+          if result then
+          begin
+          self.setBounds(bar);
+          print('TRSActionBar.__find(): bar height = ' + toStr(height));
+
+          if (not self.setSlots) then
+          begin
+            __slots := grid(14, 1, 29, 29, 36, 0, point(self.x1 + 20, self.y1 + 56));
+            self.setSlots := true;
+          end;
+          end;
         end;
-
-        // TODO - Must be legacy bar
-
-      end;
-    end;
   end;
-  print('TRSActionBar.__find(): Didn''t find the stat bars - tell a dev');
 end;
 {$ENDIF}
 
@@ -487,7 +431,7 @@ begin
   b.y1 + 26), 0, 0, 0, 3111603, 0, 'UpChars'), -1); //Color is of the number showing which bar is active.
 
   print('TRSActionBar.getCurrentBar() returned ' + toStr(result), TDebug.LOG);
-end;    
+end;
 
 (*
 switchToBar
@@ -577,7 +521,7 @@ begin
 
   until timeMarker.isFinished();
 
-end; 
+end;
 
 (*
 isSlotEmpty
@@ -1313,7 +1257,7 @@ Returns the TBoxArray of the Action Bar icons.
 .. note::
 
     - by Thomas
-    - Last Updated: 31 May 2017 by The Mayor
+    - Last Updated: 2 September 2015 by Thomas
 
 Example:
 
@@ -1324,7 +1268,7 @@ Example:
 {$IFNDEF CODEINSIGHT}
 function TRSActionBar.__iconBoxes(): TBoxArray;
 begin
-  result := grid(4, 1, 25, 25, 119, 0, [self.getbounds().x1 + 64, self.getbounds().y1 + 16]);
+  result := grid(4, 1, 29, 29, 119, 0, [self.getbounds().x1 + 65, self.getbounds().y1 + 16]);
 end;
 {$ENDIF}
 

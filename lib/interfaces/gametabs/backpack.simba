@@ -172,7 +172,7 @@ begin
   result := (gameTabs.isTabActive(self.tabIndex));
 
   if (not result) then
-    result := (getColor(gameTabs.tabArea.x1 + 115, gameTabs.tabArea.y2 -27) = COIN_COLOR);
+    result := (getColor(gameTabs.tabArea.x1 + 135, gameTabs.tabArea.y2 -27) = COIN_COLOR);
 end;
 
 (*
