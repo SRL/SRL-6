@@ -130,7 +130,7 @@ begin
     'slow': color.gatherIn(TPA, mainScreen.getBounds());
   end;
 
-  if length(TPA) < 100 then
+  if (length(TPA) < 100) then
   begin
     print('TRSTargetInfo.__find(): Didn' 't find enough color, target info isn' 't open.', TDebug.WARNING);
     exit();
@@ -199,25 +199,24 @@ var
 begin
   color.gatherIn(TPA, mainScreen.getBounds());
 
-  if length(TPA) < 500 then
+  if (length(TPA) < 500) then
   begin
     print('TRSTargetInfo.__findLock(): Didn' 't find enough colors, target info isn' 't open.', TDebug.WARNING);
     exit();
   end;
 
   ATPA := TPA.cluster(1);
-  ATPA.filterBetween(0, 400);
+  ATPA.filterBetween(0, 300);
   ATPA.sortBySize(true);
 
   if length(ATPA) then
     for i := 0 to high(ATPA) do
     begin
       box := ATPA[i].getBounds();
-
       if inRange(box.getHeight(), 28, 30) then
       begin
         b := [box.x1, box.y1, box.x1 + 15, box.y2 - 15];
-        if (countColorTolerance(2595536, b, 40) > 35) then
+        if (countColorTolerance(2669310, b, 40) > 35) then
           exit(true);
       end;
 
