@@ -162,10 +162,10 @@ Example:
 function TRSActionBar.__find(out height: integer): boolean;
 var
   i: Integer;
-  b, bar: TBox;
+  minimizeBox, bar: TBox;
   TPA: TPointArray;
   ATPA: T2DPointArray;
-  EoC: boolean;
+  EoC, correctHeight: boolean;
   barColor: TColorData := [2235669, 5, [2, [0.36, 1.29, 0.00]]];
 begin
   if barColor.gatherIn(TPA, getClientBounds()) then
@@ -174,38 +174,35 @@ begin
     ATPA.sortBySize(True);
     for i := 0 to high(ATPA) do
       if inRange(length(ATPA[i]), 2000, 25000) and inRange(ATPA[i].getBounds().getWidth(), 525, 535) then
-        begin
-          bar := ATPA[i].getBounds();
-          b := [bar.x2 - 10, bar.y1, bar.x2, bar.y1 + 10];
+      begin
+        bar := ATPA[i].getBounds();
 
-          EoC := (countColorTolerance(4499917, b, 80) > 10);
-          print('TRSActionBar.__find(): EoC = ' + toStr(EoC));
+        minimizeBox := [bar.x2 - 10, bar.y1, bar.x2, bar.y1 + 10];
+        EoC := (countColorTolerance(4499917, minimizeBox, 80) > 10);
+        print('TRSActionBar.__find(): EoC = ' + toStr(EoC));
 
-          height := bar.getHeight();
-          case bar.getHeight() of
-            37: result := true;
-            75: result := true;
+        height := bar.getHeight();
+        case bar.getHeight() of
+          37: correctHeight := true;
+          75: correctHeight := true;
           else
-          begin
             print('TRSActionBar.__find(): Actionbar needs updating! Tell a dev.', TDebug.ERROR);
-            exit(false);
-          end;
-          end;
+        end;
 
-          if result then
-          begin
+        if correctHeight then
+        begin
           self.setBounds(bar);
           print('TRSActionBar.__find(): bar height = ' + toStr(height));
-
           if (not self.setSlots) then
           begin
             __slots := grid(14, 1, 29, 29, 36, 0, point(self.x1 + 20, self.y1 + 56));
             self.setSlots := true;
           end;
-          end;
+          exit(true);
         end;
+      end;
   end;
-end;
+end; 
 {$ENDIF}
 
 {*
