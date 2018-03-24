@@ -175,7 +175,7 @@ begin
     parentID := -1;
     static := false;
     tabArea := [576, 292, 799, 599];
-    __tabSelectionArea := [581, 296, 796, 319];
+    __tabSelectionArea := [581, 296 + 12, 796, 319 + 12];
     isSetup := false;
 
     //high(navButtons[tab])is the actual button, the the next are the tab buttons when it's mouse-over'd
