@@ -368,7 +368,7 @@ begin
         begin
           ATPA2 := TPA.cluster(5);
 
-          if length(ATPA2) = 6 then // 6 green arrows
+          if length(ATPA2) = 4 then // 4 green arrows
           begin
             b.edit(-8, -562, 200, 7);
             self.setBounds(b);
