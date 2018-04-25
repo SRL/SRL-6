@@ -183,8 +183,8 @@ begin
 
         height := bar.getHeight();
         case bar.getHeight() of
-          37: correctHeight := true;
-          75: correctHeight := true;
+          37..38: correctHeight := true;
+          75..76: correctHeight := true;
           else
             print('TRSActionBar.__find(): Actionbar needs updating! Tell a dev.', TDebug.ERROR);
         end;
