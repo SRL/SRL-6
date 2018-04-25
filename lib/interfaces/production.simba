@@ -114,7 +114,8 @@ procedure __loadProductionScreen();
 begin
   with (productionScreen) do
   begin
-    __bmp := BitmapFromString(487, 6, 'meJztl2lv20YQhiOJEm/xkChTkiVTh135jI8YrVujCIIggJGiQJF+6Jf+/7/Rh3qVLSvDrpseNgoSLxazszOzs++enOThcpJO8jBLvNB3Gq9egavT+cd3l7/8+J0081EAPt1dj/pe22okgeN2moHbOpwEl/v9UWoBqiglD+J2GrSkkaWAvhi4lFnsjvsu7pQyQClfgB4z47UVh9abkxGOoedIT1/GdzEKTBByW+7GcpcvljgWg7YSBgiqSkhDB+U094/nPdyBMix7WTdJruaD/iE28tjaiTGwum7TtZu21QAIQhJYeWxTxoHdj+y9zKWUAcp+2BLQY2a8tuLQejzr4ejZHenpy/iOeq4Jsj+Oxlkgd/mWlpFNkhhIg6CqhK7XQTlInWLYxR0ow7KXdZPkaj7oJatHhZKlZIb2t9gY1Gy87LXRLkft2U2nvcbTdkp9blTZONvf+fnu5u72BNxeLN5/e/zmaBcg35zNvz7fD1yLQxs9JUc0VU5pyg9vr8yJTdMP704Gqcd0zHJfkcmKDGEJQVRraIZ2w1uVPdOKAFFEQDAc4g5IXsLWYBkmZGqM1dkxXkTIu2ViRBa+OdypdrGVhngGZu5Epkaxng5XvmjerAaaTUUmLEB4iI0kKPdF4rd8p8XqpTSC1jNC7G2UCHs73sE0QVArQp44gGNfgnHcGPh2kXeXQ++kSHZ7juID40WELGgiE1m4WParXWylAUaZB/AVyibfJgIGVOlFvmjOFj363cu7ikxYgKAkMaCKvXzVhZH/JTb2npuN4iWx8WxrI3XOlv3TWTobRZwVs6F/NEuPZo/tlPrcuM/Gqsh+en+FGVfkOLU4sa9PZ6Hb4kCmbLcarWZjd5jwtOZwTrqbx7bA6X0073FiT4ZJ5Jezo2QITkCTpBmLEQB56t6h5IrcumhkTLaH0xiB66+qF5CllxdBzMVqJpH8gUlDIGy1qphKOFgPGUdFNjayV4bqRUrZIzPpIlyDompc/pQN323NR9GqSF8vepT9yOEFIpgNxfE+zZyD3QiBR09VLyBLLy+CZFE7TyywuRo+s0FVSoGw1apisqGG6+2MvVMOwa72JXtlqF6klD3ywdhnIAKDompcsFFwE8cMxAyqZuN/zMZXY/+wSA/Lszq9WPb+0k6pzw3DxnKafXx7wXGdRw3MJpkL3E7raDkiMn80HavBif3p7vqg6HNK673tdho8s28vF5M8DF1rEP1+YuuHpTo64qhHpaoMdb9Ab/VyMWb6y9DtU6VFfMpAbFQ1pkcTTU26cwXS06+WYPi5PMj151KduOp6MHHM3MnMPAbuT9ZT2OClcb7sLcbRfBisJjGLGeE+G8PUQk8rT/Sns5E8wEYSbFrZWdk9NujoYn+HPaW+HmdjmPyBjc1PxOf4ydogCcweafPHbVq32EhKNsq9vBjH/zgbycNsmOGXbERt5bbFxvkT2CgHe29tGDaEYWVt0BdsPLo2qmxE/83aMMPX2ki+lI30ATa+eKfU50aVjZvXxd3tCZPOYxuspsn316vyLe3XX/29uC8Mw3pl1l/9bX3BemtkZ7/WqPHSwOJ89hxq1HiBYGv8BmeYn9w=');
+    //this is the fine border on the right side above text for object made details
+    __bmp := BitmapFromString(261, 2, 'meJztk2sKgzAQhKEiNIJCfIRWrfgAQfCn9z9bvzJmL9HAsGxmZ3azgVzneCUkJEQMXdGWWfA5cQ4Fx+Adsa9zsPYlPIAB28erCo9FXqsK8GhEktBERrniuJsnqdwjGh0yaYjH0pBMr9vyy99e41B21VO53YSGEtNQvIbCc4S0vViTqs21/pT2udbWeCF1h/Q+//A+/IUvwDy2NA==');
     setBitmapName(__bmp, 'SRL - ProductionScreen Mask');
     __isLoaded := true;
   end;
@@ -159,10 +160,6 @@ Example:
 *}
 {$IFNDEF CODEINSIGHT}
 function TRSProductionScreen.__find(): boolean;
-const
-  BORDER_COLOR = 11645361;
-  BUTTON_COLOR = 11238410;     //blue button color
-  BUTTON_COLOR_2 = 1447449;   //if no valid box selected it's this color
 var
   fx, fy: integer;
 begin
@@ -172,12 +169,13 @@ begin
     __loadProductionScreen();
 
   freeze();
-  // debugBitmap(self.__bmp);
+ // debugBitmap(self.__bmp);
   try
     if (findBitmapTolerance(self.__bmp, fx, fy, 43, colorSetting(1))) then
-      if (countColor(clWhite, TBox([fx + 270, fy + 20, fx + 450, fy + 40])) > 15) then  // look for white item text to verify
+      //offsets bmp to cover MAKE text and counts the black
+      if (countColor(clblack, TBox([fx + 215, fy + 265, fx + 262, fy + 283])) = 45) then  // look for white item text to verify
       begin
-        self.setBounds([fx - 8, fy - 28, fx + 495, fy + 297]);
+        self.setBounds([fx - 120, fy - 1, fx + 377, fy + 298]);
         result := true;
       end;
   finally
@@ -248,12 +246,11 @@ Example:
 *)
 function TRSProductionScreen.clickStart(space: boolean = true): boolean;
 var
-  b: TBox;
   timeOut: LongWord;
 begin
   result := false;
-
-  b := [self.x1 +252, self.y2 -30, self.x2 -29, self.y2 -3];
+  if (not self.isOpen()) then
+    exit();
 
   // try Space key first
   if space then
@@ -270,7 +267,7 @@ begin
   end;
 
   // click the button as a failsafe
-  mouseBox([self.x1 +252, self.y2 -30, self.x2 -29, self.y2 -3], MOUSE_MOVE);
+  mouseBox([self.x1 + 300, self.y2 - 30, self.x2 - 45, self.y2 - 14], MOUSE_MOVE);
 
   // this is a failsafe in case the productionscreen closes (from the space key) while moving the mouse
   if (self.isOpen()) then
