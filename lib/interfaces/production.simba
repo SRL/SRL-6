@@ -172,8 +172,8 @@ begin
  // debugBitmap(self.__bmp);
   try
     if (findBitmapTolerance(self.__bmp, fx, fy, 43, colorSetting(1))) then
-      //offsets bmp to cover MAKE text and counts the black
-      if (countColor(clblack, TBox([fx + 215, fy + 265, fx + 262, fy + 283])) = 45) then  // look for white item text to verify
+      //offsets bmp to cover Value text and counts the white
+      if (countColor(clwhite, TBox([fx + 115, fy + 62, fx + 160, fy + 80])) = 51) then  // look for white item text to verify
       begin
         self.setBounds([fx - 120, fy - 1, fx + 377, fy + 298]);
         result := true;
