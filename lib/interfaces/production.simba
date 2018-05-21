@@ -162,6 +162,7 @@ Example:
 function TRSProductionScreen.__find(): boolean;
 var
   fx, fy: integer;
+  CL_BROWN = 1388125;
 begin
   result := false;
 
@@ -172,8 +173,8 @@ begin
  // debugBitmap(self.__bmp);
   try
     if (findBitmapTolerance(self.__bmp, fx, fy, 43, colorSetting(1))) then
-      //offsets bmp to cover Value text and counts the white
-      if (countColor(clwhite, TBox([fx + 115, fy + 62, fx + 160, fy + 80])) = 51) then  // look for white item text to verify
+      //offsets bmp to cover brown box showing number of items to craft and counts the border
+      if (countColor(CL_BROWN, TBox([fx + 260, fy + 230, fx + 385, fy + 270])) = 108) then  // search brown txt
       begin
         self.setBounds([fx - 120, fy - 1, fx + 377, fy + 298]);
         result := true;
@@ -181,7 +182,7 @@ begin
   finally
     unFreeze();
   end;
-end;
+end
 {$ENDIF}
 
 (*
