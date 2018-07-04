@@ -118,12 +118,19 @@ __find
     function TRSConversationBox.__find(): boolean;
 
 Returns true if the conversationBox interface is detected and its bounds are set.
-Scripters should use conversationBox.isOpen() below.
+Scripters should use conversationBox.isOpen() below. Description of find method as
+follows:
+  TOP_COLOR = top silver circle
+  TOP_COLOR_2 = little brown bits top of box
+  MENU_LENGTH = top silver circle length
+  MENU_LENGTH_2 = length of brown bit
+  MENU_BORDER_COLOR = bottom of silver circle
+  MENU_BORDER_COLOR_2 = border of x box
 
 .. note::
 
     - by Ashaman88
-    - Last Updated: 27 February 2014 by Ashaman88
+    - Last Updated: 3 July 2018 by Ashaman88
 
 Example:
 
@@ -135,11 +142,12 @@ Example:
 {$IFNDEF CODEINSIGHT}
 function TRSConversationBox.__find(): boolean;
 const
-  TOP_COLOR = 4284025;
-  TOP_COLOR_2 = 3230309;
-  MENU_LENGTH = 87;
+  TOP_COLOR = 14802911;
+  TOP_COLOR_2 = 3625067;
+  MENU_LENGTH = 31;
   MENU_LENGTH_2 = 4;
-  MENU_BORDER_COLOR = 4481660;
+  MENU_BORDER_COLOR = 15000290;
+  MENU_BORDER_COLOR_2 = 6116419;
 var
   tpa, tpa2: TPointArray;
   atpa, atpa2: T2DPointArray;
@@ -148,13 +156,10 @@ var
 begin
   result := false;
 
-  if (not findColors(tpa, TOP_COLOR, getClientBounds())) then
+  if (not findColors(tpa, TOP_COLOR, getClientBounds())) and (not findColors(tpa2, TOP_COLOR_2, getClientBounds())) then
     exit();
 
-  if (not findColors(tpa2, TOP_COLOR_2, getClientBounds())) then
-    exit();
-
-  atpa := tpa.cluster(4, 2);
+  atpa := tpa.cluster(5);
   hh := high(atpa);
 
   for i := 0 to hh do
@@ -162,14 +167,14 @@ begin
     begin
       b := getTPABounds(atpa[i]);
 
-      if (getColor(b.x2, b.y1) = MENU_BORDER_COLOR) then
+      if (getColor(b.x1 + 15, b.y2 + 115) = MENU_BORDER_COLOR) then
       begin
-        self.setBounds([b.x2 - 505, b.y1 - 34, b.x2, b.y1 + 95]);
+        self.setBounds([b.x1 - 51, b.y1 - 9, b.x2 + 425, b.y2 + 121]);
         exit(true);
       end;
     end;
 
-  atpa2 := tpa2.cluster(5);
+  atpa2 := tpa2.cluster(10);
   hh := high(atpa2);
 
   for i := 0 to hh do
@@ -177,9 +182,9 @@ begin
     begin
       b := getTPABounds(atpa2[i]);
 
-      if (getColor(b.x2 + 1, b.y1 + 2) = MENU_BORDER_COLOR) then
+      if (getColor(b.x1 + 73, b.y2 - 11) = MENU_BORDER_COLOR_2) then
       begin
-        self.setBounds([b.x2 - 504, b.y1 - 32, b.x2 + 1, b.y1 + 97]);
+        self.setBounds([b.x1 - 411, b.y1 - 33, b.x2 + 86, b.y2 + 97]);
         exit(true);
       end;
     end;
