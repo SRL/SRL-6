@@ -211,11 +211,12 @@ getSkillBox
 
 Returns a TBox around the skill information. The **skill** is one of the skill
 constants found in `globals.simba <https://github.com/SRL/SRL-6/blob/master/lib/core/globals.simba>`_.
+will scroll up or down depending on if in multi-tab mode and the skill is visible
 
 .. note::
 
     - by Olly
-    - Last Updated: 14 September 2013 by Olly
+    - Last Updated: 12 July 2018 by Ashaman88
 
 Example:
 
@@ -229,15 +230,41 @@ Example:
     end;
 *)
 function TRSTabStats.getSkillBox(skill: integer): TBox;
+const
+  HEART_COLOR = 3289581;
 var
-  offSet: TPoint;
+  offSet, p: TPoint;
+  shift: integer;
 begin
   if gameTabs.areMultiOpen() then
-    offset := [0, 45]
-  else
-    offset := [15, 17];
+  begin
+    if (getColor(gameTabs.tabArea.x1 + 87, gameTabs.tabArea.y1 + 56) = HEART_COLOR) then
+    begin
+      if skill < 24 then
+        offset := [0, 57] else
+        begin
+          p := [gameTabs.tabArea.x2 - 11 + randomRange(-2, 2), gameTabs.tabArea.y2 - 56 + randomRange(-3, 3)];
+          mouse(p, MOUSE_LEFT);
+          wait(randomRange(600, 800));
+          offset := [0, 41];
+        end;
+    end else
+      if skill < 24 then
+      begin
+        p := [gameTabs.tabArea.x2 - 11 + randomRange(-2, 2), gameTabs.tabArea.y1 + 65 + randomRange(-3, 3)];
+        mouse(p, MOUSE_LEFT);
+        wait(randomRange(600, 800));
+        offset := [0, 57];
+      end else
+        offset := [0, 41];
+    shift := 66;
+  end else
+  begin
+    shift := 70;
+    offset := [4, 30];
+  end;
 
-  result := gridBox(skill, 3, 9, 58, 24, 65, 27, point(gameTabs.tabArea.x1 + 38 + offset.x, gameTabs.tabArea.y1 + offset.y));
+  result := gridBox(skill, 3, 9, 58, 24, shift, 27, point(gameTabs.tabArea.x1 + 38 + offset.x, gameTabs.tabArea.y1 + offset.y));
 end;
 
 (*
