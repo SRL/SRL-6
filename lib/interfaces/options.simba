@@ -69,7 +69,7 @@ Initializes the TRSOptions.
 .. note::
 
     - by Coh3n
-    - Last updated: 23 July 2013 by Coh3n
+    - Last updated: 10 July 2018
 
 Example:
 
@@ -85,8 +85,7 @@ begin
     name := 'RS Options Menu';
     ID := ID_INTERFACE_OPTIONS;
     parentID := -1;
-    static := true;
-    setBounds(IntToBox(300, 95, 499, 469));
+    static := false;
   end;
 end;
 {$ENDIF}
@@ -105,7 +104,7 @@ Scripters should use options.isOpen() below.
 .. note::
 
     - by Coh3n
-    - Last Updated: 23 July 2013 by Coh3n
+    - Last Updated: 10 July 2018 by Ashaman88
 
 Example:
 
@@ -115,12 +114,36 @@ Example:
       writeln('The options interface is open, and the bounds are set!');
 *}
 {$IFNDEF CODEINSIGHT}
-function TRSOptions.__find(): Boolean;
+function TRSOptions.__find(): boolean;
+const
+  GOLD_COLOR = 379903; //optionsmenu
+  TEXT_LENGTH = 135;    //length of options menu
+  SPLIT_LINE = 6247745;   //grey line split down the middle
 var
+  tpa: TPointArray;
+  atpa: T2DPointArray;
+  i, hh: integer;
   b: TBox;
 begin
-  b := IntToBox(Self.X1, Self.Y1, Self.X2, Self.Y1 + 30);
-  Result := (CountColorTolerance(631756, b, 70, ColorSetting(1)) > 300);
+  result := false;
+
+  if (not findColors(tpa, GOLD_COLOR, getClientBounds())) then
+    exit();
+
+  atpa := tpa.cluster(10);
+  hh := high(atpa);
+
+  for i := 0 to hh do
+    if (length(atpa[i]) = TEXT_LENGTH) then
+    begin
+      b := getTPABounds(atpa[i]);
+
+      if (getColor(b.x2 - 52, b.y1 + 113) = SPLIT_LINE) then
+      begin
+        self.setBounds([b.x1 - 178, b.y1 - 10, b.x2 + 179, b.y2 + 210]);
+        exit(true);
+      end;
+    end;
 end;
 {$ENDIF}
 
