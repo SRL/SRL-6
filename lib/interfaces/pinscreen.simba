@@ -313,7 +313,7 @@ it will pass the button bounds as the TBox **b** .
 .. note::
 
     - by Olly
-    - Last Updated: 22 September 2013 by Olly
+    - Last Updated: 23 July 2018 by Ashaman88
 
 Example:
 
@@ -325,9 +325,9 @@ Example:
 function TRSPinScreen.__findNumber(number: char; out b: TBox): boolean;
 var
   numberSlots: TBoxArray;
-  area: TBox;
   i: integer;
   p: TPoint;
+  filter: TTesseractFilter = [5, 5, [False, 10, TM_MinMax]];
 begin
   result := false;
 
@@ -337,20 +337,19 @@ begin
     exit();
   end;
 
-  numberSlots := grid(4, 3, 57, 57, 90,72, point(self.x + 64, self.y + 135));
-  area := [self.x + 30, self.y + 100, self.x + 370, self.y + self.h - 20];
+  numberSlots := grid(4, 3, 60, 60, 90, 72, point(self.x + 65, self.y + 133));
 
   // delete the two extra boxes created by grid().
   numberSlots.deleteIndex(7);
   numberSlots.deleteIndex(10);
 
-  if (findText(p, [toStr(number)], [UpCharsEx], area)) then
-    for i := 0 to high(numberSlots) do
-      if (pointInBox(p, numberSlots[i])) then
-      begin
-        b := numberSlots[i];
-        exit(true);
-      end;
+  for i := 0 to high(numberSlots) do
+    if (tesseract_GetText(numberSlots[i], filter, TESS_WHITELIST_NUMBERS) = toStr(number)) then
+    begin
+      b := numberSlots[i];
+      exit(true);
+    end;
+
 
   // if we dont find the text in any of the boxes, our mouse must be covering it.
   getMousePos(p.x, p.y);
