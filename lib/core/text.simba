@@ -886,7 +886,7 @@ Example:
 
     if isUpText('Banker') then writeLn('Found the bank!');
 *)
-function isUpText(txt: string; waitTime: integer = 100): boolean;
+function isUpText(txt: string; waitTime: integer = 150): boolean;
 var
   t: TCountDown;
 begin
@@ -923,18 +923,20 @@ Example:
 
     if isUpText(['Bank', 'Banker', 'Booth']) then writeLn('Found the bank!');
 *)
-function isUpText(txt: TStringArray; waitTime: integer = 100): boolean; overload;
+function isUpText(txt: TStringArray; waitTime: integer = 150): boolean; overload;
 var
   i: integer;
   t: TCountDown;
+  s: string;
 begin
   t.setTime(waitTime);
 
   repeat
+    s := getUpText();
     for i := 0 to high(txt) do
-      if (pos(txt[i], getUpText()) > 0) then
+      if (pos(txt[i], s) > 0) then
         exit(true);
-    wait(randomRange(10, 30));
+    wait(randomRange(10, 40));
   until t.isFinished();
 end; 
 
