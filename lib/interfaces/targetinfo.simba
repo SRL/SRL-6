@@ -213,7 +213,7 @@ begin
     for i := 0 to high(ATPA) do
     begin
       box := ATPA[i].getBounds();
-      if inRange(box.getHeight(), 28, 30) then
+      if inRange(box.getHeight(), 28, 33) then
       begin
         b := [box.x1, box.y1, box.x1 + 15, box.y2 - 15];
         if (countColorTolerance(2669310, b, 40) > 35) then
