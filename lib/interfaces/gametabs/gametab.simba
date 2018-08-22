@@ -240,7 +240,7 @@ begin
   begin
     _bmp := bitmapFromString(10, 2, 'meJzjktQQlLJTdu4AIgHJICCbi1lZwsjLJnuiqGIBkAtBSq5ZQARUAyRB6lOqgIoBZmsMmA==');
     _navBarId := NAV_BUTTON_HERO;
-    _navBarBoxIndex := 1;
+    _navBarBoxIndex := 3;
   end;
 
   with self.tabs[TAB_EQUIPMENT] do
