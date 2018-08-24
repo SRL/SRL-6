@@ -990,9 +990,9 @@ var
 begin
   result := false;
 
-  if (not tabBackpack.isOpen()) then
+  if (not tabBackpack.open()) then
   begin
-    print('findTicket(): Backpack is not open, consider calling tabBackpack.open() first', TDebug.HINT);
+    print('findTicket(): Backpack could not be opened', TDebug.HINT);
     exit();
   end;
 
